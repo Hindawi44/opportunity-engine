@@ -10,16 +10,22 @@ def write_evaluation_report(
     opportunities: Iterable[Opportunity],
     output_path: str | Path,
 ) -> Path:
-    """Evaluate opportunities and save a CSV report."""
+    """Evaluate auction opportunities and save a CSV report."""
     target = Path(output_path)
     target.parent.mkdir(parents=True, exist_ok=True)
 
     columns = [
         "title",
+        "auction_url",
+        "purchase_price",
+        "vat_cost",
+        "extra_costs",
         "total_cost",
+        "expected_resale_value",
         "expected_profit",
         "return_percent",
         "maximum_bid",
+        "risk_score",
         "classification",
         "reason",
     ]
@@ -33,10 +39,16 @@ def write_evaluation_report(
             writer.writerow(
                 {
                     "title": item.title,
+                    "auction_url": item.auction_url,
+                    "purchase_price": item.purchase_price,
+                    "vat_cost": result.vat_cost,
+                    "extra_costs": result.extra_costs,
                     "total_cost": result.total_cost,
+                    "expected_resale_value": item.expected_resale_value,
                     "expected_profit": result.expected_profit,
                     "return_percent": result.return_percent,
                     "maximum_bid": result.maximum_bid,
+                    "risk_score": item.risk_score,
                     "classification": result.classification,
                     "reason": result.reason,
                 }
