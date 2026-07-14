@@ -1,0 +1,8 @@
+{
+  "currency": "NOK",
+  "target_margin": 0.3,
+  "default_risk_score": 3,
+  "vat_rate": 0.25,
+  "strong_opportunity_min_return_percent": 35,
+  "maximum_risk_for_strong_opportunity": 2
+}
