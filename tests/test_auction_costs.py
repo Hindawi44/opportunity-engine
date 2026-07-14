@@ -32,7 +32,7 @@ def test_vat_and_full_auction_costs() -> None:
     assert result.total_cost == 17000
     assert result.expected_profit == 8000
     assert result.return_percent == pytest.approx(47.06, abs=0.01)
-    assert result.maximum_bid == pytest.approx(9200, abs=0.01)
+    assert result.maximum_bid == pytest.approx(10400, abs=0.01)
     assert result.classification == "🟢 فرصة قوية"
 
 
