@@ -11,6 +11,7 @@ from .models import (
     Status,
 )
 from .plugins import ODSPlugin, PluginRegistry
+from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
@@ -21,8 +22,11 @@ __all__ = [
     "ODSRequest",
     "ODSSession",
     "OpportunityCandidate",
+    "OpportunityRankingPlugin",
     "OpportunitySeed",
     "PluginRegistry",
+    "RankedOpportunity",
+    "RankingWeights",
     "Scanner",
     "Stage",
     "StageResult",
