@@ -13,9 +13,11 @@ import streamlit as st
 
 from opportunity_engine.ods import (
     BrregClient,
+    ExecutiveWorkflowInputs,
     FinancialInputs,
     SSBMarketEvidenceService,
     SSBTrendIntelligenceService,
+    build_decision_from_analysis,
     build_financial_report,
     calculate_opportunity_confidence,
     calculate_ssb_adjustment,
@@ -27,7 +29,7 @@ from opportunity_engine.ods import (
 
 st.set_page_config(page_title="ODS — Opportunity Development System", page_icon="🔎", layout="wide")
 st.title("🔎 ODS — Opportunity Development System")
-st.caption("نسخة Alpha: اكتشاف الفرص، دمج الأدلة الرسمية، تحليل الثقة، الذاكرة، والنموذج المالي.")
+st.caption("نسخة Alpha: اكتشاف الفرص، دمج الأدلة الرسمية، تحليل الثقة، الذاكرة، النموذج المالي، والقرار التنفيذي.")
 
 with st.form("ods-analysis-form"):
     subject = st.text_input("القطاع أو المجال", value="أزياء")
@@ -38,7 +40,7 @@ with st.form("ods-analysis-form"):
     submitted = st.form_submit_button("ابدأ التحليل", type="primary")
 
 if submitted:
-    with st.spinner("ODS يعمل الآن: Discovery → Ranking → Evidence → Confidence → Memory → Financial → BDNA → Validation"):
+    with st.spinner("ODS يعمل الآن: Discovery → Ranking → Evidence → Confidence → Memory → Financial → Executive Decision → BDNA → Validation"):
         try:
             result = run_ods(subject, country=country, shortlist_size=shortlist_size)
         except (ValueError, RuntimeError) as exc:
@@ -178,6 +180,7 @@ if submitted:
 
             st.subheader("Financial Intelligence — النموذج المالي الافتراضي")
             st.caption("أدخل افتراضاتك أنت. النظام لا يخترع الإيرادات أو التكاليف، والنتائج ليست توقع ربح.")
+            financial = None
             with st.expander("إدخال الافتراضات المالية", expanded=True):
                 f1, f2, f3 = st.columns(3)
                 startup_cost = f1.number_input("تكلفة البداية (NOK)", min_value=0.0, value=100000.0, step=10000.0)
@@ -214,6 +217,51 @@ if submitted:
                     st.dataframe(pd.DataFrame(scenario_rows), use_container_width=True, hide_index=True)
                     for warning in financial.warnings:
                         st.warning(warning)
+
+            executive = build_decision_from_analysis(
+                ExecutiveWorkflowInputs(
+                    analysis=result,
+                    financial_report=financial,
+                    evidence_quality=evidence.evidence_score if evidence else None,
+                    market_health=trend.market_health_score if trend else None,
+                    trend_confidence=trend.confidence if trend else None,
+                    brreg=brreg_summary,
+                )
+            )
+            st.subheader("🏛️ Executive Decision — القرار التنفيذي")
+            decision_col, score_col = st.columns(2)
+            decision_col.metric("Decision", executive.decision.value)
+            score_col.metric("Executive Score", f"{executive.score:.1f}/100")
+            st.dataframe(
+                pd.DataFrame(executive.component_scores, columns=["المكوّن", "الدرجة"]),
+                use_container_width=True,
+                hide_index=True,
+            )
+            st.markdown("**لماذا صدر هذا القرار؟**")
+            for reason in executive.reasons:
+                st.write(f"• {reason}")
+            if executive.blockers:
+                st.markdown("**العوائق قبل الالتزام برأس المال**")
+                for blocker in executive.blockers:
+                    st.warning(blocker)
+            if executive.missing_evidence:
+                st.markdown("**الأدلة الناقصة**")
+                for missing_item in executive.missing_evidence:
+                    st.write(f"• {missing_item}")
+            plan_7, plan_30, plan_90 = st.columns(3)
+            with plan_7:
+                st.markdown("### أول 7 أيام")
+                for action in executive.first_7_days:
+                    st.write(f"• {action}")
+            with plan_30:
+                st.markdown("### أول 30 يومًا")
+                for action in executive.first_30_days:
+                    st.write(f"• {action}")
+            with plan_90:
+                st.markdown("### أول 90 يومًا")
+                for action in executive.first_90_days:
+                    st.write(f"• {action}")
+            st.caption("القرار أداة فرز وتحكم بالمخاطر، وليس ضمان ربح أو نصيحة استثمارية.")
 
             st.subheader("Business Blueprint — الفرصة الأولى")
             st.markdown(f"### {blueprint.opportunity.title}")
