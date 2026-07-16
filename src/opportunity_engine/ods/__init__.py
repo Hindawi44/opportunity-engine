@@ -26,6 +26,11 @@ from .finn import (
     FinnConnector,
     parse_finn_atom_feed,
 )
+from .live_brreg_pipeline import (
+    BrregStatusOpportunityExtractor,
+    LiveBrregAnalysis,
+    run_live_brreg_analysis,
+)
 from .live_data import (
     DEFAULT_EXTRACTION_RULES,
     DataConnector,
@@ -74,15 +79,15 @@ from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
     "BDNAPlugin", "BRREG_API_BASE", "BRREG_ENTITY_MEDIA_TYPE", "BrregClient",
-    "BrregConnector", "BrregEvidenceSummary", "BusinessBlueprint",
-    "ConnectorRegistry", "ConnectorScanStatus", "CuratedDiscoveryPlugin",
-    "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW", "DataConnector",
-    "DecisionInputs", "EvidenceAdjustment", "ExecutiveDecision",
+    "BrregConnector", "BrregEvidenceSummary", "BrregStatusOpportunityExtractor",
+    "BusinessBlueprint", "ConnectorRegistry", "ConnectorScanStatus",
+    "CuratedDiscoveryPlugin", "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW",
+    "DataConnector", "DecisionInputs", "EvidenceAdjustment", "ExecutiveDecision",
     "ExecutiveDecisionReport", "ExecutiveWorkflowInputs", "ExtractionRule",
     "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin",
     "FinancialInputs", "FinancialReport", "FinancialScenario", "FinnApiClient",
-    "FinnConnector", "LiveDataPipeline", "LiveDataResult", "MemoryRunResult",
-    "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
+    "FinnConnector", "LiveBrregAnalysis", "LiveDataPipeline", "LiveDataResult",
+    "MemoryRunResult", "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
     "OpportunityCandidate", "OpportunityChange", "OpportunityChangeType",
     "OpportunityConfidence", "OpportunityExtractor", "OpportunityMemoryEngine",
     "OpportunityMemoryRecord", "OpportunityRankingPlugin", "OpportunitySeed",
@@ -96,6 +101,6 @@ __all__ = [
     "analyze_series", "build_alpha_engine", "build_decision_from_analysis",
     "build_executive_decision", "build_financial_report",
     "calculate_opportunity_confidence", "calculate_ssb_adjustment",
-    "calculate_trend_adjustment", "parse_finn_atom_feed", "run_ods",
-    "summarize_brreg_entities", "track_workflow_opportunities",
+    "calculate_trend_adjustment", "parse_finn_atom_feed", "run_live_brreg_analysis",
+    "run_ods", "summarize_brreg_entities", "track_workflow_opportunities",
 ]
