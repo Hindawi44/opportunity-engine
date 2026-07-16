@@ -1,9 +1,4 @@
-"""Public runner for the first usable ODS alpha flow.
-
-The runner wires together only the stages that are implemented today:
-discovery, ranking, and BDNA. It provides one stable entry point for user
-interfaces and future APIs without exposing plugin orchestration details.
-"""
+"""Public runner for the usable ODS alpha flow."""
 
 from __future__ import annotations
 
@@ -14,6 +9,7 @@ from .discovery import FashionDiscoveryPlugin
 from .models import ODSRequest, ODSSession, Stage, Status
 from .plugins import PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity
+from .validation import ValidationPlugin, ValidationReport
 from .workflow import WorkflowEngine
 
 
@@ -21,6 +17,7 @@ USABLE_ALPHA_WORKFLOW: tuple[Stage, ...] = (
     Stage.DISCOVERY,
     Stage.RANKING,
     Stage.BDNA,
+    Stage.VALIDATION,
 )
 
 
@@ -31,6 +28,7 @@ class ODSAnalysisResult:
     session: ODSSession
     ranked_opportunities: tuple[RankedOpportunity, ...]
     blueprint: BusinessBlueprint
+    validation: ValidationReport
 
     @property
     def discovered_count(self) -> int:
@@ -43,11 +41,7 @@ def build_alpha_engine(
     shortlist_size: int = 5,
     minimum_score: float = 0.0,
 ) -> WorkflowEngine:
-    """Build the currently supported ODS engine.
-
-    Fashion remains the only user-facing reference sector in this alpha.
-    Additional sector discovery plugins can be registered in later releases.
-    """
+    """Build the currently supported ODS engine."""
 
     registry = PluginRegistry(
         (
@@ -57,6 +51,7 @@ def build_alpha_engine(
                 minimum_score=minimum_score,
             ),
             BDNAPlugin(),
+            ValidationPlugin(),
         )
     )
     return WorkflowEngine(registry, workflow=USABLE_ALPHA_WORKFLOW)
@@ -70,11 +65,7 @@ def run_ods(
     shortlist_size: int = 5,
     minimum_score: float = 0.0,
 ) -> ODSAnalysisResult:
-    """Run Discovery → Ranking → BDNA and return a validated result.
-
-    Raises:
-        RuntimeError: if any workflow stage fails or returns an invalid payload.
-    """
+    """Run Discovery → Ranking → BDNA → Validation."""
 
     request = ODSRequest(
         subject=subject,
@@ -93,6 +84,7 @@ def run_ods(
 
     ranking_payload = session.results[Stage.RANKING].payload
     blueprint_payload = session.results[Stage.BDNA].payload
+    validation_payload = session.results[Stage.VALIDATION].payload
     if not isinstance(ranking_payload, tuple) or not all(
         isinstance(item, RankedOpportunity) for item in ranking_payload
     ):
@@ -101,11 +93,14 @@ def run_ods(
         raise RuntimeError("ODS ranking stage returned an empty shortlist")
     if not isinstance(blueprint_payload, BusinessBlueprint):
         raise RuntimeError("ODS BDNA stage returned an invalid payload")
+    if not isinstance(validation_payload, ValidationReport):
+        raise RuntimeError("ODS validation stage returned an invalid payload")
 
     return ODSAnalysisResult(
         session=session,
         ranked_opportunities=ranking_payload,
         blueprint=blueprint_payload,
+        validation=validation_payload,
     )
 
 
