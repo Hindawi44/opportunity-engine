@@ -22,11 +22,12 @@ from opportunity_engine.ods import (
     calculate_trend_adjustment,
     run_ods,
     summarize_brreg_entities,
+    track_workflow_opportunities,
 )
 
 st.set_page_config(page_title="ODS — Opportunity Development System", page_icon="🔎", layout="wide")
 st.title("🔎 ODS — Opportunity Development System")
-st.caption("نسخة Alpha: اكتشاف الفرص، دمج الأدلة الرسمية، تحليل الثقة، وبناء نموذج مالي افتراضي شفاف.")
+st.caption("نسخة Alpha: اكتشاف الفرص، دمج الأدلة الرسمية، تحليل الثقة، الذاكرة، والنموذج المالي.")
 
 with st.form("ods-analysis-form"):
     subject = st.text_input("القطاع أو المجال", value="أزياء")
@@ -37,7 +38,7 @@ with st.form("ods-analysis-form"):
     submitted = st.form_submit_button("ابدأ التحليل", type="primary")
 
 if submitted:
-    with st.spinner("ODS يعمل الآن: Discovery → Ranking → Evidence → Confidence → Financial → BDNA → Validation"):
+    with st.spinner("ODS يعمل الآن: Discovery → Ranking → Evidence → Confidence → Memory → Financial → BDNA → Validation"):
         try:
             result = run_ods(subject, country=country, shortlist_size=shortlist_size)
         except (ValueError, RuntimeError) as exc:
@@ -126,6 +127,35 @@ if submitted:
             for index, row in enumerate(rows, start=1):
                 row["الترتيب النهائي"] = index
             st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+            st.subheader("Opportunity Memory — ذاكرة الفرص")
+            memory_path = ROOT / "data" / "opportunity_history.json"
+            try:
+                memory = track_workflow_opportunities(
+                    (item.opportunity for item in result.ranked_opportunities),
+                    storage_path=memory_path,
+                    country=country,
+                )
+            except (OSError, RuntimeError, ValueError) as exc:
+                st.warning(f"تعذر تحديث ذاكرة الفرص في هذا التشغيل: {exc}")
+            else:
+                mem_a, mem_b, mem_c, mem_d = st.columns(4)
+                mem_a.metric("NEW", memory.new_count)
+                mem_b.metric("UPDATED", memory.updated_count)
+                mem_c.metric("UNCHANGED", memory.unchanged_count)
+                mem_d.metric("REMOVED", memory.removed_count)
+                history_rows = [{
+                    "الفرصة": record.title,
+                    "الفئة": record.category,
+                    "أول ظهور": record.first_seen,
+                    "آخر ظهور": record.last_seen,
+                    "مرات الظهور": record.times_seen,
+                    "الثقة": round(record.confidence * 100, 1),
+                    "نشطة": record.active,
+                } for record in sorted(memory.records, key=lambda item: item.last_seen, reverse=True)[:30]]
+                if history_rows:
+                    st.dataframe(pd.DataFrame(history_rows), use_container_width=True, hide_index=True)
+                st.caption("التخزين الحالي JSON محلي. على الاستضافة السحابية قد لا يكون دائمًا بين عمليات إعادة تشغيل الخادم.")
 
             blueprint = result.blueprint
             top_confidence = confidence_by_id[blueprint.opportunity.opportunity_id]
