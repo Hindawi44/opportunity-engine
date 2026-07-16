@@ -25,6 +25,12 @@ from .plugins import ODSPlugin, PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
 from .runner import ODSAnalysisResult, USABLE_ALPHA_WORKFLOW, build_alpha_engine, run_ods
 from .ssb import SSB_API_BASE, SSBClient, SSBConnector
+from .ssb_market import (
+    SSB_RETAIL_TABLE_ID,
+    SSB_RETAIL_TABLE_URL,
+    SSBMarketEvidence,
+    SSBMarketEvidenceService,
+)
 from .validation import ValidationExperiment, ValidationPlugin, ValidationReport
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
@@ -51,8 +57,12 @@ __all__ = [
     "RankedOpportunity",
     "RankingWeights",
     "SSB_API_BASE",
+    "SSB_RETAIL_TABLE_ID",
+    "SSB_RETAIL_TABLE_URL",
     "SSBClient",
     "SSBConnector",
+    "SSBMarketEvidence",
+    "SSBMarketEvidenceService",
     "Scanner",
     "SourceDocument",
     "Stage",
