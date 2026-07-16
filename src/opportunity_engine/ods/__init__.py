@@ -1,5 +1,6 @@
 """Opportunity Development System core package."""
 
+from .bdna import BDNAPlugin, BusinessBlueprint
 from .discovery import FashionDiscoveryPlugin
 from .discovery_framework import CuratedDiscoveryPlugin, OpportunitySeed, Scanner
 from .models import (
@@ -15,6 +16,8 @@ from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
+    "BDNAPlugin",
+    "BusinessBlueprint",
     "CuratedDiscoveryPlugin",
     "DEFAULT_WORKFLOW",
     "FashionDiscoveryPlugin",
