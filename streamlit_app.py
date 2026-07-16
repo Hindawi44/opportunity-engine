@@ -1,7 +1,6 @@
 """User-facing Streamlit interface for ODS alpha."""
 
 from __future__ import annotations
-
 from pathlib import Path
 import sys
 
@@ -14,26 +13,30 @@ import pandas as pd
 import streamlit as st
 
 from opportunity_engine.ods import (
+    BrregClient,
     SSBMarketEvidenceService,
     SSBTrendIntelligenceService,
+    calculate_opportunity_confidence,
     calculate_ssb_adjustment,
     calculate_trend_adjustment,
     run_ods,
+    summarize_brreg_entities,
 )
 
 st.set_page_config(page_title="ODS — Opportunity Development System", page_icon="🔎", layout="wide")
 st.title("🔎 ODS — Opportunity Development System")
-st.caption("نسخة Alpha: اكتشاف الفرص، ترتيبها، بناء Business Blueprint، وخطة تحقق عملية.")
+st.caption("نسخة Alpha: اكتشاف الفرص، ترتيبها، دمج الأدلة الرسمية، بناء Business Blueprint، وخطة تحقق عملية.")
 
 with st.form("ods-analysis-form"):
     subject = st.text_input("القطاع أو المجال", value="أزياء")
     country = st.text_input("الدولة", value="Norway")
     shortlist_size = st.slider("عدد الفرص النهائية", min_value=1, max_value=10, value=5)
     include_ssb = st.checkbox("إضافة دليل واتجاه سوق حي من SSB", value=True)
+    include_brreg = st.checkbox("إضافة دليل هيكل الشركات من Brreg", value=True)
     submitted = st.form_submit_button("ابدأ التحليل", type="primary")
 
 if submitted:
-    with st.spinner("ODS يعمل الآن: Discovery → Ranking → BDNA → Validation"):
+    with st.spinner("ODS يعمل الآن: Discovery → Ranking → Evidence → Confidence → BDNA → Validation"):
         try:
             result = run_ods(subject, country=country, shortlist_size=shortlist_size)
         except (ValueError, RuntimeError) as exc:
@@ -42,46 +45,47 @@ if submitted:
             st.success(f"اكتشف النظام {result.discovered_count} فرص، ثم اختار أفضل {len(result.ranked_opportunities)}.")
             evidence = None
             trend = None
+            brreg_summary = None
+
             if include_ssb:
                 st.subheader("Live Intelligence from SSB — ذكاء السوق الرسمي")
                 try:
                     evidence = SSBMarketEvidenceService().load_retail_evidence()
+                    trend = SSBTrendIntelligenceService().load_retail_trend()
                 except (ValueError, RuntimeError) as exc:
-                    st.warning(f"تعذر تحميل دليل SSB الآن، واستمر التحليل الداخلي دون توقف: {exc}")
+                    st.warning(f"تعذر تحميل أو تحليل SSB الآن، واستمر التحليل الداخلي: {exc}")
                 else:
                     st.markdown(f"### {evidence.title}")
                     col_a, col_b, col_c = st.columns(3)
                     col_a.metric("Evidence Score", f"{evidence.evidence_score:.0f}/100")
-                    col_b.metric("آخر فترة", evidence.last_period or "غير محدد")
-                    col_c.metric("عدد القيم", evidence.value_count)
-                    st.write(f"**الفترة المتاحة:** {evidence.first_period or '?'} → {evidence.last_period or '?'}")
-                    if evidence.variables:
-                        st.write("**المتغيرات:** " + "، ".join(evidence.variables))
-                    for line in evidence.interpretation:
+                    col_b.metric("Market Health", f"{trend.market_health_score:.0f}/100")
+                    col_c.metric("الاتجاه", trend.direction)
+                    latest_text = "غير متاح" if trend.latest_change_pct is None else f"{trend.latest_change_pct:+.2f}%"
+                    st.write(f"**آخر تغير:** {latest_text}")
+                    for line in trend.explanation:
                         st.write(f"• {line}")
                     st.link_button("فتح جدول SSB الرسمي", evidence.source_url)
 
+            if include_brreg:
+                st.subheader("Business Structure from Brreg — هيكل الشركات الرسمي")
+                brreg_query = "klær" if subject.strip().lower() in {"أزياء", "ازياء", "fashion", "apparel"} else subject
                 try:
-                    trend = SSBTrendIntelligenceService().load_retail_trend()
+                    entities = BrregClient().search_entities(name=brreg_query, page_size=20)
+                    brreg_summary = summarize_brreg_entities(entities)
                 except (ValueError, RuntimeError) as exc:
-                    st.warning(f"تعذر استخراج اتجاه SSB الآن: {exc}")
+                    st.warning(f"تعذر تحميل Brreg الآن، واستمر التحليل دون توقف: {exc}")
                 else:
-                    st.markdown("#### SSB Trend Intelligence — تحليل الاتجاه")
                     col_d, col_e, col_f = st.columns(3)
-                    col_d.metric("Market Health", f"{trend.market_health_score:.0f}/100")
-                    col_e.metric("الاتجاه", trend.direction)
-                    latest_text = "غير متاح" if trend.latest_change_pct is None else f"{trend.latest_change_pct:+.2f}%"
-                    col_f.metric("آخر تغير", latest_text)
-                    if trend.cagr_pct is not None:
-                        st.write(f"**النمو السنوي المركب التقريبي:** {trend.cagr_pct:+.2f}%")
-                    if trend.periods:
-                        st.write(f"**السلسلة المستخدمة:** {trend.periods[0]} → {trend.periods[-1]} ({len(trend.periods)} فترات)")
-                    for line in trend.explanation:
-                        st.write(f"• {line}")
-                    st.caption("التحليل وصفي ومحافظ؛ لا يمثل توقع ربح أو ضمانًا لاتجاه المستقبل.")
+                    col_d.metric("السجلات المسترجعة", brreg_summary.entity_count)
+                    col_e.metric("إفلاس/تصفية", brreg_summary.bankrupt_count + brreg_summary.liquidation_count)
+                    col_f.metric("Brreg Evidence", f"{brreg_summary.evidence_score:.0f}/100")
+                    if brreg_summary.municipalities:
+                        st.write("**البلديات الظاهرة في العينة:** " + "، ".join(brreg_summary.municipalities))
+                    st.caption("هذه عينة بحث محدودة وليست تعدادًا كاملًا للسوق.")
 
-            st.subheader("الفرص المرتبة")
+            st.subheader("الفرص المرتبة ودرجة الثقة")
             rows = []
+            confidence_by_id = {}
             for item in result.ranked_opportunities:
                 evidence_adjustment = None
                 trend_adjustment = None
@@ -99,25 +103,54 @@ if submitted:
                         category=item.opportunity.category,
                         signal=trend,
                     )
-                final_score = trend_adjustment.final_score if trend_adjustment else score_after_evidence
+                supported_score = trend_adjustment.final_score if trend_adjustment else score_after_evidence
+                confidence = calculate_opportunity_confidence(
+                    internal_score=supported_score,
+                    candidate_confidence=item.opportunity.confidence,
+                    validation_readiness=result.validation.readiness_score,
+                    ssb_evidence_score=evidence.evidence_score if evidence else None,
+                    market_health_score=trend.market_health_score if trend else None,
+                    trend_confidence=trend.confidence if trend else None,
+                    brreg=brreg_summary,
+                )
+                confidence_by_id[item.opportunity.opportunity_id] = confidence
                 rows.append({
                     "الترتيب الداخلي": item.rank,
                     "الفرصة": item.opportunity.title,
                     "الفئة": item.opportunity.category,
                     "الدرجة الأساسية": item.final_score,
-                    "جودة دليل SSB": evidence_adjustment.adjustment if evidence_adjustment else 0.0,
-                    "تعديل الاتجاه": trend_adjustment.adjustment if trend_adjustment else 0.0,
-                    "الدرجة النهائية المدعومة": final_score,
-                    "الثقة": round(item.opportunity.confidence * 100, 1),
+                    "الدرجة المدعومة": supported_score,
+                    "الثقة النهائية": confidence.final_score,
+                    "القرار": confidence.decision_band,
                 })
-            rows.sort(key=lambda row: (-row["الدرجة النهائية المدعومة"], row["الترتيب الداخلي"]))
+            rows.sort(key=lambda row: (-row["الثقة النهائية"], row["الترتيب الداخلي"]))
             for index, row in enumerate(rows, start=1):
-                row["الترتيب بالدليل"] = index
+                row["الترتيب النهائي"] = index
             st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-            if evidence is not None or trend is not None:
-                st.caption("تعديلات SSB محدودة وشفافة. Business Blueprint أدناه ما زال مبنيًا على الترتيب الداخلي الأصلي حتى تُدمج البيانات الحية داخل Workflow نفسه.")
+            st.caption("درجة الثقة تجمع إشارات مستقلة، وتعيد توزيع الأوزان عند غياب مصدر بدل اعتبار الغياب دليلًا سلبيًا.")
 
             blueprint = result.blueprint
+            top_confidence = confidence_by_id[blueprint.opportunity.opportunity_id]
+            st.subheader("Opportunity Confidence — تفسير القرار")
+            col_g, col_h = st.columns(2)
+            col_g.metric("Final Confidence", f"{top_confidence.final_score:.1f}/100")
+            col_h.metric("Decision Band", top_confidence.decision_band)
+            if top_confidence.strengths:
+                st.markdown("**نقاط القوة**")
+                for value in top_confidence.strengths:
+                    st.write(f"• {value}")
+            if top_confidence.weaknesses:
+                st.markdown("**نقاط الضعف**")
+                for value in top_confidence.weaknesses:
+                    st.write(f"• {value}")
+            if top_confidence.missing_evidence:
+                st.markdown("**الأدلة الناقصة**")
+                for value in top_confidence.missing_evidence:
+                    st.write(f"• {value}")
+            with st.expander("مكونات درجة الثقة"):
+                for name, score in top_confidence.component_scores:
+                    st.write(f"• {name}: {score:.1f}/100")
+
             st.subheader("Business Blueprint — الفرصة الأولى")
             st.markdown(f"### {blueprint.opportunity.title}")
             st.write(blueprint.opportunity.description)
