@@ -24,6 +24,7 @@ from .models import (
 from .plugins import ODSPlugin, PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
 from .runner import ODSAnalysisResult, USABLE_ALPHA_WORKFLOW, build_alpha_engine, run_ods
+from .ssb import SSB_API_BASE, SSBClient, SSBConnector
 from .validation import ValidationExperiment, ValidationPlugin, ValidationReport
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
@@ -49,6 +50,9 @@ __all__ = [
     "PluginRegistry",
     "RankedOpportunity",
     "RankingWeights",
+    "SSB_API_BASE",
+    "SSBClient",
+    "SSBConnector",
     "Scanner",
     "SourceDocument",
     "Stage",
