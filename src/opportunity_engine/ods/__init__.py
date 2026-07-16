@@ -54,6 +54,7 @@ from .ssb_trends import (
     analyze_series,
     calculate_trend_adjustment,
 )
+from .tracking import track_workflow_opportunities
 from .validation import ValidationExperiment, ValidationPlugin, ValidationReport
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
@@ -78,5 +79,5 @@ __all__ = [
     "analyze_json_stat2", "analyze_series", "build_alpha_engine",
     "build_financial_report", "calculate_opportunity_confidence",
     "calculate_ssb_adjustment", "calculate_trend_adjustment", "run_ods",
-    "summarize_brreg_entities",
+    "summarize_brreg_entities", "track_workflow_opportunities",
 ]
