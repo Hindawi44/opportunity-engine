@@ -1,5 +1,4 @@
 """User-facing Streamlit interface for ODS alpha."""
-
 from __future__ import annotations
 from pathlib import Path
 import sys
@@ -14,8 +13,10 @@ import streamlit as st
 
 from opportunity_engine.ods import (
     BrregClient,
+    FinancialInputs,
     SSBMarketEvidenceService,
     SSBTrendIntelligenceService,
+    build_financial_report,
     calculate_opportunity_confidence,
     calculate_ssb_adjustment,
     calculate_trend_adjustment,
@@ -25,7 +26,7 @@ from opportunity_engine.ods import (
 
 st.set_page_config(page_title="ODS — Opportunity Development System", page_icon="🔎", layout="wide")
 st.title("🔎 ODS — Opportunity Development System")
-st.caption("نسخة Alpha: اكتشاف الفرص، ترتيبها، دمج الأدلة الرسمية، بناء Business Blueprint، وخطة تحقق عملية.")
+st.caption("نسخة Alpha: اكتشاف الفرص، دمج الأدلة الرسمية، تحليل الثقة، وبناء نموذج مالي افتراضي شفاف.")
 
 with st.form("ods-analysis-form"):
     subject = st.text_input("القطاع أو المجال", value="أزياء")
@@ -36,7 +37,7 @@ with st.form("ods-analysis-form"):
     submitted = st.form_submit_button("ابدأ التحليل", type="primary")
 
 if submitted:
-    with st.spinner("ODS يعمل الآن: Discovery → Ranking → Evidence → Confidence → BDNA → Validation"):
+    with st.spinner("ODS يعمل الآن: Discovery → Ranking → Evidence → Confidence → Financial → BDNA → Validation"):
         try:
             result = run_ods(subject, country=country, shortlist_size=shortlist_size)
         except (ValueError, RuntimeError) as exc:
@@ -87,23 +88,21 @@ if submitted:
             rows = []
             confidence_by_id = {}
             for item in result.ranked_opportunities:
-                evidence_adjustment = None
-                trend_adjustment = None
                 score_after_evidence = item.final_score
                 if evidence is not None:
-                    evidence_adjustment = calculate_ssb_adjustment(
+                    score_after_evidence = calculate_ssb_adjustment(
                         base_score=item.final_score,
                         category=item.opportunity.category,
                         evidence_score=evidence.evidence_score,
-                    )
-                    score_after_evidence = evidence_adjustment.final_score
+                    ).final_score
                 if trend is not None:
-                    trend_adjustment = calculate_trend_adjustment(
+                    supported_score = calculate_trend_adjustment(
                         base_score=score_after_evidence,
                         category=item.opportunity.category,
                         signal=trend,
-                    )
-                supported_score = trend_adjustment.final_score if trend_adjustment else score_after_evidence
+                    ).final_score
+                else:
+                    supported_score = score_after_evidence
                 confidence = calculate_opportunity_confidence(
                     internal_score=supported_score,
                     candidate_confidence=item.opportunity.confidence,
@@ -127,7 +126,6 @@ if submitted:
             for index, row in enumerate(rows, start=1):
                 row["الترتيب النهائي"] = index
             st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-            st.caption("درجة الثقة تجمع إشارات مستقلة، وتعيد توزيع الأوزان عند غياب مصدر بدل اعتبار الغياب دليلًا سلبيًا.")
 
             blueprint = result.blueprint
             top_confidence = confidence_by_id[blueprint.opportunity.opportunity_id]
@@ -147,9 +145,45 @@ if submitted:
                 st.markdown("**الأدلة الناقصة**")
                 for value in top_confidence.missing_evidence:
                     st.write(f"• {value}")
-            with st.expander("مكونات درجة الثقة"):
-                for name, score in top_confidence.component_scores:
-                    st.write(f"• {name}: {score:.1f}/100")
+
+            st.subheader("Financial Intelligence — النموذج المالي الافتراضي")
+            st.caption("أدخل افتراضاتك أنت. النظام لا يخترع الإيرادات أو التكاليف، والنتائج ليست توقع ربح.")
+            with st.expander("إدخال الافتراضات المالية", expanded=True):
+                f1, f2, f3 = st.columns(3)
+                startup_cost = f1.number_input("تكلفة البداية (NOK)", min_value=0.0, value=100000.0, step=10000.0)
+                monthly_fixed = f2.number_input("التكاليف الثابتة الشهرية", min_value=0.0, value=20000.0, step=1000.0)
+                working_months = f3.number_input("احتياطي رأس المال العامل/أشهر", min_value=0.0, value=3.0, step=1.0)
+                f4, f5, f6 = st.columns(3)
+                unit_price = f4.number_input("سعر الوحدة أو العملية", min_value=1.0, value=1000.0, step=100.0)
+                unit_variable = f5.number_input("التكلفة المتغيرة للوحدة", min_value=0.0, value=400.0, step=50.0)
+                monthly_units = f6.number_input("عدد الوحدات/العمليات شهريًا", min_value=0.0, value=50.0, step=5.0)
+                try:
+                    financial = build_financial_report(FinancialInputs(
+                        startup_cost=startup_cost,
+                        monthly_fixed_cost=monthly_fixed,
+                        unit_price=unit_price,
+                        unit_variable_cost=unit_variable,
+                        monthly_units=monthly_units,
+                        working_capital_months=working_months,
+                    ))
+                except ValueError as exc:
+                    st.error(str(exc))
+                else:
+                    m1, m2, m3 = st.columns(3)
+                    m1.metric("رأس المال المطلوب", f"{financial.required_capital:,.0f} NOK")
+                    m2.metric("نقطة التعادل/وحدة شهريًا", f"{financial.break_even_units_monthly:,.1f}")
+                    m3.metric("هامش المساهمة", f"{financial.contribution_margin_pct:.1f}%")
+                    scenario_rows = [{
+                        "السيناريو": scenario.name,
+                        "الوحدات الشهرية": scenario.monthly_units,
+                        "الإيراد الشهري": scenario.monthly_revenue,
+                        "الربح التشغيلي الشهري": scenario.monthly_operating_profit,
+                        "الربح التشغيلي السنوي": scenario.annual_operating_profit,
+                        "استرداد رأس المال/شهر": scenario.payback_months if scenario.payback_months is not None else "لا يوجد",
+                    } for scenario in financial.scenarios]
+                    st.dataframe(pd.DataFrame(scenario_rows), use_container_width=True, hide_index=True)
+                    for warning in financial.warnings:
+                        st.warning(warning)
 
             st.subheader("Business Blueprint — الفرصة الأولى")
             st.markdown(f"### {blueprint.opportunity.title}")
