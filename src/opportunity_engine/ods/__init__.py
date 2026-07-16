@@ -26,6 +26,12 @@ from .models import ODSRequest, ODSSession, OpportunityCandidate, Stage, StageRe
 from .plugins import ODSPlugin, PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
 from .runner import ODSAnalysisResult, USABLE_ALPHA_WORKFLOW, build_alpha_engine, run_ods
+from .scanner import (
+    ConnectorRegistry,
+    ConnectorScanStatus,
+    ScanSnapshot,
+    UniversalOpportunityScanner,
+)
 from .ssb import SSB_API_BASE, SSBClient, SSBConnector
 from .ssb_market import (
     SSB_RETAIL_TABLE_ID,
@@ -47,19 +53,21 @@ from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 __all__ = [
     "BDNAPlugin", "BRREG_API_BASE", "BRREG_ENTITY_MEDIA_TYPE", "BrregClient",
     "BrregConnector", "BrregEvidenceSummary", "BusinessBlueprint",
-    "CuratedDiscoveryPlugin", "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW",
-    "DataConnector", "EvidenceAdjustment", "ExtractionRule", "FashionDiscoveryPlugin",
+    "ConnectorRegistry", "ConnectorScanStatus", "CuratedDiscoveryPlugin",
+    "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW", "DataConnector",
+    "EvidenceAdjustment", "ExtractionRule", "FashionDiscoveryPlugin",
     "FinancialInputs", "FinancialReport", "FinancialScenario", "LiveDataPipeline",
     "LiveDataResult", "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
     "OpportunityCandidate", "OpportunityConfidence", "OpportunityExtractor",
     "OpportunityRankingPlugin", "OpportunitySeed", "PluginRegistry", "RankedOpportunity",
     "RankingWeights", "SSB_API_BASE", "SSB_RETAIL_TABLE_ID", "SSB_RETAIL_TABLE_URL",
     "SSBClient", "SSBConnector", "SSBMarketEvidence", "SSBMarketEvidenceService",
-    "SSBTrendIntelligenceService", "SSBTrendSignal", "Scanner", "SourceDocument",
-    "Stage", "StageResult", "StaticDataConnector", "Status", "TrendAdjustment",
-    "USABLE_ALPHA_WORKFLOW", "ValidationExperiment", "ValidationPlugin",
-    "ValidationReport", "WorkflowEngine", "analyze_json_stat2", "analyze_series",
-    "build_alpha_engine", "build_financial_report", "calculate_opportunity_confidence",
+    "SSBTrendIntelligenceService", "SSBTrendSignal", "ScanSnapshot", "Scanner",
+    "SourceDocument", "Stage", "StageResult", "StaticDataConnector", "Status",
+    "TrendAdjustment", "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner",
+    "ValidationExperiment", "ValidationPlugin", "ValidationReport", "WorkflowEngine",
+    "analyze_json_stat2", "analyze_series", "build_alpha_engine",
+    "build_financial_report", "calculate_opportunity_confidence",
     "calculate_ssb_adjustment", "calculate_trend_adjustment", "run_ods",
     "summarize_brreg_entities",
 ]
