@@ -22,6 +22,13 @@ from .live_data import (
     SourceDocument,
     StaticDataConnector,
 )
+from .memory import (
+    MemoryRunResult,
+    OpportunityChange,
+    OpportunityChangeType,
+    OpportunityMemoryEngine,
+    OpportunityMemoryRecord,
+)
 from .models import ODSRequest, ODSSession, OpportunityCandidate, Stage, StageResult, Status
 from .plugins import ODSPlugin, PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
@@ -57,11 +64,13 @@ __all__ = [
     "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW", "DataConnector",
     "EvidenceAdjustment", "ExtractionRule", "FashionDiscoveryPlugin",
     "FinancialInputs", "FinancialReport", "FinancialScenario", "LiveDataPipeline",
-    "LiveDataResult", "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
-    "OpportunityCandidate", "OpportunityConfidence", "OpportunityExtractor",
-    "OpportunityRankingPlugin", "OpportunitySeed", "PluginRegistry", "RankedOpportunity",
-    "RankingWeights", "SSB_API_BASE", "SSB_RETAIL_TABLE_ID", "SSB_RETAIL_TABLE_URL",
-    "SSBClient", "SSBConnector", "SSBMarketEvidence", "SSBMarketEvidenceService",
+    "LiveDataResult", "MemoryRunResult", "ODSAnalysisResult", "ODSPlugin",
+    "ODSRequest", "ODSSession", "OpportunityCandidate", "OpportunityChange",
+    "OpportunityChangeType", "OpportunityConfidence", "OpportunityExtractor",
+    "OpportunityMemoryEngine", "OpportunityMemoryRecord", "OpportunityRankingPlugin",
+    "OpportunitySeed", "PluginRegistry", "RankedOpportunity", "RankingWeights",
+    "SSB_API_BASE", "SSB_RETAIL_TABLE_ID", "SSB_RETAIL_TABLE_URL", "SSBClient",
+    "SSBConnector", "SSBMarketEvidence", "SSBMarketEvidenceService",
     "SSBTrendIntelligenceService", "SSBTrendSignal", "ScanSnapshot", "Scanner",
     "SourceDocument", "Stage", "StageResult", "StaticDataConnector", "Status",
     "TrendAdjustment", "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner",
