@@ -1,11 +1,10 @@
-"""First user-facing Streamlit interface for ODS alpha."""
+"""User-facing Streamlit interface for ODS alpha."""
 
 from __future__ import annotations
 
 from pathlib import Path
 import sys
 
-# Allow Streamlit Community Cloud to import the src-layout package directly.
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
@@ -16,7 +15,6 @@ import streamlit as st
 
 from opportunity_engine.ods import run_ods
 
-
 st.set_page_config(
     page_title="ODS — Opportunity Development System",
     page_icon="🔎",
@@ -24,7 +22,7 @@ st.set_page_config(
 )
 
 st.title("🔎 ODS — Opportunity Development System")
-st.caption("نسخة Alpha: اكتشاف فرص الأزياء، ترتيبها، وبناء Business Blueprint للفرصة الأقوى.")
+st.caption("نسخة Alpha: اكتشاف فرص الأزياء، ترتيبها، بناء Business Blueprint، ثم خطة تحقق عملية.")
 
 with st.form("ods-analysis-form"):
     subject = st.text_input("القطاع أو المجال", value="أزياء")
@@ -33,13 +31,9 @@ with st.form("ods-analysis-form"):
     submitted = st.form_submit_button("ابدأ التحليل", type="primary")
 
 if submitted:
-    with st.spinner("ODS يعمل الآن: Discovery → Ranking → BDNA"):
+    with st.spinner("ODS يعمل الآن: Discovery → Ranking → BDNA → Validation"):
         try:
-            result = run_ods(
-                subject,
-                country=country,
-                shortlist_size=shortlist_size,
-            )
+            result = run_ods(subject, country=country, shortlist_size=shortlist_size)
         except (ValueError, RuntimeError) as exc:
             st.error(str(exc))
         else:
@@ -89,9 +83,27 @@ if submitted:
                 for value in blueprint.risks:
                     st.write(f"• {value}")
 
-            st.markdown("**الفرضيات المطلوب اختبارها لاحقًا**")
+            st.markdown("**الفرضيات المطلوب اختبارها**")
             for value in blueprint.hypotheses:
                 st.write(f"• {value}")
+
+            validation = result.validation
+            st.subheader("Validation Plan — خطة التحقق")
+            st.metric("Validation Readiness", f"{validation.readiness_score:.0f}/100")
+            st.markdown("**الفرضية الأخطر**")
+            st.write(validation.highest_risk_assumption)
+            st.markdown(f"**القرار الحالي:** {validation.recommended_decision}")
+
+            for index, experiment in enumerate(validation.experiments, start=1):
+                with st.expander(f"التجربة {index}: {experiment.hypothesis}", expanded=index == 1):
+                    st.write(f"**الطريقة:** {experiment.method}")
+                    st.write(f"**العينة المستهدفة:** {experiment.target_sample}")
+                    st.write(f"**المدة:** {experiment.duration_days} أيام")
+                    st.write(f"**معيار النجاح:** {experiment.success_criteria}")
+                    st.write(f"**معيار الفشل:** {experiment.failure_criteria}")
+                    st.write("**المؤشرات المطلوبة:**")
+                    for metric in experiment.required_metrics:
+                        st.write(f"• {metric}")
 
             with st.expander("سجل تشغيل ODS"):
                 for event in result.session.audit_log:
