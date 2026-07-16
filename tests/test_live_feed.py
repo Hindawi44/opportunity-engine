@@ -39,7 +39,12 @@ def _result(title: str = "Example AS") -> BrregCollectionResult:
         connector_statuses=(),
         duplicate_count=0,
     )
-    ranked = RankedOpportunity(rank=1, opportunity=candidate, final_score=72.0, score_breakdown=())
+    ranked = RankedOpportunity(
+        opportunity=candidate,
+        final_score=72.0,
+        component_scores=(("confidence", 70.0),),
+        rank=1,
+    )
     memory = MemoryRunResult(records=(), changes=())
     return BrregCollectionResult(1, 1, 0, 0, snapshot, (ranked,), memory, None, ())
 
