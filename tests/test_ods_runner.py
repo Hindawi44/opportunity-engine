@@ -45,7 +45,10 @@ def test_run_ods_respects_shortlist_size() -> None:
 
 
 def test_run_ods_rejects_unsupported_sector_with_clear_error() -> None:
-    with pytest.raises(RuntimeError, match="supports only fashion/apparel"):
+    with pytest.raises(
+        RuntimeError,
+        match=r"fashion_discovery does not support subject: Agriculture",
+    ):
         run_ods("Agriculture", country="Norway")
 
 
