@@ -17,6 +17,7 @@ from .decision import (
 from .discovery import FashionDiscoveryPlugin
 from .discovery_framework import CuratedDiscoveryPlugin, OpportunitySeed, Scanner
 from .evidence_weighting import EvidenceAdjustment, calculate_ssb_adjustment
+from .executive_workflow import ExecutiveWorkflowInputs, build_decision_from_analysis
 from .financial import FinancialInputs, FinancialReport, FinancialScenario, build_financial_report
 from .finn import (
     FINN_API_BASE,
@@ -77,23 +78,24 @@ __all__ = [
     "ConnectorRegistry", "ConnectorScanStatus", "CuratedDiscoveryPlugin",
     "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW", "DataConnector",
     "DecisionInputs", "EvidenceAdjustment", "ExecutiveDecision",
-    "ExecutiveDecisionReport", "ExtractionRule", "FINN_API_BASE",
-    "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin", "FinancialInputs",
-    "FinancialReport", "FinancialScenario", "FinnApiClient", "FinnConnector",
-    "LiveDataPipeline", "LiveDataResult", "MemoryRunResult", "ODSAnalysisResult",
-    "ODSPlugin", "ODSRequest", "ODSSession", "OpportunityCandidate",
-    "OpportunityChange", "OpportunityChangeType", "OpportunityConfidence",
-    "OpportunityExtractor", "OpportunityMemoryEngine", "OpportunityMemoryRecord",
-    "OpportunityRankingPlugin", "OpportunitySeed", "PluginRegistry",
-    "RankedOpportunity", "RankingWeights", "SSB_API_BASE",
+    "ExecutiveDecisionReport", "ExecutiveWorkflowInputs", "ExtractionRule",
+    "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin",
+    "FinancialInputs", "FinancialReport", "FinancialScenario", "FinnApiClient",
+    "FinnConnector", "LiveDataPipeline", "LiveDataResult", "MemoryRunResult",
+    "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
+    "OpportunityCandidate", "OpportunityChange", "OpportunityChangeType",
+    "OpportunityConfidence", "OpportunityExtractor", "OpportunityMemoryEngine",
+    "OpportunityMemoryRecord", "OpportunityRankingPlugin", "OpportunitySeed",
+    "PluginRegistry", "RankedOpportunity", "RankingWeights", "SSB_API_BASE",
     "SSB_RETAIL_TABLE_ID", "SSB_RETAIL_TABLE_URL", "SSBClient", "SSBConnector",
     "SSBMarketEvidence", "SSBMarketEvidenceService", "SSBTrendIntelligenceService",
     "SSBTrendSignal", "ScanSnapshot", "Scanner", "SourceDocument", "Stage",
     "StageResult", "StaticDataConnector", "Status", "TrendAdjustment",
     "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner", "ValidationExperiment",
     "ValidationPlugin", "ValidationReport", "WorkflowEngine", "analyze_json_stat2",
-    "analyze_series", "build_alpha_engine", "build_executive_decision",
-    "build_financial_report", "calculate_opportunity_confidence",
-    "calculate_ssb_adjustment", "calculate_trend_adjustment", "parse_finn_atom_feed",
-    "run_ods", "summarize_brreg_entities", "track_workflow_opportunities",
+    "analyze_series", "build_alpha_engine", "build_decision_from_analysis",
+    "build_executive_decision", "build_financial_report",
+    "calculate_opportunity_confidence", "calculate_ssb_adjustment",
+    "calculate_trend_adjustment", "parse_finn_atom_feed", "run_ods",
+    "summarize_brreg_entities", "track_workflow_opportunities",
 ]
