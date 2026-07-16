@@ -13,6 +13,7 @@ from .models import (
 )
 from .plugins import ODSPlugin, PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
+from .runner import ODSAnalysisResult, USABLE_ALPHA_WORKFLOW, build_alpha_engine, run_ods
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
@@ -21,6 +22,7 @@ __all__ = [
     "CuratedDiscoveryPlugin",
     "DEFAULT_WORKFLOW",
     "FashionDiscoveryPlugin",
+    "ODSAnalysisResult",
     "ODSPlugin",
     "ODSRequest",
     "ODSSession",
@@ -34,5 +36,8 @@ __all__ = [
     "Stage",
     "StageResult",
     "Status",
+    "USABLE_ALPHA_WORKFLOW",
     "WorkflowEngine",
+    "build_alpha_engine",
+    "run_ods",
 ]
