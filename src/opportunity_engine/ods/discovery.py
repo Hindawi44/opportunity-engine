@@ -1,76 +1,28 @@
-"""Deterministic first discovery plugin for the ODS fashion reference case.
-
-The alpha plugin intentionally uses a small curated knowledge map instead of live
-web research. Its purpose is to prove the ODS plugin contract, scanner composition,
-normalization, deduplication, and auditable output before adding external data
-connectors.
-"""
+"""Fashion reference plugin built on the reusable ODS discovery framework."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-import re
-import unicodedata
-
-from .models import ODSSession, OpportunityCandidate, Stage, StageResult, Status
+from .discovery_framework import CuratedDiscoveryPlugin, OpportunitySeed, Scanner
 
 
-_FASHION_ALIASES = {
-    "fashion",
-    "apparel",
-    "clothing",
-    "clothes",
-    "garments",
-    "ازياء",
-    "أزياء",
-    "الأزياء",
-    "ملابس",
-    "الملابس",
-    "ثياب",
-}
+FASHION_ALIASES = frozenset(
+    {
+        "fashion",
+        "apparel",
+        "clothing",
+        "clothes",
+        "garments",
+        "ازياء",
+        "أزياء",
+        "الأزياء",
+        "ملابس",
+        "الملابس",
+        "ثياب",
+    }
+)
 
 
-@dataclass(frozen=True)
-class OpportunitySeed:
-    """One curated opportunity emitted by a scanner."""
-
-    title: str
-    description: str
-    category: str
-    evidence: tuple[str, ...]
-    confidence: float
-
-
-@dataclass(frozen=True)
-class Scanner:
-    """Small deterministic scanner used by the alpha discovery plugin."""
-
-    name: str
-    seeds: tuple[OpportunitySeed, ...]
-
-    def scan(self, country: str | None) -> list[OpportunityCandidate]:
-        market = country.strip() if country and country.strip() else "the target market"
-        candidates: list[OpportunityCandidate] = []
-        for seed in self.seeds:
-            slug = _slugify(seed.title)
-            description = seed.description.format(market=market)
-            if market not in description:
-                description = f"{description} Market: {market}."
-            candidates.append(
-                OpportunityCandidate(
-                    opportunity_id=f"fashion-{self.name}-{slug}",
-                    title=seed.title,
-                    description=description,
-                    category=seed.category,
-                    evidence=seed.evidence,
-                    confidence=seed.confidence,
-                    source_plugin=f"fashion_discovery:{self.name}",
-                )
-            )
-        return candidates
-
-
-SCANNERS: tuple[Scanner, ...] = (
+FASHION_SCANNERS: tuple[Scanner, ...] = (
     Scanner(
         name="industry",
         seeds=(
@@ -229,61 +181,14 @@ SCANNERS: tuple[Scanner, ...] = (
 )
 
 
-class FashionDiscoveryPlugin:
-    """First ODS discovery-stage plugin, scoped to the fashion reference case."""
+class FashionDiscoveryPlugin(CuratedDiscoveryPlugin):
+    """First sector plugin using the generic curated discovery framework."""
 
     name = "fashion_discovery"
-    stage = Stage.DISCOVERY
-
-    def run(self, session: ODSSession) -> StageResult:
-        if not _is_fashion_subject(session.request.subject):
-            return StageResult(
-                stage=self.stage,
-                status=Status.FAILED,
-                errors=[
-                    "fashion_discovery supports only fashion/apparel subjects in this alpha"
-                ],
-            )
-
-        candidates: list[OpportunityCandidate] = []
-        for scanner in SCANNERS:
-            candidates.extend(scanner.scan(session.request.country))
-
-        deduplicated = _deduplicate(candidates)
-        return StageResult(
-            stage=self.stage,
-            status=Status.COMPLETED,
-            payload=tuple(deduplicated),
-            evidence=[
-                f"scanner_completed:{scanner.name}:{len(scanner.seeds)}"
-                for scanner in SCANNERS
-            ],
-        )
+    sector_key = "fashion"
+    aliases = FASHION_ALIASES
+    scanners = FASHION_SCANNERS
 
 
-def _is_fashion_subject(subject: str) -> bool:
-    normalized = unicodedata.normalize("NFKC", subject).strip().casefold()
-    return normalized in {
-        unicodedata.normalize("NFKC", alias).strip().casefold()
-        for alias in _FASHION_ALIASES
-    }
-
-
-def _deduplicate(
-    candidates: list[OpportunityCandidate],
-) -> list[OpportunityCandidate]:
-    unique: dict[str, OpportunityCandidate] = {}
-    for candidate in candidates:
-        key = _slugify(candidate.title)
-        existing = unique.get(key)
-        if existing is None or candidate.confidence > existing.confidence:
-            unique[key] = candidate
-    return list(unique.values())
-
-
-def _slugify(value: str) -> str:
-    normalized = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
-    slug = re.sub(r"[^a-z0-9]+", "-", normalized.casefold()).strip("-")
-    if not slug:
-        raise ValueError("value cannot be converted to a stable slug")
-    return slug
+# Compatibility alias retained for tests and callers from the first alpha.
+SCANNERS = FASHION_SCANNERS
