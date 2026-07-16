@@ -2,6 +2,11 @@
 
 from .bdna import BDNAPlugin, BusinessBlueprint
 from .brreg import BRREG_API_BASE, BRREG_ENTITY_MEDIA_TYPE, BrregClient, BrregConnector
+from .brreg_collector import (
+    BrregCollectionResult,
+    BrregOpportunityCollector,
+    BrregSearchSlice,
+)
 from .confidence import (
     BrregEvidenceSummary,
     OpportunityConfidence,
@@ -79,7 +84,8 @@ from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
     "BDNAPlugin", "BRREG_API_BASE", "BRREG_ENTITY_MEDIA_TYPE", "BrregClient",
-    "BrregConnector", "BrregEvidenceSummary", "BrregStatusOpportunityExtractor",
+    "BrregCollectionResult", "BrregConnector", "BrregEvidenceSummary",
+    "BrregOpportunityCollector", "BrregSearchSlice", "BrregStatusOpportunityExtractor",
     "BusinessBlueprint", "ConnectorRegistry", "ConnectorScanStatus",
     "CuratedDiscoveryPlugin", "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW",
     "DataConnector", "DecisionInputs", "EvidenceAdjustment", "ExecutiveDecision",
