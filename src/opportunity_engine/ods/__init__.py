@@ -14,6 +14,7 @@ from .models import (
 from .plugins import ODSPlugin, PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
 from .runner import ODSAnalysisResult, USABLE_ALPHA_WORKFLOW, build_alpha_engine, run_ods
+from .validation import ValidationExperiment, ValidationPlugin, ValidationReport
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
@@ -37,6 +38,9 @@ __all__ = [
     "StageResult",
     "Status",
     "USABLE_ALPHA_WORKFLOW",
+    "ValidationExperiment",
+    "ValidationPlugin",
+    "ValidationReport",
     "WorkflowEngine",
     "build_alpha_engine",
     "run_ods",
