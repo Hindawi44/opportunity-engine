@@ -22,6 +22,7 @@ _FASHION_ALIASES = {
     "clothes",
     "garments",
     "ازياء",
+    "أزياء",
     "الأزياء",
     "ملابس",
     "الملابس",
@@ -52,11 +53,14 @@ class Scanner:
         candidates: list[OpportunityCandidate] = []
         for seed in self.seeds:
             slug = _slugify(seed.title)
+            description = seed.description.format(market=market)
+            if market not in description:
+                description = f"{description} Market: {market}."
             candidates.append(
                 OpportunityCandidate(
                     opportunity_id=f"fashion-{self.name}-{slug}",
                     title=seed.title,
-                    description=seed.description.format(market=market),
+                    description=description,
                     category=seed.category,
                     evidence=seed.evidence,
                     confidence=seed.confidence,
@@ -259,7 +263,10 @@ class FashionDiscoveryPlugin:
 
 def _is_fashion_subject(subject: str) -> bool:
     normalized = unicodedata.normalize("NFKC", subject).strip().casefold()
-    return normalized in {alias.casefold() for alias in _FASHION_ALIASES}
+    return normalized in {
+        unicodedata.normalize("NFKC", alias).strip().casefold()
+        for alias in _FASHION_ALIASES
+    }
 
 
 def _deduplicate(
