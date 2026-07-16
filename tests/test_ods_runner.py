@@ -6,6 +6,7 @@ from opportunity_engine.ods import (
     Stage,
     Status,
     USABLE_ALPHA_WORKFLOW,
+    ValidationReport,
     build_alpha_engine,
     run_ods,
 )
@@ -21,20 +22,21 @@ def test_run_ods_completes_current_alpha_flow() -> None:
     assert len(result.ranked_opportunities) == 5
     assert result.ranked_opportunities[0].rank == 1
     assert isinstance(result.blueprint, BusinessBlueprint)
-    assert (
-        result.blueprint.opportunity.opportunity_id
-        == result.ranked_opportunities[0].opportunity.opportunity_id
-    )
+    assert isinstance(result.validation, ValidationReport)
+    assert result.validation.opportunity_id == result.blueprint.opportunity.opportunity_id
+    assert result.validation.recommended_decision == "TEST"
+    assert result.validation.experiments
     assert result.session.audit_log[-1] == "session_completed"
 
 
-def test_build_alpha_engine_stops_after_bdna() -> None:
+def test_build_alpha_engine_stops_after_validation() -> None:
     engine = build_alpha_engine(shortlist_size=3)
 
     assert engine.workflow == (
         Stage.DISCOVERY,
         Stage.RANKING,
         Stage.BDNA,
+        Stage.VALIDATION,
     )
 
 
