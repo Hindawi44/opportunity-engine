@@ -13,7 +13,7 @@ if str(SRC) not in sys.path:
 import pandas as pd
 import streamlit as st
 
-from opportunity_engine.ods import run_ods
+from opportunity_engine.ods import SSBMarketEvidenceService, run_ods
 
 st.set_page_config(
     page_title="ODS — Opportunity Development System",
@@ -28,6 +28,7 @@ with st.form("ods-analysis-form"):
     subject = st.text_input("القطاع أو المجال", value="أزياء")
     country = st.text_input("الدولة", value="Norway")
     shortlist_size = st.slider("عدد الفرص النهائية", min_value=1, max_value=10, value=5)
+    include_ssb = st.checkbox("إضافة دليل سوق حي من SSB", value=True)
     submitted = st.form_submit_button("ابدأ التحليل", type="primary")
 
 if submitted:
@@ -41,6 +42,25 @@ if submitted:
                 f"اكتشف النظام {result.discovered_count} فرص، ثم اختار أفضل "
                 f"{len(result.ranked_opportunities)}."
             )
+
+            if include_ssb:
+                st.subheader("Live Evidence from SSB — دليل السوق الرسمي")
+                try:
+                    evidence = SSBMarketEvidenceService().load_retail_evidence()
+                except (ValueError, RuntimeError) as exc:
+                    st.warning(f"تعذر تحميل SSB الآن، واستمر التحليل الداخلي دون توقف: {exc}")
+                else:
+                    st.markdown(f"### {evidence.title}")
+                    col_a, col_b, col_c = st.columns(3)
+                    col_a.metric("Evidence Score", f"{evidence.evidence_score:.0f}/100")
+                    col_b.metric("آخر فترة", evidence.last_period or "غير محدد")
+                    col_c.metric("عدد القيم", evidence.value_count)
+                    st.write(f"**الفترة المتاحة:** {evidence.first_period or '?'} → {evidence.last_period or '?'}")
+                    if evidence.variables:
+                        st.write("**المتغيرات:** " + "، ".join(evidence.variables))
+                    for line in evidence.interpretation:
+                        st.write(f"• {line}")
+                    st.link_button("فتح جدول SSB الرسمي", evidence.source_url)
 
             st.subheader("الفرص المرتبة")
             rows = [
