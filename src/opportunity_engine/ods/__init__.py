@@ -1,6 +1,7 @@
 """Opportunity Development System core package."""
 
 from .bdna import BDNAPlugin, BusinessBlueprint
+from .brreg import BRREG_API_BASE, BRREG_ENTITY_MEDIA_TYPE, BrregClient, BrregConnector
 from .discovery import FashionDiscoveryPlugin
 from .discovery_framework import CuratedDiscoveryPlugin, OpportunitySeed, Scanner
 from .evidence_weighting import EvidenceAdjustment, calculate_ssb_adjustment
@@ -37,7 +38,8 @@ from .validation import ValidationExperiment, ValidationPlugin, ValidationReport
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
-    "BDNAPlugin", "BusinessBlueprint", "CuratedDiscoveryPlugin",
+    "BDNAPlugin", "BRREG_API_BASE", "BRREG_ENTITY_MEDIA_TYPE", "BrregClient",
+    "BrregConnector", "BusinessBlueprint", "CuratedDiscoveryPlugin",
     "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW", "DataConnector",
     "EvidenceAdjustment", "ExtractionRule", "FashionDiscoveryPlugin",
     "LiveDataPipeline", "LiveDataResult", "ODSAnalysisResult", "ODSPlugin",
