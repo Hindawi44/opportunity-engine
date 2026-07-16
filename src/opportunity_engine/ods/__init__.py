@@ -1,5 +1,6 @@
 """Opportunity Development System core package."""
 
+from .discovery import FashionDiscoveryPlugin
 from .models import (
     ODSRequest,
     ODSSession,
@@ -13,6 +14,7 @@ from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
     "DEFAULT_WORKFLOW",
+    "FashionDiscoveryPlugin",
     "ODSPlugin",
     "ODSRequest",
     "ODSSession",
