@@ -15,7 +15,9 @@ import streamlit as st
 
 from opportunity_engine.ods import (
     SSBMarketEvidenceService,
+    SSBTrendIntelligenceService,
     calculate_ssb_adjustment,
+    calculate_trend_adjustment,
     run_ods,
 )
 
@@ -27,7 +29,7 @@ with st.form("ods-analysis-form"):
     subject = st.text_input("القطاع أو المجال", value="أزياء")
     country = st.text_input("الدولة", value="Norway")
     shortlist_size = st.slider("عدد الفرص النهائية", min_value=1, max_value=10, value=5)
-    include_ssb = st.checkbox("إضافة دليل سوق حي من SSB", value=True)
+    include_ssb = st.checkbox("إضافة دليل واتجاه سوق حي من SSB", value=True)
     submitted = st.form_submit_button("ابدأ التحليل", type="primary")
 
 if submitted:
@@ -39,12 +41,13 @@ if submitted:
         else:
             st.success(f"اكتشف النظام {result.discovered_count} فرص، ثم اختار أفضل {len(result.ranked_opportunities)}.")
             evidence = None
+            trend = None
             if include_ssb:
-                st.subheader("Live Evidence from SSB — دليل السوق الرسمي")
+                st.subheader("Live Intelligence from SSB — ذكاء السوق الرسمي")
                 try:
                     evidence = SSBMarketEvidenceService().load_retail_evidence()
                 except (ValueError, RuntimeError) as exc:
-                    st.warning(f"تعذر تحميل SSB الآن، واستمر التحليل الداخلي دون توقف: {exc}")
+                    st.warning(f"تعذر تحميل دليل SSB الآن، واستمر التحليل الداخلي دون توقف: {exc}")
                 else:
                     st.markdown(f"### {evidence.title}")
                     col_a, col_b, col_c = st.columns(3)
@@ -58,31 +61,61 @@ if submitted:
                         st.write(f"• {line}")
                     st.link_button("فتح جدول SSB الرسمي", evidence.source_url)
 
+                try:
+                    trend = SSBTrendIntelligenceService().load_retail_trend()
+                except (ValueError, RuntimeError) as exc:
+                    st.warning(f"تعذر استخراج اتجاه SSB الآن: {exc}")
+                else:
+                    st.markdown("#### SSB Trend Intelligence — تحليل الاتجاه")
+                    col_d, col_e, col_f = st.columns(3)
+                    col_d.metric("Market Health", f"{trend.market_health_score:.0f}/100")
+                    col_e.metric("الاتجاه", trend.direction)
+                    latest_text = "غير متاح" if trend.latest_change_pct is None else f"{trend.latest_change_pct:+.2f}%"
+                    col_f.metric("آخر تغير", latest_text)
+                    if trend.cagr_pct is not None:
+                        st.write(f"**النمو السنوي المركب التقريبي:** {trend.cagr_pct:+.2f}%")
+                    if trend.periods:
+                        st.write(f"**السلسلة المستخدمة:** {trend.periods[0]} → {trend.periods[-1]} ({len(trend.periods)} فترات)")
+                    for line in trend.explanation:
+                        st.write(f"• {line}")
+                    st.caption("التحليل وصفي ومحافظ؛ لا يمثل توقع ربح أو ضمانًا لاتجاه المستقبل.")
+
             st.subheader("الفرص المرتبة")
             rows = []
             for item in result.ranked_opportunities:
-                adjustment = None
+                evidence_adjustment = None
+                trend_adjustment = None
+                score_after_evidence = item.final_score
                 if evidence is not None:
-                    adjustment = calculate_ssb_adjustment(
+                    evidence_adjustment = calculate_ssb_adjustment(
                         base_score=item.final_score,
                         category=item.opportunity.category,
                         evidence_score=evidence.evidence_score,
                     )
+                    score_after_evidence = evidence_adjustment.final_score
+                if trend is not None:
+                    trend_adjustment = calculate_trend_adjustment(
+                        base_score=score_after_evidence,
+                        category=item.opportunity.category,
+                        signal=trend,
+                    )
+                final_score = trend_adjustment.final_score if trend_adjustment else score_after_evidence
                 rows.append({
                     "الترتيب الداخلي": item.rank,
                     "الفرصة": item.opportunity.title,
                     "الفئة": item.opportunity.category,
                     "الدرجة الأساسية": item.final_score,
-                    "تعديل SSB": adjustment.adjustment if adjustment else 0.0,
-                    "الدرجة المدعومة بالدليل": adjustment.final_score if adjustment else item.final_score,
+                    "جودة دليل SSB": evidence_adjustment.adjustment if evidence_adjustment else 0.0,
+                    "تعديل الاتجاه": trend_adjustment.adjustment if trend_adjustment else 0.0,
+                    "الدرجة النهائية المدعومة": final_score,
                     "الثقة": round(item.opportunity.confidence * 100, 1),
                 })
-            rows.sort(key=lambda row: (-row["الدرجة المدعومة بالدليل"], row["الترتيب الداخلي"]))
+            rows.sort(key=lambda row: (-row["الدرجة النهائية المدعومة"], row["الترتيب الداخلي"]))
             for index, row in enumerate(rows, start=1):
                 row["الترتيب بالدليل"] = index
             st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-            if evidence is not None:
-                st.caption("تعديل SSB محدود بحد أقصى 3 نقاط، ويقيس جودة وتوفر الدليل الرسمي فقط. لا يفترض نمو السوق أو الربحية.")
+            if evidence is not None or trend is not None:
+                st.caption("تعديلات SSB محدودة وشفافة. Business Blueprint أدناه ما زال مبنيًا على الترتيب الداخلي الأصلي حتى تُدمج البيانات الحية داخل Workflow نفسه.")
 
             blueprint = result.blueprint
             st.subheader("Business Blueprint — الفرصة الأولى")
