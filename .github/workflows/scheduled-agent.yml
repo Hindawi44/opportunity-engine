@@ -1,0 +1,57 @@
+name: Scheduled ODS research agent
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+env:
+  ODS_STATE_DB: data/ods_state.sqlite3
+  ODS_SEARCH_SUBJECTS: butikk,konkurs,avvikling,varelager
+  ODS_PAGE_SIZE: "50"
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Restore persistent ODS state
+        uses: actions/cache/restore@v4
+        with:
+          path: data/ods_state.sqlite3
+          key: ods-state-${{ github.run_id }}
+          restore-keys: |
+            ods-state-
+
+      - name: Install project
+        run: pip install -r requirements.txt
+
+      - name: Run one autonomous research cycle
+        run: python run_scheduled_agent.py
+
+      - name: Save persistent ODS state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/ods_state.sqlite3
+          key: ods-state-${{ github.run_id }}
+
+      - name: Upload auditable state snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ods-state-${{ github.run_number }}
+          path: data/ods_state.sqlite3
+          if-no-files-found: warn
+          retention-days: 30
