@@ -73,13 +73,12 @@ class AutonomousResearchAgent:
         current_state: dict[str, dict[str, object]] = {}
         for report in decisions:
             item = item_by_id[report.opportunity_id]
-            fingerprint = f"{item.status}|{report.decision.value}|{report.decision_score:.1f}"
+            decision_fingerprint = f"{report.decision.value}|{report.decision_score:.1f}"
             previous = prior.get(report.opportunity_id, {})
-            previous_fingerprint = str(previous.get("fingerprint") or "")
-            meaningful_change = (
-                item.status in {"NEW", "UPDATED"}
-                or previous_fingerprint != fingerprint
-            )
+            previous_fingerprint = str(previous.get("decision_fingerprint") or "")
+            decision_changed = previous_fingerprint != decision_fingerprint
+            meaningful_change = item.status in {"NEW", "UPDATED"} or decision_changed
+
             if meaningful_change:
                 reason = (
                     f"Feed status is {item.status}; decision is {report.decision.value} "
@@ -89,7 +88,7 @@ class AutonomousResearchAgent:
                     AgentAlert(
                         opportunity_id=report.opportunity_id,
                         title=report.title,
-                        change_type=item.status,
+                        change_type=item.status if item.status in {"NEW", "UPDATED"} else "DECISION_CHANGED",
                         decision=report.decision.value,
                         decision_score=report.decision_score,
                         reason=reason,
@@ -97,11 +96,13 @@ class AutonomousResearchAgent:
                 )
             else:
                 suppressed += 1
+
             current_state[report.opportunity_id] = {
-                "fingerprint": fingerprint,
+                "decision_fingerprint": decision_fingerprint,
                 "title": report.title,
                 "decision": report.decision.value,
                 "decision_score": report.decision_score,
+                "feed_status": item.status,
                 "last_seen_at": item.last_seen_at,
             }
 
