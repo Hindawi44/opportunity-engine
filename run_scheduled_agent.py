@@ -11,7 +11,7 @@ import tempfile
 
 from opportunity_engine.ods.autonomous_agent import AutonomousResearchAgent
 from opportunity_engine.ods.brreg_collector import BrregSearchSlice
-from opportunity_engine.ods.notifications import TelegramNotifier
+from opportunity_engine.ods.notifications import EmailNotifier
 from opportunity_engine.ods.sqlite_state import SQLiteStateStore, StateFile
 
 
@@ -86,9 +86,13 @@ def main() -> int:
             for subject in subjects
         )
         result = agent.run(slices)
-        notifier = TelegramNotifier(
-            os.getenv("TELEGRAM_BOT_TOKEN"),
-            os.getenv("TELEGRAM_CHAT_ID"),
+        notifier = EmailNotifier(
+            smtp_host=os.getenv("SMTP_HOST", "smtp.gmail.com"),
+            smtp_port=os.getenv("SMTP_PORT", "465"),
+            username=os.getenv("SMTP_USERNAME"),
+            password=os.getenv("SMTP_PASSWORD"),
+            recipient=os.getenv("EMAIL_TO"),
+            sender=os.getenv("EMAIL_FROM") or os.getenv("SMTP_USERNAME"),
         )
         delivery = notifier.send(result.alerts)
         _append_delivery_log(delivery_log, result.run_id, delivery)
