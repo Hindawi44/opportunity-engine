@@ -38,6 +38,9 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run one autonomous research cycle
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python run_scheduled_agent.py
 
       - name: Save persistent ODS state

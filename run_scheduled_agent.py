@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -9,6 +11,7 @@ import tempfile
 
 from opportunity_engine.ods.autonomous_agent import AutonomousResearchAgent
 from opportunity_engine.ods.brreg_collector import BrregSearchSlice
+from opportunity_engine.ods.notifications import TelegramNotifier
 from opportunity_engine.ods.sqlite_state import SQLiteStateStore, StateFile
 
 
@@ -17,6 +20,17 @@ def _parse_subjects(raw: str) -> tuple[str, ...]:
     if not subjects:
         raise ValueError("at least one search subject is required")
     return subjects
+
+
+def _append_delivery_log(path: Path, run_id: str, delivery) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "run_id": run_id,
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+        **asdict(delivery),
+    }
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
 def main() -> int:
@@ -48,11 +62,13 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="ods-agent-") as directory:
         workdir = Path(directory)
+        delivery_log = workdir / "deliveries.jsonl"
         files = (
             StateFile("feed.json", workdir / "feed.json"),
             StateFile("memory.json", workdir / "memory.json"),
             StateFile("alerts.json", workdir / "alerts.json"),
             StateFile("runs.jsonl", workdir / "runs.jsonl"),
+            StateFile("deliveries.jsonl", delivery_log),
         )
         restored = store.materialize(files)
         agent = AutonomousResearchAgent(
@@ -70,6 +86,12 @@ def main() -> int:
             for subject in subjects
         )
         result = agent.run(slices)
+        notifier = TelegramNotifier(
+            os.getenv("TELEGRAM_BOT_TOKEN"),
+            os.getenv("TELEGRAM_CHAT_ID"),
+        )
+        delivery = notifier.send(result.alerts)
+        _append_delivery_log(delivery_log, result.run_id, delivery)
         captured = store.capture(files)
 
     summary = {
@@ -79,6 +101,7 @@ def main() -> int:
         "opportunities": len(result.decisions),
         "alerts": len(result.alerts),
         "suppressed": result.suppressed_count,
+        "delivery": asdict(delivery),
         "database": str(database_path),
     }
     print(json.dumps(summary, ensure_ascii=False))
