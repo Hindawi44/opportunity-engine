@@ -12,6 +12,7 @@ env:
   ODS_STATE_DB: data/ods_state.sqlite3
   ODS_SEARCH_SUBJECTS: butikk,konkurs,avvikling,varelager
   ODS_PAGE_SIZE: "50"
+  PYTHONPATH: src
 
 jobs:
   run-agent:
@@ -36,6 +37,9 @@ jobs:
 
       - name: Install project
         run: pip install -r requirements.txt
+
+      - name: Verify ODS package import
+        run: python -c "import opportunity_engine; print('opportunity_engine import OK')"
 
       - name: Run one autonomous research cycle
         env:
