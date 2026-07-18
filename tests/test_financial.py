@@ -1,10 +1,16 @@
 import pytest
 
-from opportunity_engine.ods.financial import FinancialInputs, build_financial_report
+from opportunity_engine.ods import LifecycleState, OpportunityCandidate
+from opportunity_engine.ods.financial import (
+    FinancialAssessmentEvidence,
+    FinancialInputs,
+    advance_financially_assessed,
+    build_financial_report,
+)
 
 
-def test_financial_report_calculates_break_even_and_scenarios():
-    report = build_financial_report(
+def _financial_report():
+    return build_financial_report(
         FinancialInputs(
             startup_cost=100_000,
             monthly_fixed_cost=20_000,
@@ -14,6 +20,21 @@ def test_financial_report_calculates_break_even_and_scenarios():
             working_capital_months=3,
         )
     )
+
+
+def _opportunity(state: LifecycleState) -> OpportunityCandidate:
+    return OpportunityCandidate(
+        opportunity_id="opp-financial-1",
+        title="Validated opportunity",
+        description="Validated through measured experiments.",
+        category="service",
+        confidence=0.8,
+        lifecycle_state=state,
+    )
+
+
+def test_financial_report_calculates_break_even_and_scenarios():
+    report = _financial_report()
 
     assert report.required_capital == 160_000
     assert report.contribution_margin_per_unit == 600
@@ -63,3 +84,32 @@ def test_low_margin_adds_warning():
         )
     )
     assert any("below 20%" in warning for warning in report.warnings)
+
+
+def test_validated_opportunity_advances_after_documented_financial_assessment():
+    advanced = advance_financially_assessed(
+        _opportunity(LifecycleState.VALIDATED_OPPORTUNITY),
+        _financial_report(),
+        FinancialAssessmentEvidence(
+            assumption_sources=(
+                "supplier quote dated 2026-07-18",
+                "three signed customer price tests",
+            )
+        ),
+    )
+
+    assert advanced.lifecycle_state is LifecycleState.FINANCIALLY_ASSESSED
+
+
+def test_financial_gate_rejects_unvalidated_opportunity():
+    with pytest.raises(ValueError, match="requires VALIDATED_OPPORTUNITY"):
+        advance_financially_assessed(
+            _opportunity(LifecycleState.HYPOTHESIS),
+            _financial_report(),
+            FinancialAssessmentEvidence(assumption_sources=("documented assumptions",)),
+        )
+
+
+def test_financial_gate_requires_assumption_evidence():
+    with pytest.raises(ValueError, match="at least one assumption source"):
+        FinancialAssessmentEvidence(assumption_sources=())
