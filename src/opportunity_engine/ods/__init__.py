@@ -88,7 +88,13 @@ from .ssb_trends import (
     calculate_trend_adjustment,
 )
 from .tracking import track_workflow_opportunities
-from .validation import ValidationExperiment, ValidationPlugin, ValidationReport
+from .validation import (
+    ValidationExperiment,
+    ValidationExperimentResult,
+    ValidationPlugin,
+    ValidationReport,
+    validate_opportunity,
+)
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
@@ -112,10 +118,11 @@ __all__ = [
     "SSBTrendSignal", "ScanSnapshot", "Scanner", "SourceDocument", "Stage",
     "StageResult", "StaticDataConnector", "Status", "TrendAdjustment",
     "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner", "ValidationExperiment",
-    "ValidationPlugin", "ValidationReport", "WorkflowEngine", "analyze_json_stat2",
-    "analyze_series", "build_alpha_engine", "build_decision_from_analysis",
-    "build_executive_decision", "build_financial_report", "calculate_opportunity_confidence",
-    "calculate_ssb_adjustment", "calculate_trend_adjustment", "can_transition_lifecycle",
-    "parse_finn_atom_feed", "run_live_brreg_analysis", "run_ods",
-    "summarize_brreg_entities", "track_workflow_opportunities",
+    "ValidationExperimentResult", "ValidationPlugin", "ValidationReport",
+    "WorkflowEngine", "analyze_json_stat2", "analyze_series", "build_alpha_engine",
+    "build_decision_from_analysis", "build_executive_decision", "build_financial_report",
+    "calculate_opportunity_confidence", "calculate_ssb_adjustment",
+    "calculate_trend_adjustment", "can_transition_lifecycle", "parse_finn_atom_feed",
+    "run_live_brreg_analysis", "run_ods", "summarize_brreg_entities",
+    "track_workflow_opportunities", "validate_opportunity",
 ]
