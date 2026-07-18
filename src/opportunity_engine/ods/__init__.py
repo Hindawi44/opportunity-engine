@@ -23,7 +23,14 @@ from .discovery import FashionDiscoveryPlugin
 from .discovery_framework import CuratedDiscoveryPlugin, OpportunitySeed, Scanner
 from .evidence_weighting import EvidenceAdjustment, calculate_ssb_adjustment
 from .executive_workflow import ExecutiveWorkflowInputs, build_decision_from_analysis
-from .financial import FinancialInputs, FinancialReport, FinancialScenario, build_financial_report
+from .financial import (
+    FinancialAssessmentEvidence,
+    FinancialInputs,
+    FinancialReport,
+    FinancialScenario,
+    advance_financially_assessed,
+    build_financial_report,
+)
 from .finn import (
     FINN_API_BASE,
     FINN_API_KEY_HEADER,
@@ -106,10 +113,11 @@ __all__ = [
     "DataConnector", "DecisionInputs", "EvidenceAdjustment", "ExecutiveDecision",
     "ExecutiveDecisionReport", "ExecutiveWorkflowInputs", "ExtractionRule",
     "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin",
-    "FinancialInputs", "FinancialReport", "FinancialScenario", "FinnApiClient",
-    "FinnConnector", "LifecycleState", "LiveBrregAnalysis", "LiveDataPipeline",
-    "LiveDataResult", "MemoryRunResult", "ODSAnalysisResult", "ODSPlugin", "ODSRequest",
-    "ODSSession", "OpportunityCandidate", "OpportunityChange", "OpportunityChangeType",
+    "FinancialAssessmentEvidence", "FinancialInputs", "FinancialReport",
+    "FinancialScenario", "FinnApiClient", "FinnConnector", "LifecycleState",
+    "LiveBrregAnalysis", "LiveDataPipeline", "LiveDataResult", "MemoryRunResult",
+    "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
+    "OpportunityCandidate", "OpportunityChange", "OpportunityChangeType",
     "OpportunityConfidence", "OpportunityExtractor", "OpportunityMemoryEngine",
     "OpportunityMemoryRecord", "OpportunityRankingPlugin", "OpportunitySeed",
     "PluginRegistry", "RankedOpportunity", "RankingWeights", "SSB_API_BASE",
@@ -119,8 +127,9 @@ __all__ = [
     "StageResult", "StaticDataConnector", "Status", "TrendAdjustment",
     "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner", "ValidationExperiment",
     "ValidationExperimentResult", "ValidationPlugin", "ValidationReport",
-    "WorkflowEngine", "analyze_json_stat2", "analyze_series", "build_alpha_engine",
-    "build_decision_from_analysis", "build_executive_decision", "build_financial_report",
+    "WorkflowEngine", "advance_financially_assessed", "analyze_json_stat2",
+    "analyze_series", "build_alpha_engine", "build_decision_from_analysis",
+    "build_executive_decision", "build_financial_report",
     "calculate_opportunity_confidence", "calculate_ssb_adjustment",
     "calculate_trend_adjustment", "can_transition_lifecycle", "parse_finn_atom_feed",
     "run_live_brreg_analysis", "run_ods", "summarize_brreg_entities",
