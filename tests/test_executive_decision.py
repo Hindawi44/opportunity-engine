@@ -3,8 +3,10 @@ import pytest
 from opportunity_engine.ods.decision import (
     DecisionInputs,
     ExecutiveDecision,
+    OpportunityDecisionResult,
     advance_decision_candidate,
     build_executive_decision,
+    decide_opportunity,
 )
 from opportunity_engine.ods.financial import FinancialInputs, build_financial_report
 from opportunity_engine.ods.models import LifecycleState, OpportunityCandidate
@@ -68,6 +70,34 @@ def test_decision_candidate_gate_rejects_invalid_component_score():
             opportunity_confidence=86,
             validation_readiness=80,
             evidence_quality=101,
+            market_health=78,
+            financial_report=_financial(),
+        )
+
+
+def test_decide_opportunity_binds_report_to_exact_candidate():
+    result = decide_opportunity(
+        _opportunity(LifecycleState.DECISION_CANDIDATE),
+        opportunity_confidence=86,
+        validation_readiness=80,
+        evidence_quality=90,
+        market_health=78,
+        financial_report=_financial(),
+    )
+
+    assert isinstance(result, OpportunityDecisionResult)
+    assert result.opportunity_id == "opp-1"
+    assert result.lifecycle_state is LifecycleState.DECISION_CANDIDATE
+    assert result.report.decision is ExecutiveDecision.GO
+
+
+def test_decide_opportunity_rejects_non_candidate():
+    with pytest.raises(ValueError, match="requires lifecycle state decision_candidate"):
+        decide_opportunity(
+            _opportunity(LifecycleState.FINANCIALLY_ASSESSED),
+            opportunity_confidence=86,
+            validation_readiness=80,
+            evidence_quality=90,
             market_health=78,
             financial_report=_financial(),
         )
