@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .models import LifecycleState, OpportunityCandidate
+
 
 @dataclass(frozen=True)
 class FinancialInputs:
@@ -57,6 +59,20 @@ class FinancialReport:
     warnings: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class FinancialAssessmentEvidence:
+    """Auditable provenance for the assumptions used in a financial report."""
+
+    assumption_sources: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        cleaned = tuple(item.strip() for item in self.assumption_sources if item.strip())
+        if not cleaned:
+            raise ValueError("financial assessment requires at least one assumption source")
+        if len(cleaned) != len(self.assumption_sources):
+            raise ValueError("financial assumption sources must not be empty")
+
+
 def build_financial_report(inputs: FinancialInputs) -> FinancialReport:
     """Calculate break-even and three bounded demand scenarios."""
     margin = inputs.unit_price - inputs.unit_variable_cost
@@ -100,6 +116,32 @@ def build_financial_report(inputs: FinancialInputs) -> FinancialReport:
         scenarios=scenarios,
         warnings=tuple(warnings),
     )
+
+
+def advance_financially_assessed(
+    opportunity: OpportunityCandidate,
+    report: FinancialReport,
+    evidence: FinancialAssessmentEvidence,
+) -> OpportunityCandidate:
+    """Advance only a validated opportunity backed by a complete financial report.
+
+    This transition records that economics were assessed; it does not assert that the
+    opportunity is profitable or suitable for investment.
+    """
+
+    if opportunity.lifecycle_state is not LifecycleState.VALIDATED_OPPORTUNITY:
+        raise ValueError("financial assessment requires VALIDATED_OPPORTUNITY")
+    expected_scenarios = {"conservative", "base", "upside"}
+    actual_scenarios = {scenario.name for scenario in report.scenarios}
+    if actual_scenarios != expected_scenarios:
+        raise ValueError("financial assessment requires conservative, base, and upside scenarios")
+    if report.required_capital < 0:
+        raise ValueError("required capital must not be negative")
+    if report.contribution_margin_per_unit <= 0:
+        raise ValueError("financial assessment requires a positive contribution margin")
+    if not evidence.assumption_sources:
+        raise ValueError("financial assessment requires assumption evidence")
+    return opportunity.transition_to(LifecycleState.FINANCIALLY_ASSESSED)
 
 
 def _scenario(
