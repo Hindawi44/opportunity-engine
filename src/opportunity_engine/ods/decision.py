@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from .financial import FinancialReport
-from .models import LifecycleState
+from .models import LifecycleState, OpportunityCandidate
 
 
 class ExecutiveDecision(str, Enum):
@@ -58,6 +58,40 @@ class ExecutiveDecisionReport:
     first_90_days: tuple[str, ...]
 
 
+def advance_decision_candidate(
+    opportunity: OpportunityCandidate,
+    *,
+    opportunity_confidence: float,
+    validation_readiness: float,
+    evidence_quality: float,
+    market_health: float,
+    financial_report: FinancialReport,
+) -> OpportunityCandidate:
+    """Advance a financially assessed opportunity only when decision inputs are complete."""
+
+    if opportunity.lifecycle_state is not LifecycleState.FINANCIALLY_ASSESSED:
+        raise ValueError(
+            "decision candidate advancement requires lifecycle state financially_assessed; "
+            f"received {opportunity.lifecycle_state.value}"
+        )
+
+    for name, value in (
+        ("opportunity_confidence", opportunity_confidence),
+        ("validation_readiness", validation_readiness),
+        ("evidence_quality", evidence_quality),
+        ("market_health", market_health),
+    ):
+        if not 0.0 <= value <= 100.0:
+            raise ValueError(f"{name} must be between 0 and 100")
+
+    if not financial_report.scenarios:
+        raise ValueError("decision candidate advancement requires financial scenarios")
+    if not any(item.name == "base" for item in financial_report.scenarios):
+        raise ValueError("decision candidate advancement requires a base financial scenario")
+
+    return opportunity.transition_to(LifecycleState.DECISION_CANDIDATE)
+
+
 def build_executive_decision(inputs: DecisionInputs) -> ExecutiveDecisionReport:
     """Create a conservative GO/WAIT/REJECT recommendation with explanations."""
     components: list[tuple[str, float, float]] = [
@@ -76,7 +110,6 @@ def build_executive_decision(inputs: DecisionInputs) -> ExecutiveDecisionReport:
     else:
         components.append(("market", inputs.market_health, 0.10))
 
-    financial_score = None
     blockers: list[str] = []
     if inputs.financial_report is None:
         missing.append("financial assumptions")
