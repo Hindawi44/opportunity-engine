@@ -73,6 +73,12 @@ from .models import (
     Status,
     can_transition_lifecycle,
 )
+from .outcome_learning import (
+    OutcomeLearning,
+    OutcomeObservation,
+    learn_from_outcome,
+    record_outcome,
+)
 from .plugins import ODSPlugin, PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
 from .runner import ODSAnalysisResult, USABLE_ALPHA_WORKFLOW, build_alpha_engine, run_ods
@@ -123,19 +129,20 @@ __all__ = [
     "OpportunityCandidate", "OpportunityChange", "OpportunityChangeType",
     "OpportunityConfidence", "OpportunityDecisionResult", "OpportunityExtractor",
     "OpportunityMemoryEngine", "OpportunityMemoryRecord", "OpportunityRankingPlugin",
-    "OpportunitySeed", "PluginRegistry", "RankedOpportunity", "RankingWeights",
-    "SSB_API_BASE", "SSB_RETAIL_TABLE_ID", "SSB_RETAIL_TABLE_URL", "SSBClient",
-    "SSBConnector", "SSBMarketEvidence", "SSBMarketEvidenceService",
-    "SSBTrendIntelligenceService", "SSBTrendSignal", "ScanSnapshot", "Scanner",
-    "SourceDocument", "Stage", "StageResult", "StaticDataConnector", "Status",
-    "TrendAdjustment", "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner",
-    "ValidationExperiment", "ValidationExperimentResult", "ValidationPlugin",
-    "ValidationReport", "WorkflowEngine", "advance_decision_candidate",
-    "advance_financially_assessed", "analyze_json_stat2", "analyze_series",
-    "build_alpha_engine", "build_decision_from_analysis", "build_executive_decision",
-    "build_financial_report", "calculate_opportunity_confidence",
-    "calculate_ssb_adjustment", "calculate_trend_adjustment",
-    "can_transition_lifecycle", "decide_opportunity", "parse_finn_atom_feed",
+    "OpportunitySeed", "OutcomeLearning", "OutcomeObservation", "PluginRegistry",
+    "RankedOpportunity", "RankingWeights", "SSB_API_BASE", "SSB_RETAIL_TABLE_ID",
+    "SSB_RETAIL_TABLE_URL", "SSBClient", "SSBConnector", "SSBMarketEvidence",
+    "SSBMarketEvidenceService", "SSBTrendIntelligenceService", "SSBTrendSignal",
+    "ScanSnapshot", "Scanner", "SourceDocument", "Stage", "StageResult",
+    "StaticDataConnector", "Status", "TrendAdjustment", "USABLE_ALPHA_WORKFLOW",
+    "UniversalOpportunityScanner", "ValidationExperiment", "ValidationExperimentResult",
+    "ValidationPlugin", "ValidationReport", "WorkflowEngine",
+    "advance_decision_candidate", "advance_financially_assessed", "analyze_json_stat2",
+    "analyze_series", "build_alpha_engine", "build_decision_from_analysis",
+    "build_executive_decision", "build_financial_report",
+    "calculate_opportunity_confidence", "calculate_ssb_adjustment",
+    "calculate_trend_adjustment", "can_transition_lifecycle", "decide_opportunity",
+    "learn_from_outcome", "parse_finn_atom_feed", "record_outcome",
     "run_live_brreg_analysis", "run_ods", "summarize_brreg_entities",
     "track_workflow_opportunities", "validate_opportunity",
 ]
