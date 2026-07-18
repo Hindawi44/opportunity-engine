@@ -6,6 +6,7 @@ from opportunity_engine.ods.decision import (
     build_executive_decision,
 )
 from opportunity_engine.ods.financial import FinancialInputs, build_financial_report
+from opportunity_engine.ods.models import LifecycleState
 
 
 def _financial(*, units: float = 50, margin_cost: float = 400):
@@ -84,3 +85,24 @@ def test_rejects_weak_confidence_or_validation():
 def test_invalid_scores_are_rejected():
     with pytest.raises(ValueError, match="between 0 and 100"):
         DecisionInputs(opportunity_confidence=101, validation_readiness=50)
+
+
+def test_decision_engine_rejects_non_decision_candidate_lifecycle():
+    for state in (
+        LifecycleState.DOCUMENT,
+        LifecycleState.SIGNAL,
+        LifecycleState.LEAD,
+        LifecycleState.VERIFIED_LEAD,
+        LifecycleState.HYPOTHESIS,
+        LifecycleState.VALIDATED_OPPORTUNITY,
+        LifecycleState.FINANCIALLY_ASSESSED,
+    ):
+        with pytest.raises(ValueError, match="requires lifecycle state decision_candidate"):
+            DecisionInputs(
+                opportunity_confidence=90,
+                validation_readiness=90,
+                evidence_quality=90,
+                market_health=90,
+                financial_report=_financial(),
+                lifecycle_state=state,
+            )
