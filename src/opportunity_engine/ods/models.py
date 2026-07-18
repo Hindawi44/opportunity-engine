@@ -39,6 +39,9 @@ class LifecycleState(str, Enum):
     VALIDATED_OPPORTUNITY = "validated_opportunity"
     FINANCIALLY_ASSESSED = "financially_assessed"
     DECISION_CANDIDATE = "decision_candidate"
+    EXECUTION = "execution"
+    MONITORING = "monitoring"
+    ARCHIVED = "archived"
 
 
 _ALLOWED_LIFECYCLE_TRANSITIONS: dict[LifecycleState, frozenset[LifecycleState]] = {
@@ -49,7 +52,16 @@ _ALLOWED_LIFECYCLE_TRANSITIONS: dict[LifecycleState, frozenset[LifecycleState]] 
     LifecycleState.HYPOTHESIS: frozenset({LifecycleState.VALIDATED_OPPORTUNITY}),
     LifecycleState.VALIDATED_OPPORTUNITY: frozenset({LifecycleState.FINANCIALLY_ASSESSED}),
     LifecycleState.FINANCIALLY_ASSESSED: frozenset({LifecycleState.DECISION_CANDIDATE}),
-    LifecycleState.DECISION_CANDIDATE: frozenset(),
+    LifecycleState.DECISION_CANDIDATE: frozenset(
+        {
+            LifecycleState.EXECUTION,
+            LifecycleState.MONITORING,
+            LifecycleState.ARCHIVED,
+        }
+    ),
+    LifecycleState.EXECUTION: frozenset(),
+    LifecycleState.MONITORING: frozenset(),
+    LifecycleState.ARCHIVED: frozenset(),
 }
 
 
