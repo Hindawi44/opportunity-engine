@@ -3,10 +3,11 @@ import pytest
 from opportunity_engine.ods.decision import (
     DecisionInputs,
     ExecutiveDecision,
+    advance_decision_candidate,
     build_executive_decision,
 )
 from opportunity_engine.ods.financial import FinancialInputs, build_financial_report
-from opportunity_engine.ods.models import LifecycleState
+from opportunity_engine.ods.models import LifecycleState, OpportunityCandidate
 
 
 def _financial(*, units: float = 50, margin_cost: float = 400):
@@ -20,6 +21,56 @@ def _financial(*, units: float = 50, margin_cost: float = 400):
             working_capital_months=3,
         )
     )
+
+
+def _opportunity(state: LifecycleState) -> OpportunityCandidate:
+    return OpportunityCandidate(
+        opportunity_id="opp-1",
+        title="Example opportunity",
+        description="Validated and financially assessed opportunity",
+        category="test",
+        evidence=("validation evidence", "financial evidence"),
+        confidence=0.9,
+        source_plugin="test",
+        lifecycle_state=state,
+    )
+
+
+def test_financially_assessed_item_can_advance_to_decision_candidate():
+    advanced = advance_decision_candidate(
+        _opportunity(LifecycleState.FINANCIALLY_ASSESSED),
+        opportunity_confidence=86,
+        validation_readiness=80,
+        evidence_quality=90,
+        market_health=78,
+        financial_report=_financial(),
+    )
+
+    assert advanced.lifecycle_state is LifecycleState.DECISION_CANDIDATE
+
+
+def test_decision_candidate_gate_rejects_wrong_lifecycle():
+    with pytest.raises(ValueError, match="requires lifecycle state financially_assessed"):
+        advance_decision_candidate(
+            _opportunity(LifecycleState.VALIDATED_OPPORTUNITY),
+            opportunity_confidence=86,
+            validation_readiness=80,
+            evidence_quality=90,
+            market_health=78,
+            financial_report=_financial(),
+        )
+
+
+def test_decision_candidate_gate_rejects_invalid_component_score():
+    with pytest.raises(ValueError, match="evidence_quality must be between 0 and 100"):
+        advance_decision_candidate(
+            _opportunity(LifecycleState.FINANCIALLY_ASSESSED),
+            opportunity_confidence=86,
+            validation_readiness=80,
+            evidence_quality=101,
+            market_health=78,
+            financial_report=_financial(),
+        )
 
 
 def test_go_requires_complete_strong_evidence_and_viable_finance():
