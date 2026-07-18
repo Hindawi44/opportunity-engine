@@ -17,6 +17,7 @@ from .decision import (
     DecisionInputs,
     ExecutiveDecision,
     ExecutiveDecisionReport,
+    advance_decision_candidate,
     build_executive_decision,
 )
 from .discovery import FashionDiscoveryPlugin
@@ -127,9 +128,9 @@ __all__ = [
     "StageResult", "StaticDataConnector", "Status", "TrendAdjustment",
     "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner", "ValidationExperiment",
     "ValidationExperimentResult", "ValidationPlugin", "ValidationReport",
-    "WorkflowEngine", "advance_financially_assessed", "analyze_json_stat2",
-    "analyze_series", "build_alpha_engine", "build_decision_from_analysis",
-    "build_executive_decision", "build_financial_report",
+    "WorkflowEngine", "advance_decision_candidate", "advance_financially_assessed",
+    "analyze_json_stat2", "analyze_series", "build_alpha_engine",
+    "build_decision_from_analysis", "build_executive_decision", "build_financial_report",
     "calculate_opportunity_confidence", "calculate_ssb_adjustment",
     "calculate_trend_adjustment", "can_transition_lifecycle", "parse_finn_atom_feed",
     "run_live_brreg_analysis", "run_ods", "summarize_brreg_entities",
