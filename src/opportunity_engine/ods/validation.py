@@ -1,11 +1,11 @@
-"""Deterministic validation planning stage for ODS alpha."""
+"""Deterministic validation planning and lifecycle gate for ODS."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 from .bdna import BusinessBlueprint
-from .models import ODSSession, Stage, StageResult, Status
+from .models import LifecycleState, ODSSession, OpportunityCandidate, Stage, StageResult, Status
 
 
 @dataclass(frozen=True)
@@ -19,6 +19,27 @@ class ValidationExperiment:
     success_criteria: str
     failure_criteria: str
     required_metrics: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class ValidationExperimentResult:
+    """Observed result from one completed validation experiment."""
+
+    hypothesis: str
+    completed: bool
+    passed: bool
+    measured_metrics: tuple[str, ...]
+    evidence: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not self.hypothesis.strip():
+            raise ValueError("hypothesis must not be empty")
+        if self.completed and not self.measured_metrics:
+            raise ValueError("completed validation result requires measured_metrics")
+        if self.passed and not self.completed:
+            raise ValueError("an incomplete validation result cannot pass")
+        if self.passed and not self.evidence:
+            raise ValueError("a passing validation result requires evidence")
 
 
 @dataclass(frozen=True)
@@ -40,6 +61,43 @@ class ValidationReport:
             raise ValueError("experiments must not be empty")
         if not 0 <= self.readiness_score <= 100:
             raise ValueError("readiness_score must be between 0 and 100")
+
+
+def validate_opportunity(
+    candidate: OpportunityCandidate,
+    plan: ValidationReport,
+    results: tuple[ValidationExperimentResult, ...],
+) -> OpportunityCandidate:
+    """Advance a hypothesis only when every planned experiment passed with evidence."""
+
+    if candidate.lifecycle_state is not LifecycleState.HYPOTHESIS:
+        raise ValueError("validation gate requires lifecycle state HYPOTHESIS")
+    if plan.opportunity_id != candidate.opportunity_id:
+        raise ValueError("validation plan does not belong to this opportunity")
+    if len(results) != len(plan.experiments):
+        raise ValueError("every planned validation experiment requires one result")
+
+    planned = {experiment.hypothesis: experiment for experiment in plan.experiments}
+    observed = {result.hypothesis: result for result in results}
+    if len(observed) != len(results):
+        raise ValueError("validation results contain duplicate hypotheses")
+    if set(observed) != set(planned):
+        raise ValueError("validation results must match the planned hypotheses")
+
+    for hypothesis, experiment in planned.items():
+        result = observed[hypothesis]
+        if not result.completed:
+            raise ValueError(f"validation experiment is incomplete: {hypothesis}")
+        if not result.passed:
+            raise ValueError(f"validation experiment failed: {hypothesis}")
+        missing_metrics = set(experiment.required_metrics) - set(result.measured_metrics)
+        if missing_metrics:
+            missing = ", ".join(sorted(missing_metrics))
+            raise ValueError(f"validation experiment is missing required metrics: {missing}")
+        if not result.evidence:
+            raise ValueError(f"validation experiment has no evidence: {hypothesis}")
+
+    return candidate.transition_to(LifecycleState.VALIDATED_OPPORTUNITY)
 
 
 class ValidationPlugin:
@@ -128,7 +186,6 @@ class ValidationPlugin:
 
     @staticmethod
     def _readiness_score(experiments: tuple[ValidationExperiment, ...]) -> float:
-        # Alpha score rewards concrete sample, time, success/failure gates, and metrics.
         complete = sum(
             bool(item.target_sample)
             and item.duration_days > 0
