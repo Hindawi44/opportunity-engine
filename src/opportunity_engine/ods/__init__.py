@@ -53,7 +53,16 @@ from .memory import (
     OpportunityMemoryEngine,
     OpportunityMemoryRecord,
 )
-from .models import ODSRequest, ODSSession, OpportunityCandidate, Stage, StageResult, Status
+from .models import (
+    LifecycleState,
+    ODSRequest,
+    ODSSession,
+    OpportunityCandidate,
+    Stage,
+    StageResult,
+    Status,
+    can_transition_lifecycle,
+)
 from .plugins import ODSPlugin, PluginRegistry
 from .ranking import OpportunityRankingPlugin, RankedOpportunity, RankingWeights
 from .runner import ODSAnalysisResult, USABLE_ALPHA_WORKFLOW, build_alpha_engine, run_ods
@@ -92,9 +101,9 @@ __all__ = [
     "ExecutiveDecisionReport", "ExecutiveWorkflowInputs", "ExtractionRule",
     "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin",
     "FinancialInputs", "FinancialReport", "FinancialScenario", "FinnApiClient",
-    "FinnConnector", "LiveBrregAnalysis", "LiveDataPipeline", "LiveDataResult",
-    "MemoryRunResult", "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
-    "OpportunityCandidate", "OpportunityChange", "OpportunityChangeType",
+    "FinnConnector", "LifecycleState", "LiveBrregAnalysis", "LiveDataPipeline",
+    "LiveDataResult", "MemoryRunResult", "ODSAnalysisResult", "ODSPlugin", "ODSRequest",
+    "ODSSession", "OpportunityCandidate", "OpportunityChange", "OpportunityChangeType",
     "OpportunityConfidence", "OpportunityExtractor", "OpportunityMemoryEngine",
     "OpportunityMemoryRecord", "OpportunityRankingPlugin", "OpportunitySeed",
     "PluginRegistry", "RankedOpportunity", "RankingWeights", "SSB_API_BASE",
@@ -105,8 +114,8 @@ __all__ = [
     "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner", "ValidationExperiment",
     "ValidationPlugin", "ValidationReport", "WorkflowEngine", "analyze_json_stat2",
     "analyze_series", "build_alpha_engine", "build_decision_from_analysis",
-    "build_executive_decision", "build_financial_report",
-    "calculate_opportunity_confidence", "calculate_ssb_adjustment",
-    "calculate_trend_adjustment", "parse_finn_atom_feed", "run_live_brreg_analysis",
-    "run_ods", "summarize_brreg_entities", "track_workflow_opportunities",
+    "build_executive_decision", "build_financial_report", "calculate_opportunity_confidence",
+    "calculate_ssb_adjustment", "calculate_trend_adjustment", "can_transition_lifecycle",
+    "parse_finn_atom_feed", "run_live_brreg_analysis", "run_ods",
+    "summarize_brreg_entities", "track_workflow_opportunities",
 ]
