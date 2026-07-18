@@ -2,6 +2,7 @@
 
 The engine combines already-computed evidence, validation, and user-entered
 financial assumptions. It does not invent market facts or financial forecasts.
+Only lifecycle items at ``DECISION_CANDIDATE`` may enter this engine.
 """
 
 from __future__ import annotations
@@ -10,6 +11,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from .financial import FinancialReport
+from .models import LifecycleState
 
 
 class ExecutiveDecision(str, Enum):
@@ -25,8 +27,14 @@ class DecisionInputs:
     evidence_quality: float | None = None
     market_health: float | None = None
     financial_report: FinancialReport | None = None
+    lifecycle_state: LifecycleState = LifecycleState.DECISION_CANDIDATE
 
     def __post_init__(self) -> None:
+        if self.lifecycle_state is not LifecycleState.DECISION_CANDIDATE:
+            raise ValueError(
+                "executive decision requires lifecycle state decision_candidate; "
+                f"received {self.lifecycle_state.value}"
+            )
         for name, value in (
             ("opportunity_confidence", self.opportunity_confidence),
             ("validation_readiness", self.validation_readiness),
@@ -48,7 +56,6 @@ class ExecutiveDecisionReport:
     first_7_days: tuple[str, ...]
     first_30_days: tuple[str, ...]
     first_90_days: tuple[str, ...]
-
 
 
 def build_executive_decision(inputs: DecisionInputs) -> ExecutiveDecisionReport:
@@ -108,7 +115,6 @@ def build_executive_decision(inputs: DecisionInputs) -> ExecutiveDecisionReport:
     )
 
 
-
 def _financial_score(report: FinancialReport) -> tuple[float, tuple[str, ...]]:
     base = next((item for item in report.scenarios if item.name == "base"), report.scenarios[0])
     blockers: list[str] = []
@@ -132,7 +138,6 @@ def _financial_score(report: FinancialReport) -> tuple[float, tuple[str, ...]]:
     return max(0.0, min(100.0, score)), tuple(blockers)
 
 
-
 def _reasons(components: list[tuple[str, float, float]], decision: ExecutiveDecision) -> tuple[str, ...]:
     labels = {
         "confidence": "Opportunity confidence",
@@ -145,7 +150,6 @@ def _reasons(components: list[tuple[str, float, float]], decision: ExecutiveDeci
     reasons = [f"{labels[name]}: {value:.0f}/100" for name, value, _ in ordered[:3]]
     reasons.append(f"Executive rule outcome: {decision.value}.")
     return tuple(reasons)
-
 
 
 def _roadmap(
