@@ -58,6 +58,16 @@ class ExecutiveDecisionReport:
     first_90_days: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class OpportunityDecisionResult:
+    """Binds an executive decision to the exact lifecycle candidate it evaluated."""
+
+    opportunity_id: str
+    lifecycle_state: LifecycleState
+    report: ExecutiveDecisionReport
+
+
+
 def advance_decision_candidate(
     opportunity: OpportunityCandidate,
     *,
@@ -90,6 +100,42 @@ def advance_decision_candidate(
         raise ValueError("decision candidate advancement requires a base financial scenario")
 
     return opportunity.transition_to(LifecycleState.DECISION_CANDIDATE)
+
+
+
+def decide_opportunity(
+    opportunity: OpportunityCandidate,
+    *,
+    opportunity_confidence: float,
+    validation_readiness: float,
+    evidence_quality: float,
+    market_health: float,
+    financial_report: FinancialReport,
+) -> OpportunityDecisionResult:
+    """Issue GO/WAIT/REJECT only for the supplied decision candidate."""
+
+    if opportunity.lifecycle_state is not LifecycleState.DECISION_CANDIDATE:
+        raise ValueError(
+            "opportunity decision requires lifecycle state decision_candidate; "
+            f"received {opportunity.lifecycle_state.value}"
+        )
+
+    report = build_executive_decision(
+        DecisionInputs(
+            opportunity_confidence=opportunity_confidence,
+            validation_readiness=validation_readiness,
+            evidence_quality=evidence_quality,
+            market_health=market_health,
+            financial_report=financial_report,
+            lifecycle_state=opportunity.lifecycle_state,
+        )
+    )
+    return OpportunityDecisionResult(
+        opportunity_id=opportunity.opportunity_id,
+        lifecycle_state=opportunity.lifecycle_state,
+        report=report,
+    )
+
 
 
 def build_executive_decision(inputs: DecisionInputs) -> ExecutiveDecisionReport:
@@ -148,6 +194,7 @@ def build_executive_decision(inputs: DecisionInputs) -> ExecutiveDecisionReport:
     )
 
 
+
 def _financial_score(report: FinancialReport) -> tuple[float, tuple[str, ...]]:
     base = next((item for item in report.scenarios if item.name == "base"), report.scenarios[0])
     blockers: list[str] = []
@@ -171,6 +218,7 @@ def _financial_score(report: FinancialReport) -> tuple[float, tuple[str, ...]]:
     return max(0.0, min(100.0, score)), tuple(blockers)
 
 
+
 def _reasons(components: list[tuple[str, float, float]], decision: ExecutiveDecision) -> tuple[str, ...]:
     labels = {
         "confidence": "Opportunity confidence",
@@ -183,6 +231,7 @@ def _reasons(components: list[tuple[str, float, float]], decision: ExecutiveDeci
     reasons = [f"{labels[name]}: {value:.0f}/100" for name, value, _ in ordered[:3]]
     reasons.append(f"Executive rule outcome: {decision.value}.")
     return tuple(reasons)
+
 
 
 def _roadmap(
