@@ -1,31 +1,25 @@
-"""End-to-end live opportunity path backed by public Brreg records.
-
-This module closes the first real ODS loop:
-public source -> normalized evidence -> grounded opportunity -> ranking -> decision.
-It only emits an opportunity when an official record explicitly carries a
-bankruptcy or liquidation flag. It does not infer that assets are available.
-"""
+"""Live Brreg status-signal path backed by official public records."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 from .brreg import BrregConnector
-from .decision import DecisionInputs, ExecutiveDecisionReport, build_executive_decision
-from .models import ODSRequest, ODSSession, OpportunityCandidate, Stage, StageResult, Status
-from .ranking import OpportunityRankingPlugin, RankedOpportunity
-from .scanner import ConnectorRegistry, ScanSnapshot, UniversalOpportunityScanner
+from .decision import ExecutiveDecisionReport
 from .live_data import SourceDocument
+from .models import LifecycleState, ODSRequest, OpportunityCandidate
+from .ranking import RankedOpportunity
+from .scanner import ConnectorRegistry, ScanSnapshot, UniversalOpportunityScanner
 
 
 class BrregStatusOpportunityExtractor:
-    """Create follow-up opportunities only from explicit official status flags."""
+    """Create SIGNAL items only from explicit official status flags."""
 
     def extract(
         self,
         documents: tuple[SourceDocument, ...],
         request: ODSRequest,
     ) -> tuple[OpportunityCandidate, ...]:
-        candidates: list[OpportunityCandidate] = []
+        signals: list[OpportunityCandidate] = []
         for document in documents:
             bankrupt = bool(document.metadata.get("bankrupt"))
             liquidation = bool(document.metadata.get("under_liquidation"))
@@ -45,22 +39,23 @@ class BrregStatusOpportunityExtractor:
                 )
                 if item
             )
-            candidates.append(
+            signals.append(
                 OpportunityCandidate(
                     opportunity_id=f"brreg-status-{orgnr}",
-                    title=f"Verify potential business assets or service needs: {document.title}",
+                    title=f"Investigate official company status: {document.title}",
                     description=(
                         f"Official Brreg data marks {document.title} ({orgnr}) as under {status}. "
-                        "This is a verified lead for manual follow-up with the estate administrator "
-                        "or company contact. The record alone does not prove that assets are for sale."
+                        "This is a lifecycle signal for manual investigation only. The record "
+                        "does not prove that assets are available or that a commercial opportunity exists."
                     ),
-                    category="liquidation_assets",
+                    category="company_status",
                     evidence=evidence,
                     confidence=0.72 if bankrupt else 0.66,
                     source_plugin="brreg_status_extractor",
+                    lifecycle_state=LifecycleState.SIGNAL,
                 )
             )
-        return tuple(candidates)
+        return tuple(signals)
 
 
 @dataclass(frozen=True)
@@ -81,11 +76,8 @@ def run_live_brreg_analysis(
     shortlist_size: int = 10,
     connector: BrregConnector | None = None,
 ) -> LiveBrregAnalysis:
-    """Run the first live public-source ODS path.
-
-    Empty results are valid: they mean the sampled official records contained no
-    explicit bankruptcy/liquidation signal, not that no such entities exist.
-    """
+    """Collect Brreg documents and expose status signals without ranking or decision."""
+    _ = shortlist_size
     request = ODSRequest(subject=subject, country=country)
     active_connector = connector or BrregConnector(
         municipality=municipality,
@@ -97,31 +89,4 @@ def run_live_brreg_analysis(
         extractor=BrregStatusOpportunityExtractor(),
     )
     scan = scanner.scan(request)
-    if not scan.opportunities:
-        return LiveBrregAnalysis(request, scan, (), None)
-
-    session = ODSSession(request=request, status=Status.RUNNING)
-    session.results[Stage.DISCOVERY] = StageResult(
-        stage=Stage.DISCOVERY,
-        status=Status.COMPLETED,
-        payload=scan.opportunities,
-        evidence=[f"live_scan:{scan.scan_id}"],
-    )
-    ranking_result = OpportunityRankingPlugin(shortlist_size=shortlist_size).run(session)
-    if ranking_result.status is not Status.COMPLETED:
-        raise RuntimeError("live Brreg ranking failed: " + "; ".join(ranking_result.errors))
-    ranked = ranking_result.payload
-    if not isinstance(ranked, tuple):
-        raise RuntimeError("live Brreg ranking returned an invalid payload")
-
-    top = ranked[0]
-    decision = build_executive_decision(
-        DecisionInputs(
-            opportunity_confidence=top.final_score,
-            validation_readiness=40.0,
-            evidence_quality=90.0,
-            market_health=None,
-            financial_report=None,
-        )
-    )
-    return LiveBrregAnalysis(request, scan, ranked, decision)
+    return LiveBrregAnalysis(request, scan, (), None)
