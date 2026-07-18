@@ -1,8 +1,4 @@
-"""Conservative decision engine for enriched live opportunities.
-
-A GO decision is allowed only when evidence is strong, multi-source, and includes
-verified asset, price, and financial evidence. Brreg status alone can never produce GO.
-"""
+"""Conservative decision engine for enriched live opportunities."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -10,6 +6,7 @@ from enum import Enum
 from typing import Iterable
 
 from .evidence_enrichment import EnrichedOpportunity, EvidenceBand
+from .models import LifecycleState
 
 
 class OpportunityDecision(str, Enum):
@@ -32,26 +29,30 @@ class OpportunityDecisionReport:
     next_actions: tuple[str, ...]
 
 
-def decide_opportunity(enriched: EnrichedOpportunity) -> OpportunityDecisionReport:
+def decide_opportunity(
+    enriched: EnrichedOpportunity,
+    *,
+    lifecycle_state: LifecycleState = LifecycleState.DECISION_CANDIDATE,
+) -> OpportunityDecisionReport:
+    if lifecycle_state is not LifecycleState.DECISION_CANDIDATE:
+        raise ValueError(
+            "opportunity decision requires lifecycle state decision_candidate; "
+            f"received {lifecycle_state.value}"
+        )
+
     item = enriched.item
     ranking_score = item.score if item.score is not None else 0.0
     evidence_score = enriched.evidence_score
     completeness = enriched.completeness
     sources = enriched.independent_sources
-
-    score = round(
-        0.35 * ranking_score
-        + 0.40 * evidence_score
-        + 0.25 * completeness,
-        1,
-    )
+    score = round(0.35 * ranking_score + 0.40 * evidence_score + 0.25 * completeness, 1)
 
     has_market_price = any(f.kind == "market_price" for f in enriched.facts)
     has_asset_listing = any(f.kind == "asset_listing" for f in enriched.facts)
     has_financials = any(f.kind == "financials" for f in enriched.facts)
     required_for_go = has_market_price and has_asset_listing and has_financials
 
-    reasons: list[str] = [
+    reasons = [
         f"Ranking score: {ranking_score:.1f}/100",
         f"Evidence score: {evidence_score:.1f}/100",
         f"Evidence completeness: {completeness:.1f}%",
@@ -59,13 +60,7 @@ def decide_opportunity(enriched: EnrichedOpportunity) -> OpportunityDecisionRepo
     ]
     blockers = list(enriched.blockers)
 
-    if (
-        score >= 75
-        and enriched.band is EvidenceBand.STRONG
-        and completeness >= 80
-        and sources >= 3
-        and required_for_go
-    ):
+    if score >= 75 and enriched.band is EvidenceBand.STRONG and completeness >= 80 and sources >= 3 and required_for_go:
         decision = OpportunityDecision.GO
         next_actions = (
             "Verify the seller or estate representative and asset ownership",
@@ -111,20 +106,13 @@ def decide_opportunity(enriched: EnrichedOpportunity) -> OpportunityDecisionRepo
 
 def decide_opportunities(
     opportunities: Iterable[EnrichedOpportunity],
+    *,
+    lifecycle_state: LifecycleState = LifecycleState.DECISION_CANDIDATE,
 ) -> tuple[OpportunityDecisionReport, ...]:
-    reports = [decide_opportunity(item) for item in opportunities]
+    reports = [decide_opportunity(item, lifecycle_state=lifecycle_state) for item in opportunities]
     priority = {
         OpportunityDecision.GO: 0,
         OpportunityDecision.WATCH: 1,
         OpportunityDecision.REJECT: 2,
     }
-    return tuple(
-        sorted(
-            reports,
-            key=lambda report: (
-                priority[report.decision],
-                -report.decision_score,
-                report.title.casefold(),
-            ),
-        )
-    )
+    return tuple(sorted(reports, key=lambda report: (priority[report.decision], -report.decision_score, report.title.casefold())))
