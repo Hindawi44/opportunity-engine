@@ -1,5 +1,12 @@
 """Opportunity Development System core package."""
 
+from .auksjonen import (
+    AUKSJONEN_BASE_URL,
+    AUKSJONEN_LISTINGS_URL,
+    AuksjonenClient,
+    AuksjonenConnector,
+    parse_auksjonen_listing_page,
+)
 from .bdna import BDNAPlugin, BusinessBlueprint
 from .brreg import BRREG_API_BASE, BRREG_ENTITY_MEDIA_TYPE, BrregClient, BrregConnector
 from .brreg_collector import (
@@ -133,6 +140,7 @@ from .validation import (
 from .workflow import DEFAULT_WORKFLOW, WorkflowEngine
 
 __all__ = [
+    "AUKSJONEN_BASE_URL", "AUKSJONEN_LISTINGS_URL", "AuksjonenClient", "AuksjonenConnector",
     "BDNAPlugin", "BRREG_API_BASE", "BRREG_ENTITY_MEDIA_TYPE", "BrregClient",
     "BrregCollectionResult", "BrregConnector", "BrregEvidenceSummary",
     "BrregOpportunityCollector", "BrregSearchSlice", "BrregStatusOpportunityExtractor",
@@ -163,8 +171,8 @@ __all__ = [
     "build_decision_from_analysis", "build_executive_decision", "build_financial_report",
     "calculate_opportunity_confidence", "calculate_ssb_adjustment",
     "calculate_trend_adjustment", "can_transition_lifecycle", "create_policy_proposal",
-    "decide_opportunity", "learn_from_outcome", "parse_finn_atom_feed", "record_outcome",
-    "review_policy_proposal", "run_live_brreg_analysis", "run_ods",
-    "stage_approved_policy_change", "summarize_brreg_entities",
-    "track_workflow_opportunities", "validate_opportunity",
+    "decide_opportunity", "learn_from_outcome", "parse_auksjonen_listing_page",
+    "parse_finn_atom_feed", "record_outcome", "review_policy_proposal",
+    "run_live_brreg_analysis", "run_ods", "stage_approved_policy_change",
+    "summarize_brreg_entities", "track_workflow_opportunities", "validate_opportunity",
 ]
