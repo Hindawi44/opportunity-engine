@@ -29,6 +29,14 @@ from .decision_feedback import (
     FeedbackDirection,
     build_decision_feedback,
 )
+from .decision_policy import (
+    DecisionPolicyAuditEvent,
+    DecisionPolicyProposal,
+    DecisionPolicyReviewResult,
+    PolicyReviewStatus,
+    create_policy_proposal,
+    review_policy_proposal,
+)
 from .discovery import FashionDiscoveryPlugin
 from .discovery_framework import CuratedDiscoveryPlugin, OpportunitySeed, Scanner
 from .evidence_weighting import EvidenceAdjustment, calculate_ssb_adjustment
@@ -127,6 +135,7 @@ __all__ = [
     "BusinessBlueprint", "ConnectorRegistry", "ConnectorScanStatus",
     "CuratedDiscoveryPlugin", "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW",
     "DataConnector", "DecisionFeedbackReport", "DecisionInputs", "DecisionOutcomeEvidence",
+    "DecisionPolicyAuditEvent", "DecisionPolicyProposal", "DecisionPolicyReviewResult",
     "DecisionRuleRecommendation", "EvidenceAdjustment", "ExecutiveDecision",
     "ExecutiveDecisionReport", "ExecutiveWorkflowInputs", "ExtractionRule",
     "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin", "FeedbackDirection",
@@ -138,19 +147,19 @@ __all__ = [
     "OpportunityConfidence", "OpportunityDecisionResult", "OpportunityExtractor",
     "OpportunityMemoryEngine", "OpportunityMemoryRecord", "OpportunityRankingPlugin",
     "OpportunitySeed", "OutcomeLearning", "OutcomeObservation", "PluginRegistry",
-    "RankedOpportunity", "RankingWeights", "SSB_API_BASE", "SSB_RETAIL_TABLE_ID",
-    "SSB_RETAIL_TABLE_URL", "SSBClient", "SSBConnector", "SSBMarketEvidence",
-    "SSBMarketEvidenceService", "SSBTrendIntelligenceService", "SSBTrendSignal",
-    "ScanSnapshot", "Scanner", "SourceDocument", "Stage", "StageResult",
-    "StaticDataConnector", "Status", "TrendAdjustment", "USABLE_ALPHA_WORKFLOW",
-    "UniversalOpportunityScanner", "ValidationExperiment", "ValidationExperimentResult",
-    "ValidationPlugin", "ValidationReport", "WorkflowEngine",
+    "PolicyReviewStatus", "RankedOpportunity", "RankingWeights", "SSB_API_BASE",
+    "SSB_RETAIL_TABLE_ID", "SSB_RETAIL_TABLE_URL", "SSBClient", "SSBConnector",
+    "SSBMarketEvidence", "SSBMarketEvidenceService", "SSBTrendIntelligenceService",
+    "SSBTrendSignal", "ScanSnapshot", "Scanner", "SourceDocument", "Stage",
+    "StageResult", "StaticDataConnector", "Status", "TrendAdjustment",
+    "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner", "ValidationExperiment",
+    "ValidationExperimentResult", "ValidationPlugin", "ValidationReport", "WorkflowEngine",
     "advance_decision_candidate", "advance_financially_assessed", "analyze_json_stat2",
     "analyze_series", "build_alpha_engine", "build_decision_feedback",
     "build_decision_from_analysis", "build_executive_decision", "build_financial_report",
     "calculate_opportunity_confidence", "calculate_ssb_adjustment",
-    "calculate_trend_adjustment", "can_transition_lifecycle", "decide_opportunity",
-    "learn_from_outcome", "parse_finn_atom_feed", "record_outcome",
-    "run_live_brreg_analysis", "run_ods", "summarize_brreg_entities",
-    "track_workflow_opportunities", "validate_opportunity",
+    "calculate_trend_adjustment", "can_transition_lifecycle", "create_policy_proposal",
+    "decide_opportunity", "learn_from_outcome", "parse_finn_atom_feed", "record_outcome",
+    "review_policy_proposal", "run_live_brreg_analysis", "run_ods",
+    "summarize_brreg_entities", "track_workflow_opportunities", "validate_opportunity",
 ]
