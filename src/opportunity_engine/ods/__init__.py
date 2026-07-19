@@ -130,6 +130,7 @@ from .ssb_trends import (
     calculate_trend_adjustment,
 )
 from .tracking import track_workflow_opportunities
+from .unified_opportunity import UnifiedOpportunity, UnifiedOpportunityExtractor
 from .validation import (
     ValidationExperiment,
     ValidationExperimentResult,
@@ -164,15 +165,16 @@ __all__ = [
     "SSBMarketEvidence", "SSBMarketEvidenceService", "SSBTrendIntelligenceService",
     "SSBTrendSignal", "ScanSnapshot", "Scanner", "SourceDocument", "Stage",
     "StageResult", "StaticDataConnector", "Status", "TrendAdjustment",
-    "USABLE_ALPHA_WORKFLOW", "UniversalOpportunityScanner", "ValidationExperiment",
-    "ValidationExperimentResult", "ValidationPlugin", "ValidationReport", "WorkflowEngine",
-    "advance_decision_candidate", "advance_financially_assessed", "analyze_json_stat2",
-    "analyze_series", "build_alpha_engine", "build_decision_feedback",
-    "build_decision_from_analysis", "build_executive_decision", "build_financial_report",
-    "calculate_opportunity_confidence", "calculate_ssb_adjustment",
-    "calculate_trend_adjustment", "can_transition_lifecycle", "create_policy_proposal",
-    "decide_opportunity", "learn_from_outcome", "parse_auksjonen_listing_page",
-    "parse_finn_atom_feed", "record_outcome", "review_policy_proposal",
-    "run_live_brreg_analysis", "run_ods", "stage_approved_policy_change",
-    "summarize_brreg_entities", "track_workflow_opportunities", "validate_opportunity",
+    "USABLE_ALPHA_WORKFLOW", "UnifiedOpportunity", "UnifiedOpportunityExtractor",
+    "UniversalOpportunityScanner", "ValidationExperiment", "ValidationExperimentResult",
+    "ValidationPlugin", "ValidationReport", "WorkflowEngine", "advance_decision_candidate",
+    "advance_financially_assessed", "analyze_json_stat2", "analyze_series",
+    "build_alpha_engine", "build_decision_feedback", "build_decision_from_analysis",
+    "build_executive_decision", "build_financial_report", "calculate_opportunity_confidence",
+    "calculate_ssb_adjustment", "calculate_trend_adjustment", "can_transition_lifecycle",
+    "create_policy_proposal", "decide_opportunity", "learn_from_outcome",
+    "parse_auksjonen_listing_page", "parse_finn_atom_feed", "record_outcome",
+    "review_policy_proposal", "run_live_brreg_analysis", "run_ods",
+    "stage_approved_policy_change", "summarize_brreg_entities",
+    "track_workflow_opportunities", "validate_opportunity",
 ]
