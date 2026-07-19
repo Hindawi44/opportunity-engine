@@ -1,0 +1,38 @@
+name: Daily opportunity pipeline
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 5 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-opportunity-pipeline
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: pip install -e .
+      - name: Generate today's opportunities
+        run: python scripts/run_daily_pipeline.py --output data/todays_opportunities.json
+      - name: Commit changed snapshot
+        run: |
+          if git diff --quiet -- data/todays_opportunities.json; then
+            echo "No dashboard changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/todays_opportunities.json
+          git commit -m "Update today's opportunity snapshot"
+          git push
