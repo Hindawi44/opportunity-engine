@@ -22,6 +22,13 @@ from .decision import (
     build_executive_decision,
     decide_opportunity,
 )
+from .decision_feedback import (
+    DecisionFeedbackReport,
+    DecisionOutcomeEvidence,
+    DecisionRuleRecommendation,
+    FeedbackDirection,
+    build_decision_feedback,
+)
 from .discovery import FashionDiscoveryPlugin
 from .discovery_framework import CuratedDiscoveryPlugin, OpportunitySeed, Scanner
 from .evidence_weighting import EvidenceAdjustment, calculate_ssb_adjustment
@@ -119,9 +126,10 @@ __all__ = [
     "BrregOpportunityCollector", "BrregSearchSlice", "BrregStatusOpportunityExtractor",
     "BusinessBlueprint", "ConnectorRegistry", "ConnectorScanStatus",
     "CuratedDiscoveryPlugin", "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW",
-    "DataConnector", "DecisionInputs", "EvidenceAdjustment", "ExecutiveDecision",
+    "DataConnector", "DecisionFeedbackReport", "DecisionInputs", "DecisionOutcomeEvidence",
+    "DecisionRuleRecommendation", "EvidenceAdjustment", "ExecutiveDecision",
     "ExecutiveDecisionReport", "ExecutiveWorkflowInputs", "ExtractionRule",
-    "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin",
+    "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin", "FeedbackDirection",
     "FinancialAssessmentEvidence", "FinancialInputs", "FinancialReport",
     "FinancialScenario", "FinnApiClient", "FinnConnector", "LifecycleState",
     "LiveBrregAnalysis", "LiveDataPipeline", "LiveDataResult", "MemoryRunResult",
@@ -138,8 +146,8 @@ __all__ = [
     "UniversalOpportunityScanner", "ValidationExperiment", "ValidationExperimentResult",
     "ValidationPlugin", "ValidationReport", "WorkflowEngine",
     "advance_decision_candidate", "advance_financially_assessed", "analyze_json_stat2",
-    "analyze_series", "build_alpha_engine", "build_decision_from_analysis",
-    "build_executive_decision", "build_financial_report",
+    "analyze_series", "build_alpha_engine", "build_decision_feedback",
+    "build_decision_from_analysis", "build_executive_decision", "build_financial_report",
     "calculate_opportunity_confidence", "calculate_ssb_adjustment",
     "calculate_trend_adjustment", "can_transition_lifecycle", "decide_opportunity",
     "learn_from_outcome", "parse_finn_atom_feed", "record_outcome",
