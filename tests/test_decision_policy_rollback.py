@@ -1,5 +1,5 @@
-from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 import pytest
 
@@ -43,7 +43,7 @@ def test_rollback_restores_previous_version_and_records_audit():
 
 
 def test_rollback_rejects_non_active_activation():
-    activation = replace(_activation(), deployment_status="rolled_back")
+    activation = SimpleNamespace(deployment_status="rolled_back")
 
     with pytest.raises(ValueError, match="only active"):
         rollback_active_policy(
