@@ -37,6 +37,10 @@ from .decision_policy import (
     create_policy_proposal,
     review_policy_proposal,
 )
+from .decision_policy_release import (
+    DecisionPolicyChangeSet,
+    stage_approved_policy_change,
+)
 from .discovery import FashionDiscoveryPlugin
 from .discovery_framework import CuratedDiscoveryPlugin, OpportunitySeed, Scanner
 from .evidence_weighting import EvidenceAdjustment, calculate_ssb_adjustment
@@ -135,14 +139,14 @@ __all__ = [
     "BusinessBlueprint", "ConnectorRegistry", "ConnectorScanStatus",
     "CuratedDiscoveryPlugin", "DEFAULT_EXTRACTION_RULES", "DEFAULT_WORKFLOW",
     "DataConnector", "DecisionFeedbackReport", "DecisionInputs", "DecisionOutcomeEvidence",
-    "DecisionPolicyAuditEvent", "DecisionPolicyProposal", "DecisionPolicyReviewResult",
-    "DecisionRuleRecommendation", "EvidenceAdjustment", "ExecutiveDecision",
-    "ExecutiveDecisionReport", "ExecutiveWorkflowInputs", "ExtractionRule",
-    "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin", "FeedbackDirection",
-    "FinancialAssessmentEvidence", "FinancialInputs", "FinancialReport",
-    "FinancialScenario", "FinnApiClient", "FinnConnector", "LifecycleState",
-    "LiveBrregAnalysis", "LiveDataPipeline", "LiveDataResult", "MemoryRunResult",
-    "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
+    "DecisionPolicyAuditEvent", "DecisionPolicyChangeSet", "DecisionPolicyProposal",
+    "DecisionPolicyReviewResult", "DecisionRuleRecommendation", "EvidenceAdjustment",
+    "ExecutiveDecision", "ExecutiveDecisionReport", "ExecutiveWorkflowInputs",
+    "ExtractionRule", "FINN_API_BASE", "FINN_API_KEY_HEADER", "FashionDiscoveryPlugin",
+    "FeedbackDirection", "FinancialAssessmentEvidence", "FinancialInputs",
+    "FinancialReport", "FinancialScenario", "FinnApiClient", "FinnConnector",
+    "LifecycleState", "LiveBrregAnalysis", "LiveDataPipeline", "LiveDataResult",
+    "MemoryRunResult", "ODSAnalysisResult", "ODSPlugin", "ODSRequest", "ODSSession",
     "OpportunityCandidate", "OpportunityChange", "OpportunityChangeType",
     "OpportunityConfidence", "OpportunityDecisionResult", "OpportunityExtractor",
     "OpportunityMemoryEngine", "OpportunityMemoryRecord", "OpportunityRankingPlugin",
@@ -161,5 +165,6 @@ __all__ = [
     "calculate_trend_adjustment", "can_transition_lifecycle", "create_policy_proposal",
     "decide_opportunity", "learn_from_outcome", "parse_finn_atom_feed", "record_outcome",
     "review_policy_proposal", "run_live_brreg_analysis", "run_ods",
-    "summarize_brreg_entities", "track_workflow_opportunities", "validate_opportunity",
+    "stage_approved_policy_change", "summarize_brreg_entities",
+    "track_workflow_opportunities", "validate_opportunity",
 ]
