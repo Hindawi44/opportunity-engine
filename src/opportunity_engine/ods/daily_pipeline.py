@@ -1,8 +1,7 @@
-"""End-to-end daily pipeline for public auction opportunities.
+"""End-to-end daily pipeline for authorized and public opportunity sources.
 
-The pipeline is conservative by design: missing market comparables or operating
-costs never become zero. Such opportunities remain visible as ``monitor`` until
-verified inputs are supplied.
+Missing market comparables or operating costs never become zero. Opportunities
+remain ``monitor`` until verified inputs are supplied.
 """
 
 from __future__ import annotations
@@ -15,6 +14,7 @@ from typing import Iterable, Mapping
 
 from .auksjonen import AuksjonenClient
 from .daily_opportunity_report import DailyOpportunityReportEngine
+from .finn import FinnApiClient
 from .live_data import SourceDocument
 from .market_pricing import MarketComparable, MarketPriceComparisonEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
@@ -28,12 +28,15 @@ class DailyPipelineConfig:
     keyword: str | None = None
     limit: int = 25
     output_path: str = "data/todays_opportunities.json"
+    finn_rows: int = 30
 
     def __post_init__(self) -> None:
         if self.limit <= 0:
             raise ValueError("limit must be positive")
         if not self.output_path.strip():
             raise ValueError("output_path must not be empty")
+        if not 1 <= self.finn_rows <= 1000:
+            raise ValueError("finn_rows must be between 1 and 1000")
 
 
 @dataclass(frozen=True)
@@ -45,6 +48,8 @@ class DailyPipelineResult:
     buy_count: int
     monitor_count: int
     reject_count: int
+    source_counts: dict[str, int]
+    source_errors: dict[str, str]
 
 
 class AutomatedDailyPipeline:
@@ -54,6 +59,7 @@ class AutomatedDailyPipeline:
         self,
         *,
         client: AuksjonenClient | None = None,
+        finn_client: FinnApiClient | None = None,
         extractor: UnifiedOpportunityExtractor | None = None,
         market_engine: MarketPriceComparisonEngine | None = None,
         cost_engine: RealCostEngine | None = None,
@@ -61,11 +67,32 @@ class AutomatedDailyPipeline:
         report_engine: DailyOpportunityReportEngine | None = None,
     ) -> None:
         self.client = client or AuksjonenClient()
+        self.finn_client = finn_client
         self.extractor = extractor or UnifiedOpportunityExtractor()
         self.market_engine = market_engine or MarketPriceComparisonEngine()
         self.cost_engine = cost_engine or RealCostEngine()
         self.decision_engine = decision_engine or OpportunityProfitDecisionEngine()
         self.report_engine = report_engine or DailyOpportunityReportEngine()
+
+    def _collect(self, config: DailyPipelineConfig) -> tuple[tuple[SourceDocument, ...], dict[str, int], dict[str, str]]:
+        documents: list[SourceDocument] = []
+        counts: dict[str, int] = {}
+        errors: dict[str, str] = {}
+        sources = [("Auksjonen.no", lambda: self.client.search(keyword=config.keyword))]
+        if self.finn_client is not None:
+            sources.append(
+                ("FINN.no", lambda: self.finn_client.search(keyword=config.keyword, rows=config.finn_rows))
+            )
+        for source_name, fetch in sources:
+            try:
+                items = tuple(fetch())
+            except RuntimeError as exc:
+                counts[source_name] = 0
+                errors[source_name] = str(exc)
+                continue
+            counts[source_name] = len(items)
+            documents.extend(items)
+        return tuple(documents), counts, errors
 
     def run(
         self,
@@ -77,9 +104,15 @@ class AutomatedDailyPipeline:
         report_date: date | None = None,
     ) -> DailyPipelineResult:
         config = config or DailyPipelineConfig()
-        source_documents = tuple(
-            documents if documents is not None else self.client.search(keyword=config.keyword)
-        )
+        if documents is None:
+            source_documents, source_counts, source_errors = self._collect(config)
+        else:
+            source_documents = tuple(documents)
+            source_counts = {}
+            for item in source_documents:
+                source_counts[item.source_name] = source_counts.get(item.source_name, 0) + 1
+            source_errors = {}
+
         opportunities = self.extractor.extract(source_documents)
         comparables_by_id = comparables_by_id or {}
         costs_by_id = costs_by_id or {}
@@ -106,17 +139,15 @@ class AutomatedDailyPipeline:
                 ends_at=opportunity.ends_at.isoformat() if opportunity.ends_at else None,
             )
 
-        report = self.report_engine.build(
-            decisions,
-            report_date=report_date,
-            limit=config.limit,
-        )
+        report = self.report_engine.build(decisions, report_date=report_date, limit=config.limit)
         dashboard = build_today_dashboard(report, metadata)
         generated_at = datetime.now(timezone.utc).isoformat()
         payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "generated_at": generated_at,
-            "source": "Auksjonen.no public listings",
+            "source": "Auksjonen.no public listings + authorized FINN API when configured",
+            "sources": source_counts,
+            "source_errors": source_errors,
             "keyword": config.keyword,
             "fetched_count": len(source_documents),
             "extracted_count": len(opportunities),
@@ -131,6 +162,8 @@ class AutomatedDailyPipeline:
             buy_count=report.buy_count,
             monitor_count=report.monitor_count,
             reject_count=report.reject_count,
+            source_counts=source_counts,
+            source_errors=source_errors,
         )
 
     @staticmethod
