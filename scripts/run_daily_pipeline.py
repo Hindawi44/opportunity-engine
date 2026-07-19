@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
+from opportunity_engine.ods.finn import FinnApiClient
 from opportunity_engine.ods.market_pricing import MarketComparable
 from opportunity_engine.ods.real_cost import RealCostInputs
 
@@ -27,10 +29,25 @@ def _load_verified_inputs(path: str | None):
     return comparables, costs
 
 
+def _finn_client_from_environment() -> FinnApiClient | None:
+    api_key = os.getenv("FINN_API_KEY", "").strip()
+    org_id = os.getenv("FINN_ORG_ID", "").strip()
+    if not api_key and not org_id:
+        return None
+    if not api_key or not org_id:
+        raise RuntimeError("FINN_API_KEY and FINN_ORG_ID must be configured together")
+    return FinnApiClient(
+        api_key=api_key,
+        org_id=org_id,
+        market=os.getenv("FINN_MARKET", "bap/forsale").strip() or "bap/forsale",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate today's opportunity dashboard snapshot")
-    parser.add_argument("--keyword", default=None, help="Optional Auksjonen search keyword")
+    parser.add_argument("--keyword", default=None, help="Optional source search keyword")
     parser.add_argument("--limit", type=int, default=25, help="Maximum rows in the report")
+    parser.add_argument("--finn-rows", type=int, default=30, help="Maximum authorized FINN rows")
     parser.add_argument("--output", default="data/todays_opportunities.json")
     parser.add_argument(
         "--verified-inputs",
@@ -40,8 +57,13 @@ def main() -> int:
     args = parser.parse_args()
 
     comparables, costs = _load_verified_inputs(args.verified_inputs)
-    result = AutomatedDailyPipeline().run(
-        DailyPipelineConfig(keyword=args.keyword, limit=args.limit, output_path=args.output),
+    result = AutomatedDailyPipeline(finn_client=_finn_client_from_environment()).run(
+        DailyPipelineConfig(
+            keyword=args.keyword,
+            limit=args.limit,
+            output_path=args.output,
+            finn_rows=args.finn_rows,
+        ),
         comparables_by_id=comparables,
         costs_by_id=costs,
     )
