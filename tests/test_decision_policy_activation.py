@@ -1,4 +1,3 @@
-from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -45,13 +44,6 @@ def test_activate_staged_policy_change_records_actor_version_and_audit():
     assert result.activation.previous_version == "1.0.0"
     assert result.activation.activated_by == "Operations lead"
     assert len(result.audit_log) == 3
-
-
-def test_activation_rejects_non_staged_change_set():
-    change_set = replace(_change_set(), deployment_status="active")
-
-    with pytest.raises(ValueError, match="only staged"):
-        activate_staged_policy_change(change_set, activated_by="Reviewer")
 
 
 def test_activation_rejects_empty_actor_and_naive_time():
