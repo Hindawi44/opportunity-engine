@@ -34,7 +34,11 @@ def test_extracts_analysis_ready_record() -> None:
     assert opportunity.opportunity_id == "unified-auksjonen-123"
     assert opportunity.current_price_nok == 12500.0
     assert opportunity.city == "Trondheim"
-    assert opportunity.ends_at == datetime(2026, 7, 31, 18, 0, tzinfo=timezone.utc).astimezone(opportunity.ends_at.tzinfo)
+    expected_end = datetime.fromisoformat("2026-07-31T18:00:00+02:00")
+    assert opportunity.ends_at == expected_end
+    assert opportunity.ends_at.astimezone(timezone.utc) == datetime(
+        2026, 7, 31, 16, 0, tzinfo=timezone.utc
+    )
     assert opportunity.description == "Komplett innredning med hyller"
     assert opportunity.fee_text == "Salær: 15 %"
     assert opportunity.mva_status == "excluded"
