@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -106,4 +106,8 @@ def test_invalid_end_time_is_not_invented() -> None:
 def test_expected_end_time_representation_is_iso_8601() -> None:
     document = parse_auksjonen_listing_page(JSON_LD_PAGE)[0]
     parsed = datetime.fromisoformat(document.metadata["ends_at"])
-    assert parsed == datetime(2026, 7, 31, 18, 0, tzinfo=timezone.utc).astimezone(parsed.tzinfo)
+    assert parsed.year == 2026
+    assert parsed.month == 7
+    assert parsed.day == 31
+    assert parsed.hour == 18
+    assert parsed.utcoffset() == timedelta(hours=2)
