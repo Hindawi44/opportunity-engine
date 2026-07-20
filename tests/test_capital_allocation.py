@@ -58,11 +58,12 @@ def test_rejects_incomplete_or_non_buy_candidates() -> None:
         CapitalAllocationPolicy(total_capital_nok=50_000),
     )
 
+    allocations = {item.opportunity_id: item for item in plan.allocations}
     assert plan.allocation_count == 0
     assert all(item.eligible is False for item in plan.allocations)
-    assert "decision_not_buy" in plan.allocations[0].blockers
-    assert "total_cost_nok" in plan.allocations[1].blockers
-    assert "discovery_score_below_65" in plan.allocations[2].blockers
+    assert "decision_not_buy" in allocations["monitor"].blockers
+    assert "total_cost_nok" in allocations["missing"].blockers
+    assert "discovery_score_below_65" in allocations["weak"].blockers
 
 
 def test_snapshot_processor_writes_auditable_plan(tmp_path) -> None:
