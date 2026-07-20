@@ -16,6 +16,10 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      FINN_API_KEY: ${{ secrets.FINN_API_KEY }}
+      FINN_ORG_ID: ${{ secrets.FINN_ORG_ID }}
+      FINN_MARKET: ${{ vars.FINN_MARKET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

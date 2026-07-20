@@ -62,7 +62,7 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert result.fetched_count == 1
     assert result.extracted_count == 1
-    assert payload["schema_version"] == 1
+    assert payload["schema_version"] == 2
     assert payload["report_date"] == "2026-07-20"
     assert payload["rows"][0]["title"] == "Butikkinnredning"
     assert payload["rows"][0]["url"].startswith("https://")
