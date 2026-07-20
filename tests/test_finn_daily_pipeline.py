@@ -47,32 +47,35 @@ def _finn_client():
     )
 
 
+def _config(tmp_path):
+    return DailyPipelineConfig(
+        output_path=str(tmp_path / "today.json"),
+        history_path=str(tmp_path / "history.json"),
+    )
+
+
 def test_pipeline_combines_auksjonen_and_authorized_finn(tmp_path) -> None:
-    output = tmp_path / "today.json"
+    config = _config(tmp_path)
     result = AutomatedDailyPipeline(
         client=_AuksjonenStub(),
         finn_client=_finn_client(),
-    ).run(
-        DailyPipelineConfig(output_path=str(output)),
-        report_date=date(2026, 7, 20),
-    )
+    ).run(config, report_date=date(2026, 7, 20))
 
-    payload = json.loads(output.read_text(encoding="utf-8"))
+    payload = json.loads((tmp_path / "today.json").read_text(encoding="utf-8"))
     assert result.fetched_count == 2
     assert result.deduplicated_count == 2
     assert result.source_counts == {"Auksjonen.no": 1, "FINN.no": 1}
     assert result.source_errors == {}
-    assert payload["schema_version"] == 7
+    assert payload["schema_version"] == 8
     assert payload["sources"]["FINN.no"] == 1
     assert payload["total_count"] == 2
 
 
 def test_one_source_failure_does_not_stop_other_source(tmp_path) -> None:
-    output = tmp_path / "today.json"
     result = AutomatedDailyPipeline(
         client=_FailingAuksjonenStub(),
         finn_client=_finn_client(),
-    ).run(DailyPipelineConfig(output_path=str(output)))
+    ).run(_config(tmp_path))
 
     assert result.fetched_count == 1
     assert result.source_counts == {"Auksjonen.no": 0, "FINN.no": 1}
@@ -80,10 +83,7 @@ def test_one_source_failure_does_not_stop_other_source(tmp_path) -> None:
 
 
 def test_finn_is_optional_when_not_configured(tmp_path) -> None:
-    output = tmp_path / "today.json"
-    result = AutomatedDailyPipeline(client=_AuksjonenStub()).run(
-        DailyPipelineConfig(output_path=str(output))
-    )
+    result = AutomatedDailyPipeline(client=_AuksjonenStub()).run(_config(tmp_path))
 
     assert result.source_counts == {"Auksjonen.no": 1}
     assert "FINN.no" not in result.source_counts

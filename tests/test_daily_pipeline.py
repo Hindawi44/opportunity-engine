@@ -7,7 +7,7 @@ from opportunity_engine.ods.market_pricing import MarketComparable
 from opportunity_engine.ods.real_cost import RealCostInputs
 
 
-def _document() -> SourceDocument:
+def _document(price: float = 10_000) -> SourceDocument:
     return SourceDocument(
         document_id="auksjonen-123",
         source_name="Auksjonen.no",
@@ -17,7 +17,7 @@ def _document() -> SourceDocument:
         url="https://www.auksjonen.no/auksjon/123",
         country="Norway",
         metadata={
-            "current_price_nok": 10_000,
+            "current_price_nok": price,
             "city": "Trondheim",
             "ends_at": "2026-08-01T18:00:00+02:00",
             "mva_status": "included",
@@ -28,6 +28,7 @@ def _document() -> SourceDocument:
 def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     opportunity_id = "unified-auksjonen-123"
     output = tmp_path / "today.json"
+    history = tmp_path / "history.json"
     comparables = tuple(
         MarketComparable(
             comparable_id=f"c{index}",
@@ -52,7 +53,7 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     )
 
     result = AutomatedDailyPipeline().run(
-        DailyPipelineConfig(output_path=str(output)),
+        DailyPipelineConfig(output_path=str(output), history_path=str(history)),
         documents=(_document(),),
         comparables_by_id={opportunity_id: comparables},
         costs_by_id={opportunity_id: costs},
@@ -65,7 +66,8 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     assert result.extracted_count == 1
     assert result.deduplicated_count == 1
     assert result.duplicate_count == 0
-    assert payload["schema_version"] == 7
+    assert result.history_path == str(history)
+    assert payload["schema_version"] == 8
     assert payload["report_date"] == "2026-07-20"
     assert row["title"] == "Butikkinnredning"
     assert row["url"].startswith("https://")
@@ -77,13 +79,39 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     assert row["market_discount"] > 0
     assert row["market_verification_status"] == "strong_discount"
     assert row["market_is_verified"] is True
+    assert row["first_price_nok"] == 10_000
+    assert row["lowest_price_nok"] == 10_000
+    assert row["price_change_count"] == 0
+    assert row["price_history_status"] == "new"
+    assert history.exists()
     assert payload["buy_count"] == 1
+
+
+def test_pipeline_detects_price_drop_across_runs(tmp_path) -> None:
+    output = tmp_path / "today.json"
+    history = tmp_path / "history.json"
+    config = DailyPipelineConfig(output_path=str(output), history_path=str(history))
+    pipeline = AutomatedDailyPipeline()
+
+    pipeline.run(config, documents=(_document(10_000),), report_date=date(2026, 7, 20))
+    pipeline.run(config, documents=(_document(8_000),), report_date=date(2026, 7, 22))
+
+    row = json.loads(output.read_text(encoding="utf-8"))["rows"][0]
+    assert row["first_price_nok"] == 10_000
+    assert row["lowest_price_nok"] == 8_000
+    assert row["highest_price_nok"] == 10_000
+    assert row["price_change_count"] == 1
+    assert row["price_change_from_first"] == -0.2
+    assert row["listing_age_days"] == 2
+    assert row["price_history_status"] == "price_drop"
+    assert row["significant_price_drop"] is True
 
 
 def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
     output = tmp_path / "today.json"
+    history = tmp_path / "history.json"
     AutomatedDailyPipeline().run(
-        DailyPipelineConfig(output_path=str(output)),
+        DailyPipelineConfig(output_path=str(output), history_path=str(history)),
         documents=(_document(),),
         report_date=date(2026, 7, 20),
     )
@@ -98,8 +126,9 @@ def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
 
 def test_pipeline_supports_empty_collection(tmp_path) -> None:
     output = tmp_path / "today.json"
+    history = tmp_path / "history.json"
     result = AutomatedDailyPipeline().run(
-        DailyPipelineConfig(output_path=str(output)),
+        DailyPipelineConfig(output_path=str(output), history_path=str(history)),
         documents=(),
         report_date=date(2026, 7, 20),
     )
