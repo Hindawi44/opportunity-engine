@@ -1,7 +1,6 @@
 """End-to-end daily pipeline for authorized and public opportunity sources.
 
-Missing market comparables or operating costs never become zero. Opportunities
-remain ``monitor`` until verified inputs are supplied.
+Missing market comparables, operating costs, or seller facts never become zero.
 """
 
 from __future__ import annotations
@@ -26,6 +25,7 @@ from .opportunity_profit import OpportunityProfitDecisionEngine
 from .opportunity_scoring import OpportunityScoringEngine
 from .price_history import HistoricalPriceDatabase
 from .real_cost import RealCostEngine, RealCostInputs
+from .seller_reliability import SellerReliabilityEngine
 from .today_dashboard import OpportunityDisplayMetadata, build_today_dashboard
 from .unified_opportunity import UnifiedOpportunityExtractor
 
@@ -66,7 +66,7 @@ class DailyPipelineResult:
 
 
 class AutomatedDailyPipeline:
-    """Run collection, normalization, history, scoring and reporting."""
+    """Run collection, normalization, history, seller checks, scoring and reporting."""
 
     def __init__(
         self,
@@ -83,6 +83,7 @@ class AutomatedDailyPipeline:
         cost_engine: RealCostEngine | None = None,
         decision_engine: OpportunityProfitDecisionEngine | None = None,
         scoring_engine: OpportunityScoringEngine | None = None,
+        seller_reliability_engine: SellerReliabilityEngine | None = None,
         report_engine: DailyOpportunityReportEngine | None = None,
     ) -> None:
         self.client = client or AuksjonenClient()
@@ -97,6 +98,7 @@ class AutomatedDailyPipeline:
         self.cost_engine = cost_engine or RealCostEngine()
         self.decision_engine = decision_engine or OpportunityProfitDecisionEngine()
         self.scoring_engine = scoring_engine or OpportunityScoringEngine()
+        self.seller_reliability_engine = seller_reliability_engine or SellerReliabilityEngine()
         self.report_engine = report_engine or DailyOpportunityReportEngine()
 
     def _collect(self, config: DailyPipelineConfig) -> tuple[tuple[SourceDocument, ...], dict[str, int], dict[str, str]]:
@@ -147,11 +149,7 @@ class AutomatedDailyPipeline:
         opportunities = merge_result.opportunities
         comparables_by_id = comparables_by_id or {}
         costs_by_id = costs_by_id or {}
-        observed_at = (
-            datetime.combine(report_date, time.min, tzinfo=timezone.utc)
-            if report_date is not None
-            else datetime.now(timezone.utc)
-        )
+        observed_at = datetime.combine(report_date, time.min, tzinfo=timezone.utc) if report_date else datetime.now(timezone.utc)
         generated_at = observed_at.isoformat()
         history_database = HistoricalPriceDatabase(config.history_path)
 
@@ -166,6 +164,7 @@ class AutomatedDailyPipeline:
                 opportunity.current_price_nok,
                 observed_at=observed_at,
             )
+            seller = self.seller_reliability_engine.assess(opportunity.raw_metadata)
             cost_inputs = costs_by_id.get(opportunity.opportunity_id)
             if cost_inputs is None:
                 cost_inputs = RealCostInputs(
@@ -200,6 +199,18 @@ class AutomatedDailyPipeline:
                 price_history_status=history.status,
                 price_history_label=history.status_label,
                 significant_price_drop=history.significant_drop,
+                seller_id=seller.seller_id,
+                seller_name=seller.seller_name,
+                seller_type=seller.seller_type,
+                seller_score=seller.score,
+                seller_grade=seller.grade,
+                seller_risk=seller.risk,
+                seller_risk_label=seller.risk_label,
+                seller_confidence=seller.confidence,
+                seller_is_verified=seller.is_verified,
+                seller_evidence_count=seller.evidence_count,
+                seller_reasons=seller.reasons,
+                seller_warnings=seller.warnings,
             )
 
         history_database.save()
@@ -211,7 +222,7 @@ class AutomatedDailyPipeline:
         )
         dashboard = build_today_dashboard(report, metadata)
         payload = {
-            "schema_version": 8,
+            "schema_version": 9,
             "generated_at": generated_at,
             "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
             "sources": source_counts,
