@@ -11,6 +11,7 @@ from pathlib import Path
 from opportunity_engine.ods.bjaroy import BjaroyFeedClient
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
 from opportunity_engine.ods.finn import FinnApiClient
+from opportunity_engine.ods.konkurs_app import KonkursAppFeedClient
 from opportunity_engine.ods.konkurskupp import KonkurskuppFeedClient
 from opportunity_engine.ods.market_pricing import MarketComparable
 from opportunity_engine.ods.real_cost import RealCostInputs
@@ -57,6 +58,12 @@ def _bjaroy_client_from_environment() -> BjaroyFeedClient | None:
     return BjaroyFeedClient(feed_url=feed_url, token=token) if feed_url else None
 
 
+def _konkurs_app_client_from_environment() -> KonkursAppFeedClient | None:
+    feed_url = os.getenv("KONKURS_APP_FEED_URL", "").strip()
+    token = os.getenv("KONKURS_APP_FEED_TOKEN", "").strip() or None
+    return KonkursAppFeedClient(feed_url=feed_url, token=token) if feed_url else None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate today's opportunity dashboard snapshot")
     parser.add_argument("--keyword", default=None, help="Optional source search keyword")
@@ -75,6 +82,7 @@ def main() -> int:
         finn_client=_finn_client_from_environment(),
         konkurskupp_client=_konkurskupp_client_from_environment(),
         bjaroy_client=_bjaroy_client_from_environment(),
+        konkurs_app_client=_konkurs_app_client_from_environment(),
     ).run(
         DailyPipelineConfig(
             keyword=args.keyword,
