@@ -20,6 +20,8 @@ jobs:
       FINN_API_KEY: ${{ secrets.FINN_API_KEY }}
       FINN_ORG_ID: ${{ secrets.FINN_ORG_ID }}
       FINN_MARKET: ${{ vars.FINN_MARKET }}
+      KONKURSKUPP_FEED_URL: ${{ secrets.KONKURSKUPP_FEED_URL }}
+      KONKURSKUPP_FEED_TOKEN: ${{ secrets.KONKURSKUPP_FEED_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
