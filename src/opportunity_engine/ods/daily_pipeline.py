@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Iterable, Mapping
 
 from .auksjonen import AuksjonenClient
+from .bjaroy import BjaroyFeedClient
 from .daily_opportunity_report import DailyOpportunityReportEngine
 from .finn import FinnApiClient
 from .konkurskupp import KonkurskuppFeedClient
@@ -65,6 +66,7 @@ class AutomatedDailyPipeline:
         client: AuksjonenClient | None = None,
         finn_client: FinnApiClient | None = None,
         konkurskupp_client: KonkurskuppFeedClient | None = None,
+        bjaroy_client: BjaroyFeedClient | None = None,
         extractor: UnifiedOpportunityExtractor | None = None,
         multi_source_engine: UnifiedMultiSourceEngine | None = None,
         market_engine: MarketPriceComparisonEngine | None = None,
@@ -75,6 +77,7 @@ class AutomatedDailyPipeline:
         self.client = client or AuksjonenClient()
         self.finn_client = finn_client
         self.konkurskupp_client = konkurskupp_client
+        self.bjaroy_client = bjaroy_client
         self.extractor = extractor or UnifiedOpportunityExtractor()
         self.multi_source_engine = multi_source_engine or UnifiedMultiSourceEngine()
         self.market_engine = market_engine or MarketPriceComparisonEngine()
@@ -88,13 +91,11 @@ class AutomatedDailyPipeline:
         errors: dict[str, str] = {}
         sources = [("Auksjonen.no", lambda: self.client.search(keyword=config.keyword))]
         if self.finn_client is not None:
-            sources.append(
-                ("FINN.no", lambda: self.finn_client.search(keyword=config.keyword, rows=config.finn_rows))
-            )
+            sources.append(("FINN.no", lambda: self.finn_client.search(keyword=config.keyword, rows=config.finn_rows)))
         if self.konkurskupp_client is not None:
-            sources.append(
-                ("Konkurskupp", lambda: self.konkurskupp_client.fetch(keyword=config.keyword))
-            )
+            sources.append(("Konkurskupp", lambda: self.konkurskupp_client.fetch(keyword=config.keyword)))
+        if self.bjaroy_client is not None:
+            sources.append(("Bjarøy", lambda: self.bjaroy_client.fetch(keyword=config.keyword)))
         for source_name, fetch in sources:
             try:
                 items = tuple(fetch())
@@ -120,7 +121,7 @@ class AutomatedDailyPipeline:
             source_documents, source_counts, source_errors = self._collect(config)
         else:
             source_documents = tuple(documents)
-            source_counts = {}
+            source_counts: dict[str, int] = {}
             for item in source_documents:
                 source_counts[item.source_name] = source_counts.get(item.source_name, 0) + 1
             source_errors = {}
@@ -134,10 +135,7 @@ class AutomatedDailyPipeline:
         decisions = []
         metadata: dict[str, OpportunityDisplayMetadata] = {}
         for opportunity in opportunities:
-            market = self.market_engine.compare(
-                opportunity,
-                comparables_by_id.get(opportunity.opportunity_id, ()),
-            )
+            market = self.market_engine.compare(opportunity, comparables_by_id.get(opportunity.opportunity_id, ()))
             cost_inputs = costs_by_id.get(opportunity.opportunity_id)
             if cost_inputs is None:
                 cost_inputs = RealCostInputs(
@@ -157,9 +155,9 @@ class AutomatedDailyPipeline:
         dashboard = build_today_dashboard(report, metadata)
         generated_at = datetime.now(timezone.utc).isoformat()
         payload = {
-            "schema_version": 3,
+            "schema_version": 4,
             "generated_at": generated_at,
-            "source": "Auksjonen public listings + authorized FINN/Konkurskupp feeds when configured",
+            "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy feeds when configured",
             "sources": source_counts,
             "source_errors": source_errors,
             "keyword": config.keyword,
