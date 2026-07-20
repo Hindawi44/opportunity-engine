@@ -7,7 +7,7 @@ remain ``monitor`` until verified inputs are supplied.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from datetime import date, datetime, timezone
+from datetime import date, datetime, time, timezone
 import json
 from pathlib import Path
 from typing import Iterable, Mapping
@@ -24,6 +24,7 @@ from .market_verification import MarketPriceVerificationEngine
 from .multi_source import UnifiedMultiSourceEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
 from .opportunity_scoring import OpportunityScoringEngine
+from .price_history import HistoricalPriceDatabase
 from .real_cost import RealCostEngine, RealCostInputs
 from .today_dashboard import OpportunityDisplayMetadata, build_today_dashboard
 from .unified_opportunity import UnifiedOpportunityExtractor
@@ -34,6 +35,7 @@ class DailyPipelineConfig:
     keyword: str | None = None
     limit: int = 25
     output_path: str = "data/todays_opportunities.json"
+    history_path: str = "data/price_history.json"
     finn_rows: int = 30
 
     def __post_init__(self) -> None:
@@ -41,6 +43,8 @@ class DailyPipelineConfig:
             raise ValueError("limit must be positive")
         if not self.output_path.strip():
             raise ValueError("output_path must not be empty")
+        if not self.history_path.strip():
+            raise ValueError("history_path must not be empty")
         if not 1 <= self.finn_rows <= 1000:
             raise ValueError("finn_rows must be between 1 and 1000")
 
@@ -52,6 +56,7 @@ class DailyPipelineResult:
     deduplicated_count: int
     duplicate_count: int
     output_path: str
+    history_path: str
     generated_at: str
     buy_count: int
     monitor_count: int
@@ -61,7 +66,7 @@ class DailyPipelineResult:
 
 
 class AutomatedDailyPipeline:
-    """Run collection, normalization, deduplication, scoring and reporting."""
+    """Run collection, normalization, history, scoring and reporting."""
 
     def __init__(
         self,
@@ -142,6 +147,13 @@ class AutomatedDailyPipeline:
         opportunities = merge_result.opportunities
         comparables_by_id = comparables_by_id or {}
         costs_by_id = costs_by_id or {}
+        observed_at = (
+            datetime.combine(report_date, time.min, tzinfo=timezone.utc)
+            if report_date is not None
+            else datetime.now(timezone.utc)
+        )
+        generated_at = observed_at.isoformat()
+        history_database = HistoricalPriceDatabase(config.history_path)
 
         decisions = []
         scores_by_id = {}
@@ -149,6 +161,11 @@ class AutomatedDailyPipeline:
         for opportunity in opportunities:
             market = self.market_engine.compare(opportunity, comparables_by_id.get(opportunity.opportunity_id, ()))
             verification = self.market_verification_engine.verify(opportunity, market)
+            history = history_database.record(
+                opportunity.opportunity_id,
+                opportunity.current_price_nok,
+                observed_at=observed_at,
+            )
             cost_inputs = costs_by_id.get(opportunity.opportunity_id)
             if cost_inputs is None:
                 cost_inputs = RealCostInputs(
@@ -172,8 +189,20 @@ class AutomatedDailyPipeline:
                 market_verification_label=verification.status_label,
                 market_comparable_count=verification.comparable_count,
                 market_is_verified=verification.is_verified,
+                first_seen_at=history.first_seen_at,
+                last_seen_at=history.last_seen_at,
+                first_price_nok=history.first_price_nok,
+                lowest_price_nok=history.lowest_price_nok,
+                highest_price_nok=history.highest_price_nok,
+                price_change_count=history.price_change_count,
+                price_change_from_first=history.change_from_first,
+                listing_age_days=history.age_days,
+                price_history_status=history.status,
+                price_history_label=history.status_label,
+                significant_price_drop=history.significant_drop,
             )
 
+        history_database.save()
         report = self.report_engine.build(
             decisions,
             scores_by_id=scores_by_id,
@@ -181,14 +210,14 @@ class AutomatedDailyPipeline:
             limit=config.limit,
         )
         dashboard = build_today_dashboard(report, metadata)
-        generated_at = datetime.now(timezone.utc).isoformat()
         payload = {
-            "schema_version": 7,
+            "schema_version": 8,
             "generated_at": generated_at,
             "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
             "sources": source_counts,
             "source_errors": source_errors,
             "keyword": config.keyword,
+            "history_path": config.history_path,
             "fetched_count": len(source_documents),
             "extracted_count": len(extracted),
             "deduplicated_count": len(opportunities),
@@ -203,6 +232,7 @@ class AutomatedDailyPipeline:
             deduplicated_count=len(opportunities),
             duplicate_count=merge_result.duplicate_count,
             output_path=config.output_path,
+            history_path=config.history_path,
             generated_at=generated_at,
             buy_count=report.buy_count,
             monitor_count=report.monitor_count,
