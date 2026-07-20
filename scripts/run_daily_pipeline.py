@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the automated daily opportunity pipeline."""
+"""Run the automated daily opportunity pipeline and smart alert processor."""
 
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ from opportunity_engine.ods.konkurs_app import KonkursAppFeedClient
 from opportunity_engine.ods.konkurskupp import KonkurskuppFeedClient
 from opportunity_engine.ods.market_pricing import MarketComparable
 from opportunity_engine.ods.real_cost import RealCostInputs
+from opportunity_engine.ods.snapshot_alerts import SnapshotAlertProcessor
 
 
 def _load_verified_inputs(path: str | None):
@@ -70,6 +71,7 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=25, help="Maximum rows in the report")
     parser.add_argument("--finn-rows", type=int, default=30, help="Maximum authorized FINN rows")
     parser.add_argument("--output", default="data/todays_opportunities.json")
+    parser.add_argument("--alerts-output", default="data/smart_alerts.json")
     parser.add_argument(
         "--verified-inputs",
         default=None,
@@ -93,7 +95,9 @@ def main() -> int:
         comparables_by_id=comparables,
         costs_by_id=costs,
     )
-    print(json.dumps(result.__dict__, ensure_ascii=False, sort_keys=True))
+    alerts = SnapshotAlertProcessor().process(args.output, args.alerts_output)
+    response = {**result.__dict__, "alert_count": len(alerts), "alerts_path": args.alerts_output}
+    print(json.dumps(response, ensure_ascii=False, sort_keys=True))
     return 0
 
 
