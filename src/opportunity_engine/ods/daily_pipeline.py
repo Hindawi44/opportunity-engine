@@ -16,6 +16,7 @@ from .auksjonen import AuksjonenClient
 from .bjaroy import BjaroyFeedClient
 from .daily_opportunity_report import DailyOpportunityReportEngine
 from .finn import FinnApiClient
+from .konkurs_app import KonkursAppFeedClient
 from .konkurskupp import KonkurskuppFeedClient
 from .live_data import SourceDocument
 from .market_pricing import MarketComparable, MarketPriceComparisonEngine
@@ -67,6 +68,7 @@ class AutomatedDailyPipeline:
         finn_client: FinnApiClient | None = None,
         konkurskupp_client: KonkurskuppFeedClient | None = None,
         bjaroy_client: BjaroyFeedClient | None = None,
+        konkurs_app_client: KonkursAppFeedClient | None = None,
         extractor: UnifiedOpportunityExtractor | None = None,
         multi_source_engine: UnifiedMultiSourceEngine | None = None,
         market_engine: MarketPriceComparisonEngine | None = None,
@@ -78,6 +80,7 @@ class AutomatedDailyPipeline:
         self.finn_client = finn_client
         self.konkurskupp_client = konkurskupp_client
         self.bjaroy_client = bjaroy_client
+        self.konkurs_app_client = konkurs_app_client
         self.extractor = extractor or UnifiedOpportunityExtractor()
         self.multi_source_engine = multi_source_engine or UnifiedMultiSourceEngine()
         self.market_engine = market_engine or MarketPriceComparisonEngine()
@@ -96,6 +99,8 @@ class AutomatedDailyPipeline:
             sources.append(("Konkurskupp", lambda: self.konkurskupp_client.fetch(keyword=config.keyword)))
         if self.bjaroy_client is not None:
             sources.append(("Bjarøy", lambda: self.bjaroy_client.fetch(keyword=config.keyword)))
+        if self.konkurs_app_client is not None:
+            sources.append(("Konkurs.app", lambda: self.konkurs_app_client.fetch(keyword=config.keyword)))
         for source_name, fetch in sources:
             try:
                 items = tuple(fetch())
@@ -155,9 +160,9 @@ class AutomatedDailyPipeline:
         dashboard = build_today_dashboard(report, metadata)
         generated_at = datetime.now(timezone.utc).isoformat()
         payload = {
-            "schema_version": 4,
+            "schema_version": 5,
             "generated_at": generated_at,
-            "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy feeds when configured",
+            "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
             "sources": source_counts,
             "source_errors": source_errors,
             "keyword": config.keyword,
