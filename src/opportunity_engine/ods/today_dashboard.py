@@ -16,6 +16,14 @@ class OpportunityDisplayMetadata:
     url: str | None = None
     city: str | None = None
     ends_at: str | None = None
+    asking_price_nok: float | None = None
+    market_value_nok: float | None = None
+    market_median_nok: float | None = None
+    market_discount: float | None = None
+    market_verification_status: str = "unavailable"
+    market_verification_label: str = "⚪ سوق غير متحقق"
+    market_comparable_count: int = 0
+    market_is_verified: bool = False
 
     def __post_init__(self) -> None:
         if not self.title.strip():
@@ -41,6 +49,14 @@ class TodayOpportunityRow:
     confidence: str
     city: str | None
     ends_at: str | None
+    asking_price_nok: float | None
+    market_value_nok: float | None
+    market_median_nok: float | None
+    market_discount: float | None
+    market_verification_status: str
+    market_verification_label: str
+    market_comparable_count: int
+    market_is_verified: bool
     reasons: tuple[str, ...]
     warnings: tuple[str, ...]
     blockers: tuple[str, ...]
@@ -88,6 +104,18 @@ def build_today_dashboard(
                 confidence=item.confidence,
                 city=metadata.city if metadata else None,
                 ends_at=metadata.ends_at if metadata else None,
+                asking_price_nok=metadata.asking_price_nok if metadata else None,
+                market_value_nok=metadata.market_value_nok if metadata else None,
+                market_median_nok=metadata.market_median_nok if metadata else None,
+                market_discount=metadata.market_discount if metadata else None,
+                market_verification_status=(
+                    metadata.market_verification_status if metadata else "unavailable"
+                ),
+                market_verification_label=(
+                    metadata.market_verification_label if metadata else "⚪ سوق غير متحقق"
+                ),
+                market_comparable_count=metadata.market_comparable_count if metadata else 0,
+                market_is_verified=metadata.market_is_verified if metadata else False,
                 reasons=item.reasons,
                 warnings=item.warnings,
                 blockers=item.blockers,
