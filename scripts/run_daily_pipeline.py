@@ -10,6 +10,7 @@ from pathlib import Path
 
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
 from opportunity_engine.ods.finn import FinnApiClient
+from opportunity_engine.ods.konkurskupp import KonkurskuppFeedClient
 from opportunity_engine.ods.market_pricing import MarketComparable
 from opportunity_engine.ods.real_cost import RealCostInputs
 
@@ -43,6 +44,14 @@ def _finn_client_from_environment() -> FinnApiClient | None:
     )
 
 
+def _konkurskupp_client_from_environment() -> KonkurskuppFeedClient | None:
+    feed_url = os.getenv("KONKURSKUPP_FEED_URL", "").strip()
+    token = os.getenv("KONKURSKUPP_FEED_TOKEN", "").strip() or None
+    if not feed_url:
+        return None
+    return KonkurskuppFeedClient(feed_url=feed_url, token=token)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate today's opportunity dashboard snapshot")
     parser.add_argument("--keyword", default=None, help="Optional source search keyword")
@@ -57,7 +66,10 @@ def main() -> int:
     args = parser.parse_args()
 
     comparables, costs = _load_verified_inputs(args.verified_inputs)
-    result = AutomatedDailyPipeline(finn_client=_finn_client_from_environment()).run(
+    result = AutomatedDailyPipeline(
+        finn_client=_finn_client_from_environment(),
+        konkurskupp_client=_konkurskupp_client_from_environment(),
+    ).run(
         DailyPipelineConfig(
             keyword=args.keyword,
             limit=args.limit,
