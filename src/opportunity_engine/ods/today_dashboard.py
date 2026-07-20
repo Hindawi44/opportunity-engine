@@ -35,6 +35,18 @@ class OpportunityDisplayMetadata:
     price_history_status: str = "unpriced"
     price_history_label: str = "⚪ لا يوجد سعر"
     significant_price_drop: bool = False
+    seller_id: str | None = None
+    seller_name: str | None = None
+    seller_type: str | None = None
+    seller_score: float | None = None
+    seller_grade: str = "U"
+    seller_risk: str = "unknown"
+    seller_risk_label: str = "⚪ بائع غير متحقق"
+    seller_confidence: str = "insufficient"
+    seller_is_verified: bool = False
+    seller_evidence_count: int = 0
+    seller_reasons: tuple[str, ...] = ()
+    seller_warnings: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.title.strip():
@@ -79,6 +91,18 @@ class TodayOpportunityRow:
     price_history_status: str
     price_history_label: str
     significant_price_drop: bool
+    seller_id: str | None
+    seller_name: str | None
+    seller_type: str | None
+    seller_score: float | None
+    seller_grade: str
+    seller_risk: str
+    seller_risk_label: str
+    seller_confidence: str
+    seller_is_verified: bool
+    seller_evidence_count: int
+    seller_reasons: tuple[str, ...]
+    seller_warnings: tuple[str, ...]
     reasons: tuple[str, ...]
     warnings: tuple[str, ...]
     blockers: tuple[str, ...]
@@ -130,8 +154,8 @@ def build_today_dashboard(
                 market_value_nok=metadata.market_value_nok if metadata else None,
                 market_median_nok=metadata.market_median_nok if metadata else None,
                 market_discount=metadata.market_discount if metadata else None,
-                market_verification_status=(metadata.market_verification_status if metadata else "unavailable"),
-                market_verification_label=(metadata.market_verification_label if metadata else "⚪ سوق غير متحقق"),
+                market_verification_status=metadata.market_verification_status if metadata else "unavailable",
+                market_verification_label=metadata.market_verification_label if metadata else "⚪ سوق غير متحقق",
                 market_comparable_count=metadata.market_comparable_count if metadata else 0,
                 market_is_verified=metadata.market_is_verified if metadata else False,
                 first_seen_at=metadata.first_seen_at if metadata else None,
@@ -145,6 +169,18 @@ def build_today_dashboard(
                 price_history_status=metadata.price_history_status if metadata else "unpriced",
                 price_history_label=metadata.price_history_label if metadata else "⚪ لا يوجد سعر",
                 significant_price_drop=metadata.significant_price_drop if metadata else False,
+                seller_id=metadata.seller_id if metadata else None,
+                seller_name=metadata.seller_name if metadata else None,
+                seller_type=metadata.seller_type if metadata else None,
+                seller_score=metadata.seller_score if metadata else None,
+                seller_grade=metadata.seller_grade if metadata else "U",
+                seller_risk=metadata.seller_risk if metadata else "unknown",
+                seller_risk_label=metadata.seller_risk_label if metadata else "⚪ بائع غير متحقق",
+                seller_confidence=metadata.seller_confidence if metadata else "insufficient",
+                seller_is_verified=metadata.seller_is_verified if metadata else False,
+                seller_evidence_count=metadata.seller_evidence_count if metadata else 0,
+                seller_reasons=metadata.seller_reasons if metadata else (),
+                seller_warnings=metadata.seller_warnings if metadata else (),
                 reasons=item.reasons,
                 warnings=item.warnings,
                 blockers=item.blockers,
