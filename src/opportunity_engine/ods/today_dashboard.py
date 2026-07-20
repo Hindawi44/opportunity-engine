@@ -24,6 +24,17 @@ class OpportunityDisplayMetadata:
     market_verification_label: str = "⚪ سوق غير متحقق"
     market_comparable_count: int = 0
     market_is_verified: bool = False
+    first_seen_at: str | None = None
+    last_seen_at: str | None = None
+    first_price_nok: float | None = None
+    lowest_price_nok: float | None = None
+    highest_price_nok: float | None = None
+    price_change_count: int = 0
+    price_change_from_first: float | None = None
+    listing_age_days: int = 0
+    price_history_status: str = "unpriced"
+    price_history_label: str = "⚪ لا يوجد سعر"
+    significant_price_drop: bool = False
 
     def __post_init__(self) -> None:
         if not self.title.strip():
@@ -57,6 +68,17 @@ class TodayOpportunityRow:
     market_verification_label: str
     market_comparable_count: int
     market_is_verified: bool
+    first_seen_at: str | None
+    last_seen_at: str | None
+    first_price_nok: float | None
+    lowest_price_nok: float | None
+    highest_price_nok: float | None
+    price_change_count: int
+    price_change_from_first: float | None
+    listing_age_days: int
+    price_history_status: str
+    price_history_label: str
+    significant_price_drop: bool
     reasons: tuple[str, ...]
     warnings: tuple[str, ...]
     blockers: tuple[str, ...]
@@ -108,14 +130,21 @@ def build_today_dashboard(
                 market_value_nok=metadata.market_value_nok if metadata else None,
                 market_median_nok=metadata.market_median_nok if metadata else None,
                 market_discount=metadata.market_discount if metadata else None,
-                market_verification_status=(
-                    metadata.market_verification_status if metadata else "unavailable"
-                ),
-                market_verification_label=(
-                    metadata.market_verification_label if metadata else "⚪ سوق غير متحقق"
-                ),
+                market_verification_status=(metadata.market_verification_status if metadata else "unavailable"),
+                market_verification_label=(metadata.market_verification_label if metadata else "⚪ سوق غير متحقق"),
                 market_comparable_count=metadata.market_comparable_count if metadata else 0,
                 market_is_verified=metadata.market_is_verified if metadata else False,
+                first_seen_at=metadata.first_seen_at if metadata else None,
+                last_seen_at=metadata.last_seen_at if metadata else None,
+                first_price_nok=metadata.first_price_nok if metadata else None,
+                lowest_price_nok=metadata.lowest_price_nok if metadata else None,
+                highest_price_nok=metadata.highest_price_nok if metadata else None,
+                price_change_count=metadata.price_change_count if metadata else 0,
+                price_change_from_first=metadata.price_change_from_first if metadata else None,
+                listing_age_days=metadata.listing_age_days if metadata else 0,
+                price_history_status=metadata.price_history_status if metadata else "unpriced",
+                price_history_label=metadata.price_history_label if metadata else "⚪ لا يوجد سعر",
+                significant_price_drop=metadata.significant_price_drop if metadata else False,
                 reasons=item.reasons,
                 warnings=item.warnings,
                 blockers=item.blockers,
