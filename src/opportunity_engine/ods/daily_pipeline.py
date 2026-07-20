@@ -22,6 +22,7 @@ from .live_data import SourceDocument
 from .market_pricing import MarketComparable, MarketPriceComparisonEngine
 from .market_verification import MarketPriceVerificationEngine
 from .multi_source import UnifiedMultiSourceEngine
+from .opportunity_discovery import OpportunityDiscoveryEngine
 from .opportunity_intelligence import OpportunityIntelligenceEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
 from .opportunity_scoring import OpportunityScoringEngine
@@ -68,7 +69,7 @@ class DailyPipelineResult:
 
 
 class AutomatedDailyPipeline:
-    """Run collection, normalization, history, intelligence, scoring and reporting."""
+    """Run collection, normalization, history, discovery, intelligence and reporting."""
 
     def __init__(
         self,
@@ -87,6 +88,7 @@ class AutomatedDailyPipeline:
         scoring_engine: OpportunityScoringEngine | None = None,
         seller_reliability_engine: SellerReliabilityEngine | None = None,
         intelligence_engine: OpportunityIntelligenceEngine | None = None,
+        discovery_engine: OpportunityDiscoveryEngine | None = None,
         report_engine: DailyOpportunityReportEngine | None = None,
     ) -> None:
         self.client = client or AuksjonenClient()
@@ -103,6 +105,7 @@ class AutomatedDailyPipeline:
         self.scoring_engine = scoring_engine or OpportunityScoringEngine()
         self.seller_reliability_engine = seller_reliability_engine or SellerReliabilityEngine()
         self.intelligence_engine = intelligence_engine or OpportunityIntelligenceEngine()
+        self.discovery_engine = discovery_engine or OpportunityDiscoveryEngine()
         self.report_engine = report_engine or DailyOpportunityReportEngine()
 
     def _collect(self, config: DailyPipelineConfig) -> tuple[tuple[SourceDocument, ...], dict[str, int], dict[str, str]]:
@@ -160,6 +163,7 @@ class AutomatedDailyPipeline:
         decisions = []
         scores_by_id = {}
         intelligence_by_id: dict[str, object] = {}
+        discovery_by_id: dict[str, object] = {}
         metadata: dict[str, OpportunityDisplayMetadata] = {}
         for opportunity in opportunities:
             market = self.market_engine.compare(opportunity, comparables_by_id.get(opportunity.opportunity_id, ()))
@@ -187,9 +191,18 @@ class AutomatedDailyPipeline:
                 history,
                 seller,
             )
+            discovery = self.discovery_engine.discover(
+                opportunity,
+                decision,
+                score,
+                verification,
+                history,
+                seller,
+            )
             decisions.append(decision)
             scores_by_id[opportunity.opportunity_id] = score
             intelligence_by_id[opportunity.opportunity_id] = asdict(intelligence)
+            discovery_by_id[opportunity.opportunity_id] = asdict(discovery)
             metadata[opportunity.opportunity_id] = OpportunityDisplayMetadata(
                 title=opportunity.title,
                 url=opportunity.url,
@@ -237,7 +250,7 @@ class AutomatedDailyPipeline:
         )
         dashboard = build_today_dashboard(report, metadata)
         payload = {
-            "schema_version": 10,
+            "schema_version": 11,
             "generated_at": generated_at,
             "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
             "sources": source_counts,
@@ -250,6 +263,7 @@ class AutomatedDailyPipeline:
             "duplicate_count": merge_result.duplicate_count,
             "duplicate_groups_merged": merge_result.groups_merged,
             "intelligence_by_id": intelligence_by_id,
+            "discovery_by_id": discovery_by_id,
             **asdict(dashboard),
         }
         self._write_json_atomic(Path(config.output_path), payload)

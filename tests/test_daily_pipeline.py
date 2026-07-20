@@ -72,12 +72,13 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     payload = json.loads(output.read_text(encoding="utf-8"))
     row = payload["rows"][0]
     intelligence = payload["intelligence_by_id"][opportunity_id]
+    discovery = payload["discovery_by_id"][opportunity_id]
     assert result.fetched_count == 1
     assert result.extracted_count == 1
     assert result.deduplicated_count == 1
     assert result.duplicate_count == 0
     assert result.history_path == str(history)
-    assert payload["schema_version"] == 10
+    assert payload["schema_version"] == 11
     assert payload["report_date"] == "2026-07-20"
     assert row["title"] == "Butikkinnredning"
     assert row["url"].startswith("https://")
@@ -103,6 +104,9 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     assert intelligence["strengths"]
     assert intelligence["next_actions"]
     assert intelligence["headline"]
+    assert discovery["discovery_score"] >= 65
+    assert discovery["tier"] in {"strong", "exceptional"}
+    assert "verified_strong_market_discount" in discovery["signals"]
     assert history.exists()
     assert payload["buy_count"] == 1
 
@@ -119,6 +123,7 @@ def test_pipeline_detects_price_drop_across_runs(tmp_path) -> None:
     payload = json.loads(output.read_text(encoding="utf-8"))
     row = payload["rows"][0]
     intelligence = payload["intelligence_by_id"]["unified-auksjonen-123"]
+    discovery = payload["discovery_by_id"]["unified-auksjonen-123"]
     assert row["first_price_nok"] == 10_000
     assert row["lowest_price_nok"] == 8_000
     assert row["highest_price_nok"] == 10_000
@@ -128,6 +133,7 @@ def test_pipeline_detects_price_drop_across_runs(tmp_path) -> None:
     assert row["price_history_status"] == "price_drop"
     assert row["significant_price_drop"] is True
     assert any("انخفض" in item for item in intelligence["strengths"])
+    assert "significant_price_drop" in discovery["signals"]
 
 
 def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
@@ -152,6 +158,7 @@ def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
     payload = json.loads(output.read_text(encoding="utf-8"))
     row = payload["rows"][0]
     intelligence = payload["intelligence_by_id"]["unified-auksjonen-123"]
+    discovery = payload["discovery_by_id"]["unified-auksjonen-123"]
     assert row["decision"] == "monitor"
     assert row["score"] <= 59
     assert row["market_verification_status"] == "unavailable"
@@ -162,6 +169,8 @@ def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
     assert intelligence["recommendation"] == "monitor"
     assert intelligence["missing_evidence"]
     assert intelligence["is_actionable"] is False
+    assert discovery["is_exceptional"] is False
+    assert discovery["discovery_score"] <= 59
     assert "market_comparables" in row["blockers"]
     assert any(item.startswith("cost:") for item in row["blockers"])
 
@@ -179,4 +188,5 @@ def test_pipeline_supports_empty_collection(tmp_path) -> None:
     assert result.deduplicated_count == 0
     assert payload["rows"] == []
     assert payload["intelligence_by_id"] == {}
+    assert payload["discovery_by_id"] == {}
     assert payload["total_count"] == 0
