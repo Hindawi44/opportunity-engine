@@ -34,7 +34,13 @@ class UnifiedOpportunityExtractor:
     """Convert supported auction documents without inventing missing facts."""
 
     name = "unified_opportunity_extractor"
-    supported_source_types = frozenset({"public_auction_listing", "authorized_classified_ad"})
+    supported_source_types = frozenset(
+        {
+            "public_auction_listing",
+            "authorized_classified_ad",
+            "authorized_liquidation_asset",
+        }
+    )
 
     def extract(self, documents: Iterable[SourceDocument]) -> tuple[UnifiedOpportunity, ...]:
         opportunities: list[UnifiedOpportunity] = []
