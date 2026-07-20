@@ -21,6 +21,15 @@ def _document(price: float = 10_000) -> SourceDocument:
             "city": "Trondheim",
             "ends_at": "2026-08-01T18:00:00+02:00",
             "mva_status": "included",
+            "seller_id": "seller-123",
+            "seller_name": "Verified Asset AS",
+            "seller_type": "company",
+            "seller_verified": True,
+            "seller_rating": 4.7,
+            "seller_review_count": 24,
+            "seller_account_age_days": 1200,
+            "seller_listing_count": 40,
+            "seller_relist_count": 0,
         },
     )
 
@@ -67,7 +76,7 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     assert result.deduplicated_count == 1
     assert result.duplicate_count == 0
     assert result.history_path == str(history)
-    assert payload["schema_version"] == 8
+    assert payload["schema_version"] == 9
     assert payload["report_date"] == "2026-07-20"
     assert row["title"] == "Butikkinnredning"
     assert row["url"].startswith("https://")
@@ -83,6 +92,12 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     assert row["lowest_price_nok"] == 10_000
     assert row["price_change_count"] == 0
     assert row["price_history_status"] == "new"
+    assert row["seller_id"] == "seller-123"
+    assert row["seller_name"] == "Verified Asset AS"
+    assert row["seller_score"] >= 75
+    assert row["seller_grade"] in {"A", "B"}
+    assert row["seller_risk"] == "low"
+    assert row["seller_is_verified"] is True
     assert history.exists()
     assert payload["buy_count"] == 1
 
@@ -110,9 +125,24 @@ def test_pipeline_detects_price_drop_across_runs(tmp_path) -> None:
 def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
     output = tmp_path / "today.json"
     history = tmp_path / "history.json"
+    document = _document()
+    document = SourceDocument(
+        document_id=document.document_id,
+        source_name=document.source_name,
+        source_type=document.source_type,
+        title=document.title,
+        text=document.text,
+        url=document.url,
+        country=document.country,
+        metadata={
+            key: value
+            for key, value in document.metadata.items()
+            if not key.startswith("seller_")
+        },
+    )
     AutomatedDailyPipeline().run(
         DailyPipelineConfig(output_path=str(output), history_path=str(history)),
-        documents=(_document(),),
+        documents=(document,),
         report_date=date(2026, 7, 20),
     )
     row = json.loads(output.read_text(encoding="utf-8"))["rows"][0]
@@ -120,6 +150,9 @@ def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
     assert row["score"] <= 59
     assert row["market_verification_status"] == "unavailable"
     assert row["market_is_verified"] is False
+    assert row["seller_score"] is None
+    assert row["seller_grade"] == "U"
+    assert row["seller_risk"] == "unknown"
     assert "market_comparables" in row["blockers"]
     assert any(item.startswith("cost:") for item in row["blockers"])
 
