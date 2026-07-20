@@ -62,7 +62,7 @@ def test_pipeline_combines_auksjonen_and_authorized_finn(tmp_path) -> None:
     assert result.deduplicated_count == 2
     assert result.source_counts == {"Auksjonen.no": 1, "FINN.no": 1}
     assert result.source_errors == {}
-    assert payload["schema_version"] == 5
+    assert payload["schema_version"] == 6
     assert payload["sources"]["FINN.no"] == 1
     assert payload["total_count"] == 2
 
