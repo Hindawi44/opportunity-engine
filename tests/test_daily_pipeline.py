@@ -62,7 +62,9 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert result.fetched_count == 1
     assert result.extracted_count == 1
-    assert payload["schema_version"] == 2
+    assert result.deduplicated_count == 1
+    assert result.duplicate_count == 0
+    assert payload["schema_version"] == 3
     assert payload["report_date"] == "2026-07-20"
     assert payload["rows"][0]["title"] == "Butikkinnredning"
     assert payload["rows"][0]["url"].startswith("https://")
@@ -95,5 +97,6 @@ def test_pipeline_supports_empty_collection(tmp_path) -> None:
 
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert result.extracted_count == 0
+    assert result.deduplicated_count == 0
     assert payload["rows"] == []
     assert payload["total_count"] == 0
