@@ -24,6 +24,8 @@ jobs:
       KONKURSKUPP_FEED_TOKEN: ${{ secrets.KONKURSKUPP_FEED_TOKEN }}
       BJAROY_FEED_URL: ${{ secrets.BJAROY_FEED_URL }}
       BJAROY_FEED_TOKEN: ${{ secrets.BJAROY_FEED_TOKEN }}
+      KONKURS_APP_FEED_URL: ${{ secrets.KONKURS_APP_FEED_URL }}
+      KONKURS_APP_FEED_TOKEN: ${{ secrets.KONKURS_APP_FEED_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
