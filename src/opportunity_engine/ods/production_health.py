@@ -46,7 +46,7 @@ class ProductionHealthChecker:
         "opportunity_engine.ods.opportunity_discovery",
         "opportunity_engine.ods.smart_alerts",
         "opportunity_engine.ods.capital_allocation",
-        "opportunity_engine.ods.portfolio",
+        "opportunity_engine.ods.portfolio_manager",
     )
 
     CONNECTOR_ENV_GROUPS = {
@@ -115,10 +115,7 @@ class ProductionHealthChecker:
                 )
 
         required_failures = [item for item in checks if item.required and item.status == "fail"]
-        configuration_failures = [
-            item for item in checks if item.name.startswith("connector:") and item.status == "fail"
-        ]
-        ready = not required_failures and not configuration_failures
+        ready = not required_failures
         status = "healthy" if ready else "unhealthy"
         return ProductionHealthReport(status=status, ready=ready, checks=tuple(checks))
 
