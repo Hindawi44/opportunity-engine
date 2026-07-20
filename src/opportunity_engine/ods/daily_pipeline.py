@@ -1,6 +1,7 @@
 """End-to-end daily pipeline for authorized and public opportunity sources.
 
-Missing market comparables, operating costs, or seller facts never become zero.
+Missing market comparables, operating costs, seller facts, or other evidence never
+become zero or invented facts.
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from .live_data import SourceDocument
 from .market_pricing import MarketComparable, MarketPriceComparisonEngine
 from .market_verification import MarketPriceVerificationEngine
 from .multi_source import UnifiedMultiSourceEngine
+from .opportunity_intelligence import OpportunityIntelligenceEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
 from .opportunity_scoring import OpportunityScoringEngine
 from .price_history import HistoricalPriceDatabase
@@ -66,7 +68,7 @@ class DailyPipelineResult:
 
 
 class AutomatedDailyPipeline:
-    """Run collection, normalization, history, seller checks, scoring and reporting."""
+    """Run collection, normalization, history, intelligence, scoring and reporting."""
 
     def __init__(
         self,
@@ -84,6 +86,7 @@ class AutomatedDailyPipeline:
         decision_engine: OpportunityProfitDecisionEngine | None = None,
         scoring_engine: OpportunityScoringEngine | None = None,
         seller_reliability_engine: SellerReliabilityEngine | None = None,
+        intelligence_engine: OpportunityIntelligenceEngine | None = None,
         report_engine: DailyOpportunityReportEngine | None = None,
     ) -> None:
         self.client = client or AuksjonenClient()
@@ -99,6 +102,7 @@ class AutomatedDailyPipeline:
         self.decision_engine = decision_engine or OpportunityProfitDecisionEngine()
         self.scoring_engine = scoring_engine or OpportunityScoringEngine()
         self.seller_reliability_engine = seller_reliability_engine or SellerReliabilityEngine()
+        self.intelligence_engine = intelligence_engine or OpportunityIntelligenceEngine()
         self.report_engine = report_engine or DailyOpportunityReportEngine()
 
     def _collect(self, config: DailyPipelineConfig) -> tuple[tuple[SourceDocument, ...], dict[str, int], dict[str, str]]:
@@ -155,6 +159,7 @@ class AutomatedDailyPipeline:
 
         decisions = []
         scores_by_id = {}
+        intelligence_by_id: dict[str, object] = {}
         metadata: dict[str, OpportunityDisplayMetadata] = {}
         for opportunity in opportunities:
             market = self.market_engine.compare(opportunity, comparables_by_id.get(opportunity.opportunity_id, ()))
@@ -173,8 +178,18 @@ class AutomatedDailyPipeline:
                 )
             costs = self.cost_engine.calculate(cost_inputs)
             decision = self.decision_engine.decide(market, costs)
+            score = self.scoring_engine.score(opportunity, decision)
+            intelligence = self.intelligence_engine.explain(
+                opportunity,
+                decision,
+                score,
+                verification,
+                history,
+                seller,
+            )
             decisions.append(decision)
-            scores_by_id[opportunity.opportunity_id] = self.scoring_engine.score(opportunity, decision)
+            scores_by_id[opportunity.opportunity_id] = score
+            intelligence_by_id[opportunity.opportunity_id] = asdict(intelligence)
             metadata[opportunity.opportunity_id] = OpportunityDisplayMetadata(
                 title=opportunity.title,
                 url=opportunity.url,
@@ -222,7 +237,7 @@ class AutomatedDailyPipeline:
         )
         dashboard = build_today_dashboard(report, metadata)
         payload = {
-            "schema_version": 9,
+            "schema_version": 10,
             "generated_at": generated_at,
             "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
             "sources": source_counts,
@@ -234,6 +249,7 @@ class AutomatedDailyPipeline:
             "deduplicated_count": len(opportunities),
             "duplicate_count": merge_result.duplicate_count,
             "duplicate_groups_merged": merge_result.groups_merged,
+            "intelligence_by_id": intelligence_by_id,
             **asdict(dashboard),
         }
         self._write_json_atomic(Path(config.output_path), payload)
