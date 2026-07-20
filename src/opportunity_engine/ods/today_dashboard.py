@@ -32,6 +32,9 @@ class TodayOpportunityRow:
     url: str | None
     decision: str
     decision_label: str
+    score: float
+    score_grade: str
+    score_breakdown: tuple[str, ...]
     expected_profit_nok: float | None
     roi: float | None
     maximum_purchase_price_nok: float | None
@@ -76,6 +79,9 @@ def build_today_dashboard(
                 url=metadata.url if metadata else None,
                 decision=item.decision,
                 decision_label=item.decision_label,
+                score=item.score,
+                score_grade=item.score_grade,
+                score_breakdown=item.score_breakdown,
                 expected_profit_nok=item.expected_profit_nok,
                 roi=item.roi,
                 maximum_purchase_price_nok=item.maximum_purchase_price_nok,
