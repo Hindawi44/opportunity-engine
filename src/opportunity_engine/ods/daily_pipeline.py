@@ -22,6 +22,7 @@ from .live_data import SourceDocument
 from .market_pricing import MarketComparable, MarketPriceComparisonEngine
 from .multi_source import UnifiedMultiSourceEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
+from .opportunity_scoring import OpportunityScoringEngine
 from .real_cost import RealCostEngine, RealCostInputs
 from .today_dashboard import OpportunityDisplayMetadata, build_today_dashboard
 from .unified_opportunity import UnifiedOpportunityExtractor
@@ -59,7 +60,7 @@ class DailyPipelineResult:
 
 
 class AutomatedDailyPipeline:
-    """Run collection, normalization, deduplication, costing and reporting."""
+    """Run collection, normalization, deduplication, scoring and reporting."""
 
     def __init__(
         self,
@@ -74,6 +75,7 @@ class AutomatedDailyPipeline:
         market_engine: MarketPriceComparisonEngine | None = None,
         cost_engine: RealCostEngine | None = None,
         decision_engine: OpportunityProfitDecisionEngine | None = None,
+        scoring_engine: OpportunityScoringEngine | None = None,
         report_engine: DailyOpportunityReportEngine | None = None,
     ) -> None:
         self.client = client or AuksjonenClient()
@@ -86,6 +88,7 @@ class AutomatedDailyPipeline:
         self.market_engine = market_engine or MarketPriceComparisonEngine()
         self.cost_engine = cost_engine or RealCostEngine()
         self.decision_engine = decision_engine or OpportunityProfitDecisionEngine()
+        self.scoring_engine = scoring_engine or OpportunityScoringEngine()
         self.report_engine = report_engine or DailyOpportunityReportEngine()
 
     def _collect(self, config: DailyPipelineConfig) -> tuple[tuple[SourceDocument, ...], dict[str, int], dict[str, str]]:
@@ -138,6 +141,7 @@ class AutomatedDailyPipeline:
         costs_by_id = costs_by_id or {}
 
         decisions = []
+        scores_by_id = {}
         metadata: dict[str, OpportunityDisplayMetadata] = {}
         for opportunity in opportunities:
             market = self.market_engine.compare(opportunity, comparables_by_id.get(opportunity.opportunity_id, ()))
@@ -148,7 +152,9 @@ class AutomatedDailyPipeline:
                     vat_status=opportunity.mva_status,
                 )
             costs = self.cost_engine.calculate(cost_inputs)
-            decisions.append(self.decision_engine.decide(market, costs))
+            decision = self.decision_engine.decide(market, costs)
+            decisions.append(decision)
+            scores_by_id[opportunity.opportunity_id] = self.scoring_engine.score(opportunity, decision)
             metadata[opportunity.opportunity_id] = OpportunityDisplayMetadata(
                 title=opportunity.title,
                 url=opportunity.url,
@@ -156,11 +162,16 @@ class AutomatedDailyPipeline:
                 ends_at=opportunity.ends_at.isoformat() if opportunity.ends_at else None,
             )
 
-        report = self.report_engine.build(decisions, report_date=report_date, limit=config.limit)
+        report = self.report_engine.build(
+            decisions,
+            scores_by_id=scores_by_id,
+            report_date=report_date,
+            limit=config.limit,
+        )
         dashboard = build_today_dashboard(report, metadata)
         generated_at = datetime.now(timezone.utc).isoformat()
         payload = {
-            "schema_version": 5,
+            "schema_version": 6,
             "generated_at": generated_at,
             "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
             "sources": source_counts,
