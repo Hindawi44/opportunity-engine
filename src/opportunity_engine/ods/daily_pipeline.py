@@ -15,6 +15,7 @@ from typing import Iterable, Mapping
 from .auksjonen import AuksjonenClient
 from .daily_opportunity_report import DailyOpportunityReportEngine
 from .finn import FinnApiClient
+from .konkurskupp import KonkurskuppFeedClient
 from .live_data import SourceDocument
 from .market_pricing import MarketComparable, MarketPriceComparisonEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
@@ -60,6 +61,7 @@ class AutomatedDailyPipeline:
         *,
         client: AuksjonenClient | None = None,
         finn_client: FinnApiClient | None = None,
+        konkurskupp_client: KonkurskuppFeedClient | None = None,
         extractor: UnifiedOpportunityExtractor | None = None,
         market_engine: MarketPriceComparisonEngine | None = None,
         cost_engine: RealCostEngine | None = None,
@@ -68,6 +70,7 @@ class AutomatedDailyPipeline:
     ) -> None:
         self.client = client or AuksjonenClient()
         self.finn_client = finn_client
+        self.konkurskupp_client = konkurskupp_client
         self.extractor = extractor or UnifiedOpportunityExtractor()
         self.market_engine = market_engine or MarketPriceComparisonEngine()
         self.cost_engine = cost_engine or RealCostEngine()
@@ -82,6 +85,10 @@ class AutomatedDailyPipeline:
         if self.finn_client is not None:
             sources.append(
                 ("FINN.no", lambda: self.finn_client.search(keyword=config.keyword, rows=config.finn_rows))
+            )
+        if self.konkurskupp_client is not None:
+            sources.append(
+                ("Konkurskupp", lambda: self.konkurskupp_client.fetch(keyword=config.keyword))
             )
         for source_name, fetch in sources:
             try:
@@ -145,7 +152,7 @@ class AutomatedDailyPipeline:
         payload = {
             "schema_version": 2,
             "generated_at": generated_at,
-            "source": "Auksjonen.no public listings + authorized FINN API when configured",
+            "source": "Auksjonen public listings + authorized FINN/Konkurskupp feeds when configured",
             "sources": source_counts,
             "source_errors": source_errors,
             "keyword": config.keyword,
