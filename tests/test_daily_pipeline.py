@@ -60,17 +60,23 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     )
 
     payload = json.loads(output.read_text(encoding="utf-8"))
+    row = payload["rows"][0]
     assert result.fetched_count == 1
     assert result.extracted_count == 1
     assert result.deduplicated_count == 1
     assert result.duplicate_count == 0
-    assert payload["schema_version"] == 6
+    assert payload["schema_version"] == 7
     assert payload["report_date"] == "2026-07-20"
-    assert payload["rows"][0]["title"] == "Butikkinnredning"
-    assert payload["rows"][0]["url"].startswith("https://")
-    assert 0 <= payload["rows"][0]["score"] <= 100
-    assert payload["rows"][0]["score_grade"] in {"A", "B", "C", "D", "E"}
-    assert payload["rows"][0]["score_breakdown"]
+    assert row["title"] == "Butikkinnredning"
+    assert row["url"].startswith("https://")
+    assert 0 <= row["score"] <= 100
+    assert row["score_grade"] in {"A", "B", "C", "D", "E"}
+    assert row["score_breakdown"]
+    assert row["asking_price_nok"] == 10_000
+    assert row["market_value_nok"] is not None
+    assert row["market_discount"] > 0
+    assert row["market_verification_status"] == "strong_discount"
+    assert row["market_is_verified"] is True
     assert payload["buy_count"] == 1
 
 
@@ -84,6 +90,8 @@ def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
     row = json.loads(output.read_text(encoding="utf-8"))["rows"][0]
     assert row["decision"] == "monitor"
     assert row["score"] <= 59
+    assert row["market_verification_status"] == "unavailable"
+    assert row["market_is_verified"] is False
     assert "market_comparables" in row["blockers"]
     assert any(item.startswith("cost:") for item in row["blockers"])
 

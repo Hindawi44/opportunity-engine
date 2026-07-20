@@ -20,6 +20,7 @@ from .konkurs_app import KonkursAppFeedClient
 from .konkurskupp import KonkurskuppFeedClient
 from .live_data import SourceDocument
 from .market_pricing import MarketComparable, MarketPriceComparisonEngine
+from .market_verification import MarketPriceVerificationEngine
 from .multi_source import UnifiedMultiSourceEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
 from .opportunity_scoring import OpportunityScoringEngine
@@ -73,6 +74,7 @@ class AutomatedDailyPipeline:
         extractor: UnifiedOpportunityExtractor | None = None,
         multi_source_engine: UnifiedMultiSourceEngine | None = None,
         market_engine: MarketPriceComparisonEngine | None = None,
+        market_verification_engine: MarketPriceVerificationEngine | None = None,
         cost_engine: RealCostEngine | None = None,
         decision_engine: OpportunityProfitDecisionEngine | None = None,
         scoring_engine: OpportunityScoringEngine | None = None,
@@ -86,6 +88,7 @@ class AutomatedDailyPipeline:
         self.extractor = extractor or UnifiedOpportunityExtractor()
         self.multi_source_engine = multi_source_engine or UnifiedMultiSourceEngine()
         self.market_engine = market_engine or MarketPriceComparisonEngine()
+        self.market_verification_engine = market_verification_engine or MarketPriceVerificationEngine()
         self.cost_engine = cost_engine or RealCostEngine()
         self.decision_engine = decision_engine or OpportunityProfitDecisionEngine()
         self.scoring_engine = scoring_engine or OpportunityScoringEngine()
@@ -145,6 +148,7 @@ class AutomatedDailyPipeline:
         metadata: dict[str, OpportunityDisplayMetadata] = {}
         for opportunity in opportunities:
             market = self.market_engine.compare(opportunity, comparables_by_id.get(opportunity.opportunity_id, ()))
+            verification = self.market_verification_engine.verify(opportunity, market)
             cost_inputs = costs_by_id.get(opportunity.opportunity_id)
             if cost_inputs is None:
                 cost_inputs = RealCostInputs(
@@ -160,6 +164,14 @@ class AutomatedDailyPipeline:
                 url=opportunity.url,
                 city=opportunity.city,
                 ends_at=opportunity.ends_at.isoformat() if opportunity.ends_at else None,
+                asking_price_nok=verification.asking_price_nok,
+                market_value_nok=verification.conservative_market_value_nok,
+                market_median_nok=verification.median_market_value_nok,
+                market_discount=verification.discount_vs_conservative,
+                market_verification_status=verification.status,
+                market_verification_label=verification.status_label,
+                market_comparable_count=verification.comparable_count,
+                market_is_verified=verification.is_verified,
             )
 
         report = self.report_engine.build(
@@ -171,7 +183,7 @@ class AutomatedDailyPipeline:
         dashboard = build_today_dashboard(report, metadata)
         generated_at = datetime.now(timezone.utc).isoformat()
         payload = {
-            "schema_version": 6,
+            "schema_version": 7,
             "generated_at": generated_at,
             "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
             "sources": source_counts,
