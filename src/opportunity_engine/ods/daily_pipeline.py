@@ -18,6 +18,7 @@ from .finn import FinnApiClient
 from .konkurskupp import KonkurskuppFeedClient
 from .live_data import SourceDocument
 from .market_pricing import MarketComparable, MarketPriceComparisonEngine
+from .multi_source import UnifiedMultiSourceEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
 from .real_cost import RealCostEngine, RealCostInputs
 from .today_dashboard import OpportunityDisplayMetadata, build_today_dashboard
@@ -44,6 +45,8 @@ class DailyPipelineConfig:
 class DailyPipelineResult:
     fetched_count: int
     extracted_count: int
+    deduplicated_count: int
+    duplicate_count: int
     output_path: str
     generated_at: str
     buy_count: int
@@ -54,7 +57,7 @@ class DailyPipelineResult:
 
 
 class AutomatedDailyPipeline:
-    """Run collection, normalization, pricing, costing, decision and reporting."""
+    """Run collection, normalization, deduplication, costing and reporting."""
 
     def __init__(
         self,
@@ -63,6 +66,7 @@ class AutomatedDailyPipeline:
         finn_client: FinnApiClient | None = None,
         konkurskupp_client: KonkurskuppFeedClient | None = None,
         extractor: UnifiedOpportunityExtractor | None = None,
+        multi_source_engine: UnifiedMultiSourceEngine | None = None,
         market_engine: MarketPriceComparisonEngine | None = None,
         cost_engine: RealCostEngine | None = None,
         decision_engine: OpportunityProfitDecisionEngine | None = None,
@@ -72,6 +76,7 @@ class AutomatedDailyPipeline:
         self.finn_client = finn_client
         self.konkurskupp_client = konkurskupp_client
         self.extractor = extractor or UnifiedOpportunityExtractor()
+        self.multi_source_engine = multi_source_engine or UnifiedMultiSourceEngine()
         self.market_engine = market_engine or MarketPriceComparisonEngine()
         self.cost_engine = cost_engine or RealCostEngine()
         self.decision_engine = decision_engine or OpportunityProfitDecisionEngine()
@@ -120,7 +125,9 @@ class AutomatedDailyPipeline:
                 source_counts[item.source_name] = source_counts.get(item.source_name, 0) + 1
             source_errors = {}
 
-        opportunities = self.extractor.extract(source_documents)
+        extracted = self.extractor.extract(source_documents)
+        merge_result = self.multi_source_engine.merge(extracted)
+        opportunities = merge_result.opportunities
         comparables_by_id = comparables_by_id or {}
         costs_by_id = costs_by_id or {}
 
@@ -150,20 +157,25 @@ class AutomatedDailyPipeline:
         dashboard = build_today_dashboard(report, metadata)
         generated_at = datetime.now(timezone.utc).isoformat()
         payload = {
-            "schema_version": 2,
+            "schema_version": 3,
             "generated_at": generated_at,
             "source": "Auksjonen public listings + authorized FINN/Konkurskupp feeds when configured",
             "sources": source_counts,
             "source_errors": source_errors,
             "keyword": config.keyword,
             "fetched_count": len(source_documents),
-            "extracted_count": len(opportunities),
+            "extracted_count": len(extracted),
+            "deduplicated_count": len(opportunities),
+            "duplicate_count": merge_result.duplicate_count,
+            "duplicate_groups_merged": merge_result.groups_merged,
             **asdict(dashboard),
         }
         self._write_json_atomic(Path(config.output_path), payload)
         return DailyPipelineResult(
             fetched_count=len(source_documents),
-            extracted_count=len(opportunities),
+            extracted_count=len(extracted),
+            deduplicated_count=len(opportunities),
+            duplicate_count=merge_result.duplicate_count,
             output_path=config.output_path,
             generated_at=generated_at,
             buy_count=report.buy_count,
