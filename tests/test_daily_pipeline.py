@@ -64,7 +64,7 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     assert result.extracted_count == 1
     assert result.deduplicated_count == 1
     assert result.duplicate_count == 0
-    assert payload["schema_version"] == 4
+    assert payload["schema_version"] == 5
     assert payload["report_date"] == "2026-07-20"
     assert payload["rows"][0]["title"] == "Butikkinnredning"
     assert payload["rows"][0]["url"].startswith("https://")
