@@ -64,7 +64,7 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     assert result.extracted_count == 1
     assert result.deduplicated_count == 1
     assert result.duplicate_count == 0
-    assert payload["schema_version"] == 3
+    assert payload["schema_version"] == 4
     assert payload["report_date"] == "2026-07-20"
     assert payload["rows"][0]["title"] == "Butikkinnredning"
     assert payload["rows"][0]["url"].startswith("https://")
@@ -73,13 +73,11 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
 
 def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
     output = tmp_path / "today.json"
-
     AutomatedDailyPipeline().run(
         DailyPipelineConfig(output_path=str(output)),
         documents=(_document(),),
         report_date=date(2026, 7, 20),
     )
-
     row = json.loads(output.read_text(encoding="utf-8"))["rows"][0]
     assert row["decision"] == "monitor"
     assert "market_comparables" in row["blockers"]
@@ -88,13 +86,11 @@ def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
 
 def test_pipeline_supports_empty_collection(tmp_path) -> None:
     output = tmp_path / "today.json"
-
     result = AutomatedDailyPipeline().run(
         DailyPipelineConfig(output_path=str(output)),
         documents=(),
         report_date=date(2026, 7, 20),
     )
-
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert result.extracted_count == 0
     assert result.deduplicated_count == 0
