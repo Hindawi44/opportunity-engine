@@ -71,12 +71,13 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
 
     payload = json.loads(output.read_text(encoding="utf-8"))
     row = payload["rows"][0]
+    intelligence = payload["intelligence_by_id"][opportunity_id]
     assert result.fetched_count == 1
     assert result.extracted_count == 1
     assert result.deduplicated_count == 1
     assert result.duplicate_count == 0
     assert result.history_path == str(history)
-    assert payload["schema_version"] == 9
+    assert payload["schema_version"] == 10
     assert payload["report_date"] == "2026-07-20"
     assert row["title"] == "Butikkinnredning"
     assert row["url"].startswith("https://")
@@ -98,6 +99,10 @@ def test_pipeline_writes_complete_dashboard_snapshot(tmp_path) -> None:
     assert row["seller_grade"] in {"A", "B"}
     assert row["seller_risk"] == "low"
     assert row["seller_is_verified"] is True
+    assert intelligence["recommendation"] == "buy"
+    assert intelligence["strengths"]
+    assert intelligence["next_actions"]
+    assert intelligence["headline"]
     assert history.exists()
     assert payload["buy_count"] == 1
 
@@ -111,7 +116,9 @@ def test_pipeline_detects_price_drop_across_runs(tmp_path) -> None:
     pipeline.run(config, documents=(_document(10_000),), report_date=date(2026, 7, 20))
     pipeline.run(config, documents=(_document(8_000),), report_date=date(2026, 7, 22))
 
-    row = json.loads(output.read_text(encoding="utf-8"))["rows"][0]
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    row = payload["rows"][0]
+    intelligence = payload["intelligence_by_id"]["unified-auksjonen-123"]
     assert row["first_price_nok"] == 10_000
     assert row["lowest_price_nok"] == 8_000
     assert row["highest_price_nok"] == 10_000
@@ -120,6 +127,7 @@ def test_pipeline_detects_price_drop_across_runs(tmp_path) -> None:
     assert row["listing_age_days"] == 2
     assert row["price_history_status"] == "price_drop"
     assert row["significant_price_drop"] is True
+    assert any("انخفض" in item for item in intelligence["strengths"])
 
 
 def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
@@ -134,18 +142,16 @@ def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
         text=document.text,
         url=document.url,
         country=document.country,
-        metadata={
-            key: value
-            for key, value in document.metadata.items()
-            if not key.startswith("seller_")
-        },
+        metadata={key: value for key, value in document.metadata.items() if not key.startswith("seller_")},
     )
     AutomatedDailyPipeline().run(
         DailyPipelineConfig(output_path=str(output), history_path=str(history)),
         documents=(document,),
         report_date=date(2026, 7, 20),
     )
-    row = json.loads(output.read_text(encoding="utf-8"))["rows"][0]
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    row = payload["rows"][0]
+    intelligence = payload["intelligence_by_id"]["unified-auksjonen-123"]
     assert row["decision"] == "monitor"
     assert row["score"] <= 59
     assert row["market_verification_status"] == "unavailable"
@@ -153,6 +159,9 @@ def test_pipeline_keeps_unverified_opportunity_as_monitor(tmp_path) -> None:
     assert row["seller_score"] is None
     assert row["seller_grade"] == "U"
     assert row["seller_risk"] == "unknown"
+    assert intelligence["recommendation"] == "monitor"
+    assert intelligence["missing_evidence"]
+    assert intelligence["is_actionable"] is False
     assert "market_comparables" in row["blockers"]
     assert any(item.startswith("cost:") for item in row["blockers"])
 
@@ -169,4 +178,5 @@ def test_pipeline_supports_empty_collection(tmp_path) -> None:
     assert result.extracted_count == 0
     assert result.deduplicated_count == 0
     assert payload["rows"] == []
+    assert payload["intelligence_by_id"] == {}
     assert payload["total_count"] == 0
