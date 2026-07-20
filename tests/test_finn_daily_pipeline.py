@@ -59,9 +59,10 @@ def test_pipeline_combines_auksjonen_and_authorized_finn(tmp_path) -> None:
 
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert result.fetched_count == 2
+    assert result.deduplicated_count == 2
     assert result.source_counts == {"Auksjonen.no": 1, "FINN.no": 1}
     assert result.source_errors == {}
-    assert payload["schema_version"] == 2
+    assert payload["schema_version"] == 3
     assert payload["sources"]["FINN.no"] == 1
     assert payload["total_count"] == 2
 
