@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 
+from opportunity_engine.ods.bjaroy import BjaroyFeedClient
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
 from opportunity_engine.ods.finn import FinnApiClient
 from opportunity_engine.ods.konkurskupp import KonkurskuppFeedClient
@@ -47,9 +48,13 @@ def _finn_client_from_environment() -> FinnApiClient | None:
 def _konkurskupp_client_from_environment() -> KonkurskuppFeedClient | None:
     feed_url = os.getenv("KONKURSKUPP_FEED_URL", "").strip()
     token = os.getenv("KONKURSKUPP_FEED_TOKEN", "").strip() or None
-    if not feed_url:
-        return None
-    return KonkurskuppFeedClient(feed_url=feed_url, token=token)
+    return KonkurskuppFeedClient(feed_url=feed_url, token=token) if feed_url else None
+
+
+def _bjaroy_client_from_environment() -> BjaroyFeedClient | None:
+    feed_url = os.getenv("BJAROY_FEED_URL", "").strip()
+    token = os.getenv("BJAROY_FEED_TOKEN", "").strip() or None
+    return BjaroyFeedClient(feed_url=feed_url, token=token) if feed_url else None
 
 
 def main() -> int:
@@ -69,6 +74,7 @@ def main() -> int:
     result = AutomatedDailyPipeline(
         finn_client=_finn_client_from_environment(),
         konkurskupp_client=_konkurskupp_client_from_environment(),
+        bjaroy_client=_bjaroy_client_from_environment(),
     ).run(
         DailyPipelineConfig(
             keyword=args.keyword,
