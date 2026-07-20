@@ -18,7 +18,9 @@ def _ranked(opportunity_id: str, rank: int = 1) -> RankedDailyOpportunity:
         opportunity_id=opportunity_id,
         decision="buy",
         decision_label="🟢 اشترِ",
-        score=355.0,
+        score=92.0,
+        score_grade="A",
+        score_breakdown={"financial_strength": 40.0, "confidence": 15.0},
         expected_profit_nok=12_000.0,
         roi=0.45,
         confidence="high",
@@ -55,6 +57,8 @@ def test_builds_dashboard_rows_with_source_metadata() -> None:
     assert view.best.title == "Butikkinnredning"
     assert view.best.url == "https://www.auksjonen.no/auksjon/123"
     assert view.best.maximum_purchase_price_nok == 20_000.0
+    assert view.best.score == 92.0
+    assert view.best.score_grade == "A"
     assert view.summary_lines == ("ملخص اليوم",)
 
 
