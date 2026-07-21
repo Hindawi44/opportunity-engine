@@ -1,0 +1,45 @@
+{
+  "evaluation_count": 1,
+  "evaluations": [
+    {
+      "asking_price_nok": 4600.0,
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "evidence": {
+        "auction_fee_nok": null,
+        "dismantling_cost_nok": null,
+        "market_comparables_nok": [],
+        "other_costs_nok": null,
+        "repair_cost_nok": null,
+        "storage_cost_nok": null,
+        "transport_cost_nok": null,
+        "vat_nok": null
+      },
+      "expected_profit_nok": null,
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-613336",
+      "priority": 2,
+      "roi_percent": null,
+      "title": "4stk 150x60x200, 800kg komplette lager reoler! Helt nye! Garasjereoler Tønsberg 27 bud 5m 53s",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/torget/4stk_150x60x200_800kg_komplette_lager_reoler_Helt_nye_Garasjereoler/613336"
+    }
+  ],
+  "evidence_required_count": 1,
+  "evidence_source": "data/opportunity_evidence.json",
+  "generated_at": "2026-07-21T13:14:07.178619+00:00",
+  "method": "evidence-gated conservative economics; missing values remain null and block recommendations",
+  "ready_for_numeric_review_count": 0,
+  "schema_version": 1,
+  "source_queue": "data/opportunity_review_queue.json"
+}

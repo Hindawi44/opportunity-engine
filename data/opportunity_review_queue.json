@@ -1,18 +1,17 @@
 {
-  "excluded_count": 3,
+  "excluded_count": 4,
   "excluded_summary": {
-    "generic_unspecified_lot": 1,
-    "heavy_equipment": 1,
-    "sanitary_goods": 1
+    "generic_unspecified_lot": 2,
+    "vehicle": 2
   },
-  "generated_at": "2026-07-21T11:51:02.465620+00:00",
+  "generated_at": "2026-07-21T13:14:07.123702+00:00",
   "input_count": 25,
-  "low_relevance_omitted_count": 19,
+  "low_relevance_omitted_count": 20,
   "method": "strict target-category relevance; low-relevance listings are omitted and no resale values or costs are invented",
   "queue": [
     {
-      "asking_price_nok": 4500.0,
-      "city": null,
+      "asking_price_nok": 4600.0,
+      "city": "rg",
       "ends_at": null,
       "evidence_needed": [
         "three_verified_market_comparables",
@@ -23,43 +22,11 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 34 bud 52m 58s",
-      "matched_target_terms": [
-        "lagerreol",
-        "reol",
-        "hylle"
-      ],
-      "opportunity_id": "unified-auksjonen-611252",
-      "priority": 1,
-      "reasons": [
-        "target:lagerreol+15",
-        "target:reol+9",
-        "target:hylle+8",
-        "asking_price_present+5"
-      ],
-      "relevance_score": 37,
-      "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 34 bud 52m 58s",
-      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/611252"
-    },
-    {
-      "asking_price_nok": 3000.0,
-      "city": "ysil",
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "Arbeidsbenk m/søyleborrmaskin, reoler m/m. Trysil 24 bud 14m 58s",
+      "market_search_query": "4stk 150x60x200, 800kg komplette lager reoler! Helt nye! Garasjereoler Tønsberg 27 bud 5m 53s",
       "matched_target_terms": [
         "reol"
       ],
-      "opportunity_id": "unified-auksjonen-612527",
+      "opportunity_id": "unified-auksjonen-613336",
       "priority": 2,
       "reasons": [
         "target:reol+9",
@@ -68,41 +35,12 @@
       ],
       "relevance_score": 17,
       "status": "review_if_capacity",
-      "title": "Arbeidsbenk m/søyleborrmaskin, reoler m/m. Trysil 24 bud 14m 58s",
-      "url": "https://www.auksjonen.no/auksjon/torget/Arbeidsbenk_ms%C3%B8yleborrmaskin_reoler_mm/612527"
-    },
-    {
-      "asking_price_nok": 750.0,
-      "city": "ss",
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "Mannskapscontainer / Containerbrakke - 2 roms - oppholdsrom og utstyrslager / 20 fot Hønefoss 3 bud 44m 58s",
-      "matched_target_terms": [
-        "skap"
-      ],
-      "opportunity_id": "unified-auksjonen-601509",
-      "priority": 2,
-      "reasons": [
-        "target:skap+7",
-        "asking_price_present+5",
-        "location_present+3"
-      ],
-      "relevance_score": 15,
-      "status": "review_if_capacity",
-      "title": "Mannskapscontainer / Containerbrakke - 2 roms - oppholdsrom og utstyrslager / 20 fot Hønefoss 3 bud 44m 58s",
-      "url": "https://www.auksjonen.no/auksjon/torget/Mannskapscontainer__Containerbrakke_-_2_roms_-_oppholdsrom_og_utstyrslager__20_fot/601509"
+      "title": "4stk 150x60x200, 800kg komplette lager reoler! Helt nye! Garasjereoler Tønsberg 27 bud 5m 53s",
+      "url": "https://www.auksjonen.no/auksjon/torget/4stk_150x60x200_800kg_komplette_lager_reoler_Helt_nye_Garasjereoler/613336"
     }
   ],
-  "review_first_count": 1,
+  "review_first_count": 0,
   "schema_version": 3,
-  "selected_count": 3,
+  "selected_count": 1,
   "source_snapshot": "data/todays_opportunities.json"
 }
