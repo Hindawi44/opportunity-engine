@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-07-21T22:12:55.066652+00:00",
+  "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
+  "schema_version": 1,
+  "sources": [
+    {
+      "access_mode": "public_direct_category_pages",
+      "actionable_selected": 3,
+      "active": true,
+      "bankruptcy_leads_selected": 0,
+      "configured": true,
+      "error": null,
+      "fetched": 45,
+      "note": null,
+      "required_configuration": [],
+      "source": "Auksjonen.no",
+      "status": "collecting"
+    },
+    {
+      "access_mode": "authorized_api_only",
+      "actionable_selected": 0,
+      "active": false,
+      "bankruptcy_leads_selected": 0,
+      "configured": false,
+      "error": null,
+      "fetched": 0,
+      "note": null,
+      "required_configuration": [
+        "FINN_API_KEY",
+        "FINN_ORG_ID"
+      ],
+      "source": "FINN.no",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "access_mode": "authorized_feed",
+      "actionable_selected": 0,
+      "active": false,
+      "bankruptcy_leads_selected": 0,
+      "configured": false,
+      "error": null,
+      "fetched": 0,
+      "note": null,
+      "required_configuration": [
+        "KONKURSKUPP_FEED_URL"
+      ],
+      "source": "Konkurskupp",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "access_mode": "authorized_feed",
+      "actionable_selected": 0,
+      "active": false,
+      "bankruptcy_leads_selected": 0,
+      "configured": false,
+      "error": null,
+      "fetched": 0,
+      "note": null,
+      "required_configuration": [
+        "BJAROY_FEED_URL"
+      ],
+      "source": "Bjarøy",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "access_mode": "limited_public_api",
+      "actionable_selected": 0,
+      "active": true,
+      "bankruptcy_leads_selected": 5,
+      "configured": true,
+      "error": null,
+      "fetched": 25,
+      "note": "Discovery leads only; the public API does not prove that assets are offered for sale.",
+      "required_configuration": [],
+      "source": "Konkurs.app",
+      "status": "collecting"
+    }
+  ],
+  "summary": {
+    "awaiting_configuration_count": 3,
+    "collecting_count": 2,
+    "error_count": 0,
+    "fetched_total": 70,
+    "source_count": 5
+  }
+}
