@@ -17,8 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
+      PYTHONPATH: ${{ github.workspace }}
       FINN_API_KEY: ${{ secrets.FINN_API_KEY }}
-      FINN_ORG_ID: ${{ secrets.FINN_ORG_ID }}
+      FINN_ORG_ID: ${{ secrets.FINN_OR_ID }}
       FINN_MARKET: ${{ vars.FINN_MARKET }}
       KONKURSKUPP_FEED_URL: ${{ secrets.KONKURSKUPP_FEED_URL }}
       KONKURSKUPP_FEED_TOKEN: ${{ secrets.KONKURSKUPP_FEED_TOKEN }}
@@ -31,8 +32,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install project
-        run: pip install -e .
       - name: Generate today's opportunities
         run: python scripts/run_daily_pipeline.py --output data/todays_opportunities.json
       - name: Commit changed snapshot
