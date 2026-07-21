@@ -7,6 +7,7 @@ The script never estimates prices, fees, VAT, transport, resale value, or profit
 from __future__ import annotations
 
 import argparse
+import html as html_module
 import json
 import re
 from datetime import datetime, timezone
@@ -36,6 +37,24 @@ def _json_ld(html: str) -> Iterable[dict[str, object]]:
         yield from _walk(payload)
 
 
+def _embedded_json_objects(html: str) -> Iterable[dict[str, object]]:
+    """Yield JSON objects from common application-state script blocks.
+
+    Auksjonen pages may expose directly observed listing metadata outside JSON-LD.
+    Invalid or non-JSON script blocks are ignored.
+    """
+    pattern = re.compile(
+        r'<script[^>]*(?:type=["\']application/json["\']|id=["\']__NEXT_DATA__["\'])[^>]*>(.*?)</script>',
+        re.I | re.S,
+    )
+    for match in pattern.finditer(html):
+        try:
+            payload = json.loads(html_module.unescape(match.group(1)).strip())
+        except (json.JSONDecodeError, TypeError):
+            continue
+        yield from _walk(payload)
+
+
 def _number(value: object) -> float | None:
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         return float(value) if value >= 0 else None
@@ -47,32 +66,92 @@ def _number(value: object) -> float | None:
     return result if result >= 0 else None
 
 
+def _clean_text(value: object) -> str | None:
+    text = html_module.unescape(str(value or ''))
+    text = re.sub(r'<[^>]+>', ' ', text)
+    text = ' '.join(text.split()).strip(' ,;:-')
+    return text or None
+
+
+def _first_value(item: dict[str, object], keys: tuple[str, ...]) -> object | None:
+    folded = {str(key).casefold(): value for key, value in item.items()}
+    for key in keys:
+        value = folded.get(key.casefold())
+        if value not in (None, '', [], {}):
+            return value
+    return None
+
+
+def _extract_observed_fields(objects: Iterable[dict[str, object]], result: dict[str, object]) -> None:
+    for item in objects:
+        offers = item.get('offers') if isinstance(item.get('offers'), dict) else item
+        if isinstance(offers, dict) and result['asking_price_nok'] is None:
+            raw_price = _first_value(offers, ('price', 'currentBid', 'highestBid', 'amount'))
+            price = _number(raw_price)
+            if price is not None:
+                result['asking_price_nok'] = price
+
+        if result['ends_at'] is None:
+            raw_deadline = _first_value(
+                offers if isinstance(offers, dict) else item,
+                ('validThrough', 'endDate', 'endsAt', 'endTime', 'auctionEndTime', 'biddingEndsAt'),
+            )
+            if raw_deadline:
+                result['ends_at'] = _clean_text(raw_deadline)
+
+        if result['city'] is None:
+            address = item.get('address') if isinstance(item.get('address'), dict) else None
+            location = item.get('location') if isinstance(item.get('location'), dict) else None
+            source = address or location or item
+            raw_city = _first_value(
+                source,
+                ('addressLocality', 'city', 'municipality', 'place', 'pickupLocation', 'locationName'),
+            )
+            city = _clean_text(raw_city)
+            if city and len(city) <= 100:
+                result['city'] = city
+
+
+def _visible_text(html: str) -> str:
+    text = re.sub(r'<script\b[^>]*>.*?</script>', ' ', html, flags=re.I | re.S)
+    text = re.sub(r'<style\b[^>]*>.*?</style>', ' ', text, flags=re.I | re.S)
+    return _clean_text(text) or ''
+
+
 def parse_listing_metadata(html: str) -> dict[str, object]:
     result: dict[str, object] = {"asking_price_nok": None, "city": None, "ends_at": None}
-    for item in _json_ld(html):
-        item_type = str(item.get('@type') or '').casefold()
-        if item_type not in {'product', 'offer', 'event'}:
-            continue
-        offers = item.get('offers') if isinstance(item.get('offers'), dict) else item
-        price = _number(offers.get('price')) if isinstance(offers, dict) else None
-        if price is not None and result['asking_price_nok'] is None:
-            result['asking_price_nok'] = price
-        valid_through = offers.get('validThrough') if isinstance(offers, dict) else None
-        if valid_through and result['ends_at'] is None:
-            result['ends_at'] = str(valid_through)
-        address = item.get('address') if isinstance(item.get('address'), dict) else {}
-        city = address.get('addressLocality') if isinstance(address, dict) else None
-        if city and result['city'] is None:
-            result['city'] = ' '.join(str(city).split())
+    _extract_observed_fields(_json_ld(html), result)
+    _extract_observed_fields(_embedded_json_objects(html), result)
 
+    visible = _visible_text(html)
     if result['asking_price_nok'] is None:
         for pattern in (
-            r'(?:Høyeste bud|Fastpris|Kjøp nå)\s*[:]?\s*([0-9][0-9 .\u00a0]*)\s*(?:kr|,-)',
+            r'(?:Høyeste bud|Nåværende bud|Fastpris|Kjøp nå)\s*[:]?[\s\u00a0]*([0-9][0-9 .\u00a0]*)\s*(?:kr|,-)',
             r'"price"\s*:\s*"?([0-9][0-9 .]*)',
         ):
             match = re.search(pattern, html, re.I)
             if match:
                 result['asking_price_nok'] = _number(match.group(1))
+                break
+
+    if result['city'] is None:
+        for pattern in (
+            r'(?:Sted|Lokasjon|Hentested|Utleveringssted)\s*:?\s*([A-ZÆØÅ][A-Za-zÆØÅæøå .-]{1,80}?)(?=\s{2,}|\s(?:Bud|Visning|Kontakt|Avsluttes|Slutter)\b|$)',
+            r'(?:Må hentes|Hentes)\s+(?:i|på)\s+([A-ZÆØÅ][A-Za-zÆØÅæøå .-]{1,80}?)(?=\s{2,}|[.,;]|$)',
+        ):
+            match = re.search(pattern, visible, re.I)
+            if match:
+                result['city'] = _clean_text(match.group(1))
+                break
+
+    if result['ends_at'] is None:
+        for pattern in (
+            r'(?:Avsluttes|Budfrist|Auksjonen slutter|Slutter)\s*:?\s*((?:\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{2}-\d{2})(?:\s+(?:kl\.?\s*)?\d{1,2}[:.]\d{2})?)',
+            r'"(?:endsAt|endDate|auctionEndTime|biddingEndsAt)"\s*:\s*"([^"]+)"',
+        ):
+            match = re.search(pattern, html_module.unescape(html), re.I)
+            if match:
+                result['ends_at'] = _clean_text(match.group(1))
                 break
     return result
 
@@ -128,7 +207,7 @@ def enrich(payload: dict[str, object], *, timeout: float = 20.0) -> tuple[dict[s
         'error_count': len(errors),
     }
     report = {
-        'schema_version': 1,
+        'schema_version': 2,
         'generated_at': datetime.now(timezone.utc).isoformat(),
         'enriched_count': enriched_count,
         'error_count': len(errors),
