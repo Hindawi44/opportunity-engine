@@ -1,15 +1,17 @@
 {
-  "excluded_count": 22,
+  "excluded_count": 20,
   "excluded_summary": {
-    "generic_unspecified_lot": 1,
+    "generic_unspecified_lot": 2,
+    "heavy_vehicle": 1,
+    "low_relevance_goods": 1,
     "plumbing_goods": 1,
-    "vehicle": 22
+    "vehicle": 18
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-07-21T18:13:47.527933+00:00",
+  "generated_at": "2026-07-21T18:24:48.462252+00:00",
   "input_count": 25,
-  "low_relevance_omitted_count": 3,
+  "low_relevance_omitted_count": 5,
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [],
   "review_first_count": 0,

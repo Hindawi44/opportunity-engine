@@ -3,7 +3,7 @@
   "alerts": [],
   "alerts_path": "data/smart_alerts.json",
   "buy_count": 0,
-  "deduplicated_count": 30,
+  "deduplicated_count": 31,
   "discovery_by_id": {
     "unified-auksjonen-552436": {
       "discovery_score": 0.0,
@@ -41,6 +41,24 @@
         "موثوقية البائع غير متحققة."
       ]
     },
+    "unified-auksjonen-584648": {
+      "discovery_score": 0.0,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-584648",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 0/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة."
+      ]
+    },
     "unified-auksjonen-593268": {
       "discovery_score": 0.0,
       "is_exceptional": false,
@@ -59,10 +77,28 @@
         "موثوقية البائع غير متحققة."
       ]
     },
-    "unified-auksjonen-595717": {
+    "unified-auksjonen-595228": {
       "discovery_score": 0.0,
       "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-595717",
+      "opportunity_id": "unified-auksjonen-595228",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 3/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة."
+      ]
+    },
+    "unified-auksjonen-601408": {
+      "discovery_score": 0.0,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-601408",
       "reasons": [
         "درجة جودة الفرصة الأساسية 0/100."
       ],
@@ -95,10 +131,10 @@
         "موثوقية البائع غير متحققة."
       ]
     },
-    "unified-auksjonen-602300": {
+    "unified-auksjonen-602599": {
       "discovery_score": 0.0,
       "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-602300",
+      "opportunity_id": "unified-auksjonen-602599",
       "reasons": [
         "درجة جودة الفرصة الأساسية 0/100."
       ],
@@ -131,6 +167,24 @@
         "موثوقية البائع غير متحققة."
       ]
     },
+    "unified-auksjonen-604164": {
+      "discovery_score": 0.0,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-604164",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 0/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة."
+      ]
+    },
     "unified-auksjonen-604372": {
       "discovery_score": 0.0,
       "is_exceptional": false,
@@ -149,12 +203,12 @@
         "موثوقية البائع غير متحققة."
       ]
     },
-    "unified-auksjonen-605205": {
+    "unified-auksjonen-605376": {
       "discovery_score": 0.0,
       "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-605205",
+      "opportunity_id": "unified-auksjonen-605376",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 4/100."
+        "درجة جودة الفرصة الأساسية 0/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -185,12 +239,30 @@
         "موثوقية البائع غير متحققة."
       ]
     },
-    "unified-auksjonen-609554": {
+    "unified-auksjonen-609047": {
       "discovery_score": 0.0,
       "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-609554",
+      "opportunity_id": "unified-auksjonen-609047",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 4/100."
+        "درجة جودة الفرصة الأساسية 0/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة."
+      ]
+    },
+    "unified-auksjonen-609889": {
+      "discovery_score": 0.0,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-609889",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 0/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -221,12 +293,12 @@
         "موثوقية البائع غير متحققة."
       ]
     },
-    "unified-auksjonen-612292": {
+    "unified-auksjonen-611877": {
       "discovery_score": 0.0,
       "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-612292",
+      "opportunity_id": "unified-auksjonen-611877",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 4/100."
+        "درجة جودة الفرصة الأساسية 0/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -239,10 +311,28 @@
         "موثوقية البائع غير متحققة."
       ]
     },
-    "unified-auksjonen-612519": {
+    "unified-auksjonen-612127": {
       "discovery_score": 0.0,
       "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-612519",
+      "opportunity_id": "unified-auksjonen-612127",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 0/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة."
+      ]
+    },
+    "unified-auksjonen-612554": {
+      "discovery_score": 0.0,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-612554",
       "reasons": [
         "درجة جودة الفرصة الأساسية 0/100."
       ],
@@ -293,100 +383,10 @@
         "موثوقية البائع غير متحققة."
       ]
     },
-    "unified-auksjonen-612658": {
-      "discovery_score": 0.0,
-      "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-612658",
-      "reasons": [
-        "درجة جودة الفرصة الأساسية 0/100."
-      ],
-      "requires_immediate_review": false,
-      "signals": [],
-      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
-      "tier": "low",
-      "tier_label": "⚪ أولوية منخفضة",
-      "warnings": [
-        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
-        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
-        "موثوقية البائع غير متحققة."
-      ]
-    },
-    "unified-auksjonen-612672": {
-      "discovery_score": 0.0,
-      "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-612672",
-      "reasons": [
-        "درجة جودة الفرصة الأساسية 4/100."
-      ],
-      "requires_immediate_review": false,
-      "signals": [],
-      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
-      "tier": "low",
-      "tier_label": "⚪ أولوية منخفضة",
-      "warnings": [
-        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
-        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
-        "موثوقية البائع غير متحققة."
-      ]
-    },
-    "unified-auksjonen-612682": {
-      "discovery_score": 0.0,
-      "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-612682",
-      "reasons": [
-        "درجة جودة الفرصة الأساسية 0/100."
-      ],
-      "requires_immediate_review": false,
-      "signals": [],
-      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
-      "tier": "low",
-      "tier_label": "⚪ أولوية منخفضة",
-      "warnings": [
-        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
-        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
-        "موثوقية البائع غير متحققة."
-      ]
-    },
     "unified-auksjonen-612697": {
       "discovery_score": 0.0,
       "is_exceptional": false,
       "opportunity_id": "unified-auksjonen-612697",
-      "reasons": [
-        "درجة جودة الفرصة الأساسية 0/100."
-      ],
-      "requires_immediate_review": false,
-      "signals": [],
-      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
-      "tier": "low",
-      "tier_label": "⚪ أولوية منخفضة",
-      "warnings": [
-        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
-        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
-        "موثوقية البائع غير متحققة."
-      ]
-    },
-    "unified-auksjonen-612704": {
-      "discovery_score": 0.0,
-      "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-612704",
-      "reasons": [
-        "درجة جودة الفرصة الأساسية 0/100."
-      ],
-      "requires_immediate_review": false,
-      "signals": [],
-      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
-      "tier": "low",
-      "tier_label": "⚪ أولوية منخفضة",
-      "warnings": [
-        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
-        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
-        "موثوقية البائع غير متحققة."
-      ]
-    },
-    "unified-auksjonen-612717": {
-      "discovery_score": 0.0,
-      "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-612717",
       "reasons": [
         "درجة جودة الفرصة الأساسية 0/100."
       ],
@@ -424,7 +424,7 @@
       "is_exceptional": false,
       "opportunity_id": "unified-auksjonen-612736",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 0/100."
+        "درجة جودة الفرصة الأساسية 4/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -544,13 +544,31 @@
         "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
         "موثوقية البائع غير متحققة."
       ]
+    },
+    "unified-auksjonen-613485": {
+      "discovery_score": 0.0,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-613485",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 0/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة."
+      ]
     }
   },
   "duplicate_count": 0,
   "duplicate_groups_merged": 0,
-  "extracted_count": 30,
-  "fetched_count": 30,
-  "generated_at": "2026-07-21T18:13:47.362380+00:00",
+  "extracted_count": 31,
+  "fetched_count": 31,
+  "generated_at": "2026-07-21T18:24:48.298331+00:00",
   "history_path": "data/price_history.json",
   "intelligence_by_id": {
     "unified-auksjonen-552436": {
@@ -623,6 +641,41 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
+    "unified-auksjonen-584648": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-584648",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
     "unified-auksjonen-593268": {
       "confidence": "insufficient",
       "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
@@ -658,9 +711,9 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
-    "unified-auksjonen-595717": {
+    "unified-auksjonen-595228": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 3/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -668,7 +721,6 @@
         "قيمة إعادة بيع محافظة.",
         "التكلفة النهائية الكاملة.",
         "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند purchase_price_nok.",
         "تكلفة مؤكدة للبند auction_fee_nok.",
         "تكلفة مؤكدة للبند vat_status.",
         "تكلفة مؤكدة للبند transport_nok.",
@@ -683,7 +735,42 @@
         "جمع مقارنات سوق موثقة قبل أي شراء.",
         "التحقق من هوية البائع وشروط التسليم قبل الدفع."
       ],
-      "opportunity_id": "unified-auksjonen-595717",
+      "opportunity_id": "unified-auksjonen-595228",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
+    "unified-auksjonen-601408": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-601408",
       "recommendation": "monitor",
       "recommendation_label": "🟡 راقب",
       "risks": [
@@ -729,7 +816,7 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
-    "unified-auksjonen-602300": {
+    "unified-auksjonen-602599": {
       "confidence": "insufficient",
       "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
       "is_actionable": false,
@@ -753,7 +840,7 @@
         "جمع مقارنات سوق موثقة قبل أي شراء.",
         "التحقق من هوية البائع وشروط التسليم قبل الدفع."
       ],
-      "opportunity_id": "unified-auksjonen-602300",
+      "opportunity_id": "unified-auksjonen-602599",
       "recommendation": "monitor",
       "recommendation_label": "🟡 راقب",
       "risks": [
@@ -799,6 +886,41 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
+    "unified-auksjonen-604164": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-604164",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
     "unified-auksjonen-604372": {
       "confidence": "insufficient",
       "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
@@ -834,9 +956,9 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
-    "unified-auksjonen-605205": {
+    "unified-auksjonen-605376": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 4/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -858,7 +980,7 @@
         "جمع مقارنات سوق موثقة قبل أي شراء.",
         "التحقق من هوية البائع وشروط التسليم قبل الدفع."
       ],
-      "opportunity_id": "unified-auksjonen-605205",
+      "opportunity_id": "unified-auksjonen-605376",
       "recommendation": "monitor",
       "recommendation_label": "🟡 راقب",
       "risks": [
@@ -904,9 +1026,9 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
-    "unified-auksjonen-609554": {
+    "unified-auksjonen-609047": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 4/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -928,7 +1050,42 @@
         "جمع مقارنات سوق موثقة قبل أي شراء.",
         "التحقق من هوية البائع وشروط التسليم قبل الدفع."
       ],
-      "opportunity_id": "unified-auksjonen-609554",
+      "opportunity_id": "unified-auksjonen-609047",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
+    "unified-auksjonen-609889": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-609889",
       "recommendation": "monitor",
       "recommendation_label": "🟡 راقب",
       "risks": [
@@ -974,42 +1131,7 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
-    "unified-auksjonen-612292": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 4/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-612292",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
-    "unified-auksjonen-612519": {
+    "unified-auksjonen-611877": {
       "confidence": "insufficient",
       "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
       "is_actionable": false,
@@ -1033,7 +1155,77 @@
         "جمع مقارنات سوق موثقة قبل أي شراء.",
         "التحقق من هوية البائع وشروط التسليم قبل الدفع."
       ],
-      "opportunity_id": "unified-auksjonen-612519",
+      "opportunity_id": "unified-auksjonen-611877",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
+    "unified-auksjonen-612127": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-612127",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
+    "unified-auksjonen-612554": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-612554",
       "recommendation": "monitor",
       "recommendation_label": "🟡 راقب",
       "risks": [
@@ -1115,111 +1307,6 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
-    "unified-auksjonen-612658": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-612658",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
-    "unified-auksjonen-612672": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 4/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-612672",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
-    "unified-auksjonen-612682": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-612682",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
     "unified-auksjonen-612697": {
       "confidence": "insufficient",
       "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
@@ -1245,76 +1332,6 @@
         "التحقق من هوية البائع وشروط التسليم قبل الدفع."
       ],
       "opportunity_id": "unified-auksjonen-612697",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
-    "unified-auksjonen-612704": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-612704",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
-    "unified-auksjonen-612717": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-612717",
       "recommendation": "monitor",
       "recommendation_label": "🟡 راقب",
       "risks": [
@@ -1362,7 +1379,7 @@
     },
     "unified-auksjonen-612736": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 4/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -1605,15 +1622,50 @@
       ],
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
+    "unified-auksjonen-613485": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 0/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-613485",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     }
   },
   "keyword": null,
-  "monitor_count": 30,
+  "monitor_count": 31,
   "reject_count": 0,
   "report_date": "2026-07-21",
   "rows": [
     {
-      "asking_price_nok": 60000.0,
+      "asking_price_nok": 24300.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -1628,18 +1680,18 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "eland",
+      "city": "lo",
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 60000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 60000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 24300.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 24300.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 60000.0,
+      "lowest_price_nok": 24300.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -1648,7 +1700,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612672",
+      "opportunity_id": "unified-auksjonen-612736",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -1685,8 +1737,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2018 Volkswagen Caddy Alltrack 2,0 TDI 122hk 4Motion innredning 2x skyvedører ryggekamera s+v dekk hengerfeste kupevarmer Hjelmeland 37 bud 0m 42s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2018_Volkswagen_Caddy_Alltrack_20_TDI_122hk_4Motion_innredning_2x_skyved%C3%B8rer_ryggekamera_sv_dekk_hengerfeste_kupevarmer_/612672",
+      "title": "2011 Mercedes-Benz Sprinter, 316 CDI/43, 481600km, UTEN MINSTEPRIS Oslo 78 bud 3m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2011_Mercedes-Benz_Sprinter_316_CDI43_481600km_UTEN_MINSTEPRIS/612736",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -1694,7 +1746,7 @@
       ]
     },
     {
-      "asking_price_nok": 36000.0,
+      "asking_price_nok": 352000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -1709,18 +1761,18 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "iller",
+      "city": "P Sem",
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 36000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 36000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 352000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 352000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 36000.0,
+      "lowest_price_nok": 352000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -1729,7 +1781,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612292",
+      "opportunity_id": "unified-auksjonen-610891",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -1766,8 +1818,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2009 Toyota Avensis 2.0D 126hk Manuell 174890 km Tiller 17 bud 8m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2009_Toyota_Avensis_20D_126hk_Manuell_174890_km/612292",
+      "title": "2024 Toyota HiLux 2,8 204hk 4WD AUT D-CAB HENGERFESTE ACC KAMERA HARDTOP Sem 32 bud 1m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2024_Toyota_HiLux_28_204hk_4WD_AUT_D-CAB_HENGERFESTE_ACC_KAMERA_HARDTOP_/610891",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -1775,7 +1827,7 @@
       ]
     },
     {
-      "asking_price_nok": 352000.0,
+      "asking_price_nok": 30000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -1790,18 +1842,18 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "Sem",
+      "city": "E Sem",
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 352000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 352000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 30000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 30000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 352000.0,
+      "lowest_price_nok": 30000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -1810,7 +1862,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-610891",
+      "opportunity_id": "unified-auksjonen-606847",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -1847,8 +1899,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2024 Toyota HiLux 2,8 204hk 4WD AUT D-CAB HENGERFESTE ACC KAMERA HARDTOP Sem 32 bud 12m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2024_Toyota_HiLux_28_204hk_4WD_AUT_D-CAB_HENGERFESTE_ACC_KAMERA_HARDTOP_/610891",
+      "title": "2010 Mini COUNTRYMAN 184 HK 4WD PANORAMA H/K NAVI SKINN CRUISE Sem 48 bud 1m 51s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2010_Mini_COUNTRYMAN_184_HK_4WD_PANORAMA_HK_NAVI_SKINN_CRUISE_/606847",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -1856,7 +1908,7 @@
       ]
     },
     {
-      "asking_price_nok": 66000.0,
+      "asking_price_nok": 33000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -1871,18 +1923,18 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "E Sem",
+      "city": "Oslo",
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 66000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 66000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 33000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 33000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 66000.0,
+      "lowest_price_nok": 33000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -1891,7 +1943,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-609554",
+      "opportunity_id": "unified-auksjonen-584434",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -1928,8 +1980,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2020 Maxus e-Deliver 3 53 KWH 122 HK LWB AUT KAMERA CRUISE Sem 66 bud 9m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2020_Maxus_e-Deliver_3_53_KWH_122_HK_LWB_AUT_KAMERA_CRUISE_/609554",
+      "title": "2014 Volkswagen PASSAT 2.0 D 177HK 4MOTION AUT HENGERFESTE VARMER HUNDEBUR CRUISE Oslo 33 bud 8m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2014_Volkswagen_PASSAT_20_D_177HK_4MOTION_AUT_HENGERFESTE_VARMER_HUNDEBUR_CRUISE/584434",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -1937,7 +1989,7 @@
       ]
     },
     {
-      "asking_price_nok": 22500.0,
+      "asking_price_nok": 150000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -1952,18 +2004,18 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "Sem",
+      "city": null,
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 22500.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 22500.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 150000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 150000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 22500.0,
+      "lowest_price_nok": 150000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -1972,7 +2024,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-606847",
+      "opportunity_id": "unified-auksjonen-595228",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -1982,13 +2034,13 @@
         "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
       ],
       "roi": null,
-      "score": 4.5,
+      "score": 3.0,
       "score_breakdown": [
         "financial=0.0/40",
         "confidence=0.0/15",
-        "data_quality=7.5/15",
+        "data_quality=5.0/15",
         "resale=10.0/15",
-        "logistics=12.0/15",
+        "logistics=13.0/15",
         "risk_penalty=25.0"
       ],
       "score_grade": "E",
@@ -2009,8 +2061,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2010 Mini COUNTRYMAN 184 HK 4WD PANORAMA H/K NAVI SKINN CRUISE Sem 37 bud 11m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2010_Mini_COUNTRYMAN_184_HK_4WD_PANORAMA_HK_NAVI_SKINN_CRUISE_/606847",
+      "title": "Tyrolit Veggsag - komplett pakke, med sagblad - se bilder Harstad 22.07.2026",
+      "url": "https://www.auksjonen.no/auksjon/bygg_og_anlegg/Tyrolit_Veggsag_-_komplett_pakke_med_sagblad_-_se_bilder/595228",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -2018,7 +2070,7 @@
       ]
     },
     {
-      "asking_price_nok": 26000.0,
+      "asking_price_nok": 41000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2033,18 +2085,18 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "E Sem",
+      "city": null,
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 26000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 26000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 41000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 41000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 26000.0,
+      "lowest_price_nok": 41000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2053,7 +2105,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-605205",
+      "opportunity_id": "unified-auksjonen-613485",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -2063,13 +2115,13 @@
         "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
       ],
       "roi": null,
-      "score": 4.5,
+      "score": 0.0,
       "score_breakdown": [
         "financial=0.0/40",
         "confidence=0.0/15",
-        "data_quality=7.5/15",
+        "data_quality=5.0/15",
         "resale=10.0/15",
-        "logistics=12.0/15",
+        "logistics=10.0/15",
         "risk_penalty=25.0"
       ],
       "score_grade": "E",
@@ -2090,89 +2142,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2016 Peugeot 308 SW SW 130HK AUT PANO DENON CRUISE Sem 52 bud 5m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2016_Peugeot_308_SW_SW_130HK_AUT_PANO_DENON_CRUISE/605205",
-      "warnings": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ]
-    },
-    {
-      "asking_price_nok": 31000.0,
-      "blockers": [
-        "conservative_resale_nok",
-        "total_cost_nok",
-        "market_comparables",
-        "cost:auction_fee_nok",
-        "cost:vat_status",
-        "cost:transport_nok",
-        "cost:dismantling_nok",
-        "cost:storage_nok",
-        "cost:repair_nok",
-        "cost:cleaning_nok",
-        "cost:selling_cost_nok",
-        "cost:other_cost_nok"
-      ],
-      "city": "Oslo",
-      "confidence": "insufficient",
-      "decision": "monitor",
-      "decision_label": "🟡 راقب",
-      "ends_at": null,
-      "expected_profit_nok": null,
-      "first_price_nok": 31000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 31000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "listing_age_days": 0,
-      "lowest_price_nok": 31000.0,
-      "market_comparable_count": 0,
-      "market_discount": null,
-      "market_is_verified": false,
-      "market_median_nok": null,
-      "market_value_nok": null,
-      "market_verification_label": "⚪ سوق غير متحقق",
-      "market_verification_status": "unavailable",
-      "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-584434",
-      "price_change_count": 0,
-      "price_change_from_first": 0.0,
-      "price_history_label": "🔵 سعر أولي",
-      "price_history_status": "new",
-      "rank": 7,
-      "reasons": [
-        "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
-      ],
-      "roi": null,
-      "score": 4.5,
-      "score_breakdown": [
-        "financial=0.0/40",
-        "confidence=0.0/15",
-        "data_quality=7.5/15",
-        "resale=10.0/15",
-        "logistics=12.0/15",
-        "risk_penalty=25.0"
-      ],
-      "score_grade": "E",
-      "seller_confidence": "insufficient",
-      "seller_evidence_count": 0,
-      "seller_grade": "U",
-      "seller_id": null,
-      "seller_is_verified": false,
-      "seller_name": null,
-      "seller_reasons": [
-        "لا توجد بيانات بائع موثقة في المصدر."
-      ],
-      "seller_risk": "unknown",
-      "seller_risk_label": "⚪ بائع غير متحقق",
-      "seller_score": null,
-      "seller_type": null,
-      "seller_warnings": [
-        "Seller reliability cannot be assessed without source-provided seller facts."
-      ],
-      "significant_price_drop": false,
-      "title": "2014 Volkswagen PASSAT 2.0 D 177HK 4MOTION AUT HENGERFESTE VARMER HUNDEBUR CRUISE Oslo 31 bud 19m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2014_Volkswagen_PASSAT_20_D_177HK_4MOTION_AUT_HENGERFESTE_VARMER_HUNDEBUR_CRUISE/584434",
+      "title": "2015 BMW 218I ACTIVE TOURER 136hk Automat, Ryggekamera, Hengerfeste Namsos 35 bud 25m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2015_BMW_218I_ACTIVE_TOURER_136hk_Automat_Ryggekamera_Hengerfeste/613485",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -2202,9 +2173,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 7000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "highest_price_nok": 7000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 7000.0,
       "market_comparable_count": 0,
@@ -2216,6 +2187,87 @@
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
       "opportunity_id": "unified-auksjonen-613226",
+      "price_change_count": 0,
+      "price_change_from_first": 0.0,
+      "price_history_label": "🔵 سعر أولي",
+      "price_history_status": "new",
+      "rank": 7,
+      "reasons": [
+        "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
+      ],
+      "roi": null,
+      "score": 0.0,
+      "score_breakdown": [
+        "financial=0.0/40",
+        "confidence=0.0/15",
+        "data_quality=5.0/15",
+        "resale=10.0/15",
+        "logistics=10.0/15",
+        "risk_penalty=25.0"
+      ],
+      "score_grade": "E",
+      "seller_confidence": "insufficient",
+      "seller_evidence_count": 0,
+      "seller_grade": "U",
+      "seller_id": null,
+      "seller_is_verified": false,
+      "seller_name": null,
+      "seller_reasons": [
+        "لا توجد بيانات بائع موثقة في المصدر."
+      ],
+      "seller_risk": "unknown",
+      "seller_risk_label": "⚪ بائع غير متحقق",
+      "seller_score": null,
+      "seller_type": null,
+      "seller_warnings": [
+        "Seller reliability cannot be assessed without source-provided seller facts."
+      ],
+      "significant_price_drop": false,
+      "title": "2012 Nissan NAVARA 2.5-190 D 4X4 - EU godkjent til 31.08.2026 Voss 7 bud 19m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2012_Nissan_NAVARA_25-190_D_4X4_-_EU_godkjent_til_31082026/613226",
+      "warnings": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ]
+    },
+    {
+      "asking_price_nok": 52000.0,
+      "blockers": [
+        "conservative_resale_nok",
+        "total_cost_nok",
+        "market_comparables",
+        "cost:auction_fee_nok",
+        "cost:vat_status",
+        "cost:transport_nok",
+        "cost:dismantling_nok",
+        "cost:storage_nok",
+        "cost:repair_nok",
+        "cost:cleaning_nok",
+        "cost:selling_cost_nok",
+        "cost:other_cost_nok"
+      ],
+      "city": null,
+      "confidence": "insufficient",
+      "decision": "monitor",
+      "decision_label": "🟡 راقب",
+      "ends_at": null,
+      "expected_profit_nok": null,
+      "first_price_nok": 52000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 52000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "listing_age_days": 0,
+      "lowest_price_nok": 52000.0,
+      "market_comparable_count": 0,
+      "market_discount": null,
+      "market_is_verified": false,
+      "market_median_nok": null,
+      "market_value_nok": null,
+      "market_verification_label": "⚪ سوق غير متحقق",
+      "market_verification_status": "unavailable",
+      "maximum_purchase_price_nok": null,
+      "opportunity_id": "unified-auksjonen-613223",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -2252,88 +2304,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2012 Nissan NAVARA 2.5-190 D 4X4 - EU godkjent til 31.08.2026 Voss 7 bud 30m 12s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2012_Nissan_NAVARA_25-190_D_4X4_-_EU_godkjent_til_31082026/613226",
-      "warnings": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ]
-    },
-    {
-      "asking_price_nok": 52000.0,
-      "blockers": [
-        "conservative_resale_nok",
-        "total_cost_nok",
-        "market_comparables",
-        "cost:auction_fee_nok",
-        "cost:vat_status",
-        "cost:transport_nok",
-        "cost:dismantling_nok",
-        "cost:storage_nok",
-        "cost:repair_nok",
-        "cost:cleaning_nok",
-        "cost:selling_cost_nok",
-        "cost:other_cost_nok"
-      ],
-      "city": null,
-      "confidence": "insufficient",
-      "decision": "monitor",
-      "decision_label": "🟡 راقب",
-      "ends_at": null,
-      "expected_profit_nok": null,
-      "first_price_nok": 52000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 52000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "listing_age_days": 0,
-      "lowest_price_nok": 52000.0,
-      "market_comparable_count": 0,
-      "market_discount": null,
-      "market_is_verified": false,
-      "market_median_nok": null,
-      "market_value_nok": null,
-      "market_verification_label": "⚪ سوق غير متحقق",
-      "market_verification_status": "unavailable",
-      "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-613223",
-      "price_change_count": 0,
-      "price_change_from_first": 0.0,
-      "price_history_label": "🔵 سعر أولي",
-      "price_history_status": "new",
-      "rank": 9,
-      "reasons": [
-        "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
-      ],
-      "roi": null,
-      "score": 0.0,
-      "score_breakdown": [
-        "financial=0.0/40",
-        "confidence=0.0/15",
-        "data_quality=5.0/15",
-        "resale=10.0/15",
-        "logistics=10.0/15",
-        "risk_penalty=25.0"
-      ],
-      "score_grade": "E",
-      "seller_confidence": "insufficient",
-      "seller_evidence_count": 0,
-      "seller_grade": "U",
-      "seller_id": null,
-      "seller_is_verified": false,
-      "seller_name": null,
-      "seller_reasons": [
-        "لا توجد بيانات بائع موثقة في المصدر."
-      ],
-      "seller_risk": "unknown",
-      "seller_risk_label": "⚪ بائع غير متحقق",
-      "seller_score": null,
-      "seller_type": null,
-      "seller_warnings": [
-        "Seller reliability cannot be assessed without source-provided seller facts."
-      ],
-      "significant_price_drop": false,
-      "title": "2017 Volkswagen Transporter DOKA pickup med kran - 2,0 TDI 150hk Lang 4Motion Voss 26 bud 32m 12s",
+      "title": "2017 Volkswagen Transporter DOKA pickup med kran - 2,0 TDI 150hk Lang 4Motion Voss 26 bud 21m 18s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Volkswagen_Transporter_DOKA_pickup_med_kran_-_20_TDI_150hk_Lang_4Motion/613223",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2365,9 +2336,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": null,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "highest_price_nok": null,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": null,
       "market_comparable_count": 0,
@@ -2383,7 +2354,7 @@
       "price_change_from_first": null,
       "price_history_label": "⚪ لا يوجد سعر",
       "price_history_status": "unpriced",
-      "rank": 10,
+      "rank": 9,
       "reasons": [
         "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
       ],
@@ -2415,7 +2386,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Hyundai Accent 1.3 – EU-godkjent til 01/2027 – 1 eier – Starter og går Stokmarknes 0 bud 28m 12s",
+      "title": "Hyundai Accent 1.3 – EU-godkjent til 01/2027 – 1 eier – Starter og går Stokmarknes 0 bud 17m 18s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/Hyundai_Accent_13__EU-godkjent_til_012027__1_eier__Starter_og_g%C3%A5r/613128",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2424,7 +2395,7 @@
       ]
     },
     {
-      "asking_price_nok": 8000.0,
+      "asking_price_nok": 10000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2445,12 +2416,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 8000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 8000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 10000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 10000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 8000.0,
+      "lowest_price_nok": 10000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2460,6 +2431,87 @@
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
       "opportunity_id": "unified-auksjonen-613066",
+      "price_change_count": 0,
+      "price_change_from_first": 0.0,
+      "price_history_label": "🔵 سعر أولي",
+      "price_history_status": "new",
+      "rank": 10,
+      "reasons": [
+        "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
+      ],
+      "roi": null,
+      "score": 0.0,
+      "score_breakdown": [
+        "financial=0.0/40",
+        "confidence=0.0/15",
+        "data_quality=5.0/15",
+        "resale=10.0/15",
+        "logistics=10.0/15",
+        "risk_penalty=25.0"
+      ],
+      "score_grade": "E",
+      "seller_confidence": "insufficient",
+      "seller_evidence_count": 0,
+      "seller_grade": "U",
+      "seller_id": null,
+      "seller_is_verified": false,
+      "seller_name": null,
+      "seller_reasons": [
+        "لا توجد بيانات بائع موثقة في المصدر."
+      ],
+      "seller_risk": "unknown",
+      "seller_risk_label": "⚪ بائع غير متحقق",
+      "seller_score": null,
+      "seller_type": null,
+      "seller_warnings": [
+        "Seller reliability cannot be assessed without source-provided seller facts."
+      ],
+      "significant_price_drop": false,
+      "title": "2012 Citroen DS4, 1.6-111 D, 232000km Hønefoss 10 bud 9m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2012_Citroen_DS4_16-111_D_232000km/613066",
+      "warnings": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ]
+    },
+    {
+      "asking_price_nok": 35000.0,
+      "blockers": [
+        "conservative_resale_nok",
+        "total_cost_nok",
+        "market_comparables",
+        "cost:auction_fee_nok",
+        "cost:vat_status",
+        "cost:transport_nok",
+        "cost:dismantling_nok",
+        "cost:storage_nok",
+        "cost:repair_nok",
+        "cost:cleaning_nok",
+        "cost:selling_cost_nok",
+        "cost:other_cost_nok"
+      ],
+      "city": null,
+      "confidence": "insufficient",
+      "decision": "monitor",
+      "decision_label": "🟡 راقب",
+      "ends_at": null,
+      "expected_profit_nok": null,
+      "first_price_nok": 35000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 35000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "listing_age_days": 0,
+      "lowest_price_nok": 35000.0,
+      "market_comparable_count": 0,
+      "market_discount": null,
+      "market_is_verified": false,
+      "market_median_nok": null,
+      "market_value_nok": null,
+      "market_verification_label": "⚪ سوق غير متحقق",
+      "market_verification_status": "unavailable",
+      "maximum_purchase_price_nok": null,
+      "opportunity_id": "unified-auksjonen-612985",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -2496,8 +2548,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2012 Citroen DS4, 1.6-111 D, 232000km Hønefoss 8 bud 20m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2012_Citroen_DS4_16-111_D_232000km/613066",
+      "title": "1990 Volvo 740 med BMW M57D30 motor og manuell girkasse Malmefjorden 35 bud 15m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/1990_Volvo_740_med_BMW_M57D30_motor_og_manuell_girkasse/612985",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -2505,7 +2557,7 @@
       ]
     },
     {
-      "asking_price_nok": 35000.0,
+      "asking_price_nok": 6400.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2526,12 +2578,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 35000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 35000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 6400.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 6400.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 35000.0,
+      "lowest_price_nok": 6400.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2540,7 +2592,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612985",
+      "opportunity_id": "unified-auksjonen-612967",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -2577,8 +2629,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "1990 Volvo 740 med BMW M57D30 motor og manuell girkasse Malmefjorden 35 bud 26m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/1990_Volvo_740_med_BMW_M57D30_motor_og_manuell_girkasse/612985",
+      "title": "2016 Peugeot iOn automat cruisekontroll s+v dekk 73590km - ingen minstepris Laksevåg 30 bud 13m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2016_Peugeot_iOn_automat_cruisekontroll_sv_dekk__73590km_-_ingen_minstepris/612967",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -2586,7 +2638,7 @@
       ]
     },
     {
-      "asking_price_nok": 6400.0,
+      "asking_price_nok": 35800.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2607,12 +2659,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 6400.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 6400.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 35800.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 35800.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 6400.0,
+      "lowest_price_nok": 35800.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2621,7 +2673,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612967",
+      "opportunity_id": "unified-auksjonen-612734",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -2658,8 +2710,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2016 Peugeot iOn automat cruisekontroll s+v dekk 73590km - ingen minstepris Laksevåg 30 bud 24m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2016_Peugeot_iOn_automat_cruisekontroll_sv_dekk__73590km_-_ingen_minstepris/612967",
+      "title": "2016 Volkswagen Caddy Maxi 2.0-150 D Automat, 217880km, s+v hjul, ryggekamera, LED Oslo 265 bud 7m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2016_Volkswagen_Caddy_Maxi_20-150_D_Automat_217880km_sv_hjul_ryggekamera_LED/612734",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -2667,7 +2719,7 @@
       ]
     },
     {
-      "asking_price_nok": 24300.0,
+      "asking_price_nok": 40000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2688,12 +2740,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 24300.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 24300.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 40000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 40000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 24300.0,
+      "lowest_price_nok": 40000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2702,7 +2754,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612736",
+      "opportunity_id": "unified-auksjonen-612697",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -2739,8 +2791,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2011 Mercedes-Benz Sprinter, 316 CDI/43, 481600km, UTEN MINSTEPRIS Oslo 78 bud 14m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2011_Mercedes-Benz_Sprinter_316_CDI43_481600km_UTEN_MINSTEPRIS/612736",
+      "title": "2010 Volkswagen TIGUAN 2.0-140 D 4MOTION / Meget god servicehistorikk / Hønefoss 40 bud 0m 2s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2010_Volkswagen_TIGUAN_20-140_D_4MOTION__Meget_god_servicehistorikk__/612697",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -2748,11 +2800,12 @@
       ]
     },
     {
-      "asking_price_nok": 35800.0,
+      "asking_price_nok": null,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
         "market_comparables",
+        "cost:purchase_price_nok",
         "cost:auction_fee_nok",
         "cost:vat_status",
         "cost:transport_nok",
@@ -2769,25 +2822,25 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 35800.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 35800.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": null,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": null,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 35800.0,
+      "lowest_price_nok": null,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
       "market_median_nok": null,
       "market_value_nok": null,
-      "market_verification_label": "⚪ سوق غير متحقق",
+      "market_verification_label": "⚪ السعر المطلوب غير متوفر",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612734",
+      "opportunity_id": "unified-auksjonen-612645",
       "price_change_count": 0,
-      "price_change_from_first": 0.0,
-      "price_history_label": "🔵 سعر أولي",
-      "price_history_status": "new",
+      "price_change_from_first": null,
+      "price_history_label": "⚪ لا يوجد سعر",
+      "price_history_status": "unpriced",
       "rank": 15,
       "reasons": [
         "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
@@ -2797,8 +2850,8 @@
       "score_breakdown": [
         "financial=0.0/40",
         "confidence=0.0/15",
-        "data_quality=5.0/15",
-        "resale=10.0/15",
+        "data_quality=2.5/15",
+        "resale=8.0/15",
         "logistics=10.0/15",
         "risk_penalty=25.0"
       ],
@@ -2820,8 +2873,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2016 Volkswagen Caddy Maxi 2.0-150 D Automat, 217880km, s+v hjul, ryggekamera, LED Oslo 265 bud 18m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2016_Volkswagen_Caddy_Maxi_20-150_D_Automat_217880km_sv_hjul_ryggekamera_LED/612734",
+      "title": "Krause alustillas Rullestillas Nordkisa 0 bud 11m 18s Utropspris 4 900,-",
+      "url": "https://www.auksjonen.no/auksjon/torget/Krause_alustillas_Rullestillas_/612645",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -2829,7 +2882,7 @@
       ]
     },
     {
-      "asking_price_nok": 40000.0,
+      "asking_price_nok": 282000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2850,12 +2903,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 40000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 40000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 282000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 282000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 40000.0,
+      "lowest_price_nok": 282000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2864,7 +2917,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612717",
+      "opportunity_id": "unified-auksjonen-612599",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -2901,8 +2954,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2007 Mercedes-Benz E-Klasse, E 280 CDI 3.0-190 D 4MATIC, 245000 km, Eu godkjent til 30.03.2027 Svolvær 13 bud 10m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2007_Mercedes-Benz_E-Klasse_E_280_CDI_30-190_D_4MATIC_245000_km_Eu_godkjent_til_30032027_/612717",
+      "title": "2008 Laika Rexosline 720 Campingbil - Manuell - 4 sitteplasser - 4 soveplasser - 762 kg nyttelast - Hydrauliske støttelabber Åndalsnes 138 bud 5m 18s",
+      "url": "https://www.auksjonen.no/auksjon/campingvogn/2008_Laika_Rexosline_720_Campingbil_-_Manuell_-_4_sitteplasser_-_4_soveplasser_-_762_kg_nyttelast_-_Hydrauliske_st%C3%B8ttelabber/612599",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -2910,7 +2963,7 @@
       ]
     },
     {
-      "asking_price_nok": 64000.0,
+      "asking_price_nok": 1000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2931,12 +2984,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 64000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 64000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 1000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 1000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 64000.0,
+      "lowest_price_nok": 1000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2945,7 +2998,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612704",
+      "opportunity_id": "unified-auksjonen-612554",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -2982,8 +3035,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2014 Ford KUGA Titanium X 2.0-150 D AWD / Automat / Lav km / Soltak / Servicehefte Hønefoss 39 bud 1m 51s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2014_Ford_KUGA_Titanium_X_20-150_D_AWD__Automat__Lav_km__Soltak__Servicehefte_/612704",
+      "title": "NY KM 750 Pigghammer s40/s50 CE merket FABRIKKGARANTI Steinsholt 1 bud 55m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bygg_og_anlegg/NY_KM_750_Pigghammer_s40s50_CE_merket_FABRIKKGARANTI/612554",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3013,9 +3066,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 28000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "highest_price_nok": 28000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 28000.0,
       "market_comparable_count": 0,
@@ -3026,7 +3079,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612697",
+      "opportunity_id": "unified-auksjonen-612127",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3063,8 +3116,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2010 Volkswagen TIGUAN 2.0-140 D 4MOTION / Meget god servicehistorikk / Hønefoss 28 bud 2m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2010_Volkswagen_TIGUAN_20-140_D_4MOTION__Meget_god_servicehistorikk__/612697",
+      "title": "2006 Toyota Corolla 1.4-97, 164000km Namsos 67 bud 1t 3m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2006_Toyota_Corolla_14-97_164000km/612127",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3072,7 +3125,7 @@
       ]
     },
     {
-      "asking_price_nok": 41000.0,
+      "asking_price_nok": 25500.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3093,12 +3146,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 41000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 41000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 25500.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 25500.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 41000.0,
+      "lowest_price_nok": 25500.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3107,7 +3160,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612682",
+      "opportunity_id": "unified-auksjonen-611877",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3144,8 +3197,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2017 Mercedes-Benz B-Klasse B 250 E 180hk / Servicehistorikk / EU-OK Hønefoss 32 bud 1m 11s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Mercedes-Benz_B-Klasse_B_250_E_180hk__Servicehistorikk__EU-OK_/612682",
+      "title": "2014 BMW X1 - xDrive18d - 176700km - Hengerfeste - Rep Objekt Namsos 166 bud 1t 11m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2014_BMW_X1_-_xDrive18d_-_176700km_-_Hengerfeste_-_Rep_Objekt/611877",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3153,7 +3206,7 @@
       ]
     },
     {
-      "asking_price_nok": 10000.0,
+      "asking_price_nok": 1500.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3174,12 +3227,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 10000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 10000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 1500.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 1500.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 10000.0,
+      "lowest_price_nok": 1500.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3188,7 +3241,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612658",
+      "opportunity_id": "unified-auksjonen-609889",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3225,8 +3278,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2013 Fiat 500 0.9 Bensin 84hk Soltak, S+V dekk, EU ok til 10.2027 Grinder 10 bud 0m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2013_Fiat_500_09_Bensin_84hk_Soltak_SV_dekk_EU_ok_til_102027/612658",
+      "title": "HELLA LYSJUSTERINGSAPPARAT – PRODUSERT I TYSKLAND Kristiansand s 6 bud 16t 7m 16s",
+      "url": "https://www.auksjonen.no/auksjon/torget/HELLA_LYSJUSTERINGSAPPARAT__PRODUSERT_I_TYSKLAND/609889",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3234,12 +3287,11 @@
       ]
     },
     {
-      "asking_price_nok": null,
+      "asking_price_nok": 16000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
         "market_comparables",
-        "cost:purchase_price_nok",
         "cost:auction_fee_nok",
         "cost:vat_status",
         "cost:transport_nok",
@@ -3256,25 +3308,25 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": null,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": null,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 16000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 16000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": null,
+      "lowest_price_nok": 16000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
       "market_median_nok": null,
       "market_value_nok": null,
-      "market_verification_label": "⚪ السعر المطلوب غير متوفر",
+      "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612645",
+      "opportunity_id": "unified-auksjonen-609047",
       "price_change_count": 0,
-      "price_change_from_first": null,
-      "price_history_label": "⚪ لا يوجد سعر",
-      "price_history_status": "unpriced",
+      "price_change_from_first": 0.0,
+      "price_history_label": "🔵 سعر أولي",
+      "price_history_status": "new",
       "rank": 21,
       "reasons": [
         "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
@@ -3284,8 +3336,8 @@
       "score_breakdown": [
         "financial=0.0/40",
         "confidence=0.0/15",
-        "data_quality=2.5/15",
-        "resale=8.0/15",
+        "data_quality=5.0/15",
+        "resale=10.0/15",
         "logistics=10.0/15",
         "risk_penalty=25.0"
       ],
@@ -3307,8 +3359,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Krause alustillas Rullestillas Nordkisa 0 bud 22m 13s Utropspris 4 900,-",
-      "url": "https://www.auksjonen.no/auksjon/torget/Krause_alustillas_Rullestillas_/612645",
+      "title": "2008 Mercedes-Benz Sprinter 315 CDI 2.1 Diesel 150hk Automat - Ingen minstepris Holmestrand 64 bud 27m 18s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2008_Mercedes-Benz_Sprinter_315_CDI_21_Diesel_150hk_Automat_-_Ingen_minstepris/609047",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3316,7 +3368,7 @@
       ]
     },
     {
-      "asking_price_nok": 234000.0,
+      "asking_price_nok": 850000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3337,12 +3389,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 234000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 234000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 850000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 850000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 234000.0,
+      "lowest_price_nok": 850000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3351,7 +3403,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612599",
+      "opportunity_id": "unified-auksjonen-605376",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3388,8 +3440,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2008 Laika Rexosline 720 Campingbil - Manuell - 4 sitteplasser - 4 soveplasser - 762 kg nyttelast - Hydrauliske støttelabber Åndalsnes 90 bud 16m 13s",
-      "url": "https://www.auksjonen.no/auksjon/campingvogn/2008_Laika_Rexosline_720_Campingbil_-_Manuell_-_4_sitteplasser_-_4_soveplasser_-_762_kg_nyttelast_-_Hydrauliske_st%C3%B8ttelabber/612599",
+      "title": "2020 Mercedes-Benz Arocs med henger fra VM-Tarm Stjørdal 22.07.2026",
+      "url": "https://www.auksjonen.no/auksjon/lastebil_og_henger/2020_Mercedes-Benz_Arocs_med_henger_fra_VM-Tarm/605376",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3397,7 +3449,7 @@
       ]
     },
     {
-      "asking_price_nok": 145000.0,
+      "asking_price_nok": 680000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3418,12 +3470,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 145000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 145000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 680000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 680000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 145000.0,
+      "lowest_price_nok": 680000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3432,7 +3484,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-612519",
+      "opportunity_id": "unified-auksjonen-604372",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3469,8 +3521,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2023 LMC Tandero 500K Ny / Ubrukt - 4 sengeplasser - Fast dobbeltseng - WC Åndalsnes 61 bud 1m 28s",
-      "url": "https://www.auksjonen.no/auksjon/campingvogn/2023_LMC_Tandero_500K__Ny__Ubrukt_-_4_sengeplasser_-_Fast_dobbeltseng_-_WC/612519",
+      "title": "Mercedes-Benz GLS, 350d 4MATIC Alvdal 73 bud 0m 0s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/Mercedes-Benz_GLS_350d_4MATIC/604372",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3478,7 +3530,7 @@
       ]
     },
     {
-      "asking_price_nok": 514000.0,
+      "asking_price_nok": 20000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3499,12 +3551,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 514000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 514000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 20000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 20000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 514000.0,
+      "lowest_price_nok": 20000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3513,7 +3565,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-604372",
+      "opportunity_id": "unified-auksjonen-604164",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3550,8 +3602,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Mercedes-Benz GLS, 350d 4MATIC Alvdal 54 bud 4m 13s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/Mercedes-Benz_GLS_350d_4MATIC/604372",
+      "title": "Trimble R10 GNSS-mottaker med TSC3 feltkontroller, ladere, batterier og Leica GLS30-stang Sem 20 bud 16t 5m 18s",
+      "url": "https://www.auksjonen.no/auksjon/torget/Trimble_R10_GNSS-mottaker_med_TSC3_feltkontroller_ladere_batterier_og_Leica_GLS30-stang/604164",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3559,7 +3611,7 @@
       ]
     },
     {
-      "asking_price_nok": 38000.0,
+      "asking_price_nok": 40000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3580,12 +3632,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 38000.0,
-      "first_seen_at": "2026-07-21T18:13:47.362380+00:00",
-      "highest_price_nok": 38000.0,
-      "last_seen_at": "2026-07-21T18:13:47.362380+00:00",
+      "first_price_nok": 40000.0,
+      "first_seen_at": "2026-07-21T18:24:48.298331+00:00",
+      "highest_price_nok": 40000.0,
+      "last_seen_at": "2026-07-21T18:24:48.298331+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 38000.0,
+      "lowest_price_nok": 40000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3631,7 +3683,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2013 Volkswagen GOLF 1.4 140HK DSG HIGHLINE ADAPTIV CRUISE XENON Oslo 38 bud 15m 13s",
+      "title": "2013 Volkswagen GOLF 1.4 140HK DSG HIGHLINE ADAPTIV CRUISE XENON Oslo 40 bud 4m 18s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2013_Volkswagen_GOLF_14_140HK_DSG_HIGHLINE_ADAPTIV_CRUISE_XENON/603591",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3644,11 +3696,11 @@
   "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
   "source_errors": {},
   "sources": {
-    "Auksjonen.no": 30
+    "Auksjonen.no": 31
   },
   "summary_lines": [
-    "الفرص: 30 — شراء: 0، مراقبة: 30، رفض: 0.",
-    "أفضل فرصة: unified-auksjonen-612672 — 🟡 راقب — درجة 4/100 (E) — ربح غير متوفر — ROI غير متوفر."
+    "الفرص: 31 — شراء: 0، مراقبة: 31، رفض: 0.",
+    "أفضل فرصة: unified-auksjonen-612736 — 🟡 راقب — درجة 4/100 (E) — ربح غير متوفر — ROI غير متوفر."
   ],
-  "total_count": 30
+  "total_count": 31
 }
