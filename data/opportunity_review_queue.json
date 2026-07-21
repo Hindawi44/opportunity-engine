@@ -1,0 +1,309 @@
+{
+  "excluded_count": 3,
+  "excluded_summary": {
+    "heavy_equipment": 3
+  },
+  "generated_at": "2026-07-21T08:04:42.676316+00:00",
+  "input_count": 25,
+  "method": "keyword relevance and explicit exclusion rules; no resale values or costs are invented",
+  "queue": [
+    {
+      "asking_price_nok": 400.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "overskuddsmateriell parti Sannidal 4 bud",
+      "opportunity_id": "unified-auksjonen-608909",
+      "priority": 1,
+      "reasons": [
+        "target:parti+8",
+        "target:overskudd+12",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 25,
+      "status": "review_first",
+      "title": "overskuddsmateriell parti Sannidal 4 bud 2t 39m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/overskuddsmateriell_parti/608909"
+    },
+    {
+      "asking_price_nok": 2700.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "Parti med plateheiser, arbeidsbord og monteringsutstyr - INGEN MINSTEPRIS Sem 21 bud",
+      "opportunity_id": "unified-auksjonen-607918",
+      "priority": 2,
+      "reasons": [
+        "target:bord+6",
+        "target:parti+8",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 19,
+      "status": "review_if_capacity",
+      "title": "Parti med plateheiser, arbeidsbord og monteringsutstyr - INGEN MINSTEPRIS Sem 21 bud 2t 32m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/Parti_med_plateheiser_arbeidsbord_og_monteringsutstyr_-_INGEN_MINSTEPRIS/607918"
+    },
+    {
+      "asking_price_nok": 200.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "parti med forskjellig - ingen minstepris Sannidal 2 bud",
+      "opportunity_id": "unified-auksjonen-608899",
+      "priority": 2,
+      "reasons": [
+        "target:parti+8",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 13,
+      "status": "review_if_capacity",
+      "title": "parti med forskjellig - ingen minstepris Sannidal 2 bud 3t 1m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/parti_med_forskjellig_-_ingen_minstepris/608899"
+    },
+    {
+      "asking_price_nok": 200.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "parti med lamper og ledrør Sannidal 2 bud",
+      "opportunity_id": "unified-auksjonen-608895",
+      "priority": 2,
+      "reasons": [
+        "target:parti+8",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 13,
+      "status": "review_if_capacity",
+      "title": "parti med lamper og ledrør Sannidal 2 bud 2t 33m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/parti_med_lamper_og_ledr%C3%B8r/608895"
+    },
+    {
+      "asking_price_nok": 9000.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "1961 Massey-ferguson 65 Stokke 9 bud",
+      "opportunity_id": "unified-auksjonen-612203",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5"
+      ],
+      "relevance_score": 5,
+      "status": "low_relevance",
+      "title": "1961 Massey-ferguson 65 Stokke 9 bud 2t 59m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/landbruk/1961_Massey-ferguson_65/612203"
+    },
+    {
+      "asking_price_nok": 15500.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "1996 Yamaha 700 Jetski Risør 27 bud",
+      "opportunity_id": "unified-auksjonen-612723",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5"
+      ],
+      "relevance_score": 5,
+      "status": "low_relevance",
+      "title": "1996 Yamaha 700 Jetski Risør 27 bud 2t 55m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/1996_Yamaha_700_Jetski/612723"
+    },
+    {
+      "asking_price_nok": 500.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2 stk Grohe Rondo 1 stk Oras Electra 6179 Sannidal 2 bud",
+      "opportunity_id": "unified-auksjonen-608975",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5"
+      ],
+      "relevance_score": 5,
+      "status": "low_relevance",
+      "title": "2 stk Grohe Rondo 1 stk Oras Electra 6179 Sannidal 2 bud 2t 53m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/2_stk_Grohe_Rondo_1_stk_Oras_Electra_6179/608975"
+    },
+    {
+      "asking_price_nok": 1000.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2021 Wee Feiekost S40 E-ph100 Lena 1 bud",
+      "opportunity_id": "unified-auksjonen-610446",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5"
+      ],
+      "relevance_score": 5,
+      "status": "low_relevance",
+      "title": "2021 Wee Feiekost S40 E-ph100 Lena 1 bud 2t 59m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/bygg_og_anlegg/2021_Wee_Feiekost_S40_E-ph100/610446"
+    },
+    {
+      "asking_price_nok": 1095000.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2023 Scania R660 flisbil med henger Euro 6, 6x4 Vågå 21 bud",
+      "opportunity_id": "unified-auksjonen-612263",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5"
+      ],
+      "relevance_score": 5,
+      "status": "low_relevance",
+      "title": "2023 Scania R660 flisbil med henger Euro 6, 6x4 Vågå 21 bud 2t 57m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/lastebil_og_henger/2023_Scania_R660_flisbil_med_henger_Euro_6_6x4/612263"
+    },
+    {
+      "asking_price_nok": 2900.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2025 440stk nye Dørhåndtak Tolvsrød 29 bud",
+      "opportunity_id": "unified-auksjonen-613242",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5"
+      ],
+      "relevance_score": 5,
+      "status": "low_relevance",
+      "title": "2025 440stk nye Dørhåndtak Tolvsrød 29 bud 2t 57m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/2025_440stk_nye_D%C3%B8rh%C3%A5ndtak_/613242"
+    },
+    {
+      "asking_price_nok": 100.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "Elektrisk poleringsmaskin med koffert Sannidal 1 bud",
+      "opportunity_id": "unified-auksjonen-612190",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5"
+      ],
+      "relevance_score": 5,
+      "status": "low_relevance",
+      "title": "Elektrisk poleringsmaskin med koffert Sannidal 1 bud 2t 59m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/Elektrisk_poleringsmaskin_med_koffert_/612190"
+    },
+    {
+      "asking_price_nok": 1250.0,
+      "city": null,
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "MSA Altair 4XR gassmåler Sannidal 5 bud",
+      "opportunity_id": "unified-auksjonen-608905",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5"
+      ],
+      "relevance_score": 5,
+      "status": "low_relevance",
+      "title": "MSA Altair 4XR gassmåler Sannidal 5 bud 2t 25m 17s",
+      "url": "https://ny.auksjonen.no/auksjon/torget/MSA_Altair_4XR_gassm%C3%A5ler/608905"
+    }
+  ],
+  "review_first_count": 1,
+  "schema_version": 1,
+  "selected_count": 12,
+  "source_snapshot": "data/todays_opportunities.json"
+}
