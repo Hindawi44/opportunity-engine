@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 
+from opportunity_engine.ods.auksjonen import AuksjonenClient
 from opportunity_engine.ods.bjaroy import BjaroyFeedClient
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
 from opportunity_engine.ods.finn import FinnApiClient
@@ -16,6 +17,36 @@ from opportunity_engine.ods.konkurskupp import KonkurskuppFeedClient
 from opportunity_engine.ods.market_pricing import MarketComparable
 from opportunity_engine.ods.real_cost import RealCostInputs
 from opportunity_engine.ods.snapshot_alerts import SnapshotAlertProcessor
+
+
+DEFAULT_AUKSJONEN_DISCOVERY_QUERIES = (
+    "butikkinnredning",
+    "butikkinventar",
+    "varelager",
+    "lagerreol",
+    "kontormøbler",
+    "arbeidsbord",
+    "tekstil",
+    "symaskin",
+)
+
+
+class TargetedAuksjonenClient(AuksjonenClient):
+    """Prefer several business-opportunity searches over the vehicle-heavy front page."""
+
+    def search(self, *, keyword: str | None = None):
+        if keyword and keyword.strip():
+            return super().search(keyword=keyword)
+
+        documents = []
+        seen: set[str] = set()
+        for query in DEFAULT_AUKSJONEN_DISCOVERY_QUERIES:
+            for document in super().search(keyword=query):
+                if document.document_id in seen:
+                    continue
+                seen.add(document.document_id)
+                documents.append(document)
+        return tuple(documents)
 
 
 def _load_verified_inputs(path: str | None):
@@ -81,6 +112,7 @@ def main() -> int:
 
     comparables, costs = _load_verified_inputs(args.verified_inputs)
     result = AutomatedDailyPipeline(
+        client=TargetedAuksjonenClient(),
         finn_client=_finn_client_from_environment(),
         konkurskupp_client=_konkurskupp_client_from_environment(),
         bjaroy_client=_bjaroy_client_from_environment(),
