@@ -16,8 +16,6 @@ from urllib.request import Request, urlopen
 from .live_data import SourceDocument
 from .models import ODSRequest
 
-# Keep the canonical public host for stable URLs and backwards compatibility.
-# urllib follows Auksjonen redirects to the current ny.auksjonen.no frontend.
 AUKSJONEN_BASE_URL = "https://www.auksjonen.no"
 AUKSJONEN_LISTINGS_URL = f"{AUKSJONEN_BASE_URL}/auksjoner/"
 HtmlTransport = Callable[[str, float, dict[str, str]], str]
@@ -26,7 +24,7 @@ HtmlTransport = Callable[[str, float, dict[str, str]], str]
 def _default_html_transport(url: str, timeout: float, headers: dict[str, str]) -> str:
     request = Request(url, headers=headers)
     try:
-        with urlopen(request, timeout=timeout) as response:  # noqa: S310 - fixed HTTPS host
+        with urlopen(request, timeout=timeout) as response:  # noqa: S310
             charset = response.headers.get_content_charset() or "utf-8"
             return response.read().decode(charset, errors="replace")
     except HTTPError as exc:
@@ -37,8 +35,6 @@ def _default_html_transport(url: str, timeout: float, headers: dict[str, str]) -
 
 @dataclass(frozen=True)
 class AuksjonenClient:
-    """Read public listings from Auksjonen."""
-
     timeout: float = 20.0
     base_url: str = AUKSJONEN_BASE_URL
     transport: HtmlTransport = _default_html_transport
@@ -62,15 +58,7 @@ class AuksjonenClient:
         if keyword and keyword.strip():
             url = f"{url}?q={quote_plus(keyword.strip())}"
         html = self.transport(url, self.timeout, self.headers)
-        documents = parse_auksjonen_listing_page(html, base_url=self.base_url)
-        if keyword and keyword.strip():
-            needle = keyword.strip().casefold()
-            documents = tuple(
-                item
-                for item in documents
-                if needle in item.title.casefold() or needle in item.text.casefold()
-            )
-        return documents
+        return parse_auksjonen_listing_page(html, base_url=self.base_url)
 
 
 @dataclass(frozen=True)
@@ -112,17 +100,7 @@ class _AuctionAnchorParser(HTMLParser):
         self._text = []
 
 
-def parse_auksjonen_listing_page(
-    html: str,
-    *,
-    base_url: str = AUKSJONEN_BASE_URL,
-) -> tuple[SourceDocument, ...]:
-    """Parse JSON-LD listings first, then current auction-card anchors.
-
-    Auksjonen has used both structured Product records and JavaScript-rendered
-    anchor cards. Supporting both formats keeps the connector resilient while
-    avoiding invented prices, locations, or end times.
-    """
+def parse_auksjonen_listing_page(html: str, *, base_url: str = AUKSJONEN_BASE_URL) -> tuple[SourceDocument, ...]:
     if not html.strip():
         return ()
 
@@ -143,7 +121,6 @@ def parse_auksjonen_listing_page(
         document_id = f"auksjonen-{auction_id}"
         if document_id in seen:
             continue
-
         title = _extract_title(text)
         if not title:
             continue
@@ -172,10 +149,7 @@ def parse_auksjonen_listing_page(
 
 
 def _iter_json_ld_products(html: str) -> Iterable[dict[str, object]]:
-    pattern = re.compile(
-        r"<script[^>]+type=[\"']application/ld\+json[\"'][^>]*>(.*?)</script>",
-        re.IGNORECASE | re.DOTALL,
-    )
+    pattern = re.compile(r"<script[^>]+type=[\"']application/ld\+json[\"'][^>]*>(.*?)</script>", re.IGNORECASE | re.DOTALL)
     for match in pattern.finditer(html):
         try:
             payload = json.loads(match.group(1).strip())
@@ -191,49 +165,39 @@ def _walk_json_ld(value: object) -> Iterable[dict[str, object]]:
         return
     if not isinstance(value, dict):
         return
-
     item_type = str(value.get("@type") or "").casefold()
     if item_type in {"product", "offer"} and value.get("url"):
         yield value
-
     for key in ("@graph", "itemListElement", "item", "mainEntity"):
         child = value.get(key)
         if child is not None:
             yield from _walk_json_ld(child)
 
 
-def _document_from_json_ld(
-    item: dict[str, object], *, base_url: str
-) -> SourceDocument | None:
+def _document_from_json_ld(item: dict[str, object], *, base_url: str) -> SourceDocument | None:
     raw_url = item.get("url")
     title = _clean_text(item.get("name"))
     if not raw_url or not title:
         return None
-
     url = urljoin(base_url, str(raw_url))
     auction_id = _auction_id(url)
     offers = item.get("offers") if isinstance(item.get("offers"), dict) else {}
     address = item.get("address") if isinstance(item.get("address"), dict) else {}
     description = _clean_text(item.get("description"))
-    price = _coerce_price(offers.get("price"))
-    ends_at = _valid_iso_datetime(offers.get("validThrough"))
-    city = _clean_text(address.get("addressLocality")) or None
-    text = _clean_text(" ".join(part for part in (title, description) if part))
-
     return SourceDocument(
         document_id=f"auksjonen-{auction_id}",
         source_name="Auksjonen.no",
         source_type="public_auction_listing",
         title=title,
-        text=text,
+        text=_clean_text(" ".join(part for part in (title, description) if part)),
         url=url,
         published_at=None,
         country="Norway",
         metadata={
             "auction_id": auction_id,
-            "current_price_nok": price,
-            "city": city,
-            "ends_at": ends_at,
+            "current_price_nok": _coerce_price(offers.get("price")),
+            "city": _clean_text(address.get("addressLocality")) or None,
+            "ends_at": _valid_iso_datetime(offers.get("validThrough")),
             "access_mode": "public_listing_page",
             "parser_version": 3,
         },
@@ -248,12 +212,7 @@ def _auction_id(url: str) -> str:
 
 
 def _extract_title(text: str) -> str:
-    value = re.sub(
-        r"^(?:Video\s+)?(?:Uten minstepris\s+|Minstepris oppnådd\s+)?",
-        "",
-        text,
-        flags=re.IGNORECASE,
-    )
+    value = re.sub(r"^(?:Video\s+)?(?:Uten minstepris\s+|Minstepris oppnådd\s+)?", "", text, flags=re.IGNORECASE)
     markers = (
         " Høyeste bud ",
         " Fastpris ",
@@ -262,11 +221,13 @@ def _extract_title(text: str) -> str:
         " Avsluttes ",
         " Gjenstår ",
     )
-    for marker in markers:
-        index = value.casefold().find(marker.casefold())
-        if index > 0:
-            value = value[:index]
-            break
+    positions = [
+        index
+        for marker in markers
+        if (index := value.casefold().find(marker.casefold())) > 0
+    ]
+    if positions:
+        value = value[: min(positions)]
     return _clean_text(value)
 
 
@@ -305,10 +266,7 @@ def _valid_iso_datetime(value: object) -> str | None:
 
 def _extract_city(text: str, title: str) -> str | None:
     remainder = text[len(title):].strip()
-    match = re.match(
-        r"([A-Za-zÆØÅæøå][A-Za-zÆØÅæøå .-]{1,45}?)(?:\s+\d+\s+bud|\s+\d{2}\.\d{2}\.\d{4}|\s+Fastpris)",
-        remainder,
-    )
+    match = re.match(r"([A-Za-zÆØÅæøå][A-Za-zÆØÅæøå .-]{1,45}?)(?:\s+\d+\s+bud|\s+\d{2}\.\d{2}\.\d{4}|\s+Fastpris)", remainder)
     return _clean_text(match.group(1)) if match else None
 
 
