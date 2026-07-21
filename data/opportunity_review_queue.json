@@ -1,19 +1,18 @@
 {
-  "excluded_count": 11,
+  "excluded_count": 3,
   "excluded_summary": {
-    "generic_unspecified_lot": 4,
-    "heavy_equipment": 3,
-    "low_relevance_goods": 2,
-    "specialized_technical": 2,
-    "vehicle": 1
+    "generic_unspecified_lot": 1,
+    "heavy_equipment": 1,
+    "sanitary_goods": 1
   },
-  "generated_at": "2026-07-21T09:48:07.497152+00:00",
+  "generated_at": "2026-07-21T11:51:02.465620+00:00",
   "input_count": 25,
-  "method": "strict concrete-category relevance and explicit exclusion rules; no resale values or costs are invented",
+  "low_relevance_omitted_count": 19,
+  "method": "strict target-category relevance; low-relevance listings are omitted and no resale values or costs are invented",
   "queue": [
     {
-      "asking_price_nok": 100.0,
-      "city": "al",
+      "asking_price_nok": 4500.0,
+      "city": null,
       "ends_at": null,
       "evidence_needed": [
         "three_verified_market_comparables",
@@ -24,22 +23,57 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "Magiko APOLLO-M Magnetic Water Conditioner – Ny Sannidal 1 bud 45m 53s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-608902",
-      "priority": 3,
+      "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 34 bud 52m 58s",
+      "matched_target_terms": [
+        "lagerreol",
+        "reol",
+        "hylle"
+      ],
+      "opportunity_id": "unified-auksjonen-611252",
+      "priority": 1,
       "reasons": [
+        "target:lagerreol+15",
+        "target:reol+9",
+        "target:hylle+8",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 37,
+      "status": "review_first",
+      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 34 bud 52m 58s",
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/611252"
+    },
+    {
+      "asking_price_nok": 3000.0,
+      "city": "ysil",
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "Arbeidsbenk m/søyleborrmaskin, reoler m/m. Trysil 24 bud 14m 58s",
+      "matched_target_terms": [
+        "reol"
+      ],
+      "opportunity_id": "unified-auksjonen-612527",
+      "priority": 2,
+      "reasons": [
+        "target:reol+9",
         "asking_price_present+5",
         "location_present+3"
       ],
-      "relevance_score": 8,
-      "status": "low_relevance",
-      "title": "Magiko APOLLO-M Magnetic Water Conditioner – Ny Sannidal 1 bud 45m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/Magiko_APOLLO-M_Magnetic_Water_Conditioner__Ny/608902"
+      "relevance_score": 17,
+      "status": "review_if_capacity",
+      "title": "Arbeidsbenk m/søyleborrmaskin, reoler m/m. Trysil 24 bud 14m 58s",
+      "url": "https://www.auksjonen.no/auksjon/torget/Arbeidsbenk_ms%C3%B8yleborrmaskin_reoler_mm/612527"
     },
     {
-      "asking_price_nok": 100.0,
-      "city": "al",
+      "asking_price_nok": 750.0,
+      "city": "ss",
       "ends_at": null,
       "evidence_needed": [
         "three_verified_market_comparables",
@@ -50,273 +84,25 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "Magiko APOLLO-M Magnetic Water Conditioner – Stor modell – Ny Sannidal 1 bud 43m 53s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-608903",
-      "priority": 3,
+      "market_search_query": "Mannskapscontainer / Containerbrakke - 2 roms - oppholdsrom og utstyrslager / 20 fot Hønefoss 3 bud 44m 58s",
+      "matched_target_terms": [
+        "skap"
+      ],
+      "opportunity_id": "unified-auksjonen-601509",
+      "priority": 2,
       "reasons": [
+        "target:skap+7",
         "asking_price_present+5",
         "location_present+3"
       ],
-      "relevance_score": 8,
-      "status": "low_relevance",
-      "title": "Magiko APOLLO-M Magnetic Water Conditioner – Stor modell – Ny Sannidal 1 bud 43m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/Magiko_APOLLO-M_Magnetic_Water_Conditioner__Stor_modell__Ny/608903"
-    },
-    {
-      "asking_price_nok": 10000.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "1961 Massey-ferguson 65 Stokke 10 bud",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-612203",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5"
-      ],
-      "relevance_score": 5,
-      "status": "low_relevance",
-      "title": "1961 Massey-ferguson 65 Stokke 10 bud 1t 15m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/landbruk/1961_Massey-ferguson_65/612203"
-    },
-    {
-      "asking_price_nok": 500.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "2 stk Grohe Rondo 1 stk Oras Electra 6179 Sannidal 2 bud",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-608975",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5"
-      ],
-      "relevance_score": 5,
-      "status": "low_relevance",
-      "title": "2 stk Grohe Rondo 1 stk Oras Electra 6179 Sannidal 2 bud 1t 9m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/2_stk_Grohe_Rondo_1_stk_Oras_Electra_6179/608975"
-    },
-    {
-      "asking_price_nok": 1000.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "2021 Wee Feiekost S40 E-ph100 Lena 1 bud",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-610446",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5"
-      ],
-      "relevance_score": 5,
-      "status": "low_relevance",
-      "title": "2021 Wee Feiekost S40 E-ph100 Lena 1 bud 1t 15m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/bygg_og_anlegg/2021_Wee_Feiekost_S40_E-ph100/610446"
-    },
-    {
-      "asking_price_nok": 1095000.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "2023 Scania R660 flisbil med henger Euro 6, 6x4 Vågå 21 bud",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-612263",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5"
-      ],
-      "relevance_score": 5,
-      "status": "low_relevance",
-      "title": "2023 Scania R660 flisbil med henger Euro 6, 6x4 Vågå 21 bud 1t 13m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/lastebil_og_henger/2023_Scania_R660_flisbil_med_henger_Euro_6_6x4/612263"
-    },
-    {
-      "asking_price_nok": 100.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "Elektrisk poleringsmaskin med koffert Sannidal 1 bud",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-612190",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5"
-      ],
-      "relevance_score": 5,
-      "status": "low_relevance",
-      "title": "Elektrisk poleringsmaskin med koffert Sannidal 1 bud 1t 15m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/Elektrisk_poleringsmaskin_med_koffert_/612190"
-    },
-    {
-      "asking_price_nok": 200.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "Värmebaronen Elpatron VB 9002, et komplett elektrisk varmeelement med styreenhet for akkumulatortank Sannidal 2 bud 51m 53s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-608907",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5"
-      ],
-      "relevance_score": 5,
-      "status": "low_relevance",
-      "title": "Värmebaronen Elpatron VB 9002, et komplett elektrisk varmeelement med styreenhet for akkumulatortank Sannidal 2 bud 51m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/Vrmebaronen_Elpatron_VB_9002_et_komplett_elektrisk_varmeelement_med_styreenhet_for_akkumulatortank/608907"
-    },
-    {
-      "asking_price_nok": 100.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "originale Bosch tilkoblings-/strømkabler Sannidal 1 bud 57m 53s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-608910",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5"
-      ],
-      "relevance_score": 5,
-      "status": "low_relevance",
-      "title": "originale Bosch tilkoblings-/strømkabler Sannidal 1 bud 57m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/originale_Bosch_tilkoblings-str%C3%B8mkabler/608910"
-    },
-    {
-      "asking_price_nok": 100.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "støttehåndtak / oppfellbart toalettstøttehåndtak Ifö / IDO / Porsgrund. Sannidal 1 bud",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-608964",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5"
-      ],
-      "relevance_score": 5,
-      "status": "low_relevance",
-      "title": "støttehåndtak / oppfellbart toalettstøttehåndtak Ifö / IDO / Porsgrund. Sannidal 1 bud 1t 1m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/st%C3%B8tteh%C3%A5ndtak__oppfellbart_toalettst%C3%B8tteh%C3%A5ndtak_If__IDO__Porsgrund/608964"
-    },
-    {
-      "asking_price_nok": null,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "2 stk - Oras Optima ECO+ Sannidal 0 bud",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-608969",
-      "priority": 3,
-      "reasons": [
-        "asking_price_missing"
-      ],
-      "relevance_score": 0,
-      "status": "low_relevance",
-      "title": "2 stk - Oras Optima ECO+ Sannidal 0 bud 1t 5m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/2_stk_-__Oras_Optima_ECO/608969"
-    },
-    {
-      "asking_price_nok": 100.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "2 stk - Oras Safira 1070, et ettgreps servantbatteri i krom. Sannidal 1 bud",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-608967",
-      "priority": 3,
-      "reasons": [
-        "generic:batteri-7",
-        "asking_price_present+5"
-      ],
-      "relevance_score": 0,
-      "status": "low_relevance",
-      "title": "2 stk - Oras Safira 1070, et ettgreps servantbatteri i krom. Sannidal 1 bud 1t 3m 53s",
-      "url": "https://ny.auksjonen.no/auksjon/torget/2_stk_-__Oras_Safira_1070_et_ettgreps_servantbatteri_i_krom/608967"
+      "relevance_score": 15,
+      "status": "review_if_capacity",
+      "title": "Mannskapscontainer / Containerbrakke - 2 roms - oppholdsrom og utstyrslager / 20 fot Hønefoss 3 bud 44m 58s",
+      "url": "https://www.auksjonen.no/auksjon/torget/Mannskapscontainer__Containerbrakke_-_2_roms_-_oppholdsrom_og_utstyrslager__20_fot/601509"
     }
   ],
-  "review_first_count": 0,
-  "schema_version": 2,
-  "selected_count": 12,
+  "review_first_count": 1,
+  "schema_version": 3,
+  "selected_count": 3,
   "source_snapshot": "data/todays_opportunities.json"
 }
