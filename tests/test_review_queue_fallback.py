@@ -28,9 +28,9 @@ def test_non_target_items_do_not_enter_fallback(tmp_path: Path) -> None:
     payload = _run(
         tmp_path,
         [
-            {"opportunity_id": "a", "title": "Arbeidsbord", "asking_price_nok": 500, "city": "Namsos"},
+            {"opportunity_id": "a", "title": "Original litografi innrammet", "asking_price_nok": 500, "city": "Namsos"},
             {"opportunity_id": "b", "title": "Diverse parti", "asking_price_nok": 100},
-            {"opportunity_id": "c", "title": "Liten arbeidsbenk", "asking_price_nok": 300},
+            {"opportunity_id": "c", "title": "Terrassebord Kebony", "asking_price_nok": 300},
             {"opportunity_id": "d", "title": "Personbil", "asking_price_nok": 1000},
         ],
     )
@@ -45,7 +45,7 @@ def test_strong_matches_take_precedence_over_fallback(tmp_path: Path) -> None:
         tmp_path,
         [
             {"opportunity_id": "strong", "title": "Butikkinnredning med salgsdisk", "asking_price_nok": 1000},
-            {"opportunity_id": "weak", "title": "Arbeidsbord", "asking_price_nok": 200},
+            {"opportunity_id": "unrelated", "title": "Original litografi innrammet", "asking_price_nok": 200},
         ],
     )
     assert payload["fallback_used"] is False

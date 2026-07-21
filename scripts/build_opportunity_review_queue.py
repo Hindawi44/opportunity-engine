@@ -15,13 +15,33 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 TARGET_TERMS = {
+    # Shop fittings and retail display
     "butikkinnredning": 24, "butikk inventar": 22, "butikkinventar": 22,
+    "butikkhylle": 18, "butikkreol": 18, "butikkstativ": 18,
     "prøverom": 20, "klesstativ": 18, "mannekeng": 18,
-    "utstillingsstativ": 16, "salgsdisk": 16, "butikkdisk": 16,
-    "varelager": 18, "tekstil": 16, "klær": 16, "brudekjole": 18,
-    "symaskin": 18, "industrisymaskin": 22, "kontormøbler": 17,
-    "skrivebord": 13, "kontorstol": 13, "arkivskap": 13,
-    "lagerreol": 15, "pallereol": 15, "reol": 9, "hylle": 8, "skap": 7,
+    "utstillingsdukke": 18, "prøvedukke": 18,
+    "utstillingsstativ": 16, "displaystativ": 16, "varedisplay": 16,
+    "salgsdisk": 16, "butikkdisk": 16, "kassadisk": 16,
+    "resepsjonsdisk": 15, "vitrineskap": 14, "glassmonter": 14,
+
+    # Warehouse, shelving and easy-to-resell business equipment
+    "varelager": 18, "lagerinnredning": 18, "lagerutstyr": 15,
+    "lagerreol": 15, "pallereol": 15, "reolsystem": 15,
+    "stålreol": 14, "hyllereol": 14, "reol": 9, "hylle": 8,
+    "arbeidsbord": 13, "arbeidsbenk": 13, "pakkebord": 14,
+    "verkstedbenk": 12, "materialskap": 12, "stålskap": 12, "skap": 7,
+
+    # Office and commercial furniture
+    "kontormøbler": 17, "kontorinnredning": 17,
+    "skrivebord": 13, "kontorpult": 13, "kontorstol": 13,
+    "møtebord": 13, "konferansebord": 13, "arkivskap": 13,
+    "garderobeskap": 12, "resepsjonsmøbler": 14,
+
+    # Textile, clothing and sewing opportunities
+    "tekstil": 16, "stoffparti": 18, "metervare": 16,
+    "klær": 16, "klesparti": 18, "brudekjole": 18,
+    "symaskin": 18, "industrisymaskin": 22, "overlock": 19,
+    "systue": 18, "syutstyr": 16,
 }
 
 EXCLUDE_TERMS = {
@@ -185,10 +205,10 @@ def main() -> int:
         fallback_used = bool(selected)
 
     payload = {
-        "schema_version": 5,
+        "schema_version": 6,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_snapshot": args.snapshot,
-        "method": "strict target-category relevance; fallback accepts only explicit target matches; unrelated listings are omitted; no financial values are invented",
+        "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
         "input_count": len(classified),
         "selected_count": len(selected),
         "excluded_count": len(excluded),
