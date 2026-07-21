@@ -9,7 +9,7 @@
   "duplicate_groups_merged": 0,
   "extracted_count": 0,
   "fetched_count": 0,
-  "generated_at": "2026-07-21T07:09:13.423595+00:00",
+  "generated_at": "2026-07-21T07:30:48.808963+00:00",
   "history_path": "data/price_history.json",
   "intelligence_by_id": {},
   "keyword": null,
@@ -19,7 +19,23 @@
   "rows": [],
   "schema_version": 12,
   "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
-  "source_errors": {},
+  "source_diagnostics": {
+    "Auksjonen.no": {
+      "contains_auction_link": true,
+      "contains_cloudflare_marker": false,
+      "contains_json_ld": true,
+      "contains_next_data": false,
+      "contains_nuxt_data": false,
+      "final_url": "https://ny.auksjonen.no/auksjoner/alle",
+      "html_length": 215185,
+      "http_status": 200,
+      "page_title": "Alle auksjoner | Auksjonen.no",
+      "request_ok": true
+    }
+  },
+  "source_errors": {
+    "Auksjonen.no": "Public page loaded but the connector parsed zero listings. The page structure may have changed or listings may be rendered by JavaScript."
+  },
   "sources": {
     "Auksjonen.no": 0
   },
