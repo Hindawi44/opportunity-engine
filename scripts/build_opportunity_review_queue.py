@@ -41,6 +41,18 @@ EXCLUDE_TERMS = {
     "magnetic water": "specialized_technical", "batteri": "low_relevance_goods",
 }
 
+# Auksjonen category paths are more reliable than titles. Vehicle titles often
+# contain only make/model names and would otherwise leak into discovery fallback.
+URL_CATEGORY_EXCLUSIONS = {
+    "/auksjon/bruktbil/": "vehicle",
+    "/auksjon/lastebil_og_henger/": "heavy_vehicle",
+    "/auksjon/landbruk/": "heavy_equipment",
+    "/auksjon/anlegg/": "heavy_equipment",
+    "/auksjon/bat/": "vehicle",
+    "/auksjon/båt/": "vehicle",
+    "/auksjon/motorsykkel/": "vehicle",
+}
+
 GENERIC_ONLY_TERMS = {
     "parti", "overskudd", "overskuddsmateriell", "forskjellig",
     "diverse", "ingen minstepris",
@@ -58,6 +70,8 @@ def normalize(text: str) -> str:
 def classify(row: dict[str, object]) -> dict[str, object]:
     title = str(row.get("title") or "")
     normalized = normalize(title)
+    url = str(row.get("url") or "")
+    normalized_url = url.casefold()
     reasons: list[str] = []
     exclusions: list[str] = []
     score = 0
@@ -66,6 +80,11 @@ def classify(row: dict[str, object]) -> dict[str, object]:
     for term, reason in EXCLUDE_TERMS.items():
         if term in normalized:
             exclusions.append(reason)
+
+    for path, reason in URL_CATEGORY_EXCLUSIONS.items():
+        if path in normalized_url:
+            exclusions.append(reason)
+            reasons.append(f"excluded_url_category:{path}")
 
     for term, points in TARGET_TERMS.items():
         if term in normalized:
