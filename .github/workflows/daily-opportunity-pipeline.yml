@@ -19,7 +19,7 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}
       FINN_API_KEY: ${{ secrets.FINN_API_KEY }}
-      FINN_ORG_ID: ${{ secrets.FINN_OR_ID }}
+      FINN_ORG_ID: ${{ secrets.FINN_ORG_ID }}
       FINN_MARKET: ${{ vars.FINN_MARKET }}
       KONKURSKUPP_FEED_URL: ${{ secrets.KONKURSKUPP_FEED_URL }}
       KONKURSKUPP_FEED_TOKEN: ${{ secrets.KONKURSKUPP_FEED_TOKEN }}
