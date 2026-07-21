@@ -550,7 +550,7 @@
   "duplicate_groups_merged": 0,
   "extracted_count": 30,
   "fetched_count": 30,
-  "generated_at": "2026-07-21T16:46:04.956392+00:00",
+  "generated_at": "2026-07-21T16:55:48.089790+00:00",
   "history_path": "data/price_history.json",
   "intelligence_by_id": {
     "unified-auksjonen-457340": {
@@ -1636,9 +1636,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 80000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 80000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 80000.0,
       "market_comparable_count": 0,
@@ -1686,7 +1686,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2018 Peugeot Boxer Planbil med Fassi-kran og verktøyskap Tau 23 bud 31m 55s",
+      "title": "2018 Peugeot Boxer Planbil med Fassi-kran og verktøyskap Tau 23 bud 22m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2018_Peugeot_Boxer_Planbil_med_Fassi-kran_og_verkt%C3%B8yskap/605361",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -1710,16 +1710,16 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "ddal",
+      "city": "nddal",
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 25000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 25000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 25000.0,
       "market_comparable_count": 0,
@@ -1767,7 +1767,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "1985 Wester 18 ft båt med 115 hk OMC Seadrive motor og henger Brumunddal 39 bud 15m 55s",
+      "title": "1985 Wester 18 ft båt med 115 hk OMC Seadrive motor og henger Brumunddal 39 bud 6m 12s",
       "url": "https://www.auksjonen.no/auksjon/baat/1985_Wester_18_ft_b%C3%A5t_med_115_hk_OMC_Seadrive_motor_og_henger/612535",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -1776,7 +1776,7 @@
       ]
     },
     {
-      "asking_price_nok": 130000.0,
+      "asking_price_nok": 131000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -1791,18 +1791,18 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "Røn",
+      "city": "l Røn",
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 130000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
-      "highest_price_nok": 130000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_price_nok": 131000.0,
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
+      "highest_price_nok": 131000.0,
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 130000.0,
+      "lowest_price_nok": 131000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -1848,7 +1848,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2003 Elnagh Campingbil Røn 73 bud 17m 55s",
+      "title": "2003 Elnagh Campingbil Røn 74 bud 8m 12s",
       "url": "https://www.auksjonen.no/auksjon/campingvogn/2003_Elnagh_Campingbil/612467",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -1872,16 +1872,16 @@
         "cost:selling_cost_nok",
         "cost:other_cost_nok"
       ],
-      "city": "en",
+      "city": "len",
       "confidence": "insufficient",
       "decision": "monitor",
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 200.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 200.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 200.0,
       "market_comparable_count": 0,
@@ -1929,7 +1929,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Asak og andre - Diverse belegningsstein, smågate- og storgatestein / INGEN MINSTEPRIS! Lommedalen 1 bud 13m 55s",
+      "title": "Asak og andre - Diverse belegningsstein, smågate- og storgatestein / INGEN MINSTEPRIS! Lommedalen 1 bud 4m 12s",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Asak_og_andre_-_Diverse_belegningsstein_sm%C3%A5gate-_og_storgatestein__INGEN_MINSTEPRIS/609037",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -1960,9 +1960,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 1500.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 1500.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 1500.0,
       "market_comparable_count": 0,
@@ -2010,7 +2010,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "1983 Kawasaki Z 500/Z 550 Askim 3 bud 15m 55s",
+      "title": "1983 Kawasaki Z 500/Z 550 Askim 3 bud 6m 12s",
       "url": "https://www.auksjonen.no/auksjon/motorsykkel/1983_Kawasaki_Z_500Z_550/613469",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2042,9 +2042,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": null,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": null,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": null,
       "market_comparable_count": 0,
@@ -2092,7 +2092,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Elliptical 380 Crosstrainer ellipsemaskin Varhaug 0 bud 15m 55s",
+      "title": "Elliptical 380 Crosstrainer ellipsemaskin Varhaug 0 bud 6m 12s",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Elliptical_380_Crosstrainer_ellipsemaskin_/613155",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2123,9 +2123,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 9000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 9000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 9000.0,
       "market_comparable_count": 0,
@@ -2173,7 +2173,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "1988 Scand Classic AV Stathelle 9 bud 17m 55s",
+      "title": "1988 Scand Classic AV Stathelle 9 bud 8m 12s",
       "url": "https://www.auksjonen.no/auksjon/baat/1988_Scand_Classic_AV/613029",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2204,9 +2204,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 144000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 144000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 144000.0,
       "market_comparable_count": 0,
@@ -2254,7 +2254,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2016 ISUZU D-MAX 163 HK 4X4 AUTOMAT HENGERFESTE KAMERA SKINN CRUISE NAVI Hagan 105 bud 29m 55s",
+      "title": "2016 ISUZU D-MAX 163 HK 4X4 AUTOMAT HENGERFESTE KAMERA SKINN CRUISE NAVI Hagan 105 bud 20m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2016_ISUZU_D-MAX_163_HK_4X4_AUTOMAT_HENGERFESTE_KAMERA_SKINN_CRUISE_NAVI/612578",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2285,9 +2285,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 58000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 58000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 58000.0,
       "market_comparable_count": 0,
@@ -2335,7 +2335,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2016 Iveco Daily Planbil - 3 Seter - 60201km Tomasjord 33 bud 25m 55s",
+      "title": "2016 Iveco Daily Planbil - 3 Seter - 60201km Tomasjord 33 bud 16m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2016_Iveco_Daily_Planbil_-_3_Seter_-_60201km/612419",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2366,9 +2366,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 401000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 401000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 401000.0,
       "market_comparable_count": 0,
@@ -2416,7 +2416,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2018 Mercedes-Benz GLS, 350d 4MATIC, 151000km Kristiansand s 35 bud 19m 55s",
+      "title": "2018 Mercedes-Benz GLS, 350d 4MATIC, 151000km Kristiansand s 35 bud 10m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2018_Mercedes-Benz_GLS_350d_4MATIC_151000km/612416",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2425,7 +2425,7 @@
       ]
     },
     {
-      "asking_price_nok": 4000.0,
+      "asking_price_nok": 4500.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2446,12 +2446,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 4000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
-      "highest_price_nok": 4000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_price_nok": 4500.0,
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
+      "highest_price_nok": 4500.0,
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 4000.0,
+      "lowest_price_nok": 4500.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2497,7 +2497,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "0.60ct Diamant øredobber i 18k gull - Naturlig Diamanter Longyearbyen 8 bud 13m 55s",
+      "title": "0.60ct Diamant øredobber i 18k gull - Naturlig Diamanter Longyearbyen 9 bud 4m 12s",
       "url": "https://www.auksjonen.no/auksjon/torget/060ct_Diamant_%C3%B8redobber_i_18k_gull_-_Naturlig_Diamanter/612399",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2529,9 +2529,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": null,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": null,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": null,
       "market_comparable_count": 0,
@@ -2579,7 +2579,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "1990 Rana Plast 530 båt Skånevik 0 bud 13m 55s",
+      "title": "1990 Rana Plast 530 båt Skånevik 0 bud 4m 12s",
       "url": "https://www.auksjonen.no/auksjon/baat/1990_Rana_Plast_530_b%C3%A5t_/612329",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2588,7 +2588,7 @@
       ]
     },
     {
-      "asking_price_nok": 31000.0,
+      "asking_price_nok": 33000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2609,12 +2609,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 31000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
-      "highest_price_nok": 31000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_price_nok": 33000.0,
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
+      "highest_price_nok": 33000.0,
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 31000.0,
+      "lowest_price_nok": 33000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2660,7 +2660,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2007 Tec Travel king 720 campingvogn - alde varme - 7 sengeplasser Biri 17 bud 15m 55s",
+      "title": "2007 Tec Travel king 720 campingvogn - alde varme - 7 sengeplasser Biri 19 bud 6m 12s",
       "url": "https://www.auksjonen.no/auksjon/campingvogn/2007_Tec_Travel_king_720_campingvogn_-_alde_varme_-_7_sengeplasser/612272",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2691,9 +2691,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 60000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 60000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 60000.0,
       "market_comparable_count": 0,
@@ -2741,7 +2741,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2008 Toyota Land Cruiser 3.0 D-4D 173 hk 4WD, 8 seter, Automat Oslo 32 bud 21m 55s",
+      "title": "2008 Toyota Land Cruiser 3.0 D-4D 173 hk 4WD, 8 seter, Automat Oslo 32 bud 12m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2008_Toyota_Land_Cruiser_30_D-4D_173_hk_4WD_8_seter_Automat/612264",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2772,9 +2772,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 8000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 8000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 8000.0,
       "market_comparable_count": 0,
@@ -2822,7 +2822,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2009 Audi A3 Sportback 1.8 bensin 160hk s+v dekk eu ok til 06.2027 Yven 8 bud 19m 55s",
+      "title": "2009 Audi A3 Sportback 1.8 bensin 160hk s+v dekk eu ok til 06.2027 Yven 8 bud 10m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2009_Audi_A3_Sportback_18_bensin_160hk_sv_dekk_eu_ok_til_062027/612262",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2831,7 +2831,7 @@
       ]
     },
     {
-      "asking_price_nok": 17000.0,
+      "asking_price_nok": 31000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -2852,12 +2852,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 17000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
-      "highest_price_nok": 17000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_price_nok": 31000.0,
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
+      "highest_price_nok": 31000.0,
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 17000.0,
+      "lowest_price_nok": 31000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -2903,7 +2903,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2015 Toyota ProAce 2.0 Diesel 163hk Cruisekontroll eu ok til 01.2027 Kongsvinger 17 bud 17m 55s",
+      "title": "2015 Toyota ProAce 2.0 Diesel 163hk Cruisekontroll eu ok til 01.2027 Kongsvinger 29 bud 8m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2015_Toyota_ProAce_20_Diesel_163hk_Cruisekontroll_eu_ok_til_012027/612245",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2934,9 +2934,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 56000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 56000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 56000.0,
       "market_comparable_count": 0,
@@ -2984,7 +2984,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2011 BMW X3 XDRIVE20D 2.0 Diesel, Cruisekontroll, Hengerfeste, S+V dekk, EU OK til 06.2028 Aurskog 27 bud 15m 55s",
+      "title": "2011 BMW X3 XDRIVE20D 2.0 Diesel, Cruisekontroll, Hengerfeste, S+V dekk, EU OK til 06.2028 Aurskog 27 bud 6m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2011_BMW_X3_XDRIVE20D_20_Diesel_Cruisekontroll_Hengerfeste_SV_dekk_EU_OK_til_062028/612206",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2993,7 +2993,7 @@
       ]
     },
     {
-      "asking_price_nok": 14000.0,
+      "asking_price_nok": 19000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3014,12 +3014,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 14000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
-      "highest_price_nok": 14000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_price_nok": 19000.0,
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
+      "highest_price_nok": 19000.0,
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 14000.0,
+      "lowest_price_nok": 19000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3065,7 +3065,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2008 Volkswagen Tiguan 2.0 140hk 4MOTION DAB-radio Firehjulstrekk Videoavspilling Heimdal 12 bud 33m 55s",
+      "title": "2008 Volkswagen Tiguan 2.0 140hk 4MOTION DAB-radio Firehjulstrekk Videoavspilling Heimdal 17 bud 24m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2008_Volkswagen_Tiguan_20_140hk_4MOTION_DAB-radio_Firehjulstrekk_Videoavspilling/610962",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3096,9 +3096,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 21000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 21000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 21000.0,
       "market_comparable_count": 0,
@@ -3146,7 +3146,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2005 Kawasaki Z 750 Ågotnes 14 bud 13m 55s",
+      "title": "2005 Kawasaki Z 750 Ågotnes 14 bud 4m 12s",
       "url": "https://www.auksjonen.no/auksjon/motorsykkel/2005_Kawasaki_Z_750/610898",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3155,7 +3155,7 @@
       ]
     },
     {
-      "asking_price_nok": 44000.0,
+      "asking_price_nok": 46000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3176,12 +3176,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 44000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
-      "highest_price_nok": 44000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_price_nok": 46000.0,
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
+      "highest_price_nok": 46000.0,
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 44000.0,
+      "lowest_price_nok": 46000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3227,7 +3227,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2014 BMW X1 xDrive18d, 164000 km, Automatisk, Cruisekontroll, Hengerfeste, Skinninteriør, S+V dekk Stathelle 44 bud 23m 55s",
+      "title": "2014 BMW X1 xDrive18d, 164000 km, Automatisk, Cruisekontroll, Hengerfeste, Skinninteriør, S+V dekk Stathelle 46 bud 14m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2014_BMW_X1_xDrive18d_164000_km_Automatisk_Cruisekontroll_Hengerfeste_Skinninteri%C3%B8r_SV_dekk_/610710",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3258,9 +3258,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 40000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 40000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 40000.0,
       "market_comparable_count": 0,
@@ -3308,7 +3308,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2017 Fiat TALENTO 1.6-125 D - LANG UTGAVE. Skjeberg 30 bud 27m 55s",
+      "title": "2017 Fiat TALENTO 1.6-125 D - LANG UTGAVE. Skjeberg 30 bud 18m 12s",
       "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Fiat_TALENTO_16-125_D_-_LANG_UTGAVE/607676",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3339,9 +3339,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 16000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 16000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 16000.0,
       "market_comparable_count": 0,
@@ -3389,7 +3389,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2008 Aprilia Pegaso 650 IE / 5400 km Drammen 16 bud 17m 55s",
+      "title": "2008 Aprilia Pegaso 650 IE / 5400 km Drammen 16 bud 8m 12s",
       "url": "https://www.auksjonen.no/auksjon/motorsykkel/2008_Aprilia_Pegaso_650_IE__5400_km/602263",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3420,9 +3420,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 40000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 40000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 40000.0,
       "market_comparable_count": 0,
@@ -3470,7 +3470,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2023 Ifor Williams TB5521-353 Vippeplan/Maskinhenger – 3.500 kg totalvekt Sem 39 bud 13m 55s",
+      "title": "2023 Ifor Williams TB5521-353 Vippeplan/Maskinhenger – 3.500 kg totalvekt Sem 39 bud 4m 12s",
       "url": "https://www.auksjonen.no/auksjon/torget/2023_Ifor_Williams_TB5521-353_VippeplanMaskinhenger__3500_kg_totalvekt/588329",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3501,9 +3501,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 11100.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 11100.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 11100.0,
       "market_comparable_count": 0,
@@ -3551,7 +3551,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2018 20 fots container med lokk, kjetting og diverse utstyr Sem 62 bud 13m 55s",
+      "title": "2018 20 fots container med lokk, kjetting og diverse utstyr Sem 62 bud 4m 12s",
       "url": "https://www.auksjonen.no/auksjon/torget/2018_20_fots_container_med_lokk_kjetting_og_diverse_utstyr/584167",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3582,9 +3582,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 5000.0,
-      "first_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "first_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "highest_price_nok": 5000.0,
-      "last_seen_at": "2026-07-21T16:46:04.956392+00:00",
+      "last_seen_at": "2026-07-21T16:55:48.089790+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 5000.0,
       "market_comparable_count": 0,
@@ -3632,7 +3632,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "1/2\" Bi-component RØR (2\" ENDER) (1 RØR = 5,9 M) - 2 1/2\" RØR (3\" ENDER) (1 RØR = 5,9 M) Oslo 1 bud 15m 55s",
+      "title": "1/2\" Bi-component RØR (2\" ENDER) (1 RØR = 5,9 M) - 2 1/2\" RØR (3\" ENDER) (1 RØR = 5,9 M) Oslo 1 bud 6m 12s",
       "url": "https://www.auksjonen.no/auksjon/industri/12_Bi-component_R%C3%98R_2_ENDER_1_R%C3%98R__59_M_-_2_12_R%C3%98R_3_ENDER_1_R%C3%98R__59_M/580252",
       "warnings": [
         "No verified market comparables were supplied.",

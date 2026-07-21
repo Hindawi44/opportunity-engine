@@ -5,7 +5,7 @@
     "plumbing_goods": 1,
     "vehicle": 2
   },
-  "generated_at": "2026-07-21T16:46:05.117638+00:00",
+  "generated_at": "2026-07-21T16:55:48.240916+00:00",
   "input_count": 25,
   "low_relevance_omitted_count": 20,
   "method": "strict target-category relevance; low-relevance listings are omitted and no resale values or costs are invented",
