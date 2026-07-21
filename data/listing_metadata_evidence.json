@@ -1,0 +1,32 @@
+{
+  "enriched_count": 1,
+  "error_count": 0,
+  "errors": {},
+  "evidence": {
+    "unified-auksjonen-610671": {
+      "captured_at": "2026-07-21T19:07:50.524725+00:00",
+      "observed": {
+        "asking_price_nok": 0.0
+      },
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
+      "verified": true
+    },
+    "unified-auksjonen-611253": {
+      "captured_at": "2026-07-21T19:07:49.259619+00:00",
+      "observed": {},
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
+      "verified": false
+    },
+    "unified-auksjonen-612667": {
+      "captured_at": "2026-07-21T19:07:49.872180+00:00",
+      "observed": {},
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
+      "verified": false
+    }
+  },
+  "generated_at": "2026-07-21T19:07:50.524743+00:00",
+  "schema_version": 1
+}
