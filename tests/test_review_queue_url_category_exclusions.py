@@ -10,6 +10,7 @@ assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 classify = MODULE.classify
+fallback_items = MODULE._fallback_items
 
 
 def test_used_car_url_is_excluded_even_without_vehicle_word_in_title() -> None:
@@ -40,3 +41,31 @@ def test_target_reol_listing_remains_reviewable() -> None:
 
     assert item["status"] in {"review_first", "review_if_capacity"}
     assert item["exclusion_reasons"] == []
+
+
+def test_unrelated_low_relevance_items_never_enter_fallback() -> None:
+    unrelated = [
+        classify({"title": "Original litografi av Espolin Johnson", "asking_price_nok": 100}),
+        classify({"title": "2023 LMC Tandero 500K campingvogn", "asking_price_nok": 31000}),
+        classify({"title": "Kebony Radiata terrassebord", "asking_price_nok": 31000}),
+    ]
+
+    assert all(item["status"] == "low_relevance" for item in unrelated)
+    assert fallback_items(unrelated, 3) == []
+
+
+def test_weak_explicit_target_may_enter_labelled_fallback() -> None:
+    target = classify(
+        {
+            "title": "Lite skap",
+            "asking_price_nok": None,
+            "city": None,
+            "ends_at": None,
+        }
+    )
+
+    assert target["status"] == "low_relevance"
+    selected = fallback_items([target], 3)
+    assert len(selected) == 1
+    assert selected[0]["status"] == "discovery_fallback"
+    assert selected[0]["matched_target_terms"] == ["skap"]
