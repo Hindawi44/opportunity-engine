@@ -1,19 +1,19 @@
 {
-  "excluded_count": 19,
+  "excluded_count": 22,
   "excluded_summary": {
-    "heavy_vehicle": 1,
-    "sanitary_goods": 1,
-    "vehicle": 17
+    "generic_unspecified_lot": 1,
+    "plumbing_goods": 1,
+    "vehicle": 22
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-07-21T17:47:46.745448+00:00",
+  "generated_at": "2026-07-21T18:13:47.527933+00:00",
   "input_count": 25,
-  "low_relevance_omitted_count": 6,
-  "method": "strict target-category relevance; fallback accepts only explicit target matches; unrelated listings are omitted; no financial values are invented",
+  "low_relevance_omitted_count": 3,
+  "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [],
   "review_first_count": 0,
-  "schema_version": 5,
+  "schema_version": 6,
   "selected_count": 0,
   "source_snapshot": "data/todays_opportunities.json"
 }
