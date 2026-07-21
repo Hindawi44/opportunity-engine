@@ -61,6 +61,17 @@ EXCLUDE_TERMS = {
     "dørhåndtak": "low_relevance_goods",
     "lamper": "low_relevance_goods",
     "ledrør": "low_relevance_goods",
+    "servantbatteri": "plumbing_goods",
+    "kjøkkenbatteri": "plumbing_goods",
+    "blandebatteri": "plumbing_goods",
+    "kran": "plumbing_goods",
+    "armatur": "plumbing_goods",
+    "toalett": "sanitary_goods",
+    "dusj": "sanitary_goods",
+    "water conditioner": "specialized_technical",
+    "vannbehandler": "specialized_technical",
+    "magnetic water": "specialized_technical",
+    "batteri": "low_relevance_goods",
 }
 
 GENERIC_ONLY_TERMS = {
@@ -75,7 +86,6 @@ GENERIC_ONLY_TERMS = {
 GENERIC_PENALTIES = {
     "kabel": 10,
     "reservedel": 9,
-    "batteri": 7,
     "verktøy": 6,
     "elektronikk": 6,
     "monteringsutstyr": 6,
@@ -179,19 +189,25 @@ def main() -> int:
         raise ValueError("snapshot rows must be a list")
 
     classified = [classify(row) for row in rows if isinstance(row, dict)]
-    included = [item for item in classified if item["status"] != "excluded"]
+    included = [
+        item
+        for item in classified
+        if item["status"] in {"review_first", "review_if_capacity"}
+    ]
     included.sort(key=lambda item: (item["priority"], -item["relevance_score"], str(item["title"])))
     excluded = [item for item in classified if item["status"] == "excluded"]
+    low_relevance = [item for item in classified if item["status"] == "low_relevance"]
 
     selected = included[: max(args.limit, 1)]
     payload = {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_snapshot": args.snapshot,
-        "method": "strict concrete-category relevance and explicit exclusion rules; no resale values or costs are invented",
+        "method": "strict target-category relevance; low-relevance listings are omitted and no resale values or costs are invented",
         "input_count": len(classified),
         "selected_count": len(selected),
         "excluded_count": len(excluded),
+        "low_relevance_omitted_count": len(low_relevance),
         "review_first_count": sum(item["status"] == "review_first" for item in selected),
         "queue": selected,
         "excluded_summary": {
@@ -203,7 +219,18 @@ def main() -> int:
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"input_count": len(classified), "selected_count": len(selected), "excluded_count": len(excluded), "output": str(output)}, ensure_ascii=False))
+    print(
+        json.dumps(
+            {
+                "input_count": len(classified),
+                "selected_count": len(selected),
+                "excluded_count": len(excluded),
+                "low_relevance_omitted_count": len(low_relevance),
+                "output": str(output),
+            },
+            ensure_ascii=False,
+        )
+    )
     return 0
 
 
