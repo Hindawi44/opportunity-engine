@@ -1,97 +1,19 @@
 {
-  "excluded_count": 22,
+  "excluded_count": 19,
   "excluded_summary": {
-    "low_relevance_goods": 1,
-    "vehicle": 21
+    "heavy_vehicle": 1,
+    "sanitary_goods": 1,
+    "vehicle": 17
   },
-  "fallback_count": 3,
-  "fallback_used": true,
-  "generated_at": "2026-07-21T17:33:01.316594+00:00",
+  "fallback_count": 0,
+  "fallback_used": false,
+  "generated_at": "2026-07-21T17:47:46.745448+00:00",
   "input_count": 25,
-  "low_relevance_omitted_count": 0,
-  "method": "strict target relevance with a small labelled discovery fallback; excluded listings never return; no financial values are invented",
-  "queue": [
-    {
-      "asking_price_nok": 110000.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "2023 LMC Tandero 500K Ny / Ubrukt - 4 sengeplasser - Fast dobbeltseng - WC Åndalsnes 32 bud 26m 59s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-612519",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5",
-        "fallback:best_non_excluded_candidate"
-      ],
-      "relevance_score": 5,
-      "status": "discovery_fallback",
-      "title": "2023 LMC Tandero 500K Ny / Ubrukt - 4 sengeplasser - Fast dobbeltseng - WC Åndalsnes 32 bud 26m 59s",
-      "url": "https://www.auksjonen.no/auksjon/campingvogn/2023_LMC_Tandero_500K__Ny__Ubrukt_-_4_sengeplasser_-_Fast_dobbeltseng_-_WC/612519"
-    },
-    {
-      "asking_price_nok": 31000.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "Kebony Radiata terrassebord, smooth 22x148mm / Ca. 700lm totalt Hønefoss 31 bud 26m 59s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-610944",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5",
-        "fallback:best_non_excluded_candidate"
-      ],
-      "relevance_score": 5,
-      "status": "discovery_fallback",
-      "title": "Kebony Radiata terrassebord, smooth 22x148mm / Ca. 700lm totalt Hønefoss 31 bud 26m 59s",
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Kebony_Radiata_terrassebord_smooth_22x148mm__Ca_700lm_totalt/610944"
-    },
-    {
-      "asking_price_nok": 4700.0,
-      "city": null,
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "Original litografi av Espolin Johnson – innrammet Sem 31 bud 4m 59s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-611959",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5",
-        "fallback:best_non_excluded_candidate"
-      ],
-      "relevance_score": 5,
-      "status": "discovery_fallback",
-      "title": "Original litografi av Espolin Johnson – innrammet Sem 31 bud 4m 59s",
-      "url": "https://www.auksjonen.no/auksjon/torget/Original_litografi_av_Espolin_Johnson__innrammet/611959"
-    }
-  ],
+  "low_relevance_omitted_count": 6,
+  "method": "strict target-category relevance; fallback accepts only explicit target matches; unrelated listings are omitted; no financial values are invented",
+  "queue": [],
   "review_first_count": 0,
-  "schema_version": 4,
-  "selected_count": 3,
+  "schema_version": 5,
+  "selected_count": 0,
   "source_snapshot": "data/todays_opportunities.json"
 }
