@@ -1,0 +1,31 @@
+{
+  "alert_count": 0,
+  "alerts": [],
+  "alerts_path": "data/smart_alerts.json",
+  "buy_count": 0,
+  "deduplicated_count": 0,
+  "discovery_by_id": {},
+  "duplicate_count": 0,
+  "duplicate_groups_merged": 0,
+  "extracted_count": 0,
+  "fetched_count": 0,
+  "generated_at": "2026-07-21T07:09:13.423595+00:00",
+  "history_path": "data/price_history.json",
+  "intelligence_by_id": {},
+  "keyword": null,
+  "monitor_count": 0,
+  "reject_count": 0,
+  "report_date": "2026-07-21",
+  "rows": [],
+  "schema_version": 12,
+  "source": "Auksjonen public listings + authorized FINN/Konkurskupp/Bjarøy/Konkurs.app feeds when configured",
+  "source_errors": {},
+  "sources": {
+    "Auksjonen.no": 0
+  },
+  "summary_lines": [
+    "الفرص: 0 — شراء: 0، مراقبة: 0، رفض: 0.",
+    "لا توجد فرص قابلة للعرض اليوم."
+  ],
+  "total_count": 0
+}
