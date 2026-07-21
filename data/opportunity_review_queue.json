@@ -1,46 +1,17 @@
 {
-  "excluded_count": 4,
+  "excluded_count": 5,
   "excluded_summary": {
     "generic_unspecified_lot": 2,
+    "plumbing_goods": 1,
     "vehicle": 2
   },
-  "generated_at": "2026-07-21T13:14:07.123702+00:00",
+  "generated_at": "2026-07-21T16:46:05.117638+00:00",
   "input_count": 25,
   "low_relevance_omitted_count": 20,
   "method": "strict target-category relevance; low-relevance listings are omitted and no resale values or costs are invented",
-  "queue": [
-    {
-      "asking_price_nok": 4600.0,
-      "city": "rg",
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "4stk 150x60x200, 800kg komplette lager reoler! Helt nye! Garasjereoler Tønsberg 27 bud 5m 53s",
-      "matched_target_terms": [
-        "reol"
-      ],
-      "opportunity_id": "unified-auksjonen-613336",
-      "priority": 2,
-      "reasons": [
-        "target:reol+9",
-        "asking_price_present+5",
-        "location_present+3"
-      ],
-      "relevance_score": 17,
-      "status": "review_if_capacity",
-      "title": "4stk 150x60x200, 800kg komplette lager reoler! Helt nye! Garasjereoler Tønsberg 27 bud 5m 53s",
-      "url": "https://www.auksjonen.no/auksjon/torget/4stk_150x60x200_800kg_komplette_lager_reoler_Helt_nye_Garasjereoler/613336"
-    }
-  ],
+  "queue": [],
   "review_first_count": 0,
   "schema_version": 3,
-  "selected_count": 1,
+  "selected_count": 0,
   "source_snapshot": "data/todays_opportunities.json"
 }
