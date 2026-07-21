@@ -1,9 +1,109 @@
 {
-  "evaluation_count": 0,
-  "evaluations": [],
-  "evidence_required_count": 0,
+  "evaluation_count": 3,
+  "evaluations": [
+    {
+      "asking_price_nok": 133000.0,
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "evidence": {
+        "auction_fee_nok": null,
+        "dismantling_cost_nok": null,
+        "market_comparables_nok": [],
+        "other_costs_nok": null,
+        "repair_cost_nok": null,
+        "storage_cost_nok": null,
+        "transport_cost_nok": null,
+        "vat_nok": null
+      },
+      "expected_profit_nok": null,
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-612467",
+      "priority": 3,
+      "roi_percent": null,
+      "title": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/campingvogn/2003_Elnagh_Campingbil/612467"
+    },
+    {
+      "asking_price_nok": 69000.0,
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "evidence": {
+        "auction_fee_nok": null,
+        "dismantling_cost_nok": null,
+        "market_comparables_nok": [],
+        "other_costs_nok": null,
+        "repair_cost_nok": null,
+        "storage_cost_nok": null,
+        "transport_cost_nok": null,
+        "vat_nok": null
+      },
+      "expected_profit_nok": null,
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-605929",
+      "priority": 3,
+      "roi_percent": null,
+      "title": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Skoda_Superb_LAURIN__KLEMENT_20_TDI_190HK_4X4_ACC_HENGERFESTE_VARMER_SKINN_PANO_KAMERA_NAVI_/605929"
+    },
+    {
+      "asking_price_nok": 270000.0,
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "evidence": {
+        "auction_fee_nok": null,
+        "dismantling_cost_nok": null,
+        "market_comparables_nok": [],
+        "other_costs_nok": null,
+        "repair_cost_nok": null,
+        "storage_cost_nok": null,
+        "transport_cost_nok": null,
+        "vat_nok": null
+      },
+      "expected_profit_nok": null,
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-607137",
+      "priority": 3,
+      "roi_percent": null,
+      "title": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2021_Audi_e-tron_55_SPORTBACK_QUATTRO_ACC_LUFT_HENGERFESTE_PANO_MATRIX_360-KAMERA_/607137"
+    }
+  ],
+  "evidence_required_count": 3,
   "evidence_source": "data/opportunity_evidence.json",
-  "generated_at": "2026-07-21T16:55:48.398662+00:00",
+  "generated_at": "2026-07-21T17:04:18.135015+00:00",
   "method": "verified-evidence-gated conservative economics; missing values remain null and block recommendations",
   "ready_for_numeric_review_count": 0,
   "schema_version": 2,

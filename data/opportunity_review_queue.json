@@ -1,17 +1,99 @@
 {
-  "excluded_count": 5,
+  "excluded_count": 1,
   "excluded_summary": {
-    "generic_unspecified_lot": 2,
-    "plumbing_goods": 1,
-    "vehicle": 2
+    "plumbing_goods": 1
   },
-  "generated_at": "2026-07-21T16:55:48.240916+00:00",
+  "fallback_count": 3,
+  "fallback_used": true,
+  "generated_at": "2026-07-21T17:04:17.971864+00:00",
   "input_count": 25,
-  "low_relevance_omitted_count": 20,
-  "method": "strict target-category relevance; low-relevance listings are omitted and no resale values or costs are invented",
-  "queue": [],
+  "low_relevance_omitted_count": 21,
+  "method": "strict target relevance with a small labelled discovery fallback; excluded listings never return; no financial values are invented",
+  "queue": [
+    {
+      "asking_price_nok": 133000.0,
+      "city": "l Røn",
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
+      "matched_target_terms": [],
+      "opportunity_id": "unified-auksjonen-612467",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5",
+        "location_present+3",
+        "fallback:best_non_excluded_candidate"
+      ],
+      "relevance_score": 8,
+      "status": "discovery_fallback",
+      "title": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
+      "url": "https://www.auksjonen.no/auksjon/campingvogn/2003_Elnagh_Campingbil/612467"
+    },
+    {
+      "asking_price_nok": 69000.0,
+      "city": "Sem",
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
+      "matched_target_terms": [],
+      "opportunity_id": "unified-auksjonen-605929",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5",
+        "location_present+3",
+        "fallback:best_non_excluded_candidate"
+      ],
+      "relevance_score": 8,
+      "status": "discovery_fallback",
+      "title": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Skoda_Superb_LAURIN__KLEMENT_20_TDI_190HK_4X4_ACC_HENGERFESTE_VARMER_SKINN_PANO_KAMERA_NAVI_/605929"
+    },
+    {
+      "asking_price_nok": 270000.0,
+      "city": "Oslo",
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
+      "matched_target_terms": [],
+      "opportunity_id": "unified-auksjonen-607137",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5",
+        "location_present+3",
+        "fallback:best_non_excluded_candidate"
+      ],
+      "relevance_score": 8,
+      "status": "discovery_fallback",
+      "title": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2021_Audi_e-tron_55_SPORTBACK_QUATTRO_ACC_LUFT_HENGERFESTE_PANO_MATRIX_360-KAMERA_/607137"
+    }
+  ],
   "review_first_count": 0,
-  "schema_version": 3,
-  "selected_count": 0,
+  "schema_version": 4,
+  "selected_count": 3,
   "source_snapshot": "data/todays_opportunities.json"
 }

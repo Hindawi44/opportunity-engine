@@ -1,9 +1,124 @@
 {
-  "generated_at": "2026-07-21T16:55:48.289649+00:00",
+  "generated_at": "2026-07-21T17:04:18.021634+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
-  "search_required_count": 0,
+  "search_required_count": 3,
   "source_queue": "data/opportunity_review_queue.json",
-  "task_count": 0,
-  "tasks": []
+  "task_count": 3,
+  "tasks": [
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 133000.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2003+Elnagh+Campingbil+R%C3%B8n+76+bud+1m+15s",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=2003+Elnagh+Campingbil+R%C3%B8n+76+bud+1m+15s",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=2003+Elnagh+Campingbil+R%C3%B8n+76+bud+1m+15s+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
+      "opportunity_id": "unified-auksjonen-612467",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/campingvogn/2003_Elnagh_Campingbil/612467",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    },
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 69000.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+41+bud+26m+42s",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+41+bud+26m+42s",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+41+bud+26m+42s+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
+      "opportunity_id": "unified-auksjonen-605929",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Skoda_Superb_LAURIN__KLEMENT_20_TDI_190HK_4X4_ACC_HENGERFESTE_VARMER_SKINN_PANO_KAMERA_NAVI_/605929",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    },
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 270000.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2021+Audi+e-tron+55+SPORTBACK+QUATTRO+ACC+LUFT+HENGERFESTE+PANO+MATRIX+360-KAMERA+Oslo+36+bud+28m+42s",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=2021+Audi+e-tron+55+SPORTBACK+QUATTRO+ACC+LUFT+HENGERFESTE+PANO+MATRIX+360-KAMERA+Oslo+36+bud+28m+42s",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=2021+Audi+e-tron+55+SPORTBACK+QUATTRO+ACC+LUFT+HENGERFESTE+PANO+MATRIX+360-KAMERA+Oslo+36+bud+28m+42s+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
+      "opportunity_id": "unified-auksjonen-607137",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/bruktbil/2021_Audi_e-tron_55_SPORTBACK_QUATTRO_ACC_LUFT_HENGERFESTE_PANO_MATRIX_360-KAMERA_/607137",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    }
+  ]
 }
