@@ -1,4 +1,15 @@
-from scripts.build_opportunity_review_queue import classify
+from __future__ import annotations
+
+import importlib.util
+from pathlib import Path
+
+
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "build_opportunity_review_queue.py"
+SPEC = importlib.util.spec_from_file_location("build_opportunity_review_queue", SCRIPT_PATH)
+assert SPEC is not None and SPEC.loader is not None
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+classify = MODULE.classify
 
 
 def test_used_car_url_is_excluded_even_without_vehicle_word_in_title() -> None:
