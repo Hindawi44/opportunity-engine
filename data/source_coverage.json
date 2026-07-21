@@ -1,9 +1,9 @@
 {
-  "active_source_count": 1,
-  "configured_source_count": 1,
-  "generated_at": "2026-07-21T19:16:40.134657+00:00",
-  "policy": "Only public category pages or explicitly authorized APIs/feeds are used; no access controls are bypassed.",
-  "schema_version": 1,
+  "active_source_count": 2,
+  "configured_source_count": 2,
+  "generated_at": "2026-07-21T20:56:50.876381+00:00",
+  "policy": "Only public documented endpoints, public category pages, or explicitly authorized APIs/feeds are used; no access controls are bypassed and no mass harvesting is performed.",
+  "schema_version": 2,
   "sources": [
     {
       "access_mode": "public_direct_category_pages",
@@ -46,12 +46,13 @@
       "source": "Bjarøy"
     },
     {
-      "access_mode": "authorized_feed",
-      "active": false,
-      "configured": false,
-      "required_configuration": [
-        "KONKURS_APP_FEED_URL"
-      ],
+      "access_mode": "limited_public_api",
+      "active": true,
+      "authorized_feed_override": false,
+      "configured": true,
+      "coverage": "one recent active page per pipeline run",
+      "note": "Discovery leads only; the public API does not prove that assets are offered for sale.",
+      "page_size": 25,
       "source": "Konkurs.app"
     }
   ]
