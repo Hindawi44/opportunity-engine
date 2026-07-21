@@ -36,7 +36,7 @@ jobs:
         run: python scripts/run_daily_pipeline.py --output data/todays_opportunities.json
       - name: Commit changed snapshot
         run: |
-          if git diff --quiet -- data/todays_opportunities.json; then
+          if [ -z "$(git status --porcelain -- data/todays_opportunities.json)" ]; then
             echo "No dashboard changes"
             exit 0
           fi
