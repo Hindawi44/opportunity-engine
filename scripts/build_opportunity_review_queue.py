@@ -2,8 +2,8 @@
 """Build a conservative manual-review queue from the daily snapshot.
 
 Clearly unsuitable categories are excluded. Strong target-category matches are
-preferred. When none exist, a small, explicitly labelled discovery fallback is
-kept so downstream evidence collection does not stop completely.
+preferred. When none exist, fallback may keep only weak matches that still belong
+to an explicit target category. Unrelated listings never enter the queue.
 """
 
 from __future__ import annotations
@@ -41,8 +41,6 @@ EXCLUDE_TERMS = {
     "magnetic water": "specialized_technical", "batteri": "low_relevance_goods",
 }
 
-# Auksjonen category paths are more reliable than titles. Vehicle titles often
-# contain only make/model names and would otherwise leak into discovery fallback.
 URL_CATEGORY_EXCLUSIONS = {
     "/auksjon/bruktbil/": "vehicle",
     "/auksjon/lastebil_og_henger/": "heavy_vehicle",
@@ -149,16 +147,14 @@ def classify(row: dict[str, object]) -> dict[str, object]:
 
 
 def _fallback_items(low_relevance: list[dict[str, object]], count: int) -> list[dict[str, object]]:
-    candidates = sorted(
-        low_relevance,
-        key=lambda item: (-int(item["relevance_score"]), str(item["title"])),
-    )
+    candidates = [item for item in low_relevance if item.get("matched_target_terms")]
+    candidates.sort(key=lambda item: (-int(item["relevance_score"]), str(item["title"])))
     selected: list[dict[str, object]] = []
     for original in candidates[: max(count, 0)]:
         item = dict(original)
         item["status"] = "discovery_fallback"
         item["priority"] = 3
-        item["reasons"] = [*list(item["reasons"]), "fallback:best_non_excluded_candidate"]
+        item["reasons"] = [*list(item["reasons"]), "fallback:weak_target_category_candidate"]
         selected.append(item)
     return selected
 
@@ -189,10 +185,10 @@ def main() -> int:
         fallback_used = bool(selected)
 
     payload = {
-        "schema_version": 4,
+        "schema_version": 5,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_snapshot": args.snapshot,
-        "method": "strict target relevance with a small labelled discovery fallback; excluded listings never return; no financial values are invented",
+        "method": "strict target-category relevance; fallback accepts only explicit target matches; unrelated listings are omitted; no financial values are invented",
         "input_count": len(classified),
         "selected_count": len(selected),
         "excluded_count": len(excluded),
