@@ -25,9 +25,37 @@ REQUIRED_FIELDS = (
 
 
 def _number(value: object) -> float | None:
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and value >= 0:
         return float(value)
     return None
+
+
+def _evidence_records(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        return {}
+    records = payload.get("evidence", payload)
+    return records if isinstance(records, dict) else {}
+
+
+def _verified_comparable_prices(supplied: dict[str, object]) -> list[float]:
+    structured = supplied.get("market_comparables")
+    if isinstance(structured, list):
+        prices: list[float] = []
+        for item in structured:
+            if not isinstance(item, dict) or item.get("verified") is not True:
+                continue
+            source = str(item.get("source") or "").strip()
+            url = str(item.get("url") or "").strip()
+            price = _number(item.get("price_nok"))
+            if source and url.startswith("https://") and price is not None and price > 0:
+                prices.append(price)
+        return prices
+
+    # Backwards compatibility for already-created evidence files.
+    legacy = supplied.get("market_comparables_nok")
+    if isinstance(legacy, list):
+        return [float(value) for value in legacy if _number(value) is not None]
+    return []
 
 
 def _evaluate(item: dict[str, object], evidence: dict[str, object]) -> dict[str, object]:
@@ -35,13 +63,7 @@ def _evaluate(item: dict[str, object], evidence: dict[str, object]) -> dict[str,
     supplied = evidence.get(opportunity_id)
     supplied = supplied if isinstance(supplied, dict) else {}
 
-    comparables = supplied.get("market_comparables_nok")
-    valid_comparables = (
-        [float(value) for value in comparables if _number(value) is not None]
-        if isinstance(comparables, list)
-        else []
-    )
-
+    valid_comparables = _verified_comparable_prices(supplied)
     values: dict[str, object] = {
         "market_comparables_nok": valid_comparables,
         **{field: _number(supplied.get(field)) for field in REQUIRED_FIELDS[1:]},
@@ -104,17 +126,20 @@ def main() -> int:
         raise ValueError("review queue must be a list")
 
     evidence_path = Path(args.evidence)
-    evidence = json.loads(evidence_path.read_text(encoding="utf-8")) if evidence_path.exists() else {}
-    if not isinstance(evidence, dict):
-        raise ValueError("evidence must be an object keyed by opportunity_id")
+    evidence_payload = (
+        json.loads(evidence_path.read_text(encoding="utf-8"))
+        if evidence_path.exists()
+        else {}
+    )
+    evidence = _evidence_records(evidence_payload)
 
     evaluations = [_evaluate(item, evidence) for item in queue if isinstance(item, dict)]
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_queue": args.queue,
         "evidence_source": args.evidence,
-        "method": "evidence-gated conservative economics; missing values remain null and block recommendations",
+        "method": "verified-evidence-gated conservative economics; missing values remain null and block recommendations",
         "evaluation_count": len(evaluations),
         "ready_for_numeric_review_count": sum(item["decision"] == "REVIEW_NUMBERS" for item in evaluations),
         "evidence_required_count": sum(item["decision"] == "EVIDENCE_REQUIRED" for item in evaluations),
