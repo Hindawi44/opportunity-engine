@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Build a conservative manual-review queue from the daily opportunity snapshot.
 
-This stage does not invent resale values or operating costs. It only removes
-clearly unsuitable categories and ranks the remaining listings for evidence
-collection (market comparables, transport, VAT, fees, and condition).
+This stage does not invent resale values or operating costs. It removes clearly
+unsuitable categories and requires concrete resale relevance before a listing can
+reach the review queue.
 """
 
 from __future__ import annotations
@@ -15,60 +15,70 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 TARGET_TERMS = {
-    "butikkinnredning": 18,
-    "butikk": 10,
-    "inventar": 14,
-    "innredning": 12,
-    "reol": 10,
-    "hylle": 9,
-    "disk": 9,
-    "prøverom": 15,
-    "klesstativ": 14,
-    "stativ": 6,
-    "kontormøbler": 14,
-    "kontor": 8,
-    "skrivebord": 10,
-    "kontorstol": 10,
+    "butikkinnredning": 24,
+    "butikk inventar": 22,
+    "butikkinventar": 22,
+    "prøverom": 20,
+    "klesstativ": 18,
+    "mannekeng": 18,
+    "utstillingsstativ": 16,
+    "salgsdisk": 16,
+    "butikkdisk": 16,
+    "varelager": 18,
+    "tekstil": 16,
+    "klær": 16,
+    "brudekjole": 18,
+    "symaskin": 18,
+    "industrisymaskin": 22,
+    "kontormøbler": 17,
+    "skrivebord": 13,
+    "kontorstol": 13,
+    "arkivskap": 13,
+    "lagerreol": 15,
+    "pallereol": 15,
+    "reol": 9,
+    "hylle": 8,
     "skap": 7,
-    "bord": 6,
-    "stol": 5,
-    "lager": 7,
-    "varelager": 15,
-    "parti": 8,
-    "overskudd": 12,
-    "tekstil": 13,
-    "klær": 13,
-    "kjole": 10,
-    "brudekjole": 16,
-    "symaskin": 15,
-    "industrisymaskin": 18,
-    "mannekeng": 12,
-    "utstillings": 8,
 }
 
 EXCLUDE_TERMS = {
-    "bil": "vehicle",
     "varebil": "vehicle",
     "lastebil": "heavy_vehicle",
+    "personbil": "vehicle",
     "traktor": "heavy_equipment",
     "gravemaskin": "heavy_equipment",
     "hjullaster": "heavy_equipment",
     "tilhenger": "vehicle_equipment",
     "båt": "vehicle",
+    "jetski": "vehicle",
     "motorsykkel": "vehicle",
-    "motor": "complex_mechanical",
     "generator": "complex_technical",
     "kompressor": "complex_technical",
     "sveis": "complex_technical",
     "industrirobot": "complex_technical",
+    "gassmåler": "specialized_technical",
+    "øyedusj": "specialized_technical",
+    "dørhåndtak": "low_relevance_goods",
+    "lamper": "low_relevance_goods",
+    "ledrør": "low_relevance_goods",
+}
+
+GENERIC_ONLY_TERMS = {
+    "parti",
+    "overskudd",
+    "overskuddsmateriell",
+    "forskjellig",
+    "diverse",
+    "ingen minstepris",
 }
 
 GENERIC_PENALTIES = {
-    "kabel": 8,
-    "reservedel": 7,
-    "batteri": 5,
-    "verktøy": 4,
-    "elektronikk": 4,
+    "kabel": 10,
+    "reservedel": 9,
+    "batteri": 7,
+    "verktøy": 6,
+    "elektronikk": 6,
+    "monteringsutstyr": 6,
 }
 
 
@@ -82,13 +92,15 @@ def classify(row: dict[str, object]) -> dict[str, object]:
     reasons: list[str] = []
     exclusions: list[str] = []
     score = 0
+    matched_targets: list[str] = []
 
     for term, reason in EXCLUDE_TERMS.items():
-        if re.search(rf"\b{re.escape(term)}\w*", normalized):
+        if term in normalized:
             exclusions.append(reason)
 
     for term, points in TARGET_TERMS.items():
         if term in normalized:
+            matched_targets.append(term)
             score += points
             reasons.append(f"target:{term}+{points}")
 
@@ -96,6 +108,11 @@ def classify(row: dict[str, object]) -> dict[str, object]:
         if term in normalized:
             score -= penalty
             reasons.append(f"generic:{term}-{penalty}")
+
+    generic_matches = sorted(term for term in GENERIC_ONLY_TERMS if term in normalized)
+    if generic_matches and not matched_targets:
+        exclusions.append("generic_unspecified_lot")
+        reasons.append("generic lot without a concrete target category")
 
     asking_price = row.get("asking_price_nok")
     if isinstance(asking_price, (int, float)) and asking_price > 0:
@@ -114,10 +131,10 @@ def classify(row: dict[str, object]) -> dict[str, object]:
     if exclusions:
         status = "excluded"
         priority = 0
-    elif score >= 20:
+    elif score >= 22:
         status = "review_first"
         priority = 1
-    elif score >= 8:
+    elif score >= 12:
         status = "review_if_capacity"
         priority = 2
     else:
@@ -135,6 +152,7 @@ def classify(row: dict[str, object]) -> dict[str, object]:
         "priority": priority,
         "relevance_score": max(score, 0),
         "reasons": reasons,
+        "matched_target_terms": matched_targets,
         "exclusion_reasons": sorted(set(exclusions)),
         "evidence_needed": [
             "three_verified_market_comparables",
@@ -152,7 +170,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Build a conservative opportunity review queue")
     parser.add_argument("--snapshot", default="data/todays_opportunities.json")
     parser.add_argument("--output", default="data/opportunity_review_queue.json")
-    parser.add_argument("--limit", type=int, default=12)
+    parser.add_argument("--limit", type=int, default=8)
     args = parser.parse_args()
 
     snapshot = json.loads(Path(args.snapshot).read_text(encoding="utf-8"))
@@ -167,10 +185,10 @@ def main() -> int:
 
     selected = included[: max(args.limit, 1)]
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_snapshot": args.snapshot,
-        "method": "keyword relevance and explicit exclusion rules; no resale values or costs are invented",
+        "method": "strict concrete-category relevance and explicit exclusion rules; no resale values or costs are invented",
         "input_count": len(classified),
         "selected_count": len(selected),
         "excluded_count": len(excluded),
