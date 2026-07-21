@@ -48,11 +48,13 @@ jobs:
         run: python scripts/build_opportunity_evidence_registry.py --queue data/opportunity_review_queue.json --existing data/opportunity_evidence.json --output data/opportunity_evidence.json
       - name: Build evidence-gated economic evaluation queue
         run: python scripts/build_economic_evaluation_queue.py --queue data/opportunity_review_queue.json --evidence data/opportunity_evidence.json --output data/economic_evaluation_queue.json
-      - name: Build top five opportunity report
+      - name: Build top five actionable opportunity report
         run: python scripts/build_top5_opportunity_report.py --queue data/opportunity_review_queue.json --evaluations data/economic_evaluation_queue.json --output data/top5_opportunities.json --limit 5
+      - name: Build separated sale and bankruptcy channels
+        run: python scripts/build_opportunity_channels_report.py --actionable data/top5_opportunities.json --output data/opportunity_channels.json --limit 5
       - name: Commit changed snapshots
         run: |
-          FILES="data/source_coverage.json data/todays_opportunities.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json"
+          FILES="data/source_coverage.json data/todays_opportunities.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json"
           if [ -z "$(git status --porcelain -- $FILES)" ]; then
             echo "No opportunity data changes"
             exit 0
