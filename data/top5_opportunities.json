@@ -1,16 +1,16 @@
 {
   "candidate_count": 3,
-  "generated_at": "2026-07-21T19:07:50.733115+00:00",
+  "generated_at": "2026-07-21T19:16:47.124092+00:00",
   "method": "transparent operational ranking; verified economics only; missing values are never invented",
   "schema_version": 1,
   "top_count": 3,
   "top_opportunities": [
     {
       "asking_price_nok": 2900.0,
-      "city": null,
+      "city": "Tønsberg",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
-      "ends_at": null,
+      "ends_at": "1784810640000",
       "evidence_needed": [
         "three_verified_market_comparables",
         "auction_fee",
@@ -38,7 +38,7 @@
         "vat_nok"
       ],
       "opportunity_id": "unified-auksjonen-611253",
-      "opportunity_score": 49,
+      "opportunity_score": 59,
       "priority": 1,
       "reasons": [
         "target:lagerreol+15",
@@ -52,22 +52,22 @@
         "relevance:29/35",
         "priority:15/15",
         "asking_price:5/5",
-        "location:0/5",
-        "deadline:0/5",
+        "location:5/5",
+        "deadline:5/5",
         "evidence:0/20",
         "verified_economics:0/15"
       ],
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 29 bud 1d 17t 36m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 29 bud 1d 17t 27m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
     },
     {
       "asking_price_nok": 14000.0,
-      "city": null,
+      "city": "Kristiansand s",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
-      "ends_at": null,
+      "ends_at": "1784746800000",
       "evidence_needed": [
         "three_verified_market_comparables",
         "auction_fee",
@@ -94,7 +94,7 @@
         "vat_nok"
       ],
       "opportunity_id": "unified-auksjonen-612667",
-      "opportunity_score": 43,
+      "opportunity_score": 53,
       "priority": 1,
       "reasons": [
         "target:varelager+18",
@@ -107,22 +107,22 @@
         "relevance:23/35",
         "priority:15/15",
         "asking_price:5/5",
-        "location:0/5",
-        "deadline:0/5",
+        "location:5/5",
+        "deadline:5/5",
         "evidence:0/20",
         "verified_economics:0/15"
       ],
       "status": "review_first",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 13 bud 23t 52m 13s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 13 bud 23t 43m 18s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
     },
     {
       "asking_price_nok": 0.0,
-      "city": null,
+      "city": "Mathopen",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
-      "ends_at": null,
+      "ends_at": "1785517560000",
       "evidence_needed": [
         "three_verified_market_comparables",
         "auction_fee",
@@ -150,7 +150,7 @@
         "vat_nok"
       ],
       "opportunity_id": "unified-auksjonen-610671",
-      "opportunity_score": 33,
+      "opportunity_score": 43,
       "priority": 2,
       "reasons": [
         "target:skap+7",
@@ -164,13 +164,13 @@
         "relevance:19/35",
         "priority:9/15",
         "asking_price:5/5",
-        "location:0/5",
-        "deadline:0/5",
+        "location:5/5",
+        "deadline:5/5",
         "evidence:0/20",
         "verified_economics:0/15"
       ],
       "status": "review_if_capacity",
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 0 bud 9d 21t 58m",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 0 bud 9d 21t 49m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
     }
