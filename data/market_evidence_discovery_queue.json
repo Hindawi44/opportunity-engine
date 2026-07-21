@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T17:04:18.021634+00:00",
+  "generated_at": "2026-07-21T17:15:43.206014+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
   "search_required_count": 3,
@@ -15,33 +15,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 133000.0,
+      "asking_price_nok": 105000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2003+Elnagh+Campingbil+R%C3%B8n+76+bud+1m+15s",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2017+Mercedes-Benz+GLC+350+E+320+HK+4MATIC+AUT+HENGERFESTE+ACC+NAVI+360-KAMERA+Oslo+96+bud+27m+17s",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=2003+Elnagh+Campingbil+R%C3%B8n+76+bud+1m+15s",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=2017+Mercedes-Benz+GLC+350+E+320+HK+4MATIC+AUT+HENGERFESTE+ACC+NAVI+360-KAMERA+Oslo+96+bud+27m+17s",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=2003+Elnagh+Campingbil+R%C3%B8n+76+bud+1m+15s+pris+Norge",
+          "search_url": "https://www.google.com/search?q=2017+Mercedes-Benz+GLC+350+E+320+HK+4MATIC+AUT+HENGERFESTE+ACC+NAVI+360-KAMERA+Oslo+96+bud+27m+17s+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
-      "opportunity_id": "unified-auksjonen-612467",
-      "opportunity_url": "https://www.auksjonen.no/auksjon/campingvogn/2003_Elnagh_Campingbil/612467",
+      "market_search_query": "2017 Mercedes-Benz GLC 350 E 320 HK 4MATIC AUT HENGERFESTE ACC NAVI 360-KAMERA Oslo 96 bud 27m 17s",
+      "opportunity_id": "unified-auksjonen-564945",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Mercedes-Benz_GLC_350_E_320_HK_4MATIC_AUT_HENGERFESTE_ACC_NAVI_360-KAMERA_/564945",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
+      "title": "2017 Mercedes-Benz GLC 350 E 320 HK 4MATIC AUT HENGERFESTE ACC NAVI 360-KAMERA Oslo 96 bud 27m 17s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -53,33 +53,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 69000.0,
+      "asking_price_nok": 70000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+41+bud+26m+42s",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+42+bud+15m+17s",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+41+bud+26m+42s",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+42+bud+15m+17s",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+41+bud+26m+42s+pris+Norge",
+          "search_url": "https://www.google.com/search?q=2017+Skoda+Superb+LAURIN+%26+KLEMENT+2%2C0+TDI+190HK+4X4+ACC+HENGERFESTE+VARMER+SKINN+PANO+KAMERA+NAVI+Sem+42+bud+15m+17s+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
+      "market_search_query": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 42 bud 15m 17s",
       "opportunity_id": "unified-auksjonen-605929",
       "opportunity_url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Skoda_Superb_LAURIN__KLEMENT_20_TDI_190HK_4X4_ACC_HENGERFESTE_VARMER_SKINN_PANO_KAMERA_NAVI_/605929",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
+      "title": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 42 bud 15m 17s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -91,33 +91,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 270000.0,
+      "asking_price_nok": 57000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2021+Audi+e-tron+55+SPORTBACK+QUATTRO+ACC+LUFT+HENGERFESTE+PANO+MATRIX+360-KAMERA+Oslo+36+bud+28m+42s",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2017+Volkswagen+Caddy+Maxi+2%2C0+TDI+122+HK+4MOTION+HENGERFESTE+KAMERA+CRUISE+Sem+57+bud+26m+17s",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=2021+Audi+e-tron+55+SPORTBACK+QUATTRO+ACC+LUFT+HENGERFESTE+PANO+MATRIX+360-KAMERA+Oslo+36+bud+28m+42s",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=2017+Volkswagen+Caddy+Maxi+2%2C0+TDI+122+HK+4MOTION+HENGERFESTE+KAMERA+CRUISE+Sem+57+bud+26m+17s",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=2021+Audi+e-tron+55+SPORTBACK+QUATTRO+ACC+LUFT+HENGERFESTE+PANO+MATRIX+360-KAMERA+Oslo+36+bud+28m+42s+pris+Norge",
+          "search_url": "https://www.google.com/search?q=2017+Volkswagen+Caddy+Maxi+2%2C0+TDI+122+HK+4MOTION+HENGERFESTE+KAMERA+CRUISE+Sem+57+bud+26m+17s+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
-      "opportunity_id": "unified-auksjonen-607137",
-      "opportunity_url": "https://www.auksjonen.no/auksjon/bruktbil/2021_Audi_e-tron_55_SPORTBACK_QUATTRO_ACC_LUFT_HENGERFESTE_PANO_MATRIX_360-KAMERA_/607137",
+      "market_search_query": "2017 Volkswagen Caddy Maxi 2,0 TDI 122 HK 4MOTION HENGERFESTE KAMERA CRUISE Sem 57 bud 26m 17s",
+      "opportunity_id": "unified-auksjonen-602909",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Volkswagen_Caddy_Maxi_20_TDI_122_HK_4MOTION_HENGERFESTE_KAMERA_CRUISE_/602909",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
+      "title": "2017 Volkswagen Caddy Maxi 2,0 TDI 122 HK 4MOTION HENGERFESTE KAMERA CRUISE Sem 57 bud 26m 17s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]

@@ -1,71 +1,18 @@
 {
-  "excluded_count": 1,
+  "excluded_count": 2,
   "excluded_summary": {
+    "low_relevance_goods": 1,
     "plumbing_goods": 1
   },
   "fallback_count": 3,
   "fallback_used": true,
-  "generated_at": "2026-07-21T17:04:17.971864+00:00",
+  "generated_at": "2026-07-21T17:15:43.154017+00:00",
   "input_count": 25,
-  "low_relevance_omitted_count": 21,
+  "low_relevance_omitted_count": 20,
   "method": "strict target relevance with a small labelled discovery fallback; excluded listings never return; no financial values are invented",
   "queue": [
     {
-      "asking_price_nok": 133000.0,
-      "city": "l Røn",
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-612467",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5",
-        "location_present+3",
-        "fallback:best_non_excluded_candidate"
-      ],
-      "relevance_score": 8,
-      "status": "discovery_fallback",
-      "title": "2003 Elnagh Campingbil Røn 76 bud 1m 15s",
-      "url": "https://www.auksjonen.no/auksjon/campingvogn/2003_Elnagh_Campingbil/612467"
-    },
-    {
-      "asking_price_nok": 69000.0,
-      "city": "Sem",
-      "ends_at": null,
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
-      "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-605929",
-      "priority": 3,
-      "reasons": [
-        "asking_price_present+5",
-        "location_present+3",
-        "fallback:best_non_excluded_candidate"
-      ],
-      "relevance_score": 8,
-      "status": "discovery_fallback",
-      "title": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 41 bud 26m 42s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Skoda_Superb_LAURIN__KLEMENT_20_TDI_190HK_4X4_ACC_HENGERFESTE_VARMER_SKINN_PANO_KAMERA_NAVI_/605929"
-    },
-    {
-      "asking_price_nok": 270000.0,
+      "asking_price_nok": 105000.0,
       "city": "Oslo",
       "ends_at": null,
       "evidence_needed": [
@@ -77,9 +24,9 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
+      "market_search_query": "2017 Mercedes-Benz GLC 350 E 320 HK 4MATIC AUT HENGERFESTE ACC NAVI 360-KAMERA Oslo 96 bud 27m 17s",
       "matched_target_terms": [],
-      "opportunity_id": "unified-auksjonen-607137",
+      "opportunity_id": "unified-auksjonen-564945",
       "priority": 3,
       "reasons": [
         "asking_price_present+5",
@@ -88,8 +35,62 @@
       ],
       "relevance_score": 8,
       "status": "discovery_fallback",
-      "title": "2021 Audi e-tron 55 SPORTBACK QUATTRO ACC LUFT HENGERFESTE PANO MATRIX 360-KAMERA Oslo 36 bud 28m 42s",
-      "url": "https://www.auksjonen.no/auksjon/bruktbil/2021_Audi_e-tron_55_SPORTBACK_QUATTRO_ACC_LUFT_HENGERFESTE_PANO_MATRIX_360-KAMERA_/607137"
+      "title": "2017 Mercedes-Benz GLC 350 E 320 HK 4MATIC AUT HENGERFESTE ACC NAVI 360-KAMERA Oslo 96 bud 27m 17s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Mercedes-Benz_GLC_350_E_320_HK_4MATIC_AUT_HENGERFESTE_ACC_NAVI_360-KAMERA_/564945"
+    },
+    {
+      "asking_price_nok": 70000.0,
+      "city": "Sem",
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 42 bud 15m 17s",
+      "matched_target_terms": [],
+      "opportunity_id": "unified-auksjonen-605929",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5",
+        "location_present+3",
+        "fallback:best_non_excluded_candidate"
+      ],
+      "relevance_score": 8,
+      "status": "discovery_fallback",
+      "title": "2017 Skoda Superb LAURIN & KLEMENT 2,0 TDI 190HK 4X4 ACC HENGERFESTE VARMER SKINN PANO KAMERA NAVI Sem 42 bud 15m 17s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Skoda_Superb_LAURIN__KLEMENT_20_TDI_190HK_4X4_ACC_HENGERFESTE_VARMER_SKINN_PANO_KAMERA_NAVI_/605929"
+    },
+    {
+      "asking_price_nok": 57000.0,
+      "city": "Sem",
+      "ends_at": null,
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2017 Volkswagen Caddy Maxi 2,0 TDI 122 HK 4MOTION HENGERFESTE KAMERA CRUISE Sem 57 bud 26m 17s",
+      "matched_target_terms": [],
+      "opportunity_id": "unified-auksjonen-602909",
+      "priority": 3,
+      "reasons": [
+        "asking_price_present+5",
+        "location_present+3",
+        "fallback:best_non_excluded_candidate"
+      ],
+      "relevance_score": 8,
+      "status": "discovery_fallback",
+      "title": "2017 Volkswagen Caddy Maxi 2,0 TDI 122 HK 4MOTION HENGERFESTE KAMERA CRUISE Sem 57 bud 26m 17s",
+      "url": "https://www.auksjonen.no/auksjon/bruktbil/2017_Volkswagen_Caddy_Maxi_20_TDI_122_HK_4MOTION_HENGERFESTE_KAMERA_CRUISE_/602909"
     }
   ],
   "review_first_count": 0,
