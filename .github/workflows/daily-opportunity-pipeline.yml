@@ -36,14 +36,16 @@ jobs:
         run: python scripts/run_daily_pipeline.py --output data/todays_opportunities.json
       - name: Diagnose empty Auksjonen result
         run: python scripts/annotate_auksjonen_diagnostics.py --snapshot data/todays_opportunities.json
-      - name: Commit changed snapshot
+      - name: Build conservative review queue
+        run: python scripts/build_opportunity_review_queue.py --snapshot data/todays_opportunities.json --output data/opportunity_review_queue.json --limit 12
+      - name: Commit changed snapshots
         run: |
-          if [ -z "$(git status --porcelain -- data/todays_opportunities.json)" ]; then
-            echo "No dashboard changes"
+          if [ -z "$(git status --porcelain -- data/todays_opportunities.json data/opportunity_review_queue.json)" ]; then
+            echo "No dashboard or review queue changes"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/todays_opportunities.json
-          git commit -m "Update today's opportunity snapshot"
+          git add data/todays_opportunities.json data/opportunity_review_queue.json
+          git commit -m "Update daily opportunity snapshots"
           git push
