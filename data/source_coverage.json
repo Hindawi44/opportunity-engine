@@ -1,0 +1,58 @@
+{
+  "active_source_count": 1,
+  "configured_source_count": 1,
+  "generated_at": "2026-07-21T18:42:23.414152+00:00",
+  "policy": "Only public category pages or explicitly authorized APIs/feeds are used; no access controls are bypassed.",
+  "schema_version": 1,
+  "sources": [
+    {
+      "access_mode": "public_direct_category_pages",
+      "active": true,
+      "configured": true,
+      "coverage": [
+        "vareparti-og-konkursbo",
+        "overskuddsvarer",
+        "interior-kontor-innredning",
+        "varelager"
+      ],
+      "source": "Auksjonen.no"
+    },
+    {
+      "access_mode": "authorized_api_only",
+      "active": false,
+      "configured": false,
+      "required_configuration": [
+        "FINN_API_KEY",
+        "FINN_ORG_ID"
+      ],
+      "source": "FINN.no"
+    },
+    {
+      "access_mode": "authorized_feed",
+      "active": false,
+      "configured": false,
+      "required_configuration": [
+        "KONKURSKUPP_FEED_URL"
+      ],
+      "source": "Konkurskupp"
+    },
+    {
+      "access_mode": "authorized_feed",
+      "active": false,
+      "configured": false,
+      "required_configuration": [
+        "BJAROY_FEED_URL"
+      ],
+      "source": "Bjarøy"
+    },
+    {
+      "access_mode": "authorized_feed",
+      "active": false,
+      "configured": false,
+      "required_configuration": [
+        "KONKURS_APP_FEED_URL"
+      ],
+      "source": "Konkurs.app"
+    }
+  ]
+}
