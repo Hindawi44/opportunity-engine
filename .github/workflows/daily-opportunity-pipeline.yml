@@ -38,16 +38,18 @@ jobs:
         run: python scripts/annotate_auksjonen_diagnostics.py --snapshot data/todays_opportunities.json
       - name: Build conservative review queue
         run: python scripts/build_opportunity_review_queue.py --snapshot data/todays_opportunities.json --output data/opportunity_review_queue.json --limit 12
+      - name: Validate and synchronize economic evidence registry
+        run: python scripts/build_opportunity_evidence_registry.py --queue data/opportunity_review_queue.json --existing data/opportunity_evidence.json --output data/opportunity_evidence.json
       - name: Build evidence-gated economic evaluation queue
         run: python scripts/build_economic_evaluation_queue.py --queue data/opportunity_review_queue.json --evidence data/opportunity_evidence.json --output data/economic_evaluation_queue.json
       - name: Commit changed snapshots
         run: |
-          if [ -z "$(git status --porcelain -- data/todays_opportunities.json data/opportunity_review_queue.json data/economic_evaluation_queue.json)" ]; then
+          if [ -z "$(git status --porcelain -- data/todays_opportunities.json data/opportunity_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json)" ]; then
             echo "No opportunity data changes"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/todays_opportunities.json data/opportunity_review_queue.json data/economic_evaluation_queue.json
+          git add data/todays_opportunities.json data/opportunity_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json
           git commit -m "Update daily opportunity snapshots"
           git push
