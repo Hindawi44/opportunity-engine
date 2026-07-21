@@ -34,6 +34,8 @@ jobs:
           python-version: "3.11"
       - name: Generate today's opportunities
         run: python scripts/run_daily_pipeline.py --output data/todays_opportunities.json
+      - name: Diagnose empty Auksjonen result
+        run: python scripts/annotate_auksjonen_diagnostics.py --snapshot data/todays_opportunities.json
       - name: Commit changed snapshot
         run: |
           if [ -z "$(git status --porcelain -- data/todays_opportunities.json)" ]; then
