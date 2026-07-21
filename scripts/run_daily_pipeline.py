@@ -7,8 +7,9 @@ import argparse
 import json
 import os
 from pathlib import Path
+from urllib.parse import urljoin
 
-from opportunity_engine.ods.auksjonen import AuksjonenClient
+from opportunity_engine.ods.auksjonen import AuksjonenClient, parse_auksjonen_listing_page
 from opportunity_engine.ods.bjaroy import BjaroyFeedClient
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
 from opportunity_engine.ods.finn import FinnApiClient
@@ -19,20 +20,23 @@ from opportunity_engine.ods.real_cost import RealCostInputs
 from opportunity_engine.ods.snapshot_alerts import SnapshotAlertProcessor
 
 
-DEFAULT_AUKSJONEN_DISCOVERY_QUERIES = (
-    "butikkinnredning",
-    "butikkinventar",
-    "varelager",
-    "lagerreol",
-    "kontormøbler",
-    "arbeidsbord",
-    "tekstil",
-    "symaskin",
+# Discovery Engine v2: read the public category pages directly. The former ?q=
+# searches could return the vehicle-heavy general catalogue even when a target
+# keyword was supplied, so they are no longer used for the default discovery run.
+DEFAULT_AUKSJONEN_DISCOVERY_PATHS = (
+    "/auksjoner/torget/vareparti-og-konkursbo",
+    "/auksjoner/overskuddsvarer/vareparti-og-konkursbo",
+    "/auksjoner/interior_kontor-innredning",
+    "/auksjoner/varelager",
 )
 
 
 class TargetedAuksjonenClient(AuksjonenClient):
-    """Prefer several business-opportunity searches over the vehicle-heavy front page."""
+    """Collect directly from business-opportunity category pages.
+
+    An explicit keyword still uses AuksjonenClient.search for manual diagnostics.
+    The normal daily run never falls back to the general /auksjoner/ page.
+    """
 
     def search(self, *, keyword: str | None = None):
         if keyword and keyword.strip():
@@ -40,8 +44,10 @@ class TargetedAuksjonenClient(AuksjonenClient):
 
         documents = []
         seen: set[str] = set()
-        for query in DEFAULT_AUKSJONEN_DISCOVERY_QUERIES:
-            for document in super().search(keyword=query):
+        for path in DEFAULT_AUKSJONEN_DISCOVERY_PATHS:
+            url = urljoin(f"{self.base_url}/", path.lstrip("/"))
+            html = self.transport(url, self.timeout, self.headers)
+            for document in parse_auksjonen_listing_page(html, base_url=self.base_url):
                 if document.document_id in seen:
                     continue
                 seen.add(document.document_id)

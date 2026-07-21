@@ -11,10 +11,10 @@ assert spec.loader is not None
 spec.loader.exec_module(module)
 
 TargetedAuksjonenClient = module.TargetedAuksjonenClient
-DEFAULT_QUERIES = module.DEFAULT_AUKSJONEN_DISCOVERY_QUERIES
+DEFAULT_PATHS = module.DEFAULT_AUKSJONEN_DISCOVERY_PATHS
 
 
-def test_default_discovery_uses_targeted_queries_and_deduplicates() -> None:
+def test_default_discovery_uses_direct_category_pages_and_deduplicates() -> None:
     calls: list[str] = []
 
     def transport(url: str, timeout: float, headers: dict[str, str]) -> str:
@@ -32,8 +32,8 @@ def test_default_discovery_uses_targeted_queries_and_deduplicates() -> None:
 
     assert len(documents) == 1
     assert documents[0].document_id == "auksjonen-123456"
-    assert len(calls) == len(DEFAULT_QUERIES)
-    assert all("?q=" in url for url in calls)
+    assert calls == [f"https://www.auksjonen.no{path}" for path in DEFAULT_PATHS]
+    assert not any("?q=" in url for url in calls)
     assert not any(url.endswith("/auksjoner/") for url in calls)
 
 
