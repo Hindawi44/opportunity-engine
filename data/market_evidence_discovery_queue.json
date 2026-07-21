@@ -1,9 +1,124 @@
 {
-  "generated_at": "2026-07-21T18:24:48.515689+00:00",
+  "generated_at": "2026-07-21T18:35:42.923371+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
-  "search_required_count": 0,
+  "search_required_count": 3,
   "source_queue": "data/opportunity_review_queue.json",
-  "task_count": 0,
-  "tasks": []
+  "task_count": 3,
+  "tasks": [
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 2900.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+29+bud+1d",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+29+bud+1d",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+29+bud+1d+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 29 bud 1d",
+      "opportunity_id": "unified-auksjonen-611253",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 29 bud 1d 18t 8m",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    },
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 14000.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+13+bud+1d",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+13+bud+1d",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+13+bud+1d+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 13 bud 1d",
+      "opportunity_id": "unified-auksjonen-612667",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 13 bud 1d 0t 24m",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    },
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": null,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=10+stk+nye+Eskoleia+Garderobeskap+med+2+d%C3%B8rer+Mathopen+0+bud+9d",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=10+stk+nye+Eskoleia+Garderobeskap+med+2+d%C3%B8rer+Mathopen+0+bud+9d",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=10+stk+nye+Eskoleia+Garderobeskap+med+2+d%C3%B8rer+Mathopen+0+bud+9d+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 0 bud 9d",
+      "opportunity_id": "unified-auksjonen-610671",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 0 bud 9d 22t 30m",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    }
+  ]
 }
