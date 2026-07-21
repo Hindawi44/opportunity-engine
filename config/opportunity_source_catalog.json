@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "scope": "Norway first; Sweden and Denmark later",
+  "principles": [
+    "Use public pages, documented APIs, RSS/Atom feeds, or explicitly authorized feeds only",
+    "Never bypass login, robots controls, rate limits, or access restrictions",
+    "Deduplicate before scoring",
+    "Missing financial evidence must remain null"
+  ],
+  "sources": [
+    {
+      "id": "auksjonen_no",
+      "name": "Auksjonen.no",
+      "country": "NO",
+      "group": "auction",
+      "access_mode": "public_category_pages",
+      "status": "active",
+      "priority": 1,
+      "targets": ["bankruptcy_lots", "surplus_goods", "shop_fittings", "office_furniture", "warehouse_stock"]
+    },
+    {
+      "id": "finn_no",
+      "name": "FINN.no",
+      "country": "NO",
+      "group": "classifieds",
+      "access_mode": "authorized_api",
+      "status": "configuration_required",
+      "priority": 1,
+      "required_configuration": ["FINN_API_KEY", "FINN_ORG_ID"],
+      "targets": ["shop_fittings", "business_inventory", "textiles", "sewing_equipment", "office_furniture"]
+    },
+    {
+      "id": "konkurskupp",
+      "name": "Konkurskupp",
+      "country": "NO",
+      "group": "bankruptcy",
+      "access_mode": "public_or_authorized_feed",
+      "status": "configuration_required",
+      "priority": 1,
+      "required_configuration": ["KONKURSKUPP_FEED_URL"],
+      "targets": ["bankruptcy_lots", "company_inventory", "shop_fittings"]
+    },
+    {
+      "id": "konkurs_app",
+      "name": "Konkurs.app",
+      "country": "NO",
+      "group": "bankruptcy",
+      "access_mode": "public_or_authorized_feed",
+      "status": "configuration_required",
+      "priority": 1,
+      "required_configuration": ["KONKURS_APP_FEED_URL"],
+      "targets": ["bankruptcy_notices", "company_liquidations"]
+    },
+    {
+      "id": "bjaroy",
+      "name": "Bjarøy",
+      "country": "NO",
+      "group": "bankruptcy_asset_management",
+      "access_mode": "public_or_authorized_feed",
+      "status": "configuration_required",
+      "priority": 1,
+      "required_configuration": ["BJAROY_FEED_URL"],
+      "targets": ["bankruptcy_assets", "inventory", "commercial_fittings"]
+    },
+    {
+      "id": "municipal_sales_no",
+      "name": "Norwegian municipal asset sales",
+      "country": "NO",
+      "group": "public_sector",
+      "access_mode": "documented_public_feeds_or_pages",
+      "status": "planned",
+      "priority": 2,
+      "targets": ["office_furniture", "school_furniture", "storage", "commercial_equipment"]
+    },
+    {
+      "id": "police_customs_auctions_no",
+      "name": "Norwegian police and customs auctions",
+      "country": "NO",
+      "group": "public_sector",
+      "access_mode": "documented_public_feeds_or_pages",
+      "status": "planned",
+      "priority": 2,
+      "targets": ["confiscated_goods", "unclaimed_goods", "commercial_assets"]
+    },
+    {
+      "id": "bank_corporate_auctions_no",
+      "name": "Bank and corporate asset auctions",
+      "country": "NO",
+      "group": "corporate_liquidation",
+      "access_mode": "documented_public_feeds_or_authorized_access",
+      "status": "planned",
+      "priority": 2,
+      "targets": ["repossession_assets", "company_inventory", "commercial_equipment"]
+    },
+    {
+      "id": "facebook_marketplace",
+      "name": "Facebook Marketplace",
+      "country": "NO",
+      "group": "classifieds",
+      "access_mode": "official_api_or_user_supplied_export_only",
+      "status": "blocked_pending_supported_access",
+      "priority": 3,
+      "targets": ["shop_fittings", "inventory", "office_furniture"]
+    },
+    {
+      "id": "sweden_liquidation_network",
+      "name": "Swedish liquidation and auction network",
+      "country": "SE",
+      "group": "international_expansion",
+      "access_mode": "documented_public_feeds_or_authorized_access",
+      "status": "future",
+      "priority": 4,
+      "targets": ["bankruptcy_lots", "surplus_goods", "commercial_fittings"]
+    },
+    {
+      "id": "denmark_liquidation_network",
+      "name": "Danish liquidation and auction network",
+      "country": "DK",
+      "group": "international_expansion",
+      "access_mode": "documented_public_feeds_or_authorized_access",
+      "status": "future",
+      "priority": 4,
+      "targets": ["bankruptcy_lots", "surplus_goods", "commercial_fittings"]
+    }
+  ]
+}
