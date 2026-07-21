@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Build a conservative manual-review queue from the daily opportunity snapshot.
+"""Build a conservative manual-review queue from the daily snapshot.
 
-This stage does not invent resale values or operating costs. It removes clearly
-unsuitable categories and requires concrete resale relevance before a listing can
-reach the review queue.
+Clearly unsuitable categories are excluded. Strong target-category matches are
+preferred. When none exist, a small, explicitly labelled discovery fallback is
+kept so downstream evidence collection does not stop completely.
 """
 
 from __future__ import annotations
@@ -15,80 +15,39 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 TARGET_TERMS = {
-    "butikkinnredning": 24,
-    "butikk inventar": 22,
-    "butikkinventar": 22,
-    "prøverom": 20,
-    "klesstativ": 18,
-    "mannekeng": 18,
-    "utstillingsstativ": 16,
-    "salgsdisk": 16,
-    "butikkdisk": 16,
-    "varelager": 18,
-    "tekstil": 16,
-    "klær": 16,
-    "brudekjole": 18,
-    "symaskin": 18,
-    "industrisymaskin": 22,
-    "kontormøbler": 17,
-    "skrivebord": 13,
-    "kontorstol": 13,
-    "arkivskap": 13,
-    "lagerreol": 15,
-    "pallereol": 15,
-    "reol": 9,
-    "hylle": 8,
-    "skap": 7,
+    "butikkinnredning": 24, "butikk inventar": 22, "butikkinventar": 22,
+    "prøverom": 20, "klesstativ": 18, "mannekeng": 18,
+    "utstillingsstativ": 16, "salgsdisk": 16, "butikkdisk": 16,
+    "varelager": 18, "tekstil": 16, "klær": 16, "brudekjole": 18,
+    "symaskin": 18, "industrisymaskin": 22, "kontormøbler": 17,
+    "skrivebord": 13, "kontorstol": 13, "arkivskap": 13,
+    "lagerreol": 15, "pallereol": 15, "reol": 9, "hylle": 8, "skap": 7,
 }
 
 EXCLUDE_TERMS = {
-    "varebil": "vehicle",
-    "lastebil": "heavy_vehicle",
-    "personbil": "vehicle",
-    "traktor": "heavy_equipment",
-    "gravemaskin": "heavy_equipment",
-    "hjullaster": "heavy_equipment",
-    "tilhenger": "vehicle_equipment",
-    "båt": "vehicle",
-    "jetski": "vehicle",
-    "motorsykkel": "vehicle",
-    "generator": "complex_technical",
-    "kompressor": "complex_technical",
-    "sveis": "complex_technical",
-    "industrirobot": "complex_technical",
-    "gassmåler": "specialized_technical",
-    "øyedusj": "specialized_technical",
-    "dørhåndtak": "low_relevance_goods",
-    "lamper": "low_relevance_goods",
-    "ledrør": "low_relevance_goods",
-    "servantbatteri": "plumbing_goods",
-    "kjøkkenbatteri": "plumbing_goods",
-    "blandebatteri": "plumbing_goods",
-    "kran": "plumbing_goods",
-    "armatur": "plumbing_goods",
-    "toalett": "sanitary_goods",
-    "dusj": "sanitary_goods",
-    "water conditioner": "specialized_technical",
-    "vannbehandler": "specialized_technical",
-    "magnetic water": "specialized_technical",
-    "batteri": "low_relevance_goods",
+    "varebil": "vehicle", "lastebil": "heavy_vehicle", "personbil": "vehicle",
+    "traktor": "heavy_equipment", "gravemaskin": "heavy_equipment",
+    "hjullaster": "heavy_equipment", "tilhenger": "vehicle_equipment",
+    "båt": "vehicle", "jetski": "vehicle", "motorsykkel": "vehicle",
+    "generator": "complex_technical", "kompressor": "complex_technical",
+    "sveis": "complex_technical", "industrirobot": "complex_technical",
+    "gassmåler": "specialized_technical", "øyedusj": "specialized_technical",
+    "dørhåndtak": "low_relevance_goods", "lamper": "low_relevance_goods",
+    "ledrør": "low_relevance_goods", "servantbatteri": "plumbing_goods",
+    "kjøkkenbatteri": "plumbing_goods", "blandebatteri": "plumbing_goods",
+    "kran": "plumbing_goods", "armatur": "plumbing_goods",
+    "toalett": "sanitary_goods", "dusj": "sanitary_goods",
+    "water conditioner": "specialized_technical", "vannbehandler": "specialized_technical",
+    "magnetic water": "specialized_technical", "batteri": "low_relevance_goods",
 }
 
 GENERIC_ONLY_TERMS = {
-    "parti",
-    "overskudd",
-    "overskuddsmateriell",
-    "forskjellig",
-    "diverse",
-    "ingen minstepris",
+    "parti", "overskudd", "overskuddsmateriell", "forskjellig",
+    "diverse", "ingen minstepris",
 }
-
 GENERIC_PENALTIES = {
-    "kabel": 10,
-    "reservedel": 9,
-    "verktøy": 6,
-    "elektronikk": 6,
-    "monteringsutstyr": 6,
+    "kabel": 10, "reservedel": 9, "verktøy": 6,
+    "elektronikk": 6, "monteringsutstyr": 6,
 }
 
 
@@ -139,17 +98,13 @@ def classify(row: dict[str, object]) -> dict[str, object]:
         reasons.append("end_time_present+3")
 
     if exclusions:
-        status = "excluded"
-        priority = 0
+        status, priority = "excluded", 0
     elif score >= 22:
-        status = "review_first"
-        priority = 1
+        status, priority = "review_first", 1
     elif score >= 12:
-        status = "review_if_capacity"
-        priority = 2
+        status, priority = "review_if_capacity", 2
     else:
-        status = "low_relevance"
-        priority = 3
+        status, priority = "low_relevance", 3
 
     return {
         "opportunity_id": row.get("opportunity_id"),
@@ -165,15 +120,28 @@ def classify(row: dict[str, object]) -> dict[str, object]:
         "matched_target_terms": matched_targets,
         "exclusion_reasons": sorted(set(exclusions)),
         "evidence_needed": [
-            "three_verified_market_comparables",
-            "auction_fee",
-            "vat_status",
-            "transport_cost",
-            "dismantling_cost",
-            "condition_and_missing_parts",
+            "three_verified_market_comparables", "auction_fee", "vat_status",
+            "transport_cost", "dismantling_cost", "condition_and_missing_parts",
         ],
-        "market_search_query": re.sub(r"\s+(\d+\s+bud|\d+t\s+\d+m.*)$", "", title, flags=re.IGNORECASE).strip(),
+        "market_search_query": re.sub(
+            r"\s+(\d+\s+bud|\d+t\s+\d+m.*)$", "", title, flags=re.IGNORECASE
+        ).strip(),
     }
+
+
+def _fallback_items(low_relevance: list[dict[str, object]], count: int) -> list[dict[str, object]]:
+    candidates = sorted(
+        low_relevance,
+        key=lambda item: (-int(item["relevance_score"]), str(item["title"])),
+    )
+    selected: list[dict[str, object]] = []
+    for original in candidates[: max(count, 0)]:
+        item = dict(original)
+        item["status"] = "discovery_fallback"
+        item["priority"] = 3
+        item["reasons"] = [*list(item["reasons"]), "fallback:best_non_excluded_candidate"]
+        selected.append(item)
+    return selected
 
 
 def main() -> int:
@@ -181,6 +149,7 @@ def main() -> int:
     parser.add_argument("--snapshot", default="data/todays_opportunities.json")
     parser.add_argument("--output", default="data/opportunity_review_queue.json")
     parser.add_argument("--limit", type=int, default=8)
+    parser.add_argument("--fallback-limit", type=int, default=3)
     args = parser.parse_args()
 
     snapshot = json.loads(Path(args.snapshot).read_text(encoding="utf-8"))
@@ -189,25 +158,28 @@ def main() -> int:
         raise ValueError("snapshot rows must be a list")
 
     classified = [classify(row) for row in rows if isinstance(row, dict)]
-    included = [
-        item
-        for item in classified
-        if item["status"] in {"review_first", "review_if_capacity"}
-    ]
+    included = [item for item in classified if item["status"] in {"review_first", "review_if_capacity"}]
     included.sort(key=lambda item: (item["priority"], -item["relevance_score"], str(item["title"])))
     excluded = [item for item in classified if item["status"] == "excluded"]
     low_relevance = [item for item in classified if item["status"] == "low_relevance"]
 
     selected = included[: max(args.limit, 1)]
+    fallback_used = False
+    if not selected and low_relevance:
+        selected = _fallback_items(low_relevance, min(args.fallback_limit, max(args.limit, 1)))
+        fallback_used = bool(selected)
+
     payload = {
-        "schema_version": 3,
+        "schema_version": 4,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_snapshot": args.snapshot,
-        "method": "strict target-category relevance; low-relevance listings are omitted and no resale values or costs are invented",
+        "method": "strict target relevance with a small labelled discovery fallback; excluded listings never return; no financial values are invented",
         "input_count": len(classified),
         "selected_count": len(selected),
         "excluded_count": len(excluded),
-        "low_relevance_omitted_count": len(low_relevance),
+        "low_relevance_omitted_count": len(low_relevance) - (len(selected) if fallback_used else 0),
+        "fallback_used": fallback_used,
+        "fallback_count": len(selected) if fallback_used else 0,
         "review_first_count": sum(item["status"] == "review_first" for item in selected),
         "queue": selected,
         "excluded_summary": {
@@ -219,18 +191,11 @@ def main() -> int:
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(
-        json.dumps(
-            {
-                "input_count": len(classified),
-                "selected_count": len(selected),
-                "excluded_count": len(excluded),
-                "low_relevance_omitted_count": len(low_relevance),
-                "output": str(output),
-            },
-            ensure_ascii=False,
-        )
-    )
+    print(json.dumps({
+        "input_count": len(classified), "selected_count": len(selected),
+        "excluded_count": len(excluded), "fallback_used": fallback_used,
+        "output": str(output),
+    }, ensure_ascii=False))
     return 0
 
 
