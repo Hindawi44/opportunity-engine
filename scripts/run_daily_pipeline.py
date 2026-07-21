@@ -13,7 +13,7 @@ from opportunity_engine.ods.auksjonen import AuksjonenClient, parse_auksjonen_li
 from opportunity_engine.ods.bjaroy import BjaroyFeedClient
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
 from opportunity_engine.ods.finn import FinnApiClient
-from opportunity_engine.ods.konkurs_app import KonkursAppFeedClient
+from opportunity_engine.ods.konkurs_app import KonkursAppFeedClient, KonkursAppPublicApiClient
 from opportunity_engine.ods.konkurskupp import KonkurskuppFeedClient
 from opportunity_engine.ods.market_pricing import MarketComparable
 from opportunity_engine.ods.real_cost import RealCostInputs
@@ -96,10 +96,19 @@ def _bjaroy_client_from_environment() -> BjaroyFeedClient | None:
     return BjaroyFeedClient(feed_url=feed_url, token=token) if feed_url else None
 
 
-def _konkurs_app_client_from_environment() -> KonkursAppFeedClient | None:
+def _konkurs_app_client_from_environment() -> KonkursAppFeedClient | KonkursAppPublicApiClient:
+    """Prefer an operator feed; otherwise use one limited documented API request."""
+
     feed_url = os.getenv("KONKURS_APP_FEED_URL", "").strip()
     token = os.getenv("KONKURS_APP_FEED_TOKEN", "").strip() or None
-    return KonkursAppFeedClient(feed_url=feed_url, token=token) if feed_url else None
+    if feed_url:
+        return KonkursAppFeedClient(feed_url=feed_url, token=token)
+    page_size_text = os.getenv("KONKURS_APP_PAGE_SIZE", "25").strip() or "25"
+    try:
+        page_size = int(page_size_text)
+    except ValueError as exc:
+        raise RuntimeError("KONKURS_APP_PAGE_SIZE must be an integer") from exc
+    return KonkursAppPublicApiClient(page_size=page_size)
 
 
 def main() -> int:

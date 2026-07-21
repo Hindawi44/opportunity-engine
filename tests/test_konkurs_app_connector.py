@@ -3,7 +3,11 @@ import json
 import pytest
 
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
-from opportunity_engine.ods.konkurs_app import KonkursAppFeedClient, parse_konkurs_app_feed
+from opportunity_engine.ods.konkurs_app import (
+    KonkursAppFeedClient,
+    KonkursAppPublicApiClient,
+    parse_konkurs_app_feed,
+)
 
 
 PAYLOAD = {
@@ -48,6 +52,49 @@ def test_authorized_feed_is_normalized() -> None:
     assert documents[0].metadata["current_price_nok"] == 15000.0
     assert documents[0].metadata["organization_number"] == "999888777"
     assert documents[0].metadata["access_mode"] == "authorized_feed"
+    assert documents[0].metadata["lead_only"] is False
+
+
+def test_public_api_builds_one_limited_recent_request_and_normalizes_leads() -> None:
+    captured = {}
+    payload = {
+        "data": [
+            {
+                "orgnr": "938074259",
+                "navn": "CHILL AS KONKURSBO",
+                "debitor_navn": "CHILL AS",
+                "debitor_orgnr": "925111222",
+                "stiftelsesdato": "2026-07-09",
+                "kommune": "Namsos",
+                "naeringskode": "47.710",
+                "naeringsbeskrivelse": "Butikkhandel med klær",
+                "debitor_aktivitet": "Salg av klær og tekstiler",
+                "bostyrer": "Adv. Eksempel",
+            }
+        ],
+        "pagination": {"page": 1, "size": 25, "total": 1, "totalPages": 1},
+    }
+
+    def transport(url, timeout, headers):
+        captured["url"] = url
+        return json.dumps(payload).encode("utf-8")
+
+    client = KonkursAppPublicApiClient(page_size=25, transport=transport)
+    documents = client.fetch()
+
+    assert "page=1" in captured["url"]
+    assert "size=25" in captured["url"]
+    assert "status=aktive" in captured["url"]
+    assert len(documents) == 1
+    document = documents[0]
+    assert document.document_id == "konkurs-app-938074259"
+    assert document.source_type == "bankruptcy_discovery_lead"
+    assert document.url == "https://konkurs.app/konkursbo/938074259"
+    assert document.metadata["city"] == "Namsos"
+    assert document.metadata["industry_description"] == "Butikkhandel med klær"
+    assert document.metadata["access_mode"] == "public_api"
+    assert document.metadata["lead_only"] is True
+    assert document.metadata["current_price_nok"] is None
 
 
 def test_pipeline_combines_authorized_konkurs_app_feed(tmp_path) -> None:
@@ -70,6 +117,10 @@ def test_pipeline_combines_authorized_konkurs_app_feed(tmp_path) -> None:
 def test_invalid_json_and_insecure_feed_are_rejected() -> None:
     with pytest.raises(ValueError):
         KonkursAppFeedClient(feed_url="http://unsafe.example/feed")
+    with pytest.raises(ValueError):
+        KonkursAppPublicApiClient(base_url="http://unsafe.example/api")
+    with pytest.raises(ValueError):
+        KonkursAppPublicApiClient(page_size=101)
     with pytest.raises(RuntimeError):
         parse_konkurs_app_feed("not-json")
 
