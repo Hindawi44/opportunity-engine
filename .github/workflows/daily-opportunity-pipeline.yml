@@ -53,6 +53,8 @@ jobs:
         run: python scripts/build_market_evidence_discovery_queue.py --queue data/opportunity_review_queue.json --output data/market_evidence_discovery_queue.json
       - name: Collect market price candidates
         run: python scripts/collect_market_price_candidates.py --queue data/opportunity_review_queue.json --output data/market_price_candidates.json --limit 5 --results-per-query 10
+      - name: Build conservative market evidence registry
+        run: python scripts/build_market_evidence_registry.py --input data/market_price_candidates.json --output data/market_evidence_registry.json --review-output data/market_evidence_review_queue.json
       - name: Validate and synchronize economic evidence registry
         run: python scripts/build_opportunity_evidence_registry.py --queue data/opportunity_review_queue.json --existing data/opportunity_evidence.json --output data/opportunity_evidence.json
       - name: Build evidence-gated economic evaluation queue
@@ -67,7 +69,7 @@ jobs:
         run: python scripts/build_source_expansion_status.py
       - name: Commit changed snapshots
         run: |
-          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/web_search_results.json data/discovery_leads.json data/todays_opportunities.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/market_price_candidates.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json"
+          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/web_search_results.json data/discovery_leads.json data/todays_opportunities.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/market_price_candidates.json data/market_evidence_registry.json data/market_evidence_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json"
           if [ -z "$(git status --porcelain -- $FILES)" ]; then
             echo "No opportunity data changes"
             exit 0
