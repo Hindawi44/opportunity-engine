@@ -71,6 +71,7 @@ def main() -> int:
             "--discovery", "data/discovery_leads.json",
             "--scored", "data/scored_opportunities.json",
             "--existing", "data/opportunity_registry.json",
+            "--audit", "data/cross_source_deduplication_audit.json",
             "--output", "data/opportunity_registry.json",
         ], root)
         if registry_exit != 0:
