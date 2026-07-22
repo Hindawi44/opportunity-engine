@@ -1,0 +1,494 @@
+{
+  "alerts": {
+    "alerts": [],
+    "last_scoring_alert_count": 0,
+    "last_scoring_run": "2026-07-22T17:44:36.356848+00:00",
+    "schema_version": 2,
+    "signatures": []
+  },
+  "channels": {
+    "actionable_opportunities": {
+      "candidate_count": 3,
+      "items": [],
+      "top_count": 0
+    },
+    "bankruptcy_leads": {
+      "fetched_count": 25,
+      "items": [
+        {
+          "asking_price_nok": null,
+          "bankruptcy_date": "2026-07-22T00:00:00",
+          "channel": "bankruptcy_lead",
+          "city": "NAMSOS",
+          "description": "Salg av dameklær og andre varer som faller naturlig inn under dette.",
+          "expected_profit_nok": null,
+          "industry_code": "47.710",
+          "industry_description": "Detaljhandel med klær",
+          "lead_id": "konkurs-app-938143978",
+          "lead_score": 39,
+          "organization_number": "938143978",
+          "roi_percent": null,
+          "score_reasons": [
+            "target:klær+16",
+            "target:handel+8",
+            "location_present+5",
+            "organization_number_present+5",
+            "trustee_present+5"
+          ],
+          "source": "Konkurs.app",
+          "status": "FOLLOW_UP_LEAD",
+          "title": "ANNA J AS",
+          "trustee": "Adv. Nils Christian Sudbø Brandzæg",
+          "url": "https://konkurs.app/konkursbo/938143978",
+          "warning": "Discovery lead only; assets and sale availability are not confirmed."
+        },
+        {
+          "asking_price_nok": null,
+          "bankruptcy_date": "2026-07-22T00:00:00",
+          "channel": "bankruptcy_lead",
+          "city": "SKIEN",
+          "description": "Handelsvirksomhet engros med brann- og annet redningstøy til nødetater. Handelsvirksomhet engros med rednings- og beskyttelsesutstyr til nødetater. Annet som naturlig sammenfaller med dette. Samt deltakelse i andre selskaper, investeringer og nærliggende virksomhet.",
+          "expected_profit_nok": null,
+          "industry_code": "47.710",
+          "industry_description": "Detaljhandel med klær",
+          "lead_id": "konkurs-app-938143617",
+          "lead_score": 39,
+          "organization_number": "938143617",
+          "roi_percent": null,
+          "score_reasons": [
+            "target:klær+16",
+            "target:handel+8",
+            "location_present+5",
+            "organization_number_present+5",
+            "trustee_present+5"
+          ],
+          "source": "Konkurs.app",
+          "status": "FOLLOW_UP_LEAD",
+          "title": "ELEVEN POINTS AS",
+          "trustee": "Adv. Bjørn Dyrland",
+          "url": "https://konkurs.app/konkursbo/938143617",
+          "warning": "Discovery lead only; assets and sale availability are not confirmed."
+        },
+        {
+          "asking_price_nok": null,
+          "bankruptcy_date": "2026-07-22T00:00:00",
+          "channel": "bankruptcy_lead",
+          "city": "ULLENSAKER",
+          "description": "Salg av interiør og møbler. Personlig innredning, workshops, kafé og private eventer.",
+          "expected_profit_nok": null,
+          "industry_code": "47.559",
+          "industry_description": "Detaljhandel med innredningsartikler ikke nevnt annet sted",
+          "lead_id": "konkurs-app-938138451",
+          "lead_score": 35,
+          "organization_number": "938138451",
+          "roi_percent": null,
+          "score_reasons": [
+            "target:møbler+12",
+            "target:handel+8",
+            "location_present+5",
+            "organization_number_present+5",
+            "trustee_present+5"
+          ],
+          "source": "Konkurs.app",
+          "status": "FOLLOW_UP_LEAD",
+          "title": "CEBRA AS",
+          "trustee": "Adv. Ellen Dorthea Tangen Eilerås",
+          "url": "https://konkurs.app/konkursbo/938138451",
+          "warning": "Discovery lead only; assets and sale availability are not confirmed."
+        },
+        {
+          "asking_price_nok": null,
+          "bankruptcy_date": "2026-07-22T00:00:00",
+          "channel": "bankruptcy_lead",
+          "city": "VADSØ",
+          "description": "Å utvikle, markedsføre, informere om og selge tjenester som fremmer turisme- og reiselivsnæringen i Varanger-regionen. Salg, formidling og pakking av sammensatte reiselivsprodukter og tjenester. Tilby markedsføringsløsninger for de regionale reiselivsbedriftene. Formålet er å utvikle Varanger-regionen. Selskapet ønsker å fremme Arktisk turisme og destinasjonsutvikling.",
+          "expected_profit_nok": null,
+          "industry_code": "79.901",
+          "industry_description": "Aktiviteter utført av turistkontorer og destinasjonsselskaper",
+          "lead_id": "konkurs-app-938140553",
+          "lead_score": 25,
+          "organization_number": "938140553",
+          "roi_percent": null,
+          "score_reasons": [
+            "target:kontor+10",
+            "location_present+5",
+            "organization_number_present+5",
+            "trustee_present+5"
+          ],
+          "source": "Konkurs.app",
+          "status": "FOLLOW_UP_LEAD",
+          "title": "VISIT VARANGER ARCTIC NORWAY AS",
+          "trustee": "Adv. Hilde C. Stærk",
+          "url": "https://konkurs.app/konkursbo/938140553",
+          "warning": "Discovery lead only; assets and sale availability are not confirmed."
+        },
+        {
+          "asking_price_nok": null,
+          "bankruptcy_date": "2026-07-21T00:00:00",
+          "channel": "bankruptcy_lead",
+          "city": "STEINKJER",
+          "description": "Oppsøkende salgsvirksomhet samt konsulent oppdrag på vegne av andre virksomheter.",
+          "expected_profit_nok": null,
+          "industry_code": "47.920",
+          "industry_description": "Formidlingstjenester tilknyttet detaljhandel med spesialisert vareutvalg",
+          "lead_id": "konkurs-app-938135428",
+          "lead_score": 23,
+          "organization_number": "938135428",
+          "roi_percent": null,
+          "score_reasons": [
+            "target:handel+8",
+            "location_present+5",
+            "organization_number_present+5",
+            "trustee_present+5"
+          ],
+          "source": "Konkurs.app",
+          "status": "FOLLOW_UP_LEAD",
+          "title": "EVRE AS",
+          "trustee": "Adv. Bertil Vilhelm Smalås",
+          "url": "https://konkurs.app/konkursbo/938135428",
+          "warning": "Discovery lead only; assets and sale availability are not confirmed."
+        }
+      ],
+      "top_count": 5
+    },
+    "generated_at": "2026-07-22T17:44:36.850434+00:00",
+    "method": "sale listings and bankruptcy discovery leads are ranked in separate channels; no financial values are invented",
+    "schema_version": 1,
+    "source_funnel": {
+      "actionable_candidates": 3,
+      "actionable_selected": 0,
+      "bankruptcy_leads_fetched": 25,
+      "bankruptcy_leads_selected": 5
+    }
+  },
+  "generated_at": "2026-07-22T17:44:36.922593+00:00",
+  "opportunities": {
+    "actionable_count": 0,
+    "candidate_count": 3,
+    "generated_at": "2026-07-22T17:44:36.387096+00:00",
+    "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
+    "schema_version": 2,
+    "top_count": 0,
+    "top_opportunities": []
+  },
+  "schema_version": 2,
+  "scoring": {
+    "actionable_count": 0,
+    "buy_review_count": 0,
+    "candidate_count": 3,
+    "generated_at": "2026-07-22T17:44:36.356848+00:00",
+    "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
+    "monitor_count": 0,
+    "opportunities": [
+      {
+        "asking_price_nok": 26000.0,
+        "city": "Kristiansand s",
+        "conservative_resale_value_nok": null,
+        "decision": "EVIDENCE_REQUIRED",
+        "ends_at": "1784746800000",
+        "evidence_needed": [
+          "three_verified_market_comparables",
+          "auction_fee",
+          "vat_status",
+          "transport_cost",
+          "dismantling_cost",
+          "condition_and_missing_parts"
+        ],
+        "exclusion_reasons": [],
+        "expected_profit_nok": null,
+        "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud",
+        "matched_target_terms": [
+          "varelager"
+        ],
+        "maximum_safe_bid_nok": null,
+        "missing_evidence": [
+          "auction_fee_nok",
+          "dismantling_cost_nok",
+          "other_costs_nok",
+          "repair_cost_nok",
+          "storage_cost_nok",
+          "three_verified_market_comparables",
+          "transport_cost_nok",
+          "vat_nok"
+        ],
+        "opportunity_id": "unified-auksjonen-612667",
+        "opportunity_score": 33.61,
+        "priority": 1,
+        "reasons": [
+          "target:varelager+18",
+          "asking_price_present+5"
+        ],
+        "recommendation": "REJECT",
+        "recommendation_ar": "رفض",
+        "relevance_score": 23,
+        "requires_human_approval": false,
+        "roi_percent": null,
+        "score_components": {
+          "evidence": 0.0,
+          "listing_quality": 8.61,
+          "logistics": 10.0,
+          "marketability": 15.0,
+          "verified_economics": 0.0
+        },
+        "score_grade": "E",
+        "score_reasons": [
+          "verified_economics:0/35",
+          "evidence_completeness:0.0/15",
+          "verified_comparables:0.0/10",
+          "marketability:15.0/15",
+          "logistics:10.0/10",
+          "relevance:1.6/7",
+          "listing_fields:7.0/8",
+          "evidence_gate:EVIDENCE_REQUIRED"
+        ],
+        "status": "review_first",
+        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 1t 15m 43s",
+        "total_cost_nok": null,
+        "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
+      },
+      {
+        "asking_price_nok": 6100.0,
+        "city": "Tønsberg",
+        "conservative_resale_value_nok": null,
+        "decision": "EVIDENCE_REQUIRED",
+        "ends_at": "1784810640000",
+        "evidence_needed": [
+          "three_verified_market_comparables",
+          "auction_fee",
+          "vat_status",
+          "transport_cost",
+          "dismantling_cost",
+          "condition_and_missing_parts"
+        ],
+        "exclusion_reasons": [],
+        "expected_profit_nok": null,
+        "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud",
+        "matched_target_terms": [
+          "lagerreol",
+          "reol"
+        ],
+        "maximum_safe_bid_nok": null,
+        "missing_evidence": [
+          "auction_fee_nok",
+          "dismantling_cost_nok",
+          "other_costs_nok",
+          "repair_cost_nok",
+          "storage_cost_nok",
+          "three_verified_market_comparables",
+          "transport_cost_nok",
+          "vat_nok"
+        ],
+        "opportunity_id": "unified-auksjonen-611253",
+        "opportunity_score": 28.03,
+        "priority": 1,
+        "reasons": [
+          "target:lagerreol+15",
+          "target:reol+9",
+          "asking_price_present+5"
+        ],
+        "recommendation": "REJECT",
+        "recommendation_ar": "رفض",
+        "relevance_score": 29,
+        "requires_human_approval": false,
+        "roi_percent": null,
+        "score_components": {
+          "evidence": 0.0,
+          "listing_quality": 9.03,
+          "logistics": 10.0,
+          "marketability": 9.0,
+          "verified_economics": 0.0
+        },
+        "score_grade": "E",
+        "score_reasons": [
+          "verified_economics:0/35",
+          "evidence_completeness:0.0/15",
+          "verified_comparables:0.0/10",
+          "marketability:9.0/15",
+          "logistics:10.0/10",
+          "relevance:2.0/7",
+          "listing_fields:7.0/8",
+          "evidence_gate:EVIDENCE_REQUIRED"
+        ],
+        "status": "review_first",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 59m 41s",
+        "total_cost_nok": null,
+        "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
+      },
+      {
+        "asking_price_nok": 100.0,
+        "city": "Lierstranda",
+        "conservative_resale_value_nok": null,
+        "decision": "EVIDENCE_REQUIRED",
+        "ends_at": "1785438000000",
+        "evidence_needed": [
+          "three_verified_market_comparables",
+          "auction_fee",
+          "vat_status",
+          "transport_cost",
+          "dismantling_cost",
+          "condition_and_missing_parts"
+        ],
+        "exclusion_reasons": [],
+        "expected_profit_nok": null,
+        "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d",
+        "matched_target_terms": [
+          "reol"
+        ],
+        "maximum_safe_bid_nok": null,
+        "missing_evidence": [
+          "auction_fee_nok",
+          "dismantling_cost_nok",
+          "other_costs_nok",
+          "repair_cost_nok",
+          "storage_cost_nok",
+          "three_verified_market_comparables",
+          "transport_cost_nok",
+          "vat_nok"
+        ],
+        "opportunity_id": "unified-auksjonen-613169",
+        "opportunity_score": 23.98,
+        "priority": 2,
+        "reasons": [
+          "target:reol+9",
+          "asking_price_present+5"
+        ],
+        "recommendation": "REJECT",
+        "recommendation_ar": "رفض",
+        "relevance_score": 14,
+        "requires_human_approval": false,
+        "roi_percent": null,
+        "score_components": {
+          "evidence": 0.0,
+          "listing_quality": 7.98,
+          "logistics": 7.0,
+          "marketability": 9.0,
+          "verified_economics": 0.0
+        },
+        "score_grade": "E",
+        "score_reasons": [
+          "verified_economics:0/35",
+          "evidence_completeness:0.0/15",
+          "verified_comparables:0.0/10",
+          "marketability:9.0/15",
+          "logistics:7.0/10",
+          "relevance:1.0/7",
+          "listing_fields:7.0/8",
+          "evidence_gate:EVIDENCE_REQUIRED"
+        ],
+        "status": "review_if_capacity",
+        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 1t 15m",
+        "total_cost_nok": null,
+        "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
+      }
+    ],
+    "reject_count": 3,
+    "schema_version": 1
+  },
+  "scoring_history_path": "data/scoring_history.json",
+  "source_funnel": {
+    "generated_at": "2026-07-22T17:44:36.893760+00:00",
+    "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
+    "schema_version": 2,
+    "sources": [
+      {
+        "access_mode": "public_direct_category_pages",
+        "actionable_selected": 0,
+        "active": true,
+        "bankruptcy_leads_selected": 0,
+        "configured": true,
+        "error": null,
+        "fetched": 51,
+        "note": null,
+        "public_auction_event_leads_selected": 0,
+        "required_configuration": [],
+        "source": "Auksjonen.no",
+        "status": "collecting"
+      },
+      {
+        "access_mode": "official_public_page",
+        "actionable_selected": 0,
+        "active": true,
+        "bankruptcy_leads_selected": 0,
+        "configured": true,
+        "error": null,
+        "fetched": 2,
+        "note": "Event-discovery leads only; specific lots, dates and sale availability must be verified from official announcements.",
+        "public_auction_event_leads_selected": 2,
+        "required_configuration": [],
+        "source": "Politiet.no",
+        "status": "collecting"
+      },
+      {
+        "access_mode": "authorized_api_only",
+        "actionable_selected": 0,
+        "active": false,
+        "bankruptcy_leads_selected": 0,
+        "configured": false,
+        "error": null,
+        "fetched": 0,
+        "note": null,
+        "public_auction_event_leads_selected": 0,
+        "required_configuration": [
+          "FINN_API_KEY",
+          "FINN_ORG_ID"
+        ],
+        "source": "FINN.no",
+        "status": "awaiting_authorized_configuration"
+      },
+      {
+        "access_mode": "authorized_feed",
+        "actionable_selected": 0,
+        "active": false,
+        "bankruptcy_leads_selected": 0,
+        "configured": false,
+        "error": null,
+        "fetched": 0,
+        "note": null,
+        "public_auction_event_leads_selected": 0,
+        "required_configuration": [
+          "KONKURSKUPP_FEED_URL"
+        ],
+        "source": "Konkurskupp",
+        "status": "awaiting_authorized_configuration"
+      },
+      {
+        "access_mode": "authorized_feed",
+        "actionable_selected": 0,
+        "active": false,
+        "bankruptcy_leads_selected": 0,
+        "configured": false,
+        "error": null,
+        "fetched": 0,
+        "note": null,
+        "public_auction_event_leads_selected": 0,
+        "required_configuration": [
+          "BJAROY_FEED_URL"
+        ],
+        "source": "Bjarøy",
+        "status": "awaiting_authorized_configuration"
+      },
+      {
+        "access_mode": "limited_public_api",
+        "actionable_selected": 0,
+        "active": true,
+        "bankruptcy_leads_selected": 5,
+        "configured": true,
+        "error": null,
+        "fetched": 25,
+        "note": "Discovery leads only; the public API does not prove that assets are offered for sale.",
+        "public_auction_event_leads_selected": 0,
+        "required_configuration": [],
+        "source": "Konkurs.app",
+        "status": "collecting"
+      }
+    ],
+    "summary": {
+      "awaiting_configuration_count": 3,
+      "collecting_count": 3,
+      "error_count": 0,
+      "fetched_total": 78,
+      "source_count": 6
+    }
+  },
+  "status": "SUCCESS"
+}

@@ -2,10 +2,18 @@
   "evidence": {
     "unified-auksjonen-611253": {
       "auction_fee_nok": null,
+      "candidate_market_value_nok": null,
       "dismantling_cost_nok": null,
       "market_comparables": [],
+      "market_evidence_review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains",
+        "quantity_not_confirmed_for_all_comparables"
+      ],
+      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
       "missing_evidence": [
         "three_verified_market_comparables",
+        "pending_market_comparables_require_review",
         "auction_fee_nok",
         "vat_status",
         "vat_nok",
@@ -17,9 +25,20 @@
       ],
       "opportunity_id": "unified-auksjonen-611253",
       "other_costs_nok": null,
+      "pending_market_comparables": [
+        {
+          "price_nok": 4990.0,
+          "quantity_status": "UNKNOWN",
+          "similarity_score": 0.5,
+          "source": "Brave Search",
+          "url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg/",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
+        }
+      ],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 21t 44m 38s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 59m 41s",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
       "vat_nok": null,
@@ -28,10 +47,18 @@
     },
     "unified-auksjonen-612667": {
       "auction_fee_nok": null,
+      "candidate_market_value_nok": null,
       "dismantling_cost_nok": null,
       "market_comparables": [],
+      "market_evidence_review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains",
+        "quantity_not_confirmed_for_all_comparables"
+      ],
+      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
       "missing_evidence": [
         "three_verified_market_comparables",
+        "pending_market_comparables_require_review",
         "auction_fee_nok",
         "vat_status",
         "vat_nok",
@@ -43,19 +70,65 @@
       ],
       "opportunity_id": "unified-auksjonen-612667",
       "other_costs_nok": null,
+      "pending_market_comparables": [
+        {
+          "price_nok": 34341.0,
+          "quantity_status": "UNKNOWN",
+          "similarity_score": 0.4,
+          "source": "Brave Search",
+          "url": "https://www.finn.no/59501883",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
+        }
+      ],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 4t 0m 40s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 1t 15m 43s",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
+    },
+    "unified-auksjonen-613169": {
+      "auction_fee_nok": null,
+      "candidate_market_value_nok": null,
+      "dismantling_cost_nok": null,
+      "market_comparables": [],
+      "market_evidence_review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
+      "missing_evidence": [
+        "three_verified_market_comparables",
+        "auction_fee_nok",
+        "vat_status",
+        "vat_nok",
+        "transport_cost_nok",
+        "dismantling_cost_nok",
+        "storage_cost_nok",
+        "repair_cost_nok",
+        "other_costs_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-613169",
+      "other_costs_nok": null,
+      "pending_market_comparables": [],
+      "repair_cost_nok": null,
+      "storage_cost_nok": null,
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 1t 15m",
+      "transport_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
+      "vat_nok": null,
+      "vat_status": null,
+      "verified": false
     }
   },
-  "evidence_count": 2,
-  "generated_at": "2026-07-22T14:59:34.805268+00:00",
-  "method": "verified evidence only; unknown values remain null; no estimates are created",
-  "schema_version": 1,
+  "evidence_count": 3,
+  "generated_at": "2026-07-22T17:44:36.293552+00:00",
+  "market_evidence_source": "data/market_evidence_registry.json",
+  "method": "verified evidence only; discovered market evidence is bridged as pending review; unknown values remain null",
+  "pending_comparable_count": 2,
+  "schema_version": 2,
   "verified_count": 0
 }

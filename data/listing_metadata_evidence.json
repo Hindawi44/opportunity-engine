@@ -1,10 +1,10 @@
 {
-  "enriched_count": 2,
+  "enriched_count": 3,
   "error_count": 0,
   "errors": {},
   "evidence": {
     "unified-auksjonen-611253": {
-      "captured_at": "2026-07-22T14:59:23.443088+00:00",
+      "captured_at": "2026-07-22T17:44:20.059950+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1784810640000"
@@ -14,7 +14,7 @@
       "verified": true
     },
     "unified-auksjonen-612667": {
-      "captured_at": "2026-07-22T14:59:24.246543+00:00",
+      "captured_at": "2026-07-22T17:44:21.472634+00:00",
       "observed": {
         "city": "Kristiansand s",
         "ends_at": "1784746800000"
@@ -22,8 +22,18 @@
       "source": "Auksjonen.no public listing page",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "verified": true
+    },
+    "unified-auksjonen-613169": {
+      "captured_at": "2026-07-22T17:44:22.529227+00:00",
+      "observed": {
+        "city": "Lierstranda",
+        "ends_at": "1785438000000"
+      },
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
+      "verified": true
     }
   },
-  "generated_at": "2026-07-22T14:59:24.246560+00:00",
+  "generated_at": "2026-07-22T17:44:22.529251+00:00",
   "schema_version": 2
 }

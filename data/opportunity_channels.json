@@ -1,137 +1,24 @@
 {
   "actionable_opportunities": {
-    "candidate_count": 2,
-    "items": [
-      {
-        "asking_price_nok": 6100.0,
-        "city": "Tønsberg",
-        "conservative_resale_value_nok": null,
-        "decision": "EVIDENCE_REQUIRED",
-        "ends_at": "1784810640000",
-        "evidence_needed": [
-          "three_verified_market_comparables",
-          "auction_fee",
-          "vat_status",
-          "transport_cost",
-          "dismantling_cost",
-          "condition_and_missing_parts"
-        ],
-        "exclusion_reasons": [],
-        "expected_profit_nok": null,
-        "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud",
-        "matched_target_terms": [
-          "lagerreol",
-          "reol"
-        ],
-        "maximum_safe_bid_nok": null,
-        "missing_evidence": [
-          "auction_fee_nok",
-          "dismantling_cost_nok",
-          "other_costs_nok",
-          "repair_cost_nok",
-          "storage_cost_nok",
-          "three_verified_market_comparables",
-          "transport_cost_nok",
-          "vat_nok"
-        ],
-        "opportunity_id": "unified-auksjonen-611253",
-        "opportunity_score": 59,
-        "priority": 1,
-        "reasons": [
-          "target:lagerreol+15",
-          "target:reol+9",
-          "asking_price_present+5"
-        ],
-        "recommendation": "COLLECT_EVIDENCE",
-        "relevance_score": 29,
-        "roi_percent": null,
-        "score_reasons": [
-          "relevance:29/35",
-          "priority:15/15",
-          "asking_price:5/5",
-          "location:5/5",
-          "deadline:5/5",
-          "evidence:0/20",
-          "verified_economics:0/15"
-        ],
-        "status": "review_first",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 21t 44m 38s",
-        "total_cost_nok": null,
-        "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
-      },
-      {
-        "asking_price_nok": 20000.0,
-        "city": "Kristiansand s",
-        "conservative_resale_value_nok": null,
-        "decision": "EVIDENCE_REQUIRED",
-        "ends_at": "1784746800000",
-        "evidence_needed": [
-          "three_verified_market_comparables",
-          "auction_fee",
-          "vat_status",
-          "transport_cost",
-          "dismantling_cost",
-          "condition_and_missing_parts"
-        ],
-        "exclusion_reasons": [],
-        "expected_profit_nok": null,
-        "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud",
-        "matched_target_terms": [
-          "varelager"
-        ],
-        "maximum_safe_bid_nok": null,
-        "missing_evidence": [
-          "auction_fee_nok",
-          "dismantling_cost_nok",
-          "other_costs_nok",
-          "repair_cost_nok",
-          "storage_cost_nok",
-          "three_verified_market_comparables",
-          "transport_cost_nok",
-          "vat_nok"
-        ],
-        "opportunity_id": "unified-auksjonen-612667",
-        "opportunity_score": 53,
-        "priority": 1,
-        "reasons": [
-          "target:varelager+18",
-          "asking_price_present+5"
-        ],
-        "recommendation": "COLLECT_EVIDENCE",
-        "relevance_score": 23,
-        "roi_percent": null,
-        "score_reasons": [
-          "relevance:23/35",
-          "priority:15/15",
-          "asking_price:5/5",
-          "location:5/5",
-          "deadline:5/5",
-          "evidence:0/20",
-          "verified_economics:0/15"
-        ],
-        "status": "review_first",
-        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 4t 0m 40s",
-        "total_cost_nok": null,
-        "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
-      }
-    ],
-    "top_count": 2
+    "candidate_count": 3,
+    "items": [],
+    "top_count": 0
   },
   "bankruptcy_leads": {
     "fetched_count": 25,
     "items": [
       {
         "asking_price_nok": null,
-        "bankruptcy_date": "2026-07-17T00:00:00",
+        "bankruptcy_date": "2026-07-22T00:00:00",
         "channel": "bankruptcy_lead",
-        "city": "PORSGRUNN",
-        "description": "Salg av klær.",
+        "city": "NAMSOS",
+        "description": "Salg av dameklær og andre varer som faller naturlig inn under dette.",
         "expected_profit_nok": null,
         "industry_code": "47.710",
         "industry_description": "Detaljhandel med klær",
-        "lead_id": "konkurs-app-938119295",
+        "lead_id": "konkurs-app-938143978",
         "lead_score": 39,
-        "organization_number": "938119295",
+        "organization_number": "938143978",
         "roi_percent": null,
         "score_reasons": [
           "target:klær+16",
@@ -142,25 +29,26 @@
         ],
         "source": "Konkurs.app",
         "status": "FOLLOW_UP_LEAD",
-        "title": "BIRKHANS AS",
-        "trustee": "Adv. Bjørn Dyrland",
-        "url": "https://konkurs.app/konkursbo/938119295",
+        "title": "ANNA J AS",
+        "trustee": "Adv. Nils Christian Sudbø Brandzæg",
+        "url": "https://konkurs.app/konkursbo/938143978",
         "warning": "Discovery lead only; assets and sale availability are not confirmed."
       },
       {
         "asking_price_nok": null,
-        "bankruptcy_date": "2026-07-17T00:00:00",
+        "bankruptcy_date": "2026-07-22T00:00:00",
         "channel": "bankruptcy_lead",
-        "city": "RINGERIKE",
-        "description": "Kraftindustri: Finne, utvikle, bygge og drifte mikro-/minikraftverk. Handel: Salg av tjenester og varer ved utvikling, drift av mikro-/minikraftverk.",
+        "city": "SKIEN",
+        "description": "Handelsvirksomhet engros med brann- og annet redningstøy til nødetater. Handelsvirksomhet engros med rednings- og beskyttelsesutstyr til nødetater. Annet som naturlig sammenfaller med dette. Samt deltakelse i andre selskaper, investeringer og nærliggende virksomhet.",
         "expected_profit_nok": null,
-        "industry_code": "71.129",
-        "industry_description": "Annen teknisk konsulentvirksomhet",
-        "lead_id": "konkurs-app-938122458",
-        "lead_score": 23,
-        "organization_number": "938122458",
+        "industry_code": "47.710",
+        "industry_description": "Detaljhandel med klær",
+        "lead_id": "konkurs-app-938143617",
+        "lead_score": 39,
+        "organization_number": "938143617",
         "roi_percent": null,
         "score_reasons": [
+          "target:klær+16",
           "target:handel+8",
           "location_present+5",
           "organization_number_present+5",
@@ -168,9 +56,62 @@
         ],
         "source": "Konkurs.app",
         "status": "FOLLOW_UP_LEAD",
-        "title": "E45 ATERMA AS",
-        "trustee": "adv. Hans Petter Askilsrud",
-        "url": "https://konkurs.app/konkursbo/938122458",
+        "title": "ELEVEN POINTS AS",
+        "trustee": "Adv. Bjørn Dyrland",
+        "url": "https://konkurs.app/konkursbo/938143617",
+        "warning": "Discovery lead only; assets and sale availability are not confirmed."
+      },
+      {
+        "asking_price_nok": null,
+        "bankruptcy_date": "2026-07-22T00:00:00",
+        "channel": "bankruptcy_lead",
+        "city": "ULLENSAKER",
+        "description": "Salg av interiør og møbler. Personlig innredning, workshops, kafé og private eventer.",
+        "expected_profit_nok": null,
+        "industry_code": "47.559",
+        "industry_description": "Detaljhandel med innredningsartikler ikke nevnt annet sted",
+        "lead_id": "konkurs-app-938138451",
+        "lead_score": 35,
+        "organization_number": "938138451",
+        "roi_percent": null,
+        "score_reasons": [
+          "target:møbler+12",
+          "target:handel+8",
+          "location_present+5",
+          "organization_number_present+5",
+          "trustee_present+5"
+        ],
+        "source": "Konkurs.app",
+        "status": "FOLLOW_UP_LEAD",
+        "title": "CEBRA AS",
+        "trustee": "Adv. Ellen Dorthea Tangen Eilerås",
+        "url": "https://konkurs.app/konkursbo/938138451",
+        "warning": "Discovery lead only; assets and sale availability are not confirmed."
+      },
+      {
+        "asking_price_nok": null,
+        "bankruptcy_date": "2026-07-22T00:00:00",
+        "channel": "bankruptcy_lead",
+        "city": "VADSØ",
+        "description": "Å utvikle, markedsføre, informere om og selge tjenester som fremmer turisme- og reiselivsnæringen i Varanger-regionen. Salg, formidling og pakking av sammensatte reiselivsprodukter og tjenester. Tilby markedsføringsløsninger for de regionale reiselivsbedriftene. Formålet er å utvikle Varanger-regionen. Selskapet ønsker å fremme Arktisk turisme og destinasjonsutvikling.",
+        "expected_profit_nok": null,
+        "industry_code": "79.901",
+        "industry_description": "Aktiviteter utført av turistkontorer og destinasjonsselskaper",
+        "lead_id": "konkurs-app-938140553",
+        "lead_score": 25,
+        "organization_number": "938140553",
+        "roi_percent": null,
+        "score_reasons": [
+          "target:kontor+10",
+          "location_present+5",
+          "organization_number_present+5",
+          "trustee_present+5"
+        ],
+        "source": "Konkurs.app",
+        "status": "FOLLOW_UP_LEAD",
+        "title": "VISIT VARANGER ARCTIC NORWAY AS",
+        "trustee": "Adv. Hilde C. Stærk",
+        "url": "https://konkurs.app/konkursbo/938140553",
         "warning": "Discovery lead only; assets and sale availability are not confirmed."
       },
       {
@@ -198,66 +139,16 @@
         "trustee": "Adv. Bertil Vilhelm Smalås",
         "url": "https://konkurs.app/konkursbo/938135428",
         "warning": "Discovery lead only; assets and sale availability are not confirmed."
-      },
-      {
-        "asking_price_nok": null,
-        "bankruptcy_date": "2026-07-17T00:00:00",
-        "channel": "bankruptcy_lead",
-        "city": "OSLO",
-        "description": "Forskning og utviklingsarbeid innen bioteknologi.",
-        "expected_profit_nok": null,
-        "industry_code": "72.100",
-        "industry_description": "Forskning og eksperimentell utvikling innenfor naturvitenskap og teknikk",
-        "lead_id": "konkurs-app-938120609",
-        "lead_score": 15,
-        "organization_number": "938120609",
-        "roi_percent": null,
-        "score_reasons": [
-          "location_present+5",
-          "organization_number_present+5",
-          "trustee_present+5"
-        ],
-        "source": "Konkurs.app",
-        "status": "LOW_PRIORITY_LEAD",
-        "title": "BIONOR HOLDING AS",
-        "trustee": "Adv. Frank Charles Aase",
-        "url": "https://konkurs.app/konkursbo/938120609",
-        "warning": "Discovery lead only; assets and sale availability are not confirmed."
-      },
-      {
-        "asking_price_nok": null,
-        "bankruptcy_date": "2026-07-17T00:00:00",
-        "channel": "bankruptcy_lead",
-        "city": "OSLO",
-        "description": "Bioteknologisk forskning, utvikling, produksjon og kommersialisering",
-        "expected_profit_nok": null,
-        "industry_code": "72.100",
-        "industry_description": "Forskning og eksperimentell utvikling innenfor naturvitenskap og teknikk",
-        "lead_id": "konkurs-app-938121869",
-        "lead_score": 15,
-        "organization_number": "938121869",
-        "roi_percent": null,
-        "score_reasons": [
-          "location_present+5",
-          "organization_number_present+5",
-          "trustee_present+5"
-        ],
-        "source": "Konkurs.app",
-        "status": "LOW_PRIORITY_LEAD",
-        "title": "BIONOR IMMUNO AS",
-        "trustee": "Adv. Frank Charles Aase",
-        "url": "https://konkurs.app/konkursbo/938121869",
-        "warning": "Discovery lead only; assets and sale availability are not confirmed."
       }
     ],
     "top_count": 5
   },
-  "generated_at": "2026-07-22T14:59:35.381076+00:00",
+  "generated_at": "2026-07-22T17:44:36.850434+00:00",
   "method": "sale listings and bankruptcy discovery leads are ranked in separate channels; no financial values are invented",
   "schema_version": 1,
   "source_funnel": {
-    "actionable_candidates": 2,
-    "actionable_selected": 2,
+    "actionable_candidates": 3,
+    "actionable_selected": 0,
     "bankruptcy_leads_fetched": 25,
     "bankruptcy_leads_selected": 5
   }
