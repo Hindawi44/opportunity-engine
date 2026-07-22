@@ -45,7 +45,6 @@ def raw_record_id(item: dict) -> str | None:
 
 
 def identity(item: dict) -> str:
-    """Use the normalized URL first so source-specific IDs cannot create duplicates."""
     url = canonical_url(item.get("canonical_url") or item.get("url"))
     if url:
         return "url-" + hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
@@ -72,13 +71,6 @@ def audit_aliases(audit: dict) -> dict[str, str]:
 
 
 def resolved_identity(item: dict, aliases: dict[str, str]) -> str:
-    url = canonical_url(item.get("canonical_url") or item.get("url"))
-    if url:
-        url_key = "url-" + hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
-        record_id = raw_record_id(item)
-        if record_id and record_id in aliases:
-            return aliases[record_id]
-        return url_key
     record_id = raw_record_id(item)
     if record_id and record_id in aliases:
         return aliases[record_id]
@@ -146,11 +138,18 @@ def merge_record(previous: dict | None, item: dict, now: str, registry_id: str) 
     return record
 
 
-def build_registry(discovery: dict, scored: dict, existing: dict, audit: dict, generated_at: str) -> dict:
-    aliases = audit_aliases(audit)
+def build_registry(discovery: dict, scored: dict, existing: dict, generated_at: str, audit: dict | None = None) -> dict:
+    aliases = audit_aliases(audit or {})
     current: dict[str, dict] = {}
+    id_to_key: dict[str, str] = {}
     for item in [*extract_items(discovery), *extract_items(scored)]:
-        key = resolved_identity(item, aliases)
+        record_id = raw_record_id(item)
+        if record_id and record_id in id_to_key:
+            key = id_to_key[record_id]
+        else:
+            key = resolved_identity(item, aliases)
+        if record_id:
+            id_to_key[record_id] = key
         current[key] = combine_items(current.get(key, {}), item)
 
     old_records = existing.get("records", [])
@@ -195,8 +194,8 @@ def main() -> int:
         load_object(Path(args.discovery)),
         load_object(Path(args.scored)),
         load_object(Path(args.existing)),
-        load_object(Path(args.audit)),
         generated_at,
+        load_object(Path(args.audit)),
     )
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
