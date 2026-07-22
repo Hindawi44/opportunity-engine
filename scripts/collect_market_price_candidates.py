@@ -17,11 +17,17 @@ from urllib.parse import urlparse
 
 from opportunity_engine.ods.brave_search import BraveSearchClient
 
+_PRICE_NUMBER = r"(?:[0-9]{1,3}(?:[ .,'\u00a0][0-9]{3})+|[0-9]{3,8})"
 _PRICE_PATTERNS = (
-    re.compile(r"(?:kr|nok)\s*([0-9][0-9 .\u00a0]{1,12})", re.IGNORECASE),
-    re.compile(r"([0-9][0-9 .\u00a0]{1,12})\s*(?:kr|nok)\b", re.IGNORECASE),
+    re.compile(rf"(?:kr|nok)\s*({_PRICE_NUMBER})(?![0-9])", re.IGNORECASE),
+    re.compile(rf"(?<![0-9])({_PRICE_NUMBER})\s*(?:kr|nok)\b", re.IGNORECASE),
 )
-_STOPWORDS = {"selges", "brukt", "norge", "komplett", "stk", "med", "for", "til", "og", "av"}
+_STOPWORDS = {
+    "selges", "brukt", "norge", "komplett", "stk", "med", "for", "til", "og", "av",
+    "pris", "bud", "artikler", "timer", "time", "min", "sek",
+}
+_MIN_SIMILARITY = 0.35
+_REQUIRED_COMPARABLES = 3
 
 
 def _clean(value: object) -> str:
@@ -38,18 +44,24 @@ def _query(item: dict[str, object]) -> str:
     return f"{base} brukt pris Norge" if base else ""
 
 
-def _extract_price(text: str) -> float | None:
+def _extract_prices(text: str) -> list[float]:
+    values: list[float] = []
+    seen: set[float] = set()
     for pattern in _PRICE_PATTERNS:
-        match = pattern.search(text)
-        if not match:
-            continue
-        digits = re.sub(r"[^0-9]", "", match.group(1))
-        if not digits:
-            continue
-        value = float(digits)
-        if 100 <= value <= 10_000_000:
-            return value
-    return None
+        for match in pattern.finditer(text):
+            digits = re.sub(r"[^0-9]", "", match.group(1))
+            if not digits:
+                continue
+            value = float(digits)
+            if 100 <= value <= 10_000_000 and value not in seen:
+                seen.add(value)
+                values.append(value)
+    return values
+
+
+def _extract_price(text: str) -> float | None:
+    prices = _extract_prices(text)
+    return prices[0] if prices else None
 
 
 def _similarity(query: str, title: str, snippet: str) -> float:
@@ -60,26 +72,75 @@ def _similarity(query: str, title: str, snippet: str) -> float:
     return round(len(wanted & observed) / len(wanted), 3)
 
 
-def _candidate(item: dict[str, object], result: dict[str, object], query: str) -> dict[str, object] | None:
+def _quantity(value: object) -> int | None:
+    text = _clean(value).casefold()
+    patterns = (
+        re.compile(r"\b([1-9][0-9]?)\s*(?:stk|stykk|stykker)\b"),
+        re.compile(r"\bpakke\s+med\s+([1-9][0-9]?)\b"),
+        re.compile(r"\bsett\s+av\s+([1-9][0-9]?)\b"),
+    )
+    for pattern in patterns:
+        match = pattern.search(text)
+        if match:
+            return int(match.group(1))
+    return None
+
+
+def _evaluate_candidate(
+    item: dict[str, object], result: dict[str, object], query: str
+) -> tuple[dict[str, object] | None, dict[str, object] | None]:
     title = _clean(result.get("title"))
     snippet = _clean(result.get("snippet"))
     url = _clean(result.get("url"))
-    price = _extract_price(f"{title} {snippet}")
+    observed_text = f"{title} {snippet}"
+    prices = _extract_prices(observed_text)
     similarity = _similarity(query, title, snippet)
-    if not url or price is None or similarity < 0.2:
-        return None
-    return {
+    source_quantity = _quantity(item.get("title") or item.get("market_search_query"))
+    comparable_quantity = _quantity(observed_text)
+
+    reasons: list[str] = []
+    if not url:
+        reasons.append("missing_url")
+    if not prices:
+        reasons.append("missing_observed_nok_price")
+    if similarity < _MIN_SIMILARITY:
+        reasons.append(f"similarity_below_{_MIN_SIMILARITY}")
+    if source_quantity and comparable_quantity and source_quantity != comparable_quantity:
+        reasons.append("quantity_mismatch")
+
+    if reasons:
+        return None, {
+            "url": url or None,
+            "title": title or None,
+            "similarity_score": similarity,
+            "source_quantity": source_quantity,
+            "comparable_quantity": comparable_quantity,
+            "rejection_reasons": reasons,
+        }
+
+    quantity_status = "MATCHED" if source_quantity and comparable_quantity else "UNKNOWN"
+    candidate = {
         "source": _clean(result.get("source")) or "Brave Search",
         "url": url,
         "domain": urlparse(url).netloc.casefold(),
         "title": title,
         "snippet": snippet,
-        "price_nok": price,
+        "price_nok": prices[0],
+        "observed_prices_nok": prices,
         "similarity_score": similarity,
+        "source_quantity": source_quantity,
+        "comparable_quantity": comparable_quantity,
+        "quantity_status": quantity_status,
         "captured_at": datetime.now(timezone.utc).isoformat(),
         "verified": False,
         "verification_status": "REVIEW_REQUIRED",
     }
+    return candidate, None
+
+
+def _candidate(item: dict[str, object], result: dict[str, object], query: str) -> dict[str, object] | None:
+    candidate, _ = _evaluate_candidate(item, result, query)
+    return candidate
 
 
 def main() -> int:
@@ -109,16 +170,20 @@ def main() -> int:
         opportunity_id = _clean(raw_item.get("opportunity_id"))
         query = _query(raw_item)
         candidates: list[dict[str, object]] = []
+        rejected_candidates: list[dict[str, object]] = []
         if query:
             try:
                 for result in client.search(query, count=args.results_per_query, country="NO", search_lang="no"):
-                    candidate = _candidate(raw_item, dict(result), query)
+                    candidate, rejection = _evaluate_candidate(raw_item, dict(result), query)
                     if candidate and candidate["url"] != raw_item.get("url"):
                         candidates.append(candidate)
+                    elif rejection:
+                        rejected_candidates.append(rejection)
             except RuntimeError as exc:
                 errors[opportunity_id or query] = str(exc)
 
         prices = [float(item["price_nok"]) for item in candidates]
+        enough_candidates = len(candidates) >= _REQUIRED_COMPARABLES
         records.append({
             "opportunity_id": opportunity_id,
             "title": raw_item.get("title"),
@@ -128,25 +193,45 @@ def main() -> int:
             "candidate_price_min_nok": min(prices) if prices else None,
             "candidate_price_median_nok": median(prices) if prices else None,
             "candidate_price_max_nok": max(prices) if prices else None,
-            "required_verified_comparables": 3,
+            "candidate_market_value_nok": median(prices) if enough_candidates else None,
+            "required_verified_comparables": _REQUIRED_COMPARABLES,
             "verified_comparable_count": 0,
-            "market_value_status": "REVIEW_REQUIRED" if candidates else "NO_PRICE_CANDIDATES",
+            "eligible_for_market_value": enough_candidates,
+            "market_value_status": (
+                "REVIEW_REQUIRED" if enough_candidates else
+                "INSUFFICIENT_PRICE_CANDIDATES" if candidates else
+                "NO_PRICE_CANDIDATES"
+            ),
             "candidates": candidates,
+            "rejected_candidate_count": len(rejected_candidates),
+            "rejected_candidates": rejected_candidates,
         })
 
     output_payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "method": "Brave Search candidate discovery; prices are unverified and never used automatically for a buy decision",
+        "method": (
+            "Brave Search candidate discovery with strict NOK parsing, similarity and quantity checks; "
+            "prices are unverified and never used automatically for a buy decision"
+        ),
+        "minimum_similarity": _MIN_SIMILARITY,
+        "required_comparables": _REQUIRED_COMPARABLES,
         "opportunity_count": len(records),
         "candidate_count": sum(int(item["candidate_count"]) for item in records),
+        "rejected_candidate_count": sum(int(item["rejected_candidate_count"]) for item in records),
         "errors": errors,
         "opportunities": records,
     }
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(output_payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"output": str(output), "opportunity_count": len(records), "candidate_count": output_payload["candidate_count"], "error_count": len(errors)}, ensure_ascii=False))
+    print(json.dumps({
+        "output": str(output),
+        "opportunity_count": len(records),
+        "candidate_count": output_payload["candidate_count"],
+        "rejected_candidate_count": output_payload["rejected_candidate_count"],
+        "error_count": len(errors),
+    }, ensure_ascii=False))
     return 0 if not errors else 2
 
 
