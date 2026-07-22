@@ -1,7 +1,7 @@
 {
   "completion_rule": "Do not declare this phase complete until every required source is either collecting verified records or explicitly documented as blocked by required authorized access.",
   "economic_ranking_unlocked": false,
-  "generated_at": "2026-07-22T14:07:51.858458+00:00",
+  "generated_at": "2026-07-22T14:59:35.497114+00:00",
   "phase": "source_expansion_before_economic_ranking",
   "phase_complete": false,
   "schema_version": 1,
@@ -10,7 +10,7 @@
       "blocked_by_authorized_access": false,
       "complete": true,
       "error": null,
-      "fetched": 48,
+      "fetched": 51,
       "market": "Norway",
       "priority": 1,
       "source": "Auksjonen.no",

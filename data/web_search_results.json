@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-07-22T14:07:39.833229+00:00",
+  "generated_at": "2026-07-22T14:59:17.878723+00:00",
   "provider": "Brave Search API",
   "request_count": 10,
   "result_count": 100,
@@ -167,14 +167,6 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
-      "source": "Brave Search",
-      "title": "Starte bedrift | Ny i Norge",
-      "url": "https://www.nyinorge.no/en/work/starting-a-business-in-norway/"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
       "published_at": "2026-01-09T18:20:19",
       "snippet": "<strong>Bedriften tilbyr ikke henting av pakker, så forsendelsen må leveres direkte til deres adresse og innenfor åpningstiden på hverdager</strong>.",
       "source": "Brave Search",
@@ -183,11 +175,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": "2024-01-09T06:48:44",
-      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
+      "published_at": null,
+      "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
       "source": "Brave Search",
-      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
-      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
+      "title": "Starte bedrift | Ny i Norge",
+      "url": "https://www.nyinorge.no/en/work/starting-a-business-in-norway/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -196,14 +188,6 @@
       "source": "Brave Search",
       "title": "Arbeidsklær | Norges største utvalg | Billige restpartier!",
       "url": "https://billige-arbeidsklaer.no/arbeidsklaer"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
-      "published_at": "2020-10-03T16:33:09",
-      "snippet": "Storage solutions, warehousing, 3PL, 4PL, WM systems – smart warehousing solutions streamlines your flow of goods and increase your bottom line",
-      "source": "Brave Search",
-      "title": "3PL lagerløsninger for din bedrift | ColliCare Logistics Norge",
-      "url": "https://www.collicare.no/en/freight/third-party-logistics"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -220,6 +204,22 @@
       "source": "Brave Search",
       "title": "r/norge on Reddit: Nystartet vs etablert liten bedrift?",
       "url": "https://www.reddit.com/r/norge/comments/1qg43ld/nystartet_vs_etablert_liten_bedrift/"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": "2024-01-09T06:48:44",
+      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
+      "source": "Brave Search",
+      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
+      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": null,
+      "snippet": "Åpningstider: https://www.rolfselektro.no/ <strong>Rolfs Elektro er en frittstående elektronikkforhandler med hovedvekt på hvitevarer</strong>.",
+      "source": "Brave Search",
+      "title": "Rolfs Elektro, Barstølveien 58/Øvre Fergested 1 (2025)",
+      "url": "https://findglocal.com/NO/Kristiansand/267093243452936/Rolfs-Elektro"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -352,14 +352,6 @@
     {
       "discovery_query": "restaurantutstyr selges Norge",
       "published_at": null,
-      "snippet": "Se vårt utvalg av pålitelig brukt storkjøkkenutstyr til uslåelige priser! Kjøp pålitelig utstyr til ditt storkjøkken uten å tømme lommeboken. 3 mnd garanti!",
-      "source": "Brave Search",
-      "title": "Brukt Storkjøkken Utstyr Arkiver - Gastro Storkjøkken AS",
-      "url": "https://gastro.no/produktkategori/brukt-storkjokkenutstyr/"
-    },
-    {
-      "discovery_query": "restaurantutstyr selges Norge",
-      "published_at": null,
       "snippet": "We offer ▶ individual solutions and advise on the choice 👍 of equipment for restaurants in Europe",
       "source": "Brave Search",
       "title": "✅ Equipment for restaurants in Europe - individual solutions and advise",
@@ -367,11 +359,19 @@
     },
     {
       "discovery_query": "restaurantutstyr selges Norge",
-      "published_at": null,
-      "snippet": "<strong>Vi er en nettbutikk med storkjøkkenutstyr, barutstyr og restaurantutstyr i Norge</strong>. Våre kunder er blant annet restauranter, hjemmekokken, bedriftskantiner, offentlige institusjoner, hoteller, privatpersoner, barnehager og skoler. Om du skulle trenge hjelp til å finne riktig produkt så hjelper ...",
+      "published_at": "2023-10-26T10:52:55",
+      "snippet": "Det du trenger innen glass, servise, bestikk, kniver, kjøkken, servering og bar · Kjøkkenredskap, bestikk og servise har mye å si for hvordan maten tilberedes og presenteres",
       "source": "Brave Search",
-      "title": "Gastroshop.no - For profesjonelle kjøkken og hjemmekokken",
-      "url": "https://gastroshop.no/"
+      "title": "Restaurantutstyr - Beverageman",
+      "url": "https://www.beverageman.no/butikk/restaurantutstyr/"
+    },
+    {
+      "discovery_query": "restaurantutstyr selges Norge",
+      "published_at": null,
+      "snippet": "Se vårt utvalg av pålitelig brukt storkjøkkenutstyr til uslåelige priser! Kjøp pålitelig utstyr til ditt storkjøkken uten å tømme lommeboken. 3 mnd garanti!",
+      "source": "Brave Search",
+      "title": "Brukt Storkjøkken Utstyr Arkiver - Gastro Storkjøkken AS",
+      "url": "https://gastro.no/produktkategori/brukt-storkjokkenutstyr/"
     },
     {
       "discovery_query": "restaurantutstyr selges Norge",
@@ -391,11 +391,11 @@
     },
     {
       "discovery_query": "restaurantutstyr selges Norge",
-      "published_at": "2023-10-26T10:52:55",
-      "snippet": "Det du trenger innen glass, servise, bestikk, kniver, kjøkken, servering og bar · Kjøkkenredskap, bestikk og servise har mye å si for hvordan maten tilberedes og presenteres",
+      "published_at": null,
+      "snippet": "<strong>Vi er en nettbutikk med storkjøkkenutstyr, barutstyr og restaurantutstyr i Norge</strong>. Våre kunder er blant annet restauranter, hjemmekokken, bedriftskantiner, offentlige institusjoner, hoteller, privatpersoner, barnehager og skoler. Om du skulle trenge hjelp til å finne riktig produkt så hjelper ...",
       "source": "Brave Search",
-      "title": "Restaurantutstyr - Beverageman",
-      "url": "https://www.beverageman.no/butikk/restaurantutstyr/"
+      "title": "Gastroshop.no - For profesjonelle kjøkken og hjemmekokken",
+      "url": "https://gastroshop.no/"
     },
     {
       "discovery_query": "restaurantutstyr selges Norge",
@@ -440,10 +440,10 @@
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
-      "snippet": "Frisørinnredning / Utstyr fra REM. Engelsk håndlagede kvalitetsprodukter. 3 års garanti.",
+      "snippet": "Ta en titt på våre frisørartikler. Her får du frisørkapper, blanderbegre, sakser og masse mer - Alt til kanonbillige priser - Finn ditt utstyr i dag!",
       "source": "Brave Search",
-      "title": "REM Frisørinnredning / Frisørutstyr - Wellness Norge",
-      "url": "https://www.wellnessnorge.no/artikler/rem-frisorinnredning-/-frisorutstyr"
+      "title": "Frisørartikler | Alt du trenger til håret får du billig her!",
+      "url": "https://www.fashiongirl.no/shop/frisoerartikler-163c1.html"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
@@ -456,15 +456,15 @@
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
-      "snippet": "Ta en titt på våre frisørartikler. Her får du frisørkapper, blanderbegre, sakser og masse mer - Alt til kanonbillige priser - Finn ditt utstyr i dag!",
+      "snippet": "Frisørinnredning / Utstyr fra REM. Engelsk håndlagede kvalitetsprodukter. 3 års garanti.",
       "source": "Brave Search",
-      "title": "Frisørartikler | Alt du trenger til håret får du billig her!",
-      "url": "https://www.fashiongirl.no/shop/frisoerartikler-163c1.html"
+      "title": "REM Frisørinnredning / Frisørutstyr - Wellness Norge",
+      "url": "https://www.wellnessnorge.no/artikler/rem-frisorinnredning-/-frisorutstyr"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
-      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand",
+      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand.",
       "source": "Brave Search",
       "title": "'frisørutstyr' items for sale · Tise",
       "url": "https://tise.com/search/tise?country_code=NO&search=fris%C3%B8rutstyr&location_max=country"
@@ -479,11 +479,11 @@
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
-      "published_at": null,
-      "snippet": "Sjekk nyheter og oppdateringer av frisør- og velværeindustrien. NFVB skal være den største arbeidsgiverorganisasjonen i frisør- og velværebransjen.",
+      "published_at": "2026-04-08T10:46:26",
+      "snippet": "Oppdag profesjonelt frisørutstyr, skjønnhetsutstyr og salongverktøy hos Luminx. Perfekt for frisører, stylister, barbershops og skjønnhetsklinikker.",
       "source": "Brave Search",
-      "title": "Norske frisør- og velværebedrifter - Aktuelt - NFVB",
-      "url": "https://nfvb.no/"
+      "title": "Profesjonelt Frisørutstyr & Skjønnhetsutstyr | Luminx",
+      "url": "https://luminx.no/"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -688,18 +688,18 @@
     {
       "discovery_query": "konkurslager tekstil Norge",
       "published_at": null,
-      "snippet": "Konkurslager från alla köp &amp; sälj marknader i Sverige. Hitta billigaste Konkurslager hos AllaAnnonser",
-      "source": "Brave Search",
-      "title": "Konkurslager - AllaAnnonser",
-      "url": "https://www.allaannonser.se/konkurslager.html"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "published_at": null,
       "snippet": "Nor Tekstil AS avd. Biri Nor Tekstil AS avd. Biri Vaskeri Norge",
       "source": "Brave Search",
       "title": "Nor Tekstil – Svanemerket",
       "url": "https://svanemerket.no/miljomerkede-produkter/merkevare/nor-tekstil-465/"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "published_at": null,
+      "snippet": "<strong>Nor Tekstil, Florø</strong>. 3,007 likes · 3 talking about this · 26 were here. Nor Tekstil er landets ledende leverandør av tekstiltjenester. Vi leverer vaskeritjenester fra våre 25 avdelinger rundt om i Norge.",
+      "source": "Brave Search",
+      "title": "Nor Tekstil | Florø | Facebook",
+      "url": "https://www.facebook.com/nortekstilas/"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
