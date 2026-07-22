@@ -124,6 +124,7 @@ def parse_auksjonen_listing_page(html: str, *, base_url: str = AUKSJONEN_BASE_UR
         title = _extract_title(text)
         if not title:
             continue
+        price, price_type = _extract_price(text)
         seen.add(document_id)
         documents.append(
             SourceDocument(
@@ -137,11 +138,13 @@ def parse_auksjonen_listing_page(html: str, *, base_url: str = AUKSJONEN_BASE_UR
                 country="Norway",
                 metadata={
                     "auction_id": auction_id,
-                    "current_price_nok": _parse_price(text),
+                    "current_price_nok": price,
+                    "price_type": price_type,
+                    "price_status": "verified_from_listing_text" if price is not None else "missing_from_listing_text",
                     "city": _extract_city(text, title),
                     "ends_at": None,
                     "access_mode": "public_listing_page",
-                    "parser_version": 3,
+                    "parser_version": 4,
                 },
             )
         )
@@ -181,9 +184,10 @@ def _document_from_json_ld(item: dict[str, object], *, base_url: str) -> SourceD
         return None
     url = urljoin(base_url, str(raw_url))
     auction_id = _auction_id(url)
-    offers = item.get("offers") if isinstance(item.get("offers"), dict) else {}
+    offers = _normalise_offer(item.get("offers"))
     address = item.get("address") if isinstance(item.get("address"), dict) else {}
     description = _clean_text(item.get("description"))
+    price, price_type = _price_from_offer(offers)
     return SourceDocument(
         document_id=f"auksjonen-{auction_id}",
         source_name="Auksjonen.no",
@@ -195,13 +199,37 @@ def _document_from_json_ld(item: dict[str, object], *, base_url: str) -> SourceD
         country="Norway",
         metadata={
             "auction_id": auction_id,
-            "current_price_nok": _coerce_price(offers.get("price")),
+            "current_price_nok": price,
+            "price_type": price_type,
+            "price_status": "verified_from_json_ld" if price is not None else "missing_from_json_ld",
             "city": _clean_text(address.get("addressLocality")) or None,
             "ends_at": _valid_iso_datetime(offers.get("validThrough")),
             "access_mode": "public_listing_page",
-            "parser_version": 3,
+            "parser_version": 4,
         },
     )
+
+
+def _normalise_offer(value: object) -> dict[str, object]:
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, list):
+        for item in value:
+            if isinstance(item, dict):
+                return item
+    return {}
+
+
+def _price_from_offer(offer: dict[str, object]) -> tuple[float | None, str | None]:
+    for key, price_type in (
+        ("price", "offer_price"),
+        ("lowPrice", "low_price"),
+        ("highPrice", "high_price"),
+    ):
+        price = _coerce_price(offer.get(key))
+        if price is not None:
+            return price, price_type
+    return None, None
 
 
 def _auction_id(url: str) -> str:
@@ -215,8 +243,12 @@ def _extract_title(text: str) -> str:
     value = re.sub(r"^(?:Video\s+)?(?:Uten minstepris\s+|Minstepris oppnådd\s+)?", "", text, flags=re.IGNORECASE)
     markers = (
         " Høyeste bud ",
+        " Nåværende bud ",
+        " Gjeldende bud ",
+        " Startpris ",
         " Fastpris ",
         " Kjøp nå ",
+        " Pris ",
         " Avsluttes snart ",
         " Avsluttes ",
         " Gjenstår ",
@@ -231,24 +263,40 @@ def _extract_title(text: str) -> str:
     return _clean_text(value)
 
 
-def _parse_price(text: str) -> float | None:
-    for pattern in (
-        r"Høyeste bud\s+([0-9][0-9 .\u00a0]*)\s*,-",
-        r"Fastpris\s+([0-9][0-9 .\u00a0]*)\s*,-",
-        r"Kjøp nå\s+([0-9][0-9 .\u00a0]*)\s*,-",
-    ):
+def _extract_price(text: str) -> tuple[float | None, str | None]:
+    patterns = (
+        (r"Høyeste\s+bud\s*(?:er|:)??\s*(?:NOK|kr)?\s*([0-9][0-9 .\u00a0]*)\s*(?:NOK|kr|,-)?", "highest_bid"),
+        (r"Nåværende\s+bud\s*(?:er|:)??\s*(?:NOK|kr)?\s*([0-9][0-9 .\u00a0]*)\s*(?:NOK|kr|,-)?", "current_bid"),
+        (r"Gjeldende\s+bud\s*(?:er|:)??\s*(?:NOK|kr)?\s*([0-9][0-9 .\u00a0]*)\s*(?:NOK|kr|,-)?", "current_bid"),
+        (r"Fastpris\s*(?:er|:)??\s*(?:NOK|kr)?\s*([0-9][0-9 .\u00a0]*)\s*(?:NOK|kr|,-)?", "fixed_price"),
+        (r"Kjøp\s+nå\s*(?:for|:)??\s*(?:NOK|kr)?\s*([0-9][0-9 .\u00a0]*)\s*(?:NOK|kr|,-)?", "buy_now"),
+        (r"Startpris\s*(?:er|:)??\s*(?:NOK|kr)?\s*([0-9][0-9 .\u00a0]*)\s*(?:NOK|kr|,-)?", "starting_price"),
+    )
+    for pattern, price_type in patterns:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
-            return _coerce_price(match.group(1))
-    return None
+            price = _coerce_price(match.group(1))
+            if price is not None:
+                return price, price_type
+    return None, None
+
+
+def _parse_price(text: str) -> float | None:
+    """Backward-compatible wrapper used by older callers and tests."""
+    return _extract_price(text)[0]
 
 
 def _coerce_price(value: object) -> float | None:
     if isinstance(value, (int, float)):
         return float(value)
-    cleaned = re.sub(r"[^0-9,.-]", "", str(value or "")).replace(",", ".")
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    digits = re.sub(r"[^0-9]", "", raw)
+    if not digits:
+        return None
     try:
-        return float(cleaned) if cleaned else None
+        return float(digits)
     except ValueError:
         return None
 

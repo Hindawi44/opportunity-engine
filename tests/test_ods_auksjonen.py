@@ -57,6 +57,8 @@ def test_parse_json_ld_listing() -> None:
     assert document.url == "https://www.auksjonen.no/auksjon/123456/butikkinnredning"
     assert document.country == "Norway"
     assert document.metadata["current_price_nok"] == 12500.0
+    assert document.metadata["price_type"] == "offer_price"
+    assert document.metadata["price_status"] == "verified_from_json_ld"
     assert document.metadata["city"] == "Trondheim"
     assert document.metadata["ends_at"] == "2026-07-31T18:00:00+02:00"
 
@@ -68,6 +70,63 @@ def test_fallback_anchor_parser_extracts_listing() -> None:
     assert documents[0].document_id == "auksjonen-987654"
     assert documents[0].title == "Varelager klær"
     assert documents[0].metadata["current_price_nok"] == 8500.0
+    assert documents[0].metadata["price_type"] == "highest_bid"
+    assert documents[0].metadata["price_status"] == "verified_from_listing_text"
+
+
+@pytest.mark.parametrize(
+    ("label", "expected_type"),
+    [
+        ("Nåværende bud: kr 12 750", "current_bid"),
+        ("Gjeldende bud NOK 4.500", "current_bid"),
+        ("Fastpris 18 000 kr", "fixed_price"),
+        ("Kjøp nå for NOK 22 500", "buy_now"),
+        ("Startpris: 3 000,-", "starting_price"),
+    ],
+)
+def test_extracts_common_norwegian_price_formats(label: str, expected_type: str) -> None:
+    html = f"""
+    <html><body>
+      <a href="/auksjon/765432/testobjekt">Testobjekt {label} Avsluttes 31.07.2026</a>
+    </body></html>
+    """
+
+    document = parse_auksjonen_listing_page(html)[0]
+
+    expected_price = {
+        "current_bid": 12750.0 if "12 750" in label else 4500.0,
+        "fixed_price": 18000.0,
+        "buy_now": 22500.0,
+        "starting_price": 3000.0,
+    }[expected_type]
+    assert document.metadata["current_price_nok"] == expected_price
+    assert document.metadata["price_type"] == expected_type
+
+
+def test_missing_price_is_explicit_and_not_invented() -> None:
+    html = """
+    <html><body>
+      <a href="/auksjon/654321/ukjent-pris">Butikkinnredning Avsluttes snart</a>
+    </body></html>
+    """
+
+    document = parse_auksjonen_listing_page(html)[0]
+
+    assert document.metadata["current_price_nok"] is None
+    assert document.metadata["price_type"] is None
+    assert document.metadata["price_status"] == "missing_from_listing_text"
+
+
+def test_json_ld_aggregate_offer_uses_low_price() -> None:
+    html = JSON_LD_PAGE.replace(
+        '"price": "12500",',
+        '"lowPrice": "9 900",\n        "highPrice": "15 000",',
+    )
+
+    document = parse_auksjonen_listing_page(html)[0]
+
+    assert document.metadata["current_price_nok"] == 9900.0
+    assert document.metadata["price_type"] == "low_price"
 
 
 def test_connector_uses_request_subject_as_query() -> None:
