@@ -15,7 +15,7 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       PYTHONPATH: ${{ github.workspace }}/src
       BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
@@ -33,43 +33,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Build source coverage report
-        run: python scripts/build_source_coverage_report.py
-      - name: Collect official police auction-event leads
-        run: python scripts/build_public_auction_event_leads.py --output data/public_auction_event_leads.json --limit 10
-      - name: Collect authorized Brave Search results
-        run: python scripts/collect_brave_search_results.py --config config/brave_search_queries.json --output data/web_search_results.json
-      - name: Build authorized web discovery leads
-        run: python scripts/build_web_discovery_leads.py --input data/web_search_results.json --output data/discovery_leads.json --limit 100
-      - name: Generate today's opportunities and smart-alert outbox
-        run: python scripts/run_daily_pipeline.py --finn-rows 100 --output data/todays_opportunities.json --alerts-output data/smart_alerts.json
-      - name: Diagnose empty Auksjonen result
-        run: python scripts/annotate_auksjonen_diagnostics.py --snapshot data/todays_opportunities.json
-      - name: Build conservative review queue
-        run: python scripts/build_opportunity_review_queue.py --snapshot data/todays_opportunities.json --output data/opportunity_review_queue.json --limit 12
-      - name: Enrich public Auksjonen listing metadata
-        run: python scripts/enrich_auksjonen_listing_metadata.py --queue data/opportunity_review_queue.json --output data/opportunity_review_queue.json --evidence-output data/listing_metadata_evidence.json
-      - name: Build market evidence discovery queue
-        run: python scripts/build_market_evidence_discovery_queue.py --queue data/opportunity_review_queue.json --output data/market_evidence_discovery_queue.json
-      - name: Collect market price candidates
-        run: python scripts/collect_market_price_candidates.py --queue data/opportunity_review_queue.json --output data/market_price_candidates.json --limit 5 --results-per-query 10
-      - name: Build conservative market evidence registry
-        run: python scripts/build_market_evidence_registry.py --input data/market_price_candidates.json --output data/market_evidence_registry.json --review-output data/market_evidence_review_queue.json
-      - name: Bridge market evidence into economic evidence registry
-        run: python scripts/build_opportunity_evidence_registry.py --queue data/opportunity_review_queue.json --existing data/opportunity_evidence.json --market-evidence data/market_evidence_registry.json --output data/opportunity_evidence.json
-      - name: Build evidence-gated economic evaluation queue
-        run: python scripts/build_economic_evaluation_queue.py --queue data/opportunity_review_queue.json --evidence data/opportunity_evidence.json --output data/economic_evaluation_queue.json
-      - name: Build top five actionable opportunity report
-        run: python scripts/build_top5_opportunity_report.py --queue data/opportunity_review_queue.json --evaluations data/economic_evaluation_queue.json --output data/top5_opportunities.json --limit 5
-      - name: Build separated sale and bankruptcy channels
-        run: python scripts/build_opportunity_channels_report.py --actionable data/top5_opportunities.json --output data/opportunity_channels.json --limit 5
-      - name: Build transparent per-source funnel
-        run: python scripts/build_source_funnel_report.py --coverage data/source_coverage.json --snapshot data/todays_opportunities.json --channels data/opportunity_channels.json --event-leads data/public_auction_event_leads.json --output data/source_funnel.json
-      - name: Track source expansion phase
-        run: python scripts/build_source_expansion_status.py
-      - name: Commit changed snapshots
+      - name: Run complete end-to-end opportunity pipeline
+        run: python scripts/run_end_to_end_pipeline.py
+      - name: Commit successful pipeline snapshots
         run: |
-          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/web_search_results.json data/discovery_leads.json data/todays_opportunities.json data/smart_alerts.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/market_price_candidates.json data/market_evidence_registry.json data/market_evidence_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json"
+          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/web_search_results.json data/discovery_leads.json data/todays_opportunities.json data/smart_alerts.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/market_price_candidates.json data/market_evidence_registry.json data/market_evidence_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json data/opportunities.json data/dashboard.json data/daily_report.json data/pipeline_run_status.json"
           if [ -z "$(git status --porcelain -- $FILES)" ]; then
             echo "No opportunity data changes"
             exit 0
@@ -77,5 +45,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add $FILES
-          git commit -m "Update daily opportunity snapshots"
+          git commit -m "Update complete daily opportunity pipeline snapshots"
           git push
