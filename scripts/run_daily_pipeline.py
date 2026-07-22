@@ -19,10 +19,6 @@ from opportunity_engine.ods.market_pricing import MarketComparable
 from opportunity_engine.ods.real_cost import RealCostInputs
 from opportunity_engine.ods.snapshot_alerts import SnapshotAlertProcessor
 
-
-# Discovery Engine v2: read the public category pages directly. The former ?q=
-# searches could return the vehicle-heavy general catalogue even when a target
-# keyword was supplied, so they are no longer used for the default discovery run.
 DEFAULT_AUKSJONEN_DISCOVERY_PATHS = (
     "/auksjoner/torget/vareparti-og-konkursbo",
     "/auksjoner/overskuddsvarer/vareparti-og-konkursbo",
@@ -32,12 +28,6 @@ DEFAULT_AUKSJONEN_DISCOVERY_PATHS = (
 
 
 class TargetedAuksjonenClient(AuksjonenClient):
-    """Collect directly from business-opportunity category pages.
-
-    An explicit keyword still uses AuksjonenClient.search for manual diagnostics.
-    The normal daily run never falls back to the general /auksjoner/ page.
-    """
-
     def search(self, *, keyword: str | None = None):
         if keyword and keyword.strip():
             return super().search(keyword=keyword)
@@ -55,6 +45,19 @@ class TargetedAuksjonenClient(AuksjonenClient):
         return tuple(documents)
 
 
+class TargetedFinnClient:
+    """Adapter exposing targeted authorized FINN searches to the daily pipeline."""
+
+    def __init__(self, client: FinnApiClient, rows_per_query: int = 25) -> None:
+        self.client = client
+        self.rows_per_query = rows_per_query
+
+    def search(self, *, keyword: str | None = None, rows: int = 100):
+        if keyword and keyword.strip():
+            return self.client.search(keyword=keyword, rows=rows)
+        return self.client.search_targeted_business_listings(rows_per_query=self.rows_per_query)
+
+
 def _load_verified_inputs(path: str | None):
     if not path:
         return {}, {}
@@ -70,18 +73,24 @@ def _load_verified_inputs(path: str | None):
     return comparables, costs
 
 
-def _finn_client_from_environment() -> FinnApiClient | None:
+def _finn_client_from_environment() -> TargetedFinnClient | None:
     api_key = os.getenv("FINN_API_KEY", "").strip()
     org_id = os.getenv("FINN_ORG_ID", "").strip()
     if not api_key and not org_id:
         return None
     if not api_key or not org_id:
         raise RuntimeError("FINN_API_KEY and FINN_ORG_ID must be configured together")
-    return FinnApiClient(
+    rows_text = os.getenv("FINN_ROWS_PER_QUERY", "25").strip() or "25"
+    try:
+        rows_per_query = int(rows_text)
+    except ValueError as exc:
+        raise RuntimeError("FINN_ROWS_PER_QUERY must be an integer") from exc
+    client = FinnApiClient(
         api_key=api_key,
         org_id=org_id,
         market=os.getenv("FINN_MARKET", "bap/forsale").strip() or "bap/forsale",
     )
+    return TargetedFinnClient(client, rows_per_query=rows_per_query)
 
 
 def _konkurskupp_client_from_environment() -> KonkurskuppFeedClient | None:
@@ -97,8 +106,6 @@ def _bjaroy_client_from_environment() -> BjaroyFeedClient | None:
 
 
 def _konkurs_app_client_from_environment() -> KonkursAppFeedClient | KonkursAppPublicApiClient:
-    """Prefer an operator feed; otherwise use one limited documented API request."""
-
     feed_url = os.getenv("KONKURS_APP_FEED_URL", "").strip()
     token = os.getenv("KONKURS_APP_FEED_TOKEN", "").strip() or None
     if feed_url:
@@ -115,7 +122,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Generate today's opportunity dashboard snapshot")
     parser.add_argument("--keyword", default=None, help="Optional source search keyword")
     parser.add_argument("--limit", type=int, default=25, help="Maximum rows in the report")
-    parser.add_argument("--finn-rows", type=int, default=30, help="Maximum authorized FINN rows")
+    parser.add_argument("--finn-rows", type=int, default=30, help="Maximum authorized FINN rows for manual keyword searches")
     parser.add_argument("--output", default="data/todays_opportunities.json")
     parser.add_argument("--alerts-output", default="data/smart_alerts.json")
     parser.add_argument(
