@@ -43,11 +43,18 @@ def main() -> int:
         sys.executable,
         "scripts/build_discovery_health_report.py",
         "--pipeline-status", "data/pipeline_run_status.json",
-        "--coverage", "data/source_coverage.json",
+        "--source-funnel", "data/source_funnel.json",
         "--registry", "data/opportunity_registry.json",
         "--output", "data/discovery_health.json",
     ], root)
-    return p2_exit or health_exit
+    gap_exit = run([
+        sys.executable,
+        "scripts/build_source_gap_matrix.py",
+        "--plan", "config/source_expansion_plan.json",
+        "--source-funnel", "data/source_funnel.json",
+        "--output", "data/source_gap_matrix.json",
+    ], root)
+    return p2_exit or health_exit or gap_exit
 
 
 if __name__ == "__main__":
