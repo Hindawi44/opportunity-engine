@@ -24,12 +24,29 @@ _PRICE_PATTERNS = (
 )
 _STOPWORDS = {
     "selges", "brukt", "norge", "komplett", "stk", "med", "for", "til", "og", "av",
-    "pris", "bud", "artikler", "timer", "time", "min", "sek",
+    "pris", "bud", "artikler", "timer", "time", "min", "sek", "auksjon", "marked",
 }
 _MIN_SIMILARITY = 0.35
 _REQUIRED_COMPARABLES = 3
-_MAX_QUERY_VARIANTS = 3
-_TRACKING_QUERY_KEYS = {"fbclid", "gclid", "ref", "source", "utm_campaign", "utm_content", "utm_medium", "utm_source", "utm_term"}
+_MAX_QUERY_VARIANTS = 8
+_TARGET_DOMAINS = (
+    "finn.no",
+    "auksjonen.no",
+    "retrade.eu",
+    "klaravik.no",
+    "mascus.no",
+)
+_TRACKING_QUERY_KEYS = {
+    "fbclid", "gclid", "ref", "source", "utm_campaign", "utm_content", "utm_medium",
+    "utm_source", "utm_term",
+}
+_DOMAIN_CLASSES = {
+    "finn.no": "marketplace",
+    "auksjonen.no": "auction",
+    "retrade.eu": "auction",
+    "klaravik.no": "auction",
+    "mascus.no": "marketplace",
+}
 
 
 def _clean(value: object) -> str:
@@ -50,17 +67,31 @@ def _query(item: dict[str, object]) -> str:
     return f"{base} brukt pris Norge" if base else ""
 
 
+def _compact_query(base: str) -> str:
+    words = [
+        word for word in re.findall(r"[a-zA-ZæøåÆØÅ0-9]{3,}", base)
+        if word.casefold() not in _STOPWORDS and not word.isdigit()
+    ]
+    return " ".join(words[:8]) or base
+
+
 def _query_variants(item: dict[str, object]) -> list[str]:
+    """Build broad and source-targeted search queries.
+
+    Source targeting still uses the authorized Brave API. It does not scrape,
+    bypass authentication, or call undocumented endpoints on target sites.
+    """
     base = _base_query(item)
     if not base:
         return []
-    core_words = [word for word in re.findall(r"[a-zA-ZæøåÆØÅ0-9]{3,}", base) if word.casefold() not in _STOPWORDS]
-    compact = " ".join(core_words[:8]) or base
+    compact = _compact_query(base)
     variants = [
         f"{base} brukt pris Norge",
         f'"{compact}" selges kr',
         f"{compact} bruktmarked NOK",
     ]
+    variants.extend(f"site:{domain} {compact} kr" for domain in _TARGET_DOMAINS)
+
     unique: list[str] = []
     seen: set[str] = set()
     for value in variants:
@@ -72,15 +103,34 @@ def _query_variants(item: dict[str, object]) -> list[str]:
     return unique[:_MAX_QUERY_VARIANTS]
 
 
+def _query_target_domain(query: str) -> str | None:
+    match = re.search(r"(?:^|\s)site:([^\s]+)", query, re.IGNORECASE)
+    return match.group(1).casefold() if match else None
+
+
 def _canonical_url(value: object) -> str:
     raw = _clean(value)
     if not raw:
         return ""
     parsed = urlparse(raw)
-    host = parsed.netloc.casefold()
+    host = parsed.netloc.casefold().removeprefix("www.")
     path = re.sub(r"/{2,}", "/", parsed.path or "/").rstrip("/") or "/"
-    query = urlencode(sorted((key, val) for key, val in parse_qsl(parsed.query, keep_blank_values=True) if key.casefold() not in _TRACKING_QUERY_KEYS))
+    query = urlencode(sorted(
+        (key, val) for key, val in parse_qsl(parsed.query, keep_blank_values=True)
+        if key.casefold() not in _TRACKING_QUERY_KEYS
+    ))
     return urlunparse((parsed.scheme.casefold() or "https", host, path, "", query, ""))
+
+
+def _domain(value: object) -> str:
+    return urlparse(_clean(value)).netloc.casefold().removeprefix("www.")
+
+
+def _source_class(domain: str) -> str:
+    for suffix, source_class in _DOMAIN_CLASSES.items():
+        if domain == suffix or domain.endswith(f".{suffix}"):
+            return source_class
+    return "independent_web"
 
 
 def _extract_prices(text: str) -> list[float]:
@@ -104,7 +154,7 @@ def _extract_price(text: str) -> float | None:
 
 
 def _similarity(query: str, title: str, snippet: str) -> float:
-    wanted = _tokens(query)
+    wanted = _tokens(re.sub(r"(?:^|\s)site:[^\s]+", " ", query, flags=re.IGNORECASE))
     if not wanted:
         return 0.0
     observed = _tokens(f"{title} {snippet}")
@@ -125,16 +175,20 @@ def _quantity(value: object) -> int | None:
     return None
 
 
-def _evaluate_candidate(item: dict[str, object], result: dict[str, object], query: str) -> tuple[dict[str, object] | None, dict[str, object] | None]:
+def _evaluate_candidate(
+    item: dict[str, object], result: dict[str, object], query: str
+) -> tuple[dict[str, object] | None, dict[str, object] | None]:
     title = _clean(result.get("title"))
     snippet = _clean(result.get("snippet"))
     url = _clean(result.get("url"))
     canonical_url = _canonical_url(url)
+    domain = _domain(url)
     observed_text = f"{title} {snippet}"
     prices = _extract_prices(observed_text)
     similarity = _similarity(query, title, snippet)
     source_quantity = _quantity(item.get("title") or item.get("market_search_query"))
     comparable_quantity = _quantity(observed_text)
+    target_domain = _query_target_domain(query)
 
     reasons: list[str] = []
     if not url:
@@ -145,15 +199,19 @@ def _evaluate_candidate(item: dict[str, object], result: dict[str, object], quer
         reasons.append(f"similarity_below_{_MIN_SIMILARITY}")
     if source_quantity and comparable_quantity and source_quantity != comparable_quantity:
         reasons.append("quantity_mismatch")
+    if target_domain and domain and not (domain == target_domain or domain.endswith(f".{target_domain}")):
+        reasons.append("target_domain_mismatch")
 
     if reasons:
         return None, {
             "url": url or None,
             "canonical_url": canonical_url or None,
+            "domain": domain or None,
             "title": title or None,
             "similarity_score": similarity,
             "source_quantity": source_quantity,
             "comparable_quantity": comparable_quantity,
+            "target_domain": target_domain,
             "rejection_reasons": reasons,
         }
 
@@ -162,7 +220,8 @@ def _evaluate_candidate(item: dict[str, object], result: dict[str, object], quer
         "source": _clean(result.get("source")) or "Brave Search",
         "url": url,
         "canonical_url": canonical_url,
-        "domain": urlparse(url).netloc.casefold(),
+        "domain": domain,
+        "source_class": _source_class(domain),
         "title": title,
         "snippet": snippet,
         "price_nok": prices[0],
@@ -212,27 +271,48 @@ def main() -> int:
         candidates_by_url: dict[str, dict[str, object]] = {}
         rejected_candidates: list[dict[str, object]] = []
         source_url = _canonical_url(raw_item.get("url"))
+        query_stats: list[dict[str, object]] = []
+
         for query in queries:
+            accepted_for_query = 0
+            rejected_for_query = 0
+            result_count = 0
             try:
-                for result in client.search(query, count=args.results_per_query, country="NO", search_lang="no"):
+                results = client.search(query, count=args.results_per_query, country="NO", search_lang="no")
+                for result in results:
+                    result_count += 1
                     candidate, rejection = _evaluate_candidate(raw_item, dict(result), query)
                     if candidate:
                         key = str(candidate.get("canonical_url") or candidate.get("url"))
                         if key and key != source_url:
                             candidate["matched_query"] = query
+                            candidate["query_target_domain"] = _query_target_domain(query)
                             previous = candidates_by_url.get(key)
                             if previous is None or float(candidate["similarity_score"]) > float(previous["similarity_score"]):
                                 candidates_by_url[key] = candidate
+                            accepted_for_query += 1
                     elif rejection:
                         rejection["matched_query"] = query
                         rejected_candidates.append(rejection)
+                        rejected_for_query += 1
             except RuntimeError as exc:
                 errors[f"{opportunity_id or 'unknown'}:{query}"] = str(exc)
+            query_stats.append({
+                "query": query,
+                "target_domain": _query_target_domain(query),
+                "result_count": result_count,
+                "accepted_count": accepted_for_query,
+                "rejected_count": rejected_for_query,
+            })
 
-        candidates = sorted(candidates_by_url.values(), key=lambda item: (-float(item["similarity_score"]), str(item["domain"])))
+        candidates = sorted(
+            candidates_by_url.values(),
+            key=lambda item: (-float(item["similarity_score"]), str(item["domain"])),
+        )
         prices = [float(item["price_nok"]) for item in candidates]
-        enough_candidates = len(candidates) >= _REQUIRED_COMPARABLES
         distinct_domains = len({str(item["domain"]) for item in candidates})
+        distinct_source_classes = len({str(item["source_class"]) for item in candidates})
+        enough_candidates = len(candidates) >= _REQUIRED_COMPARABLES
         records.append({
             "opportunity_id": opportunity_id,
             "title": raw_item.get("title"),
@@ -240,8 +320,10 @@ def main() -> int:
             "market_search_query": queries[0] if queries else "",
             "market_search_queries": queries,
             "query_count": len(queries),
+            "query_stats": query_stats,
             "candidate_count": len(candidates),
             "distinct_domain_count": distinct_domains,
+            "distinct_source_class_count": distinct_source_classes,
             "candidate_price_min_nok": min(prices) if prices else None,
             "candidate_price_median_nok": median(prices) if prices else None,
             "candidate_price_max_nok": max(prices) if prices else None,
@@ -260,15 +342,16 @@ def main() -> int:
         })
 
     output_payload = {
-        "schema_version": 3,
+        "schema_version": 4,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "method": (
-            "Brave Search multi-query candidate discovery with strict NOK parsing, URL deduplication, "
-            "similarity and quantity checks; prices are unverified and never used automatically for a buy decision"
+            "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, "
+            "URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified"
         ),
         "minimum_similarity": _MIN_SIMILARITY,
         "required_comparables": _REQUIRED_COMPARABLES,
         "max_query_variants": _MAX_QUERY_VARIANTS,
+        "target_domains": list(_TARGET_DOMAINS),
         "opportunity_count": len(records),
         "candidate_count": sum(int(item["candidate_count"]) for item in records),
         "rejected_candidate_count": sum(int(item["rejected_candidate_count"]) for item in records),
@@ -277,7 +360,10 @@ def main() -> int:
     }
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(output_payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(output_payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     print(json.dumps({
         "output": str(output),
         "opportunity_count": len(records),
