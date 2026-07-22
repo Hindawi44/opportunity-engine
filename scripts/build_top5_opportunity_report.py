@@ -61,8 +61,21 @@ def _legacy_merge(queue_item: dict[str, object], evaluation: dict[str, object] |
     score, score_reasons = _legacy_score(merged)
     merged["opportunity_score"] = score
     merged["score_reasons"] = score_reasons
-    merged["recommendation"] = "MONITOR" if score >= 45 else "REJECT"
+    merged["recommendation"] = (
+        "NUMERIC_REVIEW" if merged.get("decision") == "REVIEW_NUMBERS"
+        else "COLLECT_EVIDENCE"
+    )
     return merged
+
+
+# Public compatibility names retained for the established unit-test and any external
+# callers. Production P2 ranking does not use these helpers when --scored is supplied.
+def _score(item: dict[str, object]) -> tuple[int, list[str]]:
+    return _legacy_score(item)
+
+
+def _merge(queue_item: dict[str, object], evaluation: dict[str, object] | None) -> dict[str, object]:
+    return _legacy_merge(queue_item, evaluation)
 
 
 def main() -> int:
