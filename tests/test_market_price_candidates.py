@@ -1,9 +1,11 @@
 from scripts.collect_market_price_candidates import (
     _candidate,
+    _canonical_url,
     _evaluate_candidate,
     _extract_price,
     _extract_prices,
     _quantity,
+    _query_variants,
     _similarity,
 )
 
@@ -26,6 +28,17 @@ def test_similarity_requires_shared_product_terms() -> None:
     assert _similarity("lagerreol 200x60", "Brudekjole", "silke størrelse 38") == 0.0
 
 
+def test_query_variants_are_unique_and_bounded() -> None:
+    variants = _query_variants({"title": "4 stk komplette lagerreoler 200x60"})
+    assert 1 <= len(variants) <= 3
+    assert len(variants) == len(set(value.casefold() for value in variants))
+    assert all("lagerreol" in value.casefold() for value in variants)
+
+
+def test_canonical_url_removes_tracking_and_fragment() -> None:
+    assert _canonical_url("https://EXAMPLE.no/reol/1/?utm_source=x&color=blue#top") == "https://example.no/reol/1?color=blue"
+
+
 def test_quantity_extracts_explicit_norwegian_quantity() -> None:
     assert _quantity("4 stk komplette lagerreoler") == 4
     assert _quantity("pakke med 6 hyller") == 6
@@ -44,6 +57,7 @@ def test_candidate_is_unverified_and_keeps_observed_price() -> None:
 
     assert candidate is not None
     assert candidate["price_nok"] == 8500.0
+    assert candidate["canonical_url"] == "https://example.no/reol/1"
     assert candidate["verified"] is False
     assert candidate["verification_status"] == "REVIEW_REQUIRED"
 
