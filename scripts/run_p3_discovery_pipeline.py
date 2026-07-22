@@ -3,13 +3,38 @@
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
 
 
+OFFICIAL_GAP_STATUSES = {"ACTIVE", "CODE_READY", "BLOCKED_AUTH", "PLANNED", "DEPRECATED"}
+
+
 def run(command: list[str], root: Path) -> int:
     return subprocess.run(command, cwd=root, check=False).returncode
+
+
+def validate_gap_matrix(path: Path) -> bool:
+    if not path.is_file():
+        print(f"Missing required source gap matrix: {path}", file=sys.stderr)
+        return False
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"Invalid source gap matrix {path}: {exc}", file=sys.stderr)
+        return False
+    allowed = set(payload.get("allowed_statuses") or [])
+    statuses = {
+        str(item.get("status"))
+        for item in payload.get("sources", [])
+        if isinstance(item, dict) and item.get("status")
+    }
+    if allowed != OFFICIAL_GAP_STATUSES or not statuses <= OFFICIAL_GAP_STATUSES:
+        print("Source gap matrix contains non-official statuses", file=sys.stderr)
+        return False
+    return True
 
 
 def main() -> int:
@@ -47,6 +72,7 @@ def main() -> int:
         "--registry", "data/opportunity_registry.json",
         "--output", "data/discovery_health.json",
     ], root)
+    gap_output = root / "data/source_gap_matrix.json"
     gap_exit = run([
         sys.executable,
         "scripts/build_source_gap_matrix.py",
@@ -54,6 +80,8 @@ def main() -> int:
         "--source-funnel", "data/source_funnel.json",
         "--output", "data/source_gap_matrix.json",
     ], root)
+    if gap_exit == 0 and not validate_gap_matrix(gap_output):
+        gap_exit = 1
     return p2_exit or health_exit or gap_exit
 
 
