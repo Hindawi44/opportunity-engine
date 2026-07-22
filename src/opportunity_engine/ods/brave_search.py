@@ -49,7 +49,6 @@ class BraveSearchClient:
     def headers(self) -> dict[str, str]:
         return {
             "Accept": "application/json",
-            "Accept-Encoding": "gzip",
             "X-Subscription-Token": self.api_key,
             "User-Agent": "Opportunity-Engine/1.0 (authorized-search)",
         }
