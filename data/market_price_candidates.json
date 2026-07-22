@@ -1,7 +1,7 @@
 {
-  "candidate_count": 2,
+  "candidate_count": 1,
   "errors": {},
-  "generated_at": "2026-07-22T17:44:36.205481+00:00",
+  "generated_at": "2026-07-22T18:12:59.989966+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
@@ -16,7 +16,7 @@
       "candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-22T17:44:23.398121+00:00",
+          "captured_at": "2026-07-22T18:12:44.053966+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
@@ -129,6 +129,21 @@
           "url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg/"
         },
         {
+          "canonical_url": "https://supersellers.dk/en/collections/warehouse-shelving",
+          "comparable_quantity": null,
+          "domain": "supersellers.dk",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.167,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Lagerreoler – Sterke og fleksible reoler",
+          "url": "https://www.supersellers.dk/en/collections/warehouse-shelving"
+        },
+        {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -142,21 +157,6 @@
           "target_domain": null,
           "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
-        },
-        {
-          "canonical_url": "https://reolteknikk.no/produktkategori/brukt",
-          "comparable_quantity": null,
-          "domain": "reolteknikk.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "rt brukt - Lagerinnredning - Reolteknikk AS",
-          "url": "https://reolteknikk.no/produktkategori/brukt/"
         },
         {
           "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
@@ -174,19 +174,19 @@
           "url": "https://fasadenor.no/product-category/lagerreoler/"
         },
         {
-          "canonical_url": "https://lagerbod.no/tonsberg",
+          "canonical_url": "https://reolteknikk.no/produktkategori/brukt",
           "comparable_quantity": null,
-          "domain": "lagerbod.no",
+          "domain": "reolteknikk.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.167,
+          "similarity_score": 0.0,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Tønsberg - Lagerbod.no",
-          "url": "https://lagerbod.no/tonsberg/"
+          "title": "rt brukt - Lagerinnredning - Reolteknikk AS",
+          "url": "https://reolteknikk.no/produktkategori/brukt/"
         },
         {
           "canonical_url": "https://movement.as/skriv-ut/kontormobler-og-utstyr/skap-og-lagring/lagerutstyr-og-arkivreoler/lagerreol---stalreol-i-galvanisert-stal-hoyde-210cm-400cm-bredde-4-fag-51cm-dybde-pent-brukt-52097.html",
@@ -205,9 +205,9 @@
           "url": "https://www.movement.as/skriv-ut/kontormobler-og-utstyr/skap-og-lagring/lagerutstyr-og-arkivreoler/lagerreol---stalreol-i-galvanisert-stal-hoyde-210cm-400cm-bredde-4-fag-51cm-dybde-pent-brukt-52097.html"
         },
         {
-          "canonical_url": "https://p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring",
+          "canonical_url": "https://lagerbod.no/tonsberg",
           "comparable_quantity": null,
-          "domain": "p-lindberg.no",
+          "domain": "lagerbod.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
@@ -216,8 +216,8 @@
           "similarity_score": 0.167,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Lagerreoler og lagring I Stort utvalg til verkstedet hos P. Lindberg",
-          "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/"
+          "title": "Tønsberg - Lagerbod.no",
+          "url": "https://lagerbod.no/tonsberg/"
         },
         {
           "canonical_url": "https://caroffice.no/categories/brukte-innredninger-pa-lager",
@@ -235,9 +235,9 @@
           "url": "https://www.caroffice.no/categories/brukte-innredninger-pa-lager"
         },
         {
-          "canonical_url": "https://reolborsen.dk/category/brugte",
+          "canonical_url": "https://p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring",
           "comparable_quantity": null,
-          "domain": "reolborsen.dk",
+          "domain": "p-lindberg.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
@@ -246,8 +246,8 @@
           "similarity_score": 0.167,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Brugtbørsen: Find de bedste brugte varer Arkiv - ReolBørsen ApS",
-          "url": "https://www.reolborsen.dk/category/brugte/"
+          "title": "Lagerreoler og lagring I Stort utvalg til verkstedet hos P. Lindberg",
+          "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/"
         },
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg",
@@ -324,21 +324,6 @@
           "url": "https://www.facebook.com/events/messehall-b/bruktmarked/2588774991469512/"
         },
         {
-          "canonical_url": "https://loppetur.no/finn-bruktbutikk/tonsberg-kommune",
-          "comparable_quantity": null,
-          "domain": "loppetur.no",
-          "matched_query": "komplette Lagerreoler 200cm Svart 1200kg Tønsberg bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Bruktbutikker i Tønsberg kommune - Loppetur",
-          "url": "https://www.loppetur.no/finn-bruktbutikk/tonsberg-kommune"
-        },
-        {
           "canonical_url": "https://p-lindberg.no/lagerreol-9041825",
           "comparable_quantity": null,
           "domain": "p-lindberg.no",
@@ -352,6 +337,21 @@
           "target_domain": null,
           "title": "Lagerreol | Verktøy og verksted | P.Lindberg",
           "url": "https://www.p-lindberg.no/lagerreol-9041825/"
+        },
+        {
+          "canonical_url": "https://loppetur.no/finn-bruktbutikk/tonsberg-kommune",
+          "comparable_quantity": null,
+          "domain": "loppetur.no",
+          "matched_query": "komplette Lagerreoler 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Bruktbutikker i Tønsberg kommune - Loppetur",
+          "url": "https://www.loppetur.no/finn-bruktbutikk/tonsberg-kommune"
         },
         {
           "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
@@ -488,6 +488,21 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=180403983"
         },
         {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/341404657",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Elektrisk rulle arkiv/ lager | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/341404657"
+        },
+        {
           "canonical_url": "https://finn.no/bap/forsale/search.html?product_category=2.91.3102.374",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -516,21 +531,6 @@
           "target_domain": "finn.no",
           "title": "Lagerhall | til salgs | FINN Torget",
           "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3102.378"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/341404657",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": "finn.no",
-          "title": "Elektrisk rulle arkiv/ lager | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/341404657"
         },
         {
           "canonical_url": "https://nyheter.auksjonen.no/",
@@ -922,21 +922,6 @@
           "url": "https://www.klaravik.no/auction/product/innvendig-spiraltrapp-i-stal-glass/"
         },
         {
-          "canonical_url": "https://klaravik.no/auction/product/traller-med-2-hyller-pa-hjul-21331",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Traller, med 2 hyller på hjul - 21331",
-          "url": "https://www.klaravik.no/auction/product/traller-med-2-hyller-pa-hjul-21331/"
-        },
-        {
           "canonical_url": "https://klaravik.no/auction/product/varmeveksler-for-bolig-og-bygg-011259",
           "comparable_quantity": null,
           "domain": "klaravik.no",
@@ -950,6 +935,21 @@
           "target_domain": "klaravik.no",
           "title": "Klaravik auksjoner - Varmeveksler for bolig og bygg - 011259",
           "url": "https://www.klaravik.no/auction/product/varmeveksler-for-bolig-og-bygg-011259/"
+        },
+        {
+          "canonical_url": "https://klaravik.no/auction/product/traller-med-2-hyller-pa-hjul-21331",
+          "comparable_quantity": null,
+          "domain": "klaravik.no",
+          "matched_query": "site:klaravik.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": "klaravik.no",
+          "title": "Klaravik auksjoner - Traller, med 2 hyller på hjul - 21331",
+          "url": "https://www.klaravik.no/auction/product/traller-med-2-hyller-pa-hjul-21331/"
         },
         {
           "canonical_url": "https://klaravik.no/auction/product/lastebil-mkrokloft",
@@ -1011,21 +1011,6 @@
           "url": "https://www.mascus.no/transport/tilhengere?from_brandmodel=palmer"
         },
         {
-          "canonical_url": "https://mascus.no/landbruk/reservedeler/utb",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.167,
-          "source_quantity": 4,
-          "target_domain": "mascus.no",
-          "title": "Brukt reservedeler Utb til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/landbruk/reservedeler/utb"
-        },
-        {
           "canonical_url": "https://mascus.no/main-category/truck",
           "comparable_quantity": null,
           "domain": "mascus.no",
@@ -1039,6 +1024,21 @@
           "target_domain": "mascus.no",
           "title": "Brukte trucker og utstyr til salgs - materialhåndtering på Mascus",
           "url": "https://www.mascus.no/main-category/truck"
+        },
+        {
+          "canonical_url": "https://mascus.no/landbruk/reservedeler/utb",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.167,
+          "source_quantity": 4,
+          "target_domain": "mascus.no",
+          "title": "Brukt reservedeler Utb til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/landbruk/reservedeler/utb"
         },
         {
           "canonical_url": "https://mascus.no/landbruk/gjodselsutstyr,4,relevance,search.html",
@@ -1056,21 +1056,6 @@
           "url": "https://www.mascus.no/landbruk/gjodselsutstyr,4,relevance,search.html"
         },
         {
-          "canonical_url": "https://mascus.no/anlegg/andre-komponenter-anlegg/komplete-tvillinghjul-til-traktor-komplette/mnhhgtmk.html",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.167,
-          "source_quantity": 4,
-          "target_domain": "mascus.no",
-          "title": "Komplete tvillinghjul til traktor. Komplette, 1900, Levanger,Trøndelag, Norge - Brukt andre komponenter - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg/komplete-tvillinghjul-til-traktor-komplette/mnhhgtmk.html"
-        },
-        {
           "canonical_url": "https://mascus.no/landbruk/gjodselsutstyr/b%C3%B8gballe",
           "comparable_quantity": null,
           "domain": "mascus.no",
@@ -1084,6 +1069,21 @@
           "target_domain": "mascus.no",
           "title": "Brukt gjødselutstyr Bøgballe til salgs - Mascus Norway",
           "url": "https://www.mascus.no/landbruk/gjodselsutstyr/b%C3%B8gballe"
+        },
+        {
+          "canonical_url": "https://mascus.no/anlegg/andre-komponenter-anlegg/komplete-tvillinghjul-til-traktor-komplette/mnhhgtmk.html",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.167,
+          "source_quantity": 4,
+          "target_domain": "mascus.no",
+          "title": "Komplete tvillinghjul til traktor. Komplette, 1900, Levanger,Trøndelag, Norge - Brukt andre komponenter - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg/komplete-tvillinghjul-til-traktor-komplette/mnhhgtmk.html"
         },
         {
           "canonical_url": "https://mascus.no/transport/lastebiler/containerramme",
@@ -1132,272 +1132,254 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 59m 41s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
       "verified_comparable_count": 0
     },
     {
       "asking_price_nok": 26000.0,
-      "candidate_count": 1,
+      "candidate_count": 0,
       "candidate_market_value_nok": null,
-      "candidate_price_max_nok": 34341.0,
-      "candidate_price_median_nok": 34341.0,
-      "candidate_price_min_nok": 34341.0,
-      "candidates": [
-        {
-          "canonical_url": "https://finn.no/59501883",
-          "captured_at": "2026-07-22T17:44:30.322615+00:00",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "observed_prices_nok": [
-            34341.0
-          ],
-          "price_nok": 34341.0,
-          "quantity_status": "UNKNOWN",
-          "query_target_domain": "finn.no",
-          "similarity_score": 0.4,
-          "snippet": "Eff.rente 11,00 %. 120 000 o/5 år. Kostnad: <strong>34 341 kr</strong>.",
-          "source": "Brave Search",
-          "source_class": "marketplace",
-          "source_quantity": null,
-          "title": "Varelager og utstilling i butikk selges! | FINN torget",
-          "url": "https://www.finn.no/59501883",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
-        }
-      ],
-      "distinct_domain_count": 1,
-      "distinct_source_class_count": 1,
+      "candidate_price_max_nok": null,
+      "candidate_price_median_nok": null,
+      "candidate_price_min_nok": null,
+      "candidates": [],
+      "distinct_domain_count": 0,
+      "distinct_source_class_count": 0,
       "eligible_for_market_value": false,
       "market_search_queries": [
-        "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
-        "\"BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand\" selges kr",
-        "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
-        "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-        "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-        "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-        "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-        "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr"
+        "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
+        "\"BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s\" selges kr",
+        "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
+        "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+        "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+        "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+        "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+        "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr"
       ],
-      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
-      "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
+      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
+      "market_value_status": "NO_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-612667",
       "query_count": 8,
       "query_stats": [
         {
           "accepted_count": 0,
-          "query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
+          "query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": null
         },
         {
           "accepted_count": 0,
-          "query": "\"BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand\" selges kr",
+          "query": "\"BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s\" selges kr",
           "rejected_count": 0,
           "result_count": 0,
           "target_domain": null
         },
         {
           "accepted_count": 0,
-          "query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": null
         },
         {
-          "accepted_count": 1,
-          "query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejected_count": 9,
+          "accepted_count": 0,
+          "query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejected_count": 10,
           "result_count": 10,
           "target_domain": "finn.no"
         },
         {
           "accepted_count": 0,
-          "query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": "auksjonen.no"
         },
         {
           "accepted_count": 0,
-          "query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": "retrade.eu"
         },
         {
           "accepted_count": 0,
-          "query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": "klaravik.no"
         },
         {
           "accepted_count": 0,
-          "query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": "mascus.no"
         }
       ],
-      "rejected_candidate_count": 69,
+      "rejected_candidate_count": 70,
       "rejected_candidates": [
-        {
-          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-home",
-          "comparable_quantity": null,
-          "domain": "ubuy.co.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Kjøp Kawaii Home produkter online til de beste prisene i Norway | Ukjøp",
-          "url": "https://www.ubuy.co.no/no/brand/kawaii-home"
-        },
         {
           "canonical_url": "https://rubrikk.no/torget-brukt-til-salgs/varelager-til-salgs.html",
           "comparable_quantity": null,
           "domain": "rubrikk.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": null,
           "title": "Varelager til salgs - Juli 2023",
           "url": "https://www.rubrikk.no/torget-brukt-til-salgs/varelager-til-salgs.html"
         },
         {
-          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-merch",
+          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-home",
           "comparable_quantity": null,
           "domain": "ubuy.co.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
           "rejection_reasons": [
-            "missing_observed_nok_price"
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
           ],
-          "similarity_score": 0.4,
+          "similarity_score": 0.286,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Kjøp Kawaii Merch produkter online til de beste prisene i Norway | Ukjøp",
-          "url": "https://www.ubuy.co.no/no/brand/kawaii-merch"
+          "title": "Kjøp Kawaii Home produkter online til de beste prisene i Norway | Ukjøp",
+          "url": "https://www.ubuy.co.no/no/brand/kawaii-home"
         },
         {
           "canonical_url": "https://ubuy.co.no/no/brand/super-cute-kawaii",
           "comparable_quantity": null,
           "domain": "ubuy.co.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
           "rejection_reasons": [
-            "missing_observed_nok_price"
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
           ],
-          "similarity_score": 0.4,
+          "similarity_score": 0.286,
           "source_quantity": null,
           "target_domain": null,
           "title": "Kjøp Super Cute Kawaii produkter online til de beste prisene i Norway | Ukjøp",
           "url": "https://www.ubuy.co.no/no/brand/super-cute-kawaii"
         },
         {
-          "canonical_url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand",
+          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-clothes-&-anime-stuff-for-men-&-women",
           "comparable_quantity": null,
-          "domain": "finnbruktbutikk.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
+          "domain": "ubuy.co.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.286,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Kjøp Kawaii Clothes & Anime Stuff For Men & Women produkter på nett |. Ukjøp Norway",
+          "url": "https://www.ubuy.co.no/no/brand/kawaii-clothes-&-anime-stuff-for-men-&-women"
+        },
+        {
+          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-merch",
+          "comparable_quantity": null,
+          "domain": "ubuy.co.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.286,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Kjøp Kawaii Merch produkter online til de beste prisene i Norway | Ukjøp",
+          "url": "https://www.ubuy.co.no/no/brand/kawaii-merch"
+        },
+        {
+          "canonical_url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand",
+          "comparable_quantity": null,
+          "domain": "finnbruktbutikk.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": null,
           "title": "Alle bruktbutikker i Kristiansand | Finnbruktbutikk",
           "url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand/"
         },
         {
-          "canonical_url": "https://facebook.com/sognebruktogantikk",
+          "canonical_url": "https://sornett.no/ny-brukt-butikk/19.10510",
           "comparable_quantity": null,
-          "domain": "facebook.com",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Søgne Brukt og Antikk | Kristiansand | Facebook",
-          "url": "https://www.facebook.com/sognebruktogantikk/"
-        },
-        {
-          "canonical_url": "https://azets.com/no-no/ressurser/artikler/varetelling-varelager-tips",
-          "comparable_quantity": null,
-          "domain": "azets.com",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Tips til varelager og varetelling | Azets | Norge | Azets",
-          "url": "https://www.azets.com/no-no/ressurser/artikler/varetelling-varelager-tips"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.91",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
+          "domain": "sornett.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.0,
+          "similarity_score": 0.286,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Næringsvirksomhet | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?category=0.91"
+          "title": "Ny bruktbutikk i Kristiansand",
+          "url": "https://sornett.no/ny-brukt-butikk/19.10510"
         },
         {
-          "canonical_url": "https://norskebransjemagasinet.no/nyheter/artikel/skogholt-yrkesbekledning",
+          "canonical_url": "https://baerekraftigkristiansand.no/temasider/hverdagsliv/secondhand-safari",
           "comparable_quantity": null,
-          "domain": "norskebransjemagasinet.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Ledende leverandør av arbeidstøy og verneutstyr til norsk industri",
-          "url": "https://www.norskebransjemagasinet.no/nyheter/artikel/skogholt-yrkesbekledning"
-        },
-        {
-          "canonical_url": "https://norgeguide.com/kristiansand/brukte-varer-butikker",
-          "comparable_quantity": null,
-          "domain": "norgeguide.com",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "🎒🧵 Brukteklær- og tilbehørbutikker i Kristiansand: stilrike varer til lav pris📍 En sjanse til å finne sjeldne perler blant klær og tilbehør. — Norway",
-          "url": "https://norgeguide.com/kristiansand/brukte-varer-butikker/"
-        },
-        {
-          "canonical_url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand",
-          "comparable_quantity": null,
-          "domain": "finnbruktbutikk.no",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "domain": "baerekraftigkristiansand.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
           "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Secondhand-safari | Bærekraftig Kristiansand",
+          "url": "https://www.baerekraftigkristiansand.no/temasider/hverdagsliv/secondhand-safari"
+        },
+        {
+          "canonical_url": "https://diskusjon.no/topic/1117060-hva-skjer-med-varelager-ved-avvikling-av-enk",
+          "comparable_quantity": 1,
+          "domain": "diskusjon.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.286,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Hva skjer med varelager ved avvikling av ENK? - Bedriftsøkonomi og ledelse - Diskusjon.no",
+          "url": "https://www.diskusjon.no/topic/1117060-hva-skjer-med-varelager-ved-avvikling-av-enk/"
+        },
+        {
+          "canonical_url": "https://ny.auksjonen.no/auksjoner/torget",
+          "comparable_quantity": null,
+          "domain": "ny.auksjonen.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Torget | Auksjonen.no",
+          "url": "https://ny.auksjonen.no/auksjoner/torget"
+        },
+        {
+          "canonical_url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand",
+          "comparable_quantity": null,
+          "domain": "finnbruktbutikk.no",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.111,
           "source_quantity": null,
           "target_domain": null,
           "title": "Alle bruktbutikker i Kristiansand | Finnbruktbutikk",
@@ -1407,187 +1389,157 @@
           "canonical_url": "https://gjenbruken.no/kristiansand",
           "comparable_quantity": null,
           "domain": "gjenbruken.no",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.143,
+          "similarity_score": 0.111,
           "source_quantity": null,
           "target_domain": null,
           "title": "Kristiansand - Gjenbruken",
           "url": "https://gjenbruken.no/kristiansand/"
         },
         {
-          "canonical_url": "https://kvadraturen.no/shopping",
-          "comparable_quantity": null,
-          "domain": "kvadraturen.no",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Shopping - Kvadraturen",
-          "url": "https://kvadraturen.no/shopping/"
-        },
-        {
-          "canonical_url": "https://gulesider.no/bruktbutikker+kristiansand/bedrifter",
-          "comparable_quantity": null,
-          "domain": "gulesider.no",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Bruktbutikker Kristiansand | bedrifter | gulesider.no | side 1",
-          "url": "https://www.gulesider.no/bruktbutikker+kristiansand/bedrifter"
-        },
-        {
           "canonical_url": "https://facebook.com/mollagjenbruk",
           "comparable_quantity": null,
           "domain": "facebook.com",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.286,
+          "similarity_score": 0.222,
           "source_quantity": null,
           "target_domain": null,
           "title": "Mølla bruktmarked | Kristiansand | Facebook",
           "url": "https://www.facebook.com/mollagjenbruk/"
         },
         {
-          "canonical_url": "https://blakors.no/kristiansand/virksomheter/bla-kors-gjenbruk",
+          "canonical_url": "https://kvadraturen.no/shopping",
           "comparable_quantity": null,
-          "domain": "blakors.no",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "domain": "kvadraturen.no",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.143,
+          "similarity_score": 0.111,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Blå Kors gjenbruk - Blå Kors Kristiansand",
-          "url": "https://www.blakors.no/kristiansand/virksomheter/bla-kors-gjenbruk/"
+          "title": "Shopping - Kvadraturen",
+          "url": "https://kvadraturen.no/shopping/"
         },
         {
-          "canonical_url": "https://facebook.com/blakorsgjenbrukkrs?locale=nb_NO",
+          "canonical_url": "https://finnbruktbutikk.no/",
           "comparable_quantity": null,
-          "domain": "facebook.com",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "domain": "finnbruktbutikk.no",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.143,
+          "similarity_score": 0.111,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Blå Kors gjenbruk, Mjåvann | Kristiansand Sør",
-          "url": "https://www.facebook.com/blakorsgjenbrukkrs/?locale=nb_NO"
+          "title": "Bruktbutikk – Alle bruktbutikker i Norge på ett sted",
+          "url": "https://finnbruktbutikk.no/"
         },
         {
-          "canonical_url": "https://sognebruktogantikk.no/",
+          "canonical_url": "https://kvadraturen.no/shopping-i-kristiansand",
           "comparable_quantity": null,
-          "domain": "sognebruktogantikk.no",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "domain": "kvadraturen.no",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.143,
+          "similarity_score": 0.111,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Søgne brukt og antikk – Bruktbutikk på nett",
-          "url": "https://sognebruktogantikk.no/"
+          "title": "Shopping i Kristiansand - Kvadraturen",
+          "url": "https://kvadraturen.no/shopping-i-kristiansand/"
         },
         {
-          "canonical_url": "https://fvn.no/krsby/i/opxEVB/den-store-bruktguiden-her-kan-du-gjoere-kuppene-i-kristiansand",
+          "canonical_url": "https://norskavvikling.no/butikk",
           "comparable_quantity": null,
-          "domain": "fvn.no",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "domain": "norskavvikling.no",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.143,
+          "similarity_score": 0.222,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Den store bruktguiden: Her kan du gjøre kuppene i Kristiansand - fvn.no",
-          "url": "https://www.fvn.no/krsby/i/opxEVB/den-store-bruktguiden-her-kan-du-gjoere-kuppene-i-kristiansand"
+          "title": "Butikk – Norsk Avvikling",
+          "url": "https://norskavvikling.no/butikk/"
         },
         {
           "canonical_url": "https://norgeguide.com/kristiansand/brukte-varer-butikker",
           "comparable_quantity": null,
           "domain": "norgeguide.com",
-          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand bruktmarked NOK",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.143,
+          "similarity_score": 0.111,
           "source_quantity": null,
           "target_domain": null,
           "title": "🎒🧵 Brukteklær- og tilbehørbutikker i Kristiansand: stilrike varer til lav pris📍 En sjanse til å finne sjeldne perler blant klær og tilbehør. — Norway",
           "url": "https://norgeguide.com/kristiansand/brukte-varer-butikker/"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/465782612",
+          "canonical_url": "https://blakors.no/kristiansand/2025/02/27/bla-kors-overtar-molla-bruktmarked",
           "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "domain": "blakors.no",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.222,
           "source_quantity": null,
-          "target_domain": "finn.no",
-          "title": "Varelager fra nedlagt nettbutikk selges samlet – masse nye varer | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/465782612"
+          "target_domain": null,
+          "title": "Blå Kors overtar Mølla bruktmarked - Blå Kors Kristiansand",
+          "url": "https://www.blakors.no/kristiansand/2025/02/27/bla-kors-overtar-molla-bruktmarked/"
         },
         {
-          "canonical_url": "https://finn.no/realestate/businessrent/search.html?location=1.22042.20179",
+          "canonical_url": "https://kristiansand.kommune.no/navigasjon/bolig-kart-og-eiendom/miljo-og-klima/arrangement-og-kampanjer/noe-for-deg-marked",
           "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "domain": "kristiansand.kommune.no",
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.111,
           "source_quantity": null,
-          "target_domain": "finn.no",
-          "title": "Næringseiendommer til leie i Kristiansand | FINN Eiendom",
-          "url": "https://www.finn.no/realestate/businessrent/search.html?location=1.22042.20179"
+          "target_domain": null,
+          "title": "Kristiansand kommune - Noe for deg-marked",
+          "url": "https://www.kristiansand.kommune.no/navigasjon/bolig-kart-og-eiendom/miljo-og-klima/arrangement-og-kampanjer/noe-for-deg-marked/"
         },
         {
-          "canonical_url": "https://finn.no/realestate/businesssale/search.html?location=0.22042",
+          "canonical_url": "https://finn.no/59501883",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.286,
           "source_quantity": null,
           "target_domain": "finn.no",
-          "title": "Næringseiendommer til salgs i Agder | FINN Eiendom",
-          "url": "https://www.finn.no/realestate/businesssale/search.html?location=0.22042"
+          "title": "Varelager og utstilling i butikk selges! | FINN torget",
+          "url": "https://www.finn.no/59501883"
         },
         {
           "canonical_url": "https://finn.no/butikk/krs123",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -1599,88 +1551,133 @@
           "url": "https://www.finn.no/butikk/krs123"
         },
         {
-          "canonical_url": "https://finn.no/butikk/oslovarelager",
+          "canonical_url": "https://finn.no/recommerce/forsale/item/465782612",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
+            "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "finn.no",
-          "title": "Nytt og brukt annonser | FINN Torget",
-          "url": "https://www.finn.no/butikk/oslovarelager"
+          "title": "Varelager fra nedlagt nettbutikk selges samlet – masse nye varer | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/465782612"
+        },
+        {
+          "canonical_url": "https://finn.no/realestate/businessrent/search.html?location=1.22042.20179",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Næringseiendommer til leie i Kristiansand | FINN Eiendom",
+          "url": "https://www.finn.no/realestate/businessrent/search.html?location=1.22042.20179"
+        },
+        {
+          "canonical_url": "https://finn.no/realestate/homes/search.html?location=1.22042.20179",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Bolig til salgs i Kristiansand | FINN Eiendom",
+          "url": "https://www.finn.no/realestate/homes/search.html?location=1.22042.20179"
+        },
+        {
+          "canonical_url": "https://finn.no/butikk/felleskjopetra",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Felleskjøpet Rogaland Agder - Stavanger – FINN-butikkside",
+          "url": "https://www.finn.no/butikk/felleskjopetra"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.91.3108.363",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Vareparti og konkursbo | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.91.3108",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.286,
           "source_quantity": null,
           "target_domain": "finn.no",
           "title": "Butikk og varehandel | til salgs | FINN Torget",
           "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.91.3108"
         },
         {
-          "canonical_url": "https://finn.no/butikk/hanes122",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": "finn.no",
-          "title": "Wasteland Brukthandel – FINN-butikkside",
-          "url": "https://www.finn.no/butikk/hanes122"
-        },
-        {
           "canonical_url": "https://finn.no/recommerce/forsale/item/379955413",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "finn.no",
           "title": "Varelager til nettbutikk selges | FINN-torget",
           "url": "https://www.finn.no/recommerce/forsale/item/379955413"
         },
         {
-          "canonical_url": "https://finn.no/butikk/pedersens",
+          "canonical_url": "https://finn.no/reise/pakkereiser/norge/kristiansand",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "finn.no",
-          "title": "Pedersens Vaabenlager AS – FINN-butikkside",
-          "url": "https://www.finn.no/butikk/pedersens"
+          "title": "Finn billige pakkereiser til Kristiansand fra 2139 kr | FINN reise",
+          "url": "https://www.finn.no/reise/pakkereiser/norge/kristiansand/"
         },
         {
           "canonical_url": "https://auksjonen.no/auksjoner/varelager",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "auksjonen.no",
           "title": "Varelager",
@@ -1690,12 +1687,12 @@
           "canonical_url": "https://auksjonen.no/auksjoner/torget?ordering=avsluttes&p=5",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "auksjonen.no",
           "title": "Kjøp og selg brukt utstyr og verktøy hos auksjonen.no",
@@ -1705,52 +1702,67 @@
           "canonical_url": "https://auksjonen.no/auksjoner/torget/vest-agder",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "auksjonen.no",
           "title": "Torget / Vest-agder",
           "url": "https://auksjonen.no/auksjoner/torget/vest-agder"
         },
         {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget/industri",
+          "canonical_url": "https://auksjonen.no/auksjoner/container",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "auksjonen.no",
-          "title": "Torget / Industri",
-          "url": "https://www.auksjonen.no/auksjoner/torget/industri"
+          "title": "Kjøp og selg alt mulig på Auksjonen.no",
+          "url": "https://www.auksjonen.no/auksjoner/container"
         },
         {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget/8",
+          "canonical_url": "https://auksjonen.no/auksjoner/torget/verksted-og-lager",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "auksjonen.no",
-          "title": "Kjøp og selg alt mulig på Auksjonen.no.no",
-          "url": "https://www.auksjonen.no/auksjoner/torget/8"
+          "title": "Torget / Verksted-og-lager",
+          "url": "https://www.auksjonen.no/auksjoner/torget/verksted-og-lager"
+        },
+        {
+          "canonical_url": "https://auksjonen.no/auksjoner/torget/sogn-og-fjordane",
+          "comparable_quantity": null,
+          "domain": "auksjonen.no",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "auksjonen.no",
+          "title": "Torget / Sogn-og-fjordane",
+          "url": "https://auksjonen.no/auksjoner/torget/sogn-og-fjordane"
         },
         {
           "canonical_url": "https://auksjonen.no/auksjoner",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -1762,25 +1774,10 @@
           "url": "https://www.auksjonen.no/auksjoner/"
         },
         {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget/%C3%B8stfold",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": "auksjonen.no",
-          "title": "Torget / Østfold",
-          "url": "https://www.auksjonen.no/auksjoner/torget/%C3%B8stfold"
-        },
-        {
           "canonical_url": "https://auksjonen.no/kunde/193",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -1792,54 +1789,55 @@
           "url": "https://www.auksjonen.no/kunde/193"
         },
         {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget/kj%C3%B8kkenutstyr-og-serviser",
+          "canonical_url": "https://auksjonen.no/auksjoner/verkstedlager",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "auksjonen.no",
-          "title": "Torget / Kjøkkenutstyr-og-serviser",
-          "url": "https://auksjonen.no/auksjoner/torget/kj%C3%B8kkenutstyr-og-serviser"
+          "title": "Verksted og lager",
+          "url": "https://www.auksjonen.no/auksjoner/verkstedlager"
         },
         {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget/oslo",
+          "canonical_url": "https://auksjonen.no/bilauksjon",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:auksjonen.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "auksjonen.no",
-          "title": "Torget / Oslo",
-          "url": "https://www.auksjonen.no/auksjoner/torget/oslo"
+          "title": "Kjøp og selg bruktbil på auksjon hos auksjonen.no",
+          "url": "https://www.auksjonen.no/bilauksjon"
         },
         {
-          "canonical_url": "https://retrade.eu/no/aitem/118990/Diverse_redskap_og_utstyr",
-          "comparable_quantity": null,
+          "canonical_url": "https://retrade.eu/no/aitem/445705/BUTIKKINNREDNING",
+          "comparable_quantity": 2,
           "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
+            "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "retrade.eu",
-          "title": "Diverse redskap og utstyr til salgs. P Retrade kan du kjpe brukte maskiner, utstyr, kjrety og annet overskuddsmateriell online. Gi bud n!",
-          "url": "https://www.retrade.eu/no/aitem/118990/Diverse_redskap_og_utstyr"
+          "title": "BUTIKKINNREDNING til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
+          "url": "https://www.retrade.eu/no/aitem/445705/BUTIKKINNREDNING"
         },
         {
           "canonical_url": "https://retrade.eu/",
           "comparable_quantity": null,
           "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -1851,26 +1849,87 @@
           "url": "https://retrade.eu/"
         },
         {
-          "canonical_url": "https://retrade.eu/no/auction/105511",
+          "canonical_url": "https://retrade.eu/sv/auction/57556",
           "comparable_quantity": null,
           "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "retrade.eu",
-          "title": "LUNDBERG 5210/ Wheel loader/ hjullaster",
-          "url": "https://retrade.eu/no/auction/105511"
+          "title": "Auction App",
+          "url": "https://retrade.eu/sv/auction/57556"
+        },
+        {
+          "canonical_url": "https://retrade.eu/no/aitem/115075/Vakumeringsutstyr",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Vakumeringsutstyr til salgs. P Retrade kan du kjpe brukte maskiner, utstyr, kjrety og annet overskuddsmateriell online. Gi bud n!",
+          "url": "https://www.retrade.eu/no/aitem/115075/Vakumeringsutstyr"
+        },
+        {
+          "canonical_url": "https://retrade.eu/en/aitem/119311/Askeladden_2210",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Askeladden 2210 for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
+          "url": "https://www.retrade.eu/en/aitem/119311/Askeladden_2210"
+        },
+        {
+          "canonical_url": "https://retrade.eu/en/aitem/422868/Kioskautomat___Vending_machine",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Kioskautomat / Vending machine for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
+          "url": "https://www.retrade.eu/en/aitem/422868/Kioskautomat___Vending_machine"
+        },
+        {
+          "canonical_url": "https://retrade.eu/auction/123798",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "ÅTM 2004 MOD MANNSKAPSVOGN | Retrade",
+          "url": "https://retrade.eu/auction/123798"
         },
         {
           "canonical_url": "https://retrade.eu/no/aitem/115186/Toyota_Yaris_varebil",
           "comparable_quantity": null,
           "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
+            "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
           "similarity_score": 0.0,
@@ -1880,24 +1939,10 @@
           "url": "https://www.retrade.eu/no/aitem/115186/Toyota_Yaris_varebil"
         },
         {
-          "canonical_url": "https://retrade.eu/en/aitem/119311/Askeladden_2210",
+          "canonical_url": "https://retrade.eu/no/aitem/118990/Diverse_redskap_og_utstyr",
           "comparable_quantity": null,
           "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "Askeladden 2210 for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
-          "url": "https://www.retrade.eu/en/aitem/119311/Askeladden_2210"
-        },
-        {
-          "canonical_url": "https://retrade.eu/auction/1114",
-          "comparable_quantity": 45,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -1905,87 +1950,29 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "retrade.eu",
-          "title": "Afspærring 45stk med fødder | Retrade",
-          "url": "https://retrade.eu/auction/1114"
-        },
-        {
-          "canonical_url": "https://retrade.eu/auction/87615",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "Auction App",
-          "url": "https://retrade.eu/auction/87615"
-        },
-        {
-          "canonical_url": "https://retrade.eu/auction/123798",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "ÅTM 2004 MOD MANNSKAPSVOGN | Retrade",
-          "url": "https://retrade.eu/auction/123798"
+          "title": "Diverse redskap og utstyr til salgs. P Retrade kan du kjpe brukte maskiner, utstyr, kjrety og annet overskuddsmateriell online. Gi bud n!",
+          "url": "https://www.retrade.eu/no/aitem/118990/Diverse_redskap_og_utstyr"
         },
         {
           "canonical_url": "https://retrade.eu/en/aitem/435971/Hydralift_Marine_Crane___Kran",
           "comparable_quantity": null,
           "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
+            "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.0,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "retrade.eu",
           "title": "Hydralift Marine Crane / Kran for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
           "url": "https://www.retrade.eu/en/aitem/435971/Hydralift_Marine_Crane___Kran"
         },
         {
-          "canonical_url": "https://retrade.eu/auction/30298",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "ROMASKIN / Rowing machine Concept 2 | Retrade",
-          "url": "https://retrade.eu/auction/30298"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/aggregatsveiseapparat",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner",
-          "url": "https://www.klaravik.no/auction/product/aggregatsveiseapparat/"
-        },
-        {
           "canonical_url": "https://klaravik.no/",
           "comparable_quantity": null,
           "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -1997,24 +1984,10 @@
           "url": "https://www.klaravik.no/"
         },
         {
-          "canonical_url": "https://klaravik.no/auction/product/lastebil-4",
+          "canonical_url": "https://klaravik.no/auction/product/varebil-kl2-eu-ok-men-feil-med-styreenhet-motor-jv13873",
           "comparable_quantity": null,
           "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Lastebil",
-          "url": "https://www.klaravik.no/auction/product/lastebil-4/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/varmeveksler-for-bolig-og-bygg-011259",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -2022,29 +1995,14 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Varmeveksler for bolig og bygg - 011259",
-          "url": "https://www.klaravik.no/auction/product/varmeveksler-for-bolig-og-bygg-011259/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/varebil-kl-2-n1-11",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Varebil kl 2 (N1)",
-          "url": "https://www.klaravik.no/auction/product/varebil-kl-2-n1-11/"
+          "title": "Klaravik auksjoner - Varebil KL2 (eu ok, men feil med styreenhet motor) JV13873",
+          "url": "https://www.klaravik.no/auction/product/varebil-kl2-eu-ok-men-feil-med-styreenhet-motor-jv13873/"
         },
         {
           "canonical_url": "https://klaravik.no/auction/product/kondemnert-personbil-volkswagen-transporter",
           "comparable_quantity": null,
           "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -2056,39 +2014,10 @@
           "url": "https://www.klaravik.no/auction/product/kondemnert-personbil-volkswagen-transporter/"
         },
         {
-          "canonical_url": "https://klaravik.no/auction/product/varebil-mercedes-benz-vito-119-4x4-a2-32t-rep-objekt",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Varebil Mercedes Benz VITO 119 4X4 A2 3,2T rep objekt",
-          "url": "https://www.klaravik.no/auction/product/varebil-mercedes-benz-vito-119-4x4-a2-32t-rep-objekt/"
-        },
-        {
-          "canonical_url": "https://old.klaravik.no/login",
-          "comparable_quantity": null,
-          "domain": "old.klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "klaravik.no",
-          "title": "Velg Kundetype - Klaravik auksjoner",
-          "url": "https://old.klaravik.no/login/"
-        },
-        {
           "canonical_url": "https://klaravik.no/auction/product/varebil-volkswagen-transporter-syncro-rep-objekt",
           "comparable_quantity": null,
           "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -2100,10 +2029,10 @@
           "url": "https://www.klaravik.no/auction/product/varebil-volkswagen-transporter-syncro-rep-objekt/"
         },
         {
-          "canonical_url": "https://old.klaravik.no/login/buyer",
+          "canonical_url": "https://klaravik.no/auction/product/traktor-14",
           "comparable_quantity": null,
-          "domain": "old.klaravik.no",
-          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "domain": "klaravik.no",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -2111,148 +2040,118 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "klaravik.no",
-          "title": "Logg inn som kjøper - Klaravik auksjoner",
-          "url": "https://old.klaravik.no/login/buyer/"
+          "title": "Klaravik auksjoner - Traktor",
+          "url": "https://www.klaravik.no/auction/product/traktor-14/"
+        },
+        {
+          "canonical_url": "https://klaravik.no/auction/product/varebil-mercedes-benz-vito-119-4x4-a2-32t-rep-objekt",
+          "comparable_quantity": null,
+          "domain": "klaravik.no",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "klaravik.no",
+          "title": "Klaravik auksjoner - Varebil Mercedes Benz VITO 119 4X4 A2 3,2T rep objekt",
+          "url": "https://www.klaravik.no/auction/product/varebil-mercedes-benz-vito-119-4x4-a2-32t-rep-objekt/"
+        },
+        {
+          "canonical_url": "https://klaravik.no/auction/product/div-handverktoy-selges-for-kunde",
+          "comparable_quantity": 3,
+          "domain": "klaravik.no",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "klaravik.no",
+          "title": "Klaravik auksjoner - Div verktøy",
+          "url": "https://www.klaravik.no/auction/product/div-handverktoy-selges-for-kunde/"
+        },
+        {
+          "canonical_url": "https://klaravik.no/auction/product/liten-lastebil-med-kran",
+          "comparable_quantity": null,
+          "domain": "klaravik.no",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "klaravik.no",
+          "title": "Klaravik auksjoner - Liten lastebil med kran",
+          "url": "https://www.klaravik.no/auction/product/liten-lastebil-med-kran/"
+        },
+        {
+          "canonical_url": "https://klaravik.no/auction/product/iseki-2140",
+          "comparable_quantity": null,
+          "domain": "klaravik.no",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "klaravik.no",
+          "title": "Klaravik auksjoner - Iseki 2140",
+          "url": "https://www.klaravik.no/auction/product/iseki-2140/"
+        },
+        {
+          "canonical_url": "https://klaravik.no/auction/product/papp-plastpresse-manuell",
+          "comparable_quantity": null,
+          "domain": "klaravik.no",
+          "matched_query": "site:klaravik.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "klaravik.no",
+          "title": "Klaravik auksjoner - Papp-/plastpresse manuell",
+          "url": "https://www.klaravik.no/auction/product/papp-plastpresse-manuell/"
         },
         {
           "canonical_url": "https://mascus.no/norsk-scania-as-avd-kristiansand/e4f935b3,1,relevance,searchdealer.html",
           "comparable_quantity": null,
           "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "mascus.no",
           "title": "NORSK SCANIA AS, AVD KRISTIANSAND - Mascus Norge",
           "url": "https://www.mascus.no/norsk-scania-as-avd-kristiansand/e4f935b3,1,relevance,searchdealer.html"
         },
         {
-          "canonical_url": "https://mascus.no/eiksenteret-gjovik/cec2b314,1,relevance,searchdealer.html",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Eiksenteret Gjøvik - Mascus Norge",
-          "url": "https://www.mascus.no/eiksenteret-gjovik/cec2b314,1,relevance,searchdealer.html"
-        },
-        {
           "canonical_url": "https://mascus.no/anlegg/gravemaskiner",
           "comparable_quantity": null,
           "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.143,
           "source_quantity": null,
           "target_domain": "mascus.no",
           "title": "Gravemaskiner hos Mascus - Brukt gravemaskin till salg",
           "url": "https://www.mascus.no/anlegg/gravemaskiner"
         },
         {
-          "canonical_url": "https://mascus.no/anlegg/hjullastere,432,relevance,search.html",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Hjullastere, kjøp og selg brukte hjullastere på Mascus!, side 432",
-          "url": "https://www.mascus.no/anlegg/hjullastere,432,relevance,search.html"
-        },
-        {
-          "canonical_url": "https://mascus.no/anlegg/rammestyrte-dumpere/kubota-kc110sl-4-m-selvlaster-kjop-leie/sishijgh.html",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Kubota KC110SL-4 m selvlaster, 2024, Kristiansand S, Norge - Brukt rammestyrte Dumpere - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/rammestyrte-dumpere/kubota-kc110sl-4-m-selvlaster-kjop-leie/sishijgh.html"
-        },
-        {
-          "canonical_url": "https://mascus.no/norsk-energigjenvinning/8cff5681,1,relevance,searchdealer.html",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Norsk Energigjenvinning - Mascus Norge",
-          "url": "https://www.mascus.no/norsk-energigjenvinning/8cff5681,1,relevance,searchdealer.html"
-        },
-        {
-          "canonical_url": "https://mascus.no/anlegg/deler-til-avfallsknusere/kawasaki",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Brukt deler til avfallsknusere Kawasaki til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/deler-til-avfallsknusere/kawasaki"
-        },
-        {
-          "canonical_url": "https://mascus.no/transport/tilhengere",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Brukt tilhenger til salgs - Brukte tilhengere til salg hos Mascus",
-          "url": "https://www.mascus.no/transport/tilhengere"
-        },
-        {
-          "canonical_url": "https://mascus.no/transport/lastebiler/containerramme",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "rejection_reasons": [
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Brukt lastebiler Containerramme til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/transport/lastebiler/containerramme"
-        },
-        {
           "canonical_url": "https://mascus.no/anlegg/redskap-og-utstyr-anlegg",
           "comparable_quantity": null,
           "domain": "mascus.no",
-          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -2262,10 +2161,115 @@
           "target_domain": "mascus.no",
           "title": "Brukt redskap og utstyr til salgs - Mascus Norway",
           "url": "https://www.mascus.no/anlegg/redskap-og-utstyr-anlegg"
+        },
+        {
+          "canonical_url": "https://mascus.no/anlegg/lastere?from_brandmodel=skidsteer",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Brukt lastere - Køp og selg brukte laster hos Mascus!",
+          "url": "https://www.mascus.no/anlegg/lastere?from_brandmodel=skidsteer"
+        },
+        {
+          "canonical_url": "https://mascus.no/norsk-energigjenvinning/8cff5681,1,relevance,searchdealer.html",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Norsk Energigjenvinning - Mascus Norge",
+          "url": "https://www.mascus.no/norsk-energigjenvinning/8cff5681,1,relevance,searchdealer.html"
+        },
+        {
+          "canonical_url": "https://mascus.no/anlegg/hjullastere,432,relevance,search.html",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Hjullastere, kjøp og selg brukte hjullastere på Mascus!, side 432",
+          "url": "https://www.mascus.no/anlegg/hjullastere,432,relevance,search.html"
+        },
+        {
+          "canonical_url": "https://mascus.no/hymax-as/2d26ac35,1,relevance,searchdealer.html",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Hymax AS - Mascus Norge",
+          "url": "https://www.mascus.no/hymax-as/2d26ac35,1,relevance,searchdealer.html"
+        },
+        {
+          "canonical_url": "https://mascus.no/transport/lastebiler,2,relevance,search.html",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Brukte lastebiler til salg. Kjøp en lastebil hos oss., side 2 - Mascus Norway",
+          "url": "https://www.mascus.no/transport/lastebiler,2,relevance,search.html"
+        },
+        {
+          "canonical_url": "https://mascus.no/anlegg/veihovler",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Brukt veihøvler til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/veihovler"
+        },
+        {
+          "canonical_url": "https://mascus.no/anlegg/rammestyrte-dumpere/kubota-kc110sl-4-m-selvlaster-kjop-leie/sishijgh.html",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand 47m 21s kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Kubota KC110SL-4 m selvlaster, 2024, Kristiansand S, Norge - Brukt rammestyrte Dumpere - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/rammestyrte-dumpere/kubota-kc110sl-4-m-selvlaster-kjop-leie/sishijgh.html"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 1t 15m 43s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
       "verified_comparable_count": 0
     },
     {
@@ -2354,19 +2358,19 @@
       "rejected_candidate_count": 65,
       "rejected_candidates": [
         {
-          "canonical_url": "https://uponor.com/nb-no/vvs/produktkatalog",
+          "canonical_url": "https://vvskomplett.no/ror-og-deler",
           "comparable_quantity": null,
-          "domain": "uponor.com",
+          "domain": "vvskomplett.no",
           "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.182,
+          "similarity_score": 0.091,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Katalog | Uponor",
-          "url": "https://www.uponor.com/nb-no/vvs/produktkatalog"
+          "title": "Rør og deler i nettbutikken - VVS Komplett",
+          "url": "https://vvskomplett.no/ror-og-deler"
         },
         {
           "canonical_url": "https://vvskupp.no/vann-og-varme/roer-og-roerdeler",
@@ -2384,6 +2388,51 @@
           "url": "https://www.vvskupp.no/vann-og-varme/roer-og-roerdeler"
         },
         {
+          "canonical_url": "https://bauhaus.no/varemerker/purus",
+          "comparable_quantity": null,
+          "domain": "bauhaus.no",
+          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.182,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Purus – Sluk, sluktilbehør & VVS-deler | BAUHAUS",
+          "url": "https://www.bauhaus.no/varemerker/purus"
+        },
+        {
+          "canonical_url": "https://uponor.com/nb-no/vvs/produktkatalog",
+          "comparable_quantity": null,
+          "domain": "uponor.com",
+          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.182,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Katalog | Uponor",
+          "url": "https://www.uponor.com/nb-no/vvs/produktkatalog"
+        },
+        {
+          "canonical_url": "https://badogbehag.no/vvs-materiell",
+          "comparable_quantity": null,
+          "domain": "badogbehag.no",
+          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.182,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Vvs Materiell | Bad og behag",
+          "url": "https://www.badogbehag.no/vvs-materiell"
+        },
+        {
           "canonical_url": "https://vb.no/proff/produkter/alle-produkter/merker/purus-joti/nrf3402292-purus-square-platinum",
           "comparable_quantity": null,
           "domain": "vb.no",
@@ -2399,19 +2448,19 @@
           "url": "https://www.vb.no/proff/produkter/alle-produkter/merker/purus-joti/nrf3402292-purus-square-platinum/"
         },
         {
-          "canonical_url": "https://vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401902-purus-corner-tile-insert-%C3%B875-sideutloep",
+          "canonical_url": "https://vvskomplett.no/catalogsearch/result?q=purus+joti+forh%C3%B8yningsr+til+sluk",
           "comparable_quantity": null,
-          "domain": "vb.no",
+          "domain": "vvskomplett.no",
           "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.091,
+          "similarity_score": 0.273,
           "source_quantity": null,
           "target_domain": null,
-          "title": "NRF3401902 - Purus Corner Tile Insert Ø75 sideutløp",
-          "url": "https://www.vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401902-purus-corner-tile-insert-%C3%B875-sideutloep/"
+          "title": "Søkeresultat: 'purus joti forhøyningsr til sluk' - VVS Komplett",
+          "url": "https://vvskomplett.no/catalogsearch/result/?q=purus+joti+forh%C3%B8yningsr+til+sluk"
         },
         {
           "canonical_url": "https://vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401801-purus-line-twist-600-side",
@@ -2429,7 +2478,7 @@
           "url": "https://www.vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401801-purus-line-twist-600-side/"
         },
         {
-          "canonical_url": "https://vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401847-purus-line-tile-insert-800-%C3%B875-sideutloep",
+          "canonical_url": "https://vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401902-purus-corner-tile-insert-%C3%B875-sideutloep",
           "comparable_quantity": null,
           "domain": "vb.no",
           "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
@@ -2440,68 +2489,23 @@
           "similarity_score": 0.091,
           "source_quantity": null,
           "target_domain": null,
-          "title": "NRF3401847 - Purus Line Tile Insert 800 Ø75 sideutløp",
-          "url": "https://www.vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401847-purus-line-tile-insert-800-%C3%B875-sideutloep/"
+          "title": "NRF3401902 - Purus Corner Tile Insert Ø75 sideutløp",
+          "url": "https://www.vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401902-purus-corner-tile-insert-%C3%B875-sideutloep/"
         },
         {
-          "canonical_url": "https://vvskomplett.no/ror-og-deler",
+          "canonical_url": "https://sig-halvorsen.no/vvs-materiell/sluk-tilbehor/plastrist-plastsluk-purus-joti",
           "comparable_quantity": null,
-          "domain": "vvskomplett.no",
+          "domain": "sig-halvorsen.no",
           "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.091,
+          "similarity_score": 0.182,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Rør og deler i nettbutikken - VVS Komplett",
-          "url": "https://vvskomplett.no/ror-og-deler"
-        },
-        {
-          "canonical_url": "https://ahlsell.no/category/verktoy/vvs-verktoy",
-          "comparable_quantity": null,
-          "domain": "ahlsell.no",
-          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.273,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "VVS-Verktøy | Ahlsell – Vi gjør det enklere å være proff",
-          "url": "https://www.ahlsell.no/category/verktoy/vvs-verktoy"
-        },
-        {
-          "canonical_url": "https://vb.no/roroghandverkservice/produkter/alle-produkter",
-          "comparable_quantity": null,
-          "domain": "vb.no",
-          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Alle produkter",
-          "url": "https://www.vb.no/roroghandverkservice/produkter/alle-produkter/"
-        },
-        {
-          "canonical_url": "https://vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401837-purus-line-twist-800-%C3%B875-sideutloep",
-          "comparable_quantity": null,
-          "domain": "vb.no",
-          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.091,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "NRF3401837 - Purus Line Twist 800 Ø75 sideutløp",
-          "url": "https://www.vb.no/produkter/alle-produkter/merker/purus-joti/nrf3401837-purus-line-twist-800-%C3%B875-sideutloep/"
+          "title": "Plastrist for plastsluk, Purus Joti | Sig. Halvorsen",
+          "url": "https://www.sig-halvorsen.no/vvs-materiell/sluk-tilbehor/plastrist-plastsluk-purus-joti"
         },
         {
           "canonical_url": "https://vvskomplett.no/ror-og-deler",
@@ -2889,21 +2893,6 @@
           "url": "https://www.auksjonen.no/auksjon/586942/586942"
         },
         {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget/industri",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "auksjonen.no",
-          "title": "Torget / Industri",
-          "url": "https://www.auksjonen.no/auksjoner/torget/industri"
-        },
-        {
           "canonical_url": "https://auksjonen.no/auksjoner/industrimaskiner",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
@@ -2917,6 +2906,21 @@
           "target_domain": "auksjonen.no",
           "title": "Industrimaskiner",
           "url": "https://www.auksjonen.no/auksjoner/industrimaskiner"
+        },
+        {
+          "canonical_url": "https://auksjonen.no/auksjoner/torget/industri",
+          "comparable_quantity": null,
+          "domain": "auksjonen.no",
+          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "auksjonen.no",
+          "title": "Torget / Industri",
+          "url": "https://www.auksjonen.no/auksjoner/torget/industri"
         },
         {
           "canonical_url": "https://auksjonen.no/auksjoner/Profilerte",
@@ -3174,36 +3178,6 @@
           "url": "https://www.klaravik.no/productprint/3584/"
         },
         {
-          "canonical_url": "https://mascus.no/anlegg/veihovler",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Brukt veihøvler til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/veihovler"
-        },
-        {
-          "canonical_url": "https://mascus.no/anlegg/vannpumper",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Brukt vannpumper til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/vannpumper"
-        },
-        {
           "canonical_url": "https://mascus.no/anlegg/motorer-anlegg",
           "comparable_quantity": null,
           "domain": "mascus.no",
@@ -3217,6 +3191,21 @@
           "target_domain": "mascus.no",
           "title": "Brukt motorer til anleggsmaskiner til salg - Mascus Norway",
           "url": "https://www.mascus.no/anlegg/motorer-anlegg"
+        },
+        {
+          "canonical_url": "https://mascus.no/anlegg/veihovler",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Brukt veihøvler til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/veihovler"
         },
         {
           "canonical_url": "https://mascus.no/skogsmaskiner/rottne/brand.html",
@@ -3234,7 +3223,7 @@
           "url": "https://www.mascus.no/skogsmaskiner/rottne/brand.html"
         },
         {
-          "canonical_url": "https://mascus.no/anlegg/rototilt/brand.html",
+          "canonical_url": "https://mascus.no/anlegg/vannpumper",
           "comparable_quantity": null,
           "domain": "mascus.no",
           "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
@@ -3245,8 +3234,8 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "mascus.no",
-          "title": "Brukt Rototilt anlegg, til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/rototilt/brand.html"
+          "title": "Brukt vannpumper til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/vannpumper"
         },
         {
           "canonical_url": "https://mascus.no/anlegg/andre-komponenter-anlegg,2,relevance,search.html",
@@ -3264,7 +3253,7 @@
           "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg,2,relevance,search.html"
         },
         {
-          "canonical_url": "https://mascus.no/anlegg/rotatorer/rototilt",
+          "canonical_url": "https://mascus.no/anlegg/rototilt/brand.html",
           "comparable_quantity": null,
           "domain": "mascus.no",
           "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
@@ -3275,8 +3264,23 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "mascus.no",
-          "title": "Brukt rototilt Rototilt til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/rotatorer/rototilt"
+          "title": "Brukt Rototilt anlegg, til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/rototilt/brand.html"
+        },
+        {
+          "canonical_url": "https://mascus.no/skogsmaskiner/hogstmaskiner/rottne",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Brukt hogstmaskiner Rottne til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/skogsmaskiner/hogstmaskiner/rottne"
         },
         {
           "canonical_url": "https://mascus.no/anlegg/andre-komponenter-anlegg,3,relevance,search.html",
@@ -3294,7 +3298,7 @@
           "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg,3,relevance,search.html"
         },
         {
-          "canonical_url": "https://mascus.no/landbruk/andre-jordforbedrings-maskiner-og-ekstrautstyr",
+          "canonical_url": "https://mascus.no/anlegg/rotatorer/rototilt",
           "comparable_quantity": null,
           "domain": "mascus.no",
           "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
@@ -3305,11 +3309,11 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "mascus.no",
-          "title": "Brukte Jordforbedringsmaskiner og ekstrautstyr - Mascus Norway",
-          "url": "https://www.mascus.no/landbruk/andre-jordforbedrings-maskiner-og-ekstrautstyr"
+          "title": "Brukt rototilt Rototilt til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/rotatorer/rototilt"
         },
         {
-          "canonical_url": "https://mascus.no/landbruk/veiutstyr",
+          "canonical_url": "https://mascus.no/anlegg/motorer-anlegg,2,relevance,search.html",
           "comparable_quantity": null,
           "domain": "mascus.no",
           "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
@@ -3320,17 +3324,17 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "mascus.no",
-          "title": "Brukt veiutstyr og snøryddingsmaskiner til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/landbruk/veiutstyr"
+          "title": "Brukt motorer til anleggsmaskiner til salg, side 2 - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/motorer-anlegg,2,relevance,search.html"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 1t 15m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
       "verified_comparable_count": 0
     }
   ],
   "opportunity_count": 3,
-  "rejected_candidate_count": 202,
+  "rejected_candidate_count": 203,
   "required_comparables": 3,
   "schema_version": 4,
   "target_domains": [

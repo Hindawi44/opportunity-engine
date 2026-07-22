@@ -2,7 +2,7 @@
   "alerts": {
     "alerts": [],
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-07-22T17:44:36.356848+00:00",
+    "last_scoring_run": "2026-07-22T18:13:00.166316+00:00",
     "schema_version": 2,
     "signatures": []
   },
@@ -151,7 +151,7 @@
       ],
       "top_count": 5
     },
-    "generated_at": "2026-07-22T17:44:36.850434+00:00",
+    "generated_at": "2026-07-22T18:13:00.539893+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels; no financial values are invented",
     "schema_version": 1,
     "source_funnel": {
@@ -161,11 +161,11 @@
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-07-22T17:44:36.922593+00:00",
+  "generated_at": "2026-07-22T18:13:00.620870+00:00",
   "opportunities": {
     "actionable_count": 0,
     "candidate_count": 3,
-    "generated_at": "2026-07-22T17:44:36.387096+00:00",
+    "generated_at": "2026-07-22T18:13:00.202244+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -176,7 +176,7 @@
     "actionable_count": 0,
     "buy_review_count": 0,
     "candidate_count": 3,
-    "generated_at": "2026-07-22T17:44:36.356848+00:00",
+    "generated_at": "2026-07-22T18:13:00.166316+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
@@ -196,7 +196,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud",
+        "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
         "matched_target_terms": [
           "varelager"
         ],
@@ -242,7 +242,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 1t 15m 43s",
+        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
       },
@@ -310,7 +310,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 59m 41s",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
       },
@@ -376,7 +376,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 1t 15m",
+        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
       }
@@ -386,7 +386,7 @@
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-07-22T17:44:36.893760+00:00",
+    "generated_at": "2026-07-22T18:13:00.587533+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T17:44:36.259289+00:00",
+  "generated_at": "2026-07-22T18:13:00.052864+00:00",
   "opportunity_count": 3,
   "policy": {
     "automatic_verification": false,
@@ -13,7 +13,7 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-22T17:44:23.398121+00:00",
+          "captured_at": "2026-07-22T18:12:44.053966+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
@@ -51,53 +51,27 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 59m 41s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
       "verified_market_value_nok": null
     },
     {
-      "accepted_comparable_count": 1,
-      "accepted_comparables": [
-        {
-          "canonical_url": "https://finn.no/59501883",
-          "captured_at": "2026-07-22T17:44:30.322615+00:00",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no BUTIKK AVVIKLING VARELAGER KAWAII Kristiansand kr",
-          "observed_prices_nok": [
-            34341.0
-          ],
-          "price_nok": 34341.0,
-          "quantity_status": "UNKNOWN",
-          "query_target_domain": "finn.no",
-          "similarity_score": 0.4,
-          "snippet": "Eff.rente 11,00 %. 120 000 o/5 år. Kostnad: <strong>34 341 kr</strong>.",
-          "source": "Brave Search",
-          "source_class": "marketplace",
-          "source_quantity": null,
-          "title": "Varelager og utstilling i butikk selges! | FINN torget",
-          "url": "https://www.finn.no/59501883",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
-        }
-      ],
+      "accepted_comparable_count": 0,
+      "accepted_comparables": [],
       "asking_price_nok": 26000.0,
-      "candidate_comparable_count": 1,
+      "candidate_comparable_count": 0,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
-      "independent_domain_count": 1,
-      "independent_domains": [
-        "finn.no"
-      ],
+      "independent_domain_count": 0,
+      "independent_domains": [],
       "market_value_verified": false,
       "opportunity_id": "unified-auksjonen-612667",
       "outlier_count": 0,
       "outliers": [],
       "review_reasons": [
         "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains",
-        "quantity_not_confirmed_for_all_comparables"
+        "fewer_than_2_independent_domains"
       ],
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 1t 15m 43s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
       "verified_market_value_nok": null
     },
     {
@@ -117,7 +91,7 @@
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 1t 15m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
       "verified_market_value_nok": null
     }
   ],

@@ -1,16 +1,20 @@
 {
-  "actionable_count": 0,
   "buy_review_count": 0,
-  "candidate_count": 3,
-  "generated_at": "2026-07-22T18:13:00.166316+00:00",
-  "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
-  "monitor_count": 0,
-  "opportunities": [
+  "decision_count": 3,
+  "decisions": [
     {
       "asking_price_nok": 26000.0,
+      "automatic_purchase": false,
       "city": "Kristiansand s",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
+      "decision_confidence": "LOW",
+      "decision_reasons_ar": [
+        "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
+      ],
+      "decision_warnings_ar": [
+        "أدلة ناقصة: auction_fee_nok, dismantling_cost_nok, other_costs_nok, repair_cost_nok, storage_cost_nok, three_verified_market_comparables, transport_cost_nok, vat_nok"
+      ],
       "ends_at": "1784746800000",
       "evidence_needed": [
         "three_verified_market_comparables",
@@ -22,6 +26,8 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "final_decision_ar": "مراقبة وجمع الأدلة",
       "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
       "matched_target_terms": [
         "varelager"
@@ -36,6 +42,10 @@
         "three_verified_market_comparables",
         "transport_cost_nok",
         "vat_nok"
+      ],
+      "next_actions_ar": [
+        "استكمال ثلاث مقارنات سوقية موثقة.",
+        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
       ],
       "opportunity_id": "unified-auksjonen-612667",
       "opportunity_score": 33.61,
@@ -68,15 +78,25 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_first",
+      "target_profit_buffer_nok": null,
       "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
       "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
+      "verified_operating_costs_nok": null
     },
     {
       "asking_price_nok": 6100.0,
+      "automatic_purchase": false,
       "city": "Tønsberg",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
+      "decision_confidence": "LOW",
+      "decision_reasons_ar": [
+        "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
+      ],
+      "decision_warnings_ar": [
+        "أدلة ناقصة: auction_fee_nok, dismantling_cost_nok, other_costs_nok, repair_cost_nok, storage_cost_nok, three_verified_market_comparables, transport_cost_nok, vat_nok"
+      ],
       "ends_at": "1784810640000",
       "evidence_needed": [
         "three_verified_market_comparables",
@@ -88,6 +108,8 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "final_decision_ar": "مراقبة وجمع الأدلة",
       "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud",
       "matched_target_terms": [
         "lagerreol",
@@ -103,6 +125,10 @@
         "three_verified_market_comparables",
         "transport_cost_nok",
         "vat_nok"
+      ],
+      "next_actions_ar": [
+        "استكمال ثلاث مقارنات سوقية موثقة.",
+        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
       ],
       "opportunity_id": "unified-auksjonen-611253",
       "opportunity_score": 28.03,
@@ -136,15 +162,25 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_first",
+      "target_profit_buffer_nok": null,
       "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
       "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
+      "verified_operating_costs_nok": null
     },
     {
       "asking_price_nok": 100.0,
+      "automatic_purchase": false,
       "city": "Lierstranda",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
+      "decision_confidence": "LOW",
+      "decision_reasons_ar": [
+        "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
+      ],
+      "decision_warnings_ar": [
+        "أدلة ناقصة: auction_fee_nok, dismantling_cost_nok, other_costs_nok, repair_cost_nok, storage_cost_nok, three_verified_market_comparables, transport_cost_nok, vat_nok"
+      ],
       "ends_at": "1785438000000",
       "evidence_needed": [
         "three_verified_market_comparables",
@@ -156,6 +192,8 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "final_decision_ar": "مراقبة وجمع الأدلة",
       "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d",
       "matched_target_terms": [
         "reol"
@@ -170,6 +208,10 @@
         "three_verified_market_comparables",
         "transport_cost_nok",
         "vat_nok"
+      ],
+      "next_actions_ar": [
+        "استكمال ثلاث مقارنات سوقية موثقة.",
+        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
       ],
       "opportunity_id": "unified-auksjonen-613169",
       "opportunity_score": 23.98,
@@ -202,11 +244,16 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
+      "target_profit_buffer_nok": null,
       "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
       "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
+      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
+      "verified_operating_costs_nok": null
     }
   ],
-  "reject_count": 3,
-  "schema_version": 1
+  "generated_at": "2026-07-22T18:13:00.744819+00:00",
+  "method": "verified evidence, conservative target-profit buffer, human approval required",
+  "reject_count": 0,
+  "schema_version": 1,
+  "watch_count": 3
 }

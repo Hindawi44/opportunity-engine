@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T17:44:22.565653+00:00",
+  "generated_at": "2026-07-22T18:12:42.985061+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
   "search_required_count": 3,
@@ -41,7 +41,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 59m 41s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -57,29 +57,29 @@
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud+47m+21s",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud+47m+21s",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud+pris+Norge",
+          "search_url": "https://www.google.com/search?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud+47m+21s+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud",
+      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
       "opportunity_id": "unified-auksjonen-612667",
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 1t 15m 43s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -117,7 +117,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 1t 15m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]

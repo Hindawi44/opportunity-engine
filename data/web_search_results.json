@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-07-22T17:44:13.591248+00:00",
+  "generated_at": "2026-07-22T18:12:36.651840+00:00",
   "provider": "Brave Search API",
   "request_count": 10,
   "result_count": 100,
@@ -40,6 +40,14 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "published_at": null,
+      "snippet": "Butikkinnredning Østlandet - brosjyreholder, butikkdesign, garderobeskap, kontorlandskap, benker, bord, garderobe, kontorstol, kontormøbler, skrivebord, brosjyrestativ, arkivskap - Finn firmaer, adresser, telefonnumre.",
+      "source": "Brave Search",
+      "title": "Butikkinnredning Østlandet | bedrifter | gulesider.no",
+      "url": "https://www.gulesider.no/butikkinnredning+%C3%B8stlandet/bedrifter"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "published_at": null,
       "snippet": "Butikkinnredning og -utstyr – Gamle Fredrikstad · <strong>Butikkdesign Norge AS</strong> · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · ...",
       "source": "Brave Search",
       "title": "Butikkinnredning og -utstyr - 1881.no",
@@ -63,27 +71,19 @@
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
-      "published_at": "2023-01-06T00:00:00",
-      "snippet": "<strong>ButikkDesign Norge AS</strong> står klare til å transformere din butikk med vår ekspertise og erfaring som en ledende aktør innen butikkinnredning.",
-      "source": "Brave Search",
-      "title": "ButikkDesign Norge AS - Din Partner i Butikkinnredning",
-      "url": "https://bdn.no"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "published_at": null,
-      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "title": "Butikkinnredning | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
       "published_at": null,
       "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
       "source": "Brave Search",
       "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
       "url": "https://www.supersellers.no/katalog"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "published_at": "2023-01-06T00:00:00",
+      "snippet": "<strong>ButikkDesign Norge AS</strong> står klare til å transformere din butikk med vår ekspertise og erfaring som en ledende aktør innen butikkinnredning.",
+      "source": "Brave Search",
+      "title": "ButikkDesign Norge AS - Din Partner i Butikkinnredning",
+      "url": "https://bdn.no"
     },
     {
       "discovery_query": "varelager konkursbo Norge",
@@ -167,14 +167,6 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
-      "source": "Brave Search",
-      "title": "Starte bedrift | Ny i Norge",
-      "url": "https://www.nyinorge.no/en/work/starting-a-business-in-norway/"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
       "published_at": "2026-01-09T18:20:19",
       "snippet": "<strong>Bedriften tilbyr ikke henting av pakker, så forsendelsen må leveres direkte til deres adresse og innenfor åpningstiden på hverdager</strong>.",
       "source": "Brave Search",
@@ -183,11 +175,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": "2024-01-09T06:48:44",
-      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
+      "published_at": null,
+      "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
       "source": "Brave Search",
-      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
-      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
+      "title": "Starte bedrift | Ny i Norge",
+      "url": "https://www.nyinorge.no/en/work/starting-a-business-in-norway/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -212,6 +204,14 @@
       "source": "Brave Search",
       "title": "stk produkter | europages",
       "url": "https://www.europages.no/no/products/stk"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": "2024-01-09T06:48:44",
+      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
+      "source": "Brave Search",
+      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
+      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -263,19 +263,19 @@
     },
     {
       "discovery_query": "kontormøbler avvikling Norge",
-      "published_at": "2025-09-30T22:19:05",
-      "snippet": "Kontorflytting, avvikling av kontorlokaler, tilbakelevering og kontormøbler. Gå til Review ... Utfører bedriftsflytting både nasjonalt i Norge og flytting til utlandet.",
-      "source": "Brave Search",
-      "title": "Kontorflytting Oslo: Flytte kontor- Kontoravvikling (oktober 2025)",
-      "url": "https://kontorflytting.net/"
-    },
-    {
-      "discovery_query": "kontormøbler avvikling Norge",
       "published_at": "2026-03-18T16:05:18",
       "snippet": "Avvikling av kontor · Store og tunge gjenstander som sofa, seng og garderobeskap kan være krevende å håndtere alene. Vi sørger for trygg og effektiv bortkjøring. Vi hjelper med å kaste blant annet: Sofa og hjørnesofa · Senger og madrasser · Skap og kommoder · Bord og stoler · TV-benker · Garderobeskap · Kontormøbler ·",
       "source": "Brave Search",
       "title": "Kaste møbler | Rask bortkjøring av gamle møbler",
       "url": "https://www.billigsoppeltaxi.no/kaste-mobler/"
+    },
+    {
+      "discovery_query": "kontormøbler avvikling Norge",
+      "published_at": "2025-09-30T22:19:05",
+      "snippet": "Kontorflytting, avvikling av kontorlokaler, tilbakelevering og kontormøbler. Gå til Review ... Utfører bedriftsflytting både nasjonalt i Norge og flytting til utlandet.",
+      "source": "Brave Search",
+      "title": "Kontorflytting Oslo: Flytte kontor- Kontoravvikling (oktober 2025)",
+      "url": "https://kontorflytting.net/"
     },
     {
       "discovery_query": "kontormøbler avvikling Norge",
@@ -303,11 +303,11 @@
     },
     {
       "discovery_query": "kontormøbler avvikling Norge",
-      "published_at": "2025-10-23T18:01:09",
-      "snippet": "<strong>Skal bedriften avvikle kontorlokaler hjelper vi dere med demontering av møbler, tømming, utvask og tilbakestilling av kontorlokalene</strong>. Vi kan også bistå med kjøp og salg av brukte kontormøbler hvis bedriften ønsker å kvitte seg med møbler ...",
+      "published_at": "2024-05-16T16:21:18",
+      "snippet": "Flyttebyrå.org er en portal som formidler flyttetjenester i Norge, og her får du en oversikt over flyttebyrå som kan gjennomføre firmaflytting på en effektiv og stressfri måte.’ · Logo · Tjenester · Firma · Evaluering · Gå til · 1 · Prosjektledelse, kontorflytting, montering, kontormøbler, avvikling av kontorlokaler.",
       "source": "Brave Search",
-      "title": "Kontoravvikling Oslo | Avvikling og tilbakestilling av kontorlokaler",
-      "url": "https://kontorflytting.no/kontoravvikling/"
+      "title": "Møbelmontering: Hjelp til montering av møbler for private og kontor",
+      "url": "https://xn--flyttebyr-e3a.org/mobelmontering/"
     },
     {
       "discovery_query": "kontormøbler avvikling Norge",
@@ -319,11 +319,11 @@
     },
     {
       "discovery_query": "kontormøbler avvikling Norge",
-      "published_at": "2024-05-16T16:21:18",
-      "snippet": "Flyttebyrå.org er en portal som formidler flyttetjenester i Norge, og her får du en oversikt over flyttebyrå som kan gjennomføre firmaflytting på en effektiv og stressfri måte.’ · Logo · Tjenester · Firma · Evaluering · Gå til · 1 · Prosjektledelse, kontorflytting, montering, kontormøbler, avvikling av kontorlokaler.",
+      "published_at": "2025-10-23T18:01:09",
+      "snippet": "<strong>Skal bedriften avvikle kontorlokaler hjelper vi dere med demontering av møbler, tømming, utvask og tilbakestilling av kontorlokalene</strong>. Vi kan også bistå med kjøp og salg av brukte kontormøbler hvis bedriften ønsker å kvitte seg med møbler ...",
       "source": "Brave Search",
-      "title": "Møbelmontering: Hjelp til montering av møbler for private og kontor",
-      "url": "https://xn--flyttebyr-e3a.org/mobelmontering/"
+      "title": "Kontoravvikling Oslo | Avvikling og tilbakestilling av kontorlokaler",
+      "url": "https://kontorflytting.no/kontoravvikling/"
     },
     {
       "discovery_query": "restaurantutstyr selges Norge",
@@ -464,7 +464,7 @@
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
-      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand.",
+      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand",
       "source": "Brave Search",
       "title": "'frisørutstyr' items for sale · Tise",
       "url": "https://tise.com/search/tise?country_code=NO&search=fris%C3%B8rutstyr&location_max=country"
@@ -479,11 +479,11 @@
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
-      "published_at": "2026-04-08T10:46:26",
-      "snippet": "Oppdag profesjonelt frisørutstyr, skjønnhetsutstyr og salongverktøy hos Luminx. Perfekt for frisører, stylister, barbershops og skjønnhetsklinikker.",
+      "published_at": null,
+      "snippet": "Sjekk nyheter og oppdateringer av frisør- og velværeindustrien. NFVB skal være den største arbeidsgiverorganisasjonen i frisør- og velværebransjen.",
       "source": "Brave Search",
-      "title": "Profesjonelt Frisørutstyr & Skjønnhetsutstyr | Luminx",
-      "url": "https://luminx.no/"
+      "title": "Norske frisør- og velværebedrifter - Aktuelt - NFVB",
+      "url": "https://nfvb.no/"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -536,10 +536,10 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "published_at": null,
-      "snippet": "Mascus in an international electronic marketplace for buyers and sellers of used machinery and equipment. Visit Mascus to find or advertise machinery and equipment for: agriculture, construction, transportation, material handling, forestry and groundscare.",
+      "snippet": "Industrisymaskin · <strong>Symaskin av merket Pfaff</strong>. Egner seg til &quot;lettere&quot; prosjekter som feks. kalesjer, presseninger, møbelskinn etc. OBS! 3 faset symaskin! Pris: 16 500,- Pussebord · Demobrukt pussebord. 2 slipebånd · 1 slipekon · 1 frontsliper · 1 børste · 1 pusserondell ·",
       "source": "Brave Search",
-      "title": "Used Construction & Farm Equipment - Mascus | Used Heavy Machinery",
-      "url": "https://www.mascus.com/"
+      "title": "Maskiner Skinnlåven",
+      "url": "https://www.skinnlaaven.no/aktuelt"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -552,10 +552,10 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "published_at": null,
-      "snippet": "Industrisymaskin · <strong>Symaskin av merket Pfaff</strong>. Egner seg til &quot;lettere&quot; prosjekter som feks. kalesjer, presseninger, møbelskinn etc. OBS! 3 faset symaskin! Pris: 16 500,- Pussebord · Demobrukt pussebord. 2 slipebånd · 1 slipekon · 1 frontsliper · 1 børste · 1 pusserondell ·",
+      "snippet": "Mascus in an international electronic marketplace for buyers and sellers of used machinery and equipment. Visit Mascus to find or advertise machinery and equipment for: agriculture, construction, transportation, material handling, forestry and groundscare.",
       "source": "Brave Search",
-      "title": "Maskiner Skinnlåven",
-      "url": "https://www.skinnlaaven.no/aktuelt"
+      "title": "Used Construction & Farm Equipment - Mascus | Used Heavy Machinery",
+      "url": "https://www.mascus.com/"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -623,19 +623,19 @@
     },
     {
       "discovery_query": "lagerreoler selges Norge",
-      "published_at": "2025-12-29T07:03:58",
-      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
-      "source": "Brave Search",
-      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
-      "url": "https://reolteknikk.no/"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
       "snippet": "Stabila grovhyllor med hög bärkraft. Perfekta för förvaring av tunga maskiner, verktyg och material. Beställ enkelt online idag!",
       "source": "Brave Search",
       "title": "Lagerreol I Hyller I Oppbevaring til verkstedet I P. Lindberg",
       "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler/"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "published_at": "2025-12-29T07:03:58",
+      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
+      "source": "Brave Search",
+      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
+      "url": "https://reolteknikk.no/"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
