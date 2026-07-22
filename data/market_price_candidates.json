@@ -1,0 +1,51 @@
+{
+  "candidate_count": 1,
+  "errors": {},
+  "generated_at": "2026-07-22T12:06:19.448368+00:00",
+  "method": "Brave Search candidate discovery; prices are unverified and never used automatically for a buy decision",
+  "opportunities": [
+    {
+      "asking_price_nok": 3400.0,
+      "candidate_count": 1,
+      "candidate_price_max_nok": 990.0,
+      "candidate_price_median_nok": 990.0,
+      "candidate_price_min_nok": 990.0,
+      "candidates": [
+        {
+          "captured_at": "2026-07-22T12:06:18.625553+00:00",
+          "domain": "fasadenor.no",
+          "price_nok": 990.0,
+          "similarity_score": 0.375,
+          "snippet": "<strong>4,990kr Inkludert Mva</strong> · Stor lagerreol med maksimal oppbevaringsplass Dette er den største modellen i serien – med 200 cm bredde og en kapasitet på hele 1,2 tonn totalt",
+          "source": "Brave Search",
+          "title": "Lagerreol 200×60×200cm - Svart 1200kg",
+          "url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg/",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
+        }
+      ],
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d brukt pris Norge",
+      "market_value_status": "REVIEW_REQUIRED",
+      "opportunity_id": "unified-auksjonen-611253",
+      "required_verified_comparables": 3,
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 0t 37m",
+      "verified_comparable_count": 0
+    },
+    {
+      "asking_price_nok": 20000.0,
+      "candidate_count": 0,
+      "candidate_price_max_nok": null,
+      "candidate_price_median_nok": null,
+      "candidate_price_min_nok": null,
+      "candidates": [],
+      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
+      "market_value_status": "NO_PRICE_CANDIDATES",
+      "opportunity_id": "unified-auksjonen-612667",
+      "required_verified_comparables": 3,
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 6t 53m 46s",
+      "verified_comparable_count": 0
+    }
+  ],
+  "opportunity_count": 2,
+  "schema_version": 1
+}

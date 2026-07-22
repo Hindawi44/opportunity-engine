@@ -3,15 +3,15 @@
     "auction": 3,
     "bankruptcy": 17,
     "estate_sale": 2,
-    "inventory": 28,
-    "liquidation": 14,
+    "inventory": 27,
+    "liquidation": 13,
     "office_furniture": 10,
     "sale_listing": 15,
     "salon_equipment": 9,
     "shop_equipment": 11
   },
-  "deduplicated_lead_count": 70,
-  "generated_at": "2026-07-22T11:41:22.842603+00:00",
+  "deduplicated_lead_count": 69,
+  "generated_at": "2026-07-22T12:06:10.882775+00:00",
   "input_result_count": 100,
   "items": [
     {
@@ -22,7 +22,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841403+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881302+00:00",
       "image_count": null,
       "lead_id": "web-f4aa2c103c9b5b4c9b71",
       "price_nok": null,
@@ -47,7 +47,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837854+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877958+00:00",
       "image_count": null,
       "lead_id": "web-a4fee36016437587aaef",
       "price_nok": null,
@@ -72,7 +72,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.842287+00:00",
+      "discovered_at": "2026-07-22T12:06:10.882560+00:00",
       "image_count": null,
       "lead_id": "web-ca1ad62b7e7d8ad4d383",
       "price_nok": null,
@@ -97,7 +97,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838301+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878314+00:00",
       "image_count": null,
       "lead_id": "web-fd34f7ffe57de15e0cfb",
       "price_nok": null,
@@ -115,29 +115,6 @@
       "url": "https://www.pinterest.com/pin/557179785159152441/"
     },
     {
-      "canonical_url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324",
-      "categories": [
-        "inventory",
-        "liquidation"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-22T11:41:22.842475+00:00",
-      "image_count": null,
-      "lead_id": "web-340bfb344e98a6d682c6",
-      "price_nok": null,
-      "priority_score": 44,
-      "published_at": "2020-05-01T15:30:26",
-      "score_reasons": [
-        "category:inventory+22",
-        "category:liquidation+16",
-        "published_at_present+6"
-      ],
-      "snippet": "– <strong>Vi har kjøpt varelager, inventar, utstyr og varemerker og skal drive butikkene videre i en måned for å rydde opp og holde opphørssalg</strong>, sier Jan Egil Flo til Tekstilforum. - Hva som skjer videre er ikke avklart.",
-      "source": "Brave Search",
-      "title": "Flo kjøper Brandstad og Wagner",
-      "url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324"
-    },
-    {
       "canonical_url": "https://www.billigsoppeltaxi.no/kontoravvikling",
       "categories": [
         "liquidation",
@@ -145,7 +122,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838786+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878943+00:00",
       "image_count": null,
       "lead_id": "web-fdc9844ca40ffc16438b",
       "price_nok": null,
@@ -168,7 +145,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838843+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879001+00:00",
       "image_count": null,
       "lead_id": "web-b205421e9bc5c469c688",
       "price_nok": null,
@@ -191,7 +168,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838919+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879073+00:00",
       "image_count": null,
       "lead_id": "web-4c4e1e08bb5aace3eaf9",
       "price_nok": null,
@@ -214,7 +191,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839219+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879356+00:00",
       "image_count": null,
       "lead_id": "web-b44ebb69f18d9ff07967",
       "price_nok": null,
@@ -237,7 +214,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839420+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879552+00:00",
       "image_count": null,
       "lead_id": "web-59562469ad1ad6328d68",
       "price_nok": null,
@@ -260,7 +237,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839150+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879287+00:00",
       "image_count": null,
       "lead_id": "web-308c25eccf104775fa2e",
       "price_nok": null,
@@ -283,7 +260,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838975+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879131+00:00",
       "image_count": null,
       "lead_id": "web-0947f69839d91d0acbd1",
       "price_nok": null,
@@ -306,7 +283,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839303+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879435+00:00",
       "image_count": null,
       "lead_id": "web-748bb4c57086428778a6",
       "price_nok": null,
@@ -329,7 +306,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841972+00:00",
+      "discovered_at": "2026-07-22T12:06:10.882223+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -351,7 +328,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.842412+00:00",
+      "discovered_at": "2026-07-22T12:06:10.882634+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -373,7 +350,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837919+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878025+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -396,7 +373,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841769+00:00",
+      "discovered_at": "2026-07-22T12:06:10.882010+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -420,7 +397,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837786+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877891+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -443,7 +420,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.836697+00:00",
+      "discovered_at": "2026-07-22T12:06:10.876638+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -465,7 +442,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837639+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877809+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -487,7 +464,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841298+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881146+00:00",
       "image_count": null,
       "lead_id": "web-c1e3e1a07794eb2a24ac",
       "price_nok": null,
@@ -509,7 +486,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839589+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879735+00:00",
       "image_count": null,
       "lead_id": "web-7d98d2dca9d156e72493",
       "price_nok": null,
@@ -531,7 +508,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838104+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878183+00:00",
       "image_count": null,
       "lead_id": "web-e6c891e1c13bdc192b3d",
       "price_nok": null,
@@ -553,7 +530,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838040+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878127+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -575,7 +552,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841692+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881931+00:00",
       "image_count": null,
       "lead_id": "web-3f88d33f469cadb89c05",
       "price_nok": null,
@@ -597,7 +574,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841586+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881794+00:00",
       "image_count": null,
       "lead_id": "web-1f73a24540df445fd318",
       "price_nok": null,
@@ -619,7 +596,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.842219+00:00",
+      "discovered_at": "2026-07-22T12:06:10.882410+00:00",
       "image_count": null,
       "lead_id": "web-05170ee30473a1493dd3",
       "price_nok": null,
@@ -642,7 +619,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841457+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881636+00:00",
       "image_count": null,
       "lead_id": "web-eecaf76c7cb772f25373",
       "price_nok": null,
@@ -658,33 +635,12 @@
       "url": "https://www.blocket.se/recommerce/forsale/search?product_category=2.91.3108.363"
     },
     {
-      "canonical_url": "https://www.collicare.no/en/freight/third-party-logistics",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838540+00:00",
-      "image_count": null,
-      "lead_id": "web-cd259dfa5072e807b3b3",
-      "price_nok": null,
-      "priority_score": 28,
-      "published_at": "2020-10-03T16:33:09",
-      "score_reasons": [
-        "category:inventory+22",
-        "published_at_present+6"
-      ],
-      "snippet": "Storage solutions, warehousing, 3PL, 4PL, WM systems – smart warehousing solutions streamlines your flow of goods and increase your bottom line",
-      "source": "Brave Search",
-      "title": "3PL lagerløsninger for din bedrift | ColliCare Logistics Norge",
-      "url": "https://www.collicare.no/en/freight/third-party-logistics"
-    },
-    {
       "canonical_url": "https://bdn.no/",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837575+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877623+00:00",
       "image_count": null,
       "lead_id": "web-f5e25a1bdcd9e106de57",
       "price_nok": null,
@@ -700,33 +656,12 @@
       "url": "https://bdn.no"
     },
     {
-      "canonical_url": "https://www.soelund-shopdesign.no/butikkinnredning",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837703+00:00",
-      "image_count": null,
-      "lead_id": "web-f25695ad1d9383c131b9",
-      "price_nok": null,
-      "priority_score": 28,
-      "published_at": "2022-06-21T04:37:14",
-      "score_reasons": [
-        "category:shop_equipment+22",
-        "published_at_present+6"
-      ],
-      "snippet": "<strong>SØLUND SHOP DESIGN tilbyr dansk designet og produserte butikkinnredninger til kvalitetsbevisste kunder, innenfor alle bransjer i hele Norge og Skandinavia</strong> og tilbyr et stort utvalg i produkter.",
-      "source": "Brave Search",
-      "title": "Butiksinventar af høj kvalitet fra Sølund Shop Design",
-      "url": "https://www.soelund-shopdesign.no/butikkinnredning/"
-    },
-    {
       "canonical_url": "https://www.hestra.com/",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837494+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877532+00:00",
       "image_count": null,
       "lead_id": "web-3711ef931e2562238b3e",
       "price_nok": null,
@@ -742,13 +677,34 @@
       "url": "https://www.hestra.com/"
     },
     {
+      "canonical_url": "https://reolteknikk.no/",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-22T12:06:10.881485+00:00",
+      "image_count": null,
+      "lead_id": "web-63600f85f4126e808e67",
+      "price_nok": null,
+      "priority_score": 28,
+      "published_at": "2025-12-29T07:03:58",
+      "score_reasons": [
+        "category:inventory+22",
+        "published_at_present+6"
+      ],
+      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
+      "source": "Brave Search",
+      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
+      "url": "https://reolteknikk.no/"
+    },
+    {
       "canonical_url": "https://tise.com/search/tise",
       "categories": [
         "sale_listing",
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840240+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880390+00:00",
       "image_count": null,
       "lead_id": "web-ab264ec5f9606558d60d",
       "price_nok": null,
@@ -758,7 +714,7 @@
         "category:sale_listing+10",
         "category:salon_equipment+16"
       ],
-      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand.",
+      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand",
       "source": "Brave Search",
       "title": "'frisørutstyr' items for sale · Tise",
       "url": "https://tise.com/search/tise?country_code=NO&search=fris%C3%B8rutstyr&location_max=country"
@@ -770,7 +726,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838366+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878449+00:00",
       "image_count": null,
       "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
@@ -792,7 +748,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837265+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877298+00:00",
       "image_count": null,
       "lead_id": "web-123271c51c6da4a9405e",
       "price_nok": null,
@@ -812,7 +768,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838480+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878534+00:00",
       "image_count": null,
       "lead_id": "web-0658ba89b4c5fc6f74ea",
       "price_nok": null,
@@ -832,7 +788,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839356+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879486+00:00",
       "image_count": null,
       "lead_id": "web-74a81ba296fd20b830eb",
       "price_nok": null,
@@ -853,7 +809,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837342+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877377+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -873,7 +829,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837403+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877445+00:00",
       "image_count": null,
       "lead_id": "web-e42d52eb07a436ed3cfe",
       "price_nok": null,
@@ -893,7 +849,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.836788+00:00",
+      "discovered_at": "2026-07-22T12:06:10.876767+00:00",
       "image_count": null,
       "lead_id": "web-72d343831b08e2486a3f",
       "price_nok": null,
@@ -913,7 +869,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841142+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881363+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -933,7 +889,7 @@
         "office_furniture"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839082+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879216+00:00",
       "image_count": null,
       "lead_id": "web-9a0e8109970eed5a090d",
       "price_nok": null,
@@ -949,12 +905,32 @@
       "url": "https://firstmovergroup.no/kontormobler-og-baerekraft-hva-kan-vi-gjore-med-de-gamle-kontormoblene-vare/"
     },
     {
+      "canonical_url": "https://www.supersellers.no/katalog",
+      "categories": [
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-22T12:06:10.877744+00:00",
+      "image_count": null,
+      "lead_id": "web-bd6977fd8acb108de839",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
+      "source": "Brave Search",
+      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
+      "url": "https://www.supersellers.no/katalog"
+    },
+    {
       "canonical_url": "https://www.witre.no/no/wno/lagerhyller-pallestativer",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840771+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881041+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -969,12 +945,32 @@
       "url": "https://www.witre.no/no/wno/lagerhyller-pallestativer"
     },
     {
+      "canonical_url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-22T12:06:10.881536+00:00",
+      "image_count": null,
+      "lead_id": "web-bac4413824a804dd34ad",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "Stabila grovhyllor med hög bärkraft. Perfekta för förvaring av tunga maskiner, verktyg och material. Beställ enkelt online idag!",
+      "source": "Brave Search",
+      "title": "Lagerreol I Hyller I Oppbevaring til verkstedet I P. Lindberg",
+      "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler/"
+    },
+    {
       "canonical_url": "https://reolhansen.dk/produkt-kategori/lagerreoler-arkivreoler",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841204+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881428+00:00",
       "image_count": null,
       "lead_id": "web-04376fdce8cb350aa3a8",
       "price_nok": null,
@@ -994,7 +990,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840835+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880984+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -1014,7 +1010,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841082+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881202+00:00",
       "image_count": null,
       "lead_id": "web-613dd332d95369012b20",
       "price_nok": null,
@@ -1034,7 +1030,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840293+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880444+00:00",
       "image_count": null,
       "lead_id": "web-7570d71d9b328c0f5b6d",
       "price_nok": null,
@@ -1050,44 +1046,24 @@
       "url": "https://luminx.no/"
     },
     {
-      "canonical_url": "http://www.reolhandling.no/",
+      "canonical_url": "https://naob.no/ordbok/restparti",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840944+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878881+00:00",
       "image_count": null,
-      "lead_id": "web-bd9eaa0e4d30c04bbc1a",
+      "lead_id": "web-921037454eb852a23c0d",
       "price_nok": null,
       "priority_score": 22,
       "published_at": null,
       "score_reasons": [
         "category:inventory+22"
       ],
-      "snippet": "<strong>Reolhandling AS</strong> er en bedrift med mer enn 20 års erfaring innen faget og bransjen. Vi leverer nye og brukte lagerinnredning / lagrings systemer/ pallereoler / småvarereoler til alle behov.",
+      "snippet": "restparti · substantiv · MODERAT BOKMÅLet · genus · nøytrum · ubestemt artikkel · et · FULL BOKMÅLSNORM · BETYDNING OG BRUK · <strong>resterende, ikke solgt parti av varer</strong> · | jf. rest · SITAT · [de skulde få avhendet] hele restpartiet af deres poteter ·",
       "source": "Brave Search",
-      "title": "Reolhandling AS - Pallereoler - Småvarereoler - Super 1 2 3 - Brukte reoler i Bergen og omegn",
-      "url": "http://www.reolhandling.no/"
-    },
-    {
-      "canonical_url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840997+00:00",
-      "image_count": null,
-      "lead_id": "web-0623254318f1aaf8f835",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
-      "source": "Brave Search",
-      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
-      "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
+      "title": "restparti - Det Norske Akademis ordbok",
+      "url": "https://naob.no/ordbok/restparti"
     },
     {
       "canonical_url": "https://merkandi.us/wholesale/sewing-machines-clearance",
@@ -1096,7 +1072,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840564+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880759+00:00",
       "image_count": null,
       "lead_id": "web-4294bca182e47934c662",
       "price_nok": null,
@@ -1117,7 +1093,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838670+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878639+00:00",
       "image_count": null,
       "lead_id": "web-067ceeb7a126feb9836a",
       "price_nok": null,
@@ -1137,7 +1113,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840880+00:00",
+      "discovered_at": "2026-07-22T12:06:10.881582+00:00",
       "image_count": null,
       "lead_id": "web-f233ebf2b059bd695449",
       "price_nok": null,
@@ -1157,7 +1133,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837192+00:00",
+      "discovered_at": "2026-07-22T12:06:10.877220+00:00",
       "image_count": null,
       "lead_id": "web-0c92990a089dcd62f0a5",
       "price_nok": null,
@@ -1177,7 +1153,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.842153+00:00",
+      "discovered_at": "2026-07-22T12:06:10.882345+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -1197,7 +1173,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840347+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880499+00:00",
       "image_count": null,
       "lead_id": "web-109ce00732f8f63fe37d",
       "price_nok": null,
@@ -1217,7 +1193,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839943+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880102+00:00",
       "image_count": null,
       "lead_id": "web-c357ac15a9bf75a0ba5e",
       "price_nok": null,
@@ -1237,7 +1213,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839892+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880049+00:00",
       "image_count": null,
       "lead_id": "web-a55e3a6ff81e23b22f21",
       "price_nok": null,
@@ -1257,7 +1233,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840482+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880639+00:00",
       "image_count": null,
       "lead_id": "web-14af6bcacbb8835cea55",
       "price_nok": null,
@@ -1278,7 +1254,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839999+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880163+00:00",
       "image_count": null,
       "lead_id": "web-dcc37d09e23b72b09f7d",
       "price_nok": null,
@@ -1298,7 +1274,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840151+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880321+00:00",
       "image_count": null,
       "lead_id": "web-6075e05144b5e4b48b80",
       "price_nok": null,
@@ -1318,7 +1294,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840195+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880269+00:00",
       "image_count": null,
       "lead_id": "web-87e12a4a9439030a48a2",
       "price_nok": null,
@@ -1338,7 +1314,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840073+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880218+00:00",
       "image_count": null,
       "lead_id": "web-b84b1185b121f5c1b96e",
       "price_nok": null,
@@ -1359,7 +1335,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838234+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878388+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1380,7 +1356,7 @@
         "auction"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840404+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880559+00:00",
       "image_count": null,
       "lead_id": "web-cf6b50eeda9575ca51c2",
       "price_nok": null,
@@ -1400,7 +1376,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839750+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879902+00:00",
       "image_count": null,
       "lead_id": "web-da37cba0876e2ce205f6",
       "price_nok": null,
@@ -1420,7 +1396,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.839509+00:00",
+      "discovered_at": "2026-07-22T12:06:10.879641+00:00",
       "image_count": null,
       "lead_id": "web-a15c941973346178a470",
       "price_nok": null,
@@ -1440,7 +1416,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.840634+00:00",
+      "discovered_at": "2026-07-22T12:06:10.880835+00:00",
       "image_count": null,
       "lead_id": "web-70716dae96a45635c972",
       "price_nok": null,
@@ -1460,7 +1436,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.838165+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878243+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1475,24 +1451,24 @@
       "url": "https://norway.dlapiper.com/no/nyhet/hvis-kunden-gar-konkurs"
     },
     {
-      "canonical_url": "https://overskuddsmateriell.no/",
+      "canonical_url": "https://e24.no/hendelse/konkurser-i-norge",
       "categories": [
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.841871+00:00",
+      "discovered_at": "2026-07-22T12:06:10.882147+00:00",
       "image_count": null,
-      "lead_id": "web-1f4f8aa14e2afaa10a68",
+      "lead_id": "web-1b759ca0b38c6792eed6",
       "price_nok": null,
       "priority_score": 8,
       "published_at": null,
       "score_reasons": [
         "category:bankruptcy+8"
       ],
-      "snippet": "<strong>Sitrex AS tidligere Alfa Nordic AS og Nordisk Fritid er konkurs</strong> · BUTIKKEN ER PERMANENT STENG",
+      "snippet": "Les siste nyheter og artikler om Konkurser i Norge på E24.",
       "source": "Brave Search",
-      "title": "Overskuddsmateriell",
-      "url": "https://overskuddsmateriell.no/"
+      "title": "Konkurser i Norge",
+      "url": "https://e24.no/hendelse/konkurser-i-norge"
     },
     {
       "canonical_url": "https://www.varelageret.net/",
@@ -1500,7 +1476,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-22T11:41:22.837975+00:00",
+      "discovered_at": "2026-07-22T12:06:10.878082+00:00",
       "image_count": null,
       "lead_id": "web-a8b396d321a9a13c10d3",
       "price_nok": null,
@@ -1518,6 +1494,6 @@
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 70
+    "Brave Search": 69
   }
 }
