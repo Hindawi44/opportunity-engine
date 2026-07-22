@@ -4,7 +4,7 @@
   "errors": {},
   "evidence": {
     "unified-auksjonen-611253": {
-      "captured_at": "2026-07-22T22:34:23.858704+00:00",
+      "captured_at": "2026-07-22T23:11:49.688585+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1784810640000"
@@ -14,7 +14,7 @@
       "verified": true
     },
     "unified-auksjonen-613168": {
-      "captured_at": "2026-07-22T22:34:24.711519+00:00",
+      "captured_at": "2026-07-22T23:11:50.291754+00:00",
       "observed": {
         "city": "Lierstranda",
         "ends_at": "1785351600000"
@@ -24,7 +24,7 @@
       "verified": true
     },
     "unified-auksjonen-613169": {
-      "captured_at": "2026-07-22T22:34:25.772196+00:00",
+      "captured_at": "2026-07-22T23:11:50.885259+00:00",
       "observed": {
         "city": "Lierstranda",
         "ends_at": "1785438000000"
@@ -34,6 +34,6 @@
       "verified": true
     }
   },
-  "generated_at": "2026-07-22T22:34:25.772213+00:00",
+  "generated_at": "2026-07-22T23:11:50.885277+00:00",
   "schema_version": 2
 }
