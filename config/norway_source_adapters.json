@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "policy": "Only official public pages, documented public APIs, or explicitly authorized feeds may be enabled. A configured adapter is not considered collecting until it returns at least one verified record without errors.",
+  "adapters": [
+    {
+      "source": "Konkursbo",
+      "market": "Norway",
+      "channel": "bankruptcy_lead",
+      "access_mode": "authorized_or_official_feed",
+      "feed_url_env": "KONKURSBO_FEED_URL",
+      "feed_token_env": "KONKURSBO_FEED_TOKEN",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "source": "Kommuner",
+      "market": "Norway",
+      "channel": "public_auction_event_lead",
+      "access_mode": "official_public_feed_registry",
+      "feed_url_env": "KOMMUNER_FEED_URL",
+      "feed_token_env": "KOMMUNER_FEED_TOKEN",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "source": "Tolletaten",
+      "market": "Norway",
+      "channel": "public_auction_event_lead",
+      "access_mode": "official_public_or_authorized_feed",
+      "feed_url_env": "TOLLETATEN_FEED_URL",
+      "feed_token_env": "TOLLETATEN_FEED_TOKEN",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "source": "Bank auctions",
+      "market": "Norway",
+      "channel": "public_auction_event_lead",
+      "access_mode": "authorized_feed_registry",
+      "feed_url_env": "BANK_AUCTIONS_FEED_URL",
+      "feed_token_env": "BANK_AUCTIONS_FEED_TOKEN",
+      "status": "awaiting_authorized_configuration"
+    }
+  ]
+}
