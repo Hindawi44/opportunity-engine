@@ -116,6 +116,23 @@ def _seller(*, risk="low") -> SellerReliabilityReport:
     )
 
 
+def _unknown_seller() -> SellerReliabilityReport:
+    return SellerReliabilityReport(
+        seller_id=None,
+        seller_name=None,
+        seller_type=None,
+        score=None,
+        grade="U",
+        risk="unknown",
+        risk_label="⚪ بائع غير متحقق",
+        confidence="insufficient",
+        is_verified=False,
+        evidence_count=0,
+        reasons=(),
+        warnings=(),
+    )
+
+
 def test_flags_exceptional_verified_opportunity() -> None:
     report = OpportunityDiscoveryEngine().discover(
         _opportunity(), _decision(), _score(), _verification(), _history(drop=True), _seller()
@@ -136,26 +153,33 @@ def test_missing_evidence_caps_non_actionable_opportunity() -> None:
         _score(55),
         _verification(status="needs_review", verified=False),
         _history(),
-        SellerReliabilityReport(
-            seller_id=None,
-            seller_name=None,
-            seller_type=None,
-            score=None,
-            grade="U",
-            risk="unknown",
-            risk_label="⚪ بائع غير متحقق",
-            confidence="insufficient",
-            is_verified=False,
-            evidence_count=0,
-            reasons=(),
-            warnings=(),
-        ),
+        _unknown_seller(),
     )
 
     assert report.discovery_score <= 59
     assert report.is_exceptional is False
     assert report.tier in {"low", "watch"}
     assert report.warnings
+
+
+def test_preliminary_score_is_not_erased_by_missing_economics() -> None:
+    report = OpportunityDiscoveryEngine().discover(
+        _opportunity(),
+        _decision(
+            decision="monitor",
+            blockers=("market_comparables", "cost:transport_nok", "cost:auction_fee_nok"),
+            actionable=False,
+        ),
+        _score(12),
+        _verification(status="needs_review", verified=False),
+        _history(),
+        _unknown_seller(),
+    )
+
+    assert 12 <= report.discovery_score <= 59
+    assert report.tier == "low"
+    assert report.is_exceptional is False
+    assert any("فجوات أدلة" in warning for warning in report.warnings)
 
 
 def test_overpriced_or_high_risk_seller_is_not_exceptional() -> None:
