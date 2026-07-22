@@ -4,7 +4,7 @@
   "errors": {},
   "evidence": {
     "unified-auksjonen-611253": {
-      "captured_at": "2026-07-22T18:12:41.587661+00:00",
+      "captured_at": "2026-07-22T20:15:48.592282+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1784810640000"
@@ -13,18 +13,18 @@
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
       "verified": true
     },
-    "unified-auksjonen-612667": {
-      "captured_at": "2026-07-22T18:12:42.086848+00:00",
+    "unified-auksjonen-613168": {
+      "captured_at": "2026-07-22T20:15:49.088468+00:00",
       "observed": {
-        "city": "Kristiansand s",
-        "ends_at": "1784746800000"
+        "city": "Lierstranda",
+        "ends_at": "1785351600000"
       },
       "source": "Auksjonen.no public listing page",
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
+      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168",
       "verified": true
     },
     "unified-auksjonen-613169": {
-      "captured_at": "2026-07-22T18:12:42.944161+00:00",
+      "captured_at": "2026-07-22T20:15:49.578283+00:00",
       "observed": {
         "city": "Lierstranda",
         "ends_at": "1785438000000"
@@ -34,6 +34,6 @@
       "verified": true
     }
   },
-  "generated_at": "2026-07-22T18:12:42.944183+00:00",
+  "generated_at": "2026-07-22T20:15:49.578303+00:00",
   "schema_version": 2
 }

@@ -1,0 +1,58 @@
+{
+  "follow_up_count": 3,
+  "generated_at": "2026-07-22T20:16:05.769623+00:00",
+  "items": [
+    {
+      "blocking_reason_ar": "عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة",
+      "city": "Tønsberg",
+      "due_at": "2026-07-23T20:16:05.769623+00:00",
+      "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "maximum_safe_bid_nok": null,
+      "next_action": "VERIFY_MARKET_PRICE",
+      "opportunity_id": "unified-auksjonen-611253",
+      "owner": "SYSTEM",
+      "priority": "HIGH",
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
+      "updated_at": "2026-07-22T20:16:05.769623+00:00",
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
+    },
+    {
+      "blocking_reason_ar": "عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة",
+      "city": "Lierstranda",
+      "due_at": "2026-07-23T20:16:05.769623+00:00",
+      "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "maximum_safe_bid_nok": null,
+      "next_action": "VERIFY_MARKET_PRICE",
+      "opportunity_id": "unified-auksjonen-613168",
+      "owner": "SYSTEM",
+      "priority": "HIGH",
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
+      "updated_at": "2026-07-22T20:16:05.769623+00:00",
+      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
+    },
+    {
+      "blocking_reason_ar": "عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة",
+      "city": "Lierstranda",
+      "due_at": "2026-07-23T20:16:05.769623+00:00",
+      "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "maximum_safe_bid_nok": null,
+      "next_action": "VERIFY_MARKET_PRICE",
+      "opportunity_id": "unified-auksjonen-613169",
+      "owner": "SYSTEM",
+      "priority": "HIGH",
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
+      "updated_at": "2026-07-22T20:16:05.769623+00:00",
+      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
+    }
+  ],
+  "schema_version": 1
+}

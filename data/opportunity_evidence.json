@@ -38,14 +38,14 @@
       ],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
     },
-    "unified-auksjonen-612667": {
+    "unified-auksjonen-613168": {
       "auction_fee_nok": null,
       "candidate_market_value_nok": null,
       "dismantling_cost_nok": null,
@@ -66,14 +66,14 @@
         "repair_cost_nok",
         "other_costs_nok"
       ],
-      "opportunity_id": "unified-auksjonen-612667",
+      "opportunity_id": "unified-auksjonen-613168",
       "other_costs_nok": null,
       "pending_market_comparables": [],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
       "transport_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
+      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
@@ -104,7 +104,7 @@
       "pending_market_comparables": [],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
       "vat_nok": null,
@@ -113,7 +113,7 @@
     }
   },
   "evidence_count": 3,
-  "generated_at": "2026-07-22T18:13:00.092767+00:00",
+  "generated_at": "2026-07-22T20:16:05.105651+00:00",
   "market_evidence_source": "data/market_evidence_registry.json",
   "method": "verified evidence only; discovered market evidence is bridged as pending review; unknown values remain null",
   "pending_comparable_count": 1,

@@ -2,7 +2,7 @@
   "alerts": {
     "alerts": [],
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-07-22T18:13:00.166316+00:00",
+    "last_scoring_run": "2026-07-22T20:16:05.180065+00:00",
     "schema_version": 2,
     "signatures": []
   },
@@ -151,7 +151,7 @@
       ],
       "top_count": 5
     },
-    "generated_at": "2026-07-22T18:13:00.539893+00:00",
+    "generated_at": "2026-07-22T20:16:05.481530+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels; no financial values are invented",
     "schema_version": 1,
     "source_funnel": {
@@ -161,11 +161,11 @@
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-07-22T18:13:00.620870+00:00",
+  "generated_at": "2026-07-22T20:16:05.562065+00:00",
   "opportunities": {
     "actionable_count": 0,
     "candidate_count": 3,
-    "generated_at": "2026-07-22T18:13:00.202244+00:00",
+    "generated_at": "2026-07-22T20:16:05.215844+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -176,76 +176,10 @@
     "actionable_count": 0,
     "buy_review_count": 0,
     "candidate_count": 3,
-    "generated_at": "2026-07-22T18:13:00.166316+00:00",
+    "generated_at": "2026-07-22T20:16:05.180065+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
-      {
-        "asking_price_nok": 26000.0,
-        "city": "Kristiansand s",
-        "conservative_resale_value_nok": null,
-        "decision": "EVIDENCE_REQUIRED",
-        "ends_at": "1784746800000",
-        "evidence_needed": [
-          "three_verified_market_comparables",
-          "auction_fee",
-          "vat_status",
-          "transport_cost",
-          "dismantling_cost",
-          "condition_and_missing_parts"
-        ],
-        "exclusion_reasons": [],
-        "expected_profit_nok": null,
-        "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
-        "matched_target_terms": [
-          "varelager"
-        ],
-        "maximum_safe_bid_nok": null,
-        "missing_evidence": [
-          "auction_fee_nok",
-          "dismantling_cost_nok",
-          "other_costs_nok",
-          "repair_cost_nok",
-          "storage_cost_nok",
-          "three_verified_market_comparables",
-          "transport_cost_nok",
-          "vat_nok"
-        ],
-        "opportunity_id": "unified-auksjonen-612667",
-        "opportunity_score": 33.61,
-        "priority": 1,
-        "reasons": [
-          "target:varelager+18",
-          "asking_price_present+5"
-        ],
-        "recommendation": "REJECT",
-        "recommendation_ar": "رفض",
-        "relevance_score": 23,
-        "requires_human_approval": false,
-        "roi_percent": null,
-        "score_components": {
-          "evidence": 0.0,
-          "listing_quality": 8.61,
-          "logistics": 10.0,
-          "marketability": 15.0,
-          "verified_economics": 0.0
-        },
-        "score_grade": "E",
-        "score_reasons": [
-          "verified_economics:0/35",
-          "evidence_completeness:0.0/15",
-          "verified_comparables:0.0/10",
-          "marketability:15.0/15",
-          "logistics:10.0/10",
-          "relevance:1.6/7",
-          "listing_fields:7.0/8",
-          "evidence_gate:EVIDENCE_REQUIRED"
-        ],
-        "status": "review_first",
-        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
-        "total_cost_nok": null,
-        "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
-      },
       {
         "asking_price_nok": 6100.0,
         "city": "Tønsberg",
@@ -310,9 +244,75 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
+      },
+      {
+        "asking_price_nok": 100.0,
+        "city": "Lierstranda",
+        "conservative_resale_value_nok": null,
+        "decision": "EVIDENCE_REQUIRED",
+        "ends_at": "1785351600000",
+        "evidence_needed": [
+          "three_verified_market_comparables",
+          "auction_fee",
+          "vat_status",
+          "transport_cost",
+          "dismantling_cost",
+          "condition_and_missing_parts"
+        ],
+        "exclusion_reasons": [],
+        "expected_profit_nok": null,
+        "market_search_query": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d",
+        "matched_target_terms": [
+          "reol"
+        ],
+        "maximum_safe_bid_nok": null,
+        "missing_evidence": [
+          "auction_fee_nok",
+          "dismantling_cost_nok",
+          "other_costs_nok",
+          "repair_cost_nok",
+          "storage_cost_nok",
+          "three_verified_market_comparables",
+          "transport_cost_nok",
+          "vat_nok"
+        ],
+        "opportunity_id": "unified-auksjonen-613168",
+        "opportunity_score": 23.98,
+        "priority": 2,
+        "reasons": [
+          "target:reol+9",
+          "asking_price_present+5"
+        ],
+        "recommendation": "REJECT",
+        "recommendation_ar": "رفض",
+        "relevance_score": 14,
+        "requires_human_approval": false,
+        "roi_percent": null,
+        "score_components": {
+          "evidence": 0.0,
+          "listing_quality": 7.98,
+          "logistics": 7.0,
+          "marketability": 9.0,
+          "verified_economics": 0.0
+        },
+        "score_grade": "E",
+        "score_reasons": [
+          "verified_economics:0/35",
+          "evidence_completeness:0.0/15",
+          "verified_comparables:0.0/10",
+          "marketability:9.0/15",
+          "logistics:7.0/10",
+          "relevance:1.0/7",
+          "listing_fields:7.0/8",
+          "evidence_gate:EVIDENCE_REQUIRED"
+        ],
+        "status": "review_if_capacity",
+        "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
+        "total_cost_nok": null,
+        "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
       },
       {
         "asking_price_nok": 100.0,
@@ -330,7 +330,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d",
+        "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d",
         "matched_target_terms": [
           "reol"
         ],
@@ -376,7 +376,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
+        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
       }
@@ -386,7 +386,7 @@
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-07-22T18:13:00.587533+00:00",
+    "generated_at": "2026-07-22T20:16:05.528856+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [
@@ -397,7 +397,7 @@
         "bankruptcy_leads_selected": 0,
         "configured": true,
         "error": null,
-        "fetched": 51,
+        "fetched": 52,
         "note": null,
         "public_auction_event_leads_selected": 0,
         "required_configuration": [],
@@ -486,7 +486,7 @@
       "awaiting_configuration_count": 3,
       "collecting_count": 3,
       "error_count": 0,
-      "fetched_total": 78,
+      "fetched_total": 79,
       "source_count": 6
     }
   },

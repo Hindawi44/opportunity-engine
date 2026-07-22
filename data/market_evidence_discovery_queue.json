@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T18:12:42.985061+00:00",
+  "generated_at": "2026-07-22T20:15:49.619412+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
   "search_required_count": 3,
@@ -41,45 +41,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
-      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
-    },
-    {
-      "accepted_comparable_fields": [
-        "source",
-        "url",
-        "price_nok",
-        "condition",
-        "captured_at",
-        "verified"
-      ],
-      "asking_price_nok": 26000.0,
-      "candidate_sources": [
-        {
-          "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud+47m+21s",
-          "source": "FINN Torget",
-          "status": "REVIEW_REQUIRED"
-        },
-        {
-          "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud+47m+21s",
-          "source": "Auksjonen.no",
-          "status": "REVIEW_REQUIRED"
-        },
-        {
-          "authorized": false,
-          "search_url": "https://www.google.com/search?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+25+bud+47m+21s+pris+Norge",
-          "source": "Google Norway",
-          "status": "REVIEW_REQUIRED"
-        }
-      ],
-      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
-      "opportunity_id": "unified-auksjonen-612667",
-      "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
-      "required_verified_comparables": 3,
-      "status": "SEARCH_REQUIRED",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -95,29 +57,67 @@
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+8d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Parti+med+VVS-deler%2C+r%C3%B8r%2C+r%C3%B8rdeler%2C+reol+og+installasjonsmateriell+Lierstranda+1+bud+6d",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+8d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=Parti+med+VVS-deler%2C+r%C3%B8r%2C+r%C3%B8rdeler%2C+reol+og+installasjonsmateriell+Lierstranda+1+bud+6d",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+8d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=Parti+med+VVS-deler%2C+r%C3%B8r%2C+r%C3%B8rdeler%2C+reol+og+installasjonsmateriell+Lierstranda+1+bud+6d+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d",
+      "market_search_query": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d",
+      "opportunity_id": "unified-auksjonen-613168",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    },
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 100.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+7d",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+7d",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+7d+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d",
       "opportunity_id": "unified-auksjonen-613169",
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]

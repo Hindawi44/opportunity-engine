@@ -1,19 +1,19 @@
 {
-  "excluded_count": 5,
+  "excluded_count": 7,
   "excluded_summary": {
-    "generic_unspecified_lot": 5,
-    "low_relevance_goods": 2
+    "generic_unspecified_lot": 7,
+    "low_relevance_goods": 3
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-07-22T18:12:40.616432+00:00",
+  "generated_at": "2026-07-22T20:15:47.651036+00:00",
   "input_count": 25,
   "listing_metadata_enrichment": {
     "enriched_count": 3,
     "error_count": 0,
     "method": "directly observed public listing metadata only; no estimates"
   },
-  "low_relevance_omitted_count": 17,
+  "low_relevance_omitted_count": 15,
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [
     {
@@ -43,13 +43,13 @@
       ],
       "relevance_score": 29,
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
     },
     {
-      "asking_price_nok": 26000.0,
-      "city": "Kristiansand s",
-      "ends_at": "1784746800000",
+      "asking_price_nok": 100.0,
+      "city": "Lierstranda",
+      "ends_at": "1785351600000",
       "evidence_needed": [
         "three_verified_market_comparables",
         "auction_fee",
@@ -59,20 +59,20 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
+      "market_search_query": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d",
       "matched_target_terms": [
-        "varelager"
+        "reol"
       ],
-      "opportunity_id": "unified-auksjonen-612667",
-      "priority": 1,
+      "opportunity_id": "unified-auksjonen-613168",
+      "priority": 2,
       "reasons": [
-        "target:varelager+18",
+        "target:reol+9",
         "asking_price_present+5"
       ],
-      "relevance_score": 23,
-      "status": "review_first",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
+      "relevance_score": 14,
+      "status": "review_if_capacity",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
+      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
     },
     {
       "asking_price_nok": 100.0,
@@ -87,7 +87,7 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d",
+      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d",
       "matched_target_terms": [
         "reol"
       ],
@@ -99,11 +99,11 @@
       ],
       "relevance_score": 14,
       "status": "review_if_capacity",
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
     }
   ],
-  "review_first_count": 2,
+  "review_first_count": 1,
   "schema_version": 6,
   "selected_count": 3,
   "source_snapshot": "data/todays_opportunities.json"

@@ -1,7 +1,7 @@
 {
   "active_source_count": 3,
   "configured_source_count": 3,
-  "generated_at": "2026-07-22T18:12:27.156896+00:00",
+  "generated_at": "2026-07-22T20:15:34.286583+00:00",
   "policy": "Only public documented endpoints, public category pages, or explicitly authorized APIs/feeds are used; no access controls are bypassed and no mass harvesting is performed.",
   "schema_version": 3,
   "sources": [

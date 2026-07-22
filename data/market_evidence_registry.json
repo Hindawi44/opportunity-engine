@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T18:13:00.052864+00:00",
+  "generated_at": "2026-07-22T20:16:05.065786+00:00",
   "opportunity_count": 3,
   "policy": {
     "automatic_verification": false,
@@ -13,7 +13,7 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-22T18:12:44.053966+00:00",
+          "captured_at": "2026-07-22T20:15:50.545269+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
@@ -51,27 +51,27 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 18t 31m 20s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
       "verified_market_value_nok": null
     },
     {
       "accepted_comparable_count": 0,
       "accepted_comparables": [],
-      "asking_price_nok": 26000.0,
+      "asking_price_nok": 100.0,
       "candidate_comparable_count": 0,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
       "independent_domain_count": 0,
       "independent_domains": [],
       "market_value_verified": false,
-      "opportunity_id": "unified-auksjonen-612667",
+      "opportunity_id": "unified-auksjonen-613168",
       "outlier_count": 0,
       "outliers": [],
       "review_reasons": [
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 25 bud 47m 21s",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
       "verified_market_value_nok": null
     },
     {
@@ -91,7 +91,7 @@
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 8d 0t 47m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
       "verified_market_value_nok": null
     }
   ],
