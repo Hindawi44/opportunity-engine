@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Build transparent, evidence-gated decisions from scored opportunities.
 
-No missing cost or market value is estimated. BUY_REVIEW is advisory only and
-always requires human approval. Maximum safe bid is calculated only when the
-upstream economic evaluation is complete and verified.
+P4.1 makes ``final_decision`` the canonical decision. Legacy recommendation
+fields are synchronized for backwards compatibility; no consumer may observe a
+WATCH/REJECT contradiction. Missing evidence is presented in Arabic while raw
+keys remain available for machine processing.
 """
 from __future__ import annotations
 
@@ -13,10 +14,38 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+EVIDENCE_LABELS_AR = {
+    "three_verified_market_comparables": "ثلاث مقارنات سوقية موثقة",
+    "pending_market_comparables_require_review": "مراجعة المقارنات السوقية المرشحة",
+    "auction_fee": "عمولة المزاد",
+    "auction_fee_nok": "عمولة المزاد",
+    "vat_status": "حالة ضريبة القيمة المضافة",
+    "vat_nok": "قيمة ضريبة القيمة المضافة",
+    "transport_cost": "تكلفة النقل",
+    "transport_cost_nok": "تكلفة النقل",
+    "dismantling_cost": "تكلفة الفك",
+    "dismantling_cost_nok": "تكلفة الفك",
+    "storage_cost_nok": "تكلفة التخزين",
+    "repair_cost_nok": "تكلفة الإصلاح",
+    "other_costs_nok": "التكاليف الأخرى",
+    "condition_and_missing_parts": "حالة البضاعة والأجزاء الناقصة",
+}
+
+DECISION_AR = {
+    "BUY_REVIEW": "مراجعة للشراء",
+    "WATCH": "مراقبة وجمع الأدلة",
+    "REJECT": "رفض",
+}
+
+
 def _number(value: object) -> float | None:
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         return float(value)
     return None
+
+
+def _arabic_evidence_labels(keys: list[str]) -> list[str]:
+    return [EVIDENCE_LABELS_AR.get(key, key.replace("_nok", "").replace("_", " ")) for key in keys]
 
 
 def _decision(item: dict[str, object]) -> dict[str, object]:
@@ -26,8 +55,9 @@ def _decision(item: dict[str, object]) -> dict[str, object]:
     total_cost = _number(item.get("total_cost_nok"))
     profit = _number(item.get("expected_profit_nok"))
     roi = _number(item.get("roi_percent"))
-    missing = item.get("missing_evidence")
-    missing = [str(value) for value in missing] if isinstance(missing, list) else []
+    missing_raw = item.get("missing_evidence")
+    missing = [str(value) for value in missing_raw] if isinstance(missing_raw, list) else []
+    missing_ar = _arabic_evidence_labels(missing)
     economics_complete = (
         item.get("decision") == "REVIEW_NUMBERS"
         and asking is not None
@@ -52,17 +82,15 @@ def _decision(item: dict[str, object]) -> dict[str, object]:
 
     if not economics_complete:
         final_decision = "WATCH"
-        final_decision_ar = "مراقبة وجمع الأدلة"
         reasons.append("البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة.")
-        if missing:
-            warnings.append("أدلة ناقصة: " + ", ".join(missing))
+        if missing_ar:
+            warnings.append("أدلة ناقصة: " + "، ".join(missing_ar))
         next_actions.extend([
             "استكمال ثلاث مقارنات سوقية موثقة.",
             "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح.",
         ])
     elif profit <= 0 or roi < 15.0 or score < 45.0:
         final_decision = "REJECT"
-        final_decision_ar = "رفض"
         reasons.append("الربحية أو العائد أو الدرجة لا تحقق الحد الأدنى المحافظ.")
         if profit <= 0:
             warnings.append("الربح المتوقع غير إيجابي.")
@@ -80,7 +108,6 @@ def _decision(item: dict[str, object]) -> dict[str, object]:
         and asking <= maximum_safe_bid
     ):
         final_decision = "BUY_REVIEW"
-        final_decision_ar = "مراجعة للشراء"
         reasons.extend([
             "الأدلة الاقتصادية مكتملة وفق المدخلات الموثقة.",
             f"الربح المتوقع {profit:.0f} كرونة والعائد {roi:.1f}%.",
@@ -94,22 +121,25 @@ def _decision(item: dict[str, object]) -> dict[str, object]:
         ])
     else:
         final_decision = "WATCH"
-        final_decision_ar = "مراقبة"
         reasons.append("الفرصة مكتملة اقتصاديًا لكنها لا تحقق جميع شروط مراجعة الشراء المحافظة.")
         if maximum_safe_bid is not None and asking is not None and asking > maximum_safe_bid:
-            warnings.append(
-                f"سعر الطلب {asking:.0f} أعلى من الحد الآمن {maximum_safe_bid:.0f} كرونة."
-            )
+            warnings.append(f"سعر الطلب {asking:.0f} أعلى من الحد الآمن {maximum_safe_bid:.0f} كرونة.")
         next_actions.append("راقب انخفاض السعر أو تحسن شروط التكلفة قبل إعادة التقييم.")
 
+    final_decision_ar = DECISION_AR[final_decision]
     result = dict(item)
     result.update({
         "final_decision": final_decision,
         "final_decision_ar": final_decision_ar,
+        "official_decision_field": "final_decision",
+        # Backwards-compatible aliases: always identical to the canonical decision.
+        "recommendation": final_decision,
+        "recommendation_ar": final_decision_ar,
         "decision_confidence": "HIGH" if economics_complete else "LOW",
         "maximum_safe_bid_nok": round(maximum_safe_bid, 2) if maximum_safe_bid is not None else None,
         "target_profit_buffer_nok": round(target_profit, 2) if target_profit is not None else None,
         "verified_operating_costs_nok": round(operating_costs, 2) if operating_costs is not None else None,
+        "missing_evidence_ar": missing_ar,
         "decision_reasons_ar": reasons,
         "decision_warnings_ar": warnings,
         "next_actions_ar": next_actions,
@@ -120,7 +150,7 @@ def _decision(item: dict[str, object]) -> dict[str, object]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build P4 decision intelligence")
+    parser = argparse.ArgumentParser(description="Build P4.1 decision intelligence")
     parser.add_argument("--scored", default="data/scored_opportunities.json")
     parser.add_argument("--output", default="data/decision_intelligence.json")
     args = parser.parse_args()
@@ -136,11 +166,16 @@ def main() -> int:
         priority.get(str(item.get("final_decision")), 9),
         -float(item.get("opportunity_score") or 0),
     ))
+    for item in decisions:
+        if item.get("recommendation") != item.get("final_decision"):
+            raise ValueError("decision consistency invariant violated")
+
     generated_at = datetime.now(timezone.utc).isoformat()
     output_payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": generated_at,
-        "method": "verified evidence, conservative target-profit buffer, human approval required",
+        "method": "canonical final decision, verified evidence, conservative target-profit buffer, human approval required",
+        "official_decision_field": "final_decision",
         "decision_count": len(decisions),
         "buy_review_count": sum(item["final_decision"] == "BUY_REVIEW" for item in decisions),
         "watch_count": sum(item["final_decision"] == "WATCH" for item in decisions),
