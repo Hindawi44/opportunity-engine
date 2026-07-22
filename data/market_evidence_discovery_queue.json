@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T10:45:42.571424+00:00",
+  "generated_at": "2026-07-22T11:27:04.339619+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
   "search_required_count": 2,
@@ -41,7 +41,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 1t 58m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 1t 16m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -53,33 +53,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 18000.0,
+      "asking_price_nok": 20000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+17+bud",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+19+bud",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+17+bud",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+19+bud",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+17+bud+pris+Norge",
+          "search_url": "https://www.google.com/search?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+19+bud+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 17 bud",
+      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud",
       "opportunity_id": "unified-auksjonen-612667",
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 17 bud 8t 14m 21s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 7t 33m 0s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]

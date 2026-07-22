@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-07-22T10:45:36.006522+00:00",
+  "generated_at": "2026-07-22T11:26:57.660958+00:00",
   "provider": "Brave Search API",
   "request_count": 10,
   "result_count": 100,
@@ -175,14 +175,6 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": "2024-01-09T06:48:44",
-      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
-      "source": "Brave Search",
-      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
-      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
       "published_at": null,
       "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
       "source": "Brave Search",
@@ -204,6 +196,14 @@
       "source": "Brave Search",
       "title": "3PL lagerløsninger for din bedrift | ColliCare Logistics Norge",
       "url": "https://www.collicare.no/en/freight/third-party-logistics"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": "2024-01-09T06:48:44",
+      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
+      "source": "Brave Search",
+      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
+      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -440,10 +440,10 @@
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
-      "snippet": "Frisørinnredning / Utstyr fra REM. Engelsk håndlagede kvalitetsprodukter. 3 års garanti.",
+      "snippet": "Ta en titt på våre frisørartikler. Her får du frisørkapper, blanderbegre, sakser og masse mer - Alt til kanonbillige priser - Finn ditt utstyr i dag!",
       "source": "Brave Search",
-      "title": "REM Frisørinnredning / Frisørutstyr - Wellness Norge",
-      "url": "https://www.wellnessnorge.no/artikler/rem-frisorinnredning-/-frisorutstyr"
+      "title": "Frisørartikler | Alt du trenger til håret får du billig her!",
+      "url": "https://www.fashiongirl.no/shop/frisoerartikler-163c1.html"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
@@ -456,15 +456,15 @@
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
-      "snippet": "Ta en titt på våre frisørartikler. Her får du frisørkapper, blanderbegre, sakser og masse mer - Alt til kanonbillige priser - Finn ditt utstyr i dag!",
+      "snippet": "Frisørinnredning / Utstyr fra REM. Engelsk håndlagede kvalitetsprodukter. 3 års garanti.",
       "source": "Brave Search",
-      "title": "Frisørartikler | Alt du trenger til håret får du billig her!",
-      "url": "https://www.fashiongirl.no/shop/frisoerartikler-163c1.html"
+      "title": "REM Frisørinnredning / Frisørutstyr - Wellness Norge",
+      "url": "https://www.wellnessnorge.no/artikler/rem-frisorinnredning-/-frisorutstyr"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
-      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand",
+      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand.",
       "source": "Brave Search",
       "title": "'frisørutstyr' items for sale · Tise",
       "url": "https://tise.com/search/tise?country_code=NO&search=fris%C3%B8rutstyr&location_max=country"
@@ -576,6 +576,14 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
+      "snippet": "Enten du trenger plassbesparende reoler, store industrireoler eller fleksible systemer for små deler, finner du en løsning hos <strong>FasadENor</strong>. Våre lagerreoler gir bedre oversikt, mer effektiv lagring og et ryddigere arbeidsmiljø.",
+      "source": "Brave Search",
+      "title": "Lagerreoler – Solide Reoler for Lager og Verksted - Fasadenor",
+      "url": "https://fasadenor.no/product-category/lagerreoler/"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "published_at": null,
       "snippet": "<strong>PR Maskin AS 4323 Sandnes Norge</strong>",
       "source": "Brave Search",
       "title": "Stålreoler, lagerreoler - Verksteds- og lagerinventar - Inventar og Innretning - Produkter",
@@ -584,18 +592,10 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
-      "snippet": "Kjøp og selg brukte maskiner, kjøretøy, utstyr og overskuddsvarer på Norges største nettauksjon.",
+      "snippet": "<strong>Reolhandling AS</strong> er en bedrift med mer enn 20 års erfaring innen faget og bransjen. Vi leverer nye og brukte lagerinnredning / lagrings systemer/ pallereoler / småvarereoler til alle behov.",
       "source": "Brave Search",
-      "title": "Lagerreoler og lagerinventar selges samlet",
-      "url": "https://www.auksjonen.no/auksjon/torget/Lagerreoler_og_lagerinventar_selges_samlet/563904"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "published_at": null,
-      "snippet": "Enten du trenger plassbesparende reoler, store industrireoler eller fleksible systemer for små deler, finner du en løsning hos <strong>FasadENor</strong>. Våre lagerreoler gir bedre oversikt, mer effektiv lagring og et ryddigere arbeidsmiljø.",
-      "source": "Brave Search",
-      "title": "Lagerreoler – Solide Reoler for Lager og Verksted - Fasadenor",
-      "url": "https://fasadenor.no/product-category/lagerreoler/"
+      "title": "Reolhandling AS - Pallereoler - Småvarereoler - Super 1 2 3 - Brukte reoler i Bergen og omegn",
+      "url": "http://www.reolhandling.no/"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -624,10 +624,10 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
-      "snippet": "<strong>Reolhandling AS</strong> er en bedrift med mer enn 20 års erfaring innen faget og bransjen. Vi leverer nye og brukte lagerinnredning / lagrings systemer/ pallereoler / småvarereoler til alle behov.",
+      "snippet": "Lagerreoler er uundværlige på enhver virksomheds lager eller hjemme i garagen, værkstedet eller kælderen. <strong>Hos ReolHansen har vi reoler til alle formål og priser, og vi sælger til både erhverv og private</strong>. Forskellige formål kræver ...",
       "source": "Brave Search",
-      "title": "Reolhandling AS - Pallereoler - Småvarereoler - Super 1 2 3 - Brukte reoler i Bergen og omegn",
-      "url": "http://www.reolhandling.no/"
+      "title": "Lagerreol | Køb nye reoler til dit Lager hos Reolhansen",
+      "url": "https://reolhansen.dk/produkt-kategori/lagerreoler-arkivreoler/"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -791,19 +791,19 @@
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
-      "published_at": null,
-      "snippet": "Udgåede vare og inventar fra messer &amp; showroom. Vi sælger ud af vareprøver, 2. sortering, brugt inventar fra messer og showroom. Måske kan du finde noget til din butik.. KOM OG KIG",
-      "source": "Brave Search",
-      "title": "Varer fra Showroom, 2-sorterings og restsalg – ombygning",
-      "url": "https://www.supersellers.dk/brugt-lager"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
       "published_at": "2020-05-01T15:30:26",
       "snippet": "– <strong>Vi har kjøpt varelager, inventar, utstyr og varemerker og skal drive butikkene videre i en måned for å rydde opp og holde opphørssalg</strong>, sier Jan Egil Flo til Tekstilforum. - Hva som skjer videre er ikke avklart.",
       "source": "Brave Search",
       "title": "Flo kjøper Brandstad og Wagner",
       "url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "published_at": null,
+      "snippet": "Udgåede vare og inventar fra messer &amp; showroom. Vi sælger ud af vareprøver, 2. sortering, brugt inventar fra messer og showroom. Måske kan du finde noget til din butik.. KOM OG KIG",
+      "source": "Brave Search",
+      "title": "Varer fra Showroom, 2-sorterings og restsalg – ombygning",
+      "url": "https://www.supersellers.dk/brugt-lager"
     }
   ],
   "schema_version": 1

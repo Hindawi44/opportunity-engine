@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T10:45:43.133716+00:00",
+  "generated_at": "2026-07-22T11:27:04.965231+00:00",
   "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
   "schema_version": 2,
   "sources": [
@@ -10,7 +10,7 @@
       "bankruptcy_leads_selected": 0,
       "configured": true,
       "error": null,
-      "fetched": 45,
+      "fetched": 44,
       "note": null,
       "public_auction_event_leads_selected": 0,
       "required_configuration": [],
@@ -99,7 +99,7 @@
     "awaiting_configuration_count": 3,
     "collecting_count": 3,
     "error_count": 0,
-    "fetched_total": 72,
+    "fetched_total": 71,
     "source_count": 6
   }
 }
