@@ -29,6 +29,14 @@ def main() -> int:
             ],
         },
         {
+            "source": "Politiet.no",
+            "access_mode": "official_public_page",
+            "configured": True,
+            "active": True,
+            "coverage": "lost-property and bicycle auction discovery directory",
+            "note": "Event-discovery leads only; specific lots, dates and sale availability must be verified from official announcements.",
+        },
+        {
             "source": "FINN.no",
             "access_mode": "authorized_api_only",
             "configured": _configured("FINN_API_KEY", "FINN_ORG_ID"),
@@ -62,7 +70,7 @@ def main() -> int:
     ]
 
     payload = {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "policy": "Only public documented endpoints, public category pages, or explicitly authorized APIs/feeds are used; no access controls are bypassed and no mass harvesting is performed.",
         "active_source_count": sum(bool(item["active"]) for item in sources),
