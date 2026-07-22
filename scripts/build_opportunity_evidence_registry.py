@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Build and validate the economic-evidence registry for shortlisted opportunities.
 
-This script never searches for, estimates, or invents prices and costs. It only
-normalizes evidence already supplied by a human or an authorized data source.
-Unknown values remain null and unverifiable comparables are excluded.
+This script never invents prices or costs. It preserves verified human/authorized
+inputs and imports discovered market comparables as pending review evidence only.
+Unknown values remain null and unverified comparables never unlock economics.
 """
 
 from __future__ import annotations
@@ -51,6 +51,19 @@ def _existing_records(payload: object) -> dict[str, dict[str, Any]]:
     return {}
 
 
+def _market_records(payload: object) -> dict[str, dict[str, Any]]:
+    if not isinstance(payload, dict):
+        return {}
+    records = payload.get("records", [])
+    if not isinstance(records, list):
+        return {}
+    return {
+        str(item.get("opportunity_id")): item
+        for item in records
+        if isinstance(item, dict) and item.get("opportunity_id")
+    }
+
+
 def _verified_comparables(value: object) -> list[dict[str, object]]:
     if not isinstance(value, list):
         return []
@@ -68,17 +81,49 @@ def _verified_comparables(value: object) -> list[dict[str, object]]:
         if key in seen:
             continue
         seen.add(key)
-        result.append(
-            {"source": source, "url": url, "price_nok": price, "verified": True}
-        )
+        result.append({"source": source, "url": url, "price_nok": price, "verified": True})
     return result
 
 
-def _normalize(item: dict[str, object], existing: dict[str, Any]) -> dict[str, object]:
+def _pending_comparables(value: object) -> list[dict[str, object]]:
+    if not isinstance(value, list):
+        return []
+    result: list[dict[str, object]] = []
+    seen: set[tuple[str, str, float]] = set()
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        source = str(item.get("source") or "").strip()
+        url = str(item.get("url") or "").strip()
+        price = _number(item.get("price_nok"))
+        if not source or not url.startswith("https://") or price is None or price <= 0:
+            continue
+        key = (source.casefold(), url, price)
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append({
+            "source": source,
+            "url": url,
+            "price_nok": price,
+            "verified": False,
+            "verification_status": "REVIEW_REQUIRED",
+            "similarity_score": _number(item.get("similarity_score")),
+            "quantity_status": item.get("quantity_status"),
+        })
+    return result
+
+
+def _normalize(
+    item: dict[str, object],
+    existing: dict[str, Any],
+    market_record: dict[str, Any],
+) -> dict[str, object]:
     opportunity_id = str(item.get("opportunity_id") or "")
     comparables = _verified_comparables(
         existing.get("market_comparables", existing.get("market_comparables_nok"))
     )
+    pending = _pending_comparables(market_record.get("accepted_comparables"))
     vat_status_raw = str(existing.get("vat_status") or "").strip().casefold()
     vat_status = vat_status_raw if vat_status_raw in VAT_STATUSES else None
 
@@ -87,6 +132,10 @@ def _normalize(item: dict[str, object], existing: dict[str, Any]) -> dict[str, o
         "title": item.get("title"),
         "url": item.get("url"),
         "market_comparables": comparables,
+        "pending_market_comparables": pending,
+        "candidate_market_value_nok": _number(market_record.get("candidate_market_value_nok")),
+        "market_evidence_status": market_record.get("evidence_status"),
+        "market_evidence_review_reasons": market_record.get("review_reasons", []),
         "vat_status": vat_status,
         **{field: _number(existing.get(field)) for field in COST_FIELDS},
     }
@@ -94,6 +143,8 @@ def _normalize(item: dict[str, object], existing: dict[str, Any]) -> dict[str, o
     missing: list[str] = []
     if len(comparables) < 3:
         missing.append("three_verified_market_comparables")
+    if pending:
+        missing.append("pending_market_comparables_require_review")
     if record["auction_fee_nok"] is None:
         missing.append("auction_fee_nok")
     if vat_status is None:
@@ -113,6 +164,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--queue", default="data/opportunity_review_queue.json")
     parser.add_argument("--existing", default="data/opportunity_evidence.json")
+    parser.add_argument("--market-evidence", default="data/market_evidence_registry.json")
     parser.add_argument("--output", default="data/opportunity_evidence.json")
     args = parser.parse_args()
 
@@ -122,35 +174,38 @@ def main() -> int:
         raise ValueError("review queue must be a list")
 
     existing_path = Path(args.existing)
-    existing_payload = (
-        json.loads(existing_path.read_text(encoding="utf-8"))
-        if existing_path.exists()
-        else {}
-    )
+    existing_payload = json.loads(existing_path.read_text(encoding="utf-8")) if existing_path.exists() else {}
     existing = _existing_records(existing_payload)
+
+    market_path = Path(args.market_evidence)
+    market_payload = json.loads(market_path.read_text(encoding="utf-8")) if market_path.exists() else {}
+    market = _market_records(market_payload)
 
     records: dict[str, dict[str, object]] = {}
     for item in queue:
         if not isinstance(item, dict) or not item.get("opportunity_id"):
             continue
         opportunity_id = str(item["opportunity_id"])
-        records[opportunity_id] = _normalize(item, existing.get(opportunity_id, {}))
+        records[opportunity_id] = _normalize(
+            item,
+            existing.get(opportunity_id, {}),
+            market.get(opportunity_id, {}),
+        )
 
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "method": "verified evidence only; unknown values remain null; no estimates are created",
+        "method": "verified evidence only; discovered market evidence is bridged as pending review; unknown values remain null",
+        "market_evidence_source": args.market_evidence,
         "evidence_count": len(records),
         "verified_count": sum(record["verified"] is True for record in records.values()),
+        "pending_comparable_count": sum(len(record["pending_market_comparables"]) for record in records.values()),
         "evidence": records,
     }
 
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({"evidence_count": len(records), "output": str(output)}))
     return 0
 
