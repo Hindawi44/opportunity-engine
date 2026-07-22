@@ -6,7 +6,7 @@
     "opportunities": "data/opportunities.json"
   },
   "failed_stage": null,
-  "finished_at": "2026-07-22T21:08:44.341847+00:00",
+  "finished_at": "2026-07-22T21:37:25.893423+00:00",
   "schema_version": 1,
   "stages": [
     {
@@ -15,9 +15,9 @@
         "scripts/build_source_coverage_report.py"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:17.456129+00:00",
+      "finished_at": "2026-07-22T21:36:54.355538+00:00",
       "name": "source_coverage",
-      "started_at": "2026-07-22T21:08:17.429875+00:00",
+      "started_at": "2026-07-22T21:36:54.326781+00:00",
       "status": "SUCCESS"
     },
     {
@@ -30,9 +30,9 @@
         "10"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:18.351811+00:00",
+      "finished_at": "2026-07-22T21:36:55.213531+00:00",
       "name": "public_auction_events",
-      "started_at": "2026-07-22T21:08:17.456142+00:00",
+      "started_at": "2026-07-22T21:36:54.355557+00:00",
       "status": "SUCCESS"
     },
     {
@@ -45,9 +45,9 @@
         "data/web_search_results.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:25.008902+00:00",
+      "finished_at": "2026-07-22T21:37:03.138106+00:00",
       "name": "brave_search",
-      "started_at": "2026-07-22T21:08:18.351829+00:00",
+      "started_at": "2026-07-22T21:36:55.213557+00:00",
       "status": "SUCCESS"
     },
     {
@@ -62,9 +62,9 @@
         "100"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:25.154736+00:00",
+      "finished_at": "2026-07-22T21:37:03.439739+00:00",
       "name": "web_discovery",
-      "started_at": "2026-07-22T21:08:25.008923+00:00",
+      "started_at": "2026-07-22T21:37:03.138133+00:00",
       "status": "SUCCESS"
     },
     {
@@ -79,9 +79,9 @@
         "data/smart_alerts.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:29.933511+00:00",
+      "finished_at": "2026-07-22T21:37:08.388946+00:00",
       "name": "daily_opportunities",
-      "started_at": "2026-07-22T21:08:25.154757+00:00",
+      "started_at": "2026-07-22T21:37:03.439759+00:00",
       "status": "SUCCESS"
     },
     {
@@ -92,9 +92,9 @@
         "data/todays_opportunities.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:29.990415+00:00",
+      "finished_at": "2026-07-22T21:37:08.447605+00:00",
       "name": "auksjonen_diagnostics",
-      "started_at": "2026-07-22T21:08:29.933532+00:00",
+      "started_at": "2026-07-22T21:37:08.388970+00:00",
       "status": "SUCCESS"
     },
     {
@@ -109,9 +109,9 @@
         "12"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:30.027862+00:00",
+      "finished_at": "2026-07-22T21:37:08.484853+00:00",
       "name": "review_queue",
-      "started_at": "2026-07-22T21:08:29.990436+00:00",
+      "started_at": "2026-07-22T21:37:08.447623+00:00",
       "status": "SUCCESS"
     },
     {
@@ -126,9 +126,9 @@
         "data/listing_metadata_evidence.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:32.438749+00:00",
+      "finished_at": "2026-07-22T21:37:11.064913+00:00",
       "name": "listing_metadata",
-      "started_at": "2026-07-22T21:08:30.027880+00:00",
+      "started_at": "2026-07-22T21:37:08.484872+00:00",
       "status": "SUCCESS"
     },
     {
@@ -141,9 +141,9 @@
         "data/market_evidence_discovery_queue.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:32.472585+00:00",
+      "finished_at": "2026-07-22T21:37:11.098663+00:00",
       "name": "market_evidence_queue",
-      "started_at": "2026-07-22T21:08:32.438770+00:00",
+      "started_at": "2026-07-22T21:37:11.064932+00:00",
       "status": "SUCCESS"
     },
     {
@@ -160,9 +160,9 @@
         "10"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:43.674403+00:00",
+      "finished_at": "2026-07-22T21:37:25.324308+00:00",
       "name": "market_price_candidates",
-      "started_at": "2026-07-22T21:08:32.472600+00:00",
+      "started_at": "2026-07-22T21:37:11.098678+00:00",
       "status": "SUCCESS"
     },
     {
@@ -177,9 +177,9 @@
         "data/market_evidence_review_queue.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:43.716906+00:00",
+      "finished_at": "2026-07-22T21:37:25.368990+00:00",
       "name": "market_evidence_registry",
-      "started_at": "2026-07-22T21:08:43.674424+00:00",
+      "started_at": "2026-07-22T21:37:25.324329+00:00",
       "status": "SUCCESS"
     },
     {
@@ -196,9 +196,9 @@
         "data/opportunity_evidence.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:43.754776+00:00",
+      "finished_at": "2026-07-22T21:37:25.407622+00:00",
       "name": "opportunity_evidence",
-      "started_at": "2026-07-22T21:08:43.716924+00:00",
+      "started_at": "2026-07-22T21:37:25.369006+00:00",
       "status": "SUCCESS"
     },
     {
@@ -213,9 +213,9 @@
         "data/economic_evaluation_queue.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:43.787984+00:00",
+      "finished_at": "2026-07-22T21:37:25.441344+00:00",
       "name": "economic_evaluation",
-      "started_at": "2026-07-22T21:08:43.754791+00:00",
+      "started_at": "2026-07-22T21:37:25.407634+00:00",
       "status": "SUCCESS"
     },
     {
@@ -232,9 +232,9 @@
         "data/scoring_history.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:43.826476+00:00",
+      "finished_at": "2026-07-22T21:37:25.481396+00:00",
       "name": "unified_scoring",
-      "started_at": "2026-07-22T21:08:43.787999+00:00",
+      "started_at": "2026-07-22T21:37:25.441357+00:00",
       "status": "SUCCESS"
     },
     {
@@ -249,9 +249,9 @@
         "5"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:43.860953+00:00",
+      "finished_at": "2026-07-22T21:37:25.516790+00:00",
       "name": "top5_report",
-      "started_at": "2026-07-22T21:08:43.826493+00:00",
+      "started_at": "2026-07-22T21:37:25.481410+00:00",
       "status": "SUCCESS"
     },
     {
@@ -266,9 +266,9 @@
         "5"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:43.895469+00:00",
+      "finished_at": "2026-07-22T21:37:25.555329+00:00",
       "name": "scoring_alerts",
-      "started_at": "2026-07-22T21:08:43.860968+00:00",
+      "started_at": "2026-07-22T21:37:25.516805+00:00",
       "status": "SUCCESS"
     },
     {
@@ -283,9 +283,9 @@
         "5"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:44.277416+00:00",
+      "finished_at": "2026-07-22T21:37:25.828756+00:00",
       "name": "opportunity_channels",
-      "started_at": "2026-07-22T21:08:43.895487+00:00",
+      "started_at": "2026-07-22T21:37:25.555358+00:00",
       "status": "SUCCESS"
     },
     {
@@ -304,9 +304,9 @@
         "data/source_funnel.json"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:44.313804+00:00",
+      "finished_at": "2026-07-22T21:37:25.865589+00:00",
       "name": "source_funnel",
-      "started_at": "2026-07-22T21:08:44.277436+00:00",
+      "started_at": "2026-07-22T21:37:25.828776+00:00",
       "status": "SUCCESS"
     },
     {
@@ -315,12 +315,12 @@
         "scripts/build_source_expansion_status.py"
       ],
       "exit_code": 0,
-      "finished_at": "2026-07-22T21:08:44.341832+00:00",
+      "finished_at": "2026-07-22T21:37:25.893408+00:00",
       "name": "source_expansion",
-      "started_at": "2026-07-22T21:08:44.313822+00:00",
+      "started_at": "2026-07-22T21:37:25.865605+00:00",
       "status": "SUCCESS"
     }
   ],
-  "started_at": "2026-07-22T21:08:17.429581+00:00",
+  "started_at": "2026-07-22T21:36:54.326507+00:00",
   "status": "SUCCESS"
 }

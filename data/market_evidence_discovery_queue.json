@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T21:08:32.466487+00:00",
+  "generated_at": "2026-07-22T21:37:11.093800+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
   "search_required_count": 3,
@@ -15,33 +15,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 6500.0,
+      "asking_price_nok": 6800.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+65+bud",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+68+bud",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+65+bud",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+68+bud",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+65+bud+pris+Norge",
+          "search_url": "https://www.google.com/search?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+68+bud+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 65 bud",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud",
       "opportunity_id": "unified-auksjonen-611253",
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 65 bud 15t 35m 31s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 15t 6m 52s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -79,7 +79,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 21t 51m",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 21t 22m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -117,7 +117,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 21t 51m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 21t 22m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]
