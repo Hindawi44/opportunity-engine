@@ -52,7 +52,19 @@ def main() -> int:
     if args.dry_run:
         return p2_exit
 
+    registry_exit = 0
+    audit_exit = 0
     if p2_exit == 0:
+        audit_exit = run([
+            sys.executable,
+            "scripts/build_cross_source_deduplication_audit.py",
+            "--daily", "data/todays_opportunities.json",
+            "--discovery", "data/discovery_leads.json",
+            "--events", "data/public_auction_event_leads.json",
+            "--output", "data/cross_source_deduplication_audit.json",
+        ], root)
+        if audit_exit != 0:
+            return audit_exit
         registry_exit = run([
             sys.executable,
             "scripts/build_opportunity_registry.py",
@@ -82,7 +94,7 @@ def main() -> int:
     ], root)
     if gap_exit == 0 and not validate_gap_matrix(gap_output):
         gap_exit = 1
-    return p2_exit or health_exit or gap_exit
+    return p2_exit or audit_exit or registry_exit or health_exit or gap_exit
 
 
 if __name__ == "__main__":
