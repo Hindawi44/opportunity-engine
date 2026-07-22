@@ -33,11 +33,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Run complete P2 opportunity scoring pipeline
-        run: python scripts/run_p2_pipeline.py
+      - name: Run complete P3 discovery operations pipeline
+        run: python scripts/run_p3_discovery_pipeline.py
       - name: Commit successful pipeline snapshots
         run: |
-          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/web_search_results.json data/discovery_leads.json data/todays_opportunities.json data/smart_alerts.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/market_price_candidates.json data/market_evidence_registry.json data/market_evidence_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/scored_opportunities.json data/scoring_history.json data/top5_opportunities.json data/opportunity_channels.json data/opportunities.json data/dashboard.json data/daily_report.json data/pipeline_run_status.json"
+          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/web_search_results.json data/discovery_leads.json data/todays_opportunities.json data/smart_alerts.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/market_price_candidates.json data/market_evidence_registry.json data/market_evidence_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/scored_opportunities.json data/scoring_history.json data/top5_opportunities.json data/opportunity_channels.json data/opportunities.json data/dashboard.json data/daily_report.json data/pipeline_run_status.json data/opportunity_registry.json data/discovery_health.json"
           if [ -z "$(git status --porcelain -- $FILES)" ]; then
             echo "No opportunity data changes"
             exit 0
@@ -45,5 +45,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add $FILES
-          git commit -m "Update complete P2 opportunity scoring snapshots"
+          git commit -m "Update complete P3 discovery snapshots"
           git push
