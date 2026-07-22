@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import sys
 
 from opportunity_engine.ods.brave_search import BraveSearchClient
 
@@ -41,6 +42,7 @@ def main() -> int:
     combined: list[dict[str, object]] = []
     errors: dict[str, str] = {}
     request_count = 0
+
     for raw_query in queries[:max_queries]:
         query = str(raw_query or "").strip()
         if not query:
@@ -52,7 +54,19 @@ def main() -> int:
                 enriched["discovery_query"] = query
                 combined.append(enriched)
         except RuntimeError as exc:
-            errors[query] = str(exc)
+            message = str(exc)
+            errors[query] = message
+            print(
+                json.dumps(
+                    {
+                        "event": "brave_search_error",
+                        "query": query,
+                        "error": message,
+                    },
+                    ensure_ascii=False,
+                ),
+                file=sys.stderr,
+            )
 
     payload = {
         "schema_version": 1,
@@ -65,8 +79,22 @@ def main() -> int:
     }
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"output": str(output), "request_count": request_count, "result_count": len(combined), "error_count": len(errors)}, ensure_ascii=False))
+    output.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    print(
+        json.dumps(
+            {
+                "output": str(output),
+                "request_count": request_count,
+                "result_count": len(combined),
+                "error_count": len(errors),
+            },
+            ensure_ascii=False,
+        )
+    )
     return 0 if not errors else 2
 
 
