@@ -27,18 +27,24 @@ def canonical_url(value: object) -> str | None:
     parts = urlsplit(value.strip())
     if not parts.netloc:
         return value.strip()
-    query = [(k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True) if not k.lower().startswith("utm_")]
-    return urlunsplit((parts.scheme.lower() or "https", parts.netloc.lower(), parts.path.rstrip("/"), urlencode(query), ""))
+    tracking = {"fbclid", "gclid", "ref", "source"}
+    query = [
+        (k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True)
+        if not k.lower().startswith("utm_") and k.lower() not in tracking
+    ]
+    path = parts.path.rstrip("/") or "/"
+    return urlunsplit(("https", parts.netloc.lower(), path, urlencode(sorted(query)), ""))
 
 
 def identity(item: dict) -> str:
+    """Use the normalized URL first so source-specific IDs cannot create duplicates."""
+    url = canonical_url(item.get("canonical_url") or item.get("url"))
+    if url:
+        return "url-" + hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
     for key in ("opportunity_id", "lead_id", "id"):
         value = item.get(key)
         if value not in (None, ""):
             return str(value)
-    url = canonical_url(item.get("canonical_url") or item.get("url"))
-    if url:
-        return "url-" + hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
     fingerprint = "|".join(str(item.get(k) or "").strip().lower() for k in ("title", "city", "source"))
     return "item-" + hashlib.sha256(fingerprint.encode("utf-8")).hexdigest()[:20]
 
@@ -52,7 +58,7 @@ def extract_items(payload: dict) -> list[dict]:
 
 
 def lifecycle(item: dict) -> str:
-    recommendation = str(item.get("recommendation") or "").upper()
+    recommendation = str(item.get("final_decision") or item.get("recommendation") or "").upper()
     if recommendation in {"BUY", "BUY_REVIEW"}:
         return "ACTIONABLE_REVIEW"
     if recommendation == "REJECT":
@@ -62,12 +68,37 @@ def lifecycle(item: dict) -> str:
     return "DISCOVERED"
 
 
+def _as_list(value: object) -> list[str]:
+    if isinstance(value, str) and value.strip():
+        return [value.strip()]
+    if isinstance(value, (list, tuple)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    return []
+
+
+def provenance(item: dict) -> tuple[list[str], list[str]]:
+    metadata = item.get("raw_metadata") if isinstance(item.get("raw_metadata"), dict) else {}
+    names = _as_list(item.get("source_names") or metadata.get("merged_source_names"))
+    ids = _as_list(item.get("source_record_ids") or metadata.get("merged_source_document_ids"))
+    source = item.get("source_name") or item.get("source")
+    record_id = item.get("source_document_id") or item.get("opportunity_id") or item.get("lead_id") or item.get("id")
+    if source:
+        names.append(str(source))
+    if record_id:
+        ids.append(str(record_id))
+    return list(dict.fromkeys(names)), list(dict.fromkeys(ids))
+
+
 def merge_record(previous: dict | None, item: dict, now: str) -> dict:
     previous = previous or {}
     record = dict(previous)
     record.update({k: v for k, v in item.items() if v is not None})
+    previous_names, previous_ids = provenance(previous)
+    current_names, current_ids = provenance(item)
     record["registry_id"] = identity(item)
     record["canonical_url"] = canonical_url(item.get("canonical_url") or item.get("url"))
+    record["source_names"] = list(dict.fromkeys([*previous_names, *current_names]))
+    record["source_record_ids"] = list(dict.fromkeys([*previous_ids, *current_ids]))
     record["lifecycle_status"] = lifecycle(item)
     record["first_seen_at"] = previous.get("first_seen_at") or now
     record["last_seen_at"] = now
@@ -78,7 +109,8 @@ def merge_record(previous: dict | None, item: dict, now: str) -> dict:
 def build_registry(discovery: dict, scored: dict, existing: dict, generated_at: str) -> dict:
     current: dict[str, dict] = {}
     for item in [*extract_items(discovery), *extract_items(scored)]:
-        current[identity(item)] = {**current.get(identity(item), {}), **item}
+        key = identity(item)
+        current[key] = {**current.get(key, {}), **item}
 
     old_records = existing.get("records", [])
     old_by_id = {
@@ -100,7 +132,7 @@ def build_registry(discovery: dict, scored: dict, existing: dict, generated_at: 
         status = str(record.get("lifecycle_status") or "UNKNOWN")
         counts[status] = counts.get(status, 0) + 1
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": generated_at,
         "record_count": len(records),
         "status_counts": counts,
