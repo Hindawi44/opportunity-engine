@@ -25,6 +25,21 @@ XmlTransport = Callable[[str, float, dict[str, str]], bytes]
 
 _ATOM = "{http://www.w3.org/2005/Atom}"
 
+TARGET_FINN_TERMS = (
+    "butikkinnredning", "butikkutstyr", "klesstativ", "hylle", "vitrineskap",
+    "butikkdisk", "kassadisk", "mannekeng", "varelager", "restparti",
+    "konkurslager", "overskuddslager", "kontormøbler", "kontorstol",
+    "skrivebord", "arkivskap", "lagerreol", "pallereol", "lagerutstyr",
+    "kjøledisk", "fryser", "kaffemaskin", "kassesystem", "industrisymaskin",
+    "symaskin", "overlock", "tekstil", "stoffparti",
+)
+
+EXCLUDED_FINN_TERMS = (
+    "personbil", "varebil", "lastebil", "motorsykkel", "båt", "bolig",
+    "leilighet", "tomt", "iphone", "samsung galaxy", "mobiltelefon",
+    "barneklær", "dameklær", "herreklær", "sko", "småelektrisk",
+)
+
 
 def _default_xml_transport(url: str, timeout: float, headers: dict[str, str]) -> bytes:
     request = Request(url, headers=headers)
@@ -67,7 +82,7 @@ class FinnApiClient:
         return {
             FINN_API_KEY_HEADER: self.api_key,
             "Accept": "application/atom+xml",
-            "User-Agent": "ODS-Opportunity-Engine/0.4",
+            "User-Agent": "ODS-Opportunity-Engine/0.5",
         }
 
     def search(self, *, keyword: str | None = None, rows: int = 30) -> tuple[SourceDocument, ...]:
@@ -79,6 +94,38 @@ class FinnApiClient:
         url = f"{self.base_url}/search/{self.market}?{urlencode(params)}"
         payload = self.transport(url, self.timeout, self.headers)
         return parse_finn_atom_feed(payload)
+
+    def search_targeted_business_listings(self, *, rows_per_query: int = 25) -> tuple[SourceDocument, ...]:
+        """Run a small authorized query set for commercial resale opportunities."""
+        if not 1 <= rows_per_query <= 100:
+            raise ValueError("rows_per_query must be between 1 and 100")
+        documents: list[SourceDocument] = []
+        seen: set[str] = set()
+        for keyword in TARGET_FINN_TERMS:
+            for document in self.search(keyword=keyword, rows=rows_per_query):
+                searchable = f"{document.title} {document.text}".casefold()
+                if any(term in searchable for term in EXCLUDED_FINN_TERMS):
+                    continue
+                if document.document_id in seen:
+                    continue
+                seen.add(document.document_id)
+                metadata = dict(document.metadata)
+                metadata["discovery_query"] = keyword
+                metadata["targeted_business_listing"] = True
+                documents.append(
+                    SourceDocument(
+                        document_id=document.document_id,
+                        source_name=document.source_name,
+                        source_type=document.source_type,
+                        title=document.title,
+                        text=document.text,
+                        url=document.url,
+                        published_at=document.published_at,
+                        country=document.country,
+                        metadata=metadata,
+                    )
+                )
+        return tuple(documents)
 
 
 @dataclass(frozen=True)
@@ -106,7 +153,7 @@ def parse_finn_atom_feed(payload: bytes | str) -> tuple[SourceDocument, ...]:
         title = _text(entry.find(f"{_ATOM}title")) or "FINN advert"
         summary = _text(entry.find(f"{_ATOM}summary"))
         content = _text(entry.find(f"{_ATOM}content"))
-        url = _self_link(entry)
+        url = _best_link(entry)
         updated = _parse_datetime(_text(entry.find(f"{_ATOM}updated")))
         document_id = _document_id(raw_id, url, title)
         text = _strip_html(" ".join(part for part in (summary, content) if part).strip())
@@ -131,11 +178,19 @@ def parse_finn_atom_feed(payload: bytes | str) -> tuple[SourceDocument, ...]:
     return tuple(documents)
 
 
-def _self_link(entry: ElementTree.Element) -> str | None:
+def _best_link(entry: ElementTree.Element) -> str | None:
+    fallback = None
     for link in entry.findall(f"{_ATOM}link"):
-        if link.attrib.get("rel") == "self" and link.attrib.get("href"):
-            return link.attrib["href"].strip()
-    return None
+        href = link.attrib.get("href")
+        if not href:
+            continue
+        href = href.strip()
+        rel = link.attrib.get("rel")
+        if rel == "alternate":
+            return href
+        if rel == "self":
+            fallback = href
+    return fallback
 
 
 def _text(element: ElementTree.Element | None) -> str:
