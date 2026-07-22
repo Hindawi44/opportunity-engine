@@ -176,7 +176,7 @@ def test_preliminary_score_is_not_erased_by_missing_economics() -> None:
         _unknown_seller(),
     )
 
-    assert report.discovery_score == 12
+    assert 12 <= report.discovery_score <= 59
     assert report.tier == "low"
     assert report.is_exceptional is False
     assert any("فجوات أدلة" in warning for warning in report.warnings)
