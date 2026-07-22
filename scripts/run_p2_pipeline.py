@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
-from run_end_to_end_pipeline import STAGES, load_json, run_pipeline, write_json_atomic
+try:
+    from scripts.run_end_to_end_pipeline import STAGES, load_json, run_pipeline, write_json_atomic
+except ModuleNotFoundError:  # Direct execution: python scripts/run_p2_pipeline.py
+    from run_end_to_end_pipeline import STAGES, load_json, run_pipeline, write_json_atomic
 
 
 SCORING_STAGE = (
