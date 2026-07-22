@@ -1,7 +1,7 @@
 {
   "candidate_count": 1,
   "errors": {},
-  "generated_at": "2026-07-22T21:37:25.304330+00:00",
+  "generated_at": "2026-07-22T22:34:38.144079+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
@@ -16,7 +16,7 @@
       "candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-22T21:37:12.150055+00:00",
+          "captured_at": "2026-07-22T22:34:26.558886+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud brukt pris Norge",
@@ -413,7 +413,7 @@
           "url": "https://www.finn.no/recommerce/forsale/item/271228732"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/314379428",
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=180403983",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
@@ -424,8 +424,8 @@
           "similarity_score": 0.167,
           "source_quantity": 4,
           "target_domain": "finn.no",
-          "title": "Minilager i Tønsberg | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/314379428"
+          "title": "Brukte Reoler Pallereoler og Lagerutstyr Kjøp & Salg | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=180403983"
         },
         {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=63166252",
@@ -441,6 +441,21 @@
           "target_domain": "finn.no",
           "title": "Lagerreol - småvarereol - galvanisert | FINN-torget",
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=63166252"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/314379428",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.167,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Minilager i Tønsberg | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/314379428"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
@@ -473,21 +488,6 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
         },
         {
-          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=180403983",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.167,
-          "source_quantity": 4,
-          "target_domain": "finn.no",
-          "title": "Brukte Reoler Pallereoler og Lagerutstyr Kjøp & Salg | FINN-torget",
-          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=180403983"
-        },
-        {
           "canonical_url": "https://finn.no/bap/forsale/search.html?product_category=2.91.3102.374",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -518,19 +518,18 @@
           "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3102.378"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/412276314",
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=24946415",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.167,
+          "similarity_score": 0.0,
           "source_quantity": 4,
           "target_domain": "finn.no",
-          "title": "Lagerreoler | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/412276314"
+          "title": "Reoler på hjul | FINN.no",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=24946415"
         },
         {
           "canonical_url": "https://nyheter.auksjonen.no/",
@@ -1039,6 +1038,21 @@
           "url": "https://www.mascus.no/landbruk/reservedeler/utb"
         },
         {
+          "canonical_url": "https://mascus.no/anlegg/andre-komponenter-anlegg/komplete-tvillinghjul-til-traktor-komplette/mnhhgtmk.html",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.167,
+          "source_quantity": 4,
+          "target_domain": "mascus.no",
+          "title": "Komplete tvillinghjul til traktor. Komplette, 1900, Levanger,Trøndelag, Norge - Brukt andre komponenter - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg/komplete-tvillinghjul-til-traktor-komplette/mnhhgtmk.html"
+        },
+        {
           "canonical_url": "https://mascus.no/landbruk/gjodselsutstyr,4,relevance,search.html",
           "comparable_quantity": null,
           "domain": "mascus.no",
@@ -1067,21 +1081,6 @@
           "target_domain": "mascus.no",
           "title": "Brukt gjødselutstyr Bøgballe til salgs - Mascus Norway",
           "url": "https://www.mascus.no/landbruk/gjodselsutstyr/b%C3%B8gballe"
-        },
-        {
-          "canonical_url": "https://mascus.no/anlegg/andre-komponenter-anlegg/komplete-tvillinghjul-til-traktor-komplette/mnhhgtmk.html",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette Lagerreoler 200cm Svart 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.167,
-          "source_quantity": 4,
-          "target_domain": "mascus.no",
-          "title": "Komplete tvillinghjul til traktor. Komplette, 1900, Levanger,Trøndelag, Norge - Brukt andre komponenter - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg/komplete-tvillinghjul-til-traktor-komplette/mnhhgtmk.html"
         },
         {
           "canonical_url": "https://mascus.no/transport/lastebiler/containerramme",
@@ -1130,7 +1129,7 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 15t 6m 52s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 14t 9m 38s",
       "verified_comparable_count": 0
     },
     {
@@ -1586,21 +1585,6 @@
           "url": "https://www.finn.no/recommerce/forsale/item/458540561"
         },
         {
-          "canonical_url": "https://finn.no/job/ad/448246824",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
-          "target_domain": "finn.no",
-          "title": "Gira på nye utfordringer ? Vi søker Service Rørlegger | FINN.no",
-          "url": "https://www.finn.no/job/ad/448246824"
-        },
-        {
           "canonical_url": "https://finn.no/recommerce/forsale/item/458933304",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -1614,6 +1598,21 @@
           "target_domain": "finn.no",
           "title": "Parti med håndverktøy og rørverktøy | FINN-torget",
           "url": "https://www.finn.no/recommerce/forsale/item/458933304"
+        },
+        {
+          "canonical_url": "https://finn.no/job/ad/448246824",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Gira på nye utfordringer ? Vi søker Service Rørlegger | FINN.no",
+          "url": "https://www.finn.no/job/ad/448246824"
         },
         {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=108500846",
@@ -1631,21 +1630,6 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=108500846"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/420750437",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
-          "target_domain": "finn.no",
-          "title": "Alt av rør og slanger til basseng | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/420750437"
-        },
-        {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=28147872",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -1659,6 +1643,21 @@
           "target_domain": "finn.no",
           "title": "Innstikksreoler - reol til trelast og rør | FINN torget",
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=28147872"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/420750437",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Alt av rør og slanger til basseng | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/420750437"
         },
         {
           "canonical_url": "https://auksjonen.no/auksjon/torget/Stort_parti_fiberutstyr_m%C3%A5leinstrumenter_kabler_og_installasjonsmateriell/585481",
@@ -1826,81 +1825,6 @@
           "url": "https://www.retrade.eu/no/aitem/152664/2_stk._%22R%C3%B8r_reoler%22."
         },
         {
-          "canonical_url": "https://retrade.eu/da/auction/23146",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "Auction App",
-          "url": "https://retrade.eu/da/auction/23146"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/auction/14881",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "Parti Borerør / Lot Drill pipes 60 tonns | Retrade",
-          "url": "https://retrade.eu/no/auction/14881"
-        },
-        {
-          "canonical_url": "https://retrade.eu/en/aitem/130260/Stort_parti_byggevarer",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "Stort parti byggevarer for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
-          "url": "https://www.retrade.eu/en/aitem/130260/Stort_parti_byggevarer"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/aitem/480976/Stort_parti_av_eldre_bilmotorer,Gearkasser_og_andre_deler",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "Stort parti av eldre bilmotorer,Gearkasser og andre deler til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
-          "url": "https://www.retrade.eu/no/aitem/480976/Stort_parti_av_eldre_bilmotorer,Gearkasser_og_andre_deler"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/aitem/447619/BUTIKKINNREDNING",
-          "comparable_quantity": 2,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "BUTIKKINNREDNING til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
-          "url": "https://www.retrade.eu/no/aitem/447619/BUTIKKINNREDNING"
-        },
-        {
           "canonical_url": "https://retrade.eu/no/aitem/141853/R%C3%B8rl%C3%B8fter",
           "comparable_quantity": null,
           "domain": "retrade.eu",
@@ -1914,21 +1838,6 @@
           "target_domain": "retrade.eu",
           "title": "Rørløfter til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
           "url": "https://www.retrade.eu/no/aitem/141853/R%C3%B8rl%C3%B8fter"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/aitem/105200/R%C3%B8rveksler",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "retrade.eu",
-          "title": "Rørveksler til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
-          "url": "https://www.retrade.eu/no/aitem/105200/R%C3%B8rveksler"
         },
         {
           "canonical_url": "https://retrade.eu/no/aitem/118466/Plast_r%C3%B8r",
@@ -1946,6 +1855,21 @@
           "url": "https://www.retrade.eu/no/aitem/118466/Plast_r%C3%B8r"
         },
         {
+          "canonical_url": "https://retrade.eu/no/aitem/105200/R%C3%B8rveksler",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Rørveksler til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
+          "url": "https://www.retrade.eu/no/aitem/105200/R%C3%B8rveksler"
+        },
+        {
           "canonical_url": "https://retrade.eu/no/aitem/546742/Verkt%C3%B8yreol___Bilinnredning_%E2%80%93_ToolPack",
           "comparable_quantity": null,
           "domain": "retrade.eu",
@@ -1959,6 +1883,80 @@
           "target_domain": "retrade.eu",
           "title": "Verktøyreol / Bilinnredning – ToolPack til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
           "url": "https://www.retrade.eu/no/aitem/546742/Verkt%C3%B8yreol___Bilinnredning_%E2%80%93_ToolPack"
+        },
+        {
+          "canonical_url": "https://retrade.eu/en/aitem/130860/Div._r%C3%B8r",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Div. rør for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
+          "url": "https://www.retrade.eu/en/aitem/130860/Div._r%C3%B8r"
+        },
+        {
+          "canonical_url": "https://retrade.eu/en/en/aitem/501750/Deler_til_Vaskeri",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Deler til Vaskeri for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
+          "url": "https://www.retrade.eu/en/en/aitem/501750/Deler_til_Vaskeri"
+        },
+        {
+          "canonical_url": "https://retrade.eu/no/aitem/515681/Rulle_reol_til_trelast",
+          "comparable_quantity": 16,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Rulle reol til trelast til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
+          "url": "https://www.retrade.eu/no/aitem/515681/Rulle_reol_til_trelast"
+        },
+        {
+          "canonical_url": "https://retrade.eu/no/aitem/101306/R%C3%B8rb%C3%B8yer",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Rørbøyer til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
+          "url": "https://www.retrade.eu/no/aitem/101306/R%C3%B8rb%C3%B8yer"
+        },
+        {
+          "canonical_url": "https://retrade.eu/en/aitem/118539/Byggevarer_-_Verkt%C3%B8y_og_festemidler",
+          "comparable_quantity": null,
+          "domain": "retrade.eu",
+          "matched_query": "site:retrade.eu Parti VVS deler rør rørdeler reol installasjonsmateriell Lierstranda kr",
+          "rejection_reasons": [
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "retrade.eu",
+          "title": "Byggevarer - Verktøy og festemidler for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
+          "url": "https://www.retrade.eu/en/aitem/118539/Byggevarer_-_Verkt%C3%B8y_og_festemidler"
         },
         {
           "canonical_url": "https://klaravik.no/productprint/20494",
@@ -2247,7 +2245,7 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 21t 22m",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 20t 25m",
       "verified_comparable_count": 0
     },
     {
@@ -2351,21 +2349,6 @@
           "url": "https://vvskomplett.no/ror-og-deler"
         },
         {
-          "canonical_url": "https://vvskupp.no/vann-og-varme/roer-og-roerdeler",
-          "comparable_quantity": null,
-          "domain": "vvskupp.no",
-          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.091,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Rør og rørdeler | VVSkupp.no | Se kvalitetsprodukter her",
-          "url": "https://www.vvskupp.no/vann-og-varme/roer-og-roerdeler"
-        },
-        {
           "canonical_url": "http://vavvs.no/medlemmer",
           "comparable_quantity": null,
           "domain": "vavvs.no",
@@ -2381,6 +2364,21 @@
           "url": "http://www.vavvs.no/medlemmer/"
         },
         {
+          "canonical_url": "https://vvskupp.no/vann-og-varme/roer-og-roerdeler",
+          "comparable_quantity": null,
+          "domain": "vvskupp.no",
+          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.091,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Rør og rørdeler | VVSkupp.no | Se kvalitetsprodukter her",
+          "url": "https://www.vvskupp.no/vann-og-varme/roer-og-roerdeler"
+        },
+        {
           "canonical_url": "https://badogbehag.no/vvs-materiell",
           "comparable_quantity": null,
           "domain": "badogbehag.no",
@@ -2394,21 +2392,6 @@
           "target_domain": null,
           "title": "Vvs Materiell | Bad og behag",
           "url": "https://www.badogbehag.no/vvs-materiell"
-        },
-        {
-          "canonical_url": "https://vvskomplett.no/ror-og-deler/avlopsror-og-deler",
-          "comparable_quantity": null,
-          "domain": "vvskomplett.no",
-          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.091,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Avløpsrør og deler - VVS Komplett",
-          "url": "https://vvskomplett.no/ror-og-deler/avlopsror-og-deler"
         },
         {
           "canonical_url": "https://ovv.no/index.php/no/teknisk-vvs/varme-produkter/gulvvarme/roth-gv/roth-gv-rordeler",
@@ -2441,7 +2424,7 @@
           "url": "https://vvskomplett.no/ror-og-deler/diverse-ror-og-deler"
         },
         {
-          "canonical_url": "https://vvskomplett.no/catalogsearch/result?q=purus+joti+forh%C3%B8yningsr+til+sluk",
+          "canonical_url": "https://vvskomplett.no/ror-og-deler/avlopsror-og-deler",
           "comparable_quantity": null,
           "domain": "vvskomplett.no",
           "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d brukt pris Norge",
@@ -2449,11 +2432,26 @@
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.273,
+          "similarity_score": 0.091,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Søkeresultat: 'purus joti forhøyningsr til sluk' - VVS Komplett",
-          "url": "https://vvskomplett.no/catalogsearch/result/?q=purus+joti+forh%C3%B8yningsr+til+sluk"
+          "title": "Avløpsrør og deler - VVS Komplett",
+          "url": "https://vvskomplett.no/ror-og-deler/avlopsror-og-deler"
+        },
+        {
+          "canonical_url": "https://prisradar.no/produkter/joti-purus-lofilter-harsil-o-77-mm",
+          "comparable_quantity": null,
+          "domain": "prisradar.no",
+          "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.182,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Joti Purus Lofilter/Hårsil Ø 77 mm » Best Pris på Prisradar.no",
+          "url": "https://prisradar.no/produkter/joti-purus-lofilter-harsil-o-77-mm"
         },
         {
           "canonical_url": "https://uponor.com/nb-no/vvs/produktkatalog",
@@ -2471,19 +2469,19 @@
           "url": "https://www.uponor.com/nb-no/vvs/produktkatalog"
         },
         {
-          "canonical_url": "https://prisradar.no/produkter/joti-purus-lofilter-harsil-o-77-mm",
+          "canonical_url": "https://vvskomplett.no/catalogsearch/result?q=purus+joti+forh%C3%B8yningsr+til+sluk",
           "comparable_quantity": null,
-          "domain": "prisradar.no",
+          "domain": "vvskomplett.no",
           "matched_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.182,
+          "similarity_score": 0.273,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Joti Purus Lofilter/Hårsil Ø 77 mm » Best Pris på Prisradar.no",
-          "url": "https://prisradar.no/produkter/joti-purus-lofilter-harsil-o-77-mm"
+          "title": "Søkeresultat: 'purus joti forhøyningsr til sluk' - VVS Komplett",
+          "url": "https://vvskomplett.no/catalogsearch/result/?q=purus+joti+forh%C3%B8yningsr+til+sluk"
         },
         {
           "canonical_url": "https://vvskomplett.no/ror-og-deler",
@@ -2720,21 +2718,6 @@
           "url": "https://www.finn.no/recommerce/forsale/search?q=uponor&sub_category=1.67.5218"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.67.3899",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "finn.no",
-          "title": "Byggevarer og oppussing | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.67.3899"
-        },
-        {
           "canonical_url": "https://finn.no/butikk/reolsystem",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -2750,7 +2733,7 @@
           "url": "https://www.finn.no/butikk/reolsystem"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/434961884",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.67.3899",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "site:finn.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
@@ -2758,11 +2741,11 @@
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.125,
+          "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "finn.no",
-          "title": "Militært overskuddsmateriell | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/434961884"
+          "title": "Byggevarer og oppussing | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.67.3899"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/item/459784255",
@@ -2780,6 +2763,21 @@
           "url": "https://www.finn.no/recommerce/forsale/item/459784255"
         },
         {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/434961884",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Militært overskuddsmateriell | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/434961884"
+        },
+        {
           "canonical_url": "https://auksjonen.no/auksjon/torget/Parti_milit%C3%A6rkasser_transportkasser_og_sm%C3%A5verkt%C3%B8y/587428",
           "comparable_quantity": null,
           "domain": "auksjonen.no",
@@ -2793,6 +2791,66 @@
           "target_domain": "auksjonen.no",
           "title": "Parti militærkasser, transportkasser og småverktøy",
           "url": "https://www.auksjonen.no/auksjon/torget/Parti_milit%C3%A6rkasser_transportkasser_og_sm%C3%A5verkt%C3%B8y/587428"
+        },
+        {
+          "canonical_url": "https://auksjonen.no/auksjoner/torget?ordering=avsluttes&p=5",
+          "comparable_quantity": null,
+          "domain": "auksjonen.no",
+          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "auksjonen.no",
+          "title": "Kjøp og selg brukt utstyr og verktøy hos auksjonen.no",
+          "url": "https://www.auksjonen.no/auksjoner/torget?p=5&ordering=avsluttes"
+        },
+        {
+          "canonical_url": "https://auksjonen.no/auksjon/torget/Brun_Royal_kledning_-_overskuddsmateriell/600269",
+          "comparable_quantity": null,
+          "domain": "auksjonen.no",
+          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "auksjonen.no",
+          "title": "Brun Royal kledning - overskuddsmateriell",
+          "url": "https://www.auksjonen.no/auksjon/torget/Brun_Royal_kledning_-_overskuddsmateriell/600269"
+        },
+        {
+          "canonical_url": "https://auksjonen.no/auksjoner/alle?ordering=avsluttes&p=7",
+          "comparable_quantity": null,
+          "domain": "auksjonen.no",
+          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "auksjonen.no",
+          "title": "Kjøp og selg alt mulig på Auksjonen.no",
+          "url": "https://www.auksjonen.no/auksjoner/alle?p=7&ordering=avsluttes"
+        },
+        {
+          "canonical_url": "https://auksjonen.no/auksjoner",
+          "comparable_quantity": null,
+          "domain": "auksjonen.no",
+          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "auksjonen.no",
+          "title": "Avsluttes først",
+          "url": "https://www.auksjonen.no/auksjoner/"
         },
         {
           "canonical_url": "https://auksjonen.no/kunde/87135",
@@ -2868,66 +2926,6 @@
           "target_domain": "auksjonen.no",
           "title": "Auksjonen",
           "url": "https://www.auksjonen.no/auksjon/586942/586942"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjoner/industrimaskiner",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "auksjonen.no",
-          "title": "Industrimaskiner",
-          "url": "https://www.auksjonen.no/auksjoner/industrimaskiner"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget/industri",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "auksjonen.no",
-          "title": "Torget / Industri",
-          "url": "https://www.auksjonen.no/auksjoner/torget/industri"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjoner/Profilerte",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "auksjonen.no",
-          "title": "Auksjonen.no - Norges største nettauksjon for kjøp og salg",
-          "url": "https://www.auksjonen.no/auksjoner/Profilerte"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjon/torget/2_x_Propanskap_for_gasslagring_2_x_St%C3%A5lskap_2_x_sorteringsreoler_6_enheter/589875",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "auksjonen.no",
-          "title": "2 x Propanskap for gasslagring, 2 x Stålskap, 2 ...",
-          "url": "https://www.auksjonen.no/auksjon/torget/2_x_Propanskap_for_gasslagring_2_x_St%C3%A5lskap_2_x_sorteringsreoler_6_enheter/589875"
         },
         {
           "canonical_url": "https://retrade.eu/no/auction/14881",
@@ -3215,21 +3213,6 @@
           "url": "https://www.mascus.no/skogsmaskiner/rottne/brand.html"
         },
         {
-          "canonical_url": "https://mascus.no/anlegg/andre-komponenter-anlegg,2,relevance,search.html",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": "mascus.no",
-          "title": "Brukt andre komponenter til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg,2,relevance,search.html"
-        },
-        {
           "canonical_url": "https://mascus.no/anlegg/rototilt/brand.html",
           "comparable_quantity": null,
           "domain": "mascus.no",
@@ -3260,7 +3243,7 @@
           "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg,3,relevance,search.html"
         },
         {
-          "canonical_url": "https://mascus.no/anlegg/rotatorer/rototilt",
+          "canonical_url": "https://mascus.no/anlegg/andre-komponenter-anlegg,2,relevance,search.html",
           "comparable_quantity": null,
           "domain": "mascus.no",
           "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
@@ -3271,8 +3254,8 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "mascus.no",
-          "title": "Brukt rototilt Rototilt til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/rotatorer/rototilt"
+          "title": "Brukt andre komponenter til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/andre-komponenter-anlegg,2,relevance,search.html"
         },
         {
           "canonical_url": "https://mascus.no/skogsmaskiner/hogstmaskiner/rottne",
@@ -3290,7 +3273,7 @@
           "url": "https://www.mascus.no/skogsmaskiner/hogstmaskiner/rottne"
         },
         {
-          "canonical_url": "https://mascus.no/anlegg/motorer-anlegg,2,relevance,search.html",
+          "canonical_url": "https://mascus.no/landbruk/andre-jordforbedrings-maskiner-og-ekstrautstyr",
           "comparable_quantity": null,
           "domain": "mascus.no",
           "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
@@ -3301,12 +3284,27 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": "mascus.no",
-          "title": "Brukt motorer til anleggsmaskiner til salg, side 2 - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/motorer-anlegg,2,relevance,search.html"
+          "title": "Brukte Jordforbedringsmaskiner og ekstrautstyr - Mascus Norway",
+          "url": "https://www.mascus.no/landbruk/andre-jordforbedrings-maskiner-og-ekstrautstyr"
+        },
+        {
+          "canonical_url": "https://mascus.no/anlegg/rotatorer/rototilt",
+          "comparable_quantity": null,
+          "domain": "mascus.no",
+          "matched_query": "site:mascus.no Parti VVS materiell Roth reol Uponor Joti Purus kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "mascus.no",
+          "title": "Brukt rototilt Rototilt til salgs - Mascus Norway",
+          "url": "https://www.mascus.no/anlegg/rotatorer/rototilt"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 21t 22m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 20t 25m",
       "verified_comparable_count": 0
     }
   ],

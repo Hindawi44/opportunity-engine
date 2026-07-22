@@ -1,8 +1,8 @@
 {
-  "completion_rule": "Do not declare this phase complete until every required source is either collecting verified records or explicitly documented as blocked by required authorized access.",
+  "completion_rule": "A source is complete when it is ACTIVE with verified records, CODE_READY with documented activation requirements, BLOCKED_AUTH with explicit authorized-access requirements, or deliberately classified as PLANNED or DEPRECATED.",
   "economic_ranking_unlocked": false,
-  "generated_at": "2026-07-22T21:37:25.889201+00:00",
-  "phase": "source_expansion_before_economic_ranking",
+  "generated_at": "2026-07-22T22:34:38.768527+00:00",
+  "phase": "source_coverage_audit_and_gap_closure",
   "phase_complete": false,
   "schema_version": 1,
   "sources": [
