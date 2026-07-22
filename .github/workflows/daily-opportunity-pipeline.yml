@@ -1,23 +1,24 @@
-name: Daily opportunity pipeline
+name: Automated opportunity pipeline
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "15 5 * * *"
+    - cron: "15 */6 * * *"
 
 permissions:
   contents: write
 
 concurrency:
-  group: daily-opportunity-pipeline
+  group: automated-opportunity-pipeline
   cancel-in-progress: false
 
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       PYTHONPATH: ${{ github.workspace }}/src
+      PIPELINE_TRIGGER: ${{ github.event_name }}
       BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
       FINN_API_KEY: ${{ secrets.FINN_API_KEY }}
       FINN_ORG_ID: ${{ secrets.FINN_ORG_ID }}
@@ -33,13 +34,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Run complete P5.3 Learning Engine pipeline
-        run: python scripts/run_p5_learning_pipeline.py
-      - name: Build V2.2 smart alerts
-        run: python scripts/run_v2_smart_alert_pipeline.py
-      - name: Commit successful pipeline snapshots
+      - name: Run V2.3 automated pipeline
+        run: python scripts/run_v2_automated_pipeline.py --trigger "$PIPELINE_TRIGGER"
+      - name: Commit successful pipeline snapshots and run audit
+        if: success()
         run: |
-          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/web_search_results.json data/discovery_leads.json data/todays_opportunities.json data/smart_alerts.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/market_price_candidates.json data/market_evidence_registry.json data/market_evidence_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/scored_opportunities.json data/scoring_history.json data/top5_opportunities.json data/opportunity_channels.json data/opportunities.json data/dashboard.json data/daily_report.json data/pipeline_run_status.json data/opportunity_registry.json data/discovery_health.json data/decision_intelligence.json data/action_queue.json data/follow_up_queue.json data/closed_opportunities.json data/decision_history.json data/follow_up_status.json data/follow_up_due.json data/completed_follow_ups.json data/learning_history.json data/learning_metrics.json data/smart_alerts_v2.json data/smart_alert_state.json data/smart_alert_history.json"
+          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/web_search_results.json data/discovery_leads.json data/todays_opportunities.json data/smart_alerts.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/market_price_candidates.json data/market_evidence_registry.json data/market_evidence_review_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/scored_opportunities.json data/scoring_history.json data/top5_opportunities.json data/opportunity_channels.json data/opportunities.json data/dashboard.json data/daily_report.json data/pipeline_run_status.json data/opportunity_registry.json data/discovery_health.json data/decision_intelligence.json data/action_queue.json data/follow_up_queue.json data/closed_opportunities.json data/decision_history.json data/follow_up_status.json data/follow_up_due.json data/completed_follow_ups.json data/learning_history.json data/learning_metrics.json data/smart_alerts_v2.json data/smart_alert_state.json data/smart_alert_history.json data/automated_pipeline_status.json data/automated_pipeline_history.json"
           if [ -z "$(git status --porcelain -- $FILES)" ]; then
             echo "No opportunity data changes"
             exit 0
@@ -47,5 +47,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add $FILES
-          git commit -m "Update V2.2 smart alert snapshots"
+          git commit -m "Update V2.3 automated pipeline snapshots"
           git push
+      - name: Upload failed run audit
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: automated-pipeline-failure-audit
+          path: |
+            data/automated_pipeline_status.json
+            data/automated_pipeline_history.json
+          if-no-files-found: warn
