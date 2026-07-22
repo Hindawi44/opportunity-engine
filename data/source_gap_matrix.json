@@ -1,0 +1,36 @@
+{
+  "allowed_statuses": [
+    "ACTIVE",
+    "BLOCKED_AUTH",
+    "CODE_READY",
+    "DEPRECATED",
+    "PLANNED"
+  ],
+  "generated_at": "2026-07-23T00:00:00+00:00",
+  "schema_version": 1,
+  "source_count": 15,
+  "sources": [
+    {"access_mode": "public_direct_category_pages", "channel": null, "error": null, "fetched": 52, "market": "Norway", "priority": 1, "required_configuration": [], "source": "Auksjonen.no", "status": "ACTIVE"},
+    {"access_mode": "authorized_api_only", "channel": null, "error": null, "fetched": 0, "market": "Norway", "priority": 2, "required_configuration": ["FINN_API_KEY", "FINN_ORG_ID"], "source": "FINN.no", "status": "BLOCKED_AUTH"},
+    {"access_mode": "limited_public_api", "channel": "bankruptcy_lead", "error": null, "fetched": 25, "market": "Norway", "priority": 3, "required_configuration": [], "source": "Konkurs.app", "status": "ACTIVE"},
+    {"access_mode": "authorized_feed_only", "channel": null, "error": null, "fetched": 0, "market": "Norway", "priority": 4, "required_configuration": ["KONKURSKUPP_FEED_URL"], "source": "Konkurskupp", "status": "BLOCKED_AUTH"},
+    {"access_mode": "authorized_feed_only", "channel": null, "error": null, "fetched": 0, "market": "Norway", "priority": 5, "required_configuration": ["BJAROY_FEED_URL"], "source": "Bjarøy", "status": "BLOCKED_AUTH"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Norway", "priority": 6, "required_configuration": [], "source": "Konkursbo", "status": "PLANNED"},
+    {"access_mode": "public_pages", "channel": "public_auction_event_lead", "error": null, "fetched": 2, "market": "Norway", "priority": 7, "required_configuration": [], "source": "Politiet.no", "status": "ACTIVE"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Norway", "priority": 8, "required_configuration": [], "source": "Kommuner", "status": "PLANNED"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Norway", "priority": 9, "required_configuration": [], "source": "Tolletaten", "status": "PLANNED"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Norway", "priority": 10, "required_configuration": [], "source": "Bank auctions", "status": "PLANNED"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Sweden", "priority": 11, "required_configuration": [], "source": "PS Auction", "status": "PLANNED"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Sweden", "priority": 12, "required_configuration": [], "source": "Klaravik", "status": "PLANNED"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Sweden", "priority": 13, "required_configuration": [], "source": "Blinto", "status": "PLANNED"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Denmark", "priority": 14, "required_configuration": [], "source": "Campen Auktioner", "status": "PLANNED"},
+    {"access_mode": null, "channel": null, "error": null, "fetched": 0, "market": "Denmark", "priority": 15, "required_configuration": [], "source": "Danish liquidation auctions", "status": "PLANNED"}
+  ],
+  "status_counts": {
+    "ACTIVE": 3,
+    "BLOCKED_AUTH": 3,
+    "CODE_READY": 0,
+    "DEPRECATED": 0,
+    "PLANNED": 9
+  }
+}

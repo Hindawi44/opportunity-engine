@@ -1,4 +1,7 @@
 import importlib.util
+import json
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -16,6 +19,7 @@ def load_module(name: str, path: Path):
 registry = load_module("opportunity_registry", ROOT / "scripts" / "build_opportunity_registry.py")
 health = load_module("discovery_health", ROOT / "scripts" / "build_discovery_health_report.py")
 gaps = load_module("source_gap_matrix", ROOT / "scripts" / "build_source_gap_matrix.py")
+p3_pipeline = load_module("p3_discovery_pipeline", ROOT / "scripts" / "run_p3_discovery_pipeline.py")
 
 
 def test_registry_deduplicates_and_preserves_first_seen():
@@ -92,3 +96,35 @@ def test_configured_but_inactive_source_is_code_ready():
         {"source": "X", "configured": True, "active": False, "required_configuration": []},
     )
     assert status == "CODE_READY"
+
+
+def test_p3_validation_fails_when_gap_matrix_is_missing(tmp_path):
+    assert p3_pipeline.validate_gap_matrix(tmp_path / "source_gap_matrix.json") is False
+
+
+def test_gap_matrix_script_creates_required_file_with_official_statuses(tmp_path):
+    plan_path = tmp_path / "plan.json"
+    funnel_path = tmp_path / "funnel.json"
+    output_path = tmp_path / "source_gap_matrix.json"
+    plan_path.write_text(json.dumps({"markets": [{"market": "Norway", "sources": [
+        {"source": "A", "audit_status": "PLANNED"},
+        {"source": "B", "audit_status": "DEPRECATED"},
+    ]}]}), encoding="utf-8")
+    funnel_path.write_text(json.dumps({"sources": [
+        {"source": "A", "active": True, "configured": True, "fetched": 2},
+    ]}), encoding="utf-8")
+
+    completed = subprocess.run([
+        sys.executable,
+        str(ROOT / "scripts" / "build_source_gap_matrix.py"),
+        "--plan", str(plan_path),
+        "--source-funnel", str(funnel_path),
+        "--output", str(output_path),
+    ], check=False)
+
+    assert completed.returncode == 0
+    assert output_path.is_file()
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert set(payload["allowed_statuses"]) == p3_pipeline.OFFICIAL_GAP_STATUSES
+    assert {row["status"] for row in payload["sources"]} <= p3_pipeline.OFFICIAL_GAP_STATUSES
+    assert p3_pipeline.validate_gap_matrix(output_path) is True
