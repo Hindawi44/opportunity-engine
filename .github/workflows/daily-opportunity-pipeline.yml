@@ -36,6 +36,8 @@ jobs:
         run: python scripts/build_source_coverage_report.py
       - name: Collect official police auction-event leads
         run: python scripts/build_public_auction_event_leads.py --output data/public_auction_event_leads.json --limit 10
+      - name: Build authorized web discovery leads
+        run: python scripts/build_web_discovery_leads.py --input data/web_search_results.json --output data/discovery_leads.json --limit 100
       - name: Generate today's opportunities
         run: python scripts/run_daily_pipeline.py --finn-rows 100 --output data/todays_opportunities.json
       - name: Diagnose empty Auksjonen result
@@ -60,7 +62,7 @@ jobs:
         run: python scripts/build_source_expansion_status.py
       - name: Commit changed snapshots
         run: |
-          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/todays_opportunities.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json"
+          FILES="data/source_coverage.json data/source_funnel.json data/source_expansion_status.json data/public_auction_event_leads.json data/discovery_leads.json data/todays_opportunities.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json"
           if [ -z "$(git status --porcelain -- $FILES)" ]; then
             echo "No opportunity data changes"
             exit 0
