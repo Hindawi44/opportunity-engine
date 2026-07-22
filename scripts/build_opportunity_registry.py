@@ -36,17 +36,53 @@ def canonical_url(value: object) -> str | None:
     return urlunsplit(("https", parts.netloc.lower(), path, urlencode(sorted(query)), ""))
 
 
+def raw_record_id(item: dict) -> str | None:
+    for key in ("source_document_id", "opportunity_id", "lead_id", "id"):
+        value = item.get(key)
+        if value not in (None, ""):
+            return str(value)
+    return None
+
+
 def identity(item: dict) -> str:
     """Use the normalized URL first so source-specific IDs cannot create duplicates."""
     url = canonical_url(item.get("canonical_url") or item.get("url"))
     if url:
         return "url-" + hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
-    for key in ("opportunity_id", "lead_id", "id"):
-        value = item.get(key)
-        if value not in (None, ""):
-            return str(value)
+    record_id = raw_record_id(item)
+    if record_id:
+        return record_id
     fingerprint = "|".join(str(item.get(k) or "").strip().lower() for k in ("title", "city", "source"))
     return "item-" + hashlib.sha256(fingerprint.encode("utf-8")).hexdigest()[:20]
+
+
+def audit_aliases(audit: dict) -> dict[str, str]:
+    aliases: dict[str, str] = {}
+    matches = audit.get("matches") if isinstance(audit.get("matches"), list) else []
+    for match in matches:
+        if not isinstance(match, dict) or not match.get("automatic_merge"):
+            continue
+        ids = sorted({str(value) for value in match.get("source_record_ids", []) if value})
+        if len(ids) < 2:
+            continue
+        group_id = "dedup-" + hashlib.sha256("|".join(ids).encode("utf-8")).hexdigest()[:20]
+        for value in ids:
+            aliases[value] = group_id
+    return aliases
+
+
+def resolved_identity(item: dict, aliases: dict[str, str]) -> str:
+    url = canonical_url(item.get("canonical_url") or item.get("url"))
+    if url:
+        url_key = "url-" + hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
+        record_id = raw_record_id(item)
+        if record_id and record_id in aliases:
+            return aliases[record_id]
+        return url_key
+    record_id = raw_record_id(item)
+    if record_id and record_id in aliases:
+        return aliases[record_id]
+    return identity(item)
 
 
 def extract_items(payload: dict) -> list[dict]:
@@ -81,24 +117,28 @@ def provenance(item: dict) -> tuple[list[str], list[str]]:
     names = _as_list(item.get("source_names") or metadata.get("merged_source_names"))
     ids = _as_list(item.get("source_record_ids") or metadata.get("merged_source_document_ids"))
     source = item.get("source_name") or item.get("source")
-    record_id = item.get("source_document_id") or item.get("opportunity_id") or item.get("lead_id") or item.get("id")
+    record_id = raw_record_id(item)
     if source:
         names.append(str(source))
     if record_id:
-        ids.append(str(record_id))
+        ids.append(record_id)
     return list(dict.fromkeys(names)), list(dict.fromkeys(ids))
 
 
-def merge_record(previous: dict | None, item: dict, now: str) -> dict:
-    previous = previous or {}
-    record = dict(previous)
-    record.update({k: v for k, v in item.items() if v is not None})
+def combine_items(previous: dict, current: dict) -> dict:
+    combined = {**previous, **{k: v for k, v in current.items() if v is not None}}
     previous_names, previous_ids = provenance(previous)
-    current_names, current_ids = provenance(item)
-    record["registry_id"] = identity(item)
+    current_names, current_ids = provenance(current)
+    combined["source_names"] = list(dict.fromkeys([*previous_names, *current_names]))
+    combined["source_record_ids"] = list(dict.fromkeys([*previous_ids, *current_ids]))
+    return combined
+
+
+def merge_record(previous: dict | None, item: dict, now: str, registry_id: str) -> dict:
+    previous = previous or {}
+    record = combine_items(previous, item)
+    record["registry_id"] = registry_id
     record["canonical_url"] = canonical_url(item.get("canonical_url") or item.get("url"))
-    record["source_names"] = list(dict.fromkeys([*previous_names, *current_names]))
-    record["source_record_ids"] = list(dict.fromkeys([*previous_ids, *current_ids]))
     record["lifecycle_status"] = lifecycle(item)
     record["first_seen_at"] = previous.get("first_seen_at") or now
     record["last_seen_at"] = now
@@ -106,11 +146,12 @@ def merge_record(previous: dict | None, item: dict, now: str) -> dict:
     return record
 
 
-def build_registry(discovery: dict, scored: dict, existing: dict, generated_at: str) -> dict:
+def build_registry(discovery: dict, scored: dict, existing: dict, audit: dict, generated_at: str) -> dict:
+    aliases = audit_aliases(audit)
     current: dict[str, dict] = {}
     for item in [*extract_items(discovery), *extract_items(scored)]:
-        key = identity(item)
-        current[key] = {**current.get(key, {}), **item}
+        key = resolved_identity(item, aliases)
+        current[key] = combine_items(current.get(key, {}), item)
 
     old_records = existing.get("records", [])
     old_by_id = {
@@ -119,7 +160,7 @@ def build_registry(discovery: dict, scored: dict, existing: dict, generated_at: 
         if isinstance(item, dict) and item.get("registry_id")
     } if isinstance(old_records, list) else {}
 
-    records = [merge_record(old_by_id.get(key), item, generated_at) for key, item in sorted(current.items())]
+    records = [merge_record(old_by_id.get(key), item, generated_at, key) for key, item in sorted(current.items())]
     active_ids = set(current)
     for key, item in old_by_id.items():
         if key not in active_ids:
@@ -132,10 +173,11 @@ def build_registry(discovery: dict, scored: dict, existing: dict, generated_at: 
         status = str(record.get("lifecycle_status") or "UNKNOWN")
         counts[status] = counts.get(status, 0) + 1
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at": generated_at,
         "record_count": len(records),
         "status_counts": counts,
+        "cross_source_alias_count": len(set(aliases.values())),
         "records": sorted(records, key=lambda x: str(x.get("registry_id"))),
     }
 
@@ -145,6 +187,7 @@ def main() -> int:
     parser.add_argument("--discovery", default="data/discovery_leads.json")
     parser.add_argument("--scored", default="data/scored_opportunities.json")
     parser.add_argument("--existing", default="data/opportunity_registry.json")
+    parser.add_argument("--audit", default="data/cross_source_deduplication_audit.json")
     parser.add_argument("--output", default="data/opportunity_registry.json")
     args = parser.parse_args()
     generated_at = utc_now()
@@ -152,6 +195,7 @@ def main() -> int:
         load_object(Path(args.discovery)),
         load_object(Path(args.scored)),
         load_object(Path(args.existing)),
+        load_object(Path(args.audit)),
         generated_at,
     )
     output = Path(args.output)
