@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-07-22T14:07:51.277161+00:00",
+  "opportunity_count": 2,
+  "policy": {
+    "automatic_verification": false,
+    "minimum_comparables": 3,
+    "minimum_independent_domains": 2,
+    "outlier_ratio": 2.5
+  },
+  "records": [
+    {
+      "accepted_comparable_count": 1,
+      "accepted_comparables": [
+        {
+          "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
+          "captured_at": "2026-07-22T14:07:46.950655+00:00",
+          "comparable_quantity": null,
+          "domain": "fasadenor.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
+          "observed_prices_nok": [
+            4990.0
+          ],
+          "price_nok": 4990.0,
+          "quantity_status": "UNKNOWN",
+          "similarity_score": 0.5,
+          "snippet": "<strong>4,990kr Inkludert Mva</strong> · Stor lagerreol med maksimal oppbevaringsplass Dette er den største modellen i serien – med 200 cm bredde og en kapasitet på hele 1,2 tonn totalt",
+          "source": "Brave Search",
+          "source_quantity": 4,
+          "title": "Lagerreol 200×60×200cm - Svart 1200kg",
+          "url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg/",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
+        }
+      ],
+      "asking_price_nok": 6100.0,
+      "candidate_comparable_count": 1,
+      "candidate_market_value_nok": null,
+      "evidence_status": "INSUFFICIENT_EVIDENCE",
+      "independent_domain_count": 1,
+      "independent_domains": [
+        "fasadenor.no"
+      ],
+      "market_value_verified": false,
+      "opportunity_id": "unified-auksjonen-611253",
+      "outlier_count": 0,
+      "outliers": [],
+      "review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains",
+        "quantity_not_confirmed_for_all_comparables"
+      ],
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 22t 36m 16s",
+      "verified_market_value_nok": null
+    },
+    {
+      "accepted_comparable_count": 0,
+      "accepted_comparables": [],
+      "asking_price_nok": 20000.0,
+      "candidate_comparable_count": 0,
+      "candidate_market_value_nok": null,
+      "evidence_status": "INSUFFICIENT_EVIDENCE",
+      "independent_domain_count": 0,
+      "independent_domains": [],
+      "market_value_verified": false,
+      "opportunity_id": "unified-auksjonen-612667",
+      "outlier_count": 0,
+      "outliers": [],
+      "review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 4t 52m 17s",
+      "verified_market_value_nok": null
+    }
+  ],
+  "review_required_count": 0,
+  "schema_version": 1,
+  "verified_count": 0
+}
