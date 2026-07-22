@@ -15,14 +15,8 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from opportunity_engine.ods.daily_opportunity_report import (  # noqa: E402
-    DailyOpportunityReport,
-    RankedDailyOpportunity,
-)
-from opportunity_engine.ods.today_dashboard import (  # noqa: E402
-    OpportunityDisplayMetadata,
-    build_today_dashboard,
-)
+from opportunity_engine.ods.daily_opportunity_report import DailyOpportunityReport, RankedDailyOpportunity  # noqa: E402
+from opportunity_engine.ods.today_dashboard import OpportunityDisplayMetadata, build_today_dashboard  # noqa: E402
 
 SNAPSHOT_PATH = ROOT / "data" / "todays_opportunities.json"
 
@@ -43,12 +37,15 @@ def _optional_float(value: object) -> float | None:
 
 
 def load_dashboard_snapshot(path: Path = SNAPSHOT_PATH):
-    """Load a scheduler-produced JSON snapshot conservatively."""
+    """Load the scheduler-produced snapshot using the current ``rows`` schema.
+
+    ``ranked`` remains supported for backwards compatibility with older snapshots.
+    """
     payload = json.loads(path.read_text(encoding="utf-8"))
     report_date = date.fromisoformat(str(payload["report_date"]))
-    raw_rows = payload.get("ranked", [])
+    raw_rows = payload.get("rows", payload.get("ranked", []))
     if not isinstance(raw_rows, list):
-        raise ValueError("ranked must be a list")
+        raise ValueError("rows must be a list")
 
     ranked: list[RankedDailyOpportunity] = []
     metadata: dict[str, OpportunityDisplayMetadata] = {}
@@ -65,6 +62,8 @@ def load_dashboard_snapshot(path: Path = SNAPSHOT_PATH):
                 decision=str(raw.get("decision", "monitor")),
                 decision_label=str(raw.get("decision_label", "🟡 راقب")),
                 score=float(raw.get("score", 0.0)),
+                score_grade=str(raw.get("score_grade", "U")),
+                score_breakdown=_tuple_text(raw.get("score_breakdown")),
                 expected_profit_nok=_optional_float(raw.get("expected_profit_nok")),
                 roi=_optional_float(raw.get("roi")),
                 confidence=str(raw.get("confidence", "insufficient")),
@@ -76,13 +75,42 @@ def load_dashboard_snapshot(path: Path = SNAPSHOT_PATH):
         )
         title = str(raw.get("title") or opportunity_id).strip()
         url = str(raw.get("url", "")).strip() or None
-        city = str(raw.get("city", "")).strip() or None
-        ends_at = str(raw.get("ends_at", "")).strip() or None
         metadata[opportunity_id] = OpportunityDisplayMetadata(
             title=title,
             url=url,
-            city=city,
-            ends_at=ends_at,
+            city=str(raw.get("city", "")).strip() or None,
+            ends_at=str(raw.get("ends_at", "")).strip() or None,
+            asking_price_nok=_optional_float(raw.get("asking_price_nok")),
+            market_value_nok=_optional_float(raw.get("market_value_nok")),
+            market_median_nok=_optional_float(raw.get("market_median_nok")),
+            market_discount=_optional_float(raw.get("market_discount")),
+            market_verification_status=str(raw.get("market_verification_status", "unavailable")),
+            market_verification_label=str(raw.get("market_verification_label", "⚪ سوق غير متحقق")),
+            market_comparable_count=int(raw.get("market_comparable_count", 0) or 0),
+            market_is_verified=raw.get("market_is_verified") is True,
+            first_seen_at=raw.get("first_seen_at"),
+            last_seen_at=raw.get("last_seen_at"),
+            first_price_nok=_optional_float(raw.get("first_price_nok")),
+            lowest_price_nok=_optional_float(raw.get("lowest_price_nok")),
+            highest_price_nok=_optional_float(raw.get("highest_price_nok")),
+            price_change_count=int(raw.get("price_change_count", 0) or 0),
+            price_change_from_first=_optional_float(raw.get("price_change_from_first")),
+            listing_age_days=int(raw.get("listing_age_days", 0) or 0),
+            price_history_status=str(raw.get("price_history_status", "unpriced")),
+            price_history_label=str(raw.get("price_history_label", "⚪ لا يوجد سعر")),
+            significant_price_drop=raw.get("significant_price_drop") is True,
+            seller_id=raw.get("seller_id"),
+            seller_name=raw.get("seller_name"),
+            seller_type=raw.get("seller_type"),
+            seller_score=_optional_float(raw.get("seller_score")),
+            seller_grade=str(raw.get("seller_grade", "U")),
+            seller_risk=str(raw.get("seller_risk", "unknown")),
+            seller_risk_label=str(raw.get("seller_risk_label", "⚪ بائع غير متحقق")),
+            seller_confidence=str(raw.get("seller_confidence", "insufficient")),
+            seller_is_verified=raw.get("seller_is_verified") is True,
+            seller_evidence_count=int(raw.get("seller_evidence_count", 0) or 0),
+            seller_reasons=_tuple_text(raw.get("seller_reasons")),
+            seller_warnings=_tuple_text(raw.get("seller_warnings")),
         )
 
     report = DailyOpportunityReport(
@@ -102,10 +130,7 @@ st.title("📊 فرص اليوم")
 st.caption("قرارات محافظة مبنية على بيانات السوق والتكاليف المتوفرة. تحقق يدويًا من الإعلان قبل أي شراء.")
 
 if not SNAPSHOT_PATH.exists():
-    st.info(
-        "لم يتم إنشاء لقطة فرص اليوم بعد. ستُنتجها مرحلة التشغيل المجدول التالية في "
-        "data/todays_opportunities.json."
-    )
+    st.info("لم يتم إنشاء لقطة فرص اليوم بعد. ستُنتجها مرحلة التشغيل المجدول التالية في data/todays_opportunities.json.")
     st.stop()
 
 try:
@@ -128,32 +153,24 @@ if not view.rows:
     st.warning("لا توجد فرص قابلة للعرض في التقرير الحالي.")
     st.stop()
 
-rows = [
-    {
-        "الترتيب": row.rank,
-        "الفرصة": row.title,
-        "القرار": row.decision_label,
-        "الربح المتوقع NOK": row.expected_profit_nok,
-        "ROI %": None if row.roi is None else round(row.roi * 100, 1),
-        "الحد الأقصى للمزايدة NOK": row.maximum_purchase_price_nok,
-        "الثقة": row.confidence,
-        "المدينة": row.city,
-        "ينتهي": row.ends_at,
-        "الإعلان": row.url,
-    }
-    for row in view.rows
-]
+rows = [{
+    "الترتيب": row.rank,
+    "الفرصة": row.title,
+    "القرار": row.decision_label,
+    "الربح المتوقع NOK": row.expected_profit_nok,
+    "ROI %": None if row.roi is None else round(row.roi * 100, 1),
+    "الحد الأقصى للمزايدة NOK": row.maximum_purchase_price_nok,
+    "الثقة": row.confidence,
+    "المدينة": row.city,
+    "ينتهي": row.ends_at,
+    "الإعلان": row.url,
+} for row in view.rows]
 
-st.dataframe(
-    pd.DataFrame(rows),
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "الإعلان": st.column_config.LinkColumn("فتح الإعلان", display_text="فتح"),
-        "الربح المتوقع NOK": st.column_config.NumberColumn(format="%.0f kr"),
-        "الحد الأقصى للمزايدة NOK": st.column_config.NumberColumn(format="%.0f kr"),
-    },
-)
+st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True, column_config={
+    "الإعلان": st.column_config.LinkColumn("فتح الإعلان", display_text="فتح"),
+    "الربح المتوقع NOK": st.column_config.NumberColumn(format="%.0f kr"),
+    "الحد الأقصى للمزايدة NOK": st.column_config.NumberColumn(format="%.0f kr"),
+})
 
 st.subheader("تفاصيل القرارات")
 for row in view.rows:
