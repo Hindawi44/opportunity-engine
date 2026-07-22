@@ -24,7 +24,13 @@ class OpportunityScore:
 
 
 class OpportunityScoringEngine:
-    """Score opportunities conservatively without inventing missing facts."""
+    """Score opportunities conservatively without inventing missing facts.
+
+    Missing economic evidence lowers confidence and caps the final score, but it is not
+    treated as if it were a proven commercial risk. This preserves a small, auditable
+    preliminary score for listings that look operationally interesting while still
+    preventing an incomplete candidate from becoming a buy recommendation.
+    """
 
     def score(
         self,
@@ -41,7 +47,14 @@ class OpportunityScoringEngine:
         data_quality = max(0.0, 15.0 - min(len(opportunity.missing_fields), 6) * 2.5)
         resale = self._resale(opportunity)
         logistics = self._logistics(opportunity)
-        risk_penalty = min(25.0, len(decision.blockers) * 4.0 + len(decision.warnings) * 1.5)
+
+        # Blockers in the profit engine mostly represent absent evidence (market
+        # comparables, transport cost, VAT status, etc.). They must cap confidence,
+        # not erase the observable listing-quality score. Warnings retain a bounded
+        # penalty, while incomplete evidence receives a small separate deduction.
+        evidence_gap_penalty = min(6.0, len(decision.blockers) * 1.0)
+        warning_penalty = min(6.0, len(decision.warnings) * 1.0)
+        risk_penalty = evidence_gap_penalty + warning_penalty
 
         raw = financial + confidence + data_quality + resale + logistics - risk_penalty
         if decision.decision == "reject":
@@ -56,6 +69,8 @@ class OpportunityScoringEngine:
             f"data_quality={data_quality:.1f}/15",
             f"resale={resale:.1f}/15",
             f"logistics={logistics:.1f}/15",
+            f"evidence_gap_penalty={evidence_gap_penalty:.1f}",
+            f"warning_penalty={warning_penalty:.1f}",
             f"risk_penalty={risk_penalty:.1f}",
         )
         return OpportunityScore(
