@@ -30,9 +30,11 @@ def test_similarity_requires_shared_product_terms() -> None:
 
 def test_query_variants_are_unique_and_bounded() -> None:
     variants = _query_variants({"title": "4 stk komplette lagerreoler 200x60"})
-    assert 1 <= len(variants) <= 3
+    assert 1 <= len(variants) <= 8
     assert len(variants) == len(set(value.casefold() for value in variants))
     assert all("lagerreol" in value.casefold() for value in variants)
+    assert any(value.startswith("site:finn.no ") for value in variants)
+    assert any(value.startswith("site:auksjonen.no ") for value in variants)
 
 
 def test_canonical_url_removes_tracking_and_fragment() -> None:
