@@ -1,8 +1,9 @@
 {
   "candidate_count": 1,
   "errors": {},
-  "generated_at": "2026-07-22T12:43:01.871400+00:00",
-  "method": "Brave Search candidate discovery with strict NOK parsing, similarity and quantity checks; prices are unverified and never used automatically for a buy decision",
+  "generated_at": "2026-07-22T13:21:03.346593+00:00",
+  "max_query_variants": 3,
+  "method": "Brave Search multi-query candidate discovery with strict NOK parsing, URL deduplication, similarity and quantity checks; prices are unverified and never used automatically for a buy decision",
   "minimum_similarity": 0.35,
   "opportunities": [
     {
@@ -14,9 +15,11 @@
       "candidate_price_min_nok": 4990.0,
       "candidates": [
         {
-          "captured_at": "2026-07-22T12:43:00.956131+00:00",
+          "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
+          "captured_at": "2026-07-22T13:20:59.443202+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
           "observed_prices_nok": [
             4990.0
           ],
@@ -32,25 +35,23 @@
           "verified": false
         }
       ],
+      "distinct_domain_count": 1,
       "eligible_for_market_value": false,
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d brukt pris Norge",
+      "market_search_queries": [
+        "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
+        "\"komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg\" selges kr",
+        "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK"
+      ],
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
       "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-611253",
-      "rejected_candidate_count": 9,
+      "query_count": 3,
+      "rejected_candidate_count": 18,
       "rejected_candidates": [
         {
+          "canonical_url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg",
           "comparable_quantity": null,
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "title": "➤ Used & new storage racks on Machineseeker.com - great brands & offers 🏷️",
-          "url": "https://www.machineseeker.com/storage-shelves/ci-2441"
-        },
-        {
-          "comparable_quantity": null,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -60,7 +61,22 @@
           "url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg/"
         },
         {
+          "canonical_url": "https://reollageret.dk/",
           "comparable_quantity": null,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.167,
+          "source_quantity": 4,
+          "title": "Reollageret - Nyt og brugt lagerinventar",
+          "url": "https://reollageret.dk/"
+        },
+        {
+          "canonical_url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136",
+          "comparable_quantity": null,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -71,7 +87,23 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
         },
         {
+          "canonical_url": "https://www.lomax.dk/lager/lagerreoler",
+          "comparable_quantity": 34,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35",
+            "quantity_mismatch"
+          ],
+          "similarity_score": 0.167,
+          "source_quantity": 4,
+          "title": "Lagerreoler - Effektiv opbevaring til lager, værksted og produktion",
+          "url": "https://www.lomax.dk/lager/lagerreoler/"
+        },
+        {
+          "canonical_url": "https://reolteknikk.no/produktkategori/brukt",
           "comparable_quantity": null,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -82,18 +114,9 @@
           "url": "https://reolteknikk.no/produktkategori/brukt/"
         },
         {
+          "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
           "comparable_quantity": null,
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "title": "Reoler | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
-        },
-        {
-          "comparable_quantity": null,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -104,7 +127,22 @@
           "url": "https://fasadenor.no/product-category/lagerreoler/"
         },
         {
+          "canonical_url": "https://www.finn.no/recommerce/forsale/search?q=reoler",
           "comparable_quantity": null,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "title": "Reoler | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
+        },
+        {
+          "canonical_url": "https://www.caroffice.no/categories/brukte-innredninger-pa-lager",
+          "comparable_quantity": null,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -115,31 +153,137 @@
           "url": "https://www.caroffice.no/categories/brukte-innredninger-pa-lager"
         },
         {
+          "canonical_url": "https://www.ajprodukter.dk/lager-vaerksted/opbevaring-til-vaerksted/reoler-til-vaerksted-lager/lagerreoler",
           "comparable_quantity": null,
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
           "similarity_score": 0.167,
           "source_quantity": 4,
+          "title": "Lagerreoler - Stort udvalg til gode priser | AJ Produkter",
+          "url": "https://www.ajprodukter.dk/lager-vaerksted/opbevaring-til-vaerksted/reoler-til-vaerksted-lager/lagerreoler"
+        },
+        {
+          "canonical_url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.375,
+          "source_quantity": 4,
+          "title": "Lagerreol 150×60×200cm - Svart 1200kg - robust oppbevaring 1200 kg",
+          "url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg/"
+        },
+        {
+          "canonical_url": "https://reollageret.dk/",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": 4,
+          "title": "Reollageret - Nyt og brugt lagerinventar",
+          "url": "https://reollageret.dk/"
+        },
+        {
+          "canonical_url": "https://reolteknikk.no/produktkategori/brukt",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "title": "rt brukt - Lagerinnredning - Reolteknikk AS",
+          "url": "https://reolteknikk.no/produktkategori/brukt/"
+        },
+        {
+          "canonical_url": "https://www.facebook.com/events/stenmalveien-30-3111-t%C3%B8nsberg-norge/fullbooket-stort-bruktmarked-i-messehall-b-t%C3%B8nsberg/592623660349500",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": 4,
+          "title": "FULLBOOKET! STORT BRUKTMARKED I MESSEHALL B ...",
+          "url": "https://www.facebook.com/events/stenmalveien-30-3111-t%C3%B8nsberg-norge/fullbooket-stort-bruktmarked-i-messehall-b-t%C3%B8nsberg/592623660349500/"
+        },
+        {
+          "canonical_url": "https://www.facebook.com/events/messehall-b/bruktmarked/2588774991469512",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": 4,
+          "title": "Bruktmarked",
+          "url": "https://www.facebook.com/events/messehall-b/bruktmarked/2588774991469512/"
+        },
+        {
+          "canonical_url": "https://www.loppetur.no/finn-bruktbutikk/tonsberg-kommune",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": 4,
+          "title": "Bruktbutikker i Tønsberg kommune - Loppetur",
+          "url": "https://www.loppetur.no/finn-bruktbutikk/tonsberg-kommune"
+        },
+        {
+          "canonical_url": "https://www.lomax.dk/lager/lagerreoler",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": 4,
           "title": "Lagerreoler - Effektiv opbevaring til lager, værksted og produktion",
           "url": "https://www.lomax.dk/lager/lagerreoler/"
         },
         {
-          "comparable_quantity": 19,
+          "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
-            "similarity_below_0.35",
-            "quantity_mismatch"
+            "similarity_below_0.35"
           ],
-          "similarity_score": 0.167,
+          "similarity_score": 0.125,
           "source_quantity": 4,
-          "title": "Lagerreol / stålreol i galvanisertstål, høyde: 210cm, 400cm bredde, 4 fag, 51cm dybde, pent brukt - Skriv ut",
-          "url": "https://www.movement.as/skriv-ut/kontormobler-og-utstyr/skap-og-lagring/lagerutstyr-og-arkivreoler/lagerreol---stalreol-i-galvanisert-stal-hoyde-210cm-400cm-bredde-4-fag-51cm-dybde-pent-brukt-52097.html"
+          "title": "Lagerreoler – Solide Reoler for Lager og Verksted - Fasadenor",
+          "url": "https://fasadenor.no/product-category/lagerreoler/"
+        },
+        {
+          "canonical_url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136",
+          "comparable_quantity": null,
+          "matched_query": "komplette Lagerreoler 200 200cm Svart 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": 4,
+          "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 0t 1m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 23t 23m 3s",
       "verified_comparable_count": 0
     },
     {
@@ -150,14 +294,23 @@
       "candidate_price_median_nok": null,
       "candidate_price_min_nok": null,
       "candidates": [],
+      "distinct_domain_count": 0,
       "eligible_for_market_value": false,
+      "market_search_queries": [
+        "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
+        "\"BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand\" selges kr",
+        "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK"
+      ],
       "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
       "market_value_status": "NO_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-612667",
-      "rejected_candidate_count": 10,
+      "query_count": 3,
+      "rejected_candidate_count": 20,
       "rejected_candidates": [
         {
+          "canonical_url": "https://www.rubrikk.no/torget-brukt-til-salgs/varelager-til-salgs.html",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -168,7 +321,9 @@
           "url": "https://www.rubrikk.no/torget-brukt-til-salgs/varelager-til-salgs.html"
         },
         {
+          "canonical_url": "https://www.ubuy.co.no/no/brand/kawaii-home",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -178,7 +333,9 @@
           "url": "https://www.ubuy.co.no/no/brand/kawaii-home"
         },
         {
+          "canonical_url": "https://www.ubuy.co.no/no/brand/super-cute-kawaii",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -188,7 +345,9 @@
           "url": "https://www.ubuy.co.no/no/brand/super-cute-kawaii"
         },
         {
+          "canonical_url": "https://www.ubuy.co.no/no/brand/kawaii-cute-clothes-here",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -198,7 +357,9 @@
           "url": "https://www.ubuy.co.no/no/brand/kawaii-cute-clothes-here"
         },
         {
+          "canonical_url": "https://www.ubuy.co.no/no/brand/kawaii-merch",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -208,7 +369,9 @@
           "url": "https://www.ubuy.co.no/no/brand/kawaii-merch"
         },
         {
+          "canonical_url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -219,7 +382,9 @@
           "url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand/"
         },
         {
+          "canonical_url": "https://loppo.no/",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -229,7 +394,9 @@
           "url": "https://loppo.no/"
         },
         {
+          "canonical_url": "https://www.azets.com/no-no/ressurser/artikler/varetelling-varelager-tips",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -239,7 +406,9 @@
           "url": "https://www.azets.com/no-no/ressurser/artikler/varetelling-varelager-tips"
         },
         {
+          "canonical_url": "https://www.facebook.com/sognebruktogantikk?locale=nb_NO",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -250,7 +419,9 @@
           "url": "https://www.facebook.com/sognebruktogantikk/?locale=nb_NO"
         },
         {
+          "canonical_url": "https://www.baerekraftigkristiansand.no/temasider/hverdagsliv/secondhand-safari",
           "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -258,15 +429,145 @@
           "source_quantity": null,
           "title": "Secondhand-safari | Bærekraftig Kristiansand",
           "url": "https://www.baerekraftigkristiansand.no/temasider/hverdagsliv/secondhand-safari"
+        },
+        {
+          "canonical_url": "https://www.gulesider.no/bruktbutikker+kristiansand/bedrifter",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "title": "Bruktbutikker Kristiansand | bedrifter | gulesider.no | side 1",
+          "url": "https://www.gulesider.no/bruktbutikker+kristiansand/bedrifter"
+        },
+        {
+          "canonical_url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "title": "Alle bruktbutikker i Kristiansand | Finnbruktbutikk",
+          "url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand/"
+        },
+        {
+          "canonical_url": "https://loppo.no/",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.286,
+          "source_quantity": null,
+          "title": "Norges største Loppesupermarked",
+          "url": "https://loppo.no/"
+        },
+        {
+          "canonical_url": "https://www.kirppis.no/",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "title": "Kirppis® | Sirkulærmarked i Norge - selg og kjøp brukt - vi tar oss av salget",
+          "url": "https://www.kirppis.no/"
+        },
+        {
+          "canonical_url": "https://www.gulesider.no/bruktbutikker+norge/bedrifter",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "title": "Bruktbutikker Norge | bedrifter | gulesider.no | side 1",
+          "url": "https://www.gulesider.no/bruktbutikker+norge/bedrifter"
+        },
+        {
+          "canonical_url": "https://gjenbruken.no/kristiansand",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "title": "Kristiansand - Gjenbruken",
+          "url": "https://gjenbruken.no/kristiansand/"
+        },
+        {
+          "canonical_url": "https://www.kirppis.no/min-kirppis",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "title": "Min Kirppis® | Sirkulærmarked med butikker rundt om i Norge - selg og kjøp brukt - vi tar oss av salget",
+          "url": "https://www.kirppis.no/min-kirppis/"
+        },
+        {
+          "canonical_url": "https://www.facebook.com/mollagjenbruk",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.286,
+          "source_quantity": null,
+          "title": "Mølla bruktmarked | Kristiansand | Facebook",
+          "url": "https://www.facebook.com/mollagjenbruk/"
+        },
+        {
+          "canonical_url": "https://norgeguide.com/kristiansand/brukte-varer-butikker",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "title": "🎒🧵 Brukteklær- og tilbehørbutikker i Kristiansand: stilrike varer til lav pris📍 En sjanse til å finne sjeldne perler blant klær og tilbehør. — Norway",
+          "url": "https://norgeguide.com/kristiansand/brukte-varer-butikker/"
+        },
+        {
+          "canonical_url": "https://www.baerekraftigkristiansand.no/temasider/hverdagsliv/secondhand-safari",
+          "comparable_quantity": null,
+          "matched_query": "BUTIKK AVVIKLING VARELAGER KAWAII 4500 Kristiansand bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": null,
+          "title": "Secondhand-safari | Bærekraftig Kristiansand",
+          "url": "https://www.baerekraftigkristiansand.no/temasider/hverdagsliv/secondhand-safari"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 6t 17m 3s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 5t 39m 4s",
       "verified_comparable_count": 0
     }
   ],
   "opportunity_count": 2,
-  "rejected_candidate_count": 19,
+  "rejected_candidate_count": 38,
   "required_comparables": 3,
-  "schema_version": 2
+  "schema_version": 3
 }

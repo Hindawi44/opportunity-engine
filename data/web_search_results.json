@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-07-22T12:42:54.504502+00:00",
+  "generated_at": "2026-07-22T13:20:53.165946+00:00",
   "provider": "Brave Search API",
   "request_count": 10,
   "result_count": 100,
@@ -167,11 +167,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
+      "published_at": "2024-01-09T06:48:44",
+      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
       "source": "Brave Search",
-      "title": "Starte bedrift | Ny i Norge",
-      "url": "https://www.nyinorge.no/en/work/starting-a-business-in-norway/"
+      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
+      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -183,27 +183,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": "2024-01-09T06:48:44",
-      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
+      "published_at": null,
+      "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
       "source": "Brave Search",
-      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
-      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
-      "published_at": "2020-10-03T16:33:09",
-      "snippet": "Storage solutions, warehousing, 3PL, 4PL, WM systems – smart warehousing solutions streamlines your flow of goods and increase your bottom line",
-      "source": "Brave Search",
-      "title": "3PL lagerløsninger for din bedrift | ColliCare Logistics Norge",
-      "url": "https://www.collicare.no/en/freight/third-party-logistics"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
-      "published_at": "2026-01-18T09:19:20",
-      "snippet": "Med vaktordning og bonus hos den lille bedriften gir meg en totalpakke på 50k+ (avhengig av bonus) mer i året.",
-      "source": "Brave Search",
-      "title": "r/norge on Reddit: Nystartet vs etablert liten bedrift?",
-      "url": "https://www.reddit.com/r/norge/comments/1qg43ld/nystartet_vs_etablert_liten_bedrift/"
+      "title": "Starte bedrift | Ny i Norge",
+      "url": "https://www.nyinorge.no/en/work/starting-a-business-in-norway/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -215,6 +199,14 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
+      "published_at": "2020-10-03T16:33:09",
+      "snippet": "Storage solutions, warehousing, 3PL, 4PL, WM systems – smart warehousing solutions streamlines your flow of goods and increase your bottom line",
+      "source": "Brave Search",
+      "title": "3PL lagerløsninger for din bedrift | ColliCare Logistics Norge",
+      "url": "https://www.collicare.no/en/freight/third-party-logistics"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
       "published_at": null,
       "snippet": "Zollstok, måleteknikk, lengdemåling, ... restparti (nyvare) Tilstand: ny Tilgjengelig mengde: 4.500 stk. Minimum bestillin... ... Håndlaget tilpasset solsikke snøkule Nummer: GRS1009 Materiale: Harpiks Type: Snøkule... ... Denne glasskubben er et høykvalitets papirvekt. Det er en original gave til bedrifter som kan gis ...",
       "source": "Brave Search",
@@ -223,11 +215,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Finn bedriftsinformasjon gratis: adresse, organisasjonsnummer, eiere, ansatte og MVA-status. Komplett bedriftsoppslag for alle norske virksomheter.",
+      "published_at": "2026-01-18T09:19:20",
+      "snippet": "Med vaktordning og bonus hos den lille bedriften gir meg en totalpakke på 50k+ (avhengig av bonus) mer i året.",
       "source": "Brave Search",
-      "title": "Sjekk bedrift – Gratis bedriftsoppslag i Norge | orgn.no",
-      "url": "https://www.orgn.no/bedrift"
+      "title": "r/norge on Reddit: Nystartet vs etablert liten bedrift?",
+      "url": "https://www.reddit.com/r/norge/comments/1qg43ld/nystartet_vs_etablert_liten_bedrift/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -240,10 +232,18 @@
     {
       "discovery_query": "restparti bedrift Norge",
       "published_at": null,
-      "snippet": "Åpningstider: https://www.rolfselektro.no/ <strong>Rolfs Elektro er en frittstående elektronikkforhandler med hovedvekt på hvitevarer</strong>.",
+      "snippet": "Finn bedriftsinformasjon gratis: adresse, organisasjonsnummer, eiere, ansatte og MVA-status. Komplett bedriftsoppslag for alle norske virksomheter.",
       "source": "Brave Search",
-      "title": "Rolfs Elektro, Barstølveien 58/Øvre Fergested 1 (2025)",
-      "url": "https://findglocal.com/NO/Kristiansand/267093243452936/Rolfs-Elektro"
+      "title": "Sjekk bedrift – Gratis bedriftsoppslag i Norge | orgn.no",
+      "url": "https://www.orgn.no/bedrift"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": "2026-06-25T12:03:32",
+      "snippet": "Her finner du alt om å starte og drive bedrift.",
+      "source": "Brave Search",
+      "title": "Bedrift | SpareBank 1 Sør-Norge",
+      "url": "https://www.sparebank1.no/nb/sor-norge/bedrift.html"
     },
     {
       "discovery_query": "kontormøbler avvikling Norge",
@@ -424,6 +424,14 @@
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
+      "snippet": "Frisørinnredning og frisørutstyr fra Salon Ambience.",
+      "source": "Brave Search",
+      "title": "FRISØRLEVERANDØRER - headquarter.no",
+      "url": "https://www.headquarter.no/p/19236/frisorleverandorer"
+    },
+    {
+      "discovery_query": "frisørutstyr avvikling Norge",
+      "published_at": null,
       "snippet": "Frisørinnredning og frisørutstyr fra Salon Ambience. Vi kan hjelpe deg med design av din frisørsalong! Negl/Fotpleie/Hudpleie/Spa (Medical &amp; Beauty) Frisørutstyr / (Salon Ambien ...",
       "source": "Brave Search",
       "title": "Norhair AS - Frisørinnredning og hårpleieprodukter",
@@ -440,10 +448,10 @@
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "published_at": null,
-      "snippet": "Frisørinnredning / Utstyr fra REM. Engelsk håndlagede kvalitetsprodukter. 3 års garanti.",
+      "snippet": "Hva er fordelene med å kjøpe frisørutstyr fra en norsk nettbutikk? Norsk nettbutikk betyr rask levering, enkel retur, trygg garanti og ingen skjulte gebyrer. Luminx tilbyr kundeservice i Norge, sikre betalingsmetoder og produkter tilpasset skandinaviske forhold.",
       "source": "Brave Search",
-      "title": "REM Frisørinnredning / Frisørutstyr - Wellness Norge",
-      "url": "https://www.wellnessnorge.no/artikler/rem-frisorinnredning-/-frisorutstyr"
+      "title": "Nettbutikk for frisørprodukter og salongutstyr | Luminx",
+      "url": "https://luminx.no/product-category/frisorprodukter-salongutstyr/"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
@@ -452,6 +460,14 @@
       "source": "Brave Search",
       "title": "OS Frisørartikler - Profesjonelle frisørartikler & frisørutstyr",
       "url": "https://www.osfrisorartikler.no/"
+    },
+    {
+      "discovery_query": "frisørutstyr avvikling Norge",
+      "published_at": null,
+      "snippet": "Frisørinnredning / Utstyr fra REM. Engelsk håndlagede kvalitetsprodukter. 3 års garanti.",
+      "source": "Brave Search",
+      "title": "REM Frisørinnredning / Frisørutstyr - Wellness Norge",
+      "url": "https://www.wellnessnorge.no/artikler/rem-frisorinnredning-/-frisorutstyr"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
@@ -468,22 +484,6 @@
       "source": "Brave Search",
       "title": "'frisørutstyr' items for sale · Tise",
       "url": "https://tise.com/search/tise?country_code=NO&search=fris%C3%B8rutstyr&location_max=country"
-    },
-    {
-      "discovery_query": "frisørutstyr avvikling Norge",
-      "published_at": "2026-04-08T10:46:26",
-      "snippet": "Oppdag profesjonelt frisørutstyr, skjønnhetsutstyr og salongverktøy hos Luminx. Perfekt for frisører, stylister, barbershops og skjønnhetsklinikker.",
-      "source": "Brave Search",
-      "title": "Profesjonelt Frisørutstyr & Skjønnhetsutstyr | Luminx",
-      "url": "https://luminx.no/"
-    },
-    {
-      "discovery_query": "frisørutstyr avvikling Norge",
-      "published_at": null,
-      "snippet": "Utmerket service ✓ Rask bestilling ✓ Topp merker ✓ Utforsk vårt store utvalg av frisørutstyr og finn riktig utstyr for din bedrift.",
-      "source": "Brave Search",
-      "title": "Frisørutstyr - kjøp frisørutstyr gunstig hos expondo.no",
-      "url": "https://www.expondo.no/frisoerutstyr/"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -544,18 +544,18 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "published_at": null,
-      "snippet": "Industrisymaskin · <strong>Symaskin av merket Pfaff</strong>. Egner seg til &quot;lettere&quot; prosjekter som feks. kalesjer, presseninger, møbelskinn etc. OBS! 3 faset symaskin! Pris: 16 500,- Pussebord · Demobrukt pussebord. 2 slipebånd · 1 slipekon · 1 frontsliper · 1 børste · 1 pusserondell ·",
-      "source": "Brave Search",
-      "title": "Maskiner Skinnlåven",
-      "url": "https://www.skinnlaaven.no/aktuelt"
-    },
-    {
-      "discovery_query": "industrisymaskin brukt Norge",
-      "published_at": null,
       "snippet": "Her vil du finne de symaskinene (og evt andre maskiner) vi måtte ha inne som andre kunder har byttet inn i et kjøp av nyere og større modell. Vi tilbyr innbytteordning, men som v",
       "source": "Brave Search",
       "title": "Brukte Maskiner - Stofflykke.no",
       "url": "https://www.stofflykke.no/categories/bruktmaskiner"
+    },
+    {
+      "discovery_query": "industrisymaskin brukt Norge",
+      "published_at": null,
+      "snippet": "Industrisymaskin · <strong>Symaskin av merket Pfaff</strong>. Egner seg til &quot;lettere&quot; prosjekter som feks. kalesjer, presseninger, møbelskinn etc. OBS! 3 faset symaskin! Pris: 16 500,- Pussebord · Demobrukt pussebord. 2 slipebånd · 1 slipekon · 1 frontsliper · 1 børste · 1 pusserondell ·",
+      "source": "Brave Search",
+      "title": "Maskiner Skinnlåven",
+      "url": "https://www.skinnlaaven.no/aktuelt"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
