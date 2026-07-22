@@ -1,19 +1,19 @@
 {
-  "excluded_count": 6,
+  "excluded_count": 5,
   "excluded_summary": {
     "generic_unspecified_lot": 5,
-    "low_relevance_goods": 3
+    "low_relevance_goods": 2
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-07-22T12:06:15.622009+00:00",
+  "generated_at": "2026-07-22T12:42:58.425998+00:00",
   "input_count": 25,
   "listing_metadata_enrichment": {
     "enriched_count": 2,
     "error_count": 0,
     "method": "directly observed public listing metadata only; no estimates"
   },
-  "low_relevance_omitted_count": 17,
+  "low_relevance_omitted_count": 18,
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [
     {
@@ -43,7 +43,7 @@
       ],
       "relevance_score": 29,
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 0t 37m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 0t 1m",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
     },
     {
@@ -71,7 +71,7 @@
       ],
       "relevance_score": 23,
       "status": "review_first",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 6t 53m 46s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 19 bud 6t 17m 3s",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
     }
   ],

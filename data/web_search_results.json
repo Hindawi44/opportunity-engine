@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-07-22T12:06:10.709221+00:00",
+  "generated_at": "2026-07-22T12:42:54.504502+00:00",
   "provider": "Brave Search API",
   "request_count": 10,
   "result_count": 100,
@@ -72,18 +72,18 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "published_at": null,
-      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
-      "source": "Brave Search",
-      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
-      "url": "https://www.supersellers.no/katalog"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "published_at": null,
       "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
       "title": "Butikkinnredning | til salgs | FINN Torget",
       "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "published_at": null,
+      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
+      "source": "Brave Search",
+      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
+      "url": "https://www.supersellers.no/katalog"
     },
     {
       "discovery_query": "varelager konkursbo Norge",
@@ -175,11 +175,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Ser du etter arbeidsklær er du havnet på rett sted her hos <strong>Billig-arbeidsklær.no</strong>, hvor vi har et kjempestort utvalg online. Vi har alt fra billige restpartier til de siste nye trends og tendenser.",
+      "published_at": "2026-01-09T18:20:19",
+      "snippet": "<strong>Bedriften tilbyr ikke henting av pakker, så forsendelsen må leveres direkte til deres adresse og innenfor åpningstiden på hverdager</strong>.",
       "source": "Brave Search",
-      "title": "Arbeidsklær | Norges største utvalg | Billige restpartier!",
-      "url": "https://billige-arbeidsklaer.no/arbeidsklaer"
+      "title": "r/norge on Reddit: Hvordan unngå at pakken havner på hentested ved sending til bedrift som privatperson?",
+      "url": "https://www.reddit.com/r/norge/comments/1q8fxot/hvordan_unng%C3%A5_at_pakken_havner_p%C3%A5_hentested_ved/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -191,11 +191,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Zollstok, måleteknikk, lengdemåling, ... restparti (nyvare) Tilstand: ny Tilgjengelig mengde: 4.500 stk. Minimum bestillin... ... Håndlaget tilpasset solsikke snøkule Nummer: GRS1009 Materiale: Harpiks Type: Snøkule... ... Denne glasskubben er et høykvalitets papirvekt. Det er en original gave til bedrifter som kan gis ...",
+      "published_at": "2020-10-03T16:33:09",
+      "snippet": "Storage solutions, warehousing, 3PL, 4PL, WM systems – smart warehousing solutions streamlines your flow of goods and increase your bottom line",
       "source": "Brave Search",
-      "title": "stk produkter | europages",
-      "url": "https://www.europages.no/no/products/stk"
+      "title": "3PL lagerløsninger for din bedrift | ColliCare Logistics Norge",
+      "url": "https://www.collicare.no/en/freight/third-party-logistics"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -204,6 +204,30 @@
       "source": "Brave Search",
       "title": "r/norge on Reddit: Nystartet vs etablert liten bedrift?",
       "url": "https://www.reddit.com/r/norge/comments/1qg43ld/nystartet_vs_etablert_liten_bedrift/"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": null,
+      "snippet": "Ser du etter arbeidsklær er du havnet på rett sted her hos <strong>Billig-arbeidsklær.no</strong>, hvor vi har et kjempestort utvalg online. Vi har alt fra billige restpartier til de siste nye trends og tendenser.",
+      "source": "Brave Search",
+      "title": "Arbeidsklær | Norges største utvalg | Billige restpartier!",
+      "url": "https://billige-arbeidsklaer.no/arbeidsklaer"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": null,
+      "snippet": "Zollstok, måleteknikk, lengdemåling, ... restparti (nyvare) Tilstand: ny Tilgjengelig mengde: 4.500 stk. Minimum bestillin... ... Håndlaget tilpasset solsikke snøkule Nummer: GRS1009 Materiale: Harpiks Type: Snøkule... ... Denne glasskubben er et høykvalitets papirvekt. Det er en original gave til bedrifter som kan gis ...",
+      "source": "Brave Search",
+      "title": "stk produkter | europages",
+      "url": "https://www.europages.no/no/products/stk"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": null,
+      "snippet": "Finn bedriftsinformasjon gratis: adresse, organisasjonsnummer, eiere, ansatte og MVA-status. Komplett bedriftsoppslag for alle norske virksomheter.",
+      "source": "Brave Search",
+      "title": "Sjekk bedrift – Gratis bedriftsoppslag i Norge | orgn.no",
+      "url": "https://www.orgn.no/bedrift"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -220,30 +244,6 @@
       "source": "Brave Search",
       "title": "Rolfs Elektro, Barstølveien 58/Øvre Fergested 1 (2025)",
       "url": "https://findglocal.com/NO/Kristiansand/267093243452936/Rolfs-Elektro"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Finn bedriftsinformasjon gratis: adresse, organisasjonsnummer, eiere, ansatte og MVA-status. Komplett bedriftsoppslag for alle norske virksomheter.",
-      "source": "Brave Search",
-      "title": "Sjekk bedrift – Gratis bedriftsoppslag i Norge | orgn.no",
-      "url": "https://www.orgn.no/bedrift"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
-      "published_at": "2026-06-25T12:03:32",
-      "snippet": "Her finner du alt om å starte og drive bedrift.",
-      "source": "Brave Search",
-      "title": "Bedrift | SpareBank 1 Sør-Norge",
-      "url": "https://www.sparebank1.no/nb/sor-norge/bedrift.html"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "restparti · substantiv · MODERAT BOKMÅLet · genus · nøytrum · ubestemt artikkel · et · FULL BOKMÅLSNORM · BETYDNING OG BRUK · <strong>resterende, ikke solgt parti av varer</strong> · | jf. rest · SITAT · [de skulde få avhendet] hele restpartiet af deres poteter ·",
-      "source": "Brave Search",
-      "title": "restparti - Det Norske Akademis ordbok",
-      "url": "https://naob.no/ordbok/restparti"
     },
     {
       "discovery_query": "kontormøbler avvikling Norge",
@@ -544,18 +544,18 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "published_at": null,
-      "snippet": "Her vil du finne de symaskinene (og evt andre maskiner) vi måtte ha inne som andre kunder har byttet inn i et kjøp av nyere og større modell. Vi tilbyr innbytteordning, men som v",
-      "source": "Brave Search",
-      "title": "Brukte Maskiner - Stofflykke.no",
-      "url": "https://www.stofflykke.no/categories/bruktmaskiner"
-    },
-    {
-      "discovery_query": "industrisymaskin brukt Norge",
-      "published_at": null,
       "snippet": "Industrisymaskin · <strong>Symaskin av merket Pfaff</strong>. Egner seg til &quot;lettere&quot; prosjekter som feks. kalesjer, presseninger, møbelskinn etc. OBS! 3 faset symaskin! Pris: 16 500,- Pussebord · Demobrukt pussebord. 2 slipebånd · 1 slipekon · 1 frontsliper · 1 børste · 1 pusserondell ·",
       "source": "Brave Search",
       "title": "Maskiner Skinnlåven",
       "url": "https://www.skinnlaaven.no/aktuelt"
+    },
+    {
+      "discovery_query": "industrisymaskin brukt Norge",
+      "published_at": null,
+      "snippet": "Her vil du finne de symaskinene (og evt andre maskiner) vi måtte ha inne som andre kunder har byttet inn i et kjøp av nyere og større modell. Vi tilbyr innbytteordning, men som v",
+      "source": "Brave Search",
+      "title": "Brukte Maskiner - Stofflykke.no",
+      "url": "https://www.stofflykke.no/categories/bruktmaskiner"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -568,14 +568,6 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
-      "snippet": "Enten du trenger plassbesparende reoler, store industrireoler eller fleksible systemer for små deler, finner du en løsning hos <strong>FasadENor</strong>. Våre lagerreoler gir bedre oversikt, mer effektiv lagring og et ryddigere arbeidsmiljø.",
-      "source": "Brave Search",
-      "title": "Lagerreoler – Solide Reoler for Lager og Verksted - Fasadenor",
-      "url": "https://fasadenor.no/product-category/lagerreoler/"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "published_at": null,
       "snippet": "Skal du pusse opp på lageret? <strong>Witre tilbyr lagerhyller og pallereolerer som dekker alle behov</strong>. Witre - alt til arbeidsplassen - 50 års erfaring",
       "source": "Brave Search",
       "title": "Lagerinnredning, lagerhyller, pallereoler - stort utvalg",
@@ -584,10 +576,34 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
-      "snippet": "Reolen er også kjent som Electrolux og Høvik-lagerreoler. Den kan leveres åpen, eventuelt med tette rygger og endevegger. Pent brukte gavler, hyller og mellomvegger. Ta kontakt for spørsmål og tilbud. Vi skaffer også nytt, hvis ikke du finner ønsket dimensjon over. Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt. ... Ta kontakt om du ønsker mer informasjon om reolene. Utstyret selges meget prisgunstige og er enkle å montere, demontere, bygge på og bygge om.",
+      "snippet": "<strong>PR Maskin AS 4323 Sandnes Norge</strong>",
       "source": "Brave Search",
-      "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
-      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
+      "title": "Stålreoler, lagerreoler - Verksteds- og lagerinventar - Inventar og Innretning - Produkter",
+      "url": "https://www.maskinregisteret.no/product/search/5017/stalreoler_lagerreoler"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "published_at": null,
+      "snippet": "Kjøp og selg brukte maskiner, kjøretøy, utstyr og overskuddsvarer på Norges største nettauksjon.",
+      "source": "Brave Search",
+      "title": "Lagerreoler og lagerinventar selges samlet",
+      "url": "https://www.auksjonen.no/auksjon/torget/Lagerreoler_og_lagerinventar_selges_samlet/563904"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "published_at": null,
+      "snippet": "Enten du trenger plassbesparende reoler, store industrireoler eller fleksible systemer for små deler, finner du en løsning hos <strong>FasadENor</strong>. Våre lagerreoler gir bedre oversikt, mer effektiv lagring og et ryddigere arbeidsmiljø.",
+      "source": "Brave Search",
+      "title": "Lagerreoler – Solide Reoler for Lager og Verksted - Fasadenor",
+      "url": "https://fasadenor.no/product-category/lagerreoler/"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "published_at": null,
+      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
+      "source": "Brave Search",
+      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
+      "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -600,14 +616,6 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
-      "snippet": "Svart arbeidsstol i god stand selges. Ta kontakt for hjelp eller spørsmål – Epost. Det hele startet med ønske om en løsning for enkelt og sikker oppbevaring av biler. Vi holder til i egne, tidsriktige lokaler i Gjerdrum, km nord. Lagerinnredninger og -utstyr. Finn veibeskrivelse, kontaktinfo, regnskapstall, ledelse, styre og eiere og kunngjøringer. Vi fører produktkategorier som arkivinnredning, resepsjonsdisker, garderobeskap, grenreoler, lagerreoler, pallereoler, plastkasser, trelastreoler, butikkinnredning og verkstedinnredning, samt montasje og HMS sikkerhetskontroll av lager.",
-      "source": "Brave Search",
-      "title": "Reolteknikk – Integrert kjokkenet",
-      "url": "http://sminkebord.ru/reolteknikk/"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "published_at": null,
       "snippet": "I vårt omfattende produktsortiment ... kategoriene under og la deg inspirere i vår store og spennende produktkatalog · <strong>Vi leverer til virksomheter over hele fastlands-Norge, raskt og sikkert</strong>....",
       "source": "Brave Search",
       "title": "Funksjonell lagerinnredning til lager og verksted | Sono",
@@ -616,34 +624,26 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
-      "snippet": "Lagerreoler er uundværlige på enhver virksomheds lager eller hjemme i garagen, værkstedet eller kælderen. <strong>Hos ReolHansen har vi reoler til alle formål og priser, og vi sælger til både erhverv og private</strong>. Forskellige formål kræver ...",
+      "snippet": "<strong>Reolhandling AS</strong> er en bedrift med mer enn 20 års erfaring innen faget og bransjen. Vi leverer nye og brukte lagerinnredning / lagrings systemer/ pallereoler / småvarereoler til alle behov.",
       "source": "Brave Search",
-      "title": "Lagerreol | Køb nye reoler til dit Lager hos Reolhansen",
-      "url": "https://reolhansen.dk/produkt-kategori/lagerreoler-arkivreoler/"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "published_at": "2025-12-29T07:03:58",
-      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
-      "source": "Brave Search",
-      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
-      "url": "https://reolteknikk.no/"
+      "title": "Reolhandling AS - Pallereoler - Småvarereoler - Super 1 2 3 - Brukte reoler i Bergen og omegn",
+      "url": "http://www.reolhandling.no/"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
-      "snippet": "Stabila grovhyllor med hög bärkraft. Perfekta för förvaring av tunga maskiner, verktyg och material. Beställ enkelt online idag!",
+      "snippet": "Reolen er også kjent som Electrolux og Høvik-lagerreoler. Den kan leveres åpen, eventuelt med tette rygger og endevegger. Pent brukte gavler, hyller og mellomvegger. Ta kontakt for spørsmål og tilbud. Vi skaffer også nytt, hvis ikke du finner ønsket dimensjon over. Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt. ... Ta kontakt om du ønsker mer informasjon om reolene. Utstyret selges meget prisgunstige og er enkle å montere, demontere, bygge på og bygge om.",
       "source": "Brave Search",
-      "title": "Lagerreol I Hyller I Oppbevaring til verkstedet I P. Lindberg",
-      "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler/"
+      "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
+      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
-      "snippet": "<strong>PR Maskin AS 4323 Sandnes Norge</strong>",
+      "snippet": "Svart arbeidsstol i god stand selges. Ta kontakt for hjelp eller spørsmål – Epost. Det hele startet med ønske om en løsning for enkelt og sikker oppbevaring av biler. Vi holder til i egne, tidsriktige lokaler i Gjerdrum, km nord. Lagerinnredninger og -utstyr. Finn veibeskrivelse, kontaktinfo, regnskapstall, ledelse, styre og eiere og kunngjøringer. Vi fører produktkategorier som arkivinnredning, resepsjonsdisker, garderobeskap, grenreoler, lagerreoler, pallereoler, plastkasser, trelastreoler, butikkinnredning og verkstedinnredning, samt montasje og HMS sikkerhetskontroll av lager.",
       "source": "Brave Search",
-      "title": "Stålreoler, lagerreoler - Verksteds- og lagerinventar - Inventar og Innretning - Produkter",
-      "url": "https://www.maskinregisteret.no/product/search/5017/stalreoler_lagerreoler"
+      "title": "Reolteknikk – Integrert kjokkenet",
+      "url": "http://sminkebord.ru/reolteknikk/"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -652,22 +652,6 @@
       "source": "Brave Search",
       "title": "Varupartier och konkurslager | Till salu | Blocket",
       "url": "https://www.blocket.se/recommerce/forsale/search?product_category=2.91.3108.363"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "published_at": null,
-      "snippet": "Nor Tekstil AS avd. Biri Nor Tekstil AS avd. Biri Vaskeri Norge",
-      "source": "Brave Search",
-      "title": "Nor Tekstil – Svanemerket",
-      "url": "https://svanemerket.no/miljomerkede-produkter/merkevare/nor-tekstil-465/"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "published_at": null,
-      "snippet": "Nor Tekstil er Norges ledende aktør innen tekstilservice og vaskeritjenester. Vi yter tjenester til helsesektor, hotell, industri-, handels- og servicebedrifter - også på arbeidstøy, sengetøy, matter og mopper.",
-      "source": "Brave Search",
-      "title": "Nor Tekstil",
-      "url": "https://www.nortekstil.no/"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -680,6 +664,14 @@
     {
       "discovery_query": "konkurslager tekstil Norge",
       "published_at": null,
+      "snippet": "Nor Tekstil er Norges ledende aktør innen tekstilservice og vaskeritjenester. Vi yter tjenester til helsesektor, hotell, industri-, handels- og servicebedrifter - også på arbeidstøy, sengetøy, matter og mopper.",
+      "source": "Brave Search",
+      "title": "Nor Tekstil",
+      "url": "https://www.nortekstil.no/"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "published_at": null,
       "snippet": "Just nu hos Netauktion. Konkurslager från Internetshoppen AB, 157 artiklar. Konkurslager från Internetshoppen AB. Inneh...",
       "source": "Brave Search",
       "title": "Netauktion - Konkurslager från Internetshoppen AB, 157 artiklar",
@@ -687,11 +679,27 @@
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
-      "published_at": null,
-      "snippet": "Konkurslager från alla köp &amp; sälj marknader i Sverige. Hitta billigaste Konkurslager hos AllaAnnonser",
+      "published_at": "2023-04-04T10:32:18",
+      "snippet": "Antall konkurser i tekstilbransjen fortsetter å øke. <strong>I mars ble 12 bedrifter i bransjer slått konkurs</strong>. Hittil i år har 36 virksomheter i bransjen gått over ende. Det er over 50 prosent flere enn i første kvartal i fjor.",
       "source": "Brave Search",
-      "title": "Konkurslager - AllaAnnonser",
-      "url": "https://www.allaannonser.se/konkurslager.html"
+      "title": "(+) Konkurstallet øker",
+      "url": "https://www.tekstilforum.no/konkurser/konkurstallet-oker/902647"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "published_at": null,
+      "snippet": "Nor Tekstil AS avd. Biri Nor Tekstil AS avd. Biri Vaskeri Norge",
+      "source": "Brave Search",
+      "title": "Nor Tekstil – Svanemerket",
+      "url": "https://svanemerket.no/miljomerkede-produkter/merkevare/nor-tekstil-465/"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "published_at": null,
+      "snippet": "<strong>Nor Tekstil, Florø</strong>. 3,007 likes · 3 talking about this · 26 were here. Nor Tekstil er landets ledende leverandør av tekstiltjenester. Vi leverer vaskeritjenester fra våre 25 avdelinger rundt om i Norge.",
+      "source": "Brave Search",
+      "title": "Nor Tekstil | Florø | Facebook",
+      "url": "https://www.facebook.com/nortekstilas/"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -703,27 +711,19 @@
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
-      "published_at": null,
-      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "published_at": "2022-09-05T10:02:35",
+      "snippet": "<strong>I august økte antallet konkurser med 42,9 prosent, sammenlignet med samme måned i fjor</strong>. Antallet ansatte som har mistet jobben som følge av konkurser har økt med hele 51,5 prosent.",
       "source": "Brave Search",
-      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
+      "title": "(+) Sterk økning i antall konkurser",
+      "url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
-      "published_at": "2026-03-17T12:17:00",
-      "snippet": "Siste utvei: <strong>Levere plagget til en tekstilcontainer</strong>. Alle tekstiler, også ødelagte klær, kan leveres i tekstilcontainerne som står sammen med glass- og metallcontainerne. Husk å levere tørt og rent i en plastpose!",
+      "published_at": "2024-02-26T10:41:32",
+      "snippet": "<strong>Renewcell, vinner av Nordisk Råds miljøpris 2023, står overfor finansielle utfordringer</strong>. Selskapet, støttet av H&amp;M og Girindus, har ikke klart å sikre tilstrekkelig finansiering.",
       "source": "Brave Search",
-      "title": "Hit skal alle klærne - også de hullete sokkene dine",
-      "url": "https://www.klimaoslo.no/hvor-skal-du-levere-odelagte-klaer/"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "published_at": null,
-      "snippet": "Les siste nyheter og artikler om Konkurser i Norge på E24.",
-      "source": "Brave Search",
-      "title": "Konkurser i Norge",
-      "url": "https://e24.no/hendelse/konkurser-i-norge"
+      "title": "Renewcell klarte ikke sikre nok finansiering",
+      "url": "https://www.tekstilforum.no/konkurs-resirkulering/renewcell-begjaerer-seg-konkurs/1003464"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -759,11 +759,11 @@
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
-      "published_at": null,
-      "snippet": "<strong>Butikk og mottak er i Høgdaveien 1-3 i Vestby</strong>. Vi ønsker også å gi mennesker en ny sjanse i form av arbeidstrening og sysselsetting, derfor kan du treffe mennesker i forskjellige livssituasjoner i arbeid hos oss.",
+      "published_at": "2026-02-26T18:19:57",
+      "snippet": "AVSLUTTES: Det drives nå avsluttende utsalg av fra butikklokalet til <strong>Poulssons Interiørtekstil</strong>. Foto: Erik Munsterhjelm ... Etter Poulsson Interiørtekstil-konkursen ble varelager og inventar solgt videre.",
       "source": "Brave Search",
-      "title": "Gjenbruksfabrikken | Brukthandel | Stasjonsveien 1, 1570, Ryggebyen, Norway",
-      "url": "https://www.gjenbruksfabrikken.no/"
+      "title": "Opphørssalg, Tønsberg | Dørene måtte stenges for et par uker siden – nå kan det igjen handles her",
+      "url": "https://www.tb.no/dorene-matte-stenges-for-et-par-uker-siden-na-kan-det-igjen-handles-her/s/5-76-2797970"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -772,14 +772,6 @@
       "source": "Brave Search",
       "title": "Vareparti og konkursbo | til salgs | FINN Torget",
       "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "published_at": "2026-02-26T18:19:57",
-      "snippet": "AVSLUTTES: Det drives nå avsluttende utsalg av fra butikklokalet til <strong>Poulssons Interiørtekstil</strong>. Foto: Erik Munsterhjelm ... Etter Poulsson Interiørtekstil-konkursen ble varelager og inventar solgt videre.",
-      "source": "Brave Search",
-      "title": "Opphørssalg, Tønsberg | Dørene måtte stenges for et par uker siden – nå kan det igjen handles her",
-      "url": "https://www.tb.no/dorene-matte-stenges-for-et-par-uker-siden-na-kan-det-igjen-handles-her/s/5-76-2797970"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -804,6 +796,14 @@
       "source": "Brave Search",
       "title": "Varer fra Showroom, 2-sorterings og restsalg – ombygning",
       "url": "https://www.supersellers.dk/brugt-lager"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "published_at": "2020-05-01T15:30:26",
+      "snippet": "– <strong>Vi har kjøpt varelager, inventar, utstyr og varemerker og skal drive butikkene videre i en måned for å rydde opp og holde opphørssalg</strong>, sier Jan Egil Flo til Tekstilforum. - Hva som skjer videre er ikke avklart.",
+      "source": "Brave Search",
+      "title": "Flo kjøper Brandstad og Wagner",
+      "url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324"
     }
   ],
   "schema_version": 1
