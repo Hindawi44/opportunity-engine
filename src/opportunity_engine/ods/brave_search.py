@@ -53,7 +53,24 @@ class BraveSearchClient:
             "User-Agent": "Opportunity-Engine/1.0 (authorized-search)",
         }
 
-    def search(self, query: str, *, count: int = 10, country: str = "NO", search_lang: str = "no") -> list[dict[str, object]]:
+    def search(
+        self,
+        query: str,
+        *,
+        count: int = 10,
+        country: str = "NO",
+        search_lang: str = "nb",
+    ) -> list[dict[str, object]]:
+        """Run a conservative Brave web search.
+
+        Brave returns HTTP 422 when one or more optional enum parameters are not
+        accepted for an account/API version. To keep the first production path
+        reliable, only the documented required query and bounded count are sent.
+        Norway targeting remains in the Norwegian query text itself. The country
+        and search_lang arguments are retained for backward compatibility and can
+        be re-enabled after a dedicated compatibility test.
+        """
+        del country, search_lang
         query = query.strip()
         if not query:
             raise ValueError("query must not be empty")
@@ -62,11 +79,6 @@ class BraveSearchClient:
         params = urlencode({
             "q": query,
             "count": count,
-            "country": country,
-            "search_lang": search_lang,
-            "safesearch": "moderate",
-            "text_decorations": "false",
-            "spellcheck": "true",
         })
         payload = self.transport(f"{self.base_url}?{params}", self.timeout, self.headers)
         return parse_brave_results(payload)
