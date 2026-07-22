@@ -48,6 +48,11 @@ class OpportunityDiscoveryEngine:
         reasons: list[str] = []
         warnings: list[str] = []
 
+        # The base scoring engine already evaluates observable quality, resale,
+        # logistics, confidence and known risk. Discovery adds verified evidence,
+        # but must never erase a valid preliminary score merely because economics
+        # are still incomplete.
+        preliminary_floor = max(0.0, min(score.total_score, 59.0))
         points += min(35.0, score.total_score * 0.35)
         reasons.append(f"درجة جودة الفرصة الأساسية {score.total_score:.0f}/100.")
 
@@ -98,8 +103,13 @@ class OpportunityDiscoveryEngine:
         else:
             warnings.append("موثوقية البائع غير متحققة.")
 
+        # Missing evidence is a reason to withhold a buy recommendation, not a
+        # proven commercial loss. Keep it visible without subtracting the entire
+        # preliminary score a second time.
         if decision.blockers:
-            points -= min(30.0, len(decision.blockers) * 6.0)
+            warnings.append("توجد فجوات أدلة تمنع إصدار قرار شراء آمن.")
+
+        points = max(points, preliminary_floor)
         if decision.decision == "reject":
             points = min(points, 39.0)
         elif not decision.is_actionable:
