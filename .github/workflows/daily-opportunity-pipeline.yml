@@ -34,6 +34,8 @@ jobs:
           python-version: "3.11"
       - name: Build source coverage report
         run: python scripts/build_source_coverage_report.py
+      - name: Collect official police auction-event leads
+        run: python scripts/build_public_auction_event_leads.py --output data/public_auction_event_leads.json --limit 10
       - name: Generate today's opportunities
         run: python scripts/run_daily_pipeline.py --finn-rows 100 --output data/todays_opportunities.json
       - name: Diagnose empty Auksjonen result
@@ -53,10 +55,10 @@ jobs:
       - name: Build separated sale and bankruptcy channels
         run: python scripts/build_opportunity_channels_report.py --actionable data/top5_opportunities.json --output data/opportunity_channels.json --limit 5
       - name: Build transparent per-source funnel
-        run: python scripts/build_source_funnel_report.py --coverage data/source_coverage.json --snapshot data/todays_opportunities.json --channels data/opportunity_channels.json --output data/source_funnel.json
+        run: python scripts/build_source_funnel_report.py --coverage data/source_coverage.json --snapshot data/todays_opportunities.json --channels data/opportunity_channels.json --event-leads data/public_auction_event_leads.json --output data/source_funnel.json
       - name: Commit changed snapshots
         run: |
-          FILES="data/source_coverage.json data/source_funnel.json data/todays_opportunities.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json"
+          FILES="data/source_coverage.json data/source_funnel.json data/public_auction_event_leads.json data/todays_opportunities.json data/opportunity_review_queue.json data/listing_metadata_evidence.json data/market_evidence_discovery_queue.json data/opportunity_evidence.json data/economic_evaluation_queue.json data/top5_opportunities.json data/opportunity_channels.json"
           if [ -z "$(git status --porcelain -- $FILES)" ]; then
             echo "No opportunity data changes"
             exit 0

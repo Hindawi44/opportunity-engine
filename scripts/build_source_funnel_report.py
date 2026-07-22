@@ -22,6 +22,8 @@ def _source_from_item(item: dict[str, object]) -> str | None:
     host = urlparse(str(item.get("url") or "")).netloc.casefold()
     if "auksjonen" in host:
         return "Auksjonen.no"
+    if "politiet.no" in host:
+        return "Politiet.no"
     if "finn.no" in host:
         return "FINN.no"
     if "konkurskupp" in host:
@@ -52,13 +54,30 @@ def build_payload(
     coverage: dict[str, object],
     snapshot: dict[str, object],
     channels: dict[str, object],
+    event_leads: dict[str, object] | None = None,
 ) -> dict[str, object]:
     fetched = snapshot.get("sources", {})
-    fetched = fetched if isinstance(fetched, dict) else {}
+    fetched = dict(fetched) if isinstance(fetched, dict) else {}
     errors = snapshot.get("source_errors", {})
-    errors = errors if isinstance(errors, dict) else {}
+    errors = dict(errors) if isinstance(errors, dict) else {}
+    event_leads = event_leads or {}
+    event_source = str(event_leads.get("source") or "").strip()
+    if event_source:
+        fetched[event_source] = int(event_leads.get("fetched_count", 0) or 0)
+        event_error = str(event_leads.get("error") or "").strip()
+        if event_error:
+            errors[event_source] = event_error
+
     actionable = _selected_counts(channels, "actionable_opportunities")
     bankruptcy = _selected_counts(channels, "bankruptcy_leads")
+    event_selected: dict[str, int] = {}
+    event_items = event_leads.get("items", [])
+    if isinstance(event_items, list):
+        for item in event_items:
+            if isinstance(item, dict):
+                source = _source_from_item(item)
+                if source:
+                    event_selected[source] = event_selected.get(source, 0) + 1
 
     rows: list[dict[str, object]] = []
     source_configs = coverage.get("sources", [])
@@ -94,6 +113,7 @@ def build_payload(
                 "fetched": fetched_count,
                 "actionable_selected": actionable.get(source, 0),
                 "bankruptcy_leads_selected": bankruptcy.get(source, 0),
+                "public_auction_event_leads_selected": event_selected.get(source, 0),
                 "error": error,
                 "required_configuration": config.get("required_configuration", []),
                 "note": config.get("note"),
@@ -101,7 +121,7 @@ def build_payload(
         )
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
         "summary": {
@@ -130,10 +150,16 @@ def main() -> int:
     parser.add_argument("--coverage", default="data/source_coverage.json")
     parser.add_argument("--snapshot", default="data/todays_opportunities.json")
     parser.add_argument("--channels", default="data/opportunity_channels.json")
+    parser.add_argument("--event-leads", default="data/public_auction_event_leads.json")
     parser.add_argument("--output", default="data/source_funnel.json")
     args = parser.parse_args()
 
-    payload = build_payload(_read(args.coverage), _read(args.snapshot), _read(args.channels))
+    payload = build_payload(
+        _read(args.coverage),
+        _read(args.snapshot),
+        _read(args.channels),
+        _read(args.event_leads),
+    )
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
