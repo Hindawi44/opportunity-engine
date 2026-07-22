@@ -15,6 +15,7 @@ def load_module(name: str, path: Path):
 
 registry = load_module("opportunity_registry", ROOT / "scripts" / "build_opportunity_registry.py")
 health = load_module("discovery_health", ROOT / "scripts" / "build_discovery_health_report.py")
+gaps = load_module("source_gap_matrix", ROOT / "scripts" / "build_source_gap_matrix.py")
 
 
 def test_registry_deduplicates_and_preserves_first_seen():
@@ -36,13 +37,58 @@ def test_registry_marks_missing_items_without_deleting_history():
     assert payload["records"][0]["lifecycle_status"] == "NOT_SEEN_THIS_RUN"
 
 
-def test_health_degrades_when_a_source_fails():
+def test_health_reads_source_funnel_and_degrades_when_active_source_fails():
     payload = health.build_health(
         {"status": "SUCCESS", "stages": [{"name": "x", "status": "SUCCESS", "exit_code": 0}]},
-        {"sources": {"A": {"available": True}, "B": {"available": False, "error": "missing secret"}}},
+        {"sources": [
+            {"source": "A", "active": True, "configured": True, "status": "collecting", "fetched": 4},
+            {"source": "B", "active": True, "configured": True, "status": "failed", "fetched": 0, "error": "timeout"},
+            {"source": "C", "active": False, "configured": False, "status": "awaiting_authorized_configuration", "required_configuration": ["TOKEN"]},
+        ]},
         {"record_count": 4, "status_counts": {"SCORED": 4}},
         "now",
     )
+    assert payload["source_count"] == 3
     assert payload["overall_health"] == "DEGRADED"
     assert payload["failed_source_count"] == 1
     assert payload["registry_record_count"] == 4
+    assert next(item for item in payload["sources"] if item["source"] == "B")["health"] == "FAILED"
+    assert next(item for item in payload["sources"] if item["source"] == "C")["health"] == "BLOCKED"
+
+
+def test_healthy_is_impossible_when_enabled_source_has_error():
+    payload = health.build_health(
+        {"status": "SUCCESS", "stages": []},
+        {"sources": [{"source": "A", "active": True, "configured": True, "status": "collecting", "error": "403"}]},
+        {},
+        "now",
+    )
+    assert payload["overall_health"] != "HEALTHY"
+
+
+def test_gap_matrix_uses_only_official_statuses():
+    plan = {"markets": [{"market": "Norway", "sources": [
+        {"source": "A", "priority": 1, "audit_status": "ACTIVE"},
+        {"source": "B", "priority": 2, "audit_status": "BLOCKED_AUTH"},
+        {"source": "C", "priority": 3, "audit_status": "PLANNED"},
+        {"source": "D", "priority": 4, "audit_status": "DEPRECATED"},
+    ]}]}
+    funnel = {"sources": [
+        {"source": "A", "active": True, "configured": True, "fetched": 10},
+        {"source": "B", "active": False, "configured": False, "required_configuration": ["KEY"]},
+    ]}
+    payload = gaps.build_matrix(plan, funnel, "now")
+    statuses = {row["status"] for row in payload["sources"]}
+    assert statuses <= gaps.ALLOWED
+    assert payload["status_counts"]["ACTIVE"] == 1
+    assert payload["status_counts"]["BLOCKED_AUTH"] == 1
+    assert payload["status_counts"]["PLANNED"] == 1
+    assert payload["status_counts"]["DEPRECATED"] == 1
+
+
+def test_configured_but_inactive_source_is_code_ready():
+    status = gaps.classify(
+        {"source": "X", "audit_status": "PLANNED"},
+        {"source": "X", "configured": True, "active": False, "required_configuration": []},
+    )
+    assert status == "CODE_READY"

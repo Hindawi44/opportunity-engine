@@ -24,7 +24,48 @@ def status_label(status: str) -> str:
     return "FAILED"
 
 
-def build_health(pipeline: dict, coverage: dict, registry: dict, generated_at: str) -> dict:
+def _source_rows(source_funnel: dict) -> list[dict]:
+    raw_sources = source_funnel.get("sources", [])
+    if not isinstance(raw_sources, list):
+        return []
+
+    rows: list[dict] = []
+    for item in raw_sources:
+        if not isinstance(item, dict):
+            continue
+        active = bool(item.get("active"))
+        configured = bool(item.get("configured"))
+        error = item.get("error")
+        fetched = int(item.get("fetched") or 0)
+        status = str(item.get("status") or "unknown")
+
+        # A configured, active source must not be reported healthy when it errors
+        # or when its status explicitly indicates failure.
+        failed = active and configured and (
+            bool(error) or status.lower() in {"failed", "error", "unavailable"}
+        )
+        if failed:
+            health = "FAILED"
+        elif active and configured:
+            health = "HEALTHY"
+        else:
+            health = "BLOCKED" if "awaiting" in status.lower() else "INACTIVE"
+
+        rows.append({
+            "source": item.get("source"),
+            "status": status,
+            "health": health,
+            "active": active,
+            "configured": configured,
+            "item_count": fetched,
+            "error": error,
+            "required_configuration": item.get("required_configuration", []),
+            "access_mode": item.get("access_mode"),
+        })
+    return rows
+
+
+def build_health(pipeline: dict, source_funnel: dict, registry: dict, generated_at: str) -> dict:
     stages = []
     raw_stages = pipeline.get("stages", [])
     if isinstance(raw_stages, list):
@@ -40,32 +81,15 @@ def build_health(pipeline: dict, coverage: dict, registry: dict, generated_at: s
                 "finished_at": item.get("finished_at"),
             })
 
-    source_rows = []
-    sources = coverage.get("sources", {})
-    if isinstance(sources, dict):
-        for name, value in sorted(sources.items()):
-            if isinstance(value, dict):
-                available = bool(value.get("available", value.get("configured", True)))
-                error = value.get("error")
-                count = value.get("count", value.get("listing_count"))
-            else:
-                available, error, count = True, None, value
-            source_rows.append({
-                "source": name,
-                "health": "HEALTHY" if available and not error else "FAILED",
-                "available": available,
-                "item_count": count,
-                "error": error,
-            })
-
+    source_rows = _source_rows(source_funnel)
     pipeline_status = str(pipeline.get("status") or "UNKNOWN")
     failed_sources = sum(1 for item in source_rows if item["health"] == "FAILED")
     overall = status_label(pipeline_status)
-    if overall == "HEALTHY" and failed_sources:
-        overall = "DEGRADED"
+    if failed_sources:
+        overall = "DEGRADED" if overall == "HEALTHY" else overall
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": generated_at,
         "overall_health": overall,
         "pipeline_status": pipeline_status,
@@ -83,13 +107,13 @@ def build_health(pipeline: dict, coverage: dict, registry: dict, generated_at: s
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pipeline-status", default="data/pipeline_run_status.json")
-    parser.add_argument("--coverage", default="data/source_coverage.json")
+    parser.add_argument("--source-funnel", default="data/source_funnel.json")
     parser.add_argument("--registry", default="data/opportunity_registry.json")
     parser.add_argument("--output", default="data/discovery_health.json")
     args = parser.parse_args()
     payload = build_health(
         load_object(Path(args.pipeline_status)),
-        load_object(Path(args.coverage)),
+        load_object(Path(args.source_funnel)),
         load_object(Path(args.registry)),
         datetime.now(timezone.utc).isoformat(),
     )

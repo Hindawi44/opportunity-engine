@@ -1,36 +1,37 @@
 {
-  "schema_version": 1,
-  "phase": "source_expansion_before_economic_ranking",
-  "completion_rule": "Do not declare this phase complete until every required source is either collecting verified records or explicitly documented as blocked by required authorized access.",
+  "schema_version": 2,
+  "phase": "source_coverage_audit_and_gap_closure",
+  "economic_ranking_policy": "enabled_for_verified_records_only",
+  "completion_rule": "A source is complete when it is ACTIVE with verified records, CODE_READY with documented activation requirements, BLOCKED_AUTH with explicit authorized-access requirements, or deliberately classified as PLANNED or DEPRECATED.",
   "markets": [
     {
       "market": "Norway",
       "sources": [
-        {"source": "Auksjonen.no", "priority": 1, "target_status": "collecting", "current_status": "collecting"},
-        {"source": "FINN.no", "priority": 2, "target_status": "collecting", "current_status": "awaiting_authorized_configuration"},
-        {"source": "Konkurs.app", "priority": 3, "target_status": "collecting", "current_status": "collecting", "channel": "bankruptcy_lead"},
-        {"source": "Konkurskupp", "priority": 4, "target_status": "collecting", "current_status": "awaiting_authorized_configuration"},
-        {"source": "Bjarøy", "priority": 5, "target_status": "collecting", "current_status": "awaiting_authorized_configuration"},
-        {"source": "Konkursbo", "priority": 6, "target_status": "collecting", "current_status": "planned"},
-        {"source": "Politiet.no", "priority": 7, "target_status": "collecting", "current_status": "collecting", "channel": "public_auction_event_lead"},
-        {"source": "Kommuner", "priority": 8, "target_status": "collecting", "current_status": "planned"},
-        {"source": "Tolletaten", "priority": 9, "target_status": "collecting", "current_status": "planned"},
-        {"source": "Bank auctions", "priority": 10, "target_status": "collecting", "current_status": "planned"}
+        {"source": "Auksjonen.no", "priority": 1, "audit_status": "ACTIVE"},
+        {"source": "FINN.no", "priority": 2, "audit_status": "BLOCKED_AUTH"},
+        {"source": "Konkurs.app", "priority": 3, "audit_status": "ACTIVE", "channel": "bankruptcy_lead"},
+        {"source": "Konkurskupp", "priority": 4, "audit_status": "BLOCKED_AUTH"},
+        {"source": "Bjarøy", "priority": 5, "audit_status": "BLOCKED_AUTH"},
+        {"source": "Konkursbo", "priority": 6, "audit_status": "PLANNED"},
+        {"source": "Politiet.no", "priority": 7, "audit_status": "ACTIVE", "channel": "public_auction_event_lead"},
+        {"source": "Kommuner", "priority": 8, "audit_status": "PLANNED"},
+        {"source": "Tolletaten", "priority": 9, "audit_status": "PLANNED"},
+        {"source": "Bank auctions", "priority": 10, "audit_status": "PLANNED"}
       ]
     },
     {
       "market": "Sweden",
       "sources": [
-        {"source": "PS Auction", "priority": 11, "target_status": "collecting", "current_status": "planned"},
-        {"source": "Klaravik", "priority": 12, "target_status": "collecting", "current_status": "planned"},
-        {"source": "Blinto", "priority": 13, "target_status": "collecting", "current_status": "planned"}
+        {"source": "PS Auction", "priority": 11, "audit_status": "PLANNED"},
+        {"source": "Klaravik", "priority": 12, "audit_status": "PLANNED"},
+        {"source": "Blinto", "priority": 13, "audit_status": "PLANNED"}
       ]
     },
     {
       "market": "Denmark",
       "sources": [
-        {"source": "Campen Auktioner", "priority": 14, "target_status": "collecting", "current_status": "planned"},
-        {"source": "Danish liquidation auctions", "priority": 15, "target_status": "collecting", "current_status": "planned"}
+        {"source": "Campen Auktioner", "priority": 14, "audit_status": "PLANNED"},
+        {"source": "Danish liquidation auctions", "priority": 15, "audit_status": "PLANNED"}
       ]
     }
   ],
@@ -38,7 +39,8 @@
     "Use only public documented endpoints, public pages that permit access, or explicitly authorized feeds/APIs.",
     "Never invent price, stock, availability, profit or ROI.",
     "Keep sale listings, bankruptcy leads and auction-event leads in separate channels.",
-    "A source counts as collecting only when fetched_count is greater than zero and there is no source error.",
-    "Economic ranking starts only after this source-expansion phase is formally completed."
+    "Economic evaluation and ranking may run only for records whose required evidence is verified.",
+    "Source expansion must not block safe evaluation of already verified records.",
+    "No automatic purchase, bid or external financial action is permitted."
   ]
 }
