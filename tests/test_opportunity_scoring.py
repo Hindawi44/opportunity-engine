@@ -51,7 +51,7 @@ def test_strong_complete_opportunity_scores_high() -> None:
     assert score.risk_penalty == 0
 
 
-def test_missing_data_and_blockers_reduce_score() -> None:
+def test_missing_data_and_blockers_preserve_preliminary_listing_score() -> None:
     score = OpportunityScoringEngine().score(
         _opportunity(missing=("city", "ends_at", "fee_text"), city=None),
         _decision(
@@ -60,12 +60,42 @@ def test_missing_data_and_blockers_reduce_score() -> None:
             roi=None,
             confidence="insufficient",
             blockers=("market_comparables", "cost:transport_nok"),
+            warnings=("market evidence missing", "transport missing"),
             actionable=False,
         ),
     )
-    assert score.total_score <= 59
+    assert 0 < score.total_score <= 59
     assert score.grade in {"D", "E"}
-    assert score.risk_penalty > 0
+    assert score.financial_score == 0
+    assert score.confidence_score == 0
+    assert score.resale_score > 0
+    assert score.logistics_score > 0
+    assert score.risk_penalty <= 12
+
+
+def test_many_evidence_blockers_do_not_erase_observable_asset_quality() -> None:
+    score = OpportunityScoringEngine().score(
+        _opportunity(title="Butikkinnredning og kontorstoler", missing=("ends_at",)),
+        _decision(
+            decision="monitor",
+            profit=None,
+            roi=None,
+            confidence="insufficient",
+            blockers=(
+                "market_comparables",
+                "total_cost_nok",
+                "cost:transport_nok",
+                "cost:dismantling_nok",
+                "cost:auction_fee_nok",
+                "cost:condition_and_missing_parts",
+            ),
+            warnings=("missing market evidence",) * 10,
+            actionable=False,
+        ),
+    )
+    assert score.total_score > 0
+    assert score.resale_score >= 13
+    assert score.risk_penalty == 12
 
 
 def test_reject_score_is_capped_below_monitor_threshold() -> None:
