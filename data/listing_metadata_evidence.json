@@ -1,21 +1,10 @@
 {
-  "enriched_count": 3,
+  "enriched_count": 2,
   "error_count": 0,
   "errors": {},
   "evidence": {
-    "unified-auksjonen-610671": {
-      "captured_at": "2026-07-22T10:28:56.786023+00:00",
-      "observed": {
-        "asking_price_nok": 0.0,
-        "city": "Mathopen",
-        "ends_at": "1785517560000"
-      },
-      "source": "Auksjonen.no public listing page",
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
-      "verified": true
-    },
     "unified-auksjonen-611253": {
-      "captured_at": "2026-07-22T10:28:55.558786+00:00",
+      "captured_at": "2026-07-22T10:45:41.877515+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1784810640000"
@@ -25,7 +14,7 @@
       "verified": true
     },
     "unified-auksjonen-612667": {
-      "captured_at": "2026-07-22T10:28:56.298866+00:00",
+      "captured_at": "2026-07-22T10:45:42.522092+00:00",
       "observed": {
         "city": "Kristiansand s",
         "ends_at": "1784746800000"
@@ -35,6 +24,6 @@
       "verified": true
     }
   },
-  "generated_at": "2026-07-22T10:28:56.786042+00:00",
+  "generated_at": "2026-07-22T10:45:42.522114+00:00",
   "schema_version": 2
 }

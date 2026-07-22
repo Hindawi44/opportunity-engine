@@ -1,5 +1,5 @@
 {
-  "evaluation_count": 3,
+  "evaluation_count": 2,
   "evaluations": [
     {
       "asking_price_nok": 3400.0,
@@ -30,7 +30,7 @@
       "opportunity_id": "unified-auksjonen-611253",
       "priority": 1,
       "roi_percent": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 2t 15m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 1t 58m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
     },
@@ -63,47 +63,14 @@
       "opportunity_id": "unified-auksjonen-612667",
       "priority": 1,
       "roi_percent": null,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 17 bud 8t 31m 7s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 17 bud 8t 14m 21s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
-    },
-    {
-      "asking_price_nok": 0.0,
-      "conservative_resale_value_nok": null,
-      "decision": "EVIDENCE_REQUIRED",
-      "evidence": {
-        "auction_fee_nok": null,
-        "dismantling_cost_nok": null,
-        "market_comparables_nok": [],
-        "other_costs_nok": null,
-        "repair_cost_nok": null,
-        "storage_cost_nok": null,
-        "transport_cost_nok": null,
-        "vat_nok": null
-      },
-      "expected_profit_nok": null,
-      "maximum_safe_bid_nok": null,
-      "missing_evidence": [
-        "auction_fee_nok",
-        "dismantling_cost_nok",
-        "other_costs_nok",
-        "repair_cost_nok",
-        "storage_cost_nok",
-        "three_verified_market_comparables",
-        "transport_cost_nok",
-        "vat_nok"
-      ],
-      "opportunity_id": "unified-auksjonen-610671",
-      "priority": 2,
-      "roi_percent": null,
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 0 bud 9d 6t 37m",
-      "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
     }
   ],
-  "evidence_required_count": 3,
+  "evidence_required_count": 2,
   "evidence_source": "data/opportunity_evidence.json",
-  "generated_at": "2026-07-22T10:28:56.948921+00:00",
+  "generated_at": "2026-07-22T10:45:42.661275+00:00",
   "method": "verified-evidence-gated conservative economics; missing values remain null and block recommendations",
   "ready_for_numeric_review_count": 0,
   "schema_version": 2,

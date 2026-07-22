@@ -1,31 +1,5 @@
 {
   "evidence": {
-    "unified-auksjonen-610671": {
-      "auction_fee_nok": null,
-      "dismantling_cost_nok": null,
-      "market_comparables": [],
-      "missing_evidence": [
-        "three_verified_market_comparables",
-        "auction_fee_nok",
-        "vat_status",
-        "vat_nok",
-        "transport_cost_nok",
-        "dismantling_cost_nok",
-        "storage_cost_nok",
-        "repair_cost_nok",
-        "other_costs_nok"
-      ],
-      "opportunity_id": "unified-auksjonen-610671",
-      "other_costs_nok": null,
-      "repair_cost_nok": null,
-      "storage_cost_nok": null,
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 0 bud 9d 6t 37m",
-      "transport_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
-      "vat_nok": null,
-      "vat_status": null,
-      "verified": false
-    },
     "unified-auksjonen-611253": {
       "auction_fee_nok": null,
       "dismantling_cost_nok": null,
@@ -45,7 +19,7 @@
       "other_costs_nok": null,
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 2t 15m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 34 bud 1d 1t 58m",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
       "vat_nok": null,
@@ -71,7 +45,7 @@
       "other_costs_nok": null,
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 17 bud 8t 31m 7s",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 17 bud 8t 14m 21s",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "vat_nok": null,
@@ -79,8 +53,8 @@
       "verified": false
     }
   },
-  "evidence_count": 3,
-  "generated_at": "2026-07-22T10:28:56.897155+00:00",
+  "evidence_count": 2,
+  "generated_at": "2026-07-22T10:45:42.617593+00:00",
   "method": "verified evidence only; unknown values remain null; no estimates are created",
   "schema_version": 1,
   "verified_count": 0

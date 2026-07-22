@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-22T10:28:57.334754+00:00",
+  "generated_at": "2026-07-22T10:45:43.133716+00:00",
   "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
   "schema_version": 2,
   "sources": [
     {
       "access_mode": "public_direct_category_pages",
-      "actionable_selected": 3,
+      "actionable_selected": 2,
       "active": true,
       "bankruptcy_leads_selected": 0,
       "configured": true,
