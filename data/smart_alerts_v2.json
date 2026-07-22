@@ -1,0 +1,13 @@
+{
+  "alert_count": 0,
+  "alerts": [],
+  "generated_at": "2026-07-22T21:08:44.699882+00:00",
+  "policy": {
+    "automatic_bid": false,
+    "automatic_purchase": false,
+    "decision_change_alerts": true,
+    "deduplication": true,
+    "new_strong_only": true
+  },
+  "schema_version": 2
+}

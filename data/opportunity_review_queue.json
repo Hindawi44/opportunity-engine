@@ -6,7 +6,7 @@
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-07-22T20:15:47.651036+00:00",
+  "generated_at": "2026-07-22T21:08:30.023060+00:00",
   "input_count": 25,
   "listing_metadata_enrichment": {
     "enriched_count": 3,
@@ -17,7 +17,7 @@
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [
     {
-      "asking_price_nok": 6100.0,
+      "asking_price_nok": 6500.0,
       "city": "Tønsberg",
       "ends_at": "1784810640000",
       "evidence_needed": [
@@ -29,7 +29,7 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 65 bud",
       "matched_target_terms": [
         "lagerreol",
         "reol"
@@ -43,7 +43,7 @@
       ],
       "relevance_score": 29,
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 65 bud 15t 35m 31s",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
     },
     {
@@ -71,7 +71,7 @@
       ],
       "relevance_score": 14,
       "status": "review_if_capacity",
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 21t 51m",
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
     },
     {
@@ -99,7 +99,7 @@
       ],
       "relevance_score": 14,
       "status": "review_if_capacity",
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 21t 51m",
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
     }
   ],

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T20:16:05.065786+00:00",
+  "generated_at": "2026-07-22T21:08:43.710873+00:00",
   "opportunity_count": 3,
   "policy": {
     "automatic_verification": false,
@@ -13,10 +13,10 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-22T20:15:50.545269+00:00",
+          "captured_at": "2026-07-22T21:08:33.279747+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 65 bud brukt pris Norge",
           "observed_prices_nok": [
             4990.0
           ],
@@ -34,7 +34,7 @@
           "verified": false
         }
       ],
-      "asking_price_nok": 6100.0,
+      "asking_price_nok": 6500.0,
       "candidate_comparable_count": 1,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
@@ -51,7 +51,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 65 bud 15t 35m 31s",
       "verified_market_value_nok": null
     },
     {
@@ -71,7 +71,7 @@
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 21t 51m",
       "verified_market_value_nok": null
     },
     {
@@ -91,7 +91,7 @@
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 21t 51m",
       "verified_market_value_nok": null
     }
   ],

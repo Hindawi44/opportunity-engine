@@ -1,8 +1,10 @@
 {
   "alerts": {
     "alerts": [],
+    "decision_source": "data/decision_intelligence.json",
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-07-22T20:16:05.180065+00:00",
+    "last_scoring_run": "2026-07-22T21:08:43.820568+00:00",
+    "official_decision_field": "final_decision",
     "schema_version": 2,
     "signatures": []
   },
@@ -151,7 +153,7 @@
       ],
       "top_count": 5
     },
-    "generated_at": "2026-07-22T20:16:05.481530+00:00",
+    "generated_at": "2026-07-22T21:08:44.262759+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels; no financial values are invented",
     "schema_version": 1,
     "source_funnel": {
@@ -161,11 +163,11 @@
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-07-22T20:16:05.562065+00:00",
+  "generated_at": "2026-07-22T21:08:44.341847+00:00",
   "opportunities": {
     "actionable_count": 0,
     "candidate_count": 3,
-    "generated_at": "2026-07-22T20:16:05.215844+00:00",
+    "generated_at": "2026-07-22T21:08:43.854951+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -176,12 +178,12 @@
     "actionable_count": 0,
     "buy_review_count": 0,
     "candidate_count": 3,
-    "generated_at": "2026-07-22T20:16:05.180065+00:00",
+    "generated_at": "2026-07-22T21:08:43.820568+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
       {
-        "asking_price_nok": 6100.0,
+        "asking_price_nok": 6500.0,
         "city": "Tønsberg",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -196,7 +198,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud",
+        "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 65 bud",
         "matched_target_terms": [
           "lagerreol",
           "reol"
@@ -244,7 +246,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 61 bud 16t 28m 13s",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 65 bud 15t 35m 31s",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
       },
@@ -310,7 +312,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 22t 44m",
+        "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 21t 51m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
       },
@@ -376,7 +378,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 22t 44m",
+        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 21t 51m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
       }
@@ -386,7 +388,7 @@
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-07-22T20:16:05.528856+00:00",
+    "generated_at": "2026-07-22T21:08:44.308175+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [
