@@ -1,9 +1,9 @@
 {
-  "active_source_count": 2,
-  "configured_source_count": 2,
-  "generated_at": "2026-07-21T22:12:48.498991+00:00",
+  "active_source_count": 3,
+  "configured_source_count": 3,
+  "generated_at": "2026-07-22T07:42:32.643729+00:00",
   "policy": "Only public documented endpoints, public category pages, or explicitly authorized APIs/feeds are used; no access controls are bypassed and no mass harvesting is performed.",
-  "schema_version": 2,
+  "schema_version": 3,
   "sources": [
     {
       "access_mode": "public_direct_category_pages",
@@ -16,6 +16,14 @@
         "varelager"
       ],
       "source": "Auksjonen.no"
+    },
+    {
+      "access_mode": "official_public_page",
+      "active": true,
+      "configured": true,
+      "coverage": "lost-property and bicycle auction discovery directory",
+      "note": "Event-discovery leads only; specific lots, dates and sale availability must be verified from official announcements.",
+      "source": "Politiet.no"
     },
     {
       "access_mode": "authorized_api_only",

@@ -1,0 +1,35 @@
+{
+  "access_mode": "official_public_page",
+  "error": null,
+  "fetched_count": 2,
+  "generated_at": "2026-07-22T07:42:33.300312+00:00",
+  "items": [
+    {
+      "asking_price_nok": null,
+      "channel": "public_auction_event_lead",
+      "city": null,
+      "ends_at": null,
+      "lead_id": "politiet-auction-b5cf1459317e9b43",
+      "source": "Politiet.no",
+      "status": "FOLLOW_UP_EVENT_LEAD",
+      "title": "Nynorsk",
+      "url": "https://www.politiet.no/tjenester/hittegods-nn/",
+      "warning": "Official auction discovery lead only; specific lots, dates and availability must be verified from the linked announcement."
+    },
+    {
+      "asking_price_nok": null,
+      "channel": "public_auction_event_lead",
+      "city": null,
+      "ends_at": null,
+      "lead_id": "politiet-auction-bfe824e3bb512c5b",
+      "source": "Politiet.no",
+      "status": "FOLLOW_UP_EVENT_LEAD",
+      "title": "Se oversikt over auksjoner",
+      "url": "https://www.politiet.no/aktuelt-tall-og-fakta/aktuelt/?tema=134",
+      "warning": "Official auction discovery lead only; specific lots, dates and availability must be verified from the linked announcement."
+    }
+  ],
+  "method": "official public auction-event discovery only; no prices, lots or availability are invented",
+  "schema_version": 1,
+  "source": "Politiet.no"
+}

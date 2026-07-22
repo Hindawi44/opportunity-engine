@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-21T22:12:55.066652+00:00",
+  "generated_at": "2026-07-22T07:42:40.659104+00:00",
   "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
-  "schema_version": 1,
+  "schema_version": 2,
   "sources": [
     {
       "access_mode": "public_direct_category_pages",
@@ -12,8 +12,23 @@
       "error": null,
       "fetched": 45,
       "note": null,
+      "public_auction_event_leads_selected": 0,
       "required_configuration": [],
       "source": "Auksjonen.no",
+      "status": "collecting"
+    },
+    {
+      "access_mode": "official_public_page",
+      "actionable_selected": 0,
+      "active": true,
+      "bankruptcy_leads_selected": 0,
+      "configured": true,
+      "error": null,
+      "fetched": 2,
+      "note": "Event-discovery leads only; specific lots, dates and sale availability must be verified from official announcements.",
+      "public_auction_event_leads_selected": 2,
+      "required_configuration": [],
+      "source": "Politiet.no",
       "status": "collecting"
     },
     {
@@ -25,6 +40,7 @@
       "error": null,
       "fetched": 0,
       "note": null,
+      "public_auction_event_leads_selected": 0,
       "required_configuration": [
         "FINN_API_KEY",
         "FINN_ORG_ID"
@@ -41,6 +57,7 @@
       "error": null,
       "fetched": 0,
       "note": null,
+      "public_auction_event_leads_selected": 0,
       "required_configuration": [
         "KONKURSKUPP_FEED_URL"
       ],
@@ -56,6 +73,7 @@
       "error": null,
       "fetched": 0,
       "note": null,
+      "public_auction_event_leads_selected": 0,
       "required_configuration": [
         "BJAROY_FEED_URL"
       ],
@@ -71,6 +89,7 @@
       "error": null,
       "fetched": 25,
       "note": "Discovery leads only; the public API does not prove that assets are offered for sale.",
+      "public_auction_event_leads_selected": 0,
       "required_configuration": [],
       "source": "Konkurs.app",
       "status": "collecting"
@@ -78,9 +97,9 @@
   ],
   "summary": {
     "awaiting_configuration_count": 3,
-    "collecting_count": 2,
+    "collecting_count": 3,
     "error_count": 0,
-    "fetched_total": 70,
-    "source_count": 5
+    "fetched_total": 72,
+    "source_count": 6
   }
 }

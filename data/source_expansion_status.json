@@ -1,0 +1,167 @@
+{
+  "completion_rule": "Do not declare this phase complete until every required source is either collecting verified records or explicitly documented as blocked by required authorized access.",
+  "economic_ranking_unlocked": false,
+  "generated_at": "2026-07-22T07:42:40.706748+00:00",
+  "phase": "source_expansion_before_economic_ranking",
+  "phase_complete": false,
+  "schema_version": 1,
+  "sources": [
+    {
+      "blocked_by_authorized_access": false,
+      "complete": true,
+      "error": null,
+      "fetched": 45,
+      "market": "Norway",
+      "priority": 1,
+      "source": "Auksjonen.no",
+      "status": "collecting"
+    },
+    {
+      "blocked_by_authorized_access": true,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Norway",
+      "priority": 2,
+      "source": "FINN.no",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": true,
+      "error": null,
+      "fetched": 25,
+      "market": "Norway",
+      "priority": 3,
+      "source": "Konkurs.app",
+      "status": "collecting"
+    },
+    {
+      "blocked_by_authorized_access": true,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Norway",
+      "priority": 4,
+      "source": "Konkurskupp",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "blocked_by_authorized_access": true,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Norway",
+      "priority": 5,
+      "source": "Bjarøy",
+      "status": "awaiting_authorized_configuration"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Norway",
+      "priority": 6,
+      "source": "Konkursbo",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": true,
+      "error": null,
+      "fetched": 2,
+      "market": "Norway",
+      "priority": 7,
+      "source": "Politiet.no",
+      "status": "collecting"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Norway",
+      "priority": 8,
+      "source": "Kommuner",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Norway",
+      "priority": 9,
+      "source": "Tolletaten",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Norway",
+      "priority": 10,
+      "source": "Bank auctions",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Sweden",
+      "priority": 11,
+      "source": "PS Auction",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Sweden",
+      "priority": 12,
+      "source": "Klaravik",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Sweden",
+      "priority": 13,
+      "source": "Blinto",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Denmark",
+      "priority": 14,
+      "source": "Campen Auktioner",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Denmark",
+      "priority": 15,
+      "source": "Danish liquidation auctions",
+      "status": "planned"
+    }
+  ],
+  "summary": {
+    "blocked_source_count": 3,
+    "complete_source_count": 3,
+    "planned_source_count": 9,
+    "remaining_source_count": 12,
+    "required_source_count": 15
+  }
+}
