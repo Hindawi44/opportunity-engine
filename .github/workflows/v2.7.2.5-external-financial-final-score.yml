@@ -50,8 +50,29 @@ jobs:
             exit 1
           fi
 
+      - name: Restore persistent investment memory
+        id: persistence-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/evidence
+            data/investment_files
+            data/opportunity_evidence.json
+          key: opportunity-memory-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            opportunity-memory-${{ github.ref_name }}-
+            opportunity-memory-main-
+
       - name: Create output folders
         run: mkdir -p data/validation data/investment_files data/evidence
+
+      - name: Capture persistence baseline
+        env:
+          PERSISTENCE_CACHE_HIT: ${{ steps.persistence-restore.outputs.cache-hit }}
+        run: |
+          python scripts/run_evidence_persistence_audit.py \
+            --phase baseline \
+            --baseline data/validation/v2.7.3-persistence-baseline.json
 
       - name: Generate fresh opportunity dataset
         run: |
@@ -79,6 +100,8 @@ jobs:
           python scripts/build_external_financial_scores.py \
             --queue data/opportunity_review_queue.json \
             --evidence-dir data/evidence \
+            --existing-evidence data/opportunity_evidence.json \
+            --evidence-output data/opportunity_evidence.json \
             --summary-output data/validation/v2.7.2.5-financial-final-score.json
 
       - name: Mark incomplete economics as evidence required
@@ -86,6 +109,14 @@ jobs:
           python scripts/normalize_incomplete_recommendations.py \
             --scores data/scored_opportunities.json \
             --summary data/validation/v2.7.2.5-financial-final-score.json
+
+      - name: Audit evidence persistence
+        if: always()
+        run: |
+          python scripts/run_evidence_persistence_audit.py \
+            --phase final \
+            --baseline data/validation/v2.7.3-persistence-baseline.json \
+            --output data/validation/v2.7.3-evidence-persistence.json
 
       - name: Print score integration report
         if: always()
@@ -95,12 +126,25 @@ jobs:
           else
             echo "Financial/final score report was not produced."
           fi
+          if [ -f data/validation/v2.7.3-evidence-persistence.json ]; then
+            python -m json.tool data/validation/v2.7.3-evidence-persistence.json
+          fi
+
+      - name: Save persistent investment memory
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/evidence
+            data/investment_files
+            data/opportunity_evidence.json
+          key: opportunity-memory-${{ github.ref_name }}-${{ github.run_id }}
 
       - name: Upload score integration artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v2.7.2.5-external-financial-final-score
+          name: v2.7.3-external-financial-final-score
           path: |
             data/validation/
             data/todays_opportunities.json
