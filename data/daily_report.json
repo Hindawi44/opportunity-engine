@@ -3,7 +3,7 @@
     "alerts": [],
     "decision_source": "data/decision_intelligence.json",
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-07-23T03:44:22.006772+00:00",
+    "last_scoring_run": "2026-07-23T06:12:09.254536+00:00",
     "official_decision_field": "final_decision",
     "schema_version": 2,
     "signatures": []
@@ -153,7 +153,7 @@
       ],
       "top_count": 5
     },
-    "generated_at": "2026-07-23T03:44:22.459470+00:00",
+    "generated_at": "2026-07-23T06:12:09.657097+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels; no financial values are invented",
     "schema_version": 1,
     "source_funnel": {
@@ -163,11 +163,11 @@
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-07-23T03:44:22.534488+00:00",
+  "generated_at": "2026-07-23T06:12:09.736777+00:00",
   "opportunities": {
     "actionable_count": 0,
     "candidate_count": 3,
-    "generated_at": "2026-07-23T03:44:22.039458+00:00",
+    "generated_at": "2026-07-23T06:12:09.289590+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -178,7 +178,7 @@
     "actionable_count": 0,
     "buy_review_count": 0,
     "candidate_count": 3,
-    "generated_at": "2026-07-23T03:44:22.006772+00:00",
+    "generated_at": "2026-07-23T06:12:09.254536+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
@@ -246,7 +246,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 8t 59m 51s",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 6t 32m 6s",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
       },
@@ -312,7 +312,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 15t 15m",
+        "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 12t 48m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
       },
@@ -378,7 +378,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 15t 15m",
+        "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 12t 48m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
       }
@@ -388,7 +388,7 @@
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-07-23T03:44:22.504684+00:00",
+    "generated_at": "2026-07-23T06:12:09.704216+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [

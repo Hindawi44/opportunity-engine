@@ -1,0 +1,21 @@
+{
+  "automatic_bid": false,
+  "automatic_merge_pair_count": 0,
+  "automatic_purchase": false,
+  "generated_at": "2026-07-23T06:12:10.121142+00:00",
+  "input_record_count": 97,
+  "match_counts": {
+    "EXACT_URL": 0,
+    "POSSIBLE_DUPLICATE_REVIEW": 0,
+    "STRONG_FINGERPRINT": 0
+  },
+  "matches": [],
+  "method": "conservative cross-source audit; weak similarity never auto-merges",
+  "possible_duplicate_review_count": 0,
+  "schema_version": 1,
+  "source_names": [
+    "Brave Search",
+    "Politiet.no",
+    "UNKNOWN"
+  ]
+}
