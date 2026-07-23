@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a diagnostic-only audit of selected candidates through External Evidence Loop."""
+"""Run a diagnostic audit of selected candidates through External Evidence Loop."""
 from __future__ import annotations
 
 import argparse
@@ -13,6 +13,7 @@ from opportunity_engine.external_execution_audit import (
     diagnose_candidate,
 )
 from opportunity_engine.investment_file_sync import InvestmentFileSynchronizer
+from opportunity_engine.linked_scenario_generator import LinkedScenarioGeneratorEngine
 from opportunity_engine.living_investment_file import LivingInvestmentFileRepository
 from opportunity_engine.research_candidate import PreliminaryResearchCandidateScorer
 
@@ -38,6 +39,7 @@ def main() -> int:
     repository = LivingInvestmentFileRepository(args.investment_files_dir)
     records: list[CandidateExecutionAudit] = []
     loop = build_loop()
+    loop.scenario_generator = LinkedScenarioGeneratorEngine()
     tracing = TracingSearchProvider(loop.search_provider)
     loop.search_provider = tracing
 
@@ -48,6 +50,7 @@ def main() -> int:
         investment_file = repository.load(candidate.opportunity_id)
         result = loop.run(investment_file)
         repository.save(investment_file)
+        tracing.refresh_price_counts(trace_start)
         traces = tuple(tracing.traces[trace_start:])
         records.append(CandidateExecutionAudit(
             opportunity_id=candidate.opportunity_id,
