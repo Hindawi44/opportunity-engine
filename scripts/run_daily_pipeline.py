@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 from urllib.parse import urljoin
 
+from opportunity_engine.investment_file_sync import InvestmentFileSynchronizer
 from opportunity_engine.ods.auksjonen import AuksjonenClient, parse_auksjonen_listing_page
 from opportunity_engine.ods.bjaroy import BjaroyFeedClient
 from opportunity_engine.ods.daily_pipeline import AutomatedDailyPipeline, DailyPipelineConfig
@@ -125,6 +126,7 @@ def main() -> int:
     parser.add_argument("--finn-rows", type=int, default=30, help="Maximum authorized FINN rows for manual keyword searches")
     parser.add_argument("--output", default="data/todays_opportunities.json")
     parser.add_argument("--alerts-output", default="data/smart_alerts.json")
+    parser.add_argument("--investment-files-dir", default="data/investment_files")
     parser.add_argument(
         "--verified-inputs",
         default=None,
@@ -150,7 +152,17 @@ def main() -> int:
         costs_by_id=costs,
     )
     alerts = SnapshotAlertProcessor().process(args.output, args.alerts_output)
-    response = {**result.__dict__, "alert_count": len(alerts), "alerts_path": args.alerts_output}
+    snapshot = json.loads(Path(args.output).read_text(encoding="utf-8"))
+    investment_sync = InvestmentFileSynchronizer(args.investment_files_dir).sync_payload(snapshot)
+    response = {
+        **result.__dict__,
+        "alert_count": len(alerts),
+        "alerts_path": args.alerts_output,
+        "investment_files_dir": args.investment_files_dir,
+        "investment_files_created": investment_sync.created_count,
+        "investment_files_updated": investment_sync.updated_count,
+        "investment_files_unchanged": investment_sync.unchanged_count,
+    }
     print(json.dumps(response, ensure_ascii=False, sort_keys=True))
     return 0
 
