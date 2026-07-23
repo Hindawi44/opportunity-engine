@@ -32,10 +32,14 @@ def test_real_dataset_validation_counts_kpis_and_duplicates():
     assert report.kpis.unique_opportunities == 1
     assert report.kpis.duplicates_detected == 1
     assert report.kpis.external_research_eligible == 1
+    assert report.kpis.blocked_below_score == 1
     assert report.kpis.accepted_comparables == 2
     assert report.kpis.potential_buyers == 1
     assert report.kpis.opportunities_with_best_scenario == 1
     assert report.kpis.average_internal_score == 61.0
+    assert report.records[0].pipeline_stage_reached == "best_scenario"
+    assert report.records[1].eligibility_reason == "internal_score_below_threshold"
+    assert report.records[1].blocked_before == "external_research"
 
 
 def test_missing_values_remain_missing_and_are_reported():
@@ -43,10 +47,14 @@ def test_missing_values_remain_missing_and_are_reported():
 
     record = report.records[0]
     assert record.internal_score is None
+    assert record.eligibility_reason == "missing_internal_score"
+    assert record.required_score == 60.0
+    assert record.pipeline_stage_reached == "eligibility"
     assert record.comparable_count == 0
     assert record.buyer_count == 0
     assert "opportunity_id" in record.missing_fields
     assert "source_url" in record.missing_fields
+    assert report.kpis.blocked_missing_score == 1
     assert report.kpis.price_coverage_rate == 0.0
     assert report.warnings
 
@@ -62,7 +70,30 @@ def test_explicit_external_eligibility_overrides_score_threshold():
         }]
     )
 
+    record = report.records[0]
     assert report.kpis.external_research_eligible == 1
+    assert record.eligibility_reason == "explicitly_eligible"
+    assert record.required_score == 90
+    assert record.blocked_before == "external_research_results"
+
+
+def test_external_results_without_evidence_are_traced():
+    report = RealOpportunityValidator().validate_payload([
+        {
+            "id": "opp-3",
+            "title": "Equipment lot",
+            "url": "https://example.test/3",
+            "score": 75,
+            "comparables": [{"price": 1000}],
+            "buyers": [{"name": "Buyer"}],
+        }
+    ])
+
+    record = report.records[0]
+    assert record.pipeline_stage_reached == "external_research"
+    assert record.blocked_before == "evidence_persistence"
+    assert report.kpis.reached_external_research == 1
+    assert report.kpis.reached_evidence == 0
 
 
 def test_empty_dataset_produces_zero_rates_without_failure():
