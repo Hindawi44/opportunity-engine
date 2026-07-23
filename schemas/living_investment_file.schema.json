@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Hindawi44/opportunity-engine/schemas/living_investment_file.schema.json",
+  "title": "Living Investment File",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "opportunity_id",
+    "schema_version",
+    "status",
+    "title",
+    "source",
+    "timestamps",
+    "asset",
+    "facts",
+    "assumptions",
+    "evidence",
+    "missing_information",
+    "potential_buyers",
+    "monetization_paths",
+    "small_test",
+    "current_recommendation",
+    "update_history"
+  ],
+  "properties": {
+    "opportunity_id": {"type": "string", "minLength": 1},
+    "schema_version": {"const": "2.5.0"},
+    "status": {
+      "enum": ["discovered", "normalized", "researching", "scenario_ready", "needs_evidence", "monitoring", "archived"]
+    },
+    "title": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "url": {"type": "string", "format": "uri"},
+        "item_id": {"type": ["string", "null"]}
+      }
+    },
+    "timestamps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["first_seen_at", "last_seen_at"],
+      "properties": {
+        "first_seen_at": {"type": "string", "format": "date-time"},
+        "last_seen_at": {"type": "string", "format": "date-time"},
+        "last_analyzed_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "description", "location", "price"],
+      "properties": {
+        "category": {"type": "string"},
+        "description": {"type": "string"},
+        "location": {"type": ["string", "null"]},
+        "quantity": {"type": ["number", "null"], "minimum": 0},
+        "condition": {"type": ["string", "null"]},
+        "seller": {"type": ["string", "null"]},
+        "images": {"type": "array", "items": {"type": "string", "format": "uri"}},
+        "deadline_at": {"type": ["string", "null"], "format": "date-time"},
+        "price": {"$ref": "#/$defs/money"}
+      }
+    },
+    "facts": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "assumptions": {"type": "array", "items": {"$ref": "#/$defs/assumption"}},
+    "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+    "missing_information": {"type": "array", "items": {"$ref": "#/$defs/missingInformation"}},
+    "potential_buyers": {"type": "array", "items": {"$ref": "#/$defs/potentialBuyer"}},
+    "monetization_paths": {"type": "array", "items": {"$ref": "#/$defs/monetizationPath"}},
+    "small_test": {"$ref": "#/$defs/smallTest"},
+    "current_recommendation": {"$ref": "#/$defs/recommendation"},
+    "update_history": {"type": "array", "items": {"$ref": "#/$defs/updateEvent"}}
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency", "value_type"],
+      "properties": {
+        "amount": {"type": ["number", "null"], "minimum": 0},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "value_type": {"enum": ["listed", "estimated", "confirmed", "conservative", "unknown"]}
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "source_url", "collected_at", "confidence", "secondary_verified"],
+      "properties": {
+        "statement": {"type": "string"},
+        "source_url": {"type": "string", "format": "uri"},
+        "collected_at": {"type": "string", "format": "date-time"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "secondary_verified": {"type": "boolean"}
+      }
+    },
+    "assumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "reason", "impact", "verification_method", "status"],
+      "properties": {
+        "statement": {"type": "string"},
+        "reason": {"type": "string"},
+        "impact": {"type": "string"},
+        "verification_method": {"type": "string"},
+        "status": {"enum": ["open", "confirmed", "rejected"]}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_type", "summary", "source_url", "collected_at", "confidence"],
+      "properties": {
+        "evidence_type": {"enum": ["market_price", "demand", "buyer", "transport_cost", "storage_cost", "handling_cost", "legal_tax", "historical_case", "other"]},
+        "summary": {"type": "string"},
+        "source_url": {"type": "string", "format": "uri"},
+        "collected_at": {"type": "string", "format": "date-time"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "missingInformation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "importance", "possible_source", "priority", "blocking"],
+      "properties": {
+        "question": {"type": "string"},
+        "importance": {"type": "string"},
+        "possible_source": {"type": ["string", "null"]},
+        "priority": {"enum": ["low", "medium", "high", "critical"]},
+        "blocking": {"type": "boolean"}
+      }
+    },
+    "potentialBuyer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sector", "buyer_type", "region", "fit_reason", "confidence"],
+      "properties": {
+        "sector": {"type": "string"},
+        "buyer_type": {"type": "string"},
+        "region": {"type": ["string", "null"]},
+        "fit_reason": {"type": "string"},
+        "interest_evidence": {"type": ["string", "null"]},
+        "contact_route": {"type": ["string", "null"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "monetizationPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path_type", "idea", "end_customer", "revenue_model", "capital_required", "expected_costs", "conservative_revenue", "duration_days", "risks", "mitigations", "supporting_evidence", "opposing_evidence", "feasibility_conditions", "first_action"],
+      "properties": {
+        "path_type": {"enum": ["buy_resell", "brokerage", "partnership", "split_lot", "presale", "liquidation_management", "rental_reuse", "other"]},
+        "idea": {"type": "string"},
+        "end_customer": {"type": "string"},
+        "revenue_model": {"type": "string"},
+        "capital_required": {"$ref": "#/$defs/money"},
+        "expected_costs": {"$ref": "#/$defs/money"},
+        "conservative_revenue": {"$ref": "#/$defs/money"},
+        "duration_days": {"type": ["integer", "null"], "minimum": 0},
+        "risks": {"type": "array", "items": {"type": "string"}},
+        "mitigations": {"type": "array", "items": {"type": "string"}},
+        "supporting_evidence": {"type": "array", "items": {"type": "string"}},
+        "opposing_evidence": {"type": "array", "items": {"type": "string"}},
+        "feasibility_conditions": {"type": "array", "items": {"type": "string"}},
+        "first_action": {"type": "string"}
+      }
+    },
+    "smallTest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hypothesis", "action", "budget", "success_criteria", "deadline_at", "status"],
+      "properties": {
+        "hypothesis": {"type": "string"},
+        "action": {"type": "string"},
+        "budget": {"$ref": "#/$defs/money"},
+        "success_criteria": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "deadline_at": {"type": ["string", "null"], "format": "date-time"},
+        "status": {"enum": ["not_started", "running", "passed", "failed", "cancelled"]}
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["best_current_path", "reason", "confidence", "change_triggers", "next_step"],
+      "properties": {
+        "best_current_path": {"type": ["string", "null"]},
+        "reason": {"type": "string"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "change_triggers": {"type": "array", "items": {"type": "string"}},
+        "next_step": {"type": "string"}
+      }
+    },
+    "updateEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["updated_at", "change_type", "changed_fields", "reason", "source", "reanalyzed"],
+      "properties": {
+        "updated_at": {"type": "string", "format": "date-time"},
+        "change_type": {"type": "string"},
+        "changed_fields": {"type": "array", "items": {"type": "string"}},
+        "reason": {"type": "string"},
+        "source": {"type": "string"},
+        "reanalyzed": {"type": "boolean"}
+      }
+    }
+  }
+}
