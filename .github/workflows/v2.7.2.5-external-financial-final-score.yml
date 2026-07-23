@@ -68,7 +68,7 @@ jobs:
 
       - name: Capture persistence baseline
         env:
-          PERSISTENCE_CACHE_HIT: ${{ steps.persistence-restore.outputs.cache-hit }}
+          PERSISTENCE_CACHE_HIT: ${{ steps.persistence-restore.outputs.cache-matched-key != '' }}
         run: |
           python scripts/run_evidence_persistence_audit.py \
             --phase baseline \
