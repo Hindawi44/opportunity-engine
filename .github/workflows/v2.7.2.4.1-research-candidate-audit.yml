@@ -1,0 +1,82 @@
+name: V2.7.2.4.1 Research Candidate Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      opportunity_limit:
+        description: Maximum opportunities to collect and rank
+        required: true
+        default: '20'
+      research_threshold:
+        description: Preliminary research eligibility threshold
+        required: true
+        default: '25'
+      selection_limit:
+        description: Maximum candidates selected for external research
+        required: true
+        default: '3'
+
+permissions:
+  contents: read
+
+jobs:
+  research-candidate-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+      EXTERNAL_RESEARCH_MAX_OPPORTUNITIES: '0'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Verify project import
+        run: python -c "import opportunity_engine; print('Opportunity Engine imports successfully')"
+
+      - name: Create output folders
+        run: mkdir -p data/validation data/investment_files
+
+      - name: Generate fresh real opportunity dataset
+        run: |
+          python scripts/run_daily_pipeline.py \
+            --limit "${{ inputs.opportunity_limit }}" \
+            > data/validation/v2.7.2.4.1-daily-pipeline-run.json
+
+      - name: Run preliminary research candidate audit
+        run: |
+          python scripts/run_research_candidate_audit.py \
+            data/todays_opportunities.json \
+            --threshold "${{ inputs.research_threshold }}" \
+            --limit "${{ inputs.selection_limit }}" \
+            --output data/validation/v2.7.2.4.1-research-candidates.json
+
+      - name: Print research candidates
+        if: always()
+        run: |
+          if [ -f data/validation/v2.7.2.4.1-research-candidates.json ]; then
+            python -m json.tool data/validation/v2.7.2.4.1-research-candidates.json
+          else
+            echo "Research candidate report was not produced."
+          fi
+
+      - name: Upload research candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.7.2.4.1-research-candidate-audit
+          path: |
+            data/validation/
+            data/todays_opportunities.json
+            data/investment_files/
+          if-no-files-found: warn
+          retention-days: 14
