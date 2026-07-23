@@ -80,7 +80,7 @@ class BraveSearchClient:
         return {
             "Accept": "application/json",
             "X-Subscription-Token": self.api_key,
-            "User-Agent": "Opportunity-Engine/2.6.1 (authorized-search)",
+            "User-Agent": "Opportunity-Engine/2.7.2.4.6 (authorized-web-search)",
         }
 
     @property
@@ -104,7 +104,8 @@ class BraveSearchClient:
         """Run one bounded Brave web search and return normalized direct fields.
 
         Brave documents ``q`` as required, with maximum 400 characters / 50 words,
-        and ``count`` as at most 20. Country, language and freshness remain optional.
+        and ``count`` as at most 20. ``result_filter=web`` is explicit so the
+        response contains the ``web.results`` collection consumed by the parser.
         """
         query = " ".join(query.split()).strip()
         if not query:
@@ -121,6 +122,7 @@ class BraveSearchClient:
             "search_lang": search_lang,
             "safesearch": "moderate",
             "spellcheck": "1",
+            "result_filter": "web",
         }
         if freshness:
             params["freshness"] = freshness
