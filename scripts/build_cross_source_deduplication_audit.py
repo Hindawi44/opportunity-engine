@@ -22,10 +22,13 @@ DOMAIN_TO_SOURCE = {
 }
 SOURCE_ALIASES = {
     "auksjonen": "Auksjonen.no",
+    "auksjonen no": "Auksjonen.no",
     "auksjonen.no": "Auksjonen.no",
     "konkurs": "Konkurs.app",
+    "konkurs app": "Konkurs.app",
     "konkurs.app": "Konkurs.app",
     "politiet": "Politiet.no",
+    "politiet no": "Politiet.no",
     "politiet.no": "Politiet.no",
 }
 
