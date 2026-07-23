@@ -1,0 +1,108 @@
+name: V2.7.2.5 External Evidence Financial Final Score
+
+on:
+  workflow_dispatch:
+    inputs:
+      opportunity_limit:
+        description: Maximum opportunities to discover
+        required: true
+        default: '20'
+      research_threshold:
+        description: Preliminary research threshold
+        required: true
+        default: '25'
+      selection_limit:
+        description: Maximum candidates for external research
+        required: true
+        default: '3'
+
+permissions:
+  contents: read
+
+jobs:
+  external-financial-final-score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      BRAVE_MAX_REQUESTS_PER_RUN: '6'
+      BRAVE_CACHE_TTL_HOURS: '0'
+      EXTERNAL_RESEARCH_MAX_OPPORTUNITIES: '0'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Verify Brave secret
+        run: |
+          if [ -z "${BRAVE_API_KEY}" ]; then
+            echo "BRAVE_API_KEY is missing"
+            exit 1
+          fi
+
+      - name: Create output folders
+        run: mkdir -p data/validation data/investment_files data/evidence
+
+      - name: Generate fresh opportunity dataset
+        run: |
+          python scripts/run_daily_pipeline.py \
+            --limit "${{ inputs.opportunity_limit }}" \
+            > data/validation/v2.7.2.5-daily-pipeline-run.json
+
+      - name: Create External Evidence and regenerate scenarios
+        run: |
+          python scripts/run_external_execution_audit.py \
+            data/todays_opportunities.json \
+            --threshold "${{ inputs.research_threshold }}" \
+            --selection-limit "${{ inputs.selection_limit }}" \
+            --output data/validation/v2.7.2.5-external-execution.json
+
+      - name: Build review queue
+        run: |
+          python scripts/build_opportunity_review_queue.py \
+            --snapshot data/todays_opportunities.json \
+            --limit "${{ inputs.opportunity_limit }}" \
+            --output data/opportunity_review_queue.json
+
+      - name: Build Financial Score and Final Investment Score
+        run: |
+          python scripts/build_external_financial_scores.py \
+            --queue data/opportunity_review_queue.json \
+            --evidence-dir data/evidence \
+            --summary-output data/validation/v2.7.2.5-financial-final-score.json
+
+      - name: Print score integration report
+        if: always()
+        run: |
+          if [ -f data/validation/v2.7.2.5-financial-final-score.json ]; then
+            python -m json.tool data/validation/v2.7.2.5-financial-final-score.json
+          else
+            echo "Financial/final score report was not produced."
+          fi
+
+      - name: Upload score integration artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.7.2.5-external-financial-final-score
+          path: |
+            data/validation/
+            data/todays_opportunities.json
+            data/opportunity_review_queue.json
+            data/opportunity_evidence.json
+            data/economic_evaluation_queue.json
+            data/scored_opportunities.json
+            data/investment_files/
+            data/evidence/
+          if-no-files-found: warn
+          retention-days: 14
