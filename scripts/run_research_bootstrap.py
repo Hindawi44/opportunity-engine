@@ -22,6 +22,7 @@ from opportunity_engine.evidence_store import (
 from opportunity_engine.external_evidence_loop import ExternalEvidenceLoop, ResearchNeed
 from opportunity_engine.external_market_comparables import ComparableCandidate, MarketComparablesEngine
 from opportunity_engine.investment_file_sync import InvestmentFileSynchronizer
+from opportunity_engine.landing_page_price import enrich_results_with_landing_page_prices
 from opportunity_engine.living_investment_file import LivingInvestmentFileRepository
 from opportunity_engine.ods.brave_search import BraveSearchClient
 from opportunity_engine.research_bootstrap import ResearchBootstrapPipeline
@@ -87,13 +88,22 @@ def _explicit_price(item: dict[str, Any]) -> float | None:
 
 
 def comparable_adapter(response: Any) -> Iterable[ComparableCandidate]:
-    """Convert Brave records only when an explicit NOK price is available."""
-    rows = response if isinstance(response, list) else []
+    """Convert Brave records only when an explicit NOK price is available.
+
+    Search-result text is checked first. Rows still missing a price are then enriched from
+    a strictly limited set of public HTTPS landing pages before conservative acceptance.
+    """
+    raw_rows = response if isinstance(response, list) else []
+    rows = [item for item in raw_rows if isinstance(item, dict)]
+
+    # Avoid unnecessary page fetches for results whose snippets already contain a price.
+    for item in rows:
+        _explicit_price(item)
+    rows = list(enrich_results_with_landing_page_prices(rows))
+
     now = datetime.now(timezone.utc).isoformat()
     candidates: list[ComparableCandidate] = []
     for item in rows:
-        if not isinstance(item, dict):
-            continue
         price = _explicit_price(item)
         if price is None:
             continue
