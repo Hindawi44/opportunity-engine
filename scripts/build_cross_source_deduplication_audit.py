@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit cross-source duplicates conservatively without automatic external actions."""
+"""Audit official cross-source duplicates conservatively without external actions."""
 from __future__ import annotations
 
 import argparse
@@ -11,6 +11,23 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 TRACKING_KEYS = {"fbclid", "gclid", "ref", "source"}
+OFFICIAL_SOURCES = ("Auksjonen.no", "Konkurs.app", "Politiet.no")
+DOMAIN_TO_SOURCE = {
+    "auksjonen.no": "Auksjonen.no",
+    "www.auksjonen.no": "Auksjonen.no",
+    "konkurs.app": "Konkurs.app",
+    "www.konkurs.app": "Konkurs.app",
+    "politiet.no": "Politiet.no",
+    "www.politiet.no": "Politiet.no",
+}
+SOURCE_ALIASES = {
+    "auksjonen": "Auksjonen.no",
+    "auksjonen.no": "Auksjonen.no",
+    "konkurs": "Konkurs.app",
+    "konkurs.app": "Konkurs.app",
+    "politiet": "Politiet.no",
+    "politiet.no": "Politiet.no",
+}
 
 
 def load_items(path: Path) -> list[dict]:
@@ -44,8 +61,25 @@ def normalize_text(value: object) -> str:
     return re.sub(r"[^a-z0-9æøå]+", " ", str(value or "").casefold()).strip()
 
 
+def official_source_name(item: dict) -> str | None:
+    """Resolve only an official source; Brave Search and unknown labels are excluded."""
+    raw = normalize_text(item.get("source_name") or item.get("source"))
+    if raw in SOURCE_ALIASES:
+        return SOURCE_ALIASES[raw]
+
+    value = item.get("canonical_url") or item.get("url")
+    if isinstance(value, str) and value.strip():
+        host = urlsplit(value.strip()).netloc.casefold()
+        return DOMAIN_TO_SOURCE.get(host)
+    return None
+
+
 def source_name(item: dict) -> str:
-    return str(item.get("source_name") or item.get("source") or "UNKNOWN").strip() or "UNKNOWN"
+    """Compatibility helper used after official-source filtering."""
+    resolved = official_source_name(item)
+    if resolved is None:
+        raise ValueError("Record does not belong to an official audit source")
+    return resolved
 
 
 def record_id(item: dict) -> str:
@@ -98,11 +132,20 @@ def classify(left: dict, right: dict) -> str | None:
 
 def build_audit(groups: list[tuple[str, list[dict]]]) -> dict:
     records: list[dict] = []
+    ignored_record_count = 0
+    source_record_counts = {name: 0 for name in OFFICIAL_SOURCES}
+
     for channel, items in groups:
         for item in items:
+            resolved_source = official_source_name(item)
+            if resolved_source is None:
+                ignored_record_count += 1
+                continue
             enriched = dict(item)
+            enriched["source_name"] = resolved_source
             enriched["_audit_channel"] = channel
             records.append(enriched)
+            source_record_counts[resolved_source] += 1
 
     matches: list[dict] = []
     merged_pairs = 0
@@ -132,12 +175,17 @@ def build_audit(groups: list[tuple[str, list[dict]]]) -> dict:
     counts = {"EXACT_URL": 0, "STRONG_FINGERPRINT": 0, "POSSIBLE_DUPLICATE_REVIEW": 0}
     for item in matches:
         counts[item["match_type"]] += 1
+
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "method": "conservative cross-source audit; weak similarity never auto-merges",
+        "method": "official-source conservative cross-source audit; weak similarity never auto-merges",
+        "official_source_names": list(OFFICIAL_SOURCES),
+        "source_names": list(OFFICIAL_SOURCES),
+        "observed_source_names": [name for name in OFFICIAL_SOURCES if source_record_counts[name] > 0],
+        "source_record_counts": source_record_counts,
         "input_record_count": len(records),
-        "source_names": sorted({source_name(item) for item in records}),
+        "ignored_non_official_record_count": ignored_record_count,
         "match_counts": counts,
         "automatic_merge_pair_count": merged_pairs,
         "possible_duplicate_review_count": review_pairs,
@@ -145,6 +193,14 @@ def build_audit(groups: list[tuple[str, list[dict]]]) -> dict:
         "automatic_purchase": False,
         "automatic_bid": False,
     }
+
+
+def validate_official_sources(payload: dict) -> bool:
+    return (
+        payload.get("source_names") == list(OFFICIAL_SOURCES)
+        and "UNKNOWN" not in payload.get("source_names", [])
+        and "Brave Search" not in payload.get("source_names", [])
+    )
 
 
 def main() -> int:
@@ -159,6 +215,8 @@ def main() -> int:
         ("discovery", load_items(Path(args.discovery))),
         ("public_auction_events", load_items(Path(args.events))),
     ])
+    if not validate_official_sources(payload):
+        raise SystemExit("Cross-source audit is missing one or more official sources")
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
