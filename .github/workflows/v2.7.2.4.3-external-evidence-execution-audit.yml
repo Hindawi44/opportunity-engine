@@ -26,7 +26,7 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}/src
       BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
-      BRAVE_MAX_REQUESTS_PER_RUN: '4'
+      BRAVE_MAX_REQUESTS_PER_RUN: '6'
       BRAVE_CACHE_TTL_HOURS: '0'
       EXTERNAL_RESEARCH_MAX_OPPORTUNITIES: '0'
 
