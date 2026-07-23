@@ -28,15 +28,66 @@ from opportunity_engine.research_bootstrap import ResearchBootstrapPipeline
 from opportunity_engine.scenario_generator import ScenarioGeneratorEngine
 
 
+_NOK_PRICE_PATTERN = re.compile(
+    r"(?ix)"
+    r"(?:"
+    r"\b(?:kr|nok)\s*[:\-]?\s*"
+    r"(?P<prefix>\d{1,3}(?:[ .\u00a0]\d{3})+|\d{2,8})(?:[,.]\d{2})?"
+    r"|"
+    r"\b(?P<suffix>\d{1,3}(?:[ .\u00a0]\d{3})+|\d{2,8})(?:[,.]\d{2})?\s*(?:kr|nok)\b"
+    r")"
+)
+
+
+def _parse_nok_amount(raw: str) -> float | None:
+    compact = re.sub(r"[ .\u00a0]", "", raw)
+    try:
+        value = float(compact.replace(",", "."))
+    except ValueError:
+        return None
+    if value < 10 or value > 100_000_000:
+        return None
+    return value
+
+
+def _extract_explicit_nok_price(item: dict[str, Any]) -> tuple[float | None, str | None]:
+    """Extract only prices explicitly adjacent to ``kr`` or ``NOK``.
+
+    Numbers without a currency marker are intentionally ignored so quantities, model
+    numbers, years, phone numbers, weights and auction metadata cannot become prices.
+    """
+    texts: list[str] = []
+    for field in ("title", "snippet", "description"):
+        value = item.get(field)
+        if isinstance(value, str) and value.strip():
+            texts.append(value)
+    extra = item.get("extra_snippets")
+    if isinstance(extra, list):
+        texts.extend(str(value) for value in extra if str(value).strip())
+
+    for text in texts:
+        for match in _NOK_PRICE_PATTERN.finditer(text):
+            raw = match.group("prefix") or match.group("suffix") or ""
+            value = _parse_nok_amount(raw)
+            if value is not None:
+                return value, match.group(0).strip()
+    return None, None
+
+
 def _explicit_price(item: dict[str, Any]) -> float | None:
     value = item.get("price_nok")
     if isinstance(value, (int, float)) and not isinstance(value, bool) and value >= 0:
         return float(value)
-    return None
+    extracted, source_text = _extract_explicit_nok_price(item)
+    if extracted is not None:
+        item["price_nok"] = extracted
+        item["price_currency"] = "NOK"
+        item["price_extraction_source"] = source_text
+    return extracted
 
 
 def comparable_adapter(response: Any) -> Iterable[ComparableCandidate]:
-    """Accept only Brave records already carrying an explicit numeric NOK price."""
+    """Convert Brave records only when an explicit NOK price is available."""
     rows = response if isinstance(response, list) else []
     now = datetime.now(timezone.utc).isoformat()
     candidates: list[ComparableCandidate] = []
