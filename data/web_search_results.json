@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-07-23T06:11:49.723293+00:00",
+  "generated_at": "2026-07-23T06:49:41.578856+00:00",
   "provider": "Brave Search API",
   "request_count": 10,
   "result_count": 100,
@@ -24,18 +24,18 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "published_at": null,
-      "snippet": "<strong>Agito Retail Design utvikler og leverer butikkinnredning og eksponeringsløsninger av høy kvalitet</strong>. Vi holder til i Oslo, men har kunder i hele Norge!",
-      "source": "Brave Search",
-      "title": "Agito Retail Design Butikkinnredning",
-      "url": "http://www.agitoretail.com/"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "published_at": null,
       "snippet": "<strong>SuperSellerS tilbyder butiksinventar, der dækker hele butikken</strong>: gondoler, rillepaneler, TUBO-reoler, tøjstativer, bøjler, mannequinfigurer og gaveemballage. Alt i god og gennemprøvet kvalitet, så du kan præsentere dine varer flot og ...",
       "source": "Brave Search",
       "title": "SuperSellerS: Butikkinnredning og inventar. 5–7 dagers ...",
       "url": "https://www.supersellers.dk/en"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "published_at": null,
+      "snippet": "<strong>Agito Retail Design utvikler og leverer butikkinnredning og eksponeringsløsninger av høy kvalitet</strong>. Vi holder til i Oslo, men har kunder i hele Norge!",
+      "source": "Brave Search",
+      "title": "Agito Retail Design Butikkinnredning",
+      "url": "http://www.agitoretail.com/"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -143,19 +143,19 @@
     },
     {
       "discovery_query": "varelager konkursbo Norge",
-      "published_at": "2022-01-06T09:57:51",
-      "snippet": "Skip to content · When autocomplete results are available use up and down arrows to review and enter to select. Touch device users, explore by touch or with swipe gestures · Log in · Sign up",
-      "source": "Brave Search",
-      "title": "Varelager fra interiørbutikk selges fra konkursbo | FINN.no",
-      "url": "https://www.pinterest.com/pin/557179785159152441/"
-    },
-    {
-      "discovery_query": "varelager konkursbo Norge",
       "published_at": null,
       "snippet": "<strong>EMPUS kjøper, henter og rydder opp etter konkursbo, varepartier, overskuddslagre og dødsbo</strong>. Vår forretningsidé er rask service hvor vi kan stille opp med 5-12 personer på kort varsel for å rydde unna og flytte ting ut av deres lokaler. Vi jobber også med praktisk bistand for advokater, ...",
       "source": "Brave Search",
       "title": "Konkursbo » EMPUS AS - arbeidsglede og kompetanse",
       "url": "https://empus.no/konkursbo"
+    },
+    {
+      "discovery_query": "varelager konkursbo Norge",
+      "published_at": "2022-01-06T09:57:51",
+      "snippet": "Skip to content · When autocomplete results are available use up and down arrows to review and enter to select. Touch device users, explore by touch or with swipe gestures · Log in · Sign up",
+      "source": "Brave Search",
+      "title": "Varelager fra interiørbutikk selges fra konkursbo | FINN.no",
+      "url": "https://www.pinterest.com/pin/557179785159152441/"
     },
     {
       "discovery_query": "varelager konkursbo Norge",
@@ -623,19 +623,19 @@
     },
     {
       "discovery_query": "lagerreoler selges Norge",
-      "published_at": null,
-      "snippet": "Stabila grovhyllor med hög bärkraft. Perfekta för förvaring av tunga maskiner, verktyg och material. Beställ enkelt online idag!",
-      "source": "Brave Search",
-      "title": "Lagerreol I Hyller I Oppbevaring til verkstedet I P. Lindberg",
-      "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler/"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
       "published_at": "2025-12-29T07:03:58",
       "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
       "source": "Brave Search",
       "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
       "url": "https://reolteknikk.no/"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "published_at": null,
+      "snippet": "Stabila grovhyllor med hög bärkraft. Perfekta för förvaring av tunga maskiner, verktyg och material. Beställ enkelt online idag!",
+      "source": "Brave Search",
+      "title": "Lagerreol I Hyller I Oppbevaring til verkstedet I P. Lindberg",
+      "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler/"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -703,6 +703,14 @@
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
+      "published_at": "2022-10-24T17:00:33",
+      "snippet": "<strong>Tre personer fra Hedmarken, en kar fra Jessheim og Silkesvarten AS skulle satse på tekstiler klær og mote i et Hamar-selskap</strong>. To år senere er det konkurs.",
+      "source": "Brave Search",
+      "title": "(+) Konkurs to år etter at fem eiere satset på mote",
+      "url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
       "published_at": "2022-09-05T10:02:35",
       "snippet": "<strong>I august økte antallet konkurser med 42,9 prosent, sammenlignet med samme måned i fjor</strong>. Antallet ansatte som har mistet jobben som følge av konkurser har økt med hele 51,5 prosent.",
       "source": "Brave Search",
@@ -716,14 +724,6 @@
       "source": "Brave Search",
       "title": "Vareparti og konkursbo | til salgs | FINN Torget",
       "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "published_at": "2024-02-26T10:41:32",
-      "snippet": "<strong>Renewcell, vinner av Nordisk Råds miljøpris 2023, står overfor finansielle utfordringer</strong>. Selskapet, støttet av H&amp;M og Girindus, har ikke klart å sikre tilstrekkelig finansiering.",
-      "source": "Brave Search",
-      "title": "Renewcell klarte ikke sikre nok finansiering",
-      "url": "https://www.tekstilforum.no/konkurs-resirkulering/renewcell-begjaerer-seg-konkurs/1003464"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",

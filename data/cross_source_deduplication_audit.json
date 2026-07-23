@@ -2,20 +2,35 @@
   "automatic_bid": false,
   "automatic_merge_pair_count": 0,
   "automatic_purchase": false,
-  "generated_at": "2026-07-23T06:12:10.121142+00:00",
-  "input_record_count": 97,
+  "generated_at": "2026-07-23T06:49:59.672178+00:00",
+  "ignored_non_official_record_count": 71,
+  "input_record_count": 27,
   "match_counts": {
     "EXACT_URL": 0,
     "POSSIBLE_DUPLICATE_REVIEW": 0,
     "STRONG_FINGERPRINT": 0
   },
   "matches": [],
-  "method": "conservative cross-source audit; weak similarity never auto-merges",
+  "method": "official-source conservative cross-source audit; weak similarity never auto-merges",
+  "observed_source_names": [
+    "Auksjonen.no",
+    "Politiet.no"
+  ],
+  "official_source_names": [
+    "Auksjonen.no",
+    "Konkurs.app",
+    "Politiet.no"
+  ],
   "possible_duplicate_review_count": 0,
-  "schema_version": 1,
+  "schema_version": 2,
   "source_names": [
-    "Brave Search",
-    "Politiet.no",
-    "UNKNOWN"
-  ]
+    "Auksjonen.no",
+    "Konkurs.app",
+    "Politiet.no"
+  ],
+  "source_record_counts": {
+    "Auksjonen.no": 25,
+    "Konkurs.app": 0,
+    "Politiet.no": 2
+  }
 }
