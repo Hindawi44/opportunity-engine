@@ -55,3 +55,36 @@ def test_audit_preserves_source_names_and_record_ids() -> None:
     match = payload["matches"][0]
     assert match["source_names"] == ["Auksjonen.no", "Konkurs.app"]
     assert match["source_record_ids"] == ["a-1", "k-1"]
+
+
+def test_audit_infers_official_source_from_url_and_excludes_brave_and_unknown() -> None:
+    records = [
+        item("Brave Search", "a-1", "Auksjon", "https://www.auksjonen.no/auksjon/1", "Oslo", 1000),
+        item("Brave Search", "k-1", "Konkurs", "https://konkurs.app/company/1", "Oslo", None),
+        item("Politiet.no", "p-1", "Tvangssalg", "https://www.politiet.no/arrangement/1", "Oslo", None),
+        item("Brave Search", "b-1", "Irrelevant", "https://example.com/item/1", "Oslo", 1000),
+        item("", "u-1", "Unknown", "", "Oslo", 1000),
+    ]
+    payload = MODULE.build_audit([("mixed", records)])
+
+    assert payload["source_names"] == ["Auksjonen.no", "Konkurs.app", "Politiet.no"]
+    assert payload["observed_source_names"] == ["Auksjonen.no", "Konkurs.app", "Politiet.no"]
+    assert payload["source_record_counts"] == {
+        "Auksjonen.no": 1,
+        "Konkurs.app": 1,
+        "Politiet.no": 1,
+    }
+    assert payload["ignored_non_official_record_count"] == 2
+    assert "Brave Search" not in payload["source_names"]
+    assert "UNKNOWN" not in payload["source_names"]
+
+
+def test_report_always_contains_all_three_official_sources() -> None:
+    payload = MODULE.build_audit([])
+    assert payload["source_names"] == list(MODULE.OFFICIAL_SOURCES)
+    assert MODULE.validate_official_sources(payload) is True
+
+
+def test_validation_fails_when_an_official_source_is_missing() -> None:
+    payload = {"source_names": ["Auksjonen.no", "Politiet.no"]}
+    assert MODULE.validate_official_sources(payload) is False
