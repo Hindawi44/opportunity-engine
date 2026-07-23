@@ -1,4 +1,9 @@
-from opportunity_engine.living_investment_file import Evidence, LivingInvestmentFile
+from opportunity_engine.living_investment_file import (
+    Evidence,
+    LivingInvestmentFile,
+    RevenuePath,
+    RevenuePathType,
+)
 from opportunity_engine.scenario_generator import ScenarioGeneratorEngine, ScenarioInputs
 
 
@@ -60,9 +65,14 @@ def test_regeneration_replaces_generated_paths_but_preserves_manual_path():
     engine = ScenarioGeneratorEngine()
     engine.generate(item)
 
-    manual = item.revenue_paths[0]
-    manual.path_id = "manual-custom-path"
-    item.revenue_paths.append(manual)
+    item.add_revenue_path(
+        RevenuePath(
+            path_id="manual-custom-path",
+            path_type=RevenuePathType.OTHER,
+            title="Manual specialist path",
+            description="A manually researched option that must survive regeneration.",
+        )
+    )
 
     engine.generate(item)
 
