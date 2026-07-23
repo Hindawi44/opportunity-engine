@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -18,7 +19,7 @@ from opportunity_engine.evidence_store import (
     EvidenceType,
     ResearchEvidence,
 )
-from opportunity_engine.external_evidence_loop import ExternalEvidenceLoop
+from opportunity_engine.external_evidence_loop import ExternalEvidenceLoop, ResearchNeed
 from opportunity_engine.external_market_comparables import ComparableCandidate, MarketComparablesEngine
 from opportunity_engine.investment_file_sync import InvestmentFileSynchronizer
 from opportunity_engine.living_investment_file import LivingInvestmentFileRepository
@@ -106,8 +107,64 @@ def evidence_factory(**kwargs: Any) -> ResearchEvidence:
     )
 
 
+def _search_subject(title: str) -> str:
+    """Convert a noisy live-auction title into a broad Brave search subject."""
+    compact = " ".join(title.split()).strip()
+    if not compact:
+        return "vareparti"
+
+    # Remove volatile auction metadata such as "2 bud 4d 16t 6m".
+    compact = re.sub(r"\b\d+\s+bud\b.*$", "", compact, flags=re.IGNORECASE)
+    compact = re.sub(r"\b\d+d\s+\d+t(?:\s+\d+m)?\b.*$", "", compact, flags=re.IGNORECASE)
+    compact = re.sub(r"\b(?:auksjon|avsluttes|igjen)\b.*$", "", compact, flags=re.IGNORECASE)
+
+    tokens = [token.strip("\"'.,;:()[]{}") for token in compact.split()]
+    tokens = [token for token in tokens if token]
+    return " ".join(tokens[:10]) or "vareparti"
+
+
+class ProductionExternalEvidenceLoop(ExternalEvidenceLoop):
+    """Use stable, unquoted Brave queries instead of exact live-listing titles."""
+
+    def detect_needs(self, investment_file: Any) -> tuple[ResearchNeed, ...]:
+        needs: list[ResearchNeed] = []
+        title = " ".join(str(getattr(investment_file, "title", "")).split())
+        subject = _search_subject(title)
+        location = " ".join(str(getattr(investment_file, "location", "") or "").split())
+        missing = tuple(getattr(investment_file, "missing_information", ()))
+        unresolved = " ".join(
+            str(getattr(item, "question", ""))
+            for item in missing
+            if not bool(getattr(item, "resolved", False))
+        ).casefold()
+
+        has_market_value = any(
+            getattr(path, "estimated_revenue_nok", None) is not None
+            for path in getattr(investment_file, "revenue_paths", ())
+        )
+        if not has_market_value or any(word in unresolved for word in ("resale", "market", "price", "value")):
+            needs.append(ResearchNeed(
+                "market",
+                f"{subject} brukt pris Norge",
+                "Verified external resale comparables are missing",
+                "high",
+            ))
+
+        potential_buyers = tuple(getattr(investment_file, "potential_buyers", ()))
+        if not potential_buyers or any(word in unresolved for word in ("buyer", "customer", "purchaser")):
+            suffix = f" {location}" if location else " Norge"
+            needs.append(ResearchNeed(
+                "buyer",
+                f"{subject} forhandler grossist kjøper{suffix}",
+                "Potential buyers are missing",
+                "high",
+            ))
+
+        return tuple(needs)
+
+
 def build_loop() -> ExternalEvidenceLoop:
-    return ExternalEvidenceLoop(
+    return ProductionExternalEvidenceLoop(
         search_provider=BraveSearchClient.from_environment(),
         evidence_repository=EvidenceRepository("data/evidence"),
         evidence_factory=evidence_factory,
