@@ -1,0 +1,88 @@
+name: V2.7.2.4.2 Bootstrap Pipeline Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      opportunity_limit:
+        description: Maximum opportunities to discover
+        required: true
+        default: '20'
+      research_threshold:
+        description: Preliminary research candidate threshold
+        required: true
+        default: '25'
+      selection_limit:
+        description: Maximum candidates forwarded to external research
+        required: true
+        default: '3'
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      BRAVE_MAX_REQUESTS_PER_RUN: '4'
+      BRAVE_CACHE_TTL_HOURS: '24'
+      EXTERNAL_RESEARCH_MAX_OPPORTUNITIES: '0'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Verify project import
+        run: python -c "import opportunity_engine; print('Opportunity Engine imports successfully')"
+
+      - name: Create output folders
+        run: mkdir -p data/validation data/investment_files data/evidence
+
+      - name: Generate fresh real opportunity dataset without legacy external gate
+        run: |
+          python scripts/run_daily_pipeline.py \
+            --limit "${{ inputs.opportunity_limit }}" \
+            > data/validation/v2.7.2.4.2-daily-pipeline-run.json
+
+      - name: Run bootstrap external research queue
+        run: |
+          python scripts/run_research_bootstrap.py \
+            data/todays_opportunities.json \
+            --threshold "${{ inputs.research_threshold }}" \
+            --selection-limit "${{ inputs.selection_limit }}" \
+            --output data/validation/v2.7.2.4.2-bootstrap-report.json
+
+      - name: Print bootstrap integration report
+        if: always()
+        run: |
+          if [ -f data/validation/v2.7.2.4.2-bootstrap-report.json ]; then
+            python -m json.tool data/validation/v2.7.2.4.2-bootstrap-report.json
+          else
+            echo "Bootstrap integration report was not produced."
+          fi
+
+      - name: Upload bootstrap evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.7.2.4.2-bootstrap-pipeline-integration
+          path: |
+            data/validation/
+            data/todays_opportunities.json
+            data/investment_files/
+            data/evidence/
+            data/brave_cache/
+            data/brave_usage.jsonl
+          if-no-files-found: warn
+          retention-days: 14
