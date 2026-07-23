@@ -20,7 +20,9 @@ def _read(path: Path, default: Any) -> Any:
 
 
 def _snapshot(root: Path) -> dict[str, Any]:
-    evidence_files = sorted((root / "evidence").glob("*.json"))
+    # EvidenceRepository stores files under data/evidence/<opportunity_id>/rev_*.json.
+    # Use a recursive scan so persisted evidence is counted correctly.
+    evidence_files = sorted((root / "evidence").rglob("rev_*.json"))
     living_files = sorted((root / "investment_files").glob("*.json"))
     payload = _read(root / "opportunity_evidence.json", {})
     records = payload.get("evidence", {}) if isinstance(payload, dict) else {}
@@ -67,7 +69,7 @@ def main() -> int:
 
     if args.phase == "baseline":
         payload = {
-            "schema_version": "2.7.3",
+            "schema_version": "2.7.3.1",
             "captured_at": datetime.now(timezone.utc).isoformat(),
             "cache_hit": os.getenv("PERSISTENCE_CACHE_HIT", "false").lower() == "true",
             **current,
@@ -84,7 +86,7 @@ def main() -> int:
     cache_hit = bool(baseline.get("cache_hit", False)) if isinstance(baseline, dict) else False
 
     report = {
-        "schema_version": "2.7.3",
+        "schema_version": "2.7.3.1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "loaded_previous_file": cache_hit and previous_living > 0,
         "previous_evidence_loaded": cache_hit and (previous_evidence > 0 or previous_comparables > 0),
@@ -100,7 +102,7 @@ def main() -> int:
             "verified_comparables": current["verified_comparable_count"] - previous_comparables,
         },
         "status": "PASS" if current["duplicate_comparable_count"] == 0 and current["living_file_count"] > 0 else "INCOMPLETE",
-        "note": "evidence_survived_next_run can only become true on the second successful workflow run.",
+        "note": "Evidence files are stored recursively under data/evidence/<opportunity_id>/rev_*.json. evidence_survived_next_run becomes true after a later run restores at least one of them.",
     }
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
