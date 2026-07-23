@@ -1,0 +1,81 @@
+name: V2.7.1 Real Dataset Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      opportunity_limit:
+        description: Maximum opportunities to collect and validate
+        required: true
+        default: '20'
+      external_research_limit:
+        description: Maximum opportunities allowed into external research
+        required: true
+        default: '2'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-real-dataset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      BRAVE_MAX_REQUESTS_PER_RUN: '4'
+      BRAVE_CACHE_TTL_HOURS: '24'
+      EXTERNAL_RESEARCH_MAX_OPPORTUNITIES: ${{ inputs.external_research_limit }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Verify project import
+        run: python -c "import opportunity_engine; print('Opportunity Engine imports successfully')"
+
+      - name: Create output folders
+        run: mkdir -p data/validation data/investment_files
+
+      - name: Generate fresh real opportunity dataset
+        run: |
+          python scripts/run_daily_pipeline.py \
+            --limit "${{ inputs.opportunity_limit }}" \
+            > data/validation/v2.7.1-daily-pipeline-run.json
+
+      - name: Validate generated dataset
+        run: |
+          python scripts/run_real_opportunity_validation.py \
+            data/todays_opportunities.json \
+            --output data/validation/v2.7.1-real-dataset-report.json
+
+      - name: Print validation summary
+        if: always()
+        run: |
+          if [ -f data/validation/v2.7.1-real-dataset-report.json ]; then
+            python -m json.tool data/validation/v2.7.1-real-dataset-report.json
+          else
+            echo "Validation report was not produced."
+          fi
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.7.1-real-dataset-validation
+          path: |
+            data/validation/
+            data/todays_opportunities.json
+            data/smart_alerts.json
+            data/investment_files/
+            data/brave_usage.jsonl
+          if-no-files-found: warn
+          retention-days: 14
