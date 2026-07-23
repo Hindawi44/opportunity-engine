@@ -31,11 +31,14 @@ def _load_evidence_file(path: Path) -> list[dict[str, Any]]:
 def collect_external_financial_evidence(root: str | Path) -> dict[str, dict[str, Any]]:
     """Return economic-evaluation evidence grouped by opportunity.
 
+    EvidenceRepository persists each item under
+    ``data/evidence/<opportunity_id>/rev_<id>.json``. The recursive scan is therefore
+    required both for the current run and for evidence restored from a previous workflow.
     Only persisted market-price observations with a positive explicit NOK value and a
     public HTTPS source are exported as verified comparables. Missing costs stay absent.
     """
     grouped: dict[str, dict[str, Any]] = {}
-    for path in sorted(Path(root).glob("*.json")):
+    for path in sorted(Path(root).rglob("rev_*.json")):
         for record in _load_evidence_file(path):
             opportunity_id = str(record.get("opportunity_id") or "").strip()
             if not opportunity_id or str(record.get("evidence_type") or "") != "market_price":
