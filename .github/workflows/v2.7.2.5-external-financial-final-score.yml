@@ -81,6 +81,12 @@ jobs:
             --evidence-dir data/evidence \
             --summary-output data/validation/v2.7.2.5-financial-final-score.json
 
+      - name: Mark incomplete economics as evidence required
+        run: |
+          python scripts/normalize_incomplete_recommendations.py \
+            --scores data/scored_opportunities.json \
+            --summary data/validation/v2.7.2.5-financial-final-score.json
+
       - name: Print score integration report
         if: always()
         run: |
