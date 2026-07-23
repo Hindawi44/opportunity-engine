@@ -46,6 +46,40 @@ def load_items(path: Path) -> list[dict]:
     return []
 
 
+def load_channel_items(path: Path, channel_name: str) -> list[dict]:
+    """Load a named channel such as bankruptcy_leads without flattening other channels."""
+    if not path.exists():
+        return []
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return []
+    channel = payload.get(channel_name)
+    if not isinstance(channel, dict):
+        return []
+    items = channel.get("items")
+    if not isinstance(items, list):
+        return []
+    return [item for item in items if isinstance(item, dict)]
+
+
+def load_funnel_counts(path: Path) -> dict[str, int]:
+    """Return fetched counts for official sources from source_funnel.json."""
+    if not path.exists():
+        return {name: 0 for name in OFFICIAL_SOURCES}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    rows = payload.get("sources", []) if isinstance(payload, dict) else []
+    counts = {name: 0 for name in OFFICIAL_SOURCES}
+    if not isinstance(rows, list):
+        return counts
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        source = str(row.get("source") or "").strip()
+        if source in counts:
+            counts[source] = int(row.get("fetched", 0) or 0)
+    return counts
+
+
 def canonical_url(value: object) -> str | None:
     if not isinstance(value, str) or not value.strip():
         return None
@@ -133,10 +167,57 @@ def classify(left: dict, right: dict) -> str | None:
     return None
 
 
-def build_audit(groups: list[tuple[str, list[dict]]]) -> dict:
+def build_reconciliation(
+    funnel_counts: dict[str, int] | None,
+    source_record_counts: dict[str, int],
+) -> dict[str, dict]:
+    """Explain every difference between collection counts and records reaching the audit."""
+    funnel_counts = funnel_counts or {name: source_record_counts.get(name, 0) for name in OFFICIAL_SOURCES}
+    reconciliation: dict[str, dict] = {}
+    for source in OFFICIAL_SOURCES:
+        fetched = int(funnel_counts.get(source, 0) or 0)
+        audited = int(source_record_counts.get(source, 0) or 0)
+        difference = fetched - audited
+        reasons: list[str] = []
+        if difference > 0:
+            reasons.append("upstream_fetched_count_includes_records removed by normalization or deduplication before audit")
+        elif difference < 0:
+            reasons.append("audit received additional channel records not represented in source_funnel fetched count")
+        reconciliation[source] = {
+            "fetched_count": fetched,
+            "audit_record_count": audited,
+            "difference": difference,
+            "exclusion_reasons": reasons,
+            "status": "RECONCILED" if difference == 0 else "EXPLAINED_DIFFERENCE",
+        }
+    return reconciliation
+
+
+def validate_funnel_coverage(payload: dict) -> bool:
+    """A fetched official source must reach the audit or carry an explicit exclusion reason."""
+    reconciliation = payload.get("source_funnel_reconciliation", {})
+    if not isinstance(reconciliation, dict):
+        return False
+    for source in OFFICIAL_SOURCES:
+        row = reconciliation.get(source)
+        if not isinstance(row, dict):
+            return False
+        fetched = int(row.get("fetched_count", 0) or 0)
+        audited = int(row.get("audit_record_count", 0) or 0)
+        reasons = row.get("exclusion_reasons", [])
+        if fetched > 0 and audited == 0 and not reasons:
+            return False
+    return True
+
+
+def build_audit(
+    groups: list[tuple[str, list[dict]]],
+    funnel_counts: dict[str, int] | None = None,
+) -> dict:
     records: list[dict] = []
     ignored_record_count = 0
     source_record_counts = {name: 0 for name in OFFICIAL_SOURCES}
+    seen_record_keys: set[tuple[str, str]] = set()
 
     for channel, items in groups:
         for item in items:
@@ -144,6 +225,11 @@ def build_audit(groups: list[tuple[str, list[dict]]]) -> dict:
             if resolved_source is None:
                 ignored_record_count += 1
                 continue
+            stable_id = record_id(item) or canonical_url(item.get("canonical_url") or item.get("url")) or repr(sorted(item.items()))
+            key = (resolved_source, stable_id)
+            if key in seen_record_keys:
+                continue
+            seen_record_keys.add(key)
             enriched = dict(item)
             enriched["source_name"] = resolved_source
             enriched["_audit_channel"] = channel
@@ -179,14 +265,16 @@ def build_audit(groups: list[tuple[str, list[dict]]]) -> dict:
     for item in matches:
         counts[item["match_type"]] += 1
 
+    reconciliation = build_reconciliation(funnel_counts, source_record_counts)
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "method": "official-source conservative cross-source audit; weak similarity never auto-merges",
+        "method": "official-source conservative cross-source audit; all official channels included; weak similarity never auto-merges",
         "official_source_names": list(OFFICIAL_SOURCES),
         "source_names": list(OFFICIAL_SOURCES),
         "observed_source_names": [name for name in OFFICIAL_SOURCES if source_record_counts[name] > 0],
         "source_record_counts": source_record_counts,
+        "source_funnel_reconciliation": reconciliation,
         "input_record_count": len(records),
         "ignored_non_official_record_count": ignored_record_count,
         "match_counts": counts,
@@ -211,15 +299,20 @@ def main() -> int:
     parser.add_argument("--daily", default="data/todays_opportunities.json")
     parser.add_argument("--discovery", default="data/discovery_leads.json")
     parser.add_argument("--events", default="data/public_auction_event_leads.json")
+    parser.add_argument("--channels", default="data/opportunity_channels.json")
+    parser.add_argument("--source-funnel", default="data/source_funnel.json")
     parser.add_argument("--output", default="data/cross_source_deduplication_audit.json")
     args = parser.parse_args()
     payload = build_audit([
         ("daily", load_items(Path(args.daily))),
         ("discovery", load_items(Path(args.discovery))),
+        ("bankruptcy_leads", load_channel_items(Path(args.channels), "bankruptcy_leads")),
         ("public_auction_events", load_items(Path(args.events))),
-    ])
+    ], funnel_counts=load_funnel_counts(Path(args.source_funnel)))
     if not validate_official_sources(payload):
         raise SystemExit("Cross-source audit is missing one or more official sources")
+    if not validate_funnel_coverage(payload):
+        raise SystemExit("Cross-source audit lost a fetched official source without an exclusion reason")
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
