@@ -37,19 +37,18 @@ def main() -> int:
 
     repository = LivingInvestmentFileRepository(args.investment_files_dir)
     records: list[CandidateExecutionAudit] = []
-    provider = None
+    loop = build_loop()
+    tracing = TracingSearchProvider(loop.search_provider)
+    loop.search_provider = tracing
 
     for candidate in candidate_report.records:
         if not candidate.selected_for_external_research:
             continue
-        loop = build_loop()
-        tracing = TracingSearchProvider(loop.search_provider)
-        loop.search_provider = tracing
-        provider = tracing.provider
+        trace_start = len(tracing.traces)
         investment_file = repository.load(candidate.opportunity_id)
         result = loop.run(investment_file)
         repository.save(investment_file)
-        traces = tuple(tracing.traces)
+        traces = tuple(tracing.traces[trace_start:])
         records.append(CandidateExecutionAudit(
             opportunity_id=candidate.opportunity_id,
             research_rank=candidate.research_rank,
@@ -75,14 +74,8 @@ def main() -> int:
     report = ExternalExecutionAuditReport(
         selected_candidates=candidate_report.selected_count,
         audited_candidates=len(records),
-        brave_request_count=sum(
-            max((trace.request_count_after - trace.request_count_before), 0)
-            for record in records for trace in record.search_traces
-        ),
-        brave_cache_hits=sum(
-            max((trace.cache_hits_after - trace.cache_hits_before), 0)
-            for record in records for trace in record.search_traces
-        ),
+        brave_request_count=int(getattr(tracing.provider, "request_count", 0)),
+        brave_cache_hits=int(getattr(tracing.provider, "cache_hits", 0)),
         searches_executed=sum(record.searches_executed for record in records),
         results_returned=sum(record.response_results_total for record in records),
         explicit_price_results=sum(record.explicit_price_results_total for record in records),
