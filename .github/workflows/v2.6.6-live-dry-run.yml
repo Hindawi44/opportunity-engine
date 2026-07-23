@@ -1,0 +1,52 @@
+name: V2.6.6 Live Dry Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      opportunity_limit:
+        description: Maximum opportunities in dry run
+        required: true
+        default: '2'
+
+permissions:
+  contents: read
+
+jobs:
+  live-dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      BRAVE_MAX_REQUESTS_PER_RUN: '4'
+      BRAVE_CACHE_TTL_HOURS: '24'
+      EXTERNAL_RESEARCH_MAX_OPPORTUNITIES: ${{ inputs.opportunity_limit }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project
+        run: pip install -e . pytest
+      - name: Verify secret and configuration
+        run: python scripts/run_production_readiness.py --output data/production_readiness.json
+      - name: First guarded daily run
+        run: python scripts/run_daily_pipeline.py --limit "${{ inputs.opportunity_limit }}" > data/dry_run_first.json
+      - name: Second guarded daily run
+        run: python scripts/run_daily_pipeline.py --limit "${{ inputs.opportunity_limit }}" > data/dry_run_second.json
+      - name: Verify cache and repeat protection
+        run: python scripts/run_production_readiness.py --output data/production_readiness_final.json --first-run data/dry_run_first.json --second-run data/dry_run_second.json
+      - name: Upload dry-run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.6.6-live-dry-run
+          path: |
+            data/production_readiness*.json
+            data/dry_run_*.json
+            data/todays_opportunities.json
+            data/smart_alerts.json
+            data/investment_files/
+            data/brave_usage.jsonl
+          if-no-files-found: warn
+          retention-days: 14
