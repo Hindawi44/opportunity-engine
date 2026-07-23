@@ -1,7 +1,7 @@
 {
   "completion_rule": "A source is complete when it is ACTIVE with verified records, CODE_READY with documented activation requirements, BLOCKED_AUTH with explicit authorized-access requirements, or deliberately classified as PLANNED or DEPRECATED.",
   "economic_ranking_unlocked": false,
-  "generated_at": "2026-07-23T06:49:59.581219+00:00",
+  "generated_at": "2026-07-23T07:47:32.601528+00:00",
   "phase": "source_coverage_audit_and_gap_closure",
   "phase_complete": false,
   "schema_version": 1,
@@ -10,7 +10,7 @@
       "blocked_by_authorized_access": false,
       "complete": true,
       "error": null,
-      "fetched": 52,
+      "fetched": 54,
       "market": "Norway",
       "priority": 1,
       "source": "Auksjonen.no",

@@ -2,18 +2,19 @@
   "automatic_bid": false,
   "automatic_merge_pair_count": 0,
   "automatic_purchase": false,
-  "generated_at": "2026-07-23T06:49:59.672178+00:00",
+  "generated_at": "2026-07-23T07:47:32.673297+00:00",
   "ignored_non_official_record_count": 71,
-  "input_record_count": 27,
+  "input_record_count": 32,
   "match_counts": {
     "EXACT_URL": 0,
     "POSSIBLE_DUPLICATE_REVIEW": 0,
     "STRONG_FINGERPRINT": 0
   },
   "matches": [],
-  "method": "official-source conservative cross-source audit; weak similarity never auto-merges",
+  "method": "official-source conservative cross-source audit; all official channels included; weak similarity never auto-merges",
   "observed_source_names": [
     "Auksjonen.no",
+    "Konkurs.app",
     "Politiet.no"
   ],
   "official_source_names": [
@@ -22,7 +23,34 @@
     "Politiet.no"
   ],
   "possible_duplicate_review_count": 0,
-  "schema_version": 2,
+  "schema_version": 3,
+  "source_funnel_reconciliation": {
+    "Auksjonen.no": {
+      "audit_record_count": 25,
+      "difference": 29,
+      "exclusion_reasons": [
+        "upstream_fetched_count_includes_records removed by normalization or deduplication before audit"
+      ],
+      "fetched_count": 54,
+      "status": "EXPLAINED_DIFFERENCE"
+    },
+    "Konkurs.app": {
+      "audit_record_count": 5,
+      "difference": 20,
+      "exclusion_reasons": [
+        "upstream_fetched_count_includes_records removed by normalization or deduplication before audit"
+      ],
+      "fetched_count": 25,
+      "status": "EXPLAINED_DIFFERENCE"
+    },
+    "Politiet.no": {
+      "audit_record_count": 2,
+      "difference": 0,
+      "exclusion_reasons": [],
+      "fetched_count": 2,
+      "status": "RECONCILED"
+    }
+  },
   "source_names": [
     "Auksjonen.no",
     "Konkurs.app",
@@ -30,7 +58,7 @@
   ],
   "source_record_counts": {
     "Auksjonen.no": 25,
-    "Konkurs.app": 0,
+    "Konkurs.app": 5,
     "Politiet.no": 2
   }
 }

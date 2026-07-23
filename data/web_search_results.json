@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-07-23T06:49:41.578856+00:00",
+  "generated_at": "2026-07-23T07:47:07.313752+00:00",
   "provider": "Brave Search API",
   "request_count": 10,
   "result_count": 100,
@@ -24,18 +24,18 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "published_at": null,
-      "snippet": "<strong>SuperSellerS tilbyder butiksinventar, der dækker hele butikken</strong>: gondoler, rillepaneler, TUBO-reoler, tøjstativer, bøjler, mannequinfigurer og gaveemballage. Alt i god og gennemprøvet kvalitet, så du kan præsentere dine varer flot og ...",
-      "source": "Brave Search",
-      "title": "SuperSellerS: Butikkinnredning og inventar. 5–7 dagers ...",
-      "url": "https://www.supersellers.dk/en"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "published_at": null,
       "snippet": "<strong>Agito Retail Design utvikler og leverer butikkinnredning og eksponeringsløsninger av høy kvalitet</strong>. Vi holder til i Oslo, men har kunder i hele Norge!",
       "source": "Brave Search",
       "title": "Agito Retail Design Butikkinnredning",
       "url": "http://www.agitoretail.com/"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "published_at": null,
+      "snippet": "<strong>SuperSellerS tilbyder butiksinventar, der dækker hele butikken</strong>: gondoler, rillepaneler, TUBO-reoler, tøjstativer, bøjler, mannequinfigurer og gaveemballage. Alt i god og gennemprøvet kvalitet, så du kan præsentere dine varer flot og ...",
+      "source": "Brave Search",
+      "title": "SuperSellerS: Butikkinnredning og inventar. 5–7 dagers ...",
+      "url": "https://www.supersellers.dk/en"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -72,18 +72,18 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "published_at": null,
-      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "title": "Butikkinnredning | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "published_at": null,
       "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
       "source": "Brave Search",
       "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
       "url": "https://www.supersellers.no/katalog"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "published_at": null,
+      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "source": "Brave Search",
+      "title": "Butikkinnredning | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
     },
     {
       "discovery_query": "varelager konkursbo Norge",
@@ -167,14 +167,6 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
-      "source": "Brave Search",
-      "title": "Starte bedrift | Ny i Norge",
-      "url": "https://www.nyinorge.no/en/work/starting-a-business-in-norway/"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
       "published_at": "2026-01-09T18:20:19",
       "snippet": "<strong>Bedriften tilbyr ikke henting av pakker, så forsendelsen må leveres direkte til deres adresse og innenfor åpningstiden på hverdager</strong>.",
       "source": "Brave Search",
@@ -183,11 +175,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": "2024-01-09T06:48:44",
-      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
+      "published_at": null,
+      "snippet": "Do you want to start your own business in Norway? Below is a brief overview of where you can find out more, get advice and get help where you live.",
       "source": "Brave Search",
-      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
-      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
+      "title": "Starte bedrift | Ny i Norge",
+      "url": "https://www.nyinorge.no/en/work/starting-a-business-in-norway/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -196,14 +188,6 @@
       "source": "Brave Search",
       "title": "3PL lagerløsninger for din bedrift | ColliCare Logistics Norge",
       "url": "https://www.collicare.no/en/freight/third-party-logistics"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
-      "published_at": "2026-01-18T09:19:20",
-      "snippet": "Med vaktordning og bonus hos den lille bedriften gir meg en totalpakke på 50k+ (avhengig av bonus) mer i året.",
-      "source": "Brave Search",
-      "title": "r/norge on Reddit: Nystartet vs etablert liten bedrift?",
-      "url": "https://www.reddit.com/r/norge/comments/1qg43ld/nystartet_vs_etablert_liten_bedrift/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -223,6 +207,22 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
+      "published_at": "2026-01-18T09:19:20",
+      "snippet": "Med vaktordning og bonus hos den lille bedriften gir meg en totalpakke på 50k+ (avhengig av bonus) mer i året.",
+      "source": "Brave Search",
+      "title": "r/norge on Reddit: Nystartet vs etablert liten bedrift?",
+      "url": "https://www.reddit.com/r/norge/comments/1qg43ld/nystartet_vs_etablert_liten_bedrift/"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "published_at": "2024-01-09T06:48:44",
+      "snippet": "Er game med skatt, alle skal betale sin del for samfunnet, men nå er bedriften min mest en melkeku for skatteetaten. Jeg benytter ikke annen infrastruktur fra Norge i bedrftsøymed enn internett, så føles som at jeg er en veldedig organisasjon for å donere penger til den norske stat, og det er ingen nåde å spore noensteds der i gården.",
+      "source": "Brave Search",
+      "title": "r/norge on Reddit: [rant] Drive bedrift i Norge",
+      "url": "https://www.reddit.com/r/norge/comments/191nkpf/rant_drive_bedrift_i_norge/"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
       "published_at": null,
       "snippet": "Finn bedriftsinformasjon gratis: adresse, organisasjonsnummer, eiere, ansatte og MVA-status. Komplett bedriftsoppslag for alle norske virksomheter.",
       "source": "Brave Search",
@@ -239,11 +239,11 @@
     },
     {
       "discovery_query": "restparti bedrift Norge",
-      "published_at": null,
-      "snippet": "Åpningstider: https://www.rolfselektro.no/ <strong>Rolfs Elektro er en frittstående elektronikkforhandler med hovedvekt på hvitevarer</strong>.",
+      "published_at": "2026-06-25T12:03:32",
+      "snippet": "Her finner du alt om å starte og drive bedrift.",
       "source": "Brave Search",
-      "title": "Rolfs Elektro, Barstølveien 58/Øvre Fergested 1 (2025)",
-      "url": "https://findglocal.com/NO/Kristiansand/267093243452936/Rolfs-Elektro"
+      "title": "Bedrift | SpareBank 1 Sør-Norge",
+      "url": "https://www.sparebank1.no/nb/sor-norge/bedrift.html"
     },
     {
       "discovery_query": "kontormøbler avvikling Norge",
@@ -352,14 +352,6 @@
     {
       "discovery_query": "restaurantutstyr selges Norge",
       "published_at": null,
-      "snippet": "We offer ▶ individual solutions and advise on the choice 👍 of equipment for restaurants in Europe",
-      "source": "Brave Search",
-      "title": "✅ Equipment for restaurants in Europe - individual solutions and advise",
-      "url": "https://ukrimports.com/restaurant-equipment/"
-    },
-    {
-      "discovery_query": "restaurantutstyr selges Norge",
-      "published_at": null,
       "snippet": "Se vårt utvalg av pålitelig brukt storkjøkkenutstyr til uslåelige priser! Kjøp pålitelig utstyr til ditt storkjøkken uten å tømme lommeboken. 3 mnd garanti!",
       "source": "Brave Search",
       "title": "Brukt Storkjøkken Utstyr Arkiver - Gastro Storkjøkken AS",
@@ -367,19 +359,11 @@
     },
     {
       "discovery_query": "restaurantutstyr selges Norge",
-      "published_at": "2023-10-26T10:52:55",
-      "snippet": "Det du trenger innen glass, servise, bestikk, kniver, kjøkken, servering og bar · Kjøkkenredskap, bestikk og servise har mye å si for hvordan maten tilberedes og presenteres",
+      "published_at": null,
+      "snippet": "We offer ▶ individual solutions and advise on the choice 👍 of equipment for restaurants in Europe",
       "source": "Brave Search",
-      "title": "Restaurantutstyr - Beverageman",
-      "url": "https://www.beverageman.no/butikk/restaurantutstyr/"
-    },
-    {
-      "discovery_query": "restaurantutstyr selges Norge",
-      "published_at": "2026-01-03T07:05:58",
-      "snippet": "<strong>Gastro Line</strong> - profesjonelt dagligvare- og storkjøkkenutstyr. Vi leverer restaurantutstyr fra ledende europeiske merker over hele Norge. Service i Østfold.",
-      "source": "Brave Search",
-      "title": "Gastro Line - Restaurant- og Storkjøkkenutstyr - Hele Norge",
-      "url": "https://gastroline.no/"
+      "title": "✅ Equipment for restaurants in Europe - individual solutions and advise",
+      "url": "https://ukrimports.com/restaurant-equipment/"
     },
     {
       "discovery_query": "restaurantutstyr selges Norge",
@@ -396,6 +380,22 @@
       "source": "Brave Search",
       "title": "Gastroshop.no - For profesjonelle kjøkken og hjemmekokken",
       "url": "https://gastroshop.no/"
+    },
+    {
+      "discovery_query": "restaurantutstyr selges Norge",
+      "published_at": "2026-01-03T07:05:58",
+      "snippet": "<strong>Gastro Line</strong> - profesjonelt dagligvare- og storkjøkkenutstyr. Vi leverer restaurantutstyr fra ledende europeiske merker over hele Norge. Service i Østfold.",
+      "source": "Brave Search",
+      "title": "Gastro Line - Restaurant- og Storkjøkkenutstyr - Hele Norge",
+      "url": "https://gastroline.no/"
+    },
+    {
+      "discovery_query": "restaurantutstyr selges Norge",
+      "published_at": "2023-10-26T10:52:55",
+      "snippet": "Det du trenger innen glass, servise, bestikk, kniver, kjøkken, servering og bar · Kjøkkenredskap, bestikk og servise har mye å si for hvordan maten tilberedes og presenteres",
+      "source": "Brave Search",
+      "title": "Restaurantutstyr - Beverageman",
+      "url": "https://www.beverageman.no/butikk/restaurantutstyr/"
     },
     {
       "discovery_query": "restaurantutstyr selges Norge",
@@ -623,19 +623,19 @@
     },
     {
       "discovery_query": "lagerreoler selges Norge",
-      "published_at": "2025-12-29T07:03:58",
-      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
-      "source": "Brave Search",
-      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
-      "url": "https://reolteknikk.no/"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
       "published_at": null,
       "snippet": "Stabila grovhyllor med hög bärkraft. Perfekta för förvaring av tunga maskiner, verktyg och material. Beställ enkelt online idag!",
       "source": "Brave Search",
       "title": "Lagerreol I Hyller I Oppbevaring til verkstedet I P. Lindberg",
       "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler/"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "published_at": "2025-12-29T07:03:58",
+      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
+      "source": "Brave Search",
+      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
+      "url": "https://reolteknikk.no/"
     },
     {
       "discovery_query": "lagerreoler selges Norge",

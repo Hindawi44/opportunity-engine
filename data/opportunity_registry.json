@@ -1,6 +1,6 @@
 {
   "cross_source_alias_count": 0,
-  "generated_at": "2026-07-23T06:49:59.709779+00:00",
+  "generated_at": "2026-07-23T07:47:32.706631+00:00",
   "record_count": 153,
   "records": [
     {
@@ -279,14 +279,14 @@
         "bankruptcy",
         "estate_sale"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725530+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438061+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-0268831f86ac1b504e78",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 12,
       "registry_id": "url-0268831f86ac1b504e78",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:estate_sale+4"
@@ -307,14 +307,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728571+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440806+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-04376fdce8cb350aa3a8",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-04376fdce8cb350aa3a8",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -335,15 +335,15 @@
         "bankruptcy",
         "liquidation"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729564+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441697+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-05170ee30473a1493dd3",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "published_at": "2025-01-17T13:00:58",
       "registry_id": "url-05170ee30473a1493dd3",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:liquidation+16",
@@ -365,14 +365,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725890+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438329+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-0658ba89b4c5fc6f74ea",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-0658ba89b4c5fc6f74ea",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -392,14 +392,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725957+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438392+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-067ceeb7a126feb9836a",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-067ceeb7a126feb9836a",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -420,15 +420,15 @@
         "liquidation",
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726313+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438739+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-0947f69839d91d0acbd1",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "published_at": "2025-09-30T22:19:05",
       "registry_id": "url-0947f69839d91d0acbd1",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16",
         "category:office_furniture+16",
@@ -450,14 +450,14 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724425+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437148+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-0c92990a089dcd62f0a5",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-0c92990a089dcd62f0a5",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:shop_equipment+22"
       ],
@@ -477,14 +477,14 @@
       "categories": [
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727626+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439950+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-109ce00732f8f63fe37d",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-109ce00732f8f63fe37d",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:salon_equipment+16"
       ],
@@ -504,15 +504,15 @@
       "categories": [
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727816+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440124+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-14af6bcacbb8835cea55",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "published_at": "2022-09-26T09:05:02",
       "registry_id": "url-14af6bcacbb8835cea55",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:sale_listing+10",
         "published_at_present+6"
@@ -533,14 +533,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728508+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440750+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-1ced43e391ceb5d18407",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-1ced43e391ceb5d18407",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -571,7 +571,7 @@
       ],
       "exclusion_reasons": [],
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lifecycle_status": "REJECTED",
       "market_search_query": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d",
       "matched_target_terms": [
@@ -599,7 +599,7 @@
       "registry_id": "url-1e4bfc836c64e0599d82",
       "relevance_score": 14,
       "requires_human_approval": false,
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_components": {
         "evidence": 0.0,
         "listing_quality": 7.98,
@@ -623,7 +623,7 @@
         "unified-auksjonen-613168"
       ],
       "status": "review_if_capacity",
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 12t 10m",
+      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 11t 12m",
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
     },
     {
@@ -632,14 +632,14 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728904+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441112+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-1f73a24540df445fd318",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "registry_id": "url-1f73a24540df445fd318",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22"
@@ -662,14 +662,14 @@
         "sale_listing",
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728450+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440697+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-f4aa2c103c9b5b4c9b71",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 54,
       "registry_id": "url-2e97627eab9d376e0db3",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22",
         "category:sale_listing+10",
@@ -692,15 +692,15 @@
         "liquidation",
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726476+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438883+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-308c25eccf104775fa2e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "published_at": "2024-09-04T17:42:27",
       "registry_id": "url-308c25eccf104775fa2e",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16",
         "category:office_furniture+16",
@@ -723,15 +723,15 @@
         "bankruptcy",
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725655+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438173+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-318117add644f04c71b7",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 24,
       "published_at": "2023-07-10T00:00:00",
       "registry_id": "url-318117add644f04c71b7",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:sale_listing+10",
@@ -754,15 +754,15 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729848+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441967+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-340bfb344e98a6d682c6",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 44,
       "published_at": "2020-05-01T15:30:26",
       "registry_id": "url-340bfb344e98a6d682c6",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22",
         "category:liquidation+16",
@@ -784,14 +784,14 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724581+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437221+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-34cee4bf8bfb11e74c6b",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:shop_equipment+22"
       ],
@@ -811,15 +811,15 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724729+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437358+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-3711ef931e2562238b3e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2024-08-21T08:16:24",
       "registry_id": "url-3711ef931e2562238b3e",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:shop_equipment+22",
         "published_at_present+6"
@@ -841,14 +841,14 @@
         "auction",
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727901+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440202+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-4294bca182e47934c662",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-4294bca182e47934c662",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:auction+12",
         "category:sale_listing+10"
@@ -870,15 +870,15 @@
         "liquidation",
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726255+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438687+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-4c4e1e08bb5aace3eaf9",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "published_at": "2026-03-18T16:05:18",
       "registry_id": "url-4c4e1e08bb5aace3eaf9",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16",
         "category:office_furniture+16",
@@ -901,15 +901,15 @@
         "liquidation",
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726746+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439125+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-59562469ad1ad6328d68",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "published_at": "2025-10-23T18:01:09",
       "registry_id": "url-59562469ad1ad6328d68",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16",
         "category:office_furniture+16",
@@ -931,14 +931,14 @@
       "categories": [
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727502+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439836+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-6075e05144b5e4b48b80",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-6075e05144b5e4b48b80",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:salon_equipment+16"
       ],
@@ -958,14 +958,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728262+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440519+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-613dd332d95369012b20",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-613dd332d95369012b20",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -986,14 +986,14 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729380+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441529+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-61d06a7585e140c934b7",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "registry_id": "url-61d06a7585e140c934b7",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22",
         "category:liquidation+16"
@@ -1014,15 +1014,15 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729029+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441232+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-6224c6a7d5c6caafdd61",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 14,
       "published_at": "2023-04-04T10:32:18",
       "registry_id": "url-6224c6a7d5c6caafdd61",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "published_at_present+6"
@@ -1043,15 +1043,15 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728626+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440904+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-63600f85f4126e808e67",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2025-12-29T07:03:58",
       "registry_id": "url-63600f85f4126e808e67",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22",
         "published_at_present+6"
@@ -1072,15 +1072,15 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729191+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441355+00:00",
       "first_seen_at": "2026-07-23T06:49:59.709779+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-6f80d243272ec5979920",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 14,
       "published_at": "2022-10-24T17:00:33",
       "registry_id": "url-6f80d243272ec5979920",
-      "runs_seen": 1,
+      "runs_seen": 2,
       "score_reasons": [
         "category:bankruptcy+8",
         "published_at_present+6"
@@ -1101,14 +1101,14 @@
       "categories": [
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728059+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440346+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-70716dae96a45635c972",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 10,
       "registry_id": "url-70716dae96a45635c972",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:sale_listing+10"
       ],
@@ -1129,14 +1129,14 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725334+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437887+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-7095af232aa83fda9586",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "registry_id": "url-7095af232aa83fda9586",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22"
@@ -1157,14 +1157,14 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724045+00:00",
+      "discovered_at": "2026-07-23T07:47:07.436701+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-72d343831b08e2486a3f",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-72d343831b08e2486a3f",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:shop_equipment+22"
       ],
@@ -1185,15 +1185,15 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725225+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437790+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-739247ba7577dd9e153e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 36,
       "published_at": "2025-12-29T13:49:00",
       "registry_id": "url-739247ba7577dd9e153e",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22",
@@ -1216,15 +1216,15 @@
         "liquidation",
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726625+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439020+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-748bb4c57086428778a6",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "published_at": "2024-05-16T16:21:18",
       "registry_id": "url-748bb4c57086428778a6",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16",
         "category:office_furniture+16",
@@ -1246,15 +1246,15 @@
       "categories": [
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726678+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439066+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-74a81ba296fd20b830eb",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "published_at": "2025-02-20T10:23:46",
       "registry_id": "url-74a81ba296fd20b830eb",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:office_furniture+16",
         "published_at_present+6"
@@ -1275,15 +1275,15 @@
       "categories": [
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727679+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439997+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-7570d71d9b328c0f5b6d",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "published_at": "2026-04-08T10:46:26",
       "registry_id": "url-7570d71d9b328c0f5b6d",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:salon_equipment+16",
         "published_at_present+6"
@@ -1315,7 +1315,7 @@
       ],
       "exclusion_reasons": [],
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lifecycle_status": "REJECTED",
       "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud",
       "matched_target_terms": [
@@ -1345,7 +1345,7 @@
       "registry_id": "url-777a83ea2e67fe482a4d",
       "relevance_score": 29,
       "requires_human_approval": false,
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_components": {
         "evidence": 0.0,
         "listing_quality": 9.03,
@@ -1369,7 +1369,7 @@
         "unified-auksjonen-611253"
       ],
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 5t 54m 15s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 4t 56m 48s",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
     },
     {
@@ -1378,14 +1378,14 @@
         "inventory",
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726905+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439280+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-7d98d2dca9d156e72493",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 32,
       "registry_id": "url-7d98d2dca9d156e72493",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22",
         "category:sale_listing+10"
@@ -1407,15 +1407,15 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729130+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441302+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 36,
       "published_at": "2024-05-28T11:14:39",
       "registry_id": "url-83de9ca3a65e8b6a6b20",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22",
@@ -1437,14 +1437,14 @@
       "categories": [
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727450+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439789+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-87e12a4a9439030a48a2",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-87e12a4a9439030a48a2",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:salon_equipment+16"
       ],
@@ -1466,14 +1466,14 @@
         "estate_sale",
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725048+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437669+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-895651357b4952b5a7ee",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 34,
       "registry_id": "url-895651357b4952b5a7ee",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:estate_sale+4",
@@ -1495,14 +1495,14 @@
       "categories": [
         "liquidation"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729500+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441638+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-91761ae2e8ab330867f3",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-91761ae2e8ab330867f3",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16"
       ],
@@ -1523,14 +1523,14 @@
         "sale_listing",
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724864+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437592+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-989e695b776848998740",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 32,
       "registry_id": "url-989e695b776848998740",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:sale_listing+10",
         "category:shop_equipment+22"
@@ -1551,15 +1551,15 @@
       "categories": [
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726399+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438820+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-9a0e8109970eed5a090d",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "published_at": "2023-02-15T16:00:16",
       "registry_id": "url-9a0e8109970eed5a090d",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:office_furniture+16",
         "published_at_present+6"
@@ -1591,7 +1591,7 @@
       ],
       "exclusion_reasons": [],
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lifecycle_status": "REJECTED",
       "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d",
       "matched_target_terms": [
@@ -1619,7 +1619,7 @@
       "registry_id": "url-9a6bd8cf0ad837442558",
       "relevance_score": 14,
       "requires_human_approval": false,
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_components": {
         "evidence": 0.0,
         "listing_quality": 7.98,
@@ -1643,7 +1643,7 @@
         "unified-auksjonen-613169"
       ],
       "status": "review_if_capacity",
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 12t 10m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 11t 12m",
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
     },
     {
@@ -1651,14 +1651,14 @@
       "categories": [
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726837+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439212+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-a15c941973346178a470",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 10,
       "registry_id": "url-a15c941973346178a470",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:sale_listing+10"
       ],
@@ -1681,14 +1681,14 @@
         "inventory",
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725151+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437731+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-a4fee36016437587aaef",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 52,
       "registry_id": "url-a4fee36016437587aaef",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:auction+12",
         "category:bankruptcy+8",
@@ -1712,14 +1712,14 @@
         "sale_listing",
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.723955+00:00",
+      "discovered_at": "2026-07-23T07:47:07.436617+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 32,
       "registry_id": "url-a556ee3a676d9da9ccd7",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:sale_listing+10",
         "category:shop_equipment+22"
@@ -1740,14 +1740,14 @@
       "categories": [
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727242+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439600+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-a55e3a6ff81e23b22f21",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-a55e3a6ff81e23b22f21",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:salon_equipment+16"
       ],
@@ -1767,14 +1767,14 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725284+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437841+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-a8b396d321a9a13c10d3",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 8,
       "registry_id": "url-a8b396d321a9a13c10d3",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8"
       ],
@@ -1795,14 +1795,14 @@
         "sale_listing",
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727570+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439899+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-ab264ec5f9606558d60d",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 26,
       "registry_id": "url-ab264ec5f9606558d60d",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:sale_listing+10",
         "category:salon_equipment+16"
@@ -1823,14 +1823,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728207+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440460+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-af4d49012ba98b9e814e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-af4d49012ba98b9e814e",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -1851,15 +1851,15 @@
         "liquidation",
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726180+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438620+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-b205421e9bc5c469c688",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "published_at": "2025-09-11T19:22:39",
       "registry_id": "url-b205421e9bc5c469c688",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16",
         "category:office_furniture+16",
@@ -1882,15 +1882,15 @@
         "liquidation",
         "office_furniture"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726546+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438945+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-b44ebb69f18d9ff07967",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "published_at": "2026-03-15T21:28:31",
       "registry_id": "url-b44ebb69f18d9ff07967",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16",
         "category:office_furniture+16",
@@ -1912,14 +1912,14 @@
       "categories": [
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727401+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439746+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-b84b1185b121f5c1b96e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-b84b1185b121f5c1b96e",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:salon_equipment+16"
       ],
@@ -1939,14 +1939,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728681+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440853+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-bac4413824a804dd34ad",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-bac4413824a804dd34ad",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -1966,14 +1966,14 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724965+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437533+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-bd6977fd8acb108de839",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-bd6977fd8acb108de839",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:shop_equipment+22"
       ],
@@ -1994,14 +1994,14 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729704+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441829+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-bfd07690aa50b7514dff",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "registry_id": "url-bfd07690aa50b7514dff",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22",
         "category:liquidation+16"
@@ -2023,14 +2023,14 @@
         "inventory",
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728355+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440607+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-c1e3e1a07794eb2a24ac",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 32,
       "registry_id": "url-c1e3e1a07794eb2a24ac",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22",
         "category:sale_listing+10"
@@ -2051,14 +2051,14 @@
       "categories": [
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727296+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439650+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-c357ac15a9bf75a0ba5e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-c357ac15a9bf75a0ba5e",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:salon_equipment+16"
       ],
@@ -2080,15 +2080,15 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729631+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441761+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-ca1ad62b7e7d8ad4d383",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 52,
       "published_at": "2026-02-26T18:19:57",
       "registry_id": "url-ca1ad62b7e7d8ad4d383",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22",
@@ -2111,15 +2111,15 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725807+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438275+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-cd259dfa5072e807b3b3",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2020-10-03T16:33:09",
       "registry_id": "url-cd259dfa5072e807b3b3",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22",
         "published_at_present+6"
@@ -2140,14 +2140,14 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724502+00:00",
+      "discovered_at": "2026-07-23T07:47:07.436761+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-123271c51c6da4a9405e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-cddc2d88deb70717cb31",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:shop_equipment+22"
       ],
@@ -2167,14 +2167,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728148+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440409+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-cecaedbad94f2c556672",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-cecaedbad94f2c556672",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -2194,14 +2194,14 @@
       "categories": [
         "auction"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727737+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440050+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-cf6b50eeda9575ca51c2",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 12,
       "registry_id": "url-cf6b50eeda9575ca51c2",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:auction+12"
       ],
@@ -2221,15 +2221,15 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-07-23T06:49:41.729254+00:00",
+      "discovered_at": "2026-07-23T07:47:07.441410+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-d2192f749651b034d4eb",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 14,
       "published_at": "2022-09-05T10:02:35",
       "registry_id": "url-d2192f749651b034d4eb",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "published_at_present+6"
@@ -2250,14 +2250,14 @@
       "categories": [
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727104+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439401+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-da37cba0876e2ce205f6",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 10,
       "registry_id": "url-da37cba0876e2ce205f6",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:sale_listing+10"
       ],
@@ -2277,14 +2277,14 @@
       "categories": [
         "salon_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.727349+00:00",
+      "discovered_at": "2026-07-23T07:47:07.439698+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-dcc37d09e23b72b09f7d",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-dcc37d09e23b72b09f7d",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:salon_equipment+16"
       ],
@@ -2304,14 +2304,14 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724646+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437280+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-e42d52eb07a436ed3cfe",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-e42d52eb07a436ed3cfe",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:shop_equipment+22"
       ],
@@ -2332,14 +2332,14 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725392+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437939+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-e6c891e1c13bdc192b3d",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "registry_id": "url-e6c891e1c13bdc192b3d",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22"
@@ -2361,14 +2361,14 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728777+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440992+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-eecaf76c7cb772f25373",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "registry_id": "url-eecaf76c7cb772f25373",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22"
@@ -2389,14 +2389,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-23T06:49:41.728725+00:00",
+      "discovered_at": "2026-07-23T07:47:07.440945+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-f233ebf2b059bd695449",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-f233ebf2b059bd695449",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -2416,14 +2416,14 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725457+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437994+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-f47652f646757f4a5e07",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 8,
       "registry_id": "url-f47652f646757f4a5e07",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8"
       ],
@@ -2443,15 +2443,15 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-07-23T06:49:41.724801+00:00",
+      "discovered_at": "2026-07-23T07:47:07.437426+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-f5e25a1bdcd9e106de57",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2023-01-06T00:00:00",
       "registry_id": "url-f5e25a1bdcd9e106de57",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:shop_equipment+22",
         "published_at_present+6"
@@ -2474,15 +2474,15 @@
         "inventory",
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.725593+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438117+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-fd34f7ffe57de15e0cfb",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 46,
       "published_at": "2022-01-06T09:57:51",
       "registry_id": "url-fd34f7ffe57de15e0cfb",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22",
@@ -2507,14 +2507,14 @@
         "office_furniture",
         "sale_listing"
       ],
-      "discovered_at": "2026-07-23T06:49:41.726110+00:00",
+      "discovered_at": "2026-07-23T07:47:07.438568+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-07-23T06:49:59.709779+00:00",
+      "last_seen_at": "2026-07-23T07:47:32.706631+00:00",
       "lead_id": "web-fdc9844ca40ffc16438b",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 42,
       "registry_id": "url-fdc9844ca40ffc16438b",
-      "runs_seen": 2,
+      "runs_seen": 3,
       "score_reasons": [
         "category:liquidation+16",
         "category:office_furniture+16",
