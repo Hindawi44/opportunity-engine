@@ -1,15 +1,15 @@
-"""Real-opportunity validation metrics for Opportunity Engine v2.7.1.
+"""Real-opportunity validation metrics and pipeline trace audit.
 
 This module evaluates persisted daily-pipeline output without changing investment
-recommendations. It records measurable coverage and data-quality KPIs so later
-validation phases can compare system output with real market outcomes.
+recommendations. V2.7.2.1 adds an explicit explanation of why each opportunity
+was or was not sent to external research, and how far it progressed.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 import json
 import time
 
@@ -27,7 +27,6 @@ def _as_rows(payload: Any) -> list[dict[str, Any]]:
         value = payload.get(key)
         if isinstance(value, list):
             return [row for row in value if isinstance(row, dict)]
-    # A single opportunity is accepted for deterministic/manual validation.
     if any(key in payload for key in ("opportunity_id", "id", "title", "source_url", "url")):
         return [payload]
     return []
@@ -57,6 +56,10 @@ class OpportunityValidationRecord:
     source_url: str | None
     internal_score: float | None
     external_research_eligible: bool
+    eligibility_reason: str
+    required_score: float
+    pipeline_stage_reached: str
+    blocked_before: str | None
     comparable_count: int
     buyer_count: int
     evidence_count: int
@@ -73,6 +76,12 @@ class ValidationKpis:
     opportunities_with_source_url: int
     opportunities_with_price: int
     external_research_eligible: int
+    blocked_below_score: int
+    blocked_missing_score: int
+    explicitly_ineligible: int
+    reached_external_research: int
+    reached_evidence: int
+    reached_scenarios: int
     opportunities_with_comparables: int
     accepted_comparables: int
     opportunities_with_buyers: int
@@ -96,7 +105,7 @@ class RealDatasetValidationReport:
     kpis: ValidationKpis
     records: tuple[OpportunityValidationRecord, ...]
     warnings: tuple[str, ...] = ()
-    schema_version: str = "2.7.1"
+    schema_version: str = "2.7.2.1"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -148,34 +157,55 @@ class RealOpportunityValidator:
                 missing.append("source_url")
 
             explicit_eligible = row.get("external_research_eligible")
-            eligible = (
-                bool(explicit_eligible)
-                if isinstance(explicit_eligible, bool)
-                else score is not None and score >= self.external_research_score_threshold
+            if isinstance(explicit_eligible, bool):
+                eligible = explicit_eligible
+                eligibility_reason = "explicitly_eligible" if eligible else "explicitly_ineligible"
+            elif score is None:
+                eligible = False
+                eligibility_reason = "missing_internal_score"
+            elif score < self.external_research_score_threshold:
+                eligible = False
+                eligibility_reason = "internal_score_below_threshold"
+            else:
+                eligible = True
+                eligibility_reason = "internal_score_meets_threshold"
+
+            stage, blocked_before = self._pipeline_stage(
+                eligible=eligible,
+                comparable_count=comparable_count,
+                buyer_count=buyer_count,
+                evidence_count=evidence_count,
+                scenario_count=scenario_count,
+                best_scenario_present=best_scenario is not None,
             )
 
-            records.append(
-                OpportunityValidationRecord(
-                    opportunity_id=opportunity_id,
-                    title=str(title) if title is not None else None,
-                    source=str(_first(row, "source", "source_name", "provider")) if _first(row, "source", "source_name", "provider") is not None else None,
-                    source_url=str(source_url) if source_url is not None else None,
-                    internal_score=score,
-                    external_research_eligible=eligible,
-                    comparable_count=comparable_count,
-                    buyer_count=buyer_count,
-                    evidence_count=evidence_count,
-                    scenario_count=scenario_count,
-                    best_scenario_present=best_scenario is not None,
-                    missing_fields=tuple(missing),
-                )
-            )
+            source_value = _first(row, "source", "source_name", "provider")
+            records.append(OpportunityValidationRecord(
+                opportunity_id=opportunity_id,
+                title=str(title) if title is not None else None,
+                source=str(source_value) if source_value is not None else None,
+                source_url=str(source_url) if source_url is not None else None,
+                internal_score=score,
+                external_research_eligible=eligible,
+                eligibility_reason=eligibility_reason,
+                required_score=self.external_research_score_threshold,
+                pipeline_stage_reached=stage,
+                blocked_before=blocked_before,
+                comparable_count=comparable_count,
+                buyer_count=buyer_count,
+                evidence_count=evidence_count,
+                scenario_count=scenario_count,
+                best_scenario_present=best_scenario is not None,
+                missing_fields=tuple(missing),
+            ))
 
         count = len(records)
         if not rows:
             warnings.append("No opportunity rows were found in the supplied payload")
         if any(record.missing_fields for record in records):
             warnings.append("Some opportunities are missing one or more core identity fields")
+        if rows and not any(record.external_research_eligible for record in records):
+            warnings.append("No opportunities qualified for external research; inspect eligibility_reason and required_score")
 
         def rate(numerator: int) -> float:
             return round(numerator / count, 4) if count else 0.0
@@ -197,6 +227,12 @@ class RealOpportunityValidator:
             opportunities_with_source_url=source_count,
             opportunities_with_price=prices_present,
             external_research_eligible=eligible_count,
+            blocked_below_score=sum(r.eligibility_reason == "internal_score_below_threshold" for r in records),
+            blocked_missing_score=sum(r.eligibility_reason == "missing_internal_score" for r in records),
+            explicitly_ineligible=sum(r.eligibility_reason == "explicitly_ineligible" for r in records),
+            reached_external_research=sum(r.pipeline_stage_reached not in ("discovery", "eligibility") for r in records),
+            reached_evidence=sum(r.evidence_count > 0 for r in records),
+            reached_scenarios=sum(r.scenario_count > 0 for r in records),
             opportunities_with_comparables=opportunities_with_comparables,
             accepted_comparables=accepted_comparables,
             opportunities_with_buyers=opportunities_with_buyers,
@@ -232,6 +268,20 @@ class RealOpportunityValidator:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(json.dumps(report.to_dict(), ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
         return target
+
+    @staticmethod
+    def _pipeline_stage(*, eligible: bool, comparable_count: int, buyer_count: int, evidence_count: int, scenario_count: int, best_scenario_present: bool) -> tuple[str, str | None]:
+        if not eligible:
+            return "eligibility", "external_research"
+        if best_scenario_present:
+            return "best_scenario", None
+        if scenario_count > 0:
+            return "scenario_generation", "best_scenario_selection"
+        if evidence_count > 0:
+            return "evidence", "scenario_generation"
+        if comparable_count > 0 or buyer_count > 0:
+            return "external_research", "evidence_persistence"
+        return "eligibility", "external_research_results"
 
     @staticmethod
     def _count(row: dict[str, Any], *keys: str) -> int:
