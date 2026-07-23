@@ -1,0 +1,97 @@
+name: V2.7.2.4.7 Comparable Acceptance Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      opportunity_limit:
+        description: Maximum opportunities to discover
+        required: true
+        default: '20'
+      research_threshold:
+        description: Preliminary research threshold
+        required: true
+        default: '25'
+      selection_limit:
+        description: Maximum selected candidates to audit
+        required: true
+        default: '3'
+      row_limit:
+        description: Maximum Brave rows inspected per search
+        required: true
+        default: '20'
+
+permissions:
+  contents: read
+
+jobs:
+  comparable-acceptance-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      BRAVE_MAX_REQUESTS_PER_RUN: '8'
+      BRAVE_CACHE_TTL_HOURS: '0'
+      EXTERNAL_RESEARCH_MAX_OPPORTUNITIES: '0'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Verify Brave secret
+        run: |
+          if [ -z "${BRAVE_API_KEY}" ]; then
+            echo "BRAVE_API_KEY is missing"
+            exit 1
+          fi
+          echo "BRAVE_API_KEY is configured"
+
+      - name: Create output folders
+        run: mkdir -p data/validation data/investment_files data/evidence
+
+      - name: Generate fresh opportunity dataset
+        run: |
+          python scripts/run_daily_pipeline.py \
+            --limit "${{ inputs.opportunity_limit }}" \
+            > data/validation/v2.7.2.4.7-daily-pipeline-run.json
+
+      - name: Run comparable acceptance audit
+        run: |
+          python scripts/run_comparable_acceptance_audit.py \
+            data/todays_opportunities.json \
+            --threshold "${{ inputs.research_threshold }}" \
+            --selection-limit "${{ inputs.selection_limit }}" \
+            --row-limit "${{ inputs.row_limit }}" \
+            --output data/validation/v2.7.2.4.7-comparable-acceptance-audit.json
+
+      - name: Print comparable acceptance audit
+        if: always()
+        run: |
+          if [ -f data/validation/v2.7.2.4.7-comparable-acceptance-audit.json ]; then
+            python -m json.tool data/validation/v2.7.2.4.7-comparable-acceptance-audit.json
+          else
+            echo "Comparable acceptance audit report was not produced."
+          fi
+
+      - name: Upload comparable acceptance audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.7.2.4.7-comparable-acceptance-audit
+          path: |
+            data/validation/
+            data/todays_opportunities.json
+            data/investment_files/
+            data/evidence/
+            data/brave_usage.jsonl
+          if-no-files-found: warn
+          retention-days: 14
