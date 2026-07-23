@@ -61,6 +61,8 @@ def main() -> int:
             "--daily", "data/todays_opportunities.json",
             "--discovery", "data/discovery_leads.json",
             "--events", "data/public_auction_event_leads.json",
+            "--channels", "data/opportunity_channels.json",
+            "--source-funnel", "data/source_funnel.json",
             "--output", "data/cross_source_deduplication_audit.json",
         ], root)
         if audit_exit != 0:

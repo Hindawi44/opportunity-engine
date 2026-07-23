@@ -88,3 +88,46 @@ def test_report_always_contains_all_three_official_sources() -> None:
 def test_validation_fails_when_an_official_source_is_missing() -> None:
     payload = {"source_names": ["Auksjonen.no", "Politiet.no"]}
     assert MODULE.validate_official_sources(payload) is False
+
+
+def test_konkurs_channel_records_reach_audit_and_reconcile_with_funnel() -> None:
+    konkurs_records = [
+        item("Konkurs.app", "k-1", "ANNA J AS", "https://konkurs.app/konkursbo/1", "Namsos", None),
+        item("Konkurs.app", "k-2", "CEBRA AS", "https://konkurs.app/konkursbo/2", "Ullensaker", None),
+    ]
+    payload = MODULE.build_audit(
+        [("bankruptcy_leads", konkurs_records)],
+        funnel_counts={"Auksjonen.no": 0, "Konkurs.app": 2, "Politiet.no": 0},
+    )
+    assert payload["source_record_counts"]["Konkurs.app"] == 2
+    assert payload["source_funnel_reconciliation"]["Konkurs.app"] == {
+        "fetched_count": 2,
+        "audit_record_count": 2,
+        "difference": 0,
+        "exclusion_reasons": [],
+        "status": "RECONCILED",
+    }
+    assert MODULE.validate_funnel_coverage(payload) is True
+
+
+def test_fetched_source_cannot_disappear_without_exclusion_reason() -> None:
+    payload = MODULE.build_audit(
+        [],
+        funnel_counts={"Auksjonen.no": 0, "Konkurs.app": 3, "Politiet.no": 0},
+    )
+    row = payload["source_funnel_reconciliation"]["Konkurs.app"]
+    assert row["audit_record_count"] == 0
+    assert row["exclusion_reasons"]
+    assert MODULE.validate_funnel_coverage(payload) is True
+
+    row["exclusion_reasons"] = []
+    assert MODULE.validate_funnel_coverage(payload) is False
+
+
+def test_duplicate_channel_input_is_counted_once() -> None:
+    record = item("Konkurs.app", "k-1", "ANNA J AS", "https://konkurs.app/konkursbo/1", "Namsos", None)
+    payload = MODULE.build_audit([
+        ("discovery", [record]),
+        ("bankruptcy_leads", [record]),
+    ])
+    assert payload["source_record_counts"]["Konkurs.app"] == 1
