@@ -34,11 +34,13 @@ def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
         f"Status: {report.get('status', 'UNKNOWN')}",
         "",
         f"Queries submitted: {report.get('queries_submitted', 0)}",
-        f"Candidates received: {report.get('candidates_received', 0)}",
+        f"Hits received: {report.get('hits_received', 0)}",
         f"Duplicates removed: {report.get('duplicates_removed', 0)}",
+        f"Filtered out: {report.get('filtered_out_count', 0)}",
+        f"Candidates received: {report.get('candidates_received', 0)}",
         f"Confirmed sales: {report.get('confirmed_sales', 0)}",
         f"Needs contact: {report.get('follow_up_leads', 0)}",
-        f"Rejected: {report.get('rejected_results', 0)}",
+        f"Rejected after filter: {report.get('rejected_results', 0)}",
         f"Errors: {len(errors)}",
         "",
         "TOP RESULTS",
@@ -110,8 +112,8 @@ def write_reports(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--report", default="artifacts/discovery-v1.4-live-report.json")
-    parser.add_argument("--text-report", default="artifacts/discovery-v1.4-phone-report.txt")
+    parser.add_argument("--report", default="artifacts/discovery-v1.5-live-report.json")
+    parser.add_argument("--text-report", default="artifacts/discovery-v1.5-phone-report.txt")
     parser.add_argument("--country", default="Norge")
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument("--mobile-limit", type=int, default=10)
@@ -131,7 +133,7 @@ def main() -> int:
         results_per_query=args.results_per_query,
         query_delay_seconds=args.query_delay_seconds,
     )
-    report["pilot_version"] = "1.4.1"
+    report["pilot_version"] = "1.5"
     report["pilot_topic"] = "CLOTHING_INVENTORY"
     report["query_records"] = query_records
     report["live_network_used"] = True
