@@ -1,0 +1,58 @@
+name: V2.10 Verified Financial Integration E2E Acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'src/opportunity_engine/verified_financial_integration.py'
+      - 'src/opportunity_engine/external_financial_bridge.py'
+      - 'src/opportunity_engine/external_research/**'
+      - 'scripts/run_v210_verified_financial_e2e_acceptance.py'
+      - 'tests/test_v210_verified_financial_integration_e2e.py'
+      - '.github/workflows/v2.10-verified-financial-integration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verified-financial-integration:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run V2.8 V2.9 and V2.10 contract tests
+        run: |
+          pytest -q \
+            tests/test_v282b_comparable_evidence_e2e.py \
+            tests/test_v29_auction_cost_evidence_e2e.py \
+            tests/test_v210_verified_financial_integration_e2e.py
+      - name: Run deterministic acceptance
+        run: |
+          python scripts/run_v210_verified_financial_e2e_acceptance.py \
+            --output data/validation/v2.10-financial-integration-e2e-acceptance.json
+      - name: Print one acceptance summary
+        if: always()
+        run: |
+          if [ -f data/validation/v2.10-financial-integration-e2e-acceptance.json ]; then
+            cat data/validation/v2.10-financial-integration-e2e-acceptance.json
+          else
+            echo '{"schema_version":"2.10","errors":["acceptance_summary_missing"],"status":"FAIL"}'
+            exit 1
+          fi
+      - name: Upload acceptance summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.10-financial-integration-acceptance
+          path: data/validation/v2.10-financial-integration-e2e-acceptance.json
+          if-no-files-found: error
+          retention-days: 14
