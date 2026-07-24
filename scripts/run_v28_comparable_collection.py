@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Focused V2.8.2 pass that integrates persisted market comparables safely."""
+"""Focused V2.8.2A pass that integrates only valid persisted market comparables."""
 from __future__ import annotations
 
 import argparse
@@ -21,13 +21,38 @@ def _evidence_type_value(item: Any) -> str:
     return str(getattr(value, "value", value)).casefold()
 
 
+def _has_verified_nok_observation(item: Any) -> bool:
+    """Return true only for a usable HTTPS market-price observation in NOK.
+
+    Older runs may contain ``market_price`` evidence shells with no numeric observation.
+    Counting those shells as completed comparables stops Brave searches prematurely and
+    leaves the financial bridge with zero verified comparables.
+    """
+    if _evidence_type_value(item) != "market_price":
+        return False
+    source_url = str(getattr(item, "source_url", "") or "").strip()
+    if not source_url.startswith("https://"):
+        return False
+    for observation in getattr(item, "observations", ()) or ():
+        value = getattr(observation, "numeric_value", None)
+        currency = str(getattr(observation, "currency", "") or "").upper()
+        if (
+            isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and value > 0
+            and currency == "NOK"
+        ):
+            return True
+    return False
+
+
 class ComparableCollectionLoop(ProductionExternalEvidenceLoop):
     """Generate query variants and link persisted evidence to living scenarios."""
 
     def detect_needs(self, investment_file: Any) -> tuple[ResearchNeed, ...]:
         opportunity_id = str(investment_file.opportunity_id)
         existing = tuple(getattr(self.evidence_repository, "list_for_opportunity", lambda _id: ())(opportunity_id))
-        existing_prices = sum(_evidence_type_value(item) == "market_price" for item in existing)
+        existing_prices = sum(_has_verified_nok_observation(item) for item in existing)
         if existing_prices >= 3:
             return ()
 
@@ -108,8 +133,8 @@ def main() -> int:
         disabled_reason="missing_brave_api_key",
     )
     report = pipeline.run(payload).to_dict()
-    report["schema_version"] = "2.8.2"
-    report["audit_scope"] = "Comparable evidence integration into scenarios"
+    report["schema_version"] = "2.8.2A"
+    report["audit_scope"] = "Valid comparable gate and evidence integration"
     target = Path(args.output)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
