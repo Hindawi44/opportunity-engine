@@ -1,4 +1,4 @@
-name: Discovery V1.5 Intelligent Result Filter
+name: Discovery V1.6 Opportunity Quality Engine
 
 on:
   pull_request:
@@ -14,10 +14,11 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pytest
-      - name: Run Discovery V1.5 filter tests
+      - name: Run Discovery V1.6 quality tests
         env:
           PYTHONPATH: src:.
         run: |
+          pytest tests/test_discovery_v16_quality_engine.py -q
           pytest tests/test_discovery_v15_result_filter.py -q
           pytest tests/test_discovery_v12_live_pilot.py -q
       - name: Run regression suite
@@ -33,20 +34,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Run live Brave pilot with intelligent filtering
+      - name: Run live Brave pilot with quality scoring
         env:
           PYTHONPATH: src:.
           BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
         run: |
           python scripts/run_discovery_v12_live_pilot.py \
             --mobile-limit 10 \
-            --report artifacts/discovery-v1.5-live-report.json \
-            --text-report artifacts/discovery-v1.5-phone-report.txt
+            --report artifacts/discovery-v1.6-live-report.json \
+            --text-report artifacts/discovery-v1.6-phone-report.txt
       - name: Show phone report
         if: ${{ always() }}
         run: |
-          if [ -f artifacts/discovery-v1.5-phone-report.txt ]; then
-            cat artifacts/discovery-v1.5-phone-report.txt
+          if [ -f artifacts/discovery-v1.6-phone-report.txt ]; then
+            cat artifacts/discovery-v1.6-phone-report.txt
           else
             echo "Phone report was not created."
           fi
@@ -54,8 +55,8 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: discovery-v1.5-intelligent-result-filter
+          name: discovery-v1.6-opportunity-quality-engine
           path: |
-            artifacts/discovery-v1.5-phone-report.txt
-            artifacts/discovery-v1.5-live-report.json
+            artifacts/discovery-v1.6-phone-report.txt
+            artifacts/discovery-v1.6-live-report.json
           if-no-files-found: warn
