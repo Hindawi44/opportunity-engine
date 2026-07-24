@@ -1,0 +1,25 @@
+name: Discovery V1 Clothing Inventory
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  discovery-v1-acceptance:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install pytest
+      - name: Run Discovery V1 acceptance tests
+        run: pytest tests/test_discovery_opportunity_maps.py tests/test_discovery_classifier.py -q
+      - name: Run full regression suite
+        run: pytest -q
