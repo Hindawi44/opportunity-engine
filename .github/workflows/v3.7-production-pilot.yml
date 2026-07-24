@@ -1,0 +1,46 @@
+name: V3.7 Production Pilot Acceptance
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+jobs:
+  production-pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pytest
+
+      - name: Run V3.7 acceptance test
+        env:
+          PYTHONPATH: src:repository
+        run: pytest tests/test_v37_production_pilot.py -q
+
+      - name: Generate one production pilot summary
+        env:
+          PYTHONPATH: src:repository
+        run: python scripts/run_v37_production_pilot_acceptance.py
+
+      - name: Run regression suite
+        env:
+          PYTHONPATH: src:repository
+        run: pytest -q
+
+      - name: Print one summary
+        run: cat artifacts/v3.7-production-pilot-summary.json
+
+      - name: Upload production pilot summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3.7-production-pilot-summary
+          path: artifacts/v3.7-production-pilot-summary.json
