@@ -1,0 +1,56 @@
+name: V2.8.2B Comparable Evidence E2E Acceptance
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/opportunity_engine/external_research/**"
+      - "src/opportunity_engine/external_evidence_loop.py"
+      - "scripts/run_research_bootstrap.py"
+      - "scripts/run_v282b_comparable_e2e_acceptance.py"
+      - "tests/test_v282b_comparable_evidence_e2e.py"
+      - ".github/workflows/v2.8.2b-comparable-evidence-e2e-acceptance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  comparable-evidence-e2e-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run contract and E2E tests
+        run: python -m pytest tests/test_v282b_comparable_evidence_e2e.py -q
+
+      - name: Run deterministic acceptance
+        run: |
+          python scripts/run_v282b_comparable_e2e_acceptance.py \
+            --output data/validation/v2.8.2b-comparable-e2e-acceptance.json
+
+      - name: Print one acceptance summary
+        if: always()
+        run: python -m json.tool data/validation/v2.8.2b-comparable-e2e-acceptance.json
+
+      - name: Upload acceptance summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.8.2b-comparable-e2e-acceptance
+          path: data/validation/v2.8.2b-comparable-e2e-acceptance.json
+          if-no-files-found: error
+          retention-days: 14
