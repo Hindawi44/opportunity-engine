@@ -1,0 +1,43 @@
+name: Discovery V1.2 Live Pilot
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest
+      - name: Run V1.2 contract test
+        env:
+          PYTHONPATH: src:.
+        run: pytest tests/test_discovery_v12_live_pilot.py -q
+      - name: Run regression suite
+        env:
+          PYTHONPATH: src:.
+        run: pytest -q
+
+  live-pilot:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run live Brave pilot
+        env:
+          PYTHONPATH: src:.
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+        run: python scripts/run_discovery_v12_live_pilot.py
+      - name: Upload live pilot report
+        uses: actions/upload-artifact@v4
+        with:
+          name: discovery-v1.2-live-pilot-summary
+          path: artifacts/discovery-v1.2-live-pilot-summary.json
