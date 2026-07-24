@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Focused V2.8.1 pass that spends its search budget on market comparables."""
+"""Focused V2.8.2 pass that integrates persisted market comparables safely."""
 from __future__ import annotations
 
 import argparse
@@ -22,7 +22,7 @@ def _evidence_type_value(item: Any) -> str:
 
 
 class ComparableCollectionLoop(ProductionExternalEvidenceLoop):
-    """Generate independent query variants until three persisted prices exist."""
+    """Generate query variants and link persisted evidence to living scenarios."""
 
     def detect_needs(self, investment_file: Any) -> tuple[ResearchNeed, ...]:
         opportunity_id = str(investment_file.opportunity_id)
@@ -43,6 +43,35 @@ class ComparableCollectionLoop(ProductionExternalEvidenceLoop):
             for query in variants[: min(2, missing)]
         )
 
+    def _store_external_evidence(self, investment_file: Any, **kwargs: Any) -> tuple[str | bool, str | None]:
+        """Return the living-file evidence ID accepted by ScenarioGenerator.
+
+        The persistent EvidenceRepository uses ``rev_*`` IDs, while the living investment
+        file creates its own mirror Evidence ID. ScenarioGenerator validates IDs against
+        the living file, so passing the repository ID causes ``Unknown evidence ids``.
+        This method reloads the persisted record, then resolves its living mirror and
+        returns the mirror ID for scenario regeneration.
+        """
+        changed, persisted_id = super()._store_external_evidence(investment_file, **kwargs)
+        if not persisted_id:
+            return changed, None
+
+        loader = getattr(self.evidence_repository, "load", None)
+        if callable(loader):
+            try:
+                persisted = loader(str(investment_file.opportunity_id), str(persisted_id))
+                persisted_id = str(getattr(persisted, "evidence_id", persisted_id))
+            except (FileNotFoundError, ValueError, OSError):
+                pass
+
+        expected_note = f"research:{persisted_id}"
+        for item in getattr(investment_file, "evidence", ()):
+            if str(getattr(item, "notes", "")) == expected_note:
+                living_id = str(getattr(item, "evidence_id", "")).strip()
+                if living_id:
+                    return changed, living_id
+        return changed, None
+
 
 def build_comparable_loop() -> ComparableCollectionLoop:
     base = build_loop()
@@ -61,7 +90,7 @@ def build_comparable_loop() -> ComparableCollectionLoop:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset", nargs="?", default="data/todays_opportunities.json")
-    parser.add_argument("--output", default="data/validation/v2.8.1-comparable-collection.json")
+    parser.add_argument("--output", default="data/validation/v2.8.2-comparable-collection.json")
     parser.add_argument("--investment-files-dir", default="data/investment_files")
     parser.add_argument("--threshold", type=float, default=25.0)
     parser.add_argument("--selection-limit", type=int, default=3)
@@ -79,8 +108,8 @@ def main() -> int:
         disabled_reason="missing_brave_api_key",
     )
     report = pipeline.run(payload).to_dict()
-    report["schema_version"] = "2.8.1"
-    report["audit_scope"] = "Focused market comparable collection only"
+    report["schema_version"] = "2.8.2"
+    report["audit_scope"] = "Comparable evidence integration into scenarios"
     target = Path(args.output)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
