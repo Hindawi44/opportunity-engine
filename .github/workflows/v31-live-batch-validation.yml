@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install -e . pytest
+        run: pip install pytest
       - name: Validate batch behavior
         run: pytest tests/test_v31_live_batch_validation.py -q
       - name: Generate one batch report
