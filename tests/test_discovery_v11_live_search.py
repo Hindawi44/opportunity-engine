@@ -43,8 +43,9 @@ def test_brave_provider_builds_norway_request_and_normalizes_hits():
     params = parse_qs(urlparse(captured["url"]).query)
     assert params["q"] == ["varelager klær"]
     assert params["country"] == ["NO"]
-    assert params["search_lang"] == ["no"]
+    assert "search_lang" not in params
     assert "ui_lang" not in params
+    assert params["result_filter"] == ["web"]
     assert params["count"] == ["5"]
     assert captured["token"] == "secret"
     assert captured["timeout"] == 20.0
@@ -63,14 +64,14 @@ def test_brave_provider_exposes_safe_http_error_body():
         code=422,
         msg="Unprocessable Entity",
         hdrs=headers,
-        fp=BytesIO(b'{"message":"Invalid ui_lang"}'),
+        fp=BytesIO(b'{"message":"Invalid search_lang"}'),
     )
 
     def transport(request, timeout):
         raise error
 
     provider = BraveSearchProvider("secret", transport=transport, max_retries=0)
-    with pytest.raises(RuntimeError, match=r"HTTP 422.*Invalid ui_lang"):
+    with pytest.raises(RuntimeError, match=r"HTTP 422.*Invalid search_lang"):
         provider.search("varelager klær")
 
 

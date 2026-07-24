@@ -67,21 +67,23 @@ class BraveSearchProvider:
         if not 1 <= count <= 20:
             raise ValueError("count must be between 1 and 20")
 
-        # ui_lang is intentionally omitted. Brave validates it against a strict
-        # locale enum, and unsupported Norwegian locale variants return HTTP 422.
+        # Norwegian intent already exists in the Norwegian query terms. Brave's
+        # language parameters are strict enums and rejected the previous `no`
+        # value with HTTP 422. Keep geographic targeting and let Brave infer
+        # language from the query text.
         params = urlencode({
             "q": clean_query,
             "count": count,
             "country": "NO",
-            "search_lang": "no",
             "safesearch": "moderate",
+            "result_filter": "web",
         })
         request = Request(
             f"{BRAVE_WEB_SEARCH_ENDPOINT}?{params}",
             headers={
                 "Accept": "application/json",
                 "X-Subscription-Token": self._api_key,
-                "User-Agent": "OpportunityEngine/Discovery-1.4.1",
+                "User-Agent": "OpportunityEngine/Discovery-1.4.2",
             },
         )
 
