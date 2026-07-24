@@ -31,6 +31,7 @@ def main() -> int:
     parser.add_argument("--evaluations-output", default="data/economic_evaluation_queue.json")
     parser.add_argument("--scores-output", default="data/scored_opportunities.json")
     parser.add_argument("--summary-output", default="data/validation/v2.7.2.5-financial-final-score.json")
+    parser.add_argument("--schema-version", default="2.7.2.5")
     args = parser.parse_args()
 
     queue_payload = _read(Path(args.queue), {"queue": []})
@@ -81,23 +82,26 @@ def main() -> int:
     summary_records: list[dict[str, Any]] = []
     for item in scored:
         components = item.get("score_components") if isinstance(item.get("score_components"), dict) else {}
+        opportunity_id = str(item.get("opportunity_id"))
+        market_comparables = records.get(opportunity_id, {}).get("market_comparables", [])
+        verified_count = len(market_comparables) if isinstance(market_comparables, list) else 0
         summary_records.append({
             "opportunity_id": item.get("opportunity_id"),
             "title": item.get("title"),
-            "verified_comparables": len(
-                records.get(str(item.get("opportunity_id")), {}).get("market_comparables", [])
-            ),
+            "verified_comparables": verified_count,
+            "verified_comparable_count": verified_count,
             "financial_score": components.get("verified_economics", 0.0),
             "final_investment_score": item.get("opportunity_score"),
             "grade": item.get("score_grade"),
             "recommendation": item.get("recommendation"),
             "decision": item.get("decision"),
+            "score_status": "NUMERIC" if item.get("decision") == "REVIEW_NUMBERS" else "PRELIMINARY",
             "expected_profit_nok": item.get("expected_profit_nok"),
             "roi_percent": item.get("roi_percent"),
             "missing_evidence": item.get("missing_evidence"),
         })
     summary = {
-        "schema_version": "2.7.2.5",
+        "schema_version": args.schema_version,
         "external_evidence_opportunities": len(external),
         "external_comparables": sum(len(item.get("market_comparables", [])) for item in external.values()),
         "financial_scores_calculated": len(summary_records),
