@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 
 from opportunity_engine.external_evidence_loop import ExternalEvidenceLoop
 
@@ -84,8 +85,12 @@ class Scenario:
 
 
 class Comparable:
-    url = "https://example.no/item"
+    title = "Used shop fixture"
+    url = "https://marketplace.no/item/123"
     price_nok = 12000.0
+    source_name = "Marketplace"
+    observed_at = datetime.now(timezone.utc).isoformat()
+    similarity_score = 0.82
 
 
 class ComparablesResult:
