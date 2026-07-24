@@ -23,6 +23,7 @@ def run_live_discovery(
     candidates: list[DiscoveryCandidate] = []
     seen_urls: set[str] = set()
     errors: list[dict[str, str]] = []
+    hits_received = 0
 
     for query in clean_queries:
         try:
@@ -31,6 +32,7 @@ def run_live_discovery(
             errors.append({"query": query, "error": str(exc)})
             continue
         for hit in hits:
+            hits_received += 1
             if hit.url in seen_urls:
                 continue
             seen_urls.add(hit.url)
@@ -52,8 +54,9 @@ def run_live_discovery(
         "provider": provider.name,
         "discovered_at": timestamp,
         "queries_submitted": len(clean_queries),
+        "hits_received": hits_received,
         "candidates_received": len(candidates),
-        "duplicates_removed": sum(1 for _ in []) if False else 0,
+        "duplicates_removed": hits_received - len(candidates),
         "classified_results": [result.to_dict() for result in classified],
         "confirmed_sales": sum(result.status == "SALE_CONFIRMED" for result in classified),
         "follow_up_leads": sum(result.status == "CONTACT_REQUIRED" for result in classified),
