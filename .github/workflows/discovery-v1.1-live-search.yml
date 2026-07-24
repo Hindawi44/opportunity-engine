@@ -1,0 +1,29 @@
+name: Discovery V1.1 Live Search Adapter
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  discovery-live-search:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependency
+        run: pip install pytest
+
+      - name: Run Discovery V1.1 acceptance tests
+        run: pytest tests/test_discovery_v11_live_search.py -q
+
+      - name: Run complete regression suite
+        run: pytest -q
