@@ -1,0 +1,69 @@
+name: V3.3 Live Source Ingestion & Snapshot Refresh
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: '12 * * * *'
+
+jobs:
+  auksjonen-source-ingestion:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependency
+        run: pip install pytest
+
+      - name: Restore seen opportunity state
+        uses: actions/cache/restore@v4
+        with:
+          path: data/monitoring/v3.2-seen-state.json
+          key: v3.3-auksjonen-seen-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            v3.3-auksjonen-seen-${{ runner.os }}-
+
+      - name: Validate Auksjonen adapter and E2E refresh
+        run: pytest tests/test_v33_live_source_ingestion.py -q
+
+      - name: Refresh deterministic PR snapshot
+        if: github.event_name == 'pull_request'
+        run: |
+          python scripts/run_v33_auksjonen_ingestion.py \
+            --html-file tests/fixtures/v33_auksjonen_page.html
+
+      - name: Refresh live Auksjonen snapshot
+        if: github.event_name != 'pull_request'
+        run: python scripts/run_v33_auksjonen_ingestion.py
+
+      - name: Save seen opportunity state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/monitoring/v3.2-seen-state.json
+          key: v3.3-auksjonen-seen-${{ runner.os }}-${{ github.run_id }}
+
+      - name: Print one ingestion summary
+        if: always()
+        run: cat data/validation/v3.3-source-ingestion.json || true
+
+      - name: Upload snapshot and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3.3-auksjonen-source-ingestion
+          path: |
+            data/live_validation/v3.3-auksjonen-live-snapshot.json
+            data/validation/v3.3-source-ingestion.json
+            data/validation/v3.2-continuous-monitoring.json
+            data/monitoring/v3.2-seen-state.json
+          if-no-files-found: warn
