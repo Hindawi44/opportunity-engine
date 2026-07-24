@@ -1,6 +1,7 @@
 """Orchestration from generated queries to classified Discovery results."""
 from __future__ import annotations
 
+import time
 from datetime import datetime, timezone
 from typing import Iterable
 
@@ -15,8 +16,12 @@ def run_live_discovery(
     *,
     discovered_at: str | None = None,
     results_per_query: int = 10,
+    query_delay_seconds: float = 0.0,
 ) -> dict:
     """Search, deduplicate, classify, and hand off confirmed sales only."""
+    if query_delay_seconds < 0:
+        raise ValueError("query_delay_seconds must not be negative")
+
     timestamp = discovered_at or datetime.now(timezone.utc).isoformat()
     clean_queries = list(dict.fromkeys(" ".join(q.split()) for q in queries if " ".join(q.split())))
 
@@ -25,7 +30,9 @@ def run_live_discovery(
     errors: list[dict[str, str]] = []
     hits_received = 0
 
-    for query in clean_queries:
+    for index, query in enumerate(clean_queries):
+        if index and query_delay_seconds:
+            time.sleep(query_delay_seconds)
         try:
             hits = provider.search(query, count=results_per_query)
         except Exception as exc:  # provider failures must not fabricate results
