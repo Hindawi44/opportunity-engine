@@ -58,8 +58,13 @@ def build_report(snapshot: dict[str, Any]) -> dict[str, Any]:
         "market_comparables": [],
         **{field: costs.get(field) for field in REQUIRED_COST_FIELDS},
     }
-    integration = integrate_verified_financial_evidence(opportunity_id, financial_evidence)
-    missing = sorted(set(snapshot.get("blocking_missing_evidence", [])) | set(integration["missing_required_evidence"]))
+    integration = integrate_verified_financial_evidence(
+        opportunity_id, financial_evidence
+    ).to_dict()
+    missing = sorted(
+        set(snapshot.get("blocking_missing_evidence", []))
+        | set(integration["missing_required_evidence"])
+    )
 
     trace_complete = (
         bool(opportunity_id)
