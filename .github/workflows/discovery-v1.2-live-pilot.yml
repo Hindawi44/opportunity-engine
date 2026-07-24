@@ -1,4 +1,4 @@
-name: Discovery V1.3 Mobile Reporting
+name: Discovery V1.4 Phone Report
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pytest
-      - name: Run Discovery mobile-report tests
+      - name: Run Discovery phone-report tests
         env:
           PYTHONPATH: src:.
         run: pytest tests/test_discovery_v12_live_pilot.py -q
@@ -31,15 +31,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Run live Brave pilot and print mobile report
+      - name: Run live Brave pilot and create phone report
         env:
           PYTHONPATH: src:.
           BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
-        run: python scripts/run_discovery_v12_live_pilot.py --mobile-limit 10
-      - name: Upload full JSON report
+        run: |
+          python scripts/run_discovery_v12_live_pilot.py \
+            --mobile-limit 10 \
+            --report artifacts/discovery-v1.4-live-report.json \
+            --text-report artifacts/discovery-v1.4-phone-report.txt
+      - name: Show phone report
+        if: ${{ always() }}
+        run: |
+          if [ -f artifacts/discovery-v1.4-phone-report.txt ]; then
+            cat artifacts/discovery-v1.4-phone-report.txt
+          else
+            echo "Phone report was not created."
+          fi
+      - name: Upload phone and JSON reports
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: discovery-v1.3-mobile-reporting-summary
-          path: artifacts/discovery-v1.2-live-pilot-summary.json
+          name: discovery-v1.4-phone-report
+          path: |
+            artifacts/discovery-v1.4-phone-report.txt
+            artifacts/discovery-v1.4-live-report.json
           if-no-files-found: warn
