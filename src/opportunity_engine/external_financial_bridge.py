@@ -20,8 +20,6 @@ def _load_evidence_file(path: Path) -> list[dict[str, Any]]:
     if isinstance(payload, list):
         return [item for item in payload if isinstance(item, dict)]
     if isinstance(payload, dict):
-        # EvidenceRepository persists one ResearchEvidence object per JSON file.
-        # Detect that shape before treating an absent bundle key as an empty list.
         if "opportunity_id" in payload and "evidence_type" in payload:
             return [payload]
         records = payload.get("evidence", payload.get("records"))
@@ -30,52 +28,94 @@ def _load_evidence_file(path: Path) -> list[dict[str, Any]]:
     return []
 
 
-def collect_external_financial_evidence(root: str | Path) -> dict[str, dict[str, Any]]:
-    """Return economic-evaluation evidence grouped by opportunity.
+def _valid_observations(record: dict[str, Any]) -> list[tuple[float, dict[str, Any]]]:
+    observations = record.get("observations")
+    if not isinstance(observations, list):
+        return []
+    valid: list[tuple[float, dict[str, Any]]] = []
+    for observation in observations:
+        if not isinstance(observation, dict):
+            continue
+        value = _number(observation.get("numeric_value"))
+        currency = str(observation.get("currency") or "").upper()
+        if value is not None and currency == "NOK":
+            valid.append((value, observation))
+    return valid
 
-    Current EvidenceRepository files are stored under
-    ``data/evidence/<opportunity_id>/rev_<id>.json``. Older fixtures and imported evidence
-    may use top-level JSON bundle files, so the recursive scan intentionally accepts every
-    JSON file beneath the evidence root. Only persisted market-price observations with a
-    positive explicit NOK value and a public HTTPS source are exported as verified
-    comparables. Missing costs stay absent.
+
+def collect_external_financial_evidence(root: str | Path) -> dict[str, dict[str, Any]]:
+    """Export only persisted, explicit and verified market/cost evidence.
+
+    V2.9 adds auction-price, fee, VAT, transport, dismantling and storage fields. The
+    bridge exposes them to the evidence payload but does not alter the Financial Score
+    formula. Missing or conflicting values remain absent.
     """
     grouped: dict[str, dict[str, Any]] = {}
     for path in sorted(Path(root).rglob("*.json")):
         for record in _load_evidence_file(path):
             opportunity_id = str(record.get("opportunity_id") or "").strip()
-            if not opportunity_id or str(record.get("evidence_type") or "") != "market_price":
-                continue
-            source = str(record.get("source_name") or "external_market_comparable").strip()
+            evidence_type = str(record.get("evidence_type") or "")
+            source = str(record.get("source_name") or "").strip()
             url = str(record.get("source_url") or "").strip()
-            if not source or not url.startswith("https://"):
+            if not opportunity_id or not source or not url.startswith("https://"):
                 continue
-            observations = record.get("observations")
-            if not isinstance(observations, list):
+
+            observations = _valid_observations(record)
+            if evidence_type == "market_price":
+                target = grouped.setdefault(opportunity_id, {"market_comparables": []})
+                comparables = target.setdefault("market_comparables", [])
+                for value, observation in observations:
+                    if value <= 0:
+                        continue
+                    candidate = {
+                        "verified": True,
+                        "source": source,
+                        "url": url,
+                        "price_nok": value,
+                        "evidence_id": record.get("evidence_id"),
+                        "observed_at": observation.get("observed_at"),
+                    }
+                    if not any(
+                        item.get("url") == url and item.get("price_nok") == value
+                        for item in comparables
+                        if isinstance(item, dict)
+                    ):
+                        comparables.append(candidate)
+                continue
+
+            if evidence_type not in {"cost", "logistics"}:
+                continue
+            metadata = record.get("metadata") if isinstance(record.get("metadata"), dict) else {}
+            field = str(metadata.get("financial_field") or "").strip()
+            component = str(metadata.get("cost_component") or "").strip()
+            allowed_fields = {
+                "auction_price_nok",
+                "auction_fee_nok",
+                "vat_nok",
+                "transport_cost_nok",
+                "dismantling_cost_nok",
+                "storage_cost_nok",
+            }
+            if field not in allowed_fields or not component or len(observations) != 1:
+                continue
+            value, observation = observations[0]
+            if value == 0 and metadata.get("zero_cost_confirmed") is not True:
                 continue
             target = grouped.setdefault(opportunity_id, {"market_comparables": []})
-            comparables = target["market_comparables"]
-            for observation in observations:
-                if not isinstance(observation, dict):
-                    continue
-                value = _number(observation.get("numeric_value"))
-                currency = str(observation.get("currency") or "").upper()
-                if value is None or value <= 0 or currency != "NOK":
-                    continue
-                candidate = {
+            existing = target.get(field)
+            if existing is None:
+                target[field] = value
+                target.setdefault("cost_evidence", {})[field] = {
                     "verified": True,
+                    "component": component,
                     "source": source,
                     "url": url,
-                    "price_nok": value,
                     "evidence_id": record.get("evidence_id"),
                     "observed_at": observation.get("observed_at"),
                 }
-                if not any(
-                    item.get("url") == url and item.get("price_nok") == value
-                    for item in comparables
-                    if isinstance(item, dict)
-                ):
-                    comparables.append(candidate)
+            elif existing != value:
+                target.pop(field, None)
+                target.setdefault("cost_conflicts", []).append(field)
     return grouped
 
 
@@ -94,4 +134,18 @@ def merge_evidence(existing: object, external: dict[str, dict[str, Any]]) -> dic
             ):
                 combined.append(item)
         target["market_comparables"] = combined
-    return {"schema_version": 3, "evidence": merged}
+        for field in (
+            "auction_price_nok",
+            "auction_fee_nok",
+            "vat_nok",
+            "transport_cost_nok",
+            "dismantling_cost_nok",
+            "storage_cost_nok",
+        ):
+            if field in supplied:
+                target[field] = supplied[field]
+        if isinstance(supplied.get("cost_evidence"), dict):
+            target["cost_evidence"] = dict(supplied["cost_evidence"])
+        if isinstance(supplied.get("cost_conflicts"), list):
+            target["cost_conflicts"] = list(supplied["cost_conflicts"])
+    return {"schema_version": 4, "evidence": merged}
