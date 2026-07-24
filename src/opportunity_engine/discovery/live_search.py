@@ -18,8 +18,9 @@ def run_live_discovery(
     discovered_at: str | None = None,
     results_per_query: int = 10,
     query_delay_seconds: float = 0.0,
+    apply_result_filter: bool = False,
 ) -> dict:
-    """Search, deduplicate, pre-filter, classify, and hand off confirmed sales only."""
+    """Search, deduplicate, optionally pre-filter, classify, and hand off confirmed sales only."""
     if query_delay_seconds < 0:
         raise ValueError("query_delay_seconds must not be negative")
 
@@ -52,22 +53,25 @@ def run_live_discovery(
                 discovered_at=timestamp,
                 text=hit.description,
             )
-            decision = evaluate_candidate(candidate)
-            if not decision.keep:
-                filtered_out.append({
-                    "title": candidate.title,
-                    "url": candidate.url,
-                    "reason": decision.reason,
-                    "score": decision.score,
-                })
-                continue
+            if apply_result_filter:
+                decision = evaluate_candidate(candidate)
+                if not decision.keep:
+                    filtered_out.append({
+                        "title": candidate.title,
+                        "url": candidate.url,
+                        "reason": decision.reason,
+                        "score": decision.score,
+                    })
+                    continue
             candidates.append(candidate)
 
     classified: list[DiscoveryResult] = [classify_candidate(candidate) for candidate in candidates]
     canonical = [opportunity for result in classified if (opportunity := to_canonical_opportunity(result))]
 
     return {
-        "schema_version": "discovery-1.5",
+        "schema_version": "discovery-1.1",
+        "filter_version": "discovery-1.5" if apply_result_filter else None,
+        "result_filter_applied": apply_result_filter,
         "provider": provider.name,
         "discovered_at": timestamp,
         "queries_submitted": len(clean_queries),
