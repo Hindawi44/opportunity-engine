@@ -1,0 +1,35 @@
+name: V3.1 Live Batch Opportunity Validation
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  live-batch-validation:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -e . pytest
+      - name: Validate batch behavior
+        run: pytest tests/test_v31_live_batch_validation.py -q
+      - name: Generate one batch report
+        run: python scripts/run_v31_live_batch_validation.py
+      - name: Print one report
+        if: always()
+        run: cat data/validation/v3.1-live-batch-validation.json || true
+      - name: Upload live batch report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3.1-live-batch-validation
+          path: data/validation/v3.1-live-batch-validation.json
+          if-no-files-found: warn
