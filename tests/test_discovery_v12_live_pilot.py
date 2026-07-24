@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from scripts.run_discovery_v12_live_pilot import build_mobile_report
+import json
+
+from scripts.run_discovery_v12_live_pilot import build_mobile_report, write_reports
 from opportunity_engine.discovery.live_search import run_live_discovery
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
 
@@ -45,6 +47,7 @@ def _report():
         results_per_query=10,
     )
     report["pilot_topic"] = "CLOTHING_INVENTORY"
+    report["pilot_version"] = "1.4"
     return report
 
 
@@ -62,9 +65,9 @@ def test_v12_live_pilot_contract():
     assert report["status"] == "PASS"
 
 
-def test_v13_mobile_report_is_compact_and_contains_links():
+def test_v14_phone_report_is_compact_and_contains_links():
     output = build_mobile_report(_report(), limit=3)
-    assert "DISCOVERY REPORT — MOBILE VIEW" in output
+    assert "DISCOVERY REPORT — PHONE VIEW" in output
     assert "Confirmed sales: 1" in output
     assert "Needs contact: 1" in output
     assert "Rejected: 1" in output
@@ -72,3 +75,19 @@ def test_v13_mobile_report_is_compact_and_contains_links():
     assert "https://example.no/lead" in output
     assert "Automatic purchase decision: NO" in output
     assert output.index("[SALE_CONFIRMED]") < output.index("[CONTACT_REQUIRED]")
+
+
+def test_v14_writes_text_and_json_reports(tmp_path):
+    report = _report()
+    text = build_mobile_report(report, limit=3)
+    json_path = tmp_path / "full-report.json"
+    text_path = tmp_path / "phone-report.txt"
+
+    write_reports(report, text, json_path=json_path, text_path=text_path)
+
+    assert json_path.exists()
+    assert text_path.exists()
+    assert json.loads(json_path.read_text(encoding="utf-8"))["confirmed_sales"] == 1
+    saved_text = text_path.read_text(encoding="utf-8")
+    assert "DISCOVERY REPORT — PHONE VIEW" in saved_text
+    assert "https://example.no/confirmed" in saved_text
