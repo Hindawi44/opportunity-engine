@@ -1,8 +1,6 @@
-"""Guarded external research loop for Opportunity Engine v2.6.4.
+"""Guarded external research loop for Opportunity Engine.
 
-The loop coordinates missing-information detection, external search, market-comparable
-analysis, buyer discovery, evidence persistence/scoring, and scenario regeneration.
-It never contacts buyers and never emits an automatic purchase decision.
+Market-price evidence is governed by the V2.8.2B comparable evidence contract.
 """
 from __future__ import annotations
 
@@ -10,6 +8,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from hashlib import sha256
 from typing import Any, Callable, Iterable, Protocol
+
+from .external_research.comparable_evidence import candidate_to_market_price_evidence
 
 
 class SearchProvider(Protocol):
@@ -82,7 +82,7 @@ class ExternalEvidenceLoop:
                 response = self.search_provider.search(need.query)
                 executed += 1
                 events.append(f"search_executed:{need.need_id}")
-            except Exception as exc:  # provider failure must not abort the opportunity
+            except Exception as exc:
                 errors.append(f"search:{need.need_id}:{exc}")
                 continue
 
@@ -92,17 +92,11 @@ class ExternalEvidenceLoop:
                     result = self.market_comparables_engine.evaluate(candidates)
                     accepted = tuple(getattr(result, "accepted", ()))
                     comparables_found += len(accepted)
-                    for item in accepted:
-                        changed, evidence_id = self._store_external_evidence(
-                            investment_file,
-                            kind="market_price",
-                            statement="External market comparable accepted by the comparables engine.",
-                            source_url=getattr(item, "url", None),
-                            source_name="external_market_comparable",
-                            numeric_value=getattr(item, "price_nok", None),
-                            metadata={"research_need": need.need_id, "external": True},
-                        )
-                        evidence_changed = evidence_changed or changed
+                    for candidate in accepted:
+                        evidence = candidate_to_market_price_evidence(candidate, opportunity_id)
+                        evidence.metadata["research_need"] = need.need_id
+                        changed, evidence_id = self._persist_evidence(investment_file, evidence)
+                        evidence_changed = evidence_changed or bool(changed)
                         if evidence_id:
                             linked_evidence_ids.append(evidence_id)
                         created += int(changed == "created")
@@ -113,10 +107,9 @@ class ExternalEvidenceLoop:
             if need.kind == "buyer" and self.buyer_discovery_engine is not None:
                 try:
                     candidates = tuple(self.buyer_adapter(response) if self.buyer_adapter else ())
-                    terms = self._opportunity_terms(investment_file)
                     result = self.buyer_discovery_engine.discover(
                         candidates,
-                        opportunity_terms=terms,
+                        opportunity_terms=self._opportunity_terms(investment_file),
                         opportunity_location=getattr(investment_file, "location", None),
                     )
                     accepted = tuple(getattr(result, "accepted", ()))
@@ -124,12 +117,11 @@ class ExternalEvidenceLoop:
                     for ranked in accepted:
                         candidate = getattr(ranked, "candidate", ranked)
                         name = str(getattr(candidate, "name", "Potential buyer"))
-                        website = getattr(candidate, "website_url", None)
                         changed, evidence_id = self._store_external_evidence(
                             investment_file,
                             kind="buyer",
                             statement=f"{name} is an externally discovered potential buyer candidate; buying intent is unconfirmed.",
-                            source_url=website,
+                            source_url=getattr(candidate, "website_url", None),
                             source_name="buyer_discovery_engine",
                             metadata={
                                 "research_need": need.need_id,
@@ -138,7 +130,7 @@ class ExternalEvidenceLoop:
                                 "confirmed_buying_intent": False,
                             },
                         )
-                        evidence_changed = evidence_changed or changed
+                        evidence_changed = evidence_changed or bool(changed)
                         if evidence_id:
                             linked_evidence_ids.append(evidence_id)
                         created += int(changed == "created")
@@ -178,27 +170,21 @@ class ExternalEvidenceLoop:
         needs: list[ResearchNeed] = []
         title = " ".join(str(getattr(investment_file, "title", "")).split())
         location = " ".join(str(getattr(investment_file, "location", "") or "").split())
-        missing = tuple(getattr(investment_file, "missing_information", ()))
         unresolved = " ".join(
             str(getattr(item, "question", ""))
-            for item in missing
+            for item in tuple(getattr(investment_file, "missing_information", ()))
             if not bool(getattr(item, "resolved", False))
         ).casefold()
-
         has_market_value = any(
             getattr(path, "estimated_revenue_nok", None) is not None
             for path in getattr(investment_file, "revenue_paths", ())
         )
         if not has_market_value or any(word in unresolved for word in ("resale", "market", "price", "value")):
-            query = f'"{title}" brukt pris Norge'.strip()
-            needs.append(ResearchNeed("market", query, "Verified external resale comparables are missing", "high"))
-
+            needs.append(ResearchNeed("market", f'"{title}" brukt pris Norge'.strip(), "Verified external resale comparables are missing", "high"))
         potential_buyers = tuple(getattr(investment_file, "potential_buyers", ()))
         if not potential_buyers or any(word in unresolved for word in ("buyer", "customer", "purchaser")):
             suffix = f" {location}" if location else " Norge"
-            query = f'"{title}" forhandler grossist kjøper{suffix}'.strip()
-            needs.append(ResearchNeed("buyer", query, "Potential buyers are missing", "high"))
-
+            needs.append(ResearchNeed("buyer", f'"{title}" forhandler grossist kjøper{suffix}'.strip(), "Potential buyers are missing", "high"))
         return tuple(needs)
 
     def _store_external_evidence(
@@ -212,6 +198,8 @@ class ExternalEvidenceLoop:
         numeric_value: float | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> tuple[str | bool, str | None]:
+        if kind == "market_price":
+            raise ValueError("market_price evidence must use candidate_to_market_price_evidence")
         evidence = self.evidence_factory(
             opportunity_id=investment_file.opportunity_id,
             evidence_type=kind,
@@ -222,6 +210,9 @@ class ExternalEvidenceLoop:
             currency="NOK" if numeric_value is not None else None,
             metadata=metadata or {},
         )
+        return self._persist_evidence(investment_file, evidence)
+
+    def _persist_evidence(self, investment_file: Any, evidence: Any) -> tuple[str | bool, str | None]:
         result = self.evidence_repository.upsert(evidence)
         stored = getattr(result, "evidence", evidence)
         peers = tuple(getattr(self.evidence_repository, "list_for_opportunity", lambda _id: ())(
@@ -239,10 +230,14 @@ class ExternalEvidenceLoop:
         ):
             add = getattr(investment_file, "add_evidence", None)
             if callable(add):
-                mirror = self._make_living_evidence(statement, source_url, source_name, evidence_id)
+                mirror = self._make_living_evidence(
+                    str(getattr(stored, "statement", "")),
+                    getattr(stored, "source_url", None),
+                    str(getattr(stored, "source_name", "")),
+                    str(evidence_id),
+                )
                 if mirror is not None:
                     add(mirror)
-
         if bool(getattr(result, "created", False)):
             return "created", evidence_id
         if bool(getattr(result, "observation_added", False)):
