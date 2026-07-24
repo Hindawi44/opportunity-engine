@@ -1,7 +1,8 @@
-"""Brave Web Search API adapter for Discovery Engine V1.1."""
+"""Brave Web Search API adapter for Discovery Engine."""
 from __future__ import annotations
 
 import json
+import time
 from collections.abc import Callable
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -19,6 +20,17 @@ def _default_transport(request: Request, timeout: float) -> bytes:
         return response.read()
 
 
+def _http_error_message(exc: HTTPError) -> str:
+    """Return a useful provider error without exposing credentials."""
+    try:
+        body = exc.read().decode("utf-8", errors="replace").strip()
+    except Exception:  # pragma: no cover - defensive fallback
+        body = ""
+    body = " ".join(body.split())[:500]
+    suffix = f": {body}" if body else ""
+    return f"Brave Search returned HTTP {exc.code}{suffix}"
+
+
 class BraveSearchProvider:
     """Search the public web through Brave and normalize ordinary web results."""
 
@@ -30,15 +42,23 @@ class BraveSearchProvider:
         *,
         timeout: float = 20.0,
         transport: Transport | None = None,
+        max_retries: int = 3,
+        retry_base_seconds: float = 1.0,
     ) -> None:
         token = api_key.strip()
         if not token:
             raise ValueError("Brave API key is required")
         if timeout <= 0:
             raise ValueError("timeout must be positive")
+        if max_retries < 0:
+            raise ValueError("max_retries must not be negative")
+        if retry_base_seconds < 0:
+            raise ValueError("retry_base_seconds must not be negative")
         self._api_key = token
         self._timeout = timeout
         self._transport = transport or _default_transport
+        self._max_retries = max_retries
+        self._retry_base_seconds = retry_base_seconds
 
     def search(self, query: str, *, count: int = 10) -> list[SearchHit]:
         clean_query = " ".join(query.split())
@@ -47,12 +67,13 @@ class BraveSearchProvider:
         if not 1 <= count <= 20:
             raise ValueError("count must be between 1 and 20")
 
+        # ui_lang is intentionally omitted. Brave validates it against a strict
+        # locale enum, and unsupported Norwegian locale variants return HTTP 422.
         params = urlencode({
             "q": clean_query,
             "count": count,
             "country": "NO",
             "search_lang": "no",
-            "ui_lang": "nb-NO",
             "safesearch": "moderate",
         })
         request = Request(
@@ -60,18 +81,36 @@ class BraveSearchProvider:
             headers={
                 "Accept": "application/json",
                 "X-Subscription-Token": self._api_key,
-                "User-Agent": "OpportunityEngine/Discovery-1.1",
+                "User-Agent": "OpportunityEngine/Discovery-1.4.1",
             },
         )
+
+        raw: bytes | None = None
+        for attempt in range(self._max_retries + 1):
+            try:
+                raw = self._transport(request, self._timeout)
+                break
+            except HTTPError as exc:
+                if exc.code == 429 and attempt < self._max_retries:
+                    retry_after = exc.headers.get("Retry-After") if exc.headers else None
+                    try:
+                        wait_seconds = float(retry_after) if retry_after else self._retry_base_seconds * (2**attempt)
+                    except (TypeError, ValueError):
+                        wait_seconds = self._retry_base_seconds * (2**attempt)
+                    time.sleep(max(0.0, wait_seconds))
+                    continue
+                raise RuntimeError(_http_error_message(exc)) from exc
+            except URLError as exc:
+                raise RuntimeError(f"Brave Search request failed: {exc.reason}") from exc
+
+        if raw is None:  # pragma: no cover - loop guarantees a result or exception
+            raise RuntimeError("Brave Search returned no response")
+
         try:
-            raw = self._transport(request, self._timeout)
             payload = json.loads(raw.decode("utf-8"))
-        except HTTPError as exc:
-            raise RuntimeError(f"Brave Search returned HTTP {exc.code}") from exc
-        except URLError as exc:
-            raise RuntimeError("Brave Search request failed") from exc
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise RuntimeError("Brave Search returned invalid JSON") from exc
+            preview = raw[:300].decode("utf-8", errors="replace")
+            raise RuntimeError(f"Brave Search returned invalid JSON: {preview}") from exc
 
         return _parse_hits(payload)
 

@@ -24,6 +24,7 @@ def _top_results(report: dict[str, Any], *, limit: int = 10) -> list[dict[str, A
 
 def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
     """Build a compact plain-text report readable on a phone."""
+    errors = report.get("errors") if isinstance(report.get("errors"), list) else []
     lines = [
         "========================================",
         "DISCOVERY REPORT — PHONE VIEW",
@@ -38,7 +39,7 @@ def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
         f"Confirmed sales: {report.get('confirmed_sales', 0)}",
         f"Needs contact: {report.get('follow_up_leads', 0)}",
         f"Rejected: {report.get('rejected_results', 0)}",
-        f"Errors: {len(report.get('errors') or [])}",
+        f"Errors: {len(errors)}",
         "",
         "TOP RESULTS",
         "----------------------------------------",
@@ -59,6 +60,14 @@ def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
                 f"   Scenario: {scenario}",
                 f"   URL: {url or 'Unavailable'}",
             ])
+
+    if errors:
+        lines.extend(["", "FIRST ERRORS", "----------------------------------------"])
+        for index, item in enumerate(errors[:5], start=1):
+            if not isinstance(item, dict):
+                continue
+            lines.append(f"{index}. Query: {item.get('query', 'UNKNOWN')}")
+            lines.append(f"   Error: {item.get('error', 'UNKNOWN')}")
 
     lines.extend([
         "",
@@ -106,6 +115,7 @@ def main() -> int:
     parser.add_argument("--country", default="Norge")
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument("--mobile-limit", type=int, default=10)
+    parser.add_argument("--query-delay-seconds", type=float, default=1.1)
     args = parser.parse_args()
 
     api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
@@ -119,8 +129,9 @@ def main() -> int:
         queries,
         provider,
         results_per_query=args.results_per_query,
+        query_delay_seconds=args.query_delay_seconds,
     )
-    report["pilot_version"] = "1.4"
+    report["pilot_version"] = "1.4.1"
     report["pilot_topic"] = "CLOTHING_INVENTORY"
     report["query_records"] = query_records
     report["live_network_used"] = True
