@@ -60,16 +60,33 @@ def test_filter_keeps_commercial_inventory_sale():
     assert decision.score > 0
 
 
-def test_live_discovery_filters_before_classification():
+def test_live_discovery_filters_before_classification_when_enabled():
+    report = run_live_discovery(
+        ["varelager klær Norge"],
+        FakeProvider(),
+        discovered_at="2026-07-24T00:00:00+00:00",
+        apply_result_filter=True,
+    )
+
+    assert report["schema_version"] == "discovery-1.1"
+    assert report["filter_version"] == "discovery-1.5"
+    assert report["result_filter_applied"] is True
+    assert report["hits_received"] == 3
+    assert report["filtered_out_count"] == 2
+    assert report["candidates_received"] == 1
+    assert report["confirmed_sales"] == 1
+    assert report["canonical_opportunities"]
+
+
+def test_live_discovery_preserves_legacy_behavior_by_default():
     report = run_live_discovery(
         ["varelager klær Norge"],
         FakeProvider(),
         discovered_at="2026-07-24T00:00:00+00:00",
     )
 
-    assert report["schema_version"] == "discovery-1.5"
-    assert report["hits_received"] == 3
-    assert report["filtered_out_count"] == 2
-    assert report["candidates_received"] == 1
-    assert report["confirmed_sales"] == 1
-    assert report["canonical_opportunities"]
+    assert report["schema_version"] == "discovery-1.1"
+    assert report["filter_version"] is None
+    assert report["result_filter_applied"] is False
+    assert report["filtered_out_count"] == 0
+    assert report["candidates_received"] == 3
