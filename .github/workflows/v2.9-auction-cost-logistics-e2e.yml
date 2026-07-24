@@ -1,0 +1,58 @@
+name: V2.9 Auction Cost & Logistics E2E Acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'src/opportunity_engine/external_research/auction_cost_evidence.py'
+      - 'src/opportunity_engine/external_financial_bridge.py'
+      - 'tests/test_v29_auction_cost_evidence_e2e.py'
+      - 'scripts/run_v29_auction_cost_e2e_acceptance.py'
+      - '.github/workflows/v2.9-auction-cost-logistics-e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  auction-cost-logistics-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run V2.9 contract and E2E tests
+        run: python -m pytest tests/test_v29_auction_cost_evidence_e2e.py -q
+
+      - name: Run deterministic V2.9 acceptance
+        run: python scripts/run_v29_auction_cost_e2e_acceptance.py
+
+      - name: Print one acceptance summary
+        if: always()
+        run: |
+          if [ -f data/validation/v2.9-auction-cost-e2e-acceptance.json ]; then
+            cat data/validation/v2.9-auction-cost-e2e-acceptance.json
+          else
+            echo '{"schema_version":"2.9","errors":["acceptance_summary_missing"],"status":"FAIL"}'
+            exit 1
+          fi
+
+      - name: Upload acceptance summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2.9-auction-cost-logistics-acceptance
+          path: data/validation/v2.9-auction-cost-e2e-acceptance.json
+          if-no-files-found: error
+          retention-days: 14
