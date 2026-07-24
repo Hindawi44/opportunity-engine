@@ -25,6 +25,7 @@ def _top_results(report: dict[str, Any], *, limit: int = 10) -> list[dict[str, A
 def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
     """Build a compact plain-text report readable on a phone."""
     errors = report.get("errors") if isinstance(report.get("errors"), list) else []
+    rejected_label = "Rejected after filter" if report.get("result_filter_applied") else "Rejected"
     lines = [
         "========================================",
         "DISCOVERY REPORT — PHONE VIEW",
@@ -40,7 +41,7 @@ def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
         f"Candidates received: {report.get('candidates_received', 0)}",
         f"Confirmed sales: {report.get('confirmed_sales', 0)}",
         f"Needs contact: {report.get('follow_up_leads', 0)}",
-        f"Rejected after filter: {report.get('rejected_results', 0)}",
+        f"{rejected_label}: {report.get('rejected_results', 0)}",
         f"Errors: {len(errors)}",
         "",
         "TOP RESULTS",
