@@ -1,0 +1,57 @@
+{
+  "schema_version": "2.11",
+  "opportunity_id": "live-auksjonen-berryalloc-route66-20260724",
+  "captured_at": "2026-07-24T10:00:00+02:00",
+  "source": {
+    "name": "Auksjonen.no",
+    "url": "https://www.auksjonen.no/auksjoner/overskuddsvarer/vareparti-og-konkursbo",
+    "title": "BerryAlloc Grand Avenue Route 66 - Høytrykkslaminat 1-stav",
+    "location": "7260 Sistranda",
+    "sale_type": "FIXED_PRICE",
+    "asking_price_nok": 10000.0,
+    "ends_on": "2026-07-31"
+  },
+  "market_price_sources": [
+    {
+      "source_name": "Plankepriser.no",
+      "source_url": "https://www.plankepriser.no/produkt/laminatgulv-grand-aluminium-route-66-rs-berryalloc-70104590",
+      "displayed_price_nok_per_m2": 567.68,
+      "product_match": "BerryAlloc Route 66 / NOBB 54167400"
+    },
+    {
+      "source_name": "Allebyggpriser / Bygghjemme",
+      "source_url": "https://allebyggpriser.no/tilbud/bygghjemme%3A875783/",
+      "displayed_price_nok": 1148.0,
+      "unit_requires_verification": true,
+      "product_match": "BerryAlloc Grand Avenue Route 66"
+    },
+    {
+      "source_name": "Allebyggpriser / Monter",
+      "source_url": "https://allebyggpriser.no/tilbud/www.monter.no%3A54167400/",
+      "displayed_price_nok": 699.0,
+      "unit_requires_verification": true,
+      "product_match": "BerryAlloc Route 66 / NOBB 54167400"
+    }
+  ],
+  "verified_cost_evidence": {
+    "auction_price_nok": 10000.0,
+    "auction_fee_nok": null,
+    "vat_nok": null,
+    "transport_cost_nok": null,
+    "dismantling_cost_nok": null,
+    "storage_cost_nok": null
+  },
+  "blocking_missing_evidence": [
+    "lot_quantity_m2",
+    "auction_fee_nok",
+    "vat_nok",
+    "transport_cost_nok",
+    "dismantling_cost_nok",
+    "storage_cost_nok"
+  ],
+  "notes": [
+    "The public category result confirms the real listing, fixed price, place and end date.",
+    "Lot quantity is not exposed in the retrieved public result, so retail unit prices cannot be converted into verified lot resale values.",
+    "No logistics or fee value is assumed. Missing values remain null under V2.9 and V2.10 rules."
+  ]
+}
