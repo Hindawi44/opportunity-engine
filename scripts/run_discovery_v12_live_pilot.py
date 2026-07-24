@@ -1,15 +1,85 @@
 #!/usr/bin/env python3
-"""Run the first live Discovery Engine pilot against Brave Search."""
+"""Run the live Discovery Engine pilot against Brave Search."""
 from __future__ import annotations
 
 import argparse
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.live_search import run_live_discovery
 from opportunity_engine.discovery.query_builder import build_clothing_inventory_queries
+
+
+def _top_results(report: dict[str, Any], *, limit: int = 10) -> list[dict[str, Any]]:
+    classified = report.get("classified_results")
+    classified = classified if isinstance(classified, list) else []
+    priority = {"SALE_CONFIRMED": 0, "CONTACT_REQUIRED": 1, "REJECTED": 2}
+    valid = [item for item in classified if isinstance(item, dict)]
+    valid.sort(key=lambda item: priority.get(str(item.get("status")), 3))
+    return valid[:limit]
+
+
+def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
+    """Build a compact report readable in GitHub Actions on a phone."""
+    lines = [
+        "========================================",
+        "DISCOVERY REPORT — MOBILE VIEW",
+        "========================================",
+        f"Topic: {report.get('pilot_topic', 'UNKNOWN')}",
+        f"Provider: {report.get('provider', 'UNKNOWN')}",
+        f"Status: {report.get('status', 'UNKNOWN')}",
+        "",
+        f"Queries submitted: {report.get('queries_submitted', 0)}",
+        f"Candidates received: {report.get('candidates_received', 0)}",
+        f"Duplicates removed: {report.get('duplicates_removed', 0)}",
+        f"Confirmed sales: {report.get('confirmed_sales', 0)}",
+        f"Needs contact: {report.get('follow_up_leads', 0)}",
+        f"Rejected: {report.get('rejected_results', 0)}",
+        f"Errors: {len(report.get('errors') or [])}",
+        "",
+        "TOP RESULTS",
+        "----------------------------------------",
+    ]
+
+    top = _top_results(report, limit=limit)
+    if not top:
+        lines.append("No results to display.")
+    else:
+        for index, item in enumerate(top, start=1):
+            candidate = item.get("candidate") if isinstance(item.get("candidate"), dict) else {}
+            title = str(candidate.get("title") or "Untitled").strip()
+            url = str(candidate.get("url") or "").strip()
+            status = str(item.get("status") or "UNKNOWN")
+            scenario = str(item.get("scenario") or "UNKNOWN")
+            lines.extend([
+                f"{index}. [{status}] {title}",
+                f"   Scenario: {scenario}",
+                f"   URL: {url or 'Unavailable'}",
+            ])
+
+    lines.extend([
+        "",
+        "Automatic purchase decision: NO",
+        "========================================",
+    ])
+    return "\n".join(lines)
+
+
+def write_github_step_summary(text: str) -> None:
+    """Append the mobile report to the GitHub Actions job summary when available."""
+    target = os.environ.get("GITHUB_STEP_SUMMARY", "").strip()
+    if not target:
+        return
+    path = Path(target)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write("## Discovery Report — Mobile View\n\n")
+        handle.write("```text\n")
+        handle.write(text)
+        handle.write("\n```\n")
 
 
 def main() -> int:
@@ -17,6 +87,7 @@ def main() -> int:
     parser.add_argument("--report", default="artifacts/discovery-v1.2-live-pilot-summary.json")
     parser.add_argument("--country", default="Norge")
     parser.add_argument("--results-per-query", type=int, default=10)
+    parser.add_argument("--mobile-limit", type=int, default=10)
     args = parser.parse_args()
 
     api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
@@ -31,7 +102,7 @@ def main() -> int:
         provider,
         results_per_query=args.results_per_query,
     )
-    report["pilot_version"] = "1.2"
+    report["pilot_version"] = "1.3"
     report["pilot_topic"] = "CLOTHING_INVENTORY"
     report["query_records"] = query_records
     report["live_network_used"] = True
@@ -40,7 +111,10 @@ def main() -> int:
     path = Path(args.report)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps(report, ensure_ascii=False, sort_keys=True))
+
+    mobile_report = build_mobile_report(report, limit=max(1, args.mobile_limit))
+    print(mobile_report)
+    write_github_step_summary(mobile_report)
     return 0 if report["status"] in {"PASS", "PARTIAL"} else 1
 
 
