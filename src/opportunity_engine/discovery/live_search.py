@@ -7,6 +7,7 @@ from typing import Iterable
 
 from opportunity_engine.discovery.classifier import classify_candidate, to_canonical_opportunity
 from opportunity_engine.discovery.models import DiscoveryCandidate, DiscoveryResult
+from opportunity_engine.discovery.result_filter import evaluate_candidate
 from opportunity_engine.discovery.search_provider import SearchProvider
 
 
@@ -18,7 +19,7 @@ def run_live_discovery(
     results_per_query: int = 10,
     query_delay_seconds: float = 0.0,
 ) -> dict:
-    """Search, deduplicate, classify, and hand off confirmed sales only."""
+    """Search, deduplicate, pre-filter, classify, and hand off confirmed sales only."""
     if query_delay_seconds < 0:
         raise ValueError("query_delay_seconds must not be negative")
 
@@ -26,6 +27,7 @@ def run_live_discovery(
     clean_queries = list(dict.fromkeys(" ".join(q.split()) for q in queries if " ".join(q.split())))
 
     candidates: list[DiscoveryCandidate] = []
+    filtered_out: list[dict[str, object]] = []
     seen_urls: set[str] = set()
     errors: list[dict[str, str]] = []
     hits_received = 0
@@ -43,27 +45,37 @@ def run_live_discovery(
             if hit.url in seen_urls:
                 continue
             seen_urls.add(hit.url)
-            candidates.append(
-                DiscoveryCandidate(
-                    title=hit.title,
-                    url=hit.url,
-                    source=hit.provider or provider.name,
-                    discovered_at=timestamp,
-                    text=hit.description,
-                )
+            candidate = DiscoveryCandidate(
+                title=hit.title,
+                url=hit.url,
+                source=hit.provider or provider.name,
+                discovered_at=timestamp,
+                text=hit.description,
             )
+            decision = evaluate_candidate(candidate)
+            if not decision.keep:
+                filtered_out.append({
+                    "title": candidate.title,
+                    "url": candidate.url,
+                    "reason": decision.reason,
+                    "score": decision.score,
+                })
+                continue
+            candidates.append(candidate)
 
     classified: list[DiscoveryResult] = [classify_candidate(candidate) for candidate in candidates]
     canonical = [opportunity for result in classified if (opportunity := to_canonical_opportunity(result))]
 
     return {
-        "schema_version": "discovery-1.1",
+        "schema_version": "discovery-1.5",
         "provider": provider.name,
         "discovered_at": timestamp,
         "queries_submitted": len(clean_queries),
         "hits_received": hits_received,
         "candidates_received": len(candidates),
-        "duplicates_removed": hits_received - len(candidates),
+        "duplicates_removed": hits_received - len(seen_urls),
+        "filtered_out_count": len(filtered_out),
+        "filtered_out_results": filtered_out,
         "classified_results": [result.to_dict() for result in classified],
         "confirmed_sales": sum(result.status == "SALE_CONFIRMED" for result in classified),
         "follow_up_leads": sum(result.status == "CONTACT_REQUIRED" for result in classified),
