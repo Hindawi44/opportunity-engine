@@ -1,0 +1,27 @@
+name: V3.6 Multi-Source Ingestion Acceptance
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  multi-source-ingestion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pytest
+      - name: Run V3.6 acceptance
+        env:
+          PYTHONPATH: src:.
+        run: pytest tests/test_v36_multi_source_ingestion.py -q
+      - name: Run regression suite
+        env:
+          PYTHONPATH: src:.
+        run: pytest -q
