@@ -23,10 +23,10 @@ def _top_results(report: dict[str, Any], *, limit: int = 10) -> list[dict[str, A
 
 
 def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
-    """Build a compact report readable in GitHub Actions on a phone."""
+    """Build a compact plain-text report readable on a phone."""
     lines = [
         "========================================",
-        "DISCOVERY REPORT — MOBILE VIEW",
+        "DISCOVERY REPORT — PHONE VIEW",
         "========================================",
         f"Topic: {report.get('pilot_topic', 'UNKNOWN')}",
         f"Provider: {report.get('provider', 'UNKNOWN')}",
@@ -69,22 +69,40 @@ def build_mobile_report(report: dict[str, Any], *, limit: int = 10) -> str:
 
 
 def write_github_step_summary(text: str) -> None:
-    """Append the mobile report to the GitHub Actions job summary when available."""
+    """Append a readable report to the GitHub Actions job summary when available."""
     target = os.environ.get("GITHUB_STEP_SUMMARY", "").strip()
     if not target:
         return
     path = Path(target)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
-        handle.write("## Discovery Report — Mobile View\n\n")
+        handle.write("## Discovery Report — Phone View\n\n")
         handle.write("```text\n")
         handle.write(text)
         handle.write("\n```\n")
 
 
+def write_reports(
+    report: dict[str, Any],
+    mobile_report: str,
+    *,
+    json_path: Path,
+    text_path: Path,
+) -> None:
+    """Persist both the full machine report and a phone-friendly text report."""
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    text_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    text_path.write_text(mobile_report + "\n", encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--report", default="artifacts/discovery-v1.2-live-pilot-summary.json")
+    parser.add_argument("--report", default="artifacts/discovery-v1.4-live-report.json")
+    parser.add_argument("--text-report", default="artifacts/discovery-v1.4-phone-report.txt")
     parser.add_argument("--country", default="Norge")
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument("--mobile-limit", type=int, default=10)
@@ -102,17 +120,19 @@ def main() -> int:
         provider,
         results_per_query=args.results_per_query,
     )
-    report["pilot_version"] = "1.3"
+    report["pilot_version"] = "1.4"
     report["pilot_topic"] = "CLOTHING_INVENTORY"
     report["query_records"] = query_records
     report["live_network_used"] = True
     report["automatic_purchase_decision"] = False
 
-    path = Path(args.report)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-
     mobile_report = build_mobile_report(report, limit=max(1, args.mobile_limit))
+    write_reports(
+        report,
+        mobile_report,
+        json_path=Path(args.report),
+        text_path=Path(args.text_report),
+    )
     print(mobile_report)
     write_github_step_summary(mobile_report)
     return 0 if report["status"] in {"PASS", "PARTIAL"} else 1
