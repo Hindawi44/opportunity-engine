@@ -132,6 +132,7 @@ def main() -> int:
         provider,
         results_per_query=args.results_per_query,
         query_delay_seconds=args.query_delay_seconds,
+        apply_result_filter=True,
     )
     report["pilot_version"] = "1.5"
     report["pilot_topic"] = "CLOTHING_INVENTORY"
