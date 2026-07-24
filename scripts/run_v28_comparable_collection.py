@@ -16,16 +16,18 @@ from opportunity_engine.research_bootstrap import ResearchBootstrapPipeline
 from run_research_bootstrap import ProductionExternalEvidenceLoop, _search_subject, build_loop
 
 
+def _evidence_type_value(item: Any) -> str:
+    value = getattr(item, "evidence_type", "")
+    return str(getattr(value, "value", value)).casefold()
+
+
 class ComparableCollectionLoop(ProductionExternalEvidenceLoop):
     """Generate independent query variants until three persisted prices exist."""
 
     def detect_needs(self, investment_file: Any) -> tuple[ResearchNeed, ...]:
         opportunity_id = str(investment_file.opportunity_id)
         existing = tuple(getattr(self.evidence_repository, "list_for_opportunity", lambda _id: ())(opportunity_id))
-        existing_prices = sum(
-            str(getattr(item, "evidence_type", "")).endswith("market_price")
-            for item in existing
-        )
+        existing_prices = sum(_evidence_type_value(item) == "market_price" for item in existing)
         if existing_prices >= 3:
             return ()
 
