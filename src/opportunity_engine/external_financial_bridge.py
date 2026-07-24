@@ -20,11 +20,13 @@ def _load_evidence_file(path: Path) -> list[dict[str, Any]]:
     if isinstance(payload, list):
         return [item for item in payload if isinstance(item, dict)]
     if isinstance(payload, dict):
-        records = payload.get("evidence", payload.get("records", []))
+        # EvidenceRepository persists one ResearchEvidence object per JSON file.
+        # Detect that shape before treating an absent bundle key as an empty list.
+        if "opportunity_id" in payload and "evidence_type" in payload:
+            return [payload]
+        records = payload.get("evidence", payload.get("records"))
         if isinstance(records, list):
             return [item for item in records if isinstance(item, dict)]
-        if "opportunity_id" in payload:
-            return [payload]
     return []
 
 
