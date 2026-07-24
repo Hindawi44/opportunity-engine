@@ -1,0 +1,23 @@
+name: V3.4 Persistent Opportunity State Engine
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  persistent-state-acceptance:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pytest
+      - name: Run V3.4 lifecycle acceptance
+        run: pytest tests/test_v34_persistent_opportunity_state.py -q
