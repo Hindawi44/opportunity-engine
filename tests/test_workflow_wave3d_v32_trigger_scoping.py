@@ -25,7 +25,7 @@ def test_v32_pull_request_trigger_has_exact_approved_paths():
     assert 'paths:' in text
 
     path_lines = {
-        line.strip()[2:-1]
+        line.strip()[3:-1]
         for line in text.splitlines()
         if line.strip().startswith("- '") and line.strip().endswith("'")
     }
