@@ -46,7 +46,7 @@ The only validated domain is:
 CLOTHING_INVENTORY
 ```
 
-No new domain implementation is approved until the next task below is completed and accepted.
+No new domain implementation is approved until the workflow-simplification checkpoint below is completed and accepted.
 
 Blocked domains remain:
 
@@ -78,6 +78,7 @@ Blocked domains remain:
   - `BRANCH_CLOSURE`
 - Controlled End-to-End Clothing Inventory checkpoint implemented and merged in PR #206.
 - Real Clothing Inventory case validation implemented and merged in PR #208.
+- Operator Workflow Inventory completed and merged in PR #210.
 
 ## Accepted Clothing Inventory result
 
@@ -105,15 +106,27 @@ Real public candidate
 
 The `EVIDENCE_REQUIRED` result is an accepted checkpoint outcome, not a rejection and not a financial recommendation.
 
+## Accepted workflow inventory result
+
+The merged workflow inventory proves:
+
+- all 31 files under `.github/workflows/` are represented;
+- every workflow has documented triggers, responsibility, owner, and classification;
+- `discovery-v1.2-live-pilot.yml` is the strongest primary discovery candidate;
+- `v3.7-production-pilot.yml` is the strongest end-to-end review candidate;
+- `tests.yml` is the canonical repository-wide quality gate;
+- duplicated regression runs, schedule collisions, acceptance-only workflows, and historical diagnostics are documented;
+- no workflow file was changed during inventory.
+
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — Inventory Only  
-**Current task:** Inventory and classify the existing GitHub Actions workflows so the project can later expose one primary discovery workflow and one end-to-end review workflow without deleting or disabling anything in this task.
+**Phase:** Operator Workflow Simplification — Cleanup Planning Only  
+**Current task:** Produce an explicit, file-by-file, non-destructive cleanup plan based on the accepted inventory. Do not execute workflow changes in this task.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_INVENTORY
+OPERATOR_WORKFLOW_CLEANUP_PLAN
 ```
 
 Status: `NEXT`
@@ -121,7 +134,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_INVENTORY_v1.0.md
+docs/OPERATOR_WORKFLOW_CLEANUP_PLAN_v1.0.md
 ```
 
 ## Knowledge-card phase
@@ -141,35 +154,37 @@ All ten scenarios remain complete. No additional Clothing Inventory knowledge ca
 - Mark facts, estimates, seller claims, and unknowns separately.
 - Preserve source traceability for text, images, prices, quantities, and comparisons.
 - Do not make an automatic purchase, bid, or contact decision.
-- Do not delete, move, disable, rename, or change triggers for workflows during the inventory task.
+- Do not delete, move, disable, rename, or change triggers for workflows during cleanup planning.
+- Every proposed workflow action must identify risk, dependency, rollback, and verification requirements.
 
 ## Definition of current-task success
 
-The workflow inventory succeeds only when it produces:
+The cleanup-plan task succeeds only when it produces:
 
-1. A complete list of GitHub Actions workflow files.
-2. A classification for each workflow:
-   - primary operator candidate;
-   - end-to-end review candidate;
-   - active production support;
-   - acceptance test;
-   - historical diagnostic;
-   - uncertain and requiring review.
-3. Trigger information for every workflow.
-4. The main responsibility and owning engine for every workflow.
-5. Overlap and duplication findings.
-6. A non-destructive recommendation for the next cleanup PR.
-7. No workflow file changes other than the inventory document itself.
+1. A file-by-file proposed disposition for all 31 workflows.
+2. A clear distinction between:
+   - keep unchanged;
+   - keep but rename later;
+   - keep but narrow triggers later;
+   - keep as scheduled production support;
+   - convert to manual/path-scoped acceptance later;
+   - archive or disable later after verification.
+3. A proposed phone-friendly operator surface with one discovery workflow and one review workflow.
+4. A schedule-collision resolution proposal.
+5. A duplicated-regression reduction proposal that retains `tests.yml` as the canonical quality gate.
+6. Risk, dependency, rollback, and verification notes for every proposed change category.
+7. An ordered sequence for a later implementation PR.
+8. No workflow file changes in this planning task.
 
 ## Immediate next action
 
-Execute the workflow inventory only:
+Execute cleanup planning only:
 
-1. enumerate every file under `.github/workflows/`;
-2. record workflow name, triggers, purpose, and owning engine;
-3. classify each workflow without deleting or changing it;
-4. identify the best primary discovery workflow candidate;
-5. identify the best end-to-end review workflow candidate;
-6. document overlaps and historical diagnostics;
-7. propose—but do not execute—a separate cleanup plan;
+1. read `docs/WORKFLOW_INVENTORY_REPORT_v1.0.md`;
+2. produce a file-by-file future disposition for all 31 workflows;
+3. define the intended operator-facing workflow names and roles;
+4. propose safe trigger and schedule changes without applying them;
+5. define regression, rollback, and artifact-preservation requirements;
+6. identify changes that require separate PRs;
+7. do not modify any file under `.github/workflows/`;
 8. keep all domains and financial formulas unchanged.
