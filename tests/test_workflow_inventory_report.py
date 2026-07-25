@@ -1,0 +1,25 @@
+from pathlib import Path
+
+
+REPORT_PATH = Path("docs/WORKFLOW_INVENTORY_REPORT_v1.0.md")
+WORKFLOW_DIR = Path(".github/workflows")
+
+
+def test_workflow_inventory_report_represents_every_workflow_file() -> None:
+    report = REPORT_PATH.read_text(encoding="utf-8")
+    workflow_paths = sorted(WORKFLOW_DIR.glob("*.yml")) + sorted(WORKFLOW_DIR.glob("*.yaml"))
+
+    assert workflow_paths, "No GitHub Actions workflows were found"
+    assert len(workflow_paths) == 31
+
+    missing = [path.as_posix() for path in workflow_paths if f"`{path.as_posix()}`" not in report]
+    assert missing == []
+
+
+def test_workflow_inventory_report_preserves_non_destructive_scope() -> None:
+    report = REPORT_PATH.read_text(encoding="utf-8")
+
+    assert "Workflow files represented:** 31" in report
+    assert "No file under `.github/workflows/` was modified" in report
+    assert "PRIMARY_DISCOVERY_CANDIDATE" in report
+    assert "END_TO_END_REVIEW_CANDIDATE" in report
