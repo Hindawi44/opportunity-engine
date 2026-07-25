@@ -73,6 +73,7 @@ Blocked domains include:
 - `IMPORTER_CLEARANCE` knowledge card approved and merged.
 - `FACTORY_SURPLUS` knowledge card approved and merged.
 - `BUSINESS_CHANGE` knowledge card approved and merged.
+- `AUCTION` knowledge card approved and merged.
 
 ## Newly approved decision
 
@@ -88,13 +89,13 @@ Discover one Clothing Inventory opportunity
 
 ## Current phase
 
-**Phase:** Clothing Inventory Opportunity Map — scenario knowledge cards  
-**Current task:** Review and approve the complete `AUCTION` knowledge card.
+**Phase:** Clothing Inventory Opportunity Map — final scenario knowledge card  
+**Current task:** Review and approve the complete `BRANCH_CLOSURE` knowledge card.
 
 ## Current scenario
 
 ```text
-AUCTION
+BRANCH_CLOSURE
 ```
 
 Status: `READY_FOR_REVIEW`
@@ -102,7 +103,7 @@ Status: `READY_FOR_REVIEW`
 Current task document:
 
 ```text
-docs/opportunity_maps/AUCTION_KNOWLEDGE_CARD_v1.0.md
+docs/opportunity_maps/BRANCH_CLOSURE_KNOWLEDGE_CARD_v1.0.md
 ```
 
 ## Scenario queue
@@ -115,8 +116,8 @@ docs/opportunity_maps/AUCTION_KNOWLEDGE_CARD_v1.0.md
 6. IMPORTER_CLEARANCE — COMPLETE
 7. FACTORY_SURPLUS — COMPLETE
 8. BUSINESS_CHANGE — COMPLETE
-9. AUCTION — READY FOR REVIEW
-10. BRANCH_CLOSURE — NOT STARTED
+9. AUCTION — COMPLETE
+10. BRANCH_CLOSURE — READY FOR REVIEW
 
 Only one scenario may be developed at a time. After each scenario is completed, this file must be updated before starting the next one.
 
@@ -146,10 +147,11 @@ The Clothing Inventory MVP succeeds only when one real or controlled end-to-end 
 
 ## Immediate next action
 
-Review `docs/opportunity_maps/AUCTION_KNOWLEDGE_CARD_v1.0.md`.
+Review `docs/opportunity_maps/BRANCH_CLOSURE_KNOWLEDGE_CARD_v1.0.md`.
 
 After approval and merge:
 
-1. mark `AUCTION` complete;
-2. set `BRANCH_CLOSURE` as the only next scenario;
-3. do not begin broader automation before that checkpoint is merged.
+1. mark all ten Clothing Inventory knowledge cards complete;
+2. close the knowledge-card phase;
+3. start the approved end-to-end Clothing Inventory implementation checkpoint;
+4. do not expand to another domain before one complete discovery-to-report cycle succeeds.
