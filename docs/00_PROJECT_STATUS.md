@@ -69,6 +69,7 @@ Blocked domains include:
 - `BANKRUPTCY` knowledge card approved and merged.
 - `INVENTORY_LIQUIDATION` knowledge card approved and merged.
 - `LARGE_LOT` knowledge card approved and merged.
+- `WAREHOUSE_SURPLUS` knowledge card approved and merged.
 
 ## Newly approved decision
 
@@ -85,12 +86,12 @@ Discover one Clothing Inventory opportunity
 ## Current phase
 
 **Phase:** Clothing Inventory Opportunity Map — scenario knowledge cards  
-**Current task:** Review and approve the complete `WAREHOUSE_SURPLUS` knowledge card.
+**Current task:** Review and approve the complete `IMPORTER_CLEARANCE` knowledge card.
 
 ## Current scenario
 
 ```text
-WAREHOUSE_SURPLUS
+IMPORTER_CLEARANCE
 ```
 
 Status: `READY_FOR_REVIEW`
@@ -98,7 +99,7 @@ Status: `READY_FOR_REVIEW`
 Current task document:
 
 ```text
-docs/opportunity_maps/WAREHOUSE_SURPLUS_KNOWLEDGE_CARD_v1.0.md
+docs/opportunity_maps/IMPORTER_CLEARANCE_KNOWLEDGE_CARD_v1.0.md
 ```
 
 ## Scenario queue
@@ -107,8 +108,8 @@ docs/opportunity_maps/WAREHOUSE_SURPLUS_KNOWLEDGE_CARD_v1.0.md
 2. BANKRUPTCY — COMPLETE
 3. INVENTORY_LIQUIDATION — COMPLETE
 4. LARGE_LOT — COMPLETE
-5. WAREHOUSE_SURPLUS — READY FOR REVIEW
-6. IMPORTER_CLEARANCE — NOT STARTED
+5. WAREHOUSE_SURPLUS — COMPLETE
+6. IMPORTER_CLEARANCE — READY FOR REVIEW
 7. FACTORY_SURPLUS — NOT STARTED
 8. BUSINESS_CHANGE — NOT STARTED
 9. AUCTION — NOT STARTED
@@ -142,10 +143,10 @@ The Clothing Inventory MVP succeeds only when one real or controlled end-to-end 
 
 ## Immediate next action
 
-Review `docs/opportunity_maps/WAREHOUSE_SURPLUS_KNOWLEDGE_CARD_v1.0.md`.
+Review `docs/opportunity_maps/IMPORTER_CLEARANCE_KNOWLEDGE_CARD_v1.0.md`.
 
 After approval and merge:
 
-1. mark `WAREHOUSE_SURPLUS` complete;
-2. set `IMPORTER_CLEARANCE` as the only next scenario;
+1. mark `IMPORTER_CLEARANCE` complete;
+2. set `FACTORY_SURPLUS` as the only next scenario;
 3. do not begin any other scenario before that checkpoint is merged.
