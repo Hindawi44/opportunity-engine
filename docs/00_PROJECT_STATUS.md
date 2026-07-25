@@ -73,6 +73,7 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 3A V3.7 schedule/dependency audit merged in PR #222.
 - Wave 3B V3.7 manual-only conversion merged in PR #223.
 - Wave 3C V3.2 monitoring ownership audit merged in PR #225.
+- Wave 3D V3.2 pull-request trigger scoping merged in PR #227.
 
 ## Accepted Clothing Inventory result
 
@@ -104,17 +105,18 @@ Tracked repository evidence establishes:
 - its hourly schedule `17 * * * *` is collision-free relative to V3.7 and should remain;
 - stateful duplicate protection works when prior state is supplied;
 - V3.2 and V3.3 share a state-file path but use separate cache namespaces;
+- the V3.2 pull-request trigger is scoped to its six tracked dependencies;
 - external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Current phase
 
 **Phase:** Operator Workflow Simplification — Wave 3 Scheduled Production Support  
-**Current task:** Scope the V3.2 pull-request trigger to its exact tracked dependencies while preserving scheduled monitoring.
+**Current task:** Audit V3.3 live-source ingestion ownership before changing its trigger, schedule, shared-state use, cache, report, artifact, or source behavior.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_WAVE3D_V32_TRIGGER_SCOPING
+OPERATOR_WORKFLOW_WAVE3E_V33_OWNERSHIP_AUDIT
 ```
 
 Status: `NEXT`
@@ -122,7 +124,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE3D_v1.0.md
+docs/OPERATOR_WORKFLOW_WAVE3E_v1.0.md
 ```
 
 ## Non-negotiable rules
@@ -133,31 +135,30 @@ docs/OPERATOR_WORKFLOW_WAVE3D_v1.0.md
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Wave 3D may modify only the V3.2 workflow and its focused trigger-scope verification test.
-- Retain V3.2 `workflow_dispatch` and schedule `17 * * * *`.
-- Retain the current state path, cache keys, focused test, monitor command, report, and artifact contracts.
-- Do not change V3.3, V3.7, `scheduled-agent.yml`, or `daily-opportunity-pipeline.yml`.
+- Wave 3E is documentation and verification only.
+- Do not change any workflow, trigger, schedule, cache, state, command, report, artifact, or source-adapter behavior in Wave 3E.
+- Do not change V3.2, V3.7, `scheduled-agent.yml`, or `daily-opportunity-pipeline.yml` in this task.
 - Repository-setting facts not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-Wave 3D succeeds only when:
+Wave 3E succeeds only when:
 
-1. the broad V3.2 pull-request trigger is replaced with the exact six approved paths;
-2. manual dispatch and the hourly minute-17 schedule remain unchanged;
-3. state/cache/report/artifact behavior remains unchanged;
-4. the focused two-run duplicate-protection test passes;
-5. `tests.yml` passes the complete suite on the same commit;
-6. YAML syntax remains valid;
-7. no file outside the approved scope changes;
-8. rollback is a direct revert restoring the previous workflow blob.
+1. V3.3 triggers, schedule, jobs, commands, source ownership, state, cache, report, and artifact contracts are documented;
+2. the V3.2/V3.3 shared-state and separate-cache relationship is mapped precisely;
+3. tracked and external consumers are classified honestly;
+4. a future trigger/schedule proposal is defined without applying it;
+5. rollback and verification requirements are explicit;
+6. no workflow or production-code changes occur;
+7. all repository checks pass.
 
 ## Immediate next action
 
-Execute Wave 3D only:
+Execute Wave 3E audit only:
 
-1. update `.github/workflows/v3.2-continuous-opportunity-monitoring.yml`;
-2. add the exact six PR path scopes from the task document;
-3. preserve schedule, manual dispatch, state/cache, focused test, report, and artifact;
-4. add focused verification for the permitted scope;
-5. do not begin V3.3 or six-hour schedule cleanup.
+1. inspect V3.3 and its directly referenced scripts, tests, fixtures, reports, and artifacts;
+2. map Auksjonen source ownership and snapshot-refresh behavior;
+3. map shared-state use and separate cache namespaces relative to V3.2;
+4. identify tracked and external consumers;
+5. document trigger/schedule options, risks, rollback, and implementation verification;
+6. do not implement any workflow change yet.
