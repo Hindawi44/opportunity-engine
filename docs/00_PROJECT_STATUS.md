@@ -75,6 +75,7 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 3C V3.2 monitoring ownership audit merged in PR #225.
 - Wave 3D V3.2 pull-request trigger scoping merged in PR #227.
 - Wave 3E V3.3 live-source ingestion ownership audit merged in PR #229.
+- Wave 4A V2.6.6 historical diagnostic audit merged in PR #231.
 
 ## Accepted Clothing Inventory result
 
@@ -111,15 +112,26 @@ Tracked repository evidence establishes:
 - the continued operational need for V3.3's hourly schedule remains `MANUAL_VERIFICATION_REQUIRED`;
 - external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
 
+## Accepted historical-diagnostic conclusion
+
+Tracked repository evidence establishes:
+
+- V2.6.6 is a manual historical production-readiness diagnostic;
+- no tracked current workflow reproduces its exact live two-run evidence bundle and artifact contract;
+- unit tests cover readiness, secret non-disclosure, missing-secret failure, and repeat-protection comparison;
+- the approved decision is `FINAL_MANUAL_RUN_THEN_DISABLE_IN_SEPARATE_PR`;
+- the workflow must not be disabled, archived, relocated, renamed, or deleted before preservation evidence is recorded;
+- branch protection, external consumers, operator dependence, secret availability, and historical artifact links remain `MANUAL_VERIFICATION_REQUIRED`.
+
 ## Current phase
 
 **Phase:** Operator Workflow Simplification — Wave 4 Historical Diagnostics  
-**Current task:** Audit the V2.6.6 live dry-run historical diagnostic before any disablement or archival action.
+**Current task:** Run V2.6.6 manually one final time and preserve its evidence before any disablement action.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_WAVE4A_V266_HISTORICAL_DIAGNOSTIC_AUDIT
+OPERATOR_WORKFLOW_WAVE4B_V266_FINAL_PRESERVATION_RUN
 ```
 
 Status: `NEXT`
@@ -127,7 +139,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE4A_v1.0.md
+docs/OPERATOR_WORKFLOW_WAVE4B_v1.0.md
 ```
 
 ## Non-negotiable rules
@@ -138,33 +150,34 @@ docs/OPERATOR_WORKFLOW_WAVE4A_v1.0.md
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Wave 4A is documentation and verification only.
-- Do not change, disable, archive, rename, relocate, or delete `.github/workflows/v2.6.6-live-dry-run.yml` in Wave 4A.
-- Preserve the exact pre-change commit SHA and define artifact-preservation requirements before any later historical-workflow change.
+- Wave 4B is manual execution, evidence capture, and documentation only.
+- Do not change, disable, archive, rename, relocate, or delete `.github/workflows/v2.6.6-live-dry-run.yml` in Wave 4B.
+- Preserve run metadata, artifact checksum, file inventory, and the honest repeat-protection result.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-Wave 4A succeeds only when:
+Wave 4B succeeds only when:
 
-1. the V2.6.6 workflow's triggers, jobs, commands, inputs, secrets, reports, and artifact contracts are documented;
-2. every directly referenced script, test, fixture, report, and artifact is mapped;
-3. equivalent current test or workflow coverage is demonstrated, or remaining gaps are identified honestly;
-4. tracked and external consumers are classified;
-5. the exact pre-change commit SHA and artifact-preservation requirements are explicit;
-6. a future keep, disable, or archive recommendation is documented without implementation;
-7. rollback and verification requirements are explicit;
-8. no workflow or production-code changes occur;
-9. all repository checks pass.
+1. V2.6.6 is run manually from `main` with the input value recorded;
+2. run ID, URL, commit SHA, times, conclusion, and job name are recorded;
+3. artifact `v2.6.6-live-dry-run` is downloaded before expiry;
+4. archive checksum and file inventory are recorded;
+5. both dry-run summaries and `production_readiness_final.json` are inspected;
+6. `repeat_protection_observed` is recorded honestly;
+7. secret values are not exposed;
+8. unresolved external facts remain `MANUAL_VERIFICATION_REQUIRED`;
+9. no workflow or production-code change occurs;
+10. all repository checks pass for the evidence PR.
 
 ## Immediate next action
 
-Execute Wave 4A audit only:
+Execute Wave 4B only:
 
-1. inspect `.github/workflows/v2.6.6-live-dry-run.yml`;
-2. inspect every directly referenced script, test, fixture, report, artifact, input, and secret contract;
-3. compare its coverage with current repository tests and workflows;
-4. identify tracked and external consumers;
-5. record the exact pre-change commit SHA and required artifact evidence;
-6. document keep, disable, or archive options, risks, rollback, and verification;
-7. do not change or disable the workflow yet.
+1. merge the status-definition PR after all checks pass;
+2. open GitHub Actions and select `V2.6.6 Live Dry Run`;
+3. run it manually on `main` with `opportunity_limit=2` unless another value is explicitly recorded;
+4. wait for completion and inspect the honest result;
+5. download artifact `v2.6.6-live-dry-run` before its 14-day expiry;
+6. record run metadata, checksum, file inventory, JSON validity, dry-run comparison, and missing-file or source errors;
+7. do not disable or delete the workflow yet.
