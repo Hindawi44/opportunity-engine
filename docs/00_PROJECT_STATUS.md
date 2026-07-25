@@ -72,6 +72,7 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 2C primary Discovery cleanup merged in PR #220.
 - Wave 3A V3.7 schedule/dependency audit merged in PR #222.
 - Wave 3B V3.7 manual-only conversion merged in PR #223.
+- Wave 3C V3.2 monitoring ownership audit merged in PR #225.
 
 ## Accepted Clothing Inventory result
 
@@ -95,15 +96,25 @@ The merged real case proves:
 
 The primary Discovery workflow is path-scoped and retains manual live execution. The end-to-end review workflow is manual-only and retains its focused test, deterministic summary, and artifact.
 
+## Accepted monitoring conclusion
+
+Tracked repository evidence establishes:
+
+- V3.2 is the primary continuous-monitoring owner;
+- its hourly schedule `17 * * * *` is collision-free relative to V3.7 and should remain;
+- stateful duplicate protection works when prior state is supplied;
+- V3.2 and V3.3 share a state-file path but use separate cache namespaces;
+- external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
+
 ## Current phase
 
 **Phase:** Operator Workflow Simplification — Wave 3 Scheduled Production Support  
-**Current task:** Audit V3.2 continuous-monitoring ownership before changing any trigger, schedule, state, cache, or artifact behavior.
+**Current task:** Scope the V3.2 pull-request trigger to its exact tracked dependencies while preserving scheduled monitoring.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_WAVE3C_V32_MONITORING_AUDIT
+OPERATOR_WORKFLOW_WAVE3D_V32_TRIGGER_SCOPING
 ```
 
 Status: `NEXT`
@@ -111,7 +122,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE3C_v1.0.md
+docs/OPERATOR_WORKFLOW_WAVE3D_v1.0.md
 ```
 
 ## Non-negotiable rules
@@ -122,31 +133,31 @@ docs/OPERATOR_WORKFLOW_WAVE3C_v1.0.md
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Wave 3C is documentation and verification only.
-- Do not change any workflow, trigger, schedule, cache, state, command, report, or artifact in Wave 3C.
-- Do not change V3.3, `scheduled-agent.yml`, or `daily-opportunity-pipeline.yml` in this task.
+- Wave 3D may modify only the V3.2 workflow and its focused trigger-scope verification test.
+- Retain V3.2 `workflow_dispatch` and schedule `17 * * * *`.
+- Retain the current state path, cache keys, focused test, monitor command, report, and artifact contracts.
+- Do not change V3.3, V3.7, `scheduled-agent.yml`, or `daily-opportunity-pipeline.yml`.
 - Repository-setting facts not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-Wave 3C succeeds only when:
+Wave 3D succeeds only when:
 
-1. V3.2 triggers, schedule, jobs, commands, state, cache, report, and artifact contracts are documented;
-2. the minute-17 collision status after Wave 3B is confirmed;
-3. state continuity and duplicate protection across runs are mapped;
-4. tracked and external consumers are classified honestly;
-5. a future trigger/schedule proposal is defined without applying it;
-6. rollback and verification requirements are explicit;
-7. no workflow or production-code changes occur;
-8. all repository checks pass.
+1. the broad V3.2 pull-request trigger is replaced with the exact six approved paths;
+2. manual dispatch and the hourly minute-17 schedule remain unchanged;
+3. state/cache/report/artifact behavior remains unchanged;
+4. the focused two-run duplicate-protection test passes;
+5. `tests.yml` passes the complete suite on the same commit;
+6. YAML syntax remains valid;
+7. no file outside the approved scope changes;
+8. rollback is a direct revert restoring the previous workflow blob.
 
 ## Immediate next action
 
-Execute Wave 3C audit only:
+Execute Wave 3D only:
 
-1. inspect V3.2 and its directly referenced scripts/tests;
-2. map state/cache/report/artifact ownership;
-3. verify the schedule is now collision-free relative to V3.7;
-4. identify whether the broad PR trigger is still needed;
-5. document risk, rollback, and implementation verification;
-6. do not implement trigger or schedule changes yet.
+1. update `.github/workflows/v3.2-continuous-opportunity-monitoring.yml`;
+2. add the exact six PR path scopes from the task document;
+3. preserve schedule, manual dispatch, state/cache, focused test, report, and artifact;
+4. add focused verification for the permitted scope;
+5. do not begin V3.3 or six-hour schedule cleanup.
