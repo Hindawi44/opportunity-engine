@@ -76,6 +76,15 @@ Blocked domains include:
   - `BUSINESS_CHANGE`
   - `AUCTION`
   - `BRANCH_CLOSURE`
+- Controlled End-to-End Clothing Inventory checkpoint implemented and merged in PR #206.
+- The controlled case now proves:
+  - candidate preservation with traceability;
+  - scenario classification;
+  - Opportunity Dossier generation;
+  - unknown-value preservation;
+  - eligibility blocking when evidence is incomplete;
+  - honest `EVIDENCE_REQUIRED` output;
+  - no automatic purchase, bid, or contact action.
 
 ## Approved MVP decision
 
@@ -91,13 +100,13 @@ Discover one Clothing Inventory opportunity
 
 ## Current phase
 
-**Phase:** End-to-End Clothing Inventory Implementation Checkpoint  
-**Current task:** Prove one complete Clothing Inventory discovery-to-report cycle without expanding the domain or rebuilding the existing Analysis Engine.
+**Phase:** Real Clothing Inventory Case Validation  
+**Current task:** Run exactly one real, traceable Clothing Inventory candidate through the merged end-to-end checkpoint without expanding the domain or rebuilding the existing Analysis Engine.
 
 ## Current implementation checkpoint
 
 ```text
-END_TO_END_CLOTHING_INVENTORY_MVP
+REAL_CLOTHING_INVENTORY_CASE_VALIDATION
 ```
 
 Status: `NEXT`
@@ -105,7 +114,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/END_TO_END_CLOTHING_INVENTORY_CHECKPOINT_v1.0.md
+docs/REAL_CLOTHING_INVENTORY_CASE_VALIDATION_v1.0.md
 ```
 
 ## Knowledge-card phase
@@ -125,7 +134,7 @@ All ten scenarios are complete:
 9. AUCTION — COMPLETE
 10. BRANCH_CLOSURE — COMPLETE
 
-No additional Clothing Inventory knowledge card is approved unless a verified gap is found during the end-to-end checkpoint.
+No additional Clothing Inventory knowledge card is approved unless a verified gap is found during real-case validation.
 
 ## Non-negotiable rules
 
@@ -138,27 +147,28 @@ No additional Clothing Inventory knowledge card is approved unless a verified ga
 - Mark facts, estimates, seller claims, and unknowns separately.
 - Preserve source traceability for text, images, prices, quantities, and comparisons.
 - Do not make an automatic purchase, bid, or contact decision.
-- Do not broaden automation before one controlled end-to-end case succeeds.
+- Do not broaden automation before one real end-to-end case is accepted.
 
 ## Definition of MVP success
 
-The Clothing Inventory MVP succeeds only when one real or controlled end-to-end case produces:
+The Clothing Inventory MVP succeeds only when one real end-to-end case produces:
 
 1. A valid discovered opportunity.
 2. A complete Opportunity Dossier using all publicly available evidence.
 3. Explicit missing-data fields and seller questions.
 4. Evidence-based market comparables.
-5. Existing acquisition-cost and financial integration results.
+5. Existing acquisition-cost and financial integration results when eligibility allows.
 6. A final report that distinguishes confirmed facts, estimates, seller claims, and unknowns.
 7. An honest evidence-required outcome when the available data is insufficient.
 
 ## Immediate next action
 
-Create and execute the approved End-to-End Clothing Inventory checkpoint:
+Execute one real Clothing Inventory case only:
 
-1. select one real or controlled Clothing Inventory opportunity;
+1. preserve one public source with URL, title, text, timestamp, and provenance;
 2. classify it using the completed Opportunity Map;
-3. create a traceable Opportunity Dossier;
-4. pass eligible confirmed data through the existing Analysis Engine;
-5. produce one final evidence-based report or an honest evidence-required outcome;
-6. keep all other domains blocked until this checkpoint is merged and accepted.
+3. generate the Opportunity Dossier;
+4. apply the eligibility gate;
+5. send only eligible confirmed data into the existing Analysis Engine;
+6. produce either one Final Investment Report or one honest Evidence-Required Outcome;
+7. keep all other domains blocked until this real-case checkpoint is merged and accepted.
