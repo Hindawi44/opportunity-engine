@@ -18,6 +18,23 @@ _COMMERCIAL_TERMS = (
 )
 _SALE_TERMS = ("til salgs", "selges", "auksjon", "bud", "pris", "opphørssalg", "tømmesalg")
 
+# Event-specific scenarios outrank generic lot descriptions when both appear.
+# INVENTORY_LIQUIDATION outranks generic STORE_CLOSING wording such as
+# "avvikling" when a more explicit inventory-liquidation signal is present.
+# LARGE_LOT_SALE is intentionally the lowest-priority commercial fallback.
+_SCENARIO_PRIORITY: dict[str, int] = {
+    "COMPANY_BANKRUPTCY": 100,
+    "BRANCH_CLOSURE": 95,
+    "INVENTORY_LIQUIDATION": 92,
+    "STORE_CLOSING": 90,
+    "AUCTION": 80,
+    "IMPORTER_LIQUIDATION": 75,
+    "MANUFACTURER_EXCESS": 70,
+    "WAREHOUSE_SURPLUS": 65,
+    "BUSINESS_MODEL_CHANGE": 60,
+    "LARGE_LOT_SALE": 10,
+}
+
 
 def _normalized(candidate: DiscoveryCandidate) -> str:
     return " ".join(f"{candidate.title} {candidate.text}".lower().split())
@@ -31,8 +48,20 @@ def _scenario(text: str) -> tuple[str | None, tuple[str, ...]]:
                 matches.append((scenario, phrase))
     if not matches:
         return None, ()
-    scenario = matches[0][0]
-    evidence = tuple(dict.fromkeys(phrase for matched_scenario, phrase in matches if matched_scenario == scenario))
+
+    # Prefer a specific commercial event over a generic lot description.
+    # Phrase length is only the tie-breaker within equal-priority scenarios.
+    scenario, _ = max(
+        matches,
+        key=lambda match: (_SCENARIO_PRIORITY.get(match[0], 0), len(match[1])),
+    )
+    evidence = tuple(
+        dict.fromkeys(
+            phrase
+            for matched_scenario, phrase in matches
+            if matched_scenario == scenario
+        )
+    )
     return scenario, evidence
 
 
