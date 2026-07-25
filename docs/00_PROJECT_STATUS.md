@@ -9,7 +9,7 @@
 Every new development session must begin by reading, in this order:
 
 1. `docs/00_PROJECT_STATUS.md`
-2. `docs/Opportunity_Discovery_Analysis_Blprint_v2.0.md`
+2. `docs/Opportunity_Discovery_Analysis_Blueprint_v2.0.md`
 3. `docs/REPOSITORY_ARCHITECTURE_AUDIT_v2.0.md`
 4. The current-task document named below
 
@@ -35,20 +35,20 @@ Opportunity Map
   -> Discovery Engine
   -> Opportunity Dossier
   -> Existing Analysis Engine
-  -> Final Investment Report
+  -> Final Investment Report or Evidence-Required Outcome
 ```
 
 ## Current scope lock
 
-The only active domain is:
+The only validated domain is:
 
 ```text
 CLOTHING_INVENTORY
 ```
 
-No new domain and no new source expansion is approved until one complete Clothing Inventory cycle succeeds from discovery through final report.
+No new domain implementation is approved until the next task below is completed and accepted.
 
-Blocked domains include:
+Blocked domains remain:
 
 - Wedding dresses
 - Sewing equipment
@@ -77,36 +77,43 @@ Blocked domains include:
   - `AUCTION`
   - `BRANCH_CLOSURE`
 - Controlled End-to-End Clothing Inventory checkpoint implemented and merged in PR #206.
-- The controlled case now proves:
-  - candidate preservation with traceability;
-  - scenario classification;
-  - Opportunity Dossier generation;
-  - unknown-value preservation;
-  - eligibility blocking when evidence is incomplete;
-  - honest `EVIDENCE_REQUIRED` output;
-  - no automatic purchase, bid, or contact action.
+- Real Clothing Inventory case validation implemented and merged in PR #208.
 
-## Approved MVP decision
+## Accepted Clothing Inventory result
 
-The first real MVP is not a list of links. It is one complete cycle:
+The merged real case proves:
+
+- one public Clothing Inventory candidate is preserved with source traceability;
+- the candidate is classified using the approved Opportunity Map;
+- a complete Opportunity Dossier is produced;
+- unsupported values remain unknown rather than invented;
+- the eligibility gate blocks incomplete evidence from financial analysis;
+- the result reaches an honest `EVIDENCE_REQUIRED` outcome;
+- no automatic purchase, bid, or contact action occurs;
+- all repository checks pass.
+
+Accepted path:
 
 ```text
-Discover one Clothing Inventory opportunity
-  -> build its Opportunity Dossier
-  -> compare against the market
-  -> run the existing analysis pipeline
-  -> produce a final evidence-based report
+Real public candidate
+  -> AUCTION
+  -> SALE_CONFIRMED
+  -> Opportunity Dossier
+  -> Eligibility Gate
+  -> EVIDENCE_REQUIRED
 ```
+
+The `EVIDENCE_REQUIRED` result is an accepted checkpoint outcome, not a rejection and not a financial recommendation.
 
 ## Current phase
 
-**Phase:** Real Clothing Inventory Case Validation  
-**Current task:** Run exactly one real, traceable Clothing Inventory candidate through the merged end-to-end checkpoint without expanding the domain or rebuilding the existing Analysis Engine.
+**Phase:** Operator Workflow Simplification — Inventory Only  
+**Current task:** Inventory and classify the existing GitHub Actions workflows so the project can later expose one primary discovery workflow and one end-to-end review workflow without deleting or disabling anything in this task.
 
 ## Current implementation checkpoint
 
 ```text
-REAL_CLOTHING_INVENTORY_CASE_VALIDATION
+OPERATOR_WORKFLOW_INVENTORY
 ```
 
 Status: `NEXT`
@@ -114,61 +121,55 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/REAL_CLOTHING_INVENTORY_CASE_VALIDATION_v1.0.md
+docs/OPERATOR_WORKFLOW_INVENTORY_v1.0.md
 ```
 
 ## Knowledge-card phase
 
 Status: `COMPLETE`
 
-All ten scenarios are complete:
-
-1. STORE_CLOSING — COMPLETE
-2. BANKRUPTCY — COMPLETE
-3. INVENTORY_LIQUIDATION — COMPLETE
-4. LARGE_LOT — COMPLETE
-5. WAREHOUSE_SURPLUS — COMPLETE
-6. IMPORTER_CLEARANCE — COMPLETE
-7. FACTORY_SURPLUS — COMPLETE
-8. BUSINESS_CHANGE — COMPLETE
-9. AUCTION — COMPLETE
-10. BRANCH_CLOSURE — COMPLETE
-
-No additional Clothing Inventory knowledge card is approved unless a verified gap is found during real-case validation.
+All ten scenarios remain complete. No additional Clothing Inventory knowledge card is approved unless a verified gap is found.
 
 ## Non-negotiable rules
 
 - Do not delete existing production code.
 - Do not modify V2.8–V3.7 financial formulas unless a verified compatibility defect exists.
-- Do not add new domains.
-- Do not add new fixed-source integrations as the project direction.
+- Do not add a new domain in this task.
+- Do not add a new fixed-source architecture.
 - Do not reject a valid discovery merely because analysis data is missing.
 - Do not invent missing values.
 - Mark facts, estimates, seller claims, and unknowns separately.
 - Preserve source traceability for text, images, prices, quantities, and comparisons.
 - Do not make an automatic purchase, bid, or contact decision.
-- Do not broaden automation before one real end-to-end case is accepted.
+- Do not delete, move, disable, rename, or change triggers for workflows during the inventory task.
 
-## Definition of MVP success
+## Definition of current-task success
 
-The Clothing Inventory MVP succeeds only when one real end-to-end case produces:
+The workflow inventory succeeds only when it produces:
 
-1. A valid discovered opportunity.
-2. A complete Opportunity Dossier using all publicly available evidence.
-3. Explicit missing-data fields and seller questions.
-4. Evidence-based market comparables.
-5. Existing acquisition-cost and financial integration results when eligibility allows.
-6. A final report that distinguishes confirmed facts, estimates, seller claims, and unknowns.
-7. An honest evidence-required outcome when the available data is insufficient.
+1. A complete list of GitHub Actions workflow files.
+2. A classification for each workflow:
+   - primary operator candidate;
+   - end-to-end review candidate;
+   - active production support;
+   - acceptance test;
+   - historical diagnostic;
+   - uncertain and requiring review.
+3. Trigger information for every workflow.
+4. The main responsibility and owning engine for every workflow.
+5. Overlap and duplication findings.
+6. A non-destructive recommendation for the next cleanup PR.
+7. No workflow file changes other than the inventory document itself.
 
 ## Immediate next action
 
-Execute one real Clothing Inventory case only:
+Execute the workflow inventory only:
 
-1. preserve one public source with URL, title, text, timestamp, and provenance;
-2. classify it using the completed Opportunity Map;
-3. generate the Opportunity Dossier;
-4. apply the eligibility gate;
-5. send only eligible confirmed data into the existing Analysis Engine;
-6. produce either one Final Investment Report or one honest Evidence-Required Outcome;
-7. keep all other domains blocked until this real-case checkpoint is merged and accepted.
+1. enumerate every file under `.github/workflows/`;
+2. record workflow name, triggers, purpose, and owning engine;
+3. classify each workflow without deleting or changing it;
+4. identify the best primary discovery workflow candidate;
+5. identify the best end-to-end review workflow candidate;
+6. document overlaps and historical diagnostics;
+7. propose—but do not execute—a separate cleanup plan;
+8. keep all domains and financial formulas unchanged.
