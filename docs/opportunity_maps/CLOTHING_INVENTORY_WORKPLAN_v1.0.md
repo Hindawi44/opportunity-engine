@@ -13,8 +13,8 @@ Build a complete, testable knowledge map explaining how Clothing Inventory oppor
 |---:|---|---|
 | 1 | `STORE_CLOSING` | COMPLETE |
 | 2 | `BANKRUPTCY` | COMPLETE |
-| 3 | `INVENTORY_LIQUIDATION` | READY FOR REVIEW |
-| 4 | `LARGE_LOT` | NOT STARTED |
+| 3 | `INVENTORY_LIQUIDATION` | COMPLETE |
+| 4 | `LARGE_LOT` | READY FOR REVIEW |
 | 5 | `WAREHOUSE_SURPLUS` | NOT STARTED |
 | 6 | `IMPORTER_CLEARANCE` | NOT STARTED |
 | 7 | `FACTORY_SURPLUS` | NOT STARTED |
@@ -54,9 +54,9 @@ After one card is approved:
 Review and approve:
 
 ```text
-docs/opportunity_maps/INVENTORY_LIQUIDATION_KNOWLEDGE_CARD_v1.0.md
+docs/opportunity_maps/LARGE_LOT_KNOWLEDGE_CARD_v1.0.md
 ```
 
 No broad query generator, new provider, market valuation, or financial code is part of this task.
 
-After merge, `LARGE_LOT` becomes the only next scenario.
+After merge, `WAREHOUSE_SURPLUS` becomes the only next scenario.
