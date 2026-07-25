@@ -71,6 +71,7 @@ Blocked domains remain:
 - Operator Workflow Inventory merged in PR #210.
 - Operator Workflow Cleanup Implementation Plan merged in PR #212.
 - Operator Workflow Wave 1 display-name changes merged in PR #214.
+- Operator Workflow Wave 2A prerequisite audit merged in PR #216.
 
 ## Accepted Clothing Inventory result
 
@@ -103,10 +104,11 @@ The accepted work establishes:
 - all 31 workflow files are represented;
 - exactly one primary discovery workflow is selected;
 - exactly one end-to-end review workflow is selected;
-- `tests.yml` remains the canonical repository-wide quality gate;
-- every future workflow change has a defined risk, dependency, rollback, verification requirement, and implementation wave;
-- Wave 1 changed only the two top-level displayed workflow names;
-- no trigger, schedule, permission, secret, job, command, environment variable, artifact, or production behavior changed in Wave 1.
+- `tests.yml` remains the canonical repository-wide quality-gate candidate;
+- every workflow change has risk, dependency, rollback, and verification requirements;
+- Wave 1 changed only the two operator-facing display names;
+- Wave 2A documented duplicated full-regression runs and the first reversible Discovery cleanup slice;
+- branch-protection and exact required-check settings remain `MANUAL_VERIFICATION_REQUIRED`.
 
 Approved operator surface:
 
@@ -115,23 +117,15 @@ Approved operator surface:
 2 — Review One Opportunity End to End
 ```
 
-Files:
-
-```text
-.github/workflows/discovery-v1.2-live-pilot.yml
-.github/workflows/v3.7-production-pilot.yml
-.github/workflows/tests.yml
-```
-
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — Wave 2A Prerequisite Audit  
-**Current task:** Verify the canonical quality-gate and check-name dependencies required before any duplicated full-regression step or broad pull-request trigger is removed. This task is audit and documentation only.
+**Phase:** Operator Workflow Simplification — Wave 2B Discovery Acceptance Cleanup  
+**Current task:** Apply the first reversible trigger and regression cleanup to two Discovery acceptance workflows only.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_WAVE2A_PREREQUISITE_AUDIT
+OPERATOR_WORKFLOW_WAVE2B_DISCOVERY_CLEANUP
 ```
 
 Status: `NEXT`
@@ -139,7 +133,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE2A_v1.0.md
+docs/OPERATOR_WORKFLOW_WAVE2B_v1.0.md
 ```
 
 ## Knowledge-card phase
@@ -154,34 +148,37 @@ All ten scenarios remain complete. No additional Clothing Inventory knowledge ca
 - Do not modify V2.8–V3.7 financial formulas unless a verified compatibility defect exists.
 - Do not add a new domain in this task.
 - Do not add a new fixed-source architecture.
-- Do not reject a valid discovery merely because analysis data is missing.
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Do not change any workflow trigger, schedule, permission, secret, job, command, environment variable, or artifact during Wave 2A prerequisite audit.
-- Do not remove a duplicated `pytest -q` step until `tests.yml` is confirmed as the canonical required quality gate and check-name dependencies are documented.
-- Do not change branch protection in this task.
+- Wave 2B may modify only:
+  - `.github/workflows/discovery-v1-clothing-inventory.yml`
+  - `.github/workflows/discovery-v1.1-live-search.yml`
+- Retain `workflow_dispatch` and existing focused test commands.
+- Do not change workflow display names, job identifiers, Python versions, dependency installation, permissions, secrets, schedules, artifacts, environment variables, or production code.
+- `tests.yml` must remain unchanged and must pass the complete regression suite on the same commit.
+- Repository-settings facts not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-Wave 2A prerequisite audit succeeds only when:
+Wave 2B succeeds only when:
 
-1. The canonical `tests.yml` workflow name, job name, triggers, artifact, and observed check identity are documented.
-2. Pull-request checks that duplicate the complete regression suite are identified.
-3. Workflows suitable for the first focused Wave 2 implementation slice are selected.
-4. Required check-name and branch-protection dependencies are explicitly marked as confirmed, unconfirmed, or requiring manual repository-settings verification.
-5. A rollback and verification bundle is defined for the first Wave 2 implementation PR.
-6. No file under `.github/workflows/` is changed.
-7. All repository checks pass.
+1. both approved Discovery workflows receive exact pull-request path scopes;
+2. both retain manual dispatch;
+3. both retain their focused Discovery tests;
+4. duplicated complete `pytest -q` steps are removed only from those two workflows;
+5. `tests.yml` runs and passes on the same commit;
+6. YAML syntax remains valid;
+7. no other workflow or production file changes;
+8. rollback is a direct revert restoring the previous YAML blobs.
 
 ## Immediate next action
 
-Execute Wave 2A prerequisite audit only:
+Execute Wave 2B only:
 
-1. inspect `tests.yml` and the Discovery acceptance workflows;
-2. document duplicated full-regression steps and current pull-request triggers;
-3. identify the safest first implementation slice, grouped by Discovery Engine ownership;
-4. record any repository-settings information that cannot be verified from tracked files as `MANUAL_VERIFICATION_REQUIRED`;
-5. define exact future path scopes and focused tests without applying them;
-6. preserve all workflow behavior;
-7. do not begin scheduled-workflow cleanup or historical diagnostic archival.
+1. update the two approved Discovery workflow files;
+2. add exact path filters from the task document;
+3. remove their duplicated complete regression steps;
+4. preserve focused tests and manual dispatch;
+5. add focused verification for the permitted scope;
+6. do not begin schedule cleanup or diagnostic archival.
