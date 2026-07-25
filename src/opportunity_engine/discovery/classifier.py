@@ -31,8 +31,19 @@ def _scenario(text: str) -> tuple[str | None, tuple[str, ...]]:
                 matches.append((scenario, phrase))
     if not matches:
         return None, ()
-    scenario = matches[0][0]
-    evidence = tuple(dict.fromkeys(phrase for matched_scenario, phrase in matches if matched_scenario == scenario))
+
+    # Prefer the most specific matching signal rather than dictionary order.
+    # Example: "lageravvikling klær" must outrank the generic substring
+    # "avvikling", otherwise an inventory-liquidation listing is incorrectly
+    # classified as STORE_CLOSING.
+    scenario, _ = max(matches, key=lambda match: len(match[1]))
+    evidence = tuple(
+        dict.fromkeys(
+            phrase
+            for matched_scenario, phrase in matches
+            if matched_scenario == scenario
+        )
+    )
     return scenario, evidence
 
 
