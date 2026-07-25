@@ -65,17 +65,19 @@ Blocked domains include:
 - Legacy FINN/Auksjonen adapters retained as optional providers.
 - Clothing Inventory selected as the reference MVP domain.
 - Opportunity Dossier specification approved as the bridge evidence artifact.
-- `STORE_CLOSING` knowledge card approved and merged.
-- `BANKRUPTCY` knowledge card approved and merged.
-- `INVENTORY_LIQUIDATION` knowledge card approved and merged.
-- `LARGE_LOT` knowledge card approved and merged.
-- `WAREHOUSE_SURPLUS` knowledge card approved and merged.
-- `IMPORTER_CLEARANCE` knowledge card approved and merged.
-- `FACTORY_SURPLUS` knowledge card approved and merged.
-- `BUSINESS_CHANGE` knowledge card approved and merged.
-- `AUCTION` knowledge card approved and merged.
+- All ten Clothing Inventory knowledge cards approved and merged:
+  - `STORE_CLOSING`
+  - `BANKRUPTCY`
+  - `INVENTORY_LIQUIDATION`
+  - `LARGE_LOT`
+  - `WAREHOUSE_SURPLUS`
+  - `IMPORTER_CLEARANCE`
+  - `FACTORY_SURPLUS`
+  - `BUSINESS_CHANGE`
+  - `AUCTION`
+  - `BRANCH_CLOSURE`
 
-## Newly approved decision
+## Approved MVP decision
 
 The first real MVP is not a list of links. It is one complete cycle:
 
@@ -89,24 +91,28 @@ Discover one Clothing Inventory opportunity
 
 ## Current phase
 
-**Phase:** Clothing Inventory Opportunity Map — final scenario knowledge card  
-**Current task:** Review and approve the complete `BRANCH_CLOSURE` knowledge card.
+**Phase:** End-to-End Clothing Inventory Implementation Checkpoint  
+**Current task:** Prove one complete Clothing Inventory discovery-to-report cycle without expanding the domain or rebuilding the existing Analysis Engine.
 
-## Current scenario
+## Current implementation checkpoint
 
 ```text
-BRANCH_CLOSURE
+END_TO_END_CLOTHING_INVENTORY_MVP
 ```
 
-Status: `READY_FOR_REVIEW`
+Status: `NEXT`
 
 Current task document:
 
 ```text
-docs/opportunity_maps/BRANCH_CLOSURE_KNOWLEDGE_CARD_v1.0.md
+docs/END_TO_END_CLOTHING_INVENTORY_CHECKPOINT_v1.0.md
 ```
 
-## Scenario queue
+## Knowledge-card phase
+
+Status: `COMPLETE`
+
+All ten scenarios are complete:
 
 1. STORE_CLOSING — COMPLETE
 2. BANKRUPTCY — COMPLETE
@@ -117,9 +123,9 @@ docs/opportunity_maps/BRANCH_CLOSURE_KNOWLEDGE_CARD_v1.0.md
 7. FACTORY_SURPLUS — COMPLETE
 8. BUSINESS_CHANGE — COMPLETE
 9. AUCTION — COMPLETE
-10. BRANCH_CLOSURE — READY FOR REVIEW
+10. BRANCH_CLOSURE — COMPLETE
 
-Only one scenario may be developed at a time. After each scenario is completed, this file must be updated before starting the next one.
+No additional Clothing Inventory knowledge card is approved unless a verified gap is found during the end-to-end checkpoint.
 
 ## Non-negotiable rules
 
@@ -129,9 +135,10 @@ Only one scenario may be developed at a time. After each scenario is completed, 
 - Do not add new fixed-source integrations as the project direction.
 - Do not reject a valid discovery merely because analysis data is missing.
 - Do not invent missing values.
-- Mark facts, estimates, and unknowns separately.
+- Mark facts, estimates, seller claims, and unknowns separately.
 - Preserve source traceability for text, images, prices, quantities, and comparisons.
 - Do not make an automatic purchase, bid, or contact decision.
+- Do not broaden automation before one controlled end-to-end case succeeds.
 
 ## Definition of MVP success
 
@@ -142,16 +149,16 @@ The Clothing Inventory MVP succeeds only when one real or controlled end-to-end 
 3. Explicit missing-data fields and seller questions.
 4. Evidence-based market comparables.
 5. Existing acquisition-cost and financial integration results.
-6. A final report that distinguishes confirmed facts, estimates, and unknowns.
+6. A final report that distinguishes confirmed facts, estimates, seller claims, and unknowns.
 7. An honest evidence-required outcome when the available data is insufficient.
 
 ## Immediate next action
 
-Review `docs/opportunity_maps/BRANCH_CLOSURE_KNOWLEDGE_CARD_v1.0.md`.
+Create and execute the approved End-to-End Clothing Inventory checkpoint:
 
-After approval and merge:
-
-1. mark all ten Clothing Inventory knowledge cards complete;
-2. close the knowledge-card phase;
-3. start the approved end-to-end Clothing Inventory implementation checkpoint;
-4. do not expand to another domain before one complete discovery-to-report cycle succeeds.
+1. select one real or controlled Clothing Inventory opportunity;
+2. classify it using the completed Opportunity Map;
+3. create a traceable Opportunity Dossier;
+4. pass eligible confirmed data through the existing Analysis Engine;
+5. produce one final evidence-based report or an honest evidence-required outcome;
+6. keep all other domains blocked until this checkpoint is merged and accepted.
