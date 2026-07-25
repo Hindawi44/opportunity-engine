@@ -19,8 +19,8 @@ Build a complete, testable knowledge map explaining how Clothing Inventory oppor
 | 6 | `IMPORTER_CLEARANCE` | COMPLETE |
 | 7 | `FACTORY_SURPLUS` | COMPLETE |
 | 8 | `BUSINESS_CHANGE` | COMPLETE |
-| 9 | `AUCTION` | READY FOR REVIEW |
-| 10 | `BRANCH_CLOSURE` | NOT STARTED |
+| 9 | `AUCTION` | COMPLETE |
+| 10 | `BRANCH_CLOSURE` | READY FOR REVIEW |
 
 ## Required knowledge card for each scenario
 
@@ -46,17 +46,17 @@ After one card is approved:
 
 1. Mark it complete in this work plan.
 2. Update `docs/00_PROJECT_STATUS.md`.
-3. Set exactly one next scenario.
-4. Commit the checkpoint before beginning another scenario.
+3. Set exactly one next scenario or implementation checkpoint.
+4. Commit the checkpoint before beginning another task.
 
 ## Current task
 
 Review and approve:
 
 ```text
-docs/opportunity_maps/AUCTION_KNOWLEDGE_CARD_v1.0.md
+docs/opportunity_maps/BRANCH_CLOSURE_KNOWLEDGE_CARD_v1.0.md
 ```
 
 No broad query generator, new provider, market valuation, or financial code is part of this task.
 
-After merge, `BRANCH_CLOSURE` becomes the only next scenario.
+After merge, the Clothing Inventory knowledge-card phase is complete and the approved end-to-end implementation checkpoint becomes the only next task.
