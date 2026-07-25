@@ -64,6 +64,7 @@ Blocked domains include:
 - Existing Analysis Engine V2.8–V3.7 retained and frozen.
 - Legacy FINN/Auksjonen adapters retained as optional providers.
 - Clothing Inventory selected as the reference MVP domain.
+- Opportunity Dossier specification approved as the bridge evidence artifact.
 
 ## Newly approved decision
 
@@ -79,8 +80,8 @@ Discover one Clothing Inventory opportunity
 
 ## Current phase
 
-**Phase:** Knowledge and architecture stabilization for Clothing Inventory MVP  
-**Current task:** Define and validate the Opportunity Dossier specification and complete the Clothing Inventory Opportunity Map one scenario at a time.
+**Phase:** Clothing Inventory Opportunity Map — scenario knowledge cards  
+**Current task:** Review and approve the complete `STORE_CLOSING` knowledge card.
 
 ## Current scenario
 
@@ -88,20 +89,26 @@ Discover one Clothing Inventory opportunity
 STORE_CLOSING
 ```
 
-Status: `NEXT`
+Status: `READY_FOR_REVIEW`
+
+Current task document:
+
+```text
+docs/opportunity_maps/STORE_CLOSING_KNOWLEDGE_CARD_v1.0.md
+```
 
 ## Scenario queue
 
-1. STORE_CLOSING
-2. BANKRUPTCY
-3. INVENTORY_LIQUIDATION
-4. LARGE_LOT
-5. WAREHOUSE_SURPLUS
-6. IMPORTER_CLEARANCE
-7. FACTORY_SURPLUS
-8. BUSINESS_CHANGE
-9. AUCTION
-10. BRANCH_CLOSURE
+1. STORE_CLOSING — READY FOR REVIEW
+2. BANKRUPTCY — NOT STARTED
+3. INVENTORY_LIQUIDATION — NOT STARTED
+4. LARGE_LOT — NOT STARTED
+5. WAREHOUSE_SURPLUS — NOT STARTED
+6. IMPORTER_CLEARANCE — NOT STARTED
+7. FACTORY_SURPLUS — NOT STARTED
+8. BUSINESS_CHANGE — NOT STARTED
+9. AUCTION — NOT STARTED
+10. BRANCH_CLOSURE — NOT STARTED
 
 Only one scenario may be developed at a time. After each scenario is completed, this file must be updated before starting the next one.
 
@@ -131,4 +138,10 @@ The Clothing Inventory MVP succeeds only when one real or controlled end-to-end 
 
 ## Immediate next action
 
-Complete the `STORE_CLOSING` knowledge card for the Clothing Inventory Opportunity Map. Do not write broad discovery automation before that card is approved.
+Review `docs/opportunity_maps/STORE_CLOSING_KNOWLEDGE_CARD_v1.0.md`.
+
+After approval and merge:
+
+1. mark `STORE_CLOSING` complete;
+2. set `BANKRUPTCY` as the only next scenario;
+3. do not begin any other scenario before that checkpoint is merged.
