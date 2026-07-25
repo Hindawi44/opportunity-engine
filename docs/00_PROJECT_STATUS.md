@@ -65,6 +65,7 @@ Blocked domains include:
 - Legacy FINN/Auksjonen adapters retained as optional providers.
 - Clothing Inventory selected as the reference MVP domain.
 - Opportunity Dossier specification approved as the bridge evidence artifact.
+- `STORE_CLOSING` knowledge card approved and merged.
 
 ## Newly approved decision
 
@@ -81,12 +82,12 @@ Discover one Clothing Inventory opportunity
 ## Current phase
 
 **Phase:** Clothing Inventory Opportunity Map — scenario knowledge cards  
-**Current task:** Review and approve the complete `STORE_CLOSING` knowledge card.
+**Current task:** Review and approve the complete `BANKRUPTCY` knowledge card.
 
 ## Current scenario
 
 ```text
-STORE_CLOSING
+BANKRUPTCY
 ```
 
 Status: `READY_FOR_REVIEW`
@@ -94,13 +95,13 @@ Status: `READY_FOR_REVIEW`
 Current task document:
 
 ```text
-docs/opportunity_maps/STORE_CLOSING_KNOWLEDGE_CARD_v1.0.md
+docs/opportunity_maps/BANKRUPTCY_KNOWLEDGE_CARD_v1.0.md
 ```
 
 ## Scenario queue
 
-1. STORE_CLOSING — READY FOR REVIEW
-2. BANKRUPTCY — NOT STARTED
+1. STORE_CLOSING — COMPLETE
+2. BANKRUPTCY — READY FOR REVIEW
 3. INVENTORY_LIQUIDATION — NOT STARTED
 4. LARGE_LOT — NOT STARTED
 5. WAREHOUSE_SURPLUS — NOT STARTED
@@ -138,10 +139,10 @@ The Clothing Inventory MVP succeeds only when one real or controlled end-to-end 
 
 ## Immediate next action
 
-Review `docs/opportunity_maps/STORE_CLOSING_KNOWLEDGE_CARD_v1.0.md`.
+Review `docs/opportunity_maps/BANKRUPTCY_KNOWLEDGE_CARD_v1.0.md`.
 
 After approval and merge:
 
-1. mark `STORE_CLOSING` complete;
-2. set `BANKRUPTCY` as the only next scenario;
+1. mark `BANKRUPTCY` complete;
+2. set `INVENTORY_LIQUIDATION` as the only next scenario;
 3. do not begin any other scenario before that checkpoint is merged.
