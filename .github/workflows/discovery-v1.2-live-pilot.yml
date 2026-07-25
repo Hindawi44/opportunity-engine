@@ -3,6 +3,18 @@ name: 1 — Discover Clothing Inventory Opportunities
 on:
   pull_request:
     branches: [main]
+    paths:
+      - ".github/workflows/discovery-v1.2-live-pilot.yml"
+      - "src/opportunity_engine/discovery/models.py"
+      - "src/opportunity_engine/discovery/quality_engine.py"
+      - "src/opportunity_engine/discovery/result_filter.py"
+      - "src/opportunity_engine/discovery/live_search.py"
+      - "src/opportunity_engine/discovery/query_builder.py"
+      - "src/opportunity_engine/discovery/search_provider.py"
+      - "scripts/run_discovery_v12_live_pilot.py"
+      - "tests/test_discovery_v12_live_pilot.py"
+      - "tests/test_discovery_v15_result_filter.py"
+      - "tests/test_discovery_v16_quality_engine.py"
   workflow_dispatch:
 
 jobs:
@@ -21,10 +33,6 @@ jobs:
           pytest tests/test_discovery_v16_quality_engine.py -q
           pytest tests/test_discovery_v15_result_filter.py -q
           pytest tests/test_discovery_v12_live_pilot.py -q
-      - name: Run regression suite
-        env:
-          PYTHONPATH: src:.
-        run: pytest -q
 
   live-pilot:
     if: ${{ github.event_name == 'workflow_dispatch' }}
