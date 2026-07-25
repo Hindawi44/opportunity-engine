@@ -18,7 +18,7 @@ def test_wave4a_report_records_exact_historical_contract():
         "scripts/run_daily_pipeline.py",
         "tests/test_production_readiness.py",
         "v2.6.6-live-dry-run",
-        "retention: 14 days",
+        "Retention: 14 days",
         "MANUAL_VERIFICATION_REQUIRED",
         "FINAL_MANUAL_RUN_THEN_DISABLE_IN_SEPARATE_PR",
     )
@@ -39,5 +39,5 @@ def test_wave4a_report_preserves_workflow_and_no_automatic_action_contract():
 
     assert "Wave 4A changes no workflow" in report
     assert "must not be removed" in report
-    assert "do not expose secret values" in report
+    assert "does not expose secret values" in report
     assert "purchase, bid, contact" not in workflow.lower()
