@@ -74,6 +74,7 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 3B V3.7 manual-only conversion merged in PR #223.
 - Wave 3C V3.2 monitoring ownership audit merged in PR #225.
 - Wave 3D V3.2 pull-request trigger scoping merged in PR #227.
+- Wave 3E V3.3 live-source ingestion ownership audit merged in PR #229.
 
 ## Accepted Clothing Inventory result
 
@@ -106,17 +107,19 @@ Tracked repository evidence establishes:
 - stateful duplicate protection works when prior state is supplied;
 - V3.2 and V3.3 share a state-file path but use separate cache namespaces;
 - the V3.2 pull-request trigger is scoped to its six tracked dependencies;
+- V3.3 remains the temporary repository-owned Auksjonen ingestion and snapshot-refresh workflow;
+- the continued operational need for V3.3's hourly schedule remains `MANUAL_VERIFICATION_REQUIRED`;
 - external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — Wave 3 Scheduled Production Support  
-**Current task:** Audit V3.3 live-source ingestion ownership before changing its trigger, schedule, shared-state use, cache, report, artifact, or source behavior.
+**Phase:** Operator Workflow Simplification — Wave 4 Historical Diagnostics  
+**Current task:** Audit the V2.6.6 live dry-run historical diagnostic before any disablement or archival action.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_WAVE3E_V33_OWNERSHIP_AUDIT
+OPERATOR_WORKFLOW_WAVE4A_V266_HISTORICAL_DIAGNOSTIC_AUDIT
 ```
 
 Status: `NEXT`
@@ -124,7 +127,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE3E_v1.0.md
+docs/OPERATOR_WORKFLOW_WAVE4A_v1.0.md
 ```
 
 ## Non-negotiable rules
@@ -135,30 +138,33 @@ docs/OPERATOR_WORKFLOW_WAVE3E_v1.0.md
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Wave 3E is documentation and verification only.
-- Do not change any workflow, trigger, schedule, cache, state, command, report, artifact, or source-adapter behavior in Wave 3E.
-- Do not change V3.2, V3.7, `scheduled-agent.yml`, or `daily-opportunity-pipeline.yml` in this task.
-- Repository-setting facts not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
+- Wave 4A is documentation and verification only.
+- Do not change, disable, archive, rename, relocate, or delete `.github/workflows/v2.6.6-live-dry-run.yml` in Wave 4A.
+- Preserve the exact pre-change commit SHA and define artifact-preservation requirements before any later historical-workflow change.
+- Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-Wave 3E succeeds only when:
+Wave 4A succeeds only when:
 
-1. V3.3 triggers, schedule, jobs, commands, source ownership, state, cache, report, and artifact contracts are documented;
-2. the V3.2/V3.3 shared-state and separate-cache relationship is mapped precisely;
-3. tracked and external consumers are classified honestly;
-4. a future trigger/schedule proposal is defined without applying it;
-5. rollback and verification requirements are explicit;
-6. no workflow or production-code changes occur;
-7. all repository checks pass.
+1. the V2.6.6 workflow's triggers, jobs, commands, inputs, secrets, reports, and artifact contracts are documented;
+2. every directly referenced script, test, fixture, report, and artifact is mapped;
+3. equivalent current test or workflow coverage is demonstrated, or remaining gaps are identified honestly;
+4. tracked and external consumers are classified;
+5. the exact pre-change commit SHA and artifact-preservation requirements are explicit;
+6. a future keep, disable, or archive recommendation is documented without implementation;
+7. rollback and verification requirements are explicit;
+8. no workflow or production-code changes occur;
+9. all repository checks pass.
 
 ## Immediate next action
 
-Execute Wave 3E audit only:
+Execute Wave 4A audit only:
 
-1. inspect V3.3 and its directly referenced scripts, tests, fixtures, reports, and artifacts;
-2. map Auksjonen source ownership and snapshot-refresh behavior;
-3. map shared-state use and separate cache namespaces relative to V3.2;
+1. inspect `.github/workflows/v2.6.6-live-dry-run.yml`;
+2. inspect every directly referenced script, test, fixture, report, artifact, input, and secret contract;
+3. compare its coverage with current repository tests and workflows;
 4. identify tracked and external consumers;
-5. document trigger/schedule options, risks, rollback, and implementation verification;
-6. do not implement any workflow change yet.
+5. record the exact pre-change commit SHA and required artifact evidence;
+6. document keep, disable, or archive options, risks, rollback, and verification;
+7. do not change or disable the workflow yet.
