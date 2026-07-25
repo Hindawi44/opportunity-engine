@@ -11,7 +11,7 @@ Build a complete, testable knowledge map explaining how Clothing Inventory oppor
 
 | Order | Scenario | Status |
 |---:|---|---|
-| 1 | `STORE_CLOSING` | NEXT |
+| 1 | `STORE_CLOSING` | READY FOR REVIEW |
 | 2 | `BANKRUPTCY` | NOT STARTED |
 | 3 | `INVENTORY_LIQUIDATION` | NOT STARTED |
 | 4 | `LARGE_LOT` | NOT STARTED |
@@ -51,10 +51,12 @@ After one card is approved:
 
 ## Current task
 
-Create the complete knowledge card for:
+Review and approve:
 
 ```text
-STORE_CLOSING
+docs/opportunity_maps/STORE_CLOSING_KNOWLEDGE_CARD_v1.0.md
 ```
 
 No broad query generator, new provider, market valuation, or financial code is part of this task.
+
+After merge, `BANKRUPTCY` becomes the only next scenario.
