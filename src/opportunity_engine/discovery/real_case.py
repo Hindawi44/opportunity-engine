@@ -29,9 +29,9 @@ def real_clothing_inventory_candidate() -> DiscoveryCandidate:
         source="AUKSJONEN_NO_PUBLIC_LISTING",
         discovered_at="2026-07-25T12:30:00Z",
         text=(
-            "Auksjonen.no Klær/Arbeidsklær listing. 310 stk Univern Hi-Vis "
+            "Auksjon klær / arbeidsklær på Auksjonen.no. 310 stk Univern Hi-Vis "
             "arbeidsjakker i flere størrelser, flammehemmende og antistatisk. "
-            "Auksjon avsluttet; offentlig side viste høyeste bud 200 NOK og sted SEM."
+            "Auksjonen var avsluttet; offentlig side viste høyeste bud 200 NOK og sted SEM."
         ),
         location="SEM",
         quantity=310,
