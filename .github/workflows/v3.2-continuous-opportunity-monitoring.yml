@@ -3,6 +3,13 @@ name: V3.2 Continuous Opportunity Monitoring
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - '.github/workflows/v3.2-continuous-opportunity-monitoring.yml'
+      - 'scripts/run_v32_continuous_opportunity_monitoring.py'
+      - 'src/opportunity_engine/continuous_opportunity_monitoring.py'
+      - 'scripts/run_v31_live_batch_validation.py'
+      - 'tests/test_v32_continuous_opportunity_monitoring.py'
+      - 'data/live_validation/v3.1-auksjonen-live-batch.json'
   workflow_dispatch:
   schedule:
     - cron: '17 * * * *'
