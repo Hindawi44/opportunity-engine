@@ -19,12 +19,14 @@ _COMMERCIAL_TERMS = (
 _SALE_TERMS = ("til salgs", "selges", "auksjon", "bud", "pris", "opphørssalg", "tømmesalg")
 
 # Event-specific scenarios outrank generic lot descriptions when both appear.
+# INVENTORY_LIQUIDATION outranks generic STORE_CLOSING wording such as
+# "avvikling" when a more explicit inventory-liquidation signal is present.
 # LARGE_LOT_SALE is intentionally the lowest-priority commercial fallback.
 _SCENARIO_PRIORITY: dict[str, int] = {
     "COMPANY_BANKRUPTCY": 100,
     "BRANCH_CLOSURE": 95,
+    "INVENTORY_LIQUIDATION": 92,
     "STORE_CLOSING": 90,
-    "INVENTORY_LIQUIDATION": 85,
     "AUCTION": 80,
     "IMPORTER_LIQUIDATION": 75,
     "MANUFACTURER_EXCESS": 70,
