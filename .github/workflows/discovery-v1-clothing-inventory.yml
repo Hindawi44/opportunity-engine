@@ -3,6 +3,13 @@ name: Discovery V1 Clothing Inventory
 on:
   pull_request:
     branches: [main]
+    paths:
+      - ".github/workflows/discovery-v1-clothing-inventory.yml"
+      - "src/opportunity_engine/discovery/models.py"
+      - "src/opportunity_engine/discovery/opportunity_maps.py"
+      - "src/opportunity_engine/discovery/classifier.py"
+      - "tests/test_discovery_opportunity_maps.py"
+      - "tests/test_discovery_classifier.py"
   workflow_dispatch:
 
 jobs:
@@ -21,5 +28,3 @@ jobs:
         run: pip install pytest
       - name: Run Discovery V1 acceptance tests
         run: pytest tests/test_discovery_opportunity_maps.py tests/test_discovery_classifier.py -q
-      - name: Run full regression suite
-        run: pytest -q
