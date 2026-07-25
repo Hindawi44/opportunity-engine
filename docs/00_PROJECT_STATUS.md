@@ -70,6 +70,7 @@ Blocked domains remain:
 - Real Clothing Inventory case validation merged in PR #208.
 - Operator Workflow Inventory merged in PR #210.
 - Operator Workflow Cleanup Implementation Plan merged in PR #212.
+- Operator Workflow Wave 1 display-name changes merged in PR #214.
 
 ## Accepted Clothing Inventory result
 
@@ -95,18 +96,26 @@ Real public candidate
   -> EVIDENCE_REQUIRED
 ```
 
-## Accepted workflow simplification planning result
+## Accepted workflow simplification result
 
-The merged inventory and cleanup plan establish:
+The accepted work establishes:
 
 - all 31 workflow files are represented;
-- exactly one primary discovery workflow candidate is selected;
-- exactly one end-to-end review workflow candidate is selected;
+- exactly one primary discovery workflow is selected;
+- exactly one end-to-end review workflow is selected;
 - `tests.yml` remains the canonical repository-wide quality gate;
 - every future workflow change has a defined risk, dependency, rollback, verification requirement, and implementation wave;
-- no workflow behavior changed during planning.
+- Wave 1 changed only the two top-level displayed workflow names;
+- no trigger, schedule, permission, secret, job, command, environment variable, artifact, or production behavior changed in Wave 1.
 
-Approved operator candidates:
+Approved operator surface:
+
+```text
+1 — Discover Clothing Inventory Opportunities
+2 — Review One Opportunity End to End
+```
+
+Files:
 
 ```text
 .github/workflows/discovery-v1.2-live-pilot.yml
@@ -116,13 +125,13 @@ Approved operator candidates:
 
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — Wave 1 Implementation  
-**Current task:** Apply display-name-only changes to the two approved operator workflows and keep `tests.yml` clearly identifiable as the quality gate. Do not change triggers, schedules, permissions, jobs, commands, secrets, artifacts, or production code.
+**Phase:** Operator Workflow Simplification — Wave 2A Prerequisite Audit  
+**Current task:** Verify the canonical quality-gate and check-name dependencies required before any duplicated full-regression step or broad pull-request trigger is removed. This task is audit and documentation only.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_WAVE1
+OPERATOR_WORKFLOW_WAVE2A_PREREQUISITE_AUDIT
 ```
 
 Status: `NEXT`
@@ -130,7 +139,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE1_v1.0.md
+docs/OPERATOR_WORKFLOW_WAVE2A_v1.0.md
 ```
 
 ## Knowledge-card phase
@@ -149,27 +158,30 @@ All ten scenarios remain complete. No additional Clothing Inventory knowledge ca
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Wave 1 may change only the top-level displayed `name:` field in the two approved operator workflow files.
-- Do not change workflow filenames, triggers, schedules, permissions, secrets, jobs, steps, commands, environment variables, or artifacts.
-- `tests.yml` must remain behaviorally unchanged.
+- Do not change any workflow trigger, schedule, permission, secret, job, command, environment variable, or artifact during Wave 2A prerequisite audit.
+- Do not remove a duplicated `pytest -q` step until `tests.yml` is confirmed as the canonical required quality gate and check-name dependencies are documented.
+- Do not change branch protection in this task.
 
 ## Definition of current-task success
 
-Wave 1 succeeds only when:
+Wave 2A prerequisite audit succeeds only when:
 
-1. `.github/workflows/discovery-v1.2-live-pilot.yml` has a clear phone-friendly displayed name.
-2. `.github/workflows/v3.7-production-pilot.yml` has a clear phone-friendly displayed name.
-3. `.github/workflows/tests.yml` remains the canonical quality gate and is not behaviorally changed.
-4. A focused verification test confirms only the permitted display-name changes.
-5. All repository checks pass.
-6. No trigger, schedule, permission, secret, job, command, artifact, production code, financial formula, or domain changes occur.
+1. The canonical `tests.yml` workflow name, job name, triggers, artifact, and observed check identity are documented.
+2. Pull-request checks that duplicate the complete regression suite are identified.
+3. Workflows suitable for the first focused Wave 2 implementation slice are selected.
+4. Required check-name and branch-protection dependencies are explicitly marked as confirmed, unconfirmed, or requiring manual repository-settings verification.
+5. A rollback and verification bundle is defined for the first Wave 2 implementation PR.
+6. No file under `.github/workflows/` is changed.
+7. All repository checks pass.
 
 ## Immediate next action
 
-Execute Wave 1 only:
+Execute Wave 2A prerequisite audit only:
 
-1. rename the displayed workflow name in `discovery-v1.2-live-pilot.yml` to a clear operator discovery label;
-2. rename the displayed workflow name in `v3.7-production-pilot.yml` to a clear end-to-end review label;
-3. preserve every other byte of workflow behavior;
-4. add verification proving the scope is display-name-only;
-5. do not begin Wave 2 trigger or regression cleanup.
+1. inspect `tests.yml` and the Discovery acceptance workflows;
+2. document duplicated full-regression steps and current pull-request triggers;
+3. identify the safest first implementation slice, grouped by Discovery Engine ownership;
+4. record any repository-settings information that cannot be verified from tracked files as `MANUAL_VERIFICATION_REQUIRED`;
+5. define exact future path scopes and focused tests without applying them;
+6. preserve all workflow behavior;
+7. do not begin scheduled-workflow cleanup or historical diagnostic archival.
