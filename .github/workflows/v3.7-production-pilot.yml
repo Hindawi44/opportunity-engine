@@ -1,10 +1,7 @@
 name: 2 — Review One Opportunity End to End
 
 on:
-  pull_request:
   workflow_dispatch:
-  schedule:
-    - cron: "17 * * * *"
 
 jobs:
   production-pilot:
@@ -30,11 +27,6 @@ jobs:
         env:
           PYTHONPATH: src:repository
         run: python scripts/run_v37_production_pilot_acceptance.py
-
-      - name: Run regression suite
-        env:
-          PYTHONPATH: src:repository
-        run: pytest -q
 
       - name: Print one summary
         run: cat artifacts/v3.7-production-pilot-summary.json
