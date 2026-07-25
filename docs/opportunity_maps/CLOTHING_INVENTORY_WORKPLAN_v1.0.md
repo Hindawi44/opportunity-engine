@@ -18,8 +18,8 @@ Build a complete, testable knowledge map explaining how Clothing Inventory oppor
 | 5 | `WAREHOUSE_SURPLUS` | COMPLETE |
 | 6 | `IMPORTER_CLEARANCE` | COMPLETE |
 | 7 | `FACTORY_SURPLUS` | COMPLETE |
-| 8 | `BUSINESS_CHANGE` | READY FOR REVIEW |
-| 9 | `AUCTION` | NOT STARTED |
+| 8 | `BUSINESS_CHANGE` | COMPLETE |
+| 9 | `AUCTION` | READY FOR REVIEW |
 | 10 | `BRANCH_CLOSURE` | NOT STARTED |
 
 ## Required knowledge card for each scenario
@@ -54,9 +54,9 @@ After one card is approved:
 Review and approve:
 
 ```text
-docs/opportunity_maps/BUSINESS_CHANGE_KNOWLEDGE_CARD_v1.0.md
+docs/opportunity_maps/AUCTION_KNOWLEDGE_CARD_v1.0.md
 ```
 
 No broad query generator, new provider, market valuation, or financial code is part of this task.
 
-After merge, `AUCTION` becomes the only next scenario.
+After merge, `BRANCH_CLOSURE` becomes the only next scenario.
