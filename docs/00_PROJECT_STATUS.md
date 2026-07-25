@@ -65,20 +65,11 @@ Blocked domains remain:
 - Legacy FINN/Auksjonen adapters retained as optional providers.
 - Clothing Inventory selected as the reference MVP domain.
 - Opportunity Dossier specification approved as the bridge evidence artifact.
-- All ten Clothing Inventory knowledge cards approved and merged:
-  - `STORE_CLOSING`
-  - `BANKRUPTCY`
-  - `INVENTORY_LIQUIDATION`
-  - `LARGE_LOT`
-  - `WAREHOUSE_SURPLUS`
-  - `IMPORTER_CLEARANCE`
-  - `FACTORY_SURPLUS`
-  - `BUSINESS_CHANGE`
-  - `AUCTION`
-  - `BRANCH_CLOSURE`
-- Controlled End-to-End Clothing Inventory checkpoint implemented and merged in PR #206.
-- Real Clothing Inventory case validation implemented and merged in PR #208.
-- Operator Workflow Inventory completed and merged in PR #210.
+- All ten Clothing Inventory knowledge cards approved and merged.
+- Controlled End-to-End Clothing Inventory checkpoint merged in PR #206.
+- Real Clothing Inventory case validation merged in PR #208.
+- Operator Workflow Inventory merged in PR #210.
+- Operator Workflow Cleanup Implementation Plan merged in PR #212.
 
 ## Accepted Clothing Inventory result
 
@@ -104,29 +95,34 @@ Real public candidate
   -> EVIDENCE_REQUIRED
 ```
 
-The `EVIDENCE_REQUIRED` result is an accepted checkpoint outcome, not a rejection and not a financial recommendation.
+## Accepted workflow simplification planning result
 
-## Accepted workflow inventory result
+The merged inventory and cleanup plan establish:
 
-The merged workflow inventory proves:
+- all 31 workflow files are represented;
+- exactly one primary discovery workflow candidate is selected;
+- exactly one end-to-end review workflow candidate is selected;
+- `tests.yml` remains the canonical repository-wide quality gate;
+- every future workflow change has a defined risk, dependency, rollback, verification requirement, and implementation wave;
+- no workflow behavior changed during planning.
 
-- all 31 files under `.github/workflows/` are represented;
-- every workflow has documented triggers, responsibility, owner, and classification;
-- `discovery-v1.2-live-pilot.yml` is the strongest primary discovery candidate;
-- `v3.7-production-pilot.yml` is the strongest end-to-end review candidate;
-- `tests.yml` is the canonical repository-wide quality gate;
-- duplicated regression runs, schedule collisions, acceptance-only workflows, and historical diagnostics are documented;
-- no workflow file was changed during inventory.
+Approved operator candidates:
+
+```text
+.github/workflows/discovery-v1.2-live-pilot.yml
+.github/workflows/v3.7-production-pilot.yml
+.github/workflows/tests.yml
+```
 
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — Cleanup Planning Only  
-**Current task:** Produce an explicit, file-by-file, non-destructive cleanup plan based on the accepted inventory. Do not execute workflow changes in this task.
+**Phase:** Operator Workflow Simplification — Wave 1 Implementation  
+**Current task:** Apply display-name-only changes to the two approved operator workflows and keep `tests.yml` clearly identifiable as the quality gate. Do not change triggers, schedules, permissions, jobs, commands, secrets, artifacts, or production code.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_CLEANUP_PLAN
+OPERATOR_WORKFLOW_WAVE1
 ```
 
 Status: `NEXT`
@@ -134,7 +130,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_CLEANUP_PLAN_v1.0.md
+docs/OPERATOR_WORKFLOW_WAVE1_v1.0.md
 ```
 
 ## Knowledge-card phase
@@ -151,40 +147,29 @@ All ten scenarios remain complete. No additional Clothing Inventory knowledge ca
 - Do not add a new fixed-source architecture.
 - Do not reject a valid discovery merely because analysis data is missing.
 - Do not invent missing values.
-- Mark facts, estimates, seller claims, and unknowns separately.
-- Preserve source traceability for text, images, prices, quantities, and comparisons.
+- Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Do not delete, move, disable, rename, or change triggers for workflows during cleanup planning.
-- Every proposed workflow action must identify risk, dependency, rollback, and verification requirements.
+- Wave 1 may change only the top-level displayed `name:` field in the two approved operator workflow files.
+- Do not change workflow filenames, triggers, schedules, permissions, secrets, jobs, steps, commands, environment variables, or artifacts.
+- `tests.yml` must remain behaviorally unchanged.
 
 ## Definition of current-task success
 
-The cleanup-plan task succeeds only when it produces:
+Wave 1 succeeds only when:
 
-1. A file-by-file proposed disposition for all 31 workflows.
-2. A clear distinction between:
-   - keep unchanged;
-   - keep but rename later;
-   - keep but narrow triggers later;
-   - keep as scheduled production support;
-   - convert to manual/path-scoped acceptance later;
-   - archive or disable later after verification.
-3. A proposed phone-friendly operator surface with one discovery workflow and one review workflow.
-4. A schedule-collision resolution proposal.
-5. A duplicated-regression reduction proposal that retains `tests.yml` as the canonical quality gate.
-6. Risk, dependency, rollback, and verification notes for every proposed change category.
-7. An ordered sequence for a later implementation PR.
-8. No workflow file changes in this planning task.
+1. `.github/workflows/discovery-v1.2-live-pilot.yml` has a clear phone-friendly displayed name.
+2. `.github/workflows/v3.7-production-pilot.yml` has a clear phone-friendly displayed name.
+3. `.github/workflows/tests.yml` remains the canonical quality gate and is not behaviorally changed.
+4. A focused verification test confirms only the permitted display-name changes.
+5. All repository checks pass.
+6. No trigger, schedule, permission, secret, job, command, artifact, production code, financial formula, or domain changes occur.
 
 ## Immediate next action
 
-Execute cleanup planning only:
+Execute Wave 1 only:
 
-1. read `docs/WORKFLOW_INVENTORY_REPORT_v1.0.md`;
-2. produce a file-by-file future disposition for all 31 workflows;
-3. define the intended operator-facing workflow names and roles;
-4. propose safe trigger and schedule changes without applying them;
-5. define regression, rollback, and artifact-preservation requirements;
-6. identify changes that require separate PRs;
-7. do not modify any file under `.github/workflows/`;
-8. keep all domains and financial formulas unchanged.
+1. rename the displayed workflow name in `discovery-v1.2-live-pilot.yml` to a clear operator discovery label;
+2. rename the displayed workflow name in `v3.7-production-pilot.yml` to a clear end-to-end review label;
+3. preserve every other byte of workflow behavior;
+4. add verification proving the scope is display-name-only;
+5. do not begin Wave 2 trigger or regression cleanup.
