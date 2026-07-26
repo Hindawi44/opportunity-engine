@@ -2,6 +2,11 @@ name: V3.0 Multi-Opportunity Ranking E2E Acceptance
 
 on:
   pull_request:
+    paths:
+      - ".github/workflows/v30-multi-opportunity-ranking.yml"
+      - "src/opportunity_engine/multi_opportunity_ranking.py"
+      - "tests/test_v30_multi_opportunity_ranking_e2e.py"
+      - "scripts/run_v30_multi_opportunity_ranking_acceptance.py"
   workflow_dispatch:
 
 jobs:
