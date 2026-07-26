@@ -85,10 +85,11 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 2I V3.4 path-scoping implementation merged in PR #271 as `COMPLETE`.
 - Wave 2J V3.5 trigger audit merged in PR #272 as `READY_FOR_PATH_SCOPING`.
 - Wave 2K V3.5 path-scoping implementation merged in PR #274 as `COMPLETE`.
-- Wave 2L V3.6 trigger and regression audit task definition merged in PR #276.
-- Wave 2L V3.6 audit result merged in PR #277 as `READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION` with merge commit `ca2cc5e08a0b3442867707fff18d6320498da4ec`.
-- Wave 2M V3.6 implementation task definition merged in PR #278.
-- Wave 2M V3.6 path-scoping and regression-deduplication implementation merged in PR #279 as `COMPLETE` with merge commit `d7ae58be40165a56d21240ca6c2d16552f4e1e87`.
+- Wave 2L V3.6 audit result merged in PR #277 as `READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION`.
+- Wave 2M V3.6 path-scoping and regression-deduplication implementation merged in PR #279 as `COMPLETE`.
+- Wave 3F V3.3 path-scoping task definition merged in PR #281.
+- Wave 3F V3.3 path-scoping implementation merged in PR #282 as `COMPLETE` with merge commit `1db30b72b57461010242f0802999c9dc00e63f4f`.
+- The Wave 3E contract test was updated in PR #282 to validate the accepted six-file V3.3 path boundary rather than prohibit `paths:`.
 
 ## Accepted Clothing Inventory result
 
@@ -121,19 +122,20 @@ Tracked repository evidence establishes:
 - stateful duplicate protection works when prior state is supplied;
 - V3.2 and V3.3 share a state-file path but use separate cache namespaces;
 - V3.3 remains the temporary repository-owned Auksjonen ingestion and snapshot-refresh workflow;
+- V3.3 now has a six-file pull-request path boundary while retaining manual and scheduled execution;
 - external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — unfinished trigger ownership  
+**Phase:** Workflow Simplification Checkpoint Review  
 **Status:** `ACTIVE`
 
-Wave 2 trigger scoping through V3.6 is complete. The next lowest-risk unfinished item is the accepted Wave 3E recommendation to path-scope V3.3's broad pull-request trigger while preserving its schedule, manual dispatch, state paths, cache namespaces, reports, artifacts, and source behavior.
+The planned low-risk workflow cleanup sequence is now implemented through V3.6 and V3.3. The project must not automatically continue into another workflow wave. It must first decide whether the simplification checkpoint is sufficient to return to the approved Clothing Inventory end-to-end product path.
 
 ## Current implementation checkpoint
 
 ```text
-WAVE3F_V33_PATH_SCOPING_TASK_DEFINITION
+WORKFLOW_SIMPLIFICATION_CHECKPOINT_REVIEW_TASK_DEFINITION
 ```
 
 Status: `NEXT`
@@ -141,12 +143,13 @@ Status: `NEXT`
 Current task document:
 
 ```text
-Not yet approved. Create one planning-only task document for V3.3 pull-request path scoping. It must use the accepted Wave 3E dependency boundary, retain workflow_dispatch and the minute-12 hourly schedule, preserve the focused fixture-backed test, preserve snapshot/report/state/artifact paths and cache namespaces, and prohibit schedule, state, cache, source, report, artifact, and production-code changes.
+Not yet approved. Create one planning-only checkpoint-review document that reconciles completed Wave 1, Wave 2, Wave 3, and Wave 4 results; identifies only genuine remaining blockers; decides whether workflow simplification is ACCEPTED or NOT_READY; and, if accepted, selects one product-facing Clothing Inventory task rather than another cleanup wave.
 ```
 
 ## Accepted workflow-simplification results
 
 ```text
+Wave 1 — COMPLETE
 Wave 2B — COMPLETE
 Wave 2C — COMPLETE
 Wave 2D — READY_FOR_PATH_SCOPING
@@ -159,33 +162,30 @@ Wave 2J — READY_FOR_PATH_SCOPING
 Wave 2K — COMPLETE
 Wave 2L — READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION
 Wave 2M — COMPLETE
-Wave 3A–3E — accepted as recorded above
-Wave 4 Historical Diagnostics — COMPLETE
+Wave 3A–3F — accepted as recorded above
+Wave 4 Historical Diagnostics — COMPLETE with Wave 4D–4L retained as NOT_READY
 ```
 
-## Why Wave 3F is next
+## Why checkpoint review is next
 
-The accepted Wave 3E audit established that `.github/workflows/v3.3-live-source-ingestion.yml` still runs on every pull request to `main`, although its tracked execution boundary is finite.
+The project has now completed the intended low-risk changes that reduce unnecessary workflow execution while preserving:
 
-The proposed dependency boundary is:
+- the two-workflow operator surface;
+- canonical regression ownership in `tests.yml`;
+- manual execution paths;
+- required schedules;
+- source traceability;
+- persistent-state and duplicate-protection contracts;
+- evidence-first behavior;
+- `automatic_purchase_decision: false`.
 
-```text
-.github/workflows/v3.3-live-source-ingestion.yml
-scripts/run_v33_auksjonen_ingestion.py
-src/opportunity_engine/source_ingestion/auksjonen.py
-scripts/run_v32_continuous_opportunity_monitoring.py
-tests/test_v33_live_source_ingestion.py
-tests/fixtures/v33_auksjonen_page.html
-```
+Remaining unknowns such as external consumers, branch-protection configuration, and hosted-cache continuity are already classified as `MANUAL_VERIFICATION_REQUIRED`. They must not automatically cause an endless sequence of speculative cleanup work.
 
-Wave 3F must define a trigger-only implementation. It must not change:
+The checkpoint review must distinguish:
 
-- `workflow_dispatch`;
-- schedule `12 * * * *`;
-- cache keys or state ownership;
-- snapshot, report, state, or artifact paths;
-- Auksjonen source behavior;
-- tests, fixtures, or production code.
+1. a proven blocker to the Clothing Inventory end-to-end path;
+2. a documented operational unknown that can remain monitored;
+3. optional future cleanup that must not delay product validation.
 
 ## Non-negotiable rules
 
@@ -198,26 +198,27 @@ Wave 3F must define a trigger-only implementation. It must not change:
 - Do not modify, run, disable, archive, rename, relocate, or delete a workflow until a separately approved task permits it.
 - Select or change only one task in a single PR.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
+- Do not create another cleanup wave unless the checkpoint review identifies a concrete blocker with repository evidence.
 
 ## Definition of current-task success
 
-The Wave 3F task-definition checkpoint succeeds only when:
+The checkpoint-review task definition succeeds only when:
 
-1. the accepted Wave 3E audit is used as the authority;
-2. exactly one planning document is created;
-3. the only later workflow change permitted is adding the six approved `pull_request.paths` entries;
-4. `workflow_dispatch` and schedule `12 * * * *` are explicitly preserved;
-5. fixture-backed PR execution and live manual/scheduled execution are preserved;
-6. state paths, cache namespaces, reports, artifacts, source adapter behavior, tests, fixtures, and production code remain unchanged;
-7. external-consumer and branch-protection facts remain `MANUAL_VERIFICATION_REQUIRED`;
-8. all repository checks pass.
+1. exactly one planning-only task document is created;
+2. completed Wave 1–4 results are reconciled against the cleanup plan;
+3. remaining items are classified as blocker, monitored unknown, or optional future cleanup;
+4. the document defines objective criteria for `SIMPLIFICATION_ACCEPTED` versus `NOT_READY`;
+5. no workflow, production code, test, fixture, state, cache, report, artifact, source, domain, or financial behavior is modified;
+6. if simplification is accepted, the next task must return to one Clothing Inventory product-facing end-to-end objective;
+7. all repository checks pass.
 
 ## Immediate next action
 
-Execute Wave 3F task definition only:
+Execute the checkpoint-review task definition only:
 
-1. create `docs/OPERATOR_WORKFLOW_WAVE3F_v1.0.md`;
-2. record the six approved path entries from Wave 3E;
-3. preserve manual and scheduled execution exactly;
-4. prohibit schedule, cache, state, report, artifact, source, test, fixture, and production-code changes;
-5. do not modify or run any workflow in this task.
+1. create `docs/WORKFLOW_SIMPLIFICATION_CHECKPOINT_REVIEW_TASK_v1.0.md`;
+2. reconcile the accepted workflow inventory and Waves 1–4;
+3. define blocker-versus-monitoring classification rules;
+4. define the evidence required to accept the checkpoint;
+5. prohibit workflow modifications in the task-definition PR;
+6. identify no more than one subsequent task.
