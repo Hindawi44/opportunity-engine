@@ -78,18 +78,18 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 4A V2.6.6 historical diagnostic audit merged in PR #231.
 - Wave 4B preservation-evidence definition merged in PR #232.
 - Wave 4B initial evidence document merged in PR #233.
-- Wave 4B final preservation run accepted with run ID `30175512518`, artifact ID `8624093715`, complete archive inventory, and artifact digest `sha256:57cc918d719a1aafa6720bff486035daf157a5e09e641f6e61214b6c8ff89420`.
-- Wave 4C reversible disablement merged in PR #234: `.github/workflows/v2.6.6-live-dry-run.yml` remains preserved at the same path, is manual-only through `workflow_dispatch`, and includes an explicit historical-diagnostic notice and documented rollback procedure.
+- Wave 4B final preservation run accepted with run ID `30175512518`, artifact ID `8624093715`, and artifact digest `sha256:57cc918d719a1aafa6720bff486035daf157a5e09e641f6e61214b6c8ff89420`.
+- Wave 4C reversible disablement merged in PR #234; the V2.6.6 workflow remains preserved, manual-only, and reversible.
 - Post-Wave 4C checkpoint merged in PR #235.
-- Wave 4D V2.7.2.5 financial final-score coverage audit merged in PR #237 with result `NOT_READY`; the workflow remains unchanged.
-- Wave 4E V2.7.2.3 score-engine trace coverage audit merged in PR #239 with result `NOT_READY`; the workflow remains unchanged.
-- Wave 4F V2.7.2.2 internal-score coverage audit merged in PR #241 with result `NOT_READY`; the workflow remains unchanged.
+- Wave 4D V2.7.2.5 coverage audit merged in PR #237 as `NOT_READY`.
+- Wave 4E V2.7.2.3 coverage audit merged in PR #239 as `NOT_READY`.
+- Wave 4F V2.7.2.2 coverage audit merged in PR #241 as `NOT_READY`.
 - Post-Wave 4F status reconciliation merged in PR #242.
-- Wave 4G V2.7.2.4.1 research-candidate task definition merged in PR #243; coverage-audit result merged in PR #244 as `NOT_READY`; the workflow remains unchanged.
-- Wave 4H V2.7.2.4.2 bootstrap-integration task definition merged in PR #245; coverage-audit result merged in PR #246 as `NOT_READY`; the workflow remains unchanged.
-- Wave 4I V2.7.2.4.3 external-evidence-execution task definition merged in PR #247; coverage-audit result merged in PR #248 as `NOT_READY`; the workflow remains unchanged.
-- Wave 4J V2.7.2.4.4 Brave transport task definition merged in PR #249; coverage-audit result merged in PR #250 as `NOT_READY`; the workflow remains unchanged.
-- Wave 4K V2.7.2.4.5 Brave response-content task definition merged in PR #251; its coverage audit is the current approved task.
+- Wave 4G V2.7.2.4.1 task definition merged in PR #243; result merged in PR #244 as `NOT_READY`.
+- Wave 4H V2.7.2.4.2 task definition merged in PR #245; result merged in PR #246 as `NOT_READY`.
+- Wave 4I V2.7.2.4.3 task definition merged in PR #247; result merged in PR #248 as `NOT_READY`.
+- Wave 4J V2.7.2.4.4 task definition merged in PR #249; result merged in PR #250 as `NOT_READY`.
+- Wave 4K V2.7.2.4.5 task definition merged in PR #251; coverage-audit result merged in PR #253 as `NOT_READY`; the workflow remains unchanged.
 
 ## Accepted Clothing Inventory result
 
@@ -118,37 +118,29 @@ The primary Discovery workflow is path-scoped and retains manual live execution.
 Tracked repository evidence establishes:
 
 - V3.2 is the primary continuous-monitoring owner;
-- its hourly schedule `17 * * * *` is collision-free relative to V3.7 and should remain;
+- its hourly schedule remains collision-free relative to V3.7;
 - stateful duplicate protection works when prior state is supplied;
 - V3.2 and V3.3 share a state-file path but use separate cache namespaces;
-- the V3.2 pull-request trigger is scoped to its six tracked dependencies;
 - V3.3 remains the temporary repository-owned Auksjonen ingestion and snapshot-refresh workflow;
-- the continued operational need for V3.3's hourly schedule remains `MANUAL_VERIFICATION_REQUIRED`;
 - external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Accepted historical-diagnostic conclusion
 
-Tracked repository evidence establishes:
-
-- V2.6.6 is a preserved, manual-only historical production-readiness diagnostic;
-- no tracked current workflow reproduces its exact live two-run evidence bundle and artifact contract;
-- unit tests cover readiness, secret non-disclosure, missing-secret failure, and repeat-protection comparison;
-- the final manual run completed successfully on `main`;
-- its run metadata, artifact metadata, archive digest, complete inventory, readiness evidence, and repeat-protection evidence were preserved;
-- the workflow is non-routine through a reversible repository change and remains available only for intentional manual execution;
-- the workflow file was not deleted, renamed, relocated, or archived;
-- branch protection, external consumers, operator dependence, and historical artifact links remain `MANUAL_VERIFICATION_REQUIRED`;
-- deletion remains unapproved.
+- V2.6.6 is a preserved, manual-only historical production-readiness diagnostic.
+- Its final manual run evidence and artifact metadata are preserved.
+- It remains available only for intentional manual execution.
+- Deletion remains unapproved.
+- Branch protection, external consumers, operator dependence, and historical artifact links remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Current phase
 
 **Phase:** Operator Workflow Simplification — Wave 4 Historical Diagnostics  
-**Current task:** Execute the approved Wave 4K coverage audit for the historical Brave response-content workflow only.
+**Current task:** Post-Wave 4K checkpoint: reconcile the accepted Wave 4K result and determine whether one remaining historical candidate exists or Wave 4 can be formally closed.
 
 ## Current implementation checkpoint
 
 ```text
-WAVE4K_BRAVE_RESPONSE_CONTENT_COVERAGE_AUDIT
+POST_WAVE4K_STATUS_RECONCILIATION_AND_NEXT_TASK_SELECTION
 ```
 
 Status: `NEXT`
@@ -156,16 +148,10 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE4K_v1.0.md
+Not yet approved. The next change must inspect the remaining historical-workflow inventory and select exactly one candidate, or formally close Wave 4 if no candidate remains.
 ```
 
-Selected workflow:
-
-```text
-.github/workflows/v2.7.2.4.5-brave-response-content-audit.yml
-```
-
-## Accepted Wave 4D–4J results
+## Accepted Wave 4D–4K results
 
 ```text
 Wave 4D — NOT_READY
@@ -175,14 +161,15 @@ Wave 4G — NOT_READY
 Wave 4H — NOT_READY
 Wave 4I — NOT_READY
 Wave 4J — NOT_READY
+Wave 4K — NOT_READY
 ```
 
 These results mean:
 
-- none of the seven audited historical workflows is approved for a final preservation run;
+- none of the eight audited historical workflows is approved for a final preservation run;
 - none is approved for disablement, archival, relocation, rename, or deletion;
 - each workflow remains unchanged;
-- missing live, CLI, file, secret, artifact, or GitHub Actions behavior must be covered before reconsideration.
+- missing live, CLI, file, secret, artifact, privacy, or GitHub Actions behavior must be covered before reconsideration.
 
 ## Non-negotiable rules
 
@@ -198,22 +185,20 @@ These results mean:
 
 ## Definition of current-task success
 
-Wave 4K succeeds only when:
+The post-Wave 4K checkpoint succeeds only when:
 
-1. `.github/workflows/v2.7.2.4.5-brave-response-content-audit.yml` is audited against its current implementation and tests;
-2. manual inputs, fresh dataset generation, secret handling, request limit `8`, cache TTL `0`, effective zero external-research limit behavior, parsed response content, raw-response evidence, CLI/file behavior, and artifact boundaries are mapped honestly;
-3. every material behavior is classified as `COVERED`, `PARTIALLY_COVERED`, `NOT_COVERED`, or `MANUAL_VERIFICATION_REQUIRED`;
-4. the workflow receives exactly one readiness result: `READY_FOR_FINAL_PRESERVATION_RUN` or `NOT_READY`;
-5. no workflow or production-code change occurs;
-6. no external research is executed and no secret or unsafe raw response is exposed;
-7. all repository checks pass for the audit PR.
+1. the accepted cleanup plan and remaining historical-workflow inventory are inspected;
+2. all candidates already handled through Wave 4K are excluded;
+3. exactly one next candidate is selected and documented, or Wave 4 is formally closed if no candidate remains;
+4. no workflow or production-code change occurs during selection;
+5. all unresolved external facts remain `MANUAL_VERIFICATION_REQUIRED`;
+6. all repository checks pass for the checkpoint PR.
 
 ## Immediate next action
 
-Execute Wave 4K only:
+Execute the post-Wave 4K checkpoint only:
 
-1. inspect `docs/OPERATOR_WORKFLOW_WAVE4K_v1.0.md`;
-2. inspect the historical workflow, `scripts/run_brave_response_content_audit.py`, implementation dependencies, and focused tests;
-3. create one coverage-audit result document under `docs/`;
-4. classify the workflow as `READY_FOR_FINAL_PRESERVATION_RUN` or `NOT_READY`;
-5. do not modify or run any workflow in this task.
+1. inspect the accepted cleanup plan and remaining historical-workflow inventory;
+2. exclude every workflow already handled through Wave 4K;
+3. select exactly one remaining candidate and create its task document, or document that Wave 4 is complete;
+4. do not modify or run any workflow in this task.
