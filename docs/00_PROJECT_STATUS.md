@@ -86,6 +86,9 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 2G V3.1 path-scoping implementation merged in PR #266 as `COMPLETE`.
 - Wave 2H V3.4 trigger audit completed as `READY_FOR_PATH_SCOPING`.
 - Wave 2I V3.4 path-scoping implementation merged in PR #271 as `COMPLETE` with merge commit `4545239e5e7016b7a2f5d356cf54a672b706091e`.
+- Wave 2J V3.5 trigger audit merged in PR #272 as `READY_FOR_PATH_SCOPING` with merge commit `4b42e0dd29c31c41b25a0fa7a3df72cc7ce66f01`.
+- Wave 2K V3.5 task definition merged in PR #273.
+- Wave 2K V3.5 path-scoping implementation merged in PR #274 as `COMPLETE` with merge commit `c2085866ff52328110e87a0072cc0bd6cd57231b`.
 
 ## Accepted Clothing Inventory result
 
@@ -140,7 +143,7 @@ Wave 4 is formally closed. Post-Wave 4 work continues the unfinished Wave 2 trig
 ## Current implementation checkpoint
 
 ```text
-WAVE2J_V35_TRIGGER_AUDIT_TASK_DEFINITION
+WAVE2L_V36_TRIGGER_AND_REGRESSION_AUDIT_TASK_DEFINITION
 ```
 
 Status: `NEXT`
@@ -148,7 +151,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-Not yet approved. Create one planning-only task document for the V3.5 alert/review-queue workflow trigger audit. The task must inspect ownership, focused-test coverage, manual-dispatch requirements, downstream review-queue contracts, duplicate-alert safety, branch-protection/check-name dependence, and external consumers before any workflow modification.
+Not yet approved. Create one planning-only task document for the V3.6 multi-source-ingestion workflow audit. The task must inspect the broad pull-request trigger, focused V3.6 acceptance ownership, the duplicate repository-wide `pytest -q` step, manual-dispatch requirements, fixtures and adapter dependencies, branch-protection/check-name dependence, external consumers, and rollback constraints before any workflow modification.
 ```
 
 ## Accepted workflow-simplification results
@@ -162,9 +165,23 @@ Wave 2F — READY_FOR_PATH_SCOPING
 Wave 2G — COMPLETE
 Wave 2H — READY_FOR_PATH_SCOPING
 Wave 2I — COMPLETE
+Wave 2J — READY_FOR_PATH_SCOPING
+Wave 2K — COMPLETE
 Wave 3A–3E — accepted as recorded above
 Wave 4 Historical Diagnostics — COMPLETE
 ```
+
+## Why Wave 2L is next
+
+`.github/workflows/v3.6-multi-source-ingestion.yml` remains unfinished Wave 2 work because it currently:
+
+- triggers broadly on every pull request to `main`;
+- retains `workflow_dispatch`;
+- runs the focused command `pytest tests/test_v36_multi_source_ingestion.py -q`;
+- also runs the duplicate repository-wide command `pytest -q`;
+- has not yet received an accepted ownership and regression audit.
+
+No trigger or regression step may be changed until the Wave 2L audit task is separately approved and completed.
 
 ## Non-negotiable rules
 
@@ -180,22 +197,24 @@ Wave 4 Historical Diagnostics — COMPLETE
 
 ## Definition of current-task success
 
-The Wave 2J task-definition checkpoint succeeds only when:
+The Wave 2L task-definition checkpoint succeeds only when:
 
-1. `.github/workflows/v3.5-opportunity-alert-review-queue.yml` and its owned files are inspected;
-2. focused-test ownership and manual-dispatch requirements are documented;
-3. review-queue, duplicate-alert, and downstream contract behavior is preserved;
-4. branch-protection/check-name and external-consumer facts remain `MANUAL_VERIFICATION_REQUIRED` unless directly verified;
-5. exactly one audit task document is created;
-6. no workflow, production-code, test, fixture, state, report, artifact, or cache file changes;
-7. all repository checks pass for the task-definition PR.
+1. `.github/workflows/v3.6-multi-source-ingestion.yml` and its tracked execution dependencies are inspected;
+2. focused V3.6 test ownership and manual-dispatch requirements are documented;
+3. the broad PR trigger and duplicate `pytest -q` step are audited separately;
+4. fixture, adapter, report, artifact, cache, and external-consumer dependencies are identified;
+5. branch-protection/check-name and external-consumer facts remain `MANUAL_VERIFICATION_REQUIRED` unless directly verified;
+6. exactly one planning-only Wave 2L task document is created;
+7. no workflow, production-code, test, fixture, state, report, artifact, or cache file changes;
+8. all repository checks pass for the task-definition PR.
 
 ## Immediate next action
 
-Execute Wave 2J task definition only:
+Execute Wave 2L task definition only:
 
-1. inspect `.github/workflows/v3.5-opportunity-alert-review-queue.yml`;
-2. inspect its focused test, runner, source module, and downstream contracts;
-3. document trigger ownership, path-scope candidates, manual behavior, and safety constraints;
-4. create exactly one Wave 2J audit task document;
-5. do not modify or run any workflow in this task.
+1. inspect `.github/workflows/v3.6-multi-source-ingestion.yml`;
+2. inspect `tests/test_v36_multi_source_ingestion.py` and all imported repository dependencies;
+3. map deterministic fixtures, adapters, report/state paths, and any generated outputs;
+4. determine whether trigger path scoping and removal of duplicate full regression can be safely proposed;
+5. create exactly one Wave 2L planning document;
+6. do not modify or run any workflow in this task.
