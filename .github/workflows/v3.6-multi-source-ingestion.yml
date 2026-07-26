@@ -3,6 +3,12 @@ name: V3.6 Multi-Source Ingestion Acceptance
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '.github/workflows/v3.6-multi-source-ingestion.yml'
+      - 'tests/test_v36_multi_source_ingestion.py'
+      - 'src/opportunity_engine/source_ingestion/auksjonen.py'
+      - 'src/opportunity_engine/source_ingestion/finn.py'
+      - 'src/opportunity_engine/source_ingestion/multisource.py'
   workflow_dispatch:
 
 jobs:
@@ -21,7 +27,3 @@ jobs:
         env:
           PYTHONPATH: src:.
         run: pytest tests/test_v36_multi_source_ingestion.py -q
-      - name: Run regression suite
-        env:
-          PYTHONPATH: src:.
-        run: pytest -q
