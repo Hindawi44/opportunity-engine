@@ -76,19 +76,19 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 3D V3.2 pull-request trigger scoping merged in PR #227.
 - Wave 3E V3.3 live-source ingestion ownership audit merged in PR #229.
 - Wave 4 Historical Diagnostics completed through Wave 4L.
-- V2.6.6 final preservation evidence retained with run ID `30175512518`, artifact ID `8624093715`, and digest `sha256:57cc918d719a1aafa6720bff486035daf157a5e09e641f6e61214b6c8ff89420`.
 - Wave 4D through Wave 4L were accepted as `NOT_READY`; their workflows remain unchanged pending equivalent coverage.
 - Wave 2D V3.0 ranking trigger audit merged in PR #259 as `READY_FOR_PATH_SCOPING`.
 - Wave 2E V3.0 path-scoping implementation merged in PR #261 as `COMPLETE`.
-- Wave 2F V3.1 trigger audit task definition merged in PR #263.
 - Wave 2F V3.1 trigger audit result merged in PR #264 as `READY_FOR_PATH_SCOPING`.
-- Wave 2G V3.1 path-scoping task definition merged in PR #265.
 - Wave 2G V3.1 path-scoping implementation merged in PR #266 as `COMPLETE`.
 - Wave 2H V3.4 trigger audit completed as `READY_FOR_PATH_SCOPING`.
-- Wave 2I V3.4 path-scoping implementation merged in PR #271 as `COMPLETE` with merge commit `4545239e5e7016b7a2f5d356cf54a672b706091e`.
-- Wave 2J V3.5 trigger audit merged in PR #272 as `READY_FOR_PATH_SCOPING` with merge commit `4b42e0dd29c31c41b25a0fa7a3df72cc7ce66f01`.
-- Wave 2K V3.5 task definition merged in PR #273.
-- Wave 2K V3.5 path-scoping implementation merged in PR #274 as `COMPLETE` with merge commit `c2085866ff52328110e87a0072cc0bd6cd57231b`.
+- Wave 2I V3.4 path-scoping implementation merged in PR #271 as `COMPLETE`.
+- Wave 2J V3.5 trigger audit merged in PR #272 as `READY_FOR_PATH_SCOPING`.
+- Wave 2K V3.5 path-scoping implementation merged in PR #274 as `COMPLETE`.
+- Wave 2L V3.6 trigger and regression audit task definition merged in PR #276.
+- Wave 2L V3.6 audit result merged in PR #277 as `READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION` with merge commit `ca2cc5e08a0b3442867707fff18d6320498da4ec`.
+- Wave 2M V3.6 implementation task definition merged in PR #278.
+- Wave 2M V3.6 path-scoping and regression-deduplication implementation merged in PR #279 as `COMPLETE` with merge commit `d7ae58be40165a56d21240ca6c2d16552f4e1e87`.
 
 ## Accepted Clothing Inventory result
 
@@ -123,27 +123,17 @@ Tracked repository evidence establishes:
 - V3.3 remains the temporary repository-owned Auksjonen ingestion and snapshot-refresh workflow;
 - external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
 
-## Accepted historical-diagnostic conclusion
-
-- V2.6.6 is a preserved, manual-only historical production-readiness diagnostic.
-- Its final manual run evidence and artifact metadata are preserved.
-- Wave 4D through Wave 4L each completed with result `NOT_READY`.
-- None of those nine workflows is approved for disablement, archival, relocation, rename, or deletion.
-- All remain unchanged pending equivalent coverage.
-- Deletion remains unapproved.
-- Repository-setting and external-consumer facts remain `MANUAL_VERIFICATION_REQUIRED`.
-
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — Wave 2 Trigger Ownership  
+**Phase:** Operator Workflow Simplification — unfinished trigger ownership  
 **Status:** `ACTIVE`
 
-Wave 4 is formally closed. Post-Wave 4 work continues the unfinished Wave 2 trigger-ownership sequence.
+Wave 2 trigger scoping through V3.6 is complete. The next lowest-risk unfinished item is the accepted Wave 3E recommendation to path-scope V3.3's broad pull-request trigger while preserving its schedule, manual dispatch, state paths, cache namespaces, reports, artifacts, and source behavior.
 
 ## Current implementation checkpoint
 
 ```text
-WAVE2L_V36_TRIGGER_AND_REGRESSION_AUDIT_TASK_DEFINITION
+WAVE3F_V33_PATH_SCOPING_TASK_DEFINITION
 ```
 
 Status: `NEXT`
@@ -151,7 +141,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-Not yet approved. Create one planning-only task document for the V3.6 multi-source-ingestion workflow audit. The task must inspect the broad pull-request trigger, focused V3.6 acceptance ownership, the duplicate repository-wide `pytest -q` step, manual-dispatch requirements, fixtures and adapter dependencies, branch-protection/check-name dependence, external consumers, and rollback constraints before any workflow modification.
+Not yet approved. Create one planning-only task document for V3.3 pull-request path scoping. It must use the accepted Wave 3E dependency boundary, retain workflow_dispatch and the minute-12 hourly schedule, preserve the focused fixture-backed test, preserve snapshot/report/state/artifact paths and cache namespaces, and prohibit schedule, state, cache, source, report, artifact, and production-code changes.
 ```
 
 ## Accepted workflow-simplification results
@@ -167,21 +157,35 @@ Wave 2H — READY_FOR_PATH_SCOPING
 Wave 2I — COMPLETE
 Wave 2J — READY_FOR_PATH_SCOPING
 Wave 2K — COMPLETE
+Wave 2L — READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION
+Wave 2M — COMPLETE
 Wave 3A–3E — accepted as recorded above
 Wave 4 Historical Diagnostics — COMPLETE
 ```
 
-## Why Wave 2L is next
+## Why Wave 3F is next
 
-`.github/workflows/v3.6-multi-source-ingestion.yml` remains unfinished Wave 2 work because it currently:
+The accepted Wave 3E audit established that `.github/workflows/v3.3-live-source-ingestion.yml` still runs on every pull request to `main`, although its tracked execution boundary is finite.
 
-- triggers broadly on every pull request to `main`;
-- retains `workflow_dispatch`;
-- runs the focused command `pytest tests/test_v36_multi_source_ingestion.py -q`;
-- also runs the duplicate repository-wide command `pytest -q`;
-- has not yet received an accepted ownership and regression audit.
+The proposed dependency boundary is:
 
-No trigger or regression step may be changed until the Wave 2L audit task is separately approved and completed.
+```text
+.github/workflows/v3.3-live-source-ingestion.yml
+scripts/run_v33_auksjonen_ingestion.py
+src/opportunity_engine/source_ingestion/auksjonen.py
+scripts/run_v32_continuous_opportunity_monitoring.py
+tests/test_v33_live_source_ingestion.py
+tests/fixtures/v33_auksjonen_page.html
+```
+
+Wave 3F must define a trigger-only implementation. It must not change:
+
+- `workflow_dispatch`;
+- schedule `12 * * * *`;
+- cache keys or state ownership;
+- snapshot, report, state, or artifact paths;
+- Auksjonen source behavior;
+- tests, fixtures, or production code.
 
 ## Non-negotiable rules
 
@@ -190,31 +194,30 @@ No trigger or regression step may be changed until the Wave 2L audit task is sep
 - Do not add a new domain.
 - Do not invent missing values.
 - Preserve source traceability.
-- Do not make an automatic purchase, bid, or contact decision.
+- Do not make an automatic purchase, bid, contact, payment, or financial decision.
 - Do not modify, run, disable, archive, rename, relocate, or delete a workflow until a separately approved task permits it.
 - Select or change only one task in a single PR.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-The Wave 2L task-definition checkpoint succeeds only when:
+The Wave 3F task-definition checkpoint succeeds only when:
 
-1. `.github/workflows/v3.6-multi-source-ingestion.yml` and its tracked execution dependencies are inspected;
-2. focused V3.6 test ownership and manual-dispatch requirements are documented;
-3. the broad PR trigger and duplicate `pytest -q` step are audited separately;
-4. fixture, adapter, report, artifact, cache, and external-consumer dependencies are identified;
-5. branch-protection/check-name and external-consumer facts remain `MANUAL_VERIFICATION_REQUIRED` unless directly verified;
-6. exactly one planning-only Wave 2L task document is created;
-7. no workflow, production-code, test, fixture, state, report, artifact, or cache file changes;
-8. all repository checks pass for the task-definition PR.
+1. the accepted Wave 3E audit is used as the authority;
+2. exactly one planning document is created;
+3. the only later workflow change permitted is adding the six approved `pull_request.paths` entries;
+4. `workflow_dispatch` and schedule `12 * * * *` are explicitly preserved;
+5. fixture-backed PR execution and live manual/scheduled execution are preserved;
+6. state paths, cache namespaces, reports, artifacts, source adapter behavior, tests, fixtures, and production code remain unchanged;
+7. external-consumer and branch-protection facts remain `MANUAL_VERIFICATION_REQUIRED`;
+8. all repository checks pass.
 
 ## Immediate next action
 
-Execute Wave 2L task definition only:
+Execute Wave 3F task definition only:
 
-1. inspect `.github/workflows/v3.6-multi-source-ingestion.yml`;
-2. inspect `tests/test_v36_multi_source_ingestion.py` and all imported repository dependencies;
-3. map deterministic fixtures, adapters, report/state paths, and any generated outputs;
-4. determine whether trigger path scoping and removal of duplicate full regression can be safely proposed;
-5. create exactly one Wave 2L planning document;
-6. do not modify or run any workflow in this task.
+1. create `docs/OPERATOR_WORKFLOW_WAVE3F_v1.0.md`;
+2. record the six approved path entries from Wave 3E;
+3. preserve manual and scheduled execution exactly;
+4. prohibit schedule, cache, state, report, artifact, source, test, fixture, and production-code changes;
+5. do not modify or run any workflow in this task.
