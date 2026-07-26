@@ -3,6 +3,14 @@ name: V3.1 Live Batch Opportunity Validation
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - '.github/workflows/v31-live-batch-validation.yml'
+      - 'tests/test_v31_live_batch_validation.py'
+      - 'scripts/run_v31_live_batch_validation.py'
+      - 'data/live_validation/v3.1-auksjonen-live-batch.json'
+      - 'scripts/run_v211_live_opportunity_validation.py'
+      - 'src/opportunity_engine/verified_financial_integration.py'
+      - 'src/opportunity_engine/multi_opportunity_ranking.py'
   workflow_dispatch:
 
 jobs:
