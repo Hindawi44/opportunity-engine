@@ -1,5 +1,7 @@
 name: V2.6.6 Live Dry Run
 
+# Historical diagnostic preserved for evidence continuity and rollback.
+# Wave 4C keeps this workflow manual-only and non-routine.
 on:
   workflow_dispatch:
     inputs:
