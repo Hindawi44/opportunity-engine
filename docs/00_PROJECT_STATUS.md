@@ -93,6 +93,10 @@ No new domain implementation is approved until the workflow-simplification check
 - Post-Wave 4K status reconciliation merged in PR #254.
 - Wave 4L V2.7.2.4.7 task definition merged in PR #255; result merged in PR #256 as `NOT_READY`.
 - Wave 4 Historical Diagnostics completed: all ten workflows classified as `HISTORICAL_DIAGNOSTIC` in the accepted cleanup plan have been handled.
+- Post-Wave 4 checkpoint selected V3.0 ranking trigger ownership in PR #258.
+- Wave 2D V3.0 ranking trigger audit merged in PR #259 as `READY_FOR_PATH_SCOPING`.
+- Wave 2E V3.0 path-scoping task definition merged in PR #260.
+- Wave 2E V3.0 path-scoping implementation merged in PR #261 as `COMPLETE`.
 
 ## Accepted Clothing Inventory result
 
@@ -140,15 +144,15 @@ Tracked repository evidence establishes:
 
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — Wave 4 Historical Diagnostics  
-**Status:** `COMPLETE`
+**Phase:** Operator Workflow Simplification — Wave 2 Trigger Ownership  
+**Status:** `ACTIVE`
 
-Wave 4 is formally closed because all ten historical-diagnostic workflows in the accepted cleanup plan have been handled.
+Wave 4 is formally closed. Post-Wave 4 work has resumed the unfinished Wave 2 trigger-ownership sequence.
 
 ## Current implementation checkpoint
 
 ```text
-WORKFLOW_SIMPLIFICATION_POST_WAVE4_CHECKPOINT
+POST_WAVE2E_STATUS_RECONCILIATION_AND_NEXT_TASK_SELECTION
 ```
 
 Status: `NEXT`
@@ -156,22 +160,17 @@ Status: `NEXT`
 Current task document:
 
 ```text
-Not yet approved. The next change must inspect the accepted cleanup plan, the remaining unfinished Wave 2 and Wave 3 items, and the product blueprint, then select exactly one next task without modifying any workflow or production code.
+Not yet approved. The next change must inspect the accepted cleanup plan and remaining unfinished Wave 2 and Wave 3 items, exclude all work completed through Wave 2E and Wave 4L, then select exactly one next task without modifying any workflow or production code.
 ```
 
-## Accepted Wave 4 results
+## Accepted workflow-simplification results
 
 ```text
-Wave 4A–4C — V2.6.6 preserved and reversibly made non-routine
-Wave 4D — NOT_READY
-Wave 4E — NOT_READY
-Wave 4F — NOT_READY
-Wave 4G — NOT_READY
-Wave 4H — NOT_READY
-Wave 4I — NOT_READY
-Wave 4J — NOT_READY
-Wave 4K — NOT_READY
-Wave 4L — NOT_READY
+Wave 2B — COMPLETE
+Wave 2C — COMPLETE
+Wave 2D — READY_FOR_PATH_SCOPING
+Wave 2E — COMPLETE
+Wave 3A–3E — accepted as recorded above
 Wave 4 Historical Diagnostics — COMPLETE
 ```
 
@@ -189,10 +188,10 @@ Wave 4 Historical Diagnostics — COMPLETE
 
 ## Definition of current-task success
 
-The post-Wave 4 checkpoint succeeds only when:
+The post-Wave 2E checkpoint succeeds only when:
 
 1. the accepted cleanup plan and product blueprint are inspected;
-2. completed Wave 1 through Wave 4 work is excluded;
+2. completed work through Wave 2E and Wave 4L is excluded;
 3. unfinished Wave 2 and Wave 3 items are identified;
 4. exactly one next task is selected and documented;
 5. no workflow or production-code change occurs during selection;
@@ -201,11 +200,11 @@ The post-Wave 4 checkpoint succeeds only when:
 
 ## Immediate next action
 
-Execute the post-Wave 4 checkpoint only:
+Execute the post-Wave 2E checkpoint only:
 
 1. inspect `docs/WORKFLOW_CLEANUP_IMPLEMENTATION_PLAN_v1.0.md`;
 2. inspect `docs/Opportunity_Discovery_Analysis_Blueprint_v2.0.md`;
-3. exclude all work completed through Wave 4L;
+3. exclude all work completed through Wave 2E and Wave 4L;
 4. identify unfinished Wave 2 and Wave 3 items;
 5. select exactly one next task and create its task document;
 6. do not modify or run any workflow in this task.
