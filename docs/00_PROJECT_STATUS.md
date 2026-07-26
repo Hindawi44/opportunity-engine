@@ -89,7 +89,10 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 4H V2.7.2.4.2 task definition merged in PR #245; result merged in PR #246 as `NOT_READY`.
 - Wave 4I V2.7.2.4.3 task definition merged in PR #247; result merged in PR #248 as `NOT_READY`.
 - Wave 4J V2.7.2.4.4 task definition merged in PR #249; result merged in PR #250 as `NOT_READY`.
-- Wave 4K V2.7.2.4.5 task definition merged in PR #251; coverage-audit result merged in PR #253 as `NOT_READY`; the workflow remains unchanged.
+- Wave 4K V2.7.2.4.5 task definition merged in PR #251; result merged in PR #253 as `NOT_READY`.
+- Post-Wave 4K status reconciliation merged in PR #254.
+- Wave 4L V2.7.2.4.7 task definition merged in PR #255; result merged in PR #256 as `NOT_READY`.
+- Wave 4 Historical Diagnostics completed: all ten workflows classified as `HISTORICAL_DIAGNOSTIC` in the accepted cleanup plan have been handled.
 
 ## Accepted Clothing Inventory result
 
@@ -129,18 +132,23 @@ Tracked repository evidence establishes:
 - V2.6.6 is a preserved, manual-only historical production-readiness diagnostic.
 - Its final manual run evidence and artifact metadata are preserved.
 - It remains available only for intentional manual execution.
+- Wave 4D through Wave 4L each completed with result `NOT_READY`.
+- None of those nine workflows is approved for a final preservation run, disablement, archival, relocation, rename, or deletion.
+- All remain unchanged pending equivalent coverage.
 - Deletion remains unapproved.
-- Branch protection, external consumers, operator dependence, and historical artifact links remain `MANUAL_VERIFICATION_REQUIRED`.
+- Branch protection, external consumers, operator dependence, historical artifact links, repository-secret ownership, hosted-cache continuity, and external retention requirements remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Current phase
 
 **Phase:** Operator Workflow Simplification — Wave 4 Historical Diagnostics  
-**Current task:** Post-Wave 4K checkpoint: reconcile the accepted Wave 4K result and determine whether one remaining historical candidate exists or Wave 4 can be formally closed.
+**Status:** `COMPLETE`
+
+Wave 4 is formally closed because all ten historical-diagnostic workflows in the accepted cleanup plan have been handled.
 
 ## Current implementation checkpoint
 
 ```text
-POST_WAVE4K_STATUS_RECONCILIATION_AND_NEXT_TASK_SELECTION
+WORKFLOW_SIMPLIFICATION_POST_WAVE4_CHECKPOINT
 ```
 
 Status: `NEXT`
@@ -148,12 +156,13 @@ Status: `NEXT`
 Current task document:
 
 ```text
-Not yet approved. The next change must inspect the remaining historical-workflow inventory and select exactly one candidate, or formally close Wave 4 if no candidate remains.
+Not yet approved. The next change must inspect the accepted cleanup plan, the remaining unfinished Wave 2 and Wave 3 items, and the product blueprint, then select exactly one next task without modifying any workflow or production code.
 ```
 
-## Accepted Wave 4D–4K results
+## Accepted Wave 4 results
 
 ```text
+Wave 4A–4C — V2.6.6 preserved and reversibly made non-routine
 Wave 4D — NOT_READY
 Wave 4E — NOT_READY
 Wave 4F — NOT_READY
@@ -162,14 +171,9 @@ Wave 4H — NOT_READY
 Wave 4I — NOT_READY
 Wave 4J — NOT_READY
 Wave 4K — NOT_READY
+Wave 4L — NOT_READY
+Wave 4 Historical Diagnostics — COMPLETE
 ```
-
-These results mean:
-
-- none of the eight audited historical workflows is approved for a final preservation run;
-- none is approved for disablement, archival, relocation, rename, or deletion;
-- each workflow remains unchanged;
-- missing live, CLI, file, secret, artifact, privacy, or GitHub Actions behavior must be covered before reconsideration.
 
 ## Non-negotiable rules
 
@@ -179,26 +183,29 @@ These results mean:
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Do not modify, run, disable, archive, rename, relocate, or delete a historical workflow until a separately approved task permits it.
-- Do not select or change more than one historical workflow in a single task.
+- Do not modify, run, disable, archive, rename, relocate, or delete a workflow until a separately approved task permits it.
+- Select or change only one task in a single PR.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-The post-Wave 4K checkpoint succeeds only when:
+The post-Wave 4 checkpoint succeeds only when:
 
-1. the accepted cleanup plan and remaining historical-workflow inventory are inspected;
-2. all candidates already handled through Wave 4K are excluded;
-3. exactly one next candidate is selected and documented, or Wave 4 is formally closed if no candidate remains;
-4. no workflow or production-code change occurs during selection;
-5. all unresolved external facts remain `MANUAL_VERIFICATION_REQUIRED`;
-6. all repository checks pass for the checkpoint PR.
+1. the accepted cleanup plan and product blueprint are inspected;
+2. completed Wave 1 through Wave 4 work is excluded;
+3. unfinished Wave 2 and Wave 3 items are identified;
+4. exactly one next task is selected and documented;
+5. no workflow or production-code change occurs during selection;
+6. all unresolved external facts remain `MANUAL_VERIFICATION_REQUIRED`;
+7. all repository checks pass for the checkpoint PR.
 
 ## Immediate next action
 
-Execute the post-Wave 4K checkpoint only:
+Execute the post-Wave 4 checkpoint only:
 
-1. inspect the accepted cleanup plan and remaining historical-workflow inventory;
-2. exclude every workflow already handled through Wave 4K;
-3. select exactly one remaining candidate and create its task document, or document that Wave 4 is complete;
-4. do not modify or run any workflow in this task.
+1. inspect `docs/WORKFLOW_CLEANUP_IMPLEMENTATION_PLAN_v1.0.md`;
+2. inspect `docs/Opportunity_Discovery_Analysis_Blueprint_v2.0.md`;
+3. exclude all work completed through Wave 4L;
+4. identify unfinished Wave 2 and Wave 3 items;
+5. select exactly one next task and create its task document;
+6. do not modify or run any workflow in this task.
