@@ -11,7 +11,7 @@ Every development session must begin by reading, in this order:
 1. `docs/00_PROJECT_STATUS.md`
 2. `docs/Opportunity_Discovery_Analysis_Blueprint_v2.0.md`
 3. `docs/REPOSITORY_ARCHITECTURE_AUDIT_v2.0.md`
-4. The current-task document named below
+4. The current-task document named below, when one is approved
 
 The conversation is not the source of truth. The repository is the source of truth.
 
@@ -79,6 +79,7 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 4B preservation-evidence definition merged in PR #232.
 - Wave 4B initial evidence document merged in PR #233.
 - Wave 4B final preservation run accepted with run ID `30175512518`, artifact ID `8624093715`, complete archive inventory, and artifact digest `sha256:57cc918d719a1aafa6720bff486035daf157a5e09e641f6e61214b6c8ff89420`.
+- Wave 4C reversible disablement merged in PR #234: `.github/workflows/v2.6.6-live-dry-run.yml` remains preserved at the same path, is manual-only through `workflow_dispatch`, and includes an explicit historical-diagnostic notice and documented rollback procedure.
 
 ## Accepted Clothing Inventory result
 
@@ -119,32 +120,33 @@ Tracked repository evidence establishes:
 
 Tracked repository evidence establishes:
 
-- V2.6.6 is a manual historical production-readiness diagnostic;
+- V2.6.6 is a preserved, manual-only historical production-readiness diagnostic;
 - no tracked current workflow reproduces its exact live two-run evidence bundle and artifact contract;
 - unit tests cover readiness, secret non-disclosure, missing-secret failure, and repeat-protection comparison;
 - the final manual run completed successfully on `main`;
 - its run metadata, artifact metadata, archive digest, complete inventory, readiness evidence, and repeat-protection evidence were preserved;
+- the workflow is non-routine through a reversible repository change and remains available only for intentional manual execution;
+- the workflow file was not deleted, renamed, relocated, or archived;
 - branch protection, external consumers, operator dependence, and historical artifact links remain `MANUAL_VERIFICATION_REQUIRED`;
-- the approved next decision is a separate reversible disablement change;
 - deletion remains unapproved.
 
 ## Current phase
 
-**Phase:** Operator Workflow Simplification — Wave 4 Historical Diagnostics  
-**Current task:** Propose a reversible disablement of the historical V2.6.6 workflow after preserving its final-run evidence.
+**Phase:** Operator Workflow Simplification — post-Wave 4C checkpoint  
+**Current task:** No additional implementation task is approved. Select and define the next task from the approved cleanup plan before changing another workflow.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_WAVE4C_V266_REVERSIBLE_DISABLEMENT
+OPERATOR_WORKFLOW_POST_WAVE4C_NEXT_TASK_SELECTION
 ```
 
-Status: `NEXT`
+Status: `AWAITING_APPROVAL`
 
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE4C_v1.0.md
+NONE — a separate status-definition PR must approve the next task first
 ```
 
 ## Non-negotiable rules
@@ -155,30 +157,26 @@ docs/OPERATOR_WORKFLOW_WAVE4C_v1.0.md
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Wave 4C may propose only a reversible disablement of `.github/workflows/v2.6.6-live-dry-run.yml`.
-- Do not delete, rename, relocate, or archive the workflow in Wave 4C.
-- Preserve the Wave 4B evidence document and historical workflow file.
+- Do not modify another workflow until its exact next-task document is approved.
+- Preserve the Wave 4B evidence and the Wave 4C reversible state.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-Wave 4C succeeds only when:
+This checkpoint succeeds only when:
 
-1. Wave 4B evidence remains preserved and unchanged in substance;
-2. the historical V2.6.6 workflow is made non-routine through a reversible repository change;
-3. the workflow file is not deleted, renamed, relocated, or archived;
-4. production code and financial formulas remain unchanged;
-5. no new domain or operator behavior is introduced;
-6. external dependencies remain `MANUAL_VERIFICATION_REQUIRED` where repository evidence is insufficient;
-7. a focused document explains the disablement mechanism and reversal procedure;
-8. all repository checks pass for the Wave 4C PR.
+1. Wave 4C is recorded as completed and retained;
+2. no unapproved workflow change is started;
+3. the remaining candidates in `docs/WORKFLOW_CLEANUP_IMPLEMENTATION_PLAN_v1.0.md` are reviewed;
+4. exactly one next task is selected with explicit scope, dependencies, rollback, and verification criteria;
+5. a dedicated task document is approved before implementation begins.
 
 ## Immediate next action
 
-Execute Wave 4C only:
+Do not implement another workflow change yet:
 
-1. add `docs/OPERATOR_WORKFLOW_WAVE4C_v1.0.md` describing the reversible disablement and rollback procedure;
-2. apply the smallest reversible change that prevents routine execution of `.github/workflows/v2.6.6-live-dry-run.yml` while preserving the file and its history;
-3. do not delete, rename, relocate, or archive the workflow;
-4. do not modify production code or financial formulas;
-5. open a focused PR and wait for all repository checks before merge.
+1. review the remaining Wave 4 historical-diagnostic candidates in `docs/WORKFLOW_CLEANUP_IMPLEMENTATION_PLAN_v1.0.md`;
+2. choose exactly one candidate based on verified dependencies and current coverage;
+3. create a focused task-definition document and status update;
+4. keep all unresolved repository-setting and external-consumer facts as `MANUAL_VERIFICATION_REQUIRED`;
+5. begin implementation only after that task-definition PR is merged.
