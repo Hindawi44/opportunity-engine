@@ -81,6 +81,9 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 4B final preservation run accepted with run ID `30175512518`, artifact ID `8624093715`, complete archive inventory, and artifact digest `sha256:57cc918d719a1aafa6720bff486035daf157a5e09e641f6e61214b6c8ff89420`.
 - Wave 4C reversible disablement merged in PR #234: `.github/workflows/v2.6.6-live-dry-run.yml` remains preserved at the same path, is manual-only through `workflow_dispatch`, and includes an explicit historical-diagnostic notice and documented rollback procedure.
 - Post-Wave 4C checkpoint merged in PR #235; no second workflow change was started before selecting one exact next task.
+- Wave 4D V2.7.2.5 financial final-score coverage audit merged in PR #237 with result `NOT_READY`; the workflow remains unchanged.
+- Wave 4E V2.7.2.3 score-engine trace coverage audit merged in PR #239 with result `NOT_READY`; the workflow remains unchanged.
+- Wave 4F V2.7.2.2 internal-score coverage audit merged in PR #241 with result `NOT_READY`; the workflow remains unchanged.
 
 ## Accepted Clothing Inventory result
 
@@ -134,12 +137,12 @@ Tracked repository evidence establishes:
 ## Current phase
 
 **Phase:** Operator Workflow Simplification — Wave 4 Historical Diagnostics  
-**Current task:** Audit whether current V2.10 coverage is equivalent to the historical V2.7.2.5 financial final-score workflow, and define its preservation requirements before any disablement proposal.
+**Current task:** Post-Wave 4F checkpoint: reconcile the accepted Wave 4D–4F audit results and select exactly one next repository task before any further historical-workflow action.
 
 ## Current implementation checkpoint
 
 ```text
-OPERATOR_WORKFLOW_WAVE4D_V2725_FINANCIAL_FINAL_SCORE_COVERAGE_AUDIT
+POST_WAVE4F_STATUS_RECONCILIATION_AND_NEXT_TASK_SELECTION
 ```
 
 Status: `NEXT`
@@ -147,20 +150,23 @@ Status: `NEXT`
 Current task document:
 
 ```text
-docs/OPERATOR_WORKFLOW_WAVE4D_v1.0.md
+Not yet approved. The next change must first inspect the remaining historical-workflow inventory and select exactly one candidate, or formally close Wave 4 if no candidate remains.
 ```
 
-## Selection rationale
-
-Exactly one remaining Wave 4 candidate is selected:
+## Accepted Wave 4D–4F results
 
 ```text
-.github/workflows/v2.7.2.5-external-financial-final-score.yml
+Wave 4D — NOT_READY
+Wave 4E — NOT_READY
+Wave 4F — NOT_READY
 ```
 
-The candidate is selected because the repository already identifies V2.10 as the authoritative verified-financial integration and decision gate, while the historical workflow remains manual-only and has a bounded artifact and financial-score contract suitable for direct coverage comparison.
+These results mean:
 
-Selection does not mean the candidate is ready for disablement. Wave 4D must first classify it honestly as `READY_FOR_FINAL_PRESERVATION_RUN` or `NOT_READY`.
+- none of the three audited historical workflows is approved for a final preservation run;
+- none is approved for disablement, archival, relocation, rename, or deletion;
+- each workflow remains unchanged;
+- missing live, CLI, file, secret, artifact, or GitHub Actions behavior must be covered before reconsideration.
 
 ## Non-negotiable rules
 
@@ -170,32 +176,26 @@ Selection does not mean the candidate is ready for disablement. Wave 4D must fir
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, or contact decision.
-- Wave 4D is a coverage audit and preservation-planning task only.
-- Do not modify, disable, archive, rename, relocate, or delete `.github/workflows/v2.7.2.5-external-financial-final-score.yml` in Wave 4D.
-- Do not select or change a second historical workflow.
+- Do not modify, run, disable, archive, rename, relocate, or delete a historical workflow until a separately approved task permits it.
+- Do not select or change more than one historical workflow in a single task.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Definition of current-task success
 
-Wave 4D succeeds only when:
+The post-Wave 4F checkpoint succeeds only when:
 
-1. the historical V2.7.2.5 workflow contract is documented accurately;
-2. each material behavior is mapped to current V2.10 tests or workflows;
-3. coverage is classified as `COVERED`, `PARTIALLY_COVERED`, `NOT_COVERED`, or `MANUAL_VERIFICATION_REQUIRED`;
-4. unique historical behavior and artifact differences are recorded without assumptions;
-5. the candidate is classified `READY_FOR_FINAL_PRESERVATION_RUN` or `NOT_READY`;
-6. the exact final-run evidence bundle and rollback approach are defined;
-7. unresolved external facts remain `MANUAL_VERIFICATION_REQUIRED`;
-8. no workflow, production code, financial formula, or operator behavior changes;
-9. all repository checks pass for the Wave 4D audit PR.
+1. the remaining historical-workflow inventory is inspected against the accepted cleanup plan;
+2. already completed candidates are excluded;
+3. exactly one next candidate is selected and documented, or Wave 4 is formally closed when no candidate remains;
+4. no workflow or production-code change occurs during selection;
+5. all unresolved external facts remain `MANUAL_VERIFICATION_REQUIRED`;
+6. all repository checks pass for the checkpoint PR.
 
 ## Immediate next action
 
-Execute Wave 4D only:
+Execute the post-Wave 4F checkpoint only:
 
-1. inspect `.github/workflows/v2.7.2.5-external-financial-final-score.yml` and its scripts;
-2. inspect the authoritative V2.10 workflow and focused tests;
-3. build a behavior-by-behavior coverage matrix;
-4. document gaps, unique persistence or artifact behavior, and external unknowns;
-5. classify readiness for a later final preservation run;
-6. do not modify or disable the workflow in this task.
+1. inspect the accepted cleanup plan and remaining historical-workflow inventory;
+2. exclude V2.6.6, V2.7.2.5, V2.7.2.3, and V2.7.2.2 because their current Wave 4 outcomes are already recorded;
+3. select exactly one remaining candidate and create its task document, or document that Wave 4 is complete;
+4. do not modify or run any workflow in this task.
