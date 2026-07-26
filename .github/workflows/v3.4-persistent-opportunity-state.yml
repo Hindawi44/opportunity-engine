@@ -3,6 +3,17 @@ name: V3.4 Persistent Opportunity State Engine
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - '.github/workflows/v3.4-persistent-opportunity-state.yml'
+      - 'tests/test_v34_persistent_opportunity_state.py'
+      - 'scripts/run_v34_persistent_opportunity_state.py'
+      - 'src/opportunity_engine/persistent_opportunity_state.py'
+      - 'scripts/run_v32_continuous_opportunity_monitoring.py'
+      - 'src/opportunity_engine/continuous_opportunity_monitoring.py'
+      - 'scripts/run_v31_live_batch_validation.py'
+      - 'scripts/run_v211_live_opportunity_validation.py'
+      - 'src/opportunity_engine/verified_financial_integration.py'
+      - 'src/opportunity_engine/multi_opportunity_ranking.py'
   workflow_dispatch:
 
 jobs:
