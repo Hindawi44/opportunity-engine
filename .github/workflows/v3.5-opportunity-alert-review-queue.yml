@@ -3,6 +3,11 @@ name: V3.5 Opportunity Alert & Review Queue
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - .github/workflows/v3.5-opportunity-alert-review-queue.yml
+      - tests/test_v35_opportunity_alert_review_queue.py
+      - scripts/run_v35_opportunity_alert_review_queue.py
+      - src/opportunity_engine/opportunity_review_queue.py
   workflow_dispatch:
 
 jobs:
