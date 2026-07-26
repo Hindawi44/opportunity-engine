@@ -84,6 +84,8 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 2F V3.1 trigger audit result merged in PR #264 as `READY_FOR_PATH_SCOPING`.
 - Wave 2G V3.1 path-scoping task definition merged in PR #265.
 - Wave 2G V3.1 path-scoping implementation merged in PR #266 as `COMPLETE`.
+- Wave 2H V3.4 trigger audit completed as `READY_FOR_PATH_SCOPING`.
+- Wave 2I V3.4 path-scoping implementation merged in PR #271 as `COMPLETE` with merge commit `4545239e5e7016b7a2f5d356cf54a672b706091e`.
 
 ## Accepted Clothing Inventory result
 
@@ -138,7 +140,7 @@ Wave 4 is formally closed. Post-Wave 4 work continues the unfinished Wave 2 trig
 ## Current implementation checkpoint
 
 ```text
-POST_WAVE2G_STATUS_RECONCILIATION_AND_NEXT_TASK_SELECTION
+WAVE2J_V35_TRIGGER_AUDIT_TASK_DEFINITION
 ```
 
 Status: `NEXT`
@@ -146,7 +148,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-Not yet approved. The next change must inspect the accepted cleanup plan and remaining unfinished Wave 2 and Wave 3 items, exclude all work completed through Wave 2G and Wave 4L, then select exactly one next task without modifying any workflow or production code.
+Not yet approved. Create one planning-only task document for the V3.5 alert/review-queue workflow trigger audit. The task must inspect ownership, focused-test coverage, manual-dispatch requirements, downstream review-queue contracts, duplicate-alert safety, branch-protection/check-name dependence, and external consumers before any workflow modification.
 ```
 
 ## Accepted workflow-simplification results
@@ -158,6 +160,8 @@ Wave 2D — READY_FOR_PATH_SCOPING
 Wave 2E — COMPLETE
 Wave 2F — READY_FOR_PATH_SCOPING
 Wave 2G — COMPLETE
+Wave 2H — READY_FOR_PATH_SCOPING
+Wave 2I — COMPLETE
 Wave 3A–3E — accepted as recorded above
 Wave 4 Historical Diagnostics — COMPLETE
 ```
@@ -176,23 +180,22 @@ Wave 4 Historical Diagnostics — COMPLETE
 
 ## Definition of current-task success
 
-The post-Wave 2G checkpoint succeeds only when:
+The Wave 2J task-definition checkpoint succeeds only when:
 
-1. the accepted cleanup plan and product blueprint are inspected;
-2. completed work through Wave 2G and Wave 4L is excluded;
-3. unfinished Wave 2 and Wave 3 items are identified;
-4. exactly one next task is selected and documented;
-5. no workflow or production-code change occurs during selection;
-6. all unresolved external facts remain `MANUAL_VERIFICATION_REQUIRED`;
-7. all repository checks pass for the checkpoint PR.
+1. `.github/workflows/v3.5-opportunity-alert-review-queue.yml` and its owned files are inspected;
+2. focused-test ownership and manual-dispatch requirements are documented;
+3. review-queue, duplicate-alert, and downstream contract behavior is preserved;
+4. branch-protection/check-name and external-consumer facts remain `MANUAL_VERIFICATION_REQUIRED` unless directly verified;
+5. exactly one audit task document is created;
+6. no workflow, production-code, test, fixture, state, report, artifact, or cache file changes;
+7. all repository checks pass for the task-definition PR.
 
 ## Immediate next action
 
-Execute the post-Wave 2G checkpoint only:
+Execute Wave 2J task definition only:
 
-1. inspect `docs/WORKFLOW_CLEANUP_IMPLEMENTATION_PLAN_v1.0.md`;
-2. inspect `docs/Opportunity_Discovery_Analysis_Blueprint_v2.0.md`;
-3. exclude all work completed through Wave 2G and Wave 4L;
-4. identify unfinished Wave 2 and Wave 3 items;
-5. select exactly one next task and create its task document;
-6. do not modify or run any workflow in this task.
+1. inspect `.github/workflows/v3.5-opportunity-alert-review-queue.yml`;
+2. inspect its focused test, runner, source module, and downstream contracts;
+3. document trigger ownership, path-scope candidates, manual behavior, and safety constraints;
+4. create exactly one Wave 2J audit task document;
+5. do not modify or run any workflow in this task.
