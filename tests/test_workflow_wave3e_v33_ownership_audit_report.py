@@ -54,13 +54,20 @@ def test_wave3e_report_defines_proposal_without_authorizing_change():
     assert "Do not alter shared state or separate cache namespaces" in text
 
 
-def test_v33_workflow_remains_unchanged_during_wave3e():
+def test_v33_workflow_preserves_contract_after_wave3f_path_scoping():
     text = WORKFLOW.read_text(encoding="utf-8")
 
     required = (
         "name: V3.3 Live Source Ingestion & Snapshot Refresh",
         "pull_request:",
         "branches: [ main ]",
+        "paths:",
+        ".github/workflows/v3.3-live-source-ingestion.yml",
+        "scripts/run_v33_auksjonen_ingestion.py",
+        "src/opportunity_engine/source_ingestion/auksjonen.py",
+        "scripts/run_v32_continuous_opportunity_monitoring.py",
+        "tests/test_v33_live_source_ingestion.py",
+        "tests/fixtures/v33_auksjonen_page.html",
         "workflow_dispatch:",
         "cron: '12 * * * *'",
         "auksjonen-source-ingestion:",
@@ -79,5 +86,4 @@ def test_v33_workflow_remains_unchanged_during_wave3e():
     for fragment in required:
         assert fragment in text
 
-    assert "paths:" not in text
     assert text.count("if: always()") == 3
