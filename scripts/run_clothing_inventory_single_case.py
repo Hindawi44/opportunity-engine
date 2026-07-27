@@ -3,8 +3,9 @@
 The default mode reuses the preserved deterministic case. Live mode fetches the
 existing public Auksjonen category, selects exactly one clothing-related listing,
 and passes only observed source facts through the approved Discovery, Opportunity
-Dossier, and eligibility contracts. Missing evidence remains explicit and no
-automatic commercial or financial action is performed.
+Dossier, eligibility, verified market-comparables, and financial-integration
+contracts. Missing evidence remains explicit and no automatic commercial or
+financial action is performed.
 """
 from __future__ import annotations
 
@@ -22,6 +23,9 @@ from opportunity_engine.discovery.e2e_checkpoint import (
 )
 from opportunity_engine.discovery.models import DiscoveryCandidate
 from opportunity_engine.discovery.real_case import run_real_clothing_inventory_case
+from opportunity_engine.discovery.single_case_market_evidence import (
+    apply_verified_market_comparables,
+)
 from opportunity_engine.source_ingestion.auksjonen import (
     AUKSJONEN_CATEGORY_URL,
     RawListing,
@@ -147,6 +151,21 @@ def build_final_report() -> dict[str, Any]:
     return report
 
 
+def load_comparables_payload(path: Path) -> object:
+    """Read a machine-readable comparable package without inferring verification."""
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def enrich_with_comparables(
+    report: dict[str, Any],
+    comparables_payload: object,
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Attach explicit verified comparisons using the existing V2.8/V2.10 contracts."""
+    return apply_verified_market_comparables(report, comparables_payload, now=now)
+
+
 def build_operator_summary(report: dict[str, Any]) -> str:
     """Create a concise operator-readable summary from the final report."""
     dossier = report["dossier"]
@@ -167,8 +186,23 @@ def build_operator_summary(report: dict[str, Any]) -> str:
         f"Observed price NOK: {seller_claims.get('asking_price_nok', 'unknown')}",
         f"Eligible for analysis: {eligibility['eligible_for_analysis']}",
         "Missing required evidence: " + (", ".join(missing) if missing else "none"),
-        "Automatic purchase/bid/contact/payment: false",
     ]
+
+    market = report.get("market_comparables")
+    if isinstance(market, dict):
+        lines.extend(
+            [
+                f"Verified comparables: {market.get('accepted_count', 0)}",
+                f"Market-comparable status: {market.get('status', 'unknown')}",
+                f"Conservative market value NOK: {market.get('conservative_market_value_nok', 'unknown')}",
+            ]
+        )
+
+    financial = report.get("financial_integration")
+    if isinstance(financial, dict):
+        lines.append(f"Financial decision gate: {financial.get('decision_gate', 'unknown')}")
+
+    lines.append("Automatic purchase/bid/contact/payment: false")
     return "\n".join(lines) + "\n"
 
 
@@ -218,6 +252,14 @@ def main() -> int:
         type=Path,
         help="Use a preserved HTML page instead of network access; implies live parsing.",
     )
+    parser.add_argument(
+        "--comparables-file",
+        type=Path,
+        help=(
+            "Optional JSON package of explicit verified market comparisons. "
+            "Only records with verified=true are eligible."
+        ),
+    )
     args = parser.parse_args()
 
     if args.live or args.html_file:
@@ -227,10 +269,16 @@ def main() -> int:
             else fetch_public_page(args.source_url)
         )
         report = build_live_final_report(html=html, source_url=args.source_url)
-        paths = write_report_outputs(report, args.output_dir)
     else:
-        paths = write_outputs(args.output_dir)
+        report = build_final_report()
 
+    if args.comparables_file:
+        report = enrich_with_comparables(
+            report,
+            load_comparables_payload(args.comparables_file),
+        )
+
+    paths = write_report_outputs(report, args.output_dir)
     for label, path in paths.items():
         print(f"{label}: {path}")
     return 0
