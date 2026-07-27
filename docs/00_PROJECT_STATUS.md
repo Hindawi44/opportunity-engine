@@ -64,7 +64,7 @@ Blocked domains remain:
 - Store fixtures
 - Other opportunity domains
 
-No new domain implementation is approved until the Clothing Inventory live path accepts repeated real opportunities through a general dossier-intake and reporting contract.
+No new domain implementation is approved until the Clothing Inventory live path repeatedly discovers traceable real opportunities, preserves incomplete evidence honestly, and completes the approved dossier and reporting cycle.
 
 ## Completed and retained
 
@@ -89,7 +89,7 @@ No new domain implementation is approved until the Clothing Inventory live path 
 
 ## Accepted Clothing Inventory product implementation
 
-The product-facing implementation sequence is complete through active-scan operation and source-review evidence:
+The product-facing implementation sequence is complete through active-scan operation, confirmed dossier intake, and structured discovery-search implementation:
 
 - PR #287 added the deterministic Clothing Inventory single-case end-to-end runner and focused tests.
 - PR #288 added live Auksjonen Clothing Inventory candidate ingestion.
@@ -106,6 +106,11 @@ The product-facing implementation sequence is complete through active-scan opera
 - PR #299 corrected current Auksjonen URL, price, listing-link, and source-verification behavior.
 - PR #300 defined extracted-listing review evidence.
 - PR #301 added `extracted-listings.json` for transparent review of every parsed listing and classifier match.
+- PR #307 defined the source-agnostic confirmed Clothing Inventory dossier-intake contract.
+- PR #308 implemented confirmed dossier intake with retained `DOSSIER_EVIDENCE_REQUIRED / NO_DECISION` reporting.
+- PR #310 implemented the structured sixteen-query Clothing Inventory Discovery search, three-state qualification, multi-source merging, bounded public-page verification, discovery-only scoring, and top-five artifacts.
+
+Draft PR #309 remains deferred and must not be merged or mixed into the current Discovery task.
 
 ## Accepted operator surface
 
@@ -114,23 +119,29 @@ The product-facing implementation sequence is complete through active-scan opera
 2 — Review One Opportunity End to End
 ```
 
-The Discovery workflow now exposes two manual operations:
+Before the current integration PR, the Discovery workflow exposes two manual operations:
 
 ```text
 brave_discovery
 active_clothing_scan
 ```
 
-The active scan is integrated and operational. It:
+The current task adds exactly one third manual operation:
 
-- runs `scripts/run_active_clothing_inventory_scan.py`;
-- preserves `ACTIVE_CANDIDATE_SELECTED`;
-- preserves `NO_ACTIVE_CANDIDATE / NO_DECISION` as a successful result;
-- preserves `SOURCE_EXTRACTION_UNVERIFIED` when a zero parse is not verified;
-- prints an operator summary;
-- uploads the complete scan artifact directory;
-- does not require `BRAVE_SEARCH_API_KEY`;
-- adds no schedule or automatic execution.
+```text
+structured_clothing_discovery
+```
+
+The three operations remain mutually exclusive. No schedule or automatic execution is added.
+
+The structured operation must:
+
+- run `scripts/run_clothing_inventory_discovery_search.py`;
+- use `BRAVE_SEARCH_API_KEY` only from GitHub Secrets;
+- enable bounded public-page verification;
+- print `artifacts/clothing-inventory-discovery/operator-summary.txt`;
+- upload the complete `artifacts/clothing-inventory-discovery/` directory;
+- preserve the Discovery/Analysis separation.
 
 The V3.7 review workflow remains separate and manual-only.
 
@@ -149,11 +160,13 @@ The merged implementation proves:
 - ended listings cannot be promoted as live opportunities;
 - a verified scan with no active Clothing Inventory listing produces `NO_ACTIVE_CANDIDATE` and `NO_DECISION`;
 - an unverified zero extraction produces `SOURCE_EXTRACTION_UNVERIFIED` rather than a false no-candidate claim;
+- a structured Discovery run can retain `CONFIRMED_SALE` and `STRONG_LEAD_REQUIRES_VERIFICATION` candidates without using financial ranking;
+- missing price or quantity does not delete a traceable opportunity;
 - no automatic purchase, bid, contact, payment, or financial action occurs.
 
 ## AXL real-opportunity validation chain
 
-The repository now contains the first confirmed active Clothing Inventory opportunity discovered outside the narrow Auksjonen live-listing path:
+The repository contains the first confirmed active Clothing Inventory opportunity discovered outside the narrow Auksjonen live-listing path:
 
 ```text
 AXL Sport og Fritid Kolvereid AS konkursbo
@@ -165,6 +178,8 @@ Accepted sequence:
 - PR #303 verified the active sale, company identity, clothing/footwear relevance, location, public sources, and contact traceability.
 - PR #304 created the complete AXL Opportunity Dossier.
 - PR #305 prepared a human-reviewable evidence-request package but did not send it.
+- PR #307 defined general confirmed-dossier intake.
+- PR #308 implemented the source-agnostic intake route.
 
 Canonical AXL state:
 
@@ -174,76 +189,56 @@ DOSSIER_EVIDENCE_REQUIRED
 NO_DECISION
 ```
 
-AXL must remain visible in opportunity reporting while active. Missing quantity, acquisition price, VAT, fees, condition, pickup, packing, or transport evidence is not a rejection reason.
+AXL remains a validation example, not a hard-coded product rule. Missing quantity, acquisition price, VAT, fees, condition, pickup, packing, or transport evidence is not a rejection reason.
 
-The evidence-request package is a reusable documentation template. It does not require contact with AXL in order to continue building the product, and it does not authorize automatic contact.
+## Current product gap
 
-## Confirmed product gap
+The structured search implementation is merged, but it is not yet exposed as an operator choice in the primary Discovery workflow and has not yet completed its first live run through that operator surface.
 
-The repository already contains a reusable `DiscoveryCandidate -> OpportunityDossier -> EVIDENCE_REQUIRED` code path. It also contains a source-specific live Auksjonen runner.
+The current gap is therefore operational, not architectural:
 
-The missing product capability is a general, machine-readable intake route for a confirmed active Clothing Inventory opportunity such as AXL when the opportunity is discovered through another public route or human-verified evidence package.
-
-Current limitations:
-
-- `scripts/run_clothing_inventory_single_case.py` accepts only the preserved case or the Auksjonen live page;
-- AXL evidence is preserved in documentation but is not yet consumable as a structured program input;
-- no general operator output proves that a confirmed dossier with incomplete decision evidence remains retained in the final report with `NO_DECISION`;
-- the program must not require contacting the seller before it can record and report the opportunity.
+```text
+merged structured Discovery search
+  -> operator workflow choice
+  -> live Brave run
+  -> discovery-top5.json inspection
+  -> strongest traceable active candidate
+  -> existing Opportunity Dossier boundary
+```
 
 ## Current phase
 
-**Phase:** Confirmed Clothing Inventory Dossier Intake and Report Retention  
+**Phase:** Structured Clothing Inventory Discovery Operator Integration and Live Validation  
 **Status:** `ACTIVE`
-
-The next product milestone is to make the AXL pattern reusable without hard-coding AXL and without adding a new domain or source-specific architecture.
 
 ## Current implementation checkpoint
 
 ```text
-CONFIRMED_CLOTHING_INVENTORY_DOSSIER_INTAKE_TASK_DEFINITION
+CLOTHING_INVENTORY_DISCOVERY_OPERATOR_INTEGRATION
 ```
 
-Status: `NEXT`
+Status: `IN_IMPLEMENTATION`
 
 Current task document:
 
 ```text
-Not yet approved. Create one planning-only task document that defines the minimum safe machine-readable intake of one confirmed active Clothing Inventory opportunity into the existing single-case dossier and reporting boundary.
+docs/CLOTHING_INVENTORY_DISCOVERY_OPERATOR_INTEGRATION_v1.0.md
 ```
 
-The task must remain source-agnostic. AXL is the validation example, not a hard-coded product rule.
+## Current task contract
 
-## Required task contract
+The task must:
 
-The task definition must specify:
-
-1. one versioned JSON input contract for a confirmed active Clothing Inventory opportunity;
-2. required source identity, scenario, status, title, URL, observation time, location, and evidence provenance fields;
-3. nullable quantity, price, contact, VAT, fees, condition, pickup, packing, and transport fields;
-4. explicit classification of confirmed facts, seller claims, supported inferences, unknowns, and missing evidence;
-5. reuse of the existing `DiscoveryCandidate`, `build_opportunity_dossier`, `evaluate_analysis_eligibility`, final-report, and operator-summary boundaries where compatible;
-6. exact outputs:
-
-```text
-opportunity-dossier.json
-final-report.json
-operator-summary.txt
-```
-
-7. a retained incomplete-opportunity state:
-
-```text
-CONFIRMED_ACTIVE_CLOTHING_INVENTORY_OPPORTUNITY
-DOSSIER_EVIDENCE_REQUIRED
-NO_DECISION
-```
-
-8. no invocation of market, acquisition-cost, scoring, or decision intelligence while eligibility evidence is incomplete;
-9. no conversion of incomplete evidence into `REJECT`;
-10. focused tests proving both a dossier-ready incomplete opportunity and a malformed/untraceable input outcome;
-11. no workflow modification in the planning-only PR;
-12. exactly one subsequent implementation task.
+1. add `structured_clothing_discovery` to the existing manual Discovery operation choices;
+2. keep all three Discovery operations mutually exclusive;
+3. run `scripts/run_clothing_inventory_discovery_search.py --verify-pages`;
+4. use `BRAVE_SEARCH_API_KEY` only from GitHub Secrets;
+5. preserve the exact four-file artifact contract;
+6. print the operator summary for phone review;
+7. upload the complete artifact directory;
+8. add focused workflow-contract tests;
+9. add no schedule or automatic execution;
+10. leave the Analysis Engine and review workflow unchanged.
 
 ## Non-negotiable rules
 
@@ -256,36 +251,41 @@ NO_DECISION
 - Do not require seller contact to preserve an active confirmed opportunity in reporting.
 - Do not make an automatic purchase, bid, contact, reservation, payment, or financial decision.
 - `BUY_REVIEW` always requires human approval.
-- Do not modify, run, disable, archive, rename, relocate, or delete a workflow until a separately approved task permits it.
 - Select or change only one task in a single PR.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 - Do not create another cleanup wave unless a concrete blocker is established with repository evidence.
 - Do not promote an `ENDED` listing as a live opportunity.
 - Do not manufacture an Opportunity Dossier when no traceable confirmed opportunity exists.
+- Do not use ROI, expected profit, maximum bid, or investment decisions to rank initial Discovery candidates.
 
 ## Definition of current-task success
 
-The dossier-intake task-definition PR succeeds only when:
+The operator-integration PR succeeds only when:
 
-1. exactly one planning-only task document is created;
-2. the input is general and source-agnostic;
-3. the input contract preserves public-source and evidence provenance;
-4. incomplete quantity, price, VAT, fees, logistics, and market evidence remain explicitly unknown;
-5. the opportunity remains visible in final and operator reports;
-6. incomplete evidence results in `DOSSIER_EVIDENCE_REQUIRED / NO_DECISION`, not `REJECT`;
-7. existing Analysis Engine formulas and thresholds remain unchanged;
-8. no workflow, production code, test, fixture, state, cache, report, artifact, source adapter, or automatic commercial behavior is modified in the planning-only PR;
-9. exactly one subsequent implementation task is identified;
-10. all repository checks pass.
+1. exactly three manual Discovery choices are present;
+2. the structured choice invokes only the structured Discovery runner;
+3. the runner receives the Brave key from GitHub Secrets;
+4. public-page verification remains bounded and public-only;
+5. the four artifacts are uploaded together;
+6. the operator summary is printed;
+7. the existing active scan and legacy Brave operation remain intact;
+8. the review workflow remains separate;
+9. focused and repository checks pass;
+10. no automatic commercial behavior is added.
 
 ## Immediate next action
 
-Execute the dossier-intake task definition only:
+Complete and merge the current operator-integration PR, then manually run:
 
-1. create `docs/CONFIRMED_CLOTHING_INVENTORY_DOSSIER_INTAKE_TASK_v1.0.md`;
-2. inventory the existing `DiscoveryCandidate`, dossier, eligibility, final-report, and operator-summary contracts;
-3. define the versioned machine-readable input schema;
-4. define exact validation and evidence-classification behavior;
-5. define retained reporting for incomplete active opportunities;
-6. prohibit seller contact and financial analysis as prerequisites for report retention;
-7. identify exactly one subsequent implementation PR.
+```text
+1 — Discover Clothing Inventory Opportunities
+operation = structured_clothing_discovery
+```
+
+Inspect:
+
+```text
+artifacts/clothing-inventory-discovery/discovery-top5.json
+```
+
+Select the strongest traceable active result and pass only that result to the existing Opportunity Dossier boundary. If no qualifying active opportunity exists, retain the honest no-opportunity result and do not invent one.
