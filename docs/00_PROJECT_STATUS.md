@@ -1,6 +1,6 @@
 # Opportunity Engine — Project Status
 
-**Last updated:** 2026-07-26  
+**Last updated:** 2026-07-27  
 **Status:** ACTIVE  
 **Authoritative repository:** `Hindawi44/opportunity-engine`
 
@@ -32,9 +32,21 @@ The bridge between them is the **Opportunity Dossier**, which gathers and organi
 Opportunity Map
   -> Discovery Engine
   -> Opportunity Dossier
+  -> Verified Market Comparables
+  -> Verified Acquisition Costs
   -> Existing Analysis Engine
+  -> Opportunity Score
+  -> Decision Intelligence
   -> Final Investment Report or Evidence-Required Outcome
 ```
+
+Canonical investment decisions are:
+
+```text
+BUY_REVIEW / WATCH / REJECT
+```
+
+`BUY_REVIEW` is a human-review state only. It is never an automatic purchase instruction.
 
 ## Current scope lock
 
@@ -52,7 +64,7 @@ Blocked domains remain:
 - Store fixtures
 - Other opportunity domains
 
-No new domain implementation is approved until the workflow-simplification checkpoint is completed and accepted.
+No new domain implementation is approved until the Clothing Inventory live operator path is integrated and repeated live-product validation is accepted.
 
 ## Completed and retained
 
@@ -88,21 +100,60 @@ No new domain implementation is approved until the workflow-simplification check
 - Wave 2L V3.6 audit result merged in PR #277 as `READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION`.
 - Wave 2M V3.6 path-scoping and regression-deduplication implementation merged in PR #279 as `COMPLETE`.
 - Wave 3F V3.3 path-scoping task definition merged in PR #281.
-- Wave 3F V3.3 path-scoping implementation merged in PR #282 as `COMPLETE` with merge commit `1db30b72b57461010242f0802999c9dc00e63f4f`.
-- The Wave 3E contract test was updated in PR #282 to validate the accepted six-file V3.3 path boundary rather than prohibit `paths:`.
+- Wave 3F V3.3 path-scoping implementation merged in PR #282 as `COMPLETE`.
+- Post-Wave 3F status reconciliation merged in PR #283.
+- Workflow-simplification checkpoint task definition merged in PR #284.
+- Workflow-simplification checkpoint result merged in PR #285 as `SIMPLIFICATION_ACCEPTED`.
+- Clothing Inventory single-case execution task definition merged in PR #286.
+
+## Accepted Clothing Inventory product implementation
+
+The product-facing implementation sequence is complete through live no-candidate handling:
+
+- PR #287 added the deterministic Clothing Inventory single-case end-to-end runner and focused tests.
+- PR #288 added live Auksjonen Clothing Inventory candidate ingestion.
+- PR #289 integrated verified market comparables through the existing V2.8 contract.
+- PR #290 integrated verified acquisition-cost evidence through the existing V2.9/V2.10 contracts.
+- PR #291 connected the single case to the existing opportunity scoring and canonical decision-intelligence policy.
+- PR #292 stored and executed the first public Clothing Inventory investment report; its honest decision was `WATCH` because acquisition-cost evidence remained incomplete.
+- PR #293 preserved Auksjonen listing status and prohibited ended listings from entering the live candidate path.
+- PR #294 added an operational live scan result for the case where no active Clothing Inventory candidate exists.
 
 ## Accepted Clothing Inventory result
 
-The merged real case proves:
+The merged implementation now proves:
 
-- one public Clothing Inventory candidate is preserved with source traceability;
-- the candidate is classified using the approved Opportunity Map;
-- a complete Opportunity Dossier is produced;
-- unsupported values remain unknown rather than invented;
-- the eligibility gate blocks incomplete evidence from financial analysis;
-- the result reaches an honest `EVIDENCE_REQUIRED` outcome;
-- no automatic purchase, bid, or contact action occurs;
-- all repository checks pass.
+- one public Clothing Inventory candidate can be preserved with source traceability;
+- a candidate can be classified using the approved Opportunity Map;
+- a complete Opportunity Dossier can be produced;
+- three explicitly verified market comparables can be evaluated without inventing market value;
+- six explicitly verified acquisition-cost components can be integrated without treating missing values as zero;
+- the existing financial engine can calculate true acquisition cost, conservative resale value, expected profit, and ROI when evidence is complete;
+- the existing scoring and decision-intelligence contracts can produce `BUY_REVIEW`, `WATCH`, or `REJECT`;
+- incomplete evidence produces an honest `EVIDENCE_REQUIRED` or `WATCH` outcome;
+- ended listings cannot be promoted as live opportunities;
+- a scan with no active Clothing Inventory listing produces `NO_ACTIVE_CANDIDATE` and `NO_DECISION` rather than an error or a fabricated candidate;
+- no automatic purchase, bid, contact, payment, or financial action occurs;
+- repository checks pass for the merged implementation.
+
+## Accepted live operating contract
+
+```text
+ACTIVE clothing candidate found
+  -> ACTIVE_CANDIDATE_SELECTED
+  -> Opportunity Dossier
+  -> evidence and financial gates
+  -> BUY_REVIEW / WATCH / REJECT
+```
+
+```text
+No ACTIVE clothing candidate found
+  -> NO_ACTIVE_CANDIDATE
+  -> NO_DECISION
+  -> analysis_invoked: false
+```
+
+Ended listings remain traceable evidence but never become live opportunities.
 
 ## Accepted operator surface
 
@@ -111,7 +162,9 @@ The merged real case proves:
 2 — Review One Opportunity End to End
 ```
 
-The primary Discovery workflow is path-scoped and retains manual live execution. The end-to-end review workflow is manual-only and retains its focused test, deterministic summary, and artifact.
+The primary Discovery workflow remains path-scoped and retains manual live execution. The end-to-end review workflow remains manual-only and retains its focused test, deterministic summary, and artifact.
+
+The new active Clothing Inventory scan runner is not yet connected to the approved operator workflow surface. That integration requires a separately approved task definition and implementation PR.
 
 ## Accepted monitoring conclusion
 
@@ -122,20 +175,23 @@ Tracked repository evidence establishes:
 - stateful duplicate protection works when prior state is supplied;
 - V3.2 and V3.3 share a state-file path but use separate cache namespaces;
 - V3.3 remains the temporary repository-owned Auksjonen ingestion and snapshot-refresh workflow;
-- V3.3 now has a six-file pull-request path boundary while retaining manual and scheduled execution;
+- V3.3 has a six-file pull-request path boundary while retaining manual and scheduled execution;
+- live Clothing Inventory review now requires an explicitly preserved `ACTIVE` listing status;
 - external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
 
 ## Current phase
 
-**Phase:** Workflow Simplification Checkpoint Review  
+**Phase:** Clothing Inventory Live Product Validation and Operator Integration  
 **Status:** `ACTIVE`
 
-The planned low-risk workflow cleanup sequence is now implemented through V3.6 and V3.3. The project must not automatically continue into another workflow wave. It must first decide whether the simplification checkpoint is sufficient to return to the approved Clothing Inventory end-to-end product path.
+Workflow simplification is accepted. The project has returned to the approved Clothing Inventory product path and has completed the first full public-case cycle from discovery through decision intelligence.
+
+The remaining product-facing gap is operational: the active Clothing Inventory scan runner exists in production code but is not yet exposed through the approved manual operator surface.
 
 ## Current implementation checkpoint
 
 ```text
-WORKFLOW_SIMPLIFICATION_CHECKPOINT_REVIEW_TASK_DEFINITION
+ACTIVE_CLOTHING_INVENTORY_OPERATOR_INTEGRATION_TASK_DEFINITION
 ```
 
 Status: `NEXT`
@@ -143,7 +199,7 @@ Status: `NEXT`
 Current task document:
 
 ```text
-Not yet approved. Create one planning-only checkpoint-review document that reconciles completed Wave 1, Wave 2, Wave 3, and Wave 4 results; identifies only genuine remaining blockers; decides whether workflow simplification is ACCEPTED or NOT_READY; and, if accepted, selects one product-facing Clothing Inventory task rather than another cleanup wave.
+Not yet approved. Create one planning-only task document that defines the minimum safe integration of scripts/run_active_clothing_inventory_scan.py into exactly one existing approved manual operator workflow, while preserving ACTIVE-only selection, NO_ACTIVE_CANDIDATE behavior, reports, artifacts, source traceability, focused tests, and automatic_purchase_decision: false.
 ```
 
 ## Accepted workflow-simplification results
@@ -162,30 +218,12 @@ Wave 2J — READY_FOR_PATH_SCOPING
 Wave 2K — COMPLETE
 Wave 2L — READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION
 Wave 2M — COMPLETE
-Wave 3A–3F — accepted as recorded above
+Wave 3A–3F — COMPLETE as accepted and recorded
 Wave 4 Historical Diagnostics — COMPLETE with Wave 4D–4L retained as NOT_READY
+Workflow Simplification Checkpoint — SIMPLIFICATION_ACCEPTED
 ```
 
-## Why checkpoint review is next
-
-The project has now completed the intended low-risk changes that reduce unnecessary workflow execution while preserving:
-
-- the two-workflow operator surface;
-- canonical regression ownership in `tests.yml`;
-- manual execution paths;
-- required schedules;
-- source traceability;
-- persistent-state and duplicate-protection contracts;
-- evidence-first behavior;
-- `automatic_purchase_decision: false`.
-
-Remaining unknowns such as external consumers, branch-protection configuration, and hosted-cache continuity are already classified as `MANUAL_VERIFICATION_REQUIRED`. They must not automatically cause an endless sequence of speculative cleanup work.
-
-The checkpoint review must distinguish:
-
-1. a proven blocker to the Clothing Inventory end-to-end path;
-2. a documented operational unknown that can remain monitored;
-3. optional future cleanup that must not delay product validation.
+Remaining unknowns such as external consumers, branch-protection configuration, and hosted-cache continuity remain monitored operational unknowns. They are not proven blockers to the Clothing Inventory product path.
 
 ## Non-negotiable rules
 
@@ -195,30 +233,37 @@ The checkpoint review must distinguish:
 - Do not invent missing values.
 - Preserve source traceability.
 - Do not make an automatic purchase, bid, contact, payment, or financial decision.
+- `BUY_REVIEW` always requires human approval.
 - Do not modify, run, disable, archive, rename, relocate, or delete a workflow until a separately approved task permits it.
 - Select or change only one task in a single PR.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
-- Do not create another cleanup wave unless the checkpoint review identifies a concrete blocker with repository evidence.
+- Do not create another cleanup wave unless a concrete blocker is established with repository evidence.
+- Do not promote an `ENDED` listing as a live opportunity.
+- Do not manufacture an Opportunity Dossier when no active candidate exists.
 
 ## Definition of current-task success
 
-The checkpoint-review task definition succeeds only when:
+The operator-integration task-definition PR succeeds only when:
 
 1. exactly one planning-only task document is created;
-2. completed Wave 1–4 results are reconciled against the cleanup plan;
-3. remaining items are classified as blocker, monitored unknown, or optional future cleanup;
-4. the document defines objective criteria for `SIMPLIFICATION_ACCEPTED` versus `NOT_READY`;
-5. no workflow, production code, test, fixture, state, cache, report, artifact, source, domain, or financial behavior is modified;
-6. if simplification is accepted, the next task must return to one Clothing Inventory product-facing end-to-end objective;
-7. all repository checks pass.
+2. exactly one existing approved manual workflow is selected as the integration target;
+3. the document defines the runner command, inputs, outputs, report paths, summary, and artifact contract;
+4. `ACTIVE_CANDIDATE_SELECTED` and `NO_ACTIVE_CANDIDATE` are both preserved as successful operational outcomes;
+5. ended listings remain ineligible for live review;
+6. focused tests and the canonical regression suite remain required;
+7. `automatic_purchase_decision: false`, automatic bid, automatic contact, and automatic payment remain preserved;
+8. no workflow, production code, test, fixture, state, cache, report, artifact, source, domain, scoring threshold, decision policy, or financial behavior is modified in the task-definition PR;
+9. no more than one subsequent implementation task is identified;
+10. all repository checks pass.
 
 ## Immediate next action
 
-Execute the checkpoint-review task definition only:
+Execute the operator-integration task definition only:
 
-1. create `docs/WORKFLOW_SIMPLIFICATION_CHECKPOINT_REVIEW_TASK_v1.0.md`;
-2. reconcile the accepted workflow inventory and Waves 1–4;
-3. define blocker-versus-monitoring classification rules;
-4. define the evidence required to accept the checkpoint;
-5. prohibit workflow modifications in the task-definition PR;
-6. identify no more than one subsequent task.
+1. create `docs/ACTIVE_CLOTHING_INVENTORY_OPERATOR_INTEGRATION_TASK_v1.0.md`;
+2. inventory the two approved operator workflows and the active-scan runner contract;
+3. select exactly one manual workflow as the integration target;
+4. define the minimum trigger, command, output, report, summary, and artifact changes;
+5. preserve both active-candidate and no-active-candidate outcomes;
+6. prohibit workflow and production-code modifications in the task-definition PR;
+7. identify exactly one subsequent implementation PR.
