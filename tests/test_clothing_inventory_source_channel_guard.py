@@ -17,6 +17,7 @@ from opportunity_engine.discovery.source_channel_guard import (
 )
 
 NOW = "2026-07-28T12:00:00+00:00"
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = Path(__file__).parent / "fixtures/clothing_inventory_discovery_verification"
 
 
@@ -117,3 +118,14 @@ def test_guard_preserves_a_specific_non_root_item_listing():
     )
 
     assert enforce_source_channel_identity(result) == result
+
+
+def test_live_structured_discovery_runner_applies_the_guard():
+    script = (
+        REPOSITORY_ROOT / "scripts/run_clothing_inventory_discovery_search.py"
+    ).read_text(encoding="utf-8")
+
+    assert "enforce_source_channel_identity" in script
+    assert "def _guarded_public_verifier" in script
+    assert "return enforce_source_channel_identity(verify_public_page(url))" in script
+    assert "verifier=_guarded_public_verifier if args.verify_pages else None" in script
