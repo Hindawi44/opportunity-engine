@@ -178,17 +178,21 @@ def apply_verified_market_comparables(
 
     if market["status"] == "COMPLETE":
         missing_evidence = dossier.get("missing_evidence", [])
-        if isinstance(missing_evidence, list):
+        if isinstance(missing_evidence, (list, tuple)):
             dossier["missing_evidence"] = [
                 item for item in missing_evidence if item != "market comparable evidence"
             ]
 
         missing_requirements = eligibility.get("missing_requirements", [])
-        if isinstance(missing_requirements, list):
-            eligibility["missing_requirements"] = [
-                item for item in missing_requirements if item != "verified market comparables"
+        if isinstance(missing_requirements, (list, tuple)):
+            remaining = [
+                item
+                for item in missing_requirements
+                if item != "verified market comparables"
             ]
-        remaining = eligibility.get("missing_requirements", [])
+            eligibility["missing_requirements"] = remaining
+        else:
+            remaining = ["invalid eligibility missing-requirements contract"]
         eligibility["eligible_for_analysis"] = not remaining
         eligibility["reason"] = (
             "Minimum verified market-comparable evidence is complete."
