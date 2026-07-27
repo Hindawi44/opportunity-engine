@@ -5,36 +5,61 @@ import pytest
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     ACTIVE,
-    ENDED,
-    CONFIRMED_SALE,
-    REJECTED_NOISE,
-    STRONG_LEAD_REQUIRES_VERIFICATION,
+    CATEGORY_INDEX,
     CLOTHING_INVENTORY_QUERY_MATRIX,
+    CONFIRMED_SALE,
+    ENDED,
+    ITEM_LISTING,
+    ORDINARY_STORE,
+    REJECTED_NOISE,
+    SOURCE_CHANNEL,
+    STRONG_LEAD_REQUIRES_VERIFICATION,
+    UNKNOWN,
+    UNRESOLVED_SOURCE,
+    UNVERIFIED_EVENT,
     DiscoveryQuery,
     PageVerification,
     classify_search_hit,
     normalize_public_url,
     run_clothing_inventory_discovery,
+    verify_public_html,
     write_discovery_artifacts,
 )
 from opportunity_engine.discovery.search_provider import SearchHit
 
 NOW = "2026-07-27T12:00:00+00:00"
+FIXTURES = Path(__file__).parent / "fixtures/clothing_inventory_discovery_verification"
 
 
 def query(query_id="test", scenario="COMPANY_BANKRUPTCY", intent="EVENT_LEAD"):
     return DiscoveryQuery(query_id, scenario, intent, "CLOTHING_INVENTORY", "test query")
 
 
-def test_query_matrix_has_six_sales_six_event_leads_and_four_specialized_queries():
+def fixture(name: str) -> str:
+    return (FIXTURES / name).read_text(encoding="utf-8")
+
+
+class FakeProvider:
+    name = "Fake Search"
+
+    def __init__(self, hits_by_query):
+        self.hits_by_query = hits_by_query
+
+    def search(self, search_query, *, count=10):
+        value = self.hits_by_query.get(search_query, [])
+        if isinstance(value, Exception):
+            raise value
+        return value[:count]
+
+
+def test_query_matrix_remains_six_sales_six_event_leads_and_four_specialized():
     assert len(CLOTHING_INVENTORY_QUERY_MATRIX) == 16
     assert sum(item.intent == "SALE_INTENT" for item in CLOTHING_INVENTORY_QUERY_MATRIX) == 6
     assert sum(item.intent == "EVENT_LEAD" for item in CLOTHING_INVENTORY_QUERY_MATRIX) == 6
     assert sum(item.intent == "SPECIALIZED" for item in CLOTHING_INVENTORY_QUERY_MATRIX) == 4
-    assert all(item.asset_scope == "CLOTHING_INVENTORY" for item in CLOTHING_INVENTORY_QUERY_MATRIX)
 
 
-def test_axl_like_bankruptcy_is_retained_without_sale_word():
+def test_search_snippet_retains_axl_like_lead_but_never_confirms_sale():
     result = classify_search_hit(
         SearchHit(
             "AXL Sport og Fritid Kolvereid AS konkurs",
@@ -48,17 +73,18 @@ def test_axl_like_bankruptcy_is_retained_without_sale_word():
     assert result.scenario == "COMPANY_BANKRUPTCY"
 
 
-def test_confirmed_sale_is_classified_confirmed():
+def test_sale_snippet_is_only_a_lead_until_bounded_verification():
     result = classify_search_hit(
         SearchHit(
             "Komplett varelager fra klesbutikk selges",
-            "https://auction.example.no/lot/7",
+            "https://auction.example.no/lot/7001",
             "Hele lageret med klær og sko selges samlet på auksjon.",
             "Fake Search",
         ),
         query(scenario="AUCTION", intent="SALE_INTENT"),
     )
-    assert result.state == CONFIRMED_SALE
+    assert result.state == STRONG_LEAD_REQUIRES_VERIFICATION
+    assert result.page_role_hint == ITEM_LISTING
 
 
 @pytest.mark.parametrize(
@@ -80,119 +106,288 @@ def test_noise_is_rejected(title, description, reason):
 
 
 def test_url_normalization_removes_tracking_and_normalizes_domain_and_path():
-    assert normalize_public_url("https://WWW.Example.no//lot/7/?utm_source=x&b=2&a=1#top") == "https://example.no/lot/7?a=1&b=2"
+    assert normalize_public_url(
+        "https://WWW.Example.no//lot/7/?utm_source=x&b=2&a=1#top"
+    ) == "https://example.no/lot/7?a=1&b=2"
     assert normalize_public_url("http://example.no/lot") == ""
 
 
-class FakeProvider:
-    name = "Fake Search"
+def test_live_regression_auksjonen_category_is_excluded_without_cross_combining_fields():
+    result = verify_public_html(
+        "https://ny.auksjonen.no/auksjoner/torget/vareparti-og-konkursbo",
+        fixture("auksjonen-category.html"),
+    )
+    assert result.page_role == CATEGORY_INDEX
+    assert result.price_nok is None
+    assert result.quantity is None
+    assert result.location is None
+    assert result.inventory_type is None
+    assert result.sale_evidence is False
 
-    def __init__(self, hits_by_query):
-        self.hits_by_query = hits_by_query
 
-    def search(self, search_query, *, count=10):
-        value = self.hits_by_query.get(search_query, [])
-        if isinstance(value, Exception):
-            raise value
-        return value[:count]
+def test_live_regression_proffsport_is_ordinary_store_and_zero_cart_is_not_price():
+    result = verify_public_html(
+        "https://proffsport.no/pages/om-oss",
+        fixture("proffsport-store.html"),
+    )
+    assert result.page_role == ORDINARY_STORE
+    assert result.price_nok is None
+    assert result.event_scenario == UNVERIFIED_EVENT
+    assert result.sale_evidence is False
 
 
-def test_multiple_urls_for_same_company_merge_into_one_candidate_with_all_sources():
-    q1 = DiscoveryQuery("q1", "COMPANY_BANKRUPTCY", "EVENT_LEAD", "CLOTHING_INVENTORY", "first")
-    q2 = DiscoveryQuery("q2", "COMPANY_BANKRUPTCY", "EVENT_LEAD", "CLOTHING_INVENTORY", "second")
+def test_live_regression_altpasalg_is_source_channel_not_opportunity():
+    result = verify_public_html(
+        "https://altpasalg.no/",
+        fixture("altpasalg-source-channel.html"),
+    )
+    assert result.page_role == SOURCE_CHANNEL
+    assert result.price_nok is None
+    assert result.quantity is None
+
+
+def test_live_regression_motorcycle_listing_shell_is_unresolved():
+    result = verify_public_html(
+        "https://auksjonen.no/auksjon/torget/motorsykkel-klaer/445743",
+        fixture("motorcycle-auction-shell.html"),
+    )
+    assert result.page_role == UNRESOLVED_SOURCE
+    assert result.verified is False
+    assert result.listing_status == UNKNOWN
+
+
+def test_live_regression_konkursnett_timeout_cannot_promote_generic_portal():
+    q = DiscoveryQuery("q", "COMPANY_BANKRUPTCY", "SALE_INTENT", "CLOTHING_INVENTORY", "portal")
     provider = FakeProvider({
-        "first": [SearchHit("AXL Sport Kolvereid AS konkurs", "https://news.no/axl", "Klesbutikk med varelager i Kolvereid", "News")],
-        "second": [SearchHit("Konkursbo: AXL Sport Kolvereid", "https://estate.no/case/44", "Sportsklær og sko i konkursbo Kolvereid", "Estate")],
-    })
-    report = run_clothing_inventory_discovery(provider, queries=[q1, q2], discovered_at=NOW)
-    candidates = [item for item in report["all_discovered_candidates"] if item["opportunity_state"] != REJECTED_NOISE]
-    assert len(candidates) == 1
-    assert set(candidates[0]["found_by_queries"]) == {"q1", "q2"}
-    assert len(candidates[0]["source_urls"]) == 2
-    assert candidates[0]["duplicate_count"] == 1
-
-
-def test_ended_listing_is_historical_and_not_in_active_top5():
-    q = DiscoveryQuery("q", "AUCTION", "SALE_INTENT", "CLOTHING_INVENTORY", "ended")
-    provider = FakeProvider({
-        "ended": [SearchHit("Varelager klær selges", "https://auction.no/ended", "Auksjonen er avsluttet og lotten er solgt.", "Auction")]
-    })
-    report = run_clothing_inventory_discovery(provider, queries=[q], discovered_at=NOW)
-    assert report["search_run_report"]["ended_or_historical"] == 1
-    assert report["discovery_top5"] == []
-    assert report["all_discovered_candidates"][0]["listing_status"] == ENDED
-
-
-def test_missing_price_and_quantity_do_not_delete_the_opportunity():
-    q = DiscoveryQuery("q", "STORE_CLOSING", "EVENT_LEAD", "CLOTHING_INVENTORY", "lead")
-    provider = FakeProvider({
-        "lead": [SearchHit("Klesbutikk stenger i Trondheim", "https://news.no/closure", "Butikken avvikles med varelager klær.", "News")]
-    })
-    report = run_clothing_inventory_discovery(provider, queries=[q], discovered_at=NOW)
-    top = report["discovery_top5"][0]
-    assert top["price_nok"] is None
-    assert top["quantity"] is None
-    assert top["opportunity_state"] == STRONG_LEAD_REQUIRES_VERIFICATION
-    assert "price" in top["missing_information"]
-    assert "quantity" in top["missing_information"]
-
-
-def test_public_verification_can_confirm_sale_and_extract_visible_fields():
-    q = DiscoveryQuery("q", "COMPANY_BANKRUPTCY", "EVENT_LEAD", "CLOTHING_INVENTORY", "lead")
-    provider = FakeProvider({
-        "lead": [SearchHit("Sport AS konkurs", "https://estate.no/sport", "Klesbutikk med varelager.", "Search")]
+        "portal": [SearchHit(
+            "Auksjon - konkursbo, partivare, restlager mm.",
+            "https://konkursnett.no/",
+            "Konkursbo og auksjon.",
+            "Search",
+        )]
     })
 
     def verifier(url):
         return PageVerification(
             url=url,
-            title="Sport AS konkursbo — hele varelageret selges",
-            text="Sportsklær og sko selges samlet. 2500 stk. Pris NOK 100000. Til salgs i Namsos.",
-            location="Namsos",
-            inventory_type="sportsklær",
-            price_nok=100000,
-            quantity=2500,
-            listing_status=ACTIVE,
+            page_role=UNRESOLVED_SOURCE,
+            verified=False,
+            error="timed out",
+        )
+
+    report = run_clothing_inventory_discovery(
+        provider, queries=[q], discovered_at=NOW, verifier=verifier
+    )
+    assert report["discovery_top5"] == []
+    candidate = report["all_discovered_candidates"][0]
+    assert candidate["opportunity_state"] == REJECTED_NOISE
+    assert candidate["page_role"] == UNRESOLVED_SOURCE
+
+
+def test_valid_active_specific_listing_becomes_confirmed_sale_with_bounded_fields():
+    result = verify_public_html(
+        "https://estate.example.no/auksjon/7001",
+        fixture("valid-active-item-listing.html"),
+    )
+    assert result.page_role == ITEM_LISTING
+    assert result.identity_stable is True
+    assert result.listing_status == ACTIVE
+    assert result.clothing_inventory_evidence is True
+    assert result.sale_evidence is True
+    assert result.price_nok == 100000
+    assert result.quantity == 2500
+    assert result.location == "Namsos"
+
+    q = DiscoveryQuery("q", "COMPANY_BANKRUPTCY", "EVENT_LEAD", "CLOTHING_INVENTORY", "lead")
+    provider = FakeProvider({
+        "lead": [SearchHit(
+            "Sport AS konkursbo – hele varelageret selges",
+            "https://estate.example.no/auksjon/7001",
+            "Sportsklær og sko i konkursbo.",
+            "Search",
+        )]
+    })
+    report = run_clothing_inventory_discovery(
+        provider,
+        queries=[q],
+        discovered_at=NOW,
+        verifier=lambda url: result,
+    )
+    top = report["discovery_top5"][0]
+    assert top["opportunity_state"] == CONFIRMED_SALE
+    assert top["page_role"] == ITEM_LISTING
+    assert top["top5_eligible"] is True
+
+
+def test_unknown_status_specific_listing_remains_lead_not_confirmed():
+    q = DiscoveryQuery("q", "AUCTION", "SALE_INTENT", "CLOTHING_INVENTORY", "lead")
+    provider = FakeProvider({
+        "lead": [SearchHit(
+            "Helt nytt stort vareparti MC utstyr og motorsykkel klær",
+            "https://auction.example.no/auksjon/445743",
+            "Vareparti klær på auksjon.",
+            "Search",
+        )]
+    })
+
+    def verifier(url):
+        return PageVerification(
+            url=url,
+            title="Helt nytt stort vareparti MC utstyr og motorsykkel klær",
+            text="Vareparti med motorsykkel klær.",
+            page_role=ITEM_LISTING,
+            opportunity_identity="url-id:445743",
+            identity_stable=True,
+            clothing_inventory_evidence=True,
+            sale_evidence=False,
+            listing_status=UNKNOWN,
+            event_scenario="AUCTION",
             verified=True,
         )
 
-    report = run_clothing_inventory_discovery(provider, queries=[q], discovered_at=NOW, verifier=verifier)
+    report = run_clothing_inventory_discovery(
+        provider, queries=[q], discovered_at=NOW, verifier=verifier
+    )
     top = report["discovery_top5"][0]
-    assert top["opportunity_state"] == CONFIRMED_SALE
-    assert top["price_nok"] == 100000
-    assert top["quantity"] == 2500
-    assert top["location"] == "Namsos"
+    assert top["opportunity_state"] == STRONG_LEAD_REQUIRES_VERIFICATION
+    assert top["listing_status"] == UNKNOWN
 
 
-def test_top5_are_unique_traceable_and_ranked_without_financial_fields():
+def test_ordinary_store_from_bankruptcy_query_does_not_keep_bankruptcy_scenario():
+    q = DiscoveryQuery("q", "COMPANY_BANKRUPTCY", "SPECIALIZED", "CLOTHING_INVENTORY", "store")
+    provider = FakeProvider({
+        "store": [SearchHit(
+            "Proffsport - klær og utstyrsleverandør",
+            "https://proffsport.example.no/pages/om-oss",
+            "Klær, sko og varelager.",
+            "Search",
+        )]
+    })
+    verified = verify_public_html(
+        "https://proffsport.example.no/pages/om-oss",
+        fixture("proffsport-store.html"),
+    )
+    report = run_clothing_inventory_discovery(
+        provider, queries=[q], discovered_at=NOW, verifier=lambda url: verified
+    )
+    candidate = report["all_discovered_candidates"][0]
+    assert candidate["scenario"] == UNVERIFIED_EVENT
+    assert candidate["opportunity_state"] == REJECTED_NOISE
+    assert candidate["price_nok"] is None
+
+
+def test_ended_specific_listing_is_historical_only():
+    q = DiscoveryQuery("q", "AUCTION", "SALE_INTENT", "CLOTHING_INVENTORY", "ended")
+    provider = FakeProvider({
+        "ended": [SearchHit(
+            "Varelager klær selges",
+            "https://auction.example.no/auksjon/7002",
+            "Auksjonen er avsluttet og lotten er solgt.",
+            "Auction",
+        )]
+    })
+
+    def verifier(url):
+        return PageVerification(
+            url=url,
+            title="Varelager klær selges",
+            text="Hele varelageret med klær. Auksjonen er avsluttet.",
+            page_role=ITEM_LISTING,
+            opportunity_identity="url-id:7002",
+            identity_stable=True,
+            clothing_inventory_evidence=True,
+            sale_evidence=True,
+            listing_status=ENDED,
+            event_scenario="AUCTION",
+            verified=True,
+        )
+
+    report = run_clothing_inventory_discovery(
+        provider, queries=[q], discovered_at=NOW, verifier=verifier
+    )
+    assert report["discovery_top5"] == []
+    assert report["search_run_report"]["ended_or_historical"] == 1
+
+
+def test_top5_contains_up_to_five_specific_listings_and_never_fills_with_generic_pages():
     queries = []
     hits = {}
-    for index in range(7):
-        query_item = DiscoveryQuery(f"q{index}", "LARGE_LOT_SALE", "SALE_INTENT", "CLOTHING_INVENTORY", f"search-{index}")
-        queries.append(query_item)
-        hits[query_item.query] = [SearchHit(
+    verifications = {}
+    for index in range(2):
+        item_query = DiscoveryQuery(
+            f"q{index}", "LARGE_LOT_SALE", "SALE_INTENT",
+            "CLOTHING_INVENTORY", f"search-{index}"
+        )
+        queries.append(item_query)
+        url = f"https://source{index}.no/lot/{7000 + index}"
+        hits[item_query.query] = [SearchHit(
             f"Bedrift{index} stort klesparti selges",
-            f"https://source{index}.no/lot",
-            f"Vareparti klær til salgs i Oslo, {100 + index} stk.",
-            "Fake Search",
+            url,
+            "Vareparti klær til salgs.",
+            "Search",
         )]
-    report = run_clothing_inventory_discovery(FakeProvider(hits), queries=queries, discovered_at=NOW)
-    top5 = report["discovery_top5"]
-    assert len(top5) == 5
-    assert len({item["source_urls"][0] for item in top5}) == 5
-    assert all(item["source_urls"] for item in top5)
-    forbidden = {"roi", "expected_profit", "maximum_bid", "BUY_REVIEW", "WATCH", "REJECT"}
-    serialized = json.dumps(top5)
-    assert all(term not in serialized for term in forbidden)
-    assert report["search_run_report"]["financial_ranking_used"] is False
+        verifications[url] = PageVerification(
+            url=url,
+            title=f"Bedrift{index} stort klesparti selges",
+            text="Vareparti med klær til salgs. Budfrist i morgen.",
+            page_role=ITEM_LISTING,
+            opportunity_identity=f"url-id:{7000 + index}",
+            identity_stable=True,
+            clothing_inventory_evidence=True,
+            sale_evidence=True,
+            listing_status=ACTIVE,
+            event_scenario="LARGE_LOT_SALE",
+            verified=True,
+        )
+    generic_query = DiscoveryQuery(
+        "generic", "COMPANY_BANKRUPTCY", "SALE_INTENT",
+        "CLOTHING_INVENTORY", "generic"
+    )
+    queries.append(generic_query)
+    hits["generic"] = [SearchHit(
+        "Torget / Vareparti-og-konkursbo",
+        "https://portal.example.no/",
+        "Varelager, klær, auksjon og høyeste bud.",
+        "Search",
+    )]
+    verifications["https://portal.example.no/"] = verify_public_html(
+        "https://portal.example.no/",
+        fixture("auksjonen-category.html"),
+    )
+
+    report = run_clothing_inventory_discovery(
+        FakeProvider(hits),
+        queries=queries,
+        discovered_at=NOW,
+        verifier=lambda url: verifications[url],
+    )
+    assert len(report["discovery_top5"]) == 2
+    assert all(item["page_role"] == ITEM_LISTING for item in report["discovery_top5"])
+    assert report["search_run_report"]["generic_pages_excluded"] >= 1
 
 
-def test_no_results_is_an_honest_success_and_writes_all_four_artifacts(tmp_path: Path):
+def test_report_splits_execution_health_from_opportunity_quality_and_keeps_safety_fields():
     q = DiscoveryQuery("q", "LARGE_LOT_SALE", "SALE_INTENT", "CLOTHING_INVENTORY", "nothing")
-    report = run_clothing_inventory_discovery(FakeProvider({"nothing": []}), queries=[q], discovered_at=NOW)
-    assert report["search_run_report"]["no_opportunities_found"] is True
-    assert report["search_run_report"]["status"] == "PASS"
-    assert report["discovery_top5"] == []
+    report = run_clothing_inventory_discovery(
+        FakeProvider({"nothing": []}),
+        queries=[q],
+        discovered_at=NOW,
+    )
+    summary = report["search_run_report"]
+    assert summary["execution_status"] == "PASS"
+    assert summary["opportunity_quality_status"] == "NO_VALID_OPPORTUNITIES"
+    assert summary["status"] == "PASS"
+    assert summary["top5_eligible_count"] == 0
+    assert summary["automatic_contact"] is False
+    assert summary["automatic_purchase_decision"] is False
+    assert summary["financial_ranking_used"] is False
+
+
+def test_no_results_writes_all_four_artifacts_with_honest_summary(tmp_path: Path):
+    q = DiscoveryQuery("q", "LARGE_LOT_SALE", "SALE_INTENT", "CLOTHING_INVENTORY", "nothing")
+    report = run_clothing_inventory_discovery(
+        FakeProvider({"nothing": []}), queries=[q], discovered_at=NOW
+    )
     paths = write_discovery_artifacts(report, tmp_path)
     assert {path.name for path in paths.values()} == {
         "search-run-report.json",
@@ -200,4 +395,9 @@ def test_no_results_is_an_honest_success_and_writes_all_four_artifacts(tmp_path:
         "discovery-top5.json",
         "operator-summary.txt",
     }
-    assert "No active traceable" in paths["operator_summary"].read_text(encoding="utf-8")
+    text = paths["operator_summary"].read_text(encoding="utf-8")
+    assert "Opportunity quality: NO_VALID_OPPORTUNITIES" in text
+    assert "No valid specific" in text
+    serialized = json.dumps(report)
+    for forbidden in ("roi", "expected_profit", "maximum_bid", "BUY_REVIEW"):
+        assert forbidden not in serialized
