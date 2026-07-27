@@ -3,9 +3,9 @@
 The default mode reuses the preserved deterministic case. Live mode fetches the
 existing public Auksjonen category, selects exactly one clothing-related listing,
 and passes only observed source facts through the approved Discovery, Opportunity
-Dossier, eligibility, verified market-comparables, and financial-integration
-contracts. Missing evidence remains explicit and no automatic commercial or
-financial action is performed.
+Dossier, eligibility, verified market-comparables, verified acquisition-cost, and
+financial-integration contracts. Missing evidence remains explicit and no
+automatic commercial or financial action is performed.
 """
 from __future__ import annotations
 
@@ -23,6 +23,9 @@ from opportunity_engine.discovery.e2e_checkpoint import (
 )
 from opportunity_engine.discovery.models import DiscoveryCandidate
 from opportunity_engine.discovery.real_case import run_real_clothing_inventory_case
+from opportunity_engine.discovery.single_case_cost_evidence import (
+    apply_verified_acquisition_costs,
+)
 from opportunity_engine.discovery.single_case_market_evidence import (
     apply_verified_market_comparables,
 )
@@ -156,6 +159,11 @@ def load_comparables_payload(path: Path) -> object:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_costs_payload(path: Path) -> object:
+    """Read a machine-readable acquisition-cost package without inferring verification."""
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def enrich_with_comparables(
     report: dict[str, Any],
     comparables_payload: object,
@@ -164,6 +172,14 @@ def enrich_with_comparables(
 ) -> dict[str, Any]:
     """Attach explicit verified comparisons using the existing V2.8/V2.10 contracts."""
     return apply_verified_market_comparables(report, comparables_payload, now=now)
+
+
+def enrich_with_costs(
+    report: dict[str, Any],
+    costs_payload: object,
+) -> dict[str, Any]:
+    """Attach explicit verified acquisition costs using V2.9/V2.10 contracts."""
+    return apply_verified_acquisition_costs(report, costs_payload)
 
 
 def build_operator_summary(report: dict[str, Any]) -> str:
@@ -198,9 +214,27 @@ def build_operator_summary(report: dict[str, Any]) -> str:
             ]
         )
 
+    costs = report.get("acquisition_cost_evidence")
+    if isinstance(costs, dict):
+        lines.extend(
+            [
+                f"Verified cost components: {costs.get('accepted_count', 0)}",
+                f"Acquisition-cost status: {costs.get('status', 'unknown')}",
+                f"True acquisition cost NOK: {costs.get('true_acquisition_cost_nok', 'unknown')}",
+            ]
+        )
+
     financial = report.get("financial_integration")
     if isinstance(financial, dict):
         lines.append(f"Financial decision gate: {financial.get('decision_gate', 'unknown')}")
+        if financial.get("conservative_resale_value_nok") is not None:
+            lines.append(
+                f"Conservative resale value NOK: {financial.get('conservative_resale_value_nok')}"
+            )
+        if financial.get("expected_profit_nok") is not None:
+            lines.append(f"Expected profit NOK: {financial.get('expected_profit_nok')}")
+        if financial.get("roi_percent") is not None:
+            lines.append(f"ROI percent: {financial.get('roi_percent')}")
 
     lines.append("Automatic purchase/bid/contact/payment: false")
     return "\n".join(lines) + "\n"
@@ -260,6 +294,14 @@ def main() -> int:
             "Only records with verified=true are eligible."
         ),
     )
+    parser.add_argument(
+        "--costs-file",
+        type=Path,
+        help=(
+            "Optional JSON package of explicit verified acquisition-cost components. "
+            "All six V2.9 components are required for a complete acquisition cost."
+        ),
+    )
     args = parser.parse_args()
 
     if args.live or args.html_file:
@@ -276,6 +318,11 @@ def main() -> int:
         report = enrich_with_comparables(
             report,
             load_comparables_payload(args.comparables_file),
+        )
+    if args.costs_file:
+        report = enrich_with_costs(
+            report,
+            load_costs_payload(args.costs_file),
         )
 
     paths = write_report_outputs(report, args.output_dir)
