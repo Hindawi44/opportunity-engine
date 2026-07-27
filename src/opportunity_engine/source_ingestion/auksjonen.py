@@ -15,11 +15,11 @@ from typing import Any, Iterable
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
 
-AUKSJONEN_CATEGORY_URL = (
-    "https://www.auksjonen.no/auksjoner/overskuddsvarer/"
-    "vareparti-og-konkursbo"
+AUKSJONEN_CATEGORY_URL = "https://www.auksjonen.no/auksjoner/vareparti_konkursbo"
+_PRICE_RE = re.compile(
+    r"(?<!\d)(\d{1,3}(?:[ \u00a0.]\d{3})+|\d+)\s*(?:(?:kr|nok)\b|,-)",
+    re.IGNORECASE,
 )
-_PRICE_RE = re.compile(r"(?<!\d)(\d[\d\s\u00a0.]*)\s*(?:kr|nok)\b", re.IGNORECASE)
 _ID_RE = re.compile(r"(?:^|[-_/])(\d{4,})(?:$|[/?#])")
 _ENDED_TERMS = (
     "avsluttet",
@@ -38,6 +38,19 @@ _ACTIVE_TERMS = (
     "preorder",
     "limitedavailability",
 )
+_EMPTY_STATE_TERMS = (
+    "ingen auksjoner funnet",
+    "ingen resultater funnet",
+    "det finnes ingen auksjoner",
+    "ingen objekter funnet",
+)
+_HYDRATION_MARKERS = (
+    "__next_data__",
+    "__nuxt__",
+    "data-reactroot",
+    "data-react-root",
+    "ng-version",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,44 +63,101 @@ class RawListing:
     listing_status: str = "ACTIVE"
 
 
+@dataclass(frozen=True, slots=True)
+class PublicPageResponse:
+    html: str
+    requested_url: str
+    final_url: str
+    http_status: int
+    content_type: str
+    response_byte_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class PublicPageExtraction:
+    listings: tuple[RawListing, ...]
+    source_extraction_status: str
+    diagnostics: dict[str, Any]
+
+
 class _PublicPageParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.links: list[tuple[str, str]] = []
         self.json_ld: list[str] = []
+        self.application_json: list[str] = []
+        self.anchor_count = 0
+        self.html_title: str | None = None
+        self.hydration_container_present = False
         self._href: str | None = None
         self._link_text: list[str] = []
-        self._in_json_ld = False
+        self._script_kind: str | None = None
         self._script_text: list[str] = []
+        self._in_title = False
+        self._title_text: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = {key.lower(): value for key, value in attrs}
-        if tag.lower() == "a" and values.get("href"):
+        lowered_tag = tag.lower()
+        if lowered_tag == "a" and values.get("href"):
+            self.anchor_count += 1
             self._href = str(values["href"])
             self._link_text = []
-        if tag.lower() == "script" and "ld+json" in str(values.get("type") or "").lower():
-            self._in_json_ld = True
-            self._script_text = []
+        if lowered_tag == "script":
+            script_type = str(values.get("type") or "").lower()
+            if "ld+json" in script_type:
+                self._script_kind = "ld+json"
+                self._script_text = []
+            elif "application/json" in script_type:
+                self._script_kind = "application/json"
+                self._script_text = []
+        if lowered_tag == "title":
+            self._in_title = True
+            self._title_text = []
+
+        marker_text = " ".join(
+            str(value or "")
+            for key, value in values.items()
+            if key in {"id", "class", "data-reactroot"}
+        ).casefold()
+        if any(marker in marker_text for marker in _HYDRATION_MARKERS):
+            self.hydration_container_present = True
 
     def handle_data(self, data: str) -> None:
         if self._href is not None:
             self._link_text.append(data)
-        if self._in_json_ld:
+        if self._script_kind is not None:
             self._script_text.append(data)
+        if self._in_title:
+            self._title_text.append(data)
 
     def handle_endtag(self, tag: str) -> None:
-        if tag.lower() == "a" and self._href is not None:
+        lowered_tag = tag.lower()
+        if lowered_tag == "a" and self._href is not None:
             text = " ".join(" ".join(self._link_text).split())
             self.links.append((self._href, text))
             self._href = None
             self._link_text = []
-        if tag.lower() == "script" and self._in_json_ld:
-            self.json_ld.append("".join(self._script_text))
-            self._in_json_ld = False
+        if lowered_tag == "script" and self._script_kind is not None:
+            payload = "".join(self._script_text)
+            if self._script_kind == "ld+json":
+                self.json_ld.append(payload)
+            else:
+                self.application_json.append(payload)
+            self._script_kind = None
             self._script_text = []
+        if lowered_tag == "title" and self._in_title:
+            title = " ".join(" ".join(self._title_text).split())
+            self.html_title = title or None
+            self._in_title = False
+            self._title_text = []
 
 
-def fetch_public_page(url: str = AUKSJONEN_CATEGORY_URL, *, timeout: int = 30) -> str:
+def fetch_public_page_response(
+    url: str = AUKSJONEN_CATEGORY_URL,
+    *,
+    timeout: int = 30,
+) -> PublicPageResponse:
     request = Request(
         url,
         headers={
@@ -101,7 +171,19 @@ def fetch_public_page(url: str = AUKSJONEN_CATEGORY_URL, *, timeout: int = 30) -
             raise RuntimeError(f"Auksjonen returned HTTP {response.status}")
         if "html" not in content_type.lower():
             raise RuntimeError(f"Auksjonen returned unsupported content type: {content_type}")
-        return response.read().decode("utf-8", errors="replace")
+        payload = response.read()
+        return PublicPageResponse(
+            html=payload.decode("utf-8", errors="replace"),
+            requested_url=url,
+            final_url=str(response.geturl()),
+            http_status=int(response.status),
+            content_type=content_type,
+            response_byte_count=len(payload),
+        )
+
+
+def fetch_public_page(url: str = AUKSJONEN_CATEGORY_URL, *, timeout: int = 30) -> str:
+    return fetch_public_page_response(url, timeout=timeout).html
 
 
 def _price(value: object) -> float | None:
@@ -143,7 +225,7 @@ def _valid_listing_url(url: str, category_url: str) -> bool:
         return False
     if url.rstrip("/") == category_url.rstrip("/"):
         return False
-    return "/auksjon" in parsed.path.lower()
+    return "/auksjon/" in parsed.path.lower() or "/auksjoner/" in parsed.path.lower()
 
 
 def _walk_json(value: object) -> Iterable[dict[str, Any]]:
@@ -156,9 +238,9 @@ def _walk_json(value: object) -> Iterable[dict[str, Any]]:
             yield from _walk_json(child)
 
 
-def _from_json_ld(parser: _PublicPageParser, category_url: str) -> list[RawListing]:
+def _from_json_payloads(payloads: Iterable[str], category_url: str) -> list[RawListing]:
     listings: list[RawListing] = []
-    for raw in parser.json_ld:
+    for raw in payloads:
         try:
             payload = json.loads(raw)
         except (json.JSONDecodeError, TypeError):
@@ -179,10 +261,36 @@ def _from_json_ld(parser: _PublicPageParser, category_url: str) -> list[RawListi
                 item.get("availability"),
                 item.get("status"),
             )
-            listings.append(
-                RawListing(_listing_id(url), title, url, amount, location, status)
-            )
+            listings.append(RawListing(_listing_id(url), title, url, amount, location, status))
     return listings
+
+
+def _title_from_link_text(text: str) -> str:
+    cleaned = _PRICE_RE.sub("", text)
+    marker_positions = [
+        position
+        for marker in (
+            " Avsluttet",
+            " Avsluttes",
+            " Gjenstår",
+            " Høyeste bud",
+            " Fastpris",
+            " Bud",
+            " Sted",
+        )
+        if (position := cleaned.find(marker)) >= 0
+    ]
+    if marker_positions:
+        cleaned = cleaned[: min(marker_positions)]
+    return cleaned.strip(" -–|\n\t")
+
+
+def _location_from_link_text(text: str) -> str | None:
+    match = re.search(
+        r"\bSted\s*\d{4}\s+([A-ZÆØÅ][A-ZÆØÅ\s-]*?)(?:\s+favorite_border|$)",
+        text,
+    )
+    return " ".join(match.group(1).split()) if match else None
 
 
 def _from_links(parser: _PublicPageParser, category_url: str) -> list[RawListing]:
@@ -190,7 +298,7 @@ def _from_links(parser: _PublicPageParser, category_url: str) -> list[RawListing
     for href, text in parser.links:
         url = urljoin(category_url, href)
         amount = _price(text)
-        title = _PRICE_RE.sub("", text).strip(" -–|\n\t")
+        title = _title_from_link_text(text)
         if amount is None or len(title) < 3 or not _valid_listing_url(url, category_url):
             continue
         listings.append(
@@ -199,19 +307,70 @@ def _from_links(parser: _PublicPageParser, category_url: str) -> list[RawListing
                 title,
                 url,
                 amount,
-                listing_status=_listing_status(text),
+                _location_from_link_text(text),
+                _listing_status(text),
             )
         )
     return listings
 
 
-def parse_public_listings(html: str, *, category_url: str = AUKSJONEN_CATEGORY_URL) -> list[RawListing]:
+def _parse(html: str, category_url: str) -> tuple[_PublicPageParser, list[RawListing]]:
     parser = _PublicPageParser()
     parser.feed(html)
     merged: dict[str, RawListing] = {}
-    for item in [*_from_json_ld(parser, category_url), *_from_links(parser, category_url)]:
-        merged[item.listing_id] = item
-    return sorted(merged.values(), key=lambda item: item.listing_id)
+    json_payloads = [*parser.json_ld, *parser.application_json]
+    for item in [*_from_json_payloads(json_payloads, category_url), *_from_links(parser, category_url)]:
+        merged.setdefault(item.listing_id, item)
+    return parser, sorted(merged.values(), key=lambda item: item.listing_id)
+
+
+def parse_public_listings(
+    html: str,
+    *,
+    category_url: str = AUKSJONEN_CATEGORY_URL,
+) -> list[RawListing]:
+    _, listings = _parse(html, category_url)
+    return listings
+
+
+def inspect_public_page(
+    html: str,
+    *,
+    category_url: str = AUKSJONEN_CATEGORY_URL,
+    requested_url: str | None = None,
+    final_url: str | None = None,
+    http_status: int | None = None,
+    content_type: str | None = None,
+    response_byte_count: int | None = None,
+) -> PublicPageExtraction:
+    parser, listings = _parse(html, category_url)
+    normalized = " ".join(html.casefold().split())
+    explicit_empty = any(term in normalized for term in _EMPTY_STATE_TERMS)
+    if listings:
+        status = "VERIFIED_LISTINGS"
+    elif explicit_empty:
+        status = "VERIFIED_EMPTY"
+    else:
+        status = "UNVERIFIED_ZERO"
+
+    diagnostics = {
+        "requested_url": requested_url or category_url,
+        "final_url": final_url or category_url,
+        "http_status": http_status,
+        "content_type": content_type,
+        "response_byte_count": (
+            response_byte_count
+            if response_byte_count is not None
+            else len(html.encode("utf-8"))
+        ),
+        "html_title": parser.html_title,
+        "anchor_count": parser.anchor_count,
+        "application_ld_json_count": len(parser.json_ld),
+        "application_json_count": len(parser.application_json),
+        "hydration_container_present": parser.hydration_container_present,
+        "explicit_empty_state_present": explicit_empty,
+    }
+    return PublicPageExtraction(tuple(listings), status, diagnostics)
 
 
 def build_snapshot(
