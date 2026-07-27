@@ -21,6 +21,23 @@ AUKSJONEN_CATEGORY_URL = (
 )
 _PRICE_RE = re.compile(r"(?<!\d)(\d[\d\s\u00a0.]*)\s*(?:kr|nok)\b", re.IGNORECASE)
 _ID_RE = re.compile(r"(?:^|[-_/])(\d{4,})(?:$|[/?#])")
+_ENDED_TERMS = (
+    "avsluttet",
+    "utløpt",
+    "utlopt",
+    "soldout",
+    "outofstock",
+    "discontinued",
+)
+_ACTIVE_TERMS = (
+    "avsluttes",
+    "gjenstår",
+    "gjenstar",
+    "gi bud",
+    "instock",
+    "preorder",
+    "limitedavailability",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,6 +47,7 @@ class RawListing:
     url: str
     asking_price_nok: float
     location: str | None = None
+    listing_status: str = "ACTIVE"
 
 
 class _PublicPageParser(HTMLParser):
@@ -101,6 +119,16 @@ def _price(value: object) -> float | None:
     return None
 
 
+def _listing_status(*values: object) -> str:
+    """Preserve explicit public active/ended markers without inferring dates."""
+    normalized = " ".join(str(value) for value in values if value is not None).casefold()
+    if any(term in normalized for term in _ENDED_TERMS):
+        return "ENDED"
+    if any(term in normalized for term in _ACTIVE_TERMS):
+        return "ACTIVE"
+    return "ACTIVE"
+
+
 def _listing_id(url: str) -> str:
     match = _ID_RE.search(urlparse(url).path)
     if match:
@@ -146,7 +174,14 @@ def _from_json_ld(parser: _PublicPageParser, category_url: str) -> list[RawListi
             location = None
             if isinstance(location_data, dict):
                 location = str(location_data.get("name") or "").strip() or None
-            listings.append(RawListing(_listing_id(url), title, url, amount, location))
+            status = _listing_status(
+                offers.get("availability"),
+                item.get("availability"),
+                item.get("status"),
+            )
+            listings.append(
+                RawListing(_listing_id(url), title, url, amount, location, status)
+            )
     return listings
 
 
@@ -158,7 +193,15 @@ def _from_links(parser: _PublicPageParser, category_url: str) -> list[RawListing
         title = _PRICE_RE.sub("", text).strip(" -–|\n\t")
         if amount is None or len(title) < 3 or not _valid_listing_url(url, category_url):
             continue
-        listings.append(RawListing(_listing_id(url), title, url, amount))
+        listings.append(
+            RawListing(
+                _listing_id(url),
+                title,
+                url,
+                amount,
+                listing_status=_listing_status(text),
+            )
+        )
     return listings
 
 
@@ -190,7 +233,7 @@ def build_snapshot(
                 "url": listing.url,
                 "title": listing.title,
                 "location": listing.location,
-                "listing_status": "ACTIVE",
+                "listing_status": listing.listing_status,
                 "asking_price_nok": listing.asking_price_nok,
             },
             "market_price_sources": [],

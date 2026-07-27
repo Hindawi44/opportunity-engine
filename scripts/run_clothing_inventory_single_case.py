@@ -1,11 +1,12 @@
 """Execute one Clothing Inventory case end to end.
 
 The default mode reuses the preserved deterministic case. Live mode fetches the
-existing public Auksjonen category, selects exactly one clothing-related listing,
-and passes only observed source facts through the approved Discovery, Opportunity
-Dossier, eligibility, verified market-comparables, verified acquisition-cost,
-financial-integration, scoring, and canonical decision contracts. Missing evidence
-remains explicit and no automatic commercial or financial action is performed.
+existing public Auksjonen category, selects exactly one active clothing-related
+listing, and passes only observed source facts through the approved Discovery,
+Opportunity Dossier, eligibility, verified market-comparables, verified
+acquisition-cost, financial-integration, scoring, and canonical decision
+contracts. Missing evidence remains explicit and no automatic commercial or
+financial action is performed.
 """
 from __future__ import annotations
 
@@ -63,14 +64,23 @@ def is_clothing_listing(listing: RawListing) -> bool:
     return any(term in normalized for term in _CLOTHING_TERMS)
 
 
+def is_active_listing(listing: RawListing) -> bool:
+    """Return true only for a listing explicitly preserved as active."""
+    return listing.listing_status == "ACTIVE"
+
+
 def select_one_clothing_listing(listings: list[RawListing]) -> RawListing:
-    """Select exactly one deterministic clothing listing from parsed live results."""
+    """Select exactly one deterministic active clothing listing from live results."""
     matches = sorted(
-        (listing for listing in listings if is_clothing_listing(listing)),
+        (
+            listing
+            for listing in listings
+            if is_clothing_listing(listing) and is_active_listing(listing)
+        ),
         key=lambda listing: listing.listing_id,
     )
     if not matches:
-        raise ValueError("No clothing-related Auksjonen listing was found")
+        raise ValueError("No active clothing-related Auksjonen listing was found")
     return matches[0]
 
 
@@ -79,14 +89,16 @@ def candidate_from_live_listing(
     *,
     observed_at: str | None = None,
 ) -> DiscoveryCandidate:
-    """Convert one observed listing without inventing quantity or contact facts."""
+    """Convert one active observed listing without inventing quantity or contact facts."""
+    if not is_active_listing(listing):
+        raise ValueError("Ended Auksjonen listings cannot enter the live candidate path")
     timestamp = observed_at or datetime.now(timezone.utc).isoformat()
     return DiscoveryCandidate(
         title=listing.title,
         url=listing.url,
         source="AUKSJONEN_NO_LIVE_LISTING",
         discovered_at=timestamp,
-        text=f"Auksjonen.no public auction clothing listing: {listing.title}",
+        text=f"Auksjonen.no public active auction clothing listing: {listing.title}",
         location=listing.location,
         quantity=None,
         price_nok=listing.asking_price_nok,
@@ -118,7 +130,7 @@ def build_live_final_report(
     source_url: str = AUKSJONEN_CATEGORY_URL,
     observed_at: str | None = None,
 ) -> dict[str, Any]:
-    """Parse a public page and execute exactly one observed clothing candidate."""
+    """Parse a public page and execute exactly one active clothing candidate."""
     listings = parse_public_listings(html, category_url=source_url)
     selected = select_one_clothing_listing(listings)
     candidate = candidate_from_live_listing(selected, observed_at=observed_at)
@@ -129,7 +141,12 @@ def build_live_final_report(
             "execution_mode": "LIVE_SOURCE",
             "source_page": source_url,
             "live_listings_extracted": len(listings),
+            "active_clothing_listings": sum(
+                is_clothing_listing(listing) and is_active_listing(listing)
+                for listing in listings
+            ),
             "selected_listing_id": selected.listing_id,
+            "selected_listing_status": selected.listing_status,
         }
     )
     return report
@@ -299,7 +316,7 @@ def main() -> int:
     parser.add_argument(
         "--live",
         action="store_true",
-        help="Fetch the existing public Auksjonen category and select one clothing listing.",
+        help="Fetch the public Auksjonen category and select one active clothing listing.",
     )
     parser.add_argument("--source-url", default=AUKSJONEN_CATEGORY_URL)
     parser.add_argument(
