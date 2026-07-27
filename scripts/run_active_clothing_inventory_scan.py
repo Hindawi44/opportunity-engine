@@ -29,6 +29,7 @@ from opportunity_engine.source_ingestion.auksjonen import (  # noqa: E402
     inspect_public_page,
 )
 from scripts.run_clothing_inventory_single_case import (  # noqa: E402
+    _CLOTHING_TERMS,
     build_live_final_report,
     is_active_listing,
     is_clothing_listing,
@@ -36,10 +37,17 @@ from scripts.run_clothing_inventory_single_case import (  # noqa: E402
 )
 
 DEFAULT_OUTPUT_DIR = Path("data/validation/active-clothing-inventory-scan")
+_REVIEW_EVIDENCE_KEY = "_extracted_listing_review_evidence"
 
 
 def _observed_at(value: str | None) -> str:
     return value or datetime.now(timezone.utc).isoformat()
+
+
+def _matched_clothing_terms(title: str) -> list[str]:
+    """Return deterministic literal matches from the approved Clothing Inventory terms."""
+    normalized = title.casefold()
+    return sorted({term for term in _CLOTHING_TERMS if term in normalized})
 
 
 def _listing_payload(listing: RawListing) -> dict[str, Any]:
@@ -50,6 +58,34 @@ def _listing_payload(listing: RawListing) -> dict[str, Any]:
         "asking_price_nok": listing.asking_price_nok,
         "location": listing.location,
         "listing_status": listing.listing_status,
+    }
+
+
+def _review_listing_payload(listing: RawListing) -> dict[str, Any]:
+    matched_terms = _matched_clothing_terms(listing.title)
+    return {
+        **_listing_payload(listing),
+        "clothing_match": bool(matched_terms),
+        "matched_clothing_terms": matched_terms,
+    }
+
+
+def build_extracted_listing_review(
+    *,
+    listings: list[RawListing],
+    source_page: str,
+    scan_observed_at: str,
+    source_extraction_status: str,
+) -> dict[str, Any]:
+    """Build human-review evidence from the listings already parsed by the scan."""
+    records = [_review_listing_payload(listing) for listing in listings]
+    return {
+        "schema_version": "extracted-listing-review-v1",
+        "source_page": source_page,
+        "scan_observed_at": scan_observed_at,
+        "source_extraction_status": source_extraction_status,
+        "listing_count": len(records),
+        "listings": records,
     }
 
 
@@ -75,6 +111,12 @@ def build_live_scan_report(
         response_byte_count=response_byte_count,
     )
     listings = list(extraction.listings)
+    review_evidence = build_extracted_listing_review(
+        listings=listings,
+        source_page=source_url,
+        scan_observed_at=timestamp,
+        source_extraction_status=extraction.source_extraction_status,
+    )
     clothing = [listing for listing in listings if is_clothing_listing(listing)]
     active = [listing for listing in clothing if is_active_listing(listing)]
 
@@ -88,6 +130,7 @@ def build_live_scan_report(
         report["scan_observed_at"] = timestamp
         report["source_extraction_status"] = extraction.source_extraction_status
         report["source_diagnostics"] = extraction.diagnostics
+        report[_REVIEW_EVIDENCE_KEY] = review_evidence
         return report
 
     common = {
@@ -109,6 +152,7 @@ def build_live_scan_report(
         "automatic_bid": False,
         "automatic_contact": False,
         "automatic_payment": False,
+        _REVIEW_EVIDENCE_KEY: review_evidence,
     }
 
     if extraction.source_extraction_status == "UNVERIFIED_ZERO":
@@ -170,19 +214,43 @@ def build_scan_summary(report: dict[str, Any]) -> str:
 
 
 def write_scan_outputs(report: dict[str, Any], output_dir: Path) -> dict[str, Path]:
-    """Write the canonical case outputs or the non-candidate scan outputs."""
-    if report.get("scan_outcome") == "ACTIVE_CANDIDATE_SELECTED":
-        return write_report_outputs(report, output_dir)
-
+    """Write canonical scan outputs plus extracted-listing review evidence."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    report_path = output_dir / "scan-report.json"
-    summary_path = output_dir / "operator-summary.txt"
-    report_path.write_text(
-        json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+    stored_report = dict(report)
+    review_evidence = stored_report.pop(
+        _REVIEW_EVIDENCE_KEY,
+        {
+            "schema_version": "extracted-listing-review-v1",
+            "source_page": report.get("source_page", "unknown"),
+            "scan_observed_at": report.get("scan_observed_at", "unknown"),
+            "source_extraction_status": report.get(
+                "source_extraction_status",
+                "unknown",
+            ),
+            "listing_count": 0,
+            "listings": [],
+        },
+    )
+
+    if stored_report.get("scan_outcome") == "ACTIVE_CANDIDATE_SELECTED":
+        paths = write_report_outputs(stored_report, output_dir)
+    else:
+        report_path = output_dir / "scan-report.json"
+        summary_path = output_dir / "operator-summary.txt"
+        report_path.write_text(
+            json.dumps(stored_report, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        summary_path.write_text(build_scan_summary(stored_report), encoding="utf-8")
+        paths = {"report": report_path, "summary": summary_path}
+
+    review_path = output_dir / "extracted-listings.json"
+    review_path.write_text(
+        json.dumps(review_evidence, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    summary_path.write_text(build_scan_summary(report), encoding="utf-8")
-    return {"report": report_path, "summary": summary_path}
+    paths["listings_review"] = review_path
+    return paths
 
 
 def _fixture_response(path: Path, source_url: str) -> PublicPageResponse:
