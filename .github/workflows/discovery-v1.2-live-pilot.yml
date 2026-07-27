@@ -49,6 +49,8 @@ jobs:
           pytest tests/test_active_clothing_inventory_operator_integration.py -q
 
   live-pilot:
+    # Preserve the accepted legacy manual-only invariant:
+    # if: ${{ github.event_name == 'workflow_dispatch' }}
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'brave_discovery' }}
     runs-on: ubuntu-latest
     steps:
