@@ -32,6 +32,31 @@ def test_auksjonen_adapter_extracts_only_public_positive_nok_listings():
     assert all(item["automatic_purchase_decision"] is False for item in [])
 
 
+def test_auksjonen_adapter_preserves_explicit_active_and_ended_status():
+    html = """
+    <html><body>
+      <a href="/auksjoner/20001/arbeidsjakker">
+        Parti arbeidsjakker Avsluttet Høyeste bud 500 NOK
+      </a>
+      <a href="/auksjoner/20002/arbeidsbukser">
+        Parti arbeidsbukser Avsluttes 30.07.2026 Høyeste bud 700 NOK
+      </a>
+    </body></html>
+    """
+
+    listings = parse_public_listings(html)
+    assert [(item.listing_id, item.listing_status) for item in listings] == [
+        ("20001", "ENDED"),
+        ("20002", "ACTIVE"),
+    ]
+
+    snapshot = build_snapshot(listings, captured_at="2026-07-27T08:00:00Z")
+    assert [item["source"]["listing_status"] for item in snapshot["opportunities"]] == [
+        "ENDED",
+        "ACTIVE",
+    ]
+
+
 def test_refresh_passes_snapshot_to_v32_and_deduplicates_second_run():
     first_report, first_snapshot, first_state = run_refresh(
         html=_fixture(),
@@ -61,7 +86,6 @@ def test_refresh_passes_snapshot_to_v32_and_deduplicates_second_run():
         state_payload=first_state,
         captured_at="2026-07-24T13:00:00+02:00",
     )
-
     assert second_report["listings_extracted"] == 3
     assert second_report["new_opportunities_detected"] == 0
     assert second_report["monitoring_status"] == "NO_NEW_OPPORTUNITIES"
