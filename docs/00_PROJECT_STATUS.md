@@ -64,7 +64,7 @@ Blocked domains remain:
 - Store fixtures
 - Other opportunity domains
 
-No new domain implementation is approved until the Clothing Inventory live operator path is integrated and repeated live-product validation is accepted.
+No new domain implementation is approved until the Clothing Inventory live path accepts repeated real opportunities through a general dossier-intake and reporting contract.
 
 ## Completed and retained
 
@@ -82,33 +82,14 @@ No new domain implementation is approved until the Clothing Inventory live opera
 - Wave 2A prerequisite audit merged in PR #216.
 - Wave 2B Discovery cleanup merged in PR #218.
 - Wave 2C primary Discovery cleanup merged in PR #220.
-- Wave 3A V3.7 schedule/dependency audit merged in PR #222.
-- Wave 3B V3.7 manual-only conversion merged in PR #223.
-- Wave 3C V3.2 monitoring ownership audit merged in PR #225.
-- Wave 3D V3.2 pull-request trigger scoping merged in PR #227.
-- Wave 3E V3.3 live-source ingestion ownership audit merged in PR #229.
-- Wave 4 Historical Diagnostics completed through Wave 4L.
-- Wave 4D through Wave 4L were accepted as `NOT_READY`; their workflows remain unchanged pending equivalent coverage.
-- Wave 2D V3.0 ranking trigger audit merged in PR #259 as `READY_FOR_PATH_SCOPING`.
-- Wave 2E V3.0 path-scoping implementation merged in PR #261 as `COMPLETE`.
-- Wave 2F V3.1 trigger audit result merged in PR #264 as `READY_FOR_PATH_SCOPING`.
-- Wave 2G V3.1 path-scoping implementation merged in PR #266 as `COMPLETE`.
-- Wave 2H V3.4 trigger audit completed as `READY_FOR_PATH_SCOPING`.
-- Wave 2I V3.4 path-scoping implementation merged in PR #271 as `COMPLETE`.
-- Wave 2J V3.5 trigger audit merged in PR #272 as `READY_FOR_PATH_SCOPING`.
-- Wave 2K V3.5 path-scoping implementation merged in PR #274 as `COMPLETE`.
-- Wave 2L V3.6 audit result merged in PR #277 as `READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION`.
-- Wave 2M V3.6 path-scoping and regression-deduplication implementation merged in PR #279 as `COMPLETE`.
-- Wave 3F V3.3 path-scoping task definition merged in PR #281.
-- Wave 3F V3.3 path-scoping implementation merged in PR #282 as `COMPLETE`.
-- Post-Wave 3F status reconciliation merged in PR #283.
-- Workflow-simplification checkpoint task definition merged in PR #284.
-- Workflow-simplification checkpoint result merged in PR #285 as `SIMPLIFICATION_ACCEPTED`.
+- Wave 3A–3F workflow ownership and path-scoping work completed through PR #283.
+- Wave 4 Historical Diagnostics completed through Wave 4L; Wave 4D–4L remain retained as `NOT_READY` where recorded.
+- Workflow-simplification checkpoint accepted in PR #285.
 - Clothing Inventory single-case execution task definition merged in PR #286.
 
 ## Accepted Clothing Inventory product implementation
 
-The product-facing implementation sequence is complete through live no-candidate handling:
+The product-facing implementation sequence is complete through active-scan operation and source-review evidence:
 
 - PR #287 added the deterministic Clothing Inventory single-case end-to-end runner and focused tests.
 - PR #288 added live Auksjonen Clothing Inventory candidate ingestion.
@@ -118,42 +99,13 @@ The product-facing implementation sequence is complete through live no-candidate
 - PR #292 stored and executed the first public Clothing Inventory investment report; its honest decision was `WATCH` because acquisition-cost evidence remained incomplete.
 - PR #293 preserved Auksjonen listing status and prohibited ended listings from entering the live candidate path.
 - PR #294 added an operational live scan result for the case where no active Clothing Inventory candidate exists.
-
-## Accepted Clothing Inventory result
-
-The merged implementation now proves:
-
-- one public Clothing Inventory candidate can be preserved with source traceability;
-- a candidate can be classified using the approved Opportunity Map;
-- a complete Opportunity Dossier can be produced;
-- three explicitly verified market comparables can be evaluated without inventing market value;
-- six explicitly verified acquisition-cost components can be integrated without treating missing values as zero;
-- the existing financial engine can calculate true acquisition cost, conservative resale value, expected profit, and ROI when evidence is complete;
-- the existing scoring and decision-intelligence contracts can produce `BUY_REVIEW`, `WATCH`, or `REJECT`;
-- incomplete evidence produces an honest `EVIDENCE_REQUIRED` or `WATCH` outcome;
-- ended listings cannot be promoted as live opportunities;
-- a scan with no active Clothing Inventory listing produces `NO_ACTIVE_CANDIDATE` and `NO_DECISION` rather than an error or a fabricated candidate;
-- no automatic purchase, bid, contact, payment, or financial action occurs;
-- repository checks pass for the merged implementation.
-
-## Accepted live operating contract
-
-```text
-ACTIVE clothing candidate found
-  -> ACTIVE_CANDIDATE_SELECTED
-  -> Opportunity Dossier
-  -> evidence and financial gates
-  -> BUY_REVIEW / WATCH / REJECT
-```
-
-```text
-No ACTIVE clothing candidate found
-  -> NO_ACTIVE_CANDIDATE
-  -> NO_DECISION
-  -> analysis_invoked: false
-```
-
-Ended listings remain traceable evidence but never become live opportunities.
+- PR #295 reconciled project status after the first live product cycle.
+- PR #296 defined the active Clothing Inventory operator-integration task.
+- PR #297 integrated the active scan into `1 — Discover Clothing Inventory Opportunities` with the approved manual choices.
+- PR #298 defined the Auksjonen live-extraction compatibility correction.
+- PR #299 corrected current Auksjonen URL, price, listing-link, and source-verification behavior.
+- PR #300 defined extracted-listing review evidence.
+- PR #301 added `extracted-listings.json` for transparent review of every parsed listing and classifier match.
 
 ## Accepted operator surface
 
@@ -162,36 +114,94 @@ Ended listings remain traceable evidence but never become live opportunities.
 2 — Review One Opportunity End to End
 ```
 
-The primary Discovery workflow remains path-scoped and retains manual live execution. The end-to-end review workflow remains manual-only and retains its focused test, deterministic summary, and artifact.
+The Discovery workflow now exposes two manual operations:
 
-The new active Clothing Inventory scan runner is not yet connected to the approved operator workflow surface. That integration requires a separately approved task definition and implementation PR.
+```text
+brave_discovery
+active_clothing_scan
+```
 
-## Accepted monitoring conclusion
+The active scan is integrated and operational. It:
 
-Tracked repository evidence establishes:
+- runs `scripts/run_active_clothing_inventory_scan.py`;
+- preserves `ACTIVE_CANDIDATE_SELECTED`;
+- preserves `NO_ACTIVE_CANDIDATE / NO_DECISION` as a successful result;
+- preserves `SOURCE_EXTRACTION_UNVERIFIED` when a zero parse is not verified;
+- prints an operator summary;
+- uploads the complete scan artifact directory;
+- does not require `BRAVE_SEARCH_API_KEY`;
+- adds no schedule or automatic execution.
 
-- V3.2 is the primary continuous-monitoring owner;
-- its hourly schedule remains collision-free relative to V3.7;
-- stateful duplicate protection works when prior state is supplied;
-- V3.2 and V3.3 share a state-file path but use separate cache namespaces;
-- V3.3 remains the temporary repository-owned Auksjonen ingestion and snapshot-refresh workflow;
-- V3.3 has a six-file pull-request path boundary while retaining manual and scheduled execution;
-- live Clothing Inventory review now requires an explicitly preserved `ACTIVE` listing status;
-- external consumers, branch protection, and hosted cache continuity remain `MANUAL_VERIFICATION_REQUIRED`.
+The V3.7 review workflow remains separate and manual-only.
+
+## Accepted Clothing Inventory result
+
+The merged implementation proves:
+
+- one public Clothing Inventory candidate can be preserved with source traceability;
+- a candidate can be classified using the approved Opportunity Map;
+- an Opportunity Dossier can be produced without inventing missing facts;
+- explicitly verified market comparables can be evaluated without inventing market value;
+- explicitly verified acquisition-cost components can be integrated without treating missing values as zero;
+- the existing financial engine can calculate true acquisition cost, conservative resale value, expected profit, and ROI when evidence is complete;
+- the existing scoring and decision-intelligence contracts can produce `BUY_REVIEW`, `WATCH`, or `REJECT` when eligible evidence reaches Analysis;
+- incomplete evidence produces an honest evidence-required result and must not be treated as an economic rejection;
+- ended listings cannot be promoted as live opportunities;
+- a verified scan with no active Clothing Inventory listing produces `NO_ACTIVE_CANDIDATE` and `NO_DECISION`;
+- an unverified zero extraction produces `SOURCE_EXTRACTION_UNVERIFIED` rather than a false no-candidate claim;
+- no automatic purchase, bid, contact, payment, or financial action occurs.
+
+## AXL real-opportunity validation chain
+
+The repository now contains the first confirmed active Clothing Inventory opportunity discovered outside the narrow Auksjonen live-listing path:
+
+```text
+AXL Sport og Fritid Kolvereid AS konkursbo
+```
+
+Accepted sequence:
+
+- PR #302 recorded the first active AXL Clothing Inventory lead and its evidence gate.
+- PR #303 verified the active sale, company identity, clothing/footwear relevance, location, public sources, and contact traceability.
+- PR #304 created the complete AXL Opportunity Dossier.
+- PR #305 prepared a human-reviewable evidence-request package but did not send it.
+
+Canonical AXL state:
+
+```text
+CONFIRMED_ACTIVE_CLOTHING_INVENTORY_OPPORTUNITY
+DOSSIER_EVIDENCE_REQUIRED
+NO_DECISION
+```
+
+AXL must remain visible in opportunity reporting while active. Missing quantity, acquisition price, VAT, fees, condition, pickup, packing, or transport evidence is not a rejection reason.
+
+The evidence-request package is a reusable documentation template. It does not require contact with AXL in order to continue building the product, and it does not authorize automatic contact.
+
+## Confirmed product gap
+
+The repository already contains a reusable `DiscoveryCandidate -> OpportunityDossier -> EVIDENCE_REQUIRED` code path. It also contains a source-specific live Auksjonen runner.
+
+The missing product capability is a general, machine-readable intake route for a confirmed active Clothing Inventory opportunity such as AXL when the opportunity is discovered through another public route or human-verified evidence package.
+
+Current limitations:
+
+- `scripts/run_clothing_inventory_single_case.py` accepts only the preserved case or the Auksjonen live page;
+- AXL evidence is preserved in documentation but is not yet consumable as a structured program input;
+- no general operator output proves that a confirmed dossier with incomplete decision evidence remains retained in the final report with `NO_DECISION`;
+- the program must not require contacting the seller before it can record and report the opportunity.
 
 ## Current phase
 
-**Phase:** Clothing Inventory Live Product Validation and Operator Integration  
+**Phase:** Confirmed Clothing Inventory Dossier Intake and Report Retention  
 **Status:** `ACTIVE`
 
-Workflow simplification is accepted. The project has returned to the approved Clothing Inventory product path and has completed the first full public-case cycle from discovery through decision intelligence.
-
-The remaining product-facing gap is operational: the active Clothing Inventory scan runner exists in production code but is not yet exposed through the approved manual operator surface.
+The next product milestone is to make the AXL pattern reusable without hard-coding AXL and without adding a new domain or source-specific architecture.
 
 ## Current implementation checkpoint
 
 ```text
-ACTIVE_CLOTHING_INVENTORY_OPERATOR_INTEGRATION_TASK_DEFINITION
+CONFIRMED_CLOTHING_INVENTORY_DOSSIER_INTAKE_TASK_DEFINITION
 ```
 
 Status: `NEXT`
@@ -199,71 +209,83 @@ Status: `NEXT`
 Current task document:
 
 ```text
-Not yet approved. Create one planning-only task document that defines the minimum safe integration of scripts/run_active_clothing_inventory_scan.py into exactly one existing approved manual operator workflow, while preserving ACTIVE-only selection, NO_ACTIVE_CANDIDATE behavior, reports, artifacts, source traceability, focused tests, and automatic_purchase_decision: false.
+Not yet approved. Create one planning-only task document that defines the minimum safe machine-readable intake of one confirmed active Clothing Inventory opportunity into the existing single-case dossier and reporting boundary.
 ```
 
-## Accepted workflow-simplification results
+The task must remain source-agnostic. AXL is the validation example, not a hard-coded product rule.
+
+## Required task contract
+
+The task definition must specify:
+
+1. one versioned JSON input contract for a confirmed active Clothing Inventory opportunity;
+2. required source identity, scenario, status, title, URL, observation time, location, and evidence provenance fields;
+3. nullable quantity, price, contact, VAT, fees, condition, pickup, packing, and transport fields;
+4. explicit classification of confirmed facts, seller claims, supported inferences, unknowns, and missing evidence;
+5. reuse of the existing `DiscoveryCandidate`, `build_opportunity_dossier`, `evaluate_analysis_eligibility`, final-report, and operator-summary boundaries where compatible;
+6. exact outputs:
 
 ```text
-Wave 1 — COMPLETE
-Wave 2B — COMPLETE
-Wave 2C — COMPLETE
-Wave 2D — READY_FOR_PATH_SCOPING
-Wave 2E — COMPLETE
-Wave 2F — READY_FOR_PATH_SCOPING
-Wave 2G — COMPLETE
-Wave 2H — READY_FOR_PATH_SCOPING
-Wave 2I — COMPLETE
-Wave 2J — READY_FOR_PATH_SCOPING
-Wave 2K — COMPLETE
-Wave 2L — READY_FOR_PATH_SCOPING_AND_REGRESSION_DEDUPLICATION
-Wave 2M — COMPLETE
-Wave 3A–3F — COMPLETE as accepted and recorded
-Wave 4 Historical Diagnostics — COMPLETE with Wave 4D–4L retained as NOT_READY
-Workflow Simplification Checkpoint — SIMPLIFICATION_ACCEPTED
+opportunity-dossier.json
+final-report.json
+operator-summary.txt
 ```
 
-Remaining unknowns such as external consumers, branch-protection configuration, and hosted-cache continuity remain monitored operational unknowns. They are not proven blockers to the Clothing Inventory product path.
+7. a retained incomplete-opportunity state:
+
+```text
+CONFIRMED_ACTIVE_CLOTHING_INVENTORY_OPPORTUNITY
+DOSSIER_EVIDENCE_REQUIRED
+NO_DECISION
+```
+
+8. no invocation of market, acquisition-cost, scoring, or decision intelligence while eligibility evidence is incomplete;
+9. no conversion of incomplete evidence into `REJECT`;
+10. focused tests proving both a dossier-ready incomplete opportunity and a malformed/untraceable input outcome;
+11. no workflow modification in the planning-only PR;
+12. exactly one subsequent implementation task.
 
 ## Non-negotiable rules
 
 - Do not delete existing production code.
 - Do not modify V2.8–V3.7 financial formulas unless a verified compatibility defect exists.
 - Do not add a new domain.
+- Do not hard-code the product around AXL, Auksjonen, FINN, or another named source.
 - Do not invent missing values.
 - Preserve source traceability.
-- Do not make an automatic purchase, bid, contact, payment, or financial decision.
+- Do not require seller contact to preserve an active confirmed opportunity in reporting.
+- Do not make an automatic purchase, bid, contact, reservation, payment, or financial decision.
 - `BUY_REVIEW` always requires human approval.
 - Do not modify, run, disable, archive, rename, relocate, or delete a workflow until a separately approved task permits it.
 - Select or change only one task in a single PR.
 - Repository-setting facts and external consumers not visible in tracked files remain `MANUAL_VERIFICATION_REQUIRED`.
 - Do not create another cleanup wave unless a concrete blocker is established with repository evidence.
 - Do not promote an `ENDED` listing as a live opportunity.
-- Do not manufacture an Opportunity Dossier when no active candidate exists.
+- Do not manufacture an Opportunity Dossier when no traceable confirmed opportunity exists.
 
 ## Definition of current-task success
 
-The operator-integration task-definition PR succeeds only when:
+The dossier-intake task-definition PR succeeds only when:
 
 1. exactly one planning-only task document is created;
-2. exactly one existing approved manual workflow is selected as the integration target;
-3. the document defines the runner command, inputs, outputs, report paths, summary, and artifact contract;
-4. `ACTIVE_CANDIDATE_SELECTED` and `NO_ACTIVE_CANDIDATE` are both preserved as successful operational outcomes;
-5. ended listings remain ineligible for live review;
-6. focused tests and the canonical regression suite remain required;
-7. `automatic_purchase_decision: false`, automatic bid, automatic contact, and automatic payment remain preserved;
-8. no workflow, production code, test, fixture, state, cache, report, artifact, source, domain, scoring threshold, decision policy, or financial behavior is modified in the task-definition PR;
-9. no more than one subsequent implementation task is identified;
+2. the input is general and source-agnostic;
+3. the input contract preserves public-source and evidence provenance;
+4. incomplete quantity, price, VAT, fees, logistics, and market evidence remain explicitly unknown;
+5. the opportunity remains visible in final and operator reports;
+6. incomplete evidence results in `DOSSIER_EVIDENCE_REQUIRED / NO_DECISION`, not `REJECT`;
+7. existing Analysis Engine formulas and thresholds remain unchanged;
+8. no workflow, production code, test, fixture, state, cache, report, artifact, source adapter, or automatic commercial behavior is modified in the planning-only PR;
+9. exactly one subsequent implementation task is identified;
 10. all repository checks pass.
 
 ## Immediate next action
 
-Execute the operator-integration task definition only:
+Execute the dossier-intake task definition only:
 
-1. create `docs/ACTIVE_CLOTHING_INVENTORY_OPERATOR_INTEGRATION_TASK_v1.0.md`;
-2. inventory the two approved operator workflows and the active-scan runner contract;
-3. select exactly one manual workflow as the integration target;
-4. define the minimum trigger, command, output, report, summary, and artifact changes;
-5. preserve both active-candidate and no-active-candidate outcomes;
-6. prohibit workflow and production-code modifications in the task-definition PR;
+1. create `docs/CONFIRMED_CLOTHING_INVENTORY_DOSSIER_INTAKE_TASK_v1.0.md`;
+2. inventory the existing `DiscoveryCandidate`, dossier, eligibility, final-report, and operator-summary contracts;
+3. define the versioned machine-readable input schema;
+4. define exact validation and evidence-classification behavior;
+5. define retained reporting for incomplete active opportunities;
+6. prohibit seller contact and financial analysis as prerequisites for report retention;
 7. identify exactly one subsequent implementation PR.
