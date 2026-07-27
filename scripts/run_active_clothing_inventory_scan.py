@@ -10,17 +10,24 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from opportunity_engine.source_ingestion.auksjonen import (
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+for import_root in (REPOSITORY_ROOT, REPOSITORY_ROOT / "src"):
+    import_root_text = str(import_root)
+    if import_root_text not in sys.path:
+        sys.path.insert(0, import_root_text)
+
+from opportunity_engine.source_ingestion.auksjonen import (  # noqa: E402
     AUKSJONEN_CATEGORY_URL,
     RawListing,
     fetch_public_page,
     parse_public_listings,
 )
-from scripts.run_clothing_inventory_single_case import (
+from scripts.run_clothing_inventory_single_case import (  # noqa: E402
     build_live_final_report,
     is_active_listing,
     is_clothing_listing,
