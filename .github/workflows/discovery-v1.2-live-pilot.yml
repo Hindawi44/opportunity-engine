@@ -11,12 +11,15 @@ on:
       - "src/opportunity_engine/discovery/live_search.py"
       - "src/opportunity_engine/discovery/query_builder.py"
       - "src/opportunity_engine/discovery/search_provider.py"
+      - "src/opportunity_engine/discovery/clothing_inventory_search.py"
       - "scripts/run_discovery_v12_live_pilot.py"
       - "scripts/run_active_clothing_inventory_scan.py"
+      - "scripts/run_clothing_inventory_discovery_search.py"
       - "tests/test_discovery_v12_live_pilot.py"
       - "tests/test_discovery_v15_result_filter.py"
       - "tests/test_discovery_v16_quality_engine.py"
       - "tests/test_active_clothing_inventory_scan.py"
+      - "tests/test_clothing_inventory_discovery_search.py"
       - "tests/test_active_clothing_inventory_operator_integration.py"
   workflow_dispatch:
     inputs:
@@ -28,6 +31,7 @@ on:
         options:
           - brave_discovery
           - active_clothing_scan
+          - structured_clothing_discovery
 
 jobs:
   contract-tests:
@@ -38,7 +42,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pytest
-      - name: Run Discovery V1.6 quality tests
+      - name: Run Discovery contract tests
         env:
           PYTHONPATH: src:.
         run: |
@@ -46,6 +50,7 @@ jobs:
           pytest tests/test_discovery_v15_result_filter.py -q
           pytest tests/test_discovery_v12_live_pilot.py -q
           pytest tests/test_active_clothing_inventory_scan.py -q
+          pytest tests/test_clothing_inventory_discovery_search.py -q
           pytest tests/test_active_clothing_inventory_operator_integration.py -q
 
   live-pilot:
@@ -116,4 +121,38 @@ jobs:
         with:
           name: active-clothing-inventory-scan
           path: artifacts/active-clothing-inventory-scan/
+          if-no-files-found: error
+
+  structured-clothing-discovery:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'structured_clothing_discovery' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run structured Clothing Inventory Discovery
+        env:
+          PYTHONPATH: src:.
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+        run: |
+          python scripts/run_clothing_inventory_discovery_search.py \
+            --verify-pages \
+            --output-dir artifacts/clothing-inventory-discovery
+      - name: Show structured Discovery operator summary
+        if: ${{ always() }}
+        run: |
+          summary="artifacts/clothing-inventory-discovery/operator-summary.txt"
+          if [ -f "$summary" ]; then
+            cat "$summary"
+          else
+            echo "Structured Clothing Inventory Discovery summary was not created."
+            exit 1
+          fi
+      - name: Upload structured Clothing Inventory Discovery artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: clothing-inventory-discovery-top5
+          path: artifacts/clothing-inventory-discovery/
           if-no-files-found: error
