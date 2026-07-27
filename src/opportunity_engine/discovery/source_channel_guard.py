@@ -10,7 +10,6 @@ production rule is keyed to a domain or company name.
 """
 from __future__ import annotations
 
-import re
 from dataclasses import replace
 from urllib.parse import urlparse
 
