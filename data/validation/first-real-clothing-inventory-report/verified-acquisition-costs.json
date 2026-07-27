@@ -1,0 +1,17 @@
+{
+  "schema_version": "first-real-clothing-acquisition-costs-v1",
+  "status_note": "Only the published highest bid is verified. Auction fee, VAT, transport, dismantling and storage remain unknown and must not be converted to zero.",
+  "costs": [
+    {
+      "component": "auction_price",
+      "amount_nok": 1000,
+      "currency": "NOK",
+      "source_url": "https://www.auksjonen.no/auksjoner/overskudd_klaer",
+      "source_name": "Auksjonen.no public category",
+      "observed_at": "2026-07-27T06:55:00Z",
+      "basis": "Published highest bid for the 25-item Blåkläder 3463 hybrid-jacket lot, closed 09.04.2026.",
+      "zero_cost_confirmed": false,
+      "verified": true
+    }
+  ]
+}
