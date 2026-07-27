@@ -12,6 +12,14 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     verify_public_page,
     write_discovery_artifacts,
 )
+from opportunity_engine.discovery.source_channel_guard import (
+    enforce_source_channel_identity,
+)
+
+
+def _guarded_public_verifier(url: str):
+    """Verify one public page and fail closed on generic source channels."""
+    return enforce_source_channel_identity(verify_public_page(url))
 
 
 def main() -> int:
@@ -38,7 +46,7 @@ def main() -> int:
     result = run_clothing_inventory_discovery(
         provider,
         results_per_query=args.results_per_query,
-        verifier=verify_public_page if args.verify_pages else None,
+        verifier=_guarded_public_verifier if args.verify_pages else None,
         verification_limit=args.verification_limit,
     )
     paths = write_discovery_artifacts(result, Path(args.output_dir))
