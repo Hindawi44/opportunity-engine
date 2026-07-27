@@ -12,10 +12,22 @@ on:
       - "src/opportunity_engine/discovery/query_builder.py"
       - "src/opportunity_engine/discovery/search_provider.py"
       - "scripts/run_discovery_v12_live_pilot.py"
+      - "scripts/run_active_clothing_inventory_scan.py"
       - "tests/test_discovery_v12_live_pilot.py"
       - "tests/test_discovery_v15_result_filter.py"
       - "tests/test_discovery_v16_quality_engine.py"
+      - "tests/test_active_clothing_inventory_scan.py"
+      - "tests/test_active_clothing_inventory_operator_integration.py"
   workflow_dispatch:
+    inputs:
+      operation:
+        description: Select the Discovery operation
+        required: true
+        default: brave_discovery
+        type: choice
+        options:
+          - brave_discovery
+          - active_clothing_scan
 
 jobs:
   contract-tests:
@@ -33,9 +45,13 @@ jobs:
           pytest tests/test_discovery_v16_quality_engine.py -q
           pytest tests/test_discovery_v15_result_filter.py -q
           pytest tests/test_discovery_v12_live_pilot.py -q
+          pytest tests/test_active_clothing_inventory_scan.py -q
+          pytest tests/test_active_clothing_inventory_operator_integration.py -q
 
   live-pilot:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    # Preserve the accepted legacy manual-only invariant:
+    # if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'brave_discovery' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -68,3 +84,36 @@ jobs:
             artifacts/discovery-v1.6-phone-report.txt
             artifacts/discovery-v1.6-live-report.json
           if-no-files-found: warn
+
+  active-clothing-inventory-scan:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'active_clothing_scan' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest
+      - name: Run active Clothing Inventory scan
+        env:
+          PYTHONPATH: src:.
+        run: |
+          python scripts/run_active_clothing_inventory_scan.py \
+            --output-dir artifacts/active-clothing-inventory-scan
+      - name: Show active Clothing Inventory operator summary
+        if: ${{ always() }}
+        run: |
+          summary="artifacts/active-clothing-inventory-scan/operator-summary.txt"
+          if [ -f "$summary" ]; then
+            cat "$summary"
+          else
+            echo "Active Clothing Inventory operator summary was not created."
+            exit 1
+          fi
+      - name: Upload active Clothing Inventory scan
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: active-clothing-inventory-scan
+          path: artifacts/active-clothing-inventory-scan/
+          if-no-files-found: error
