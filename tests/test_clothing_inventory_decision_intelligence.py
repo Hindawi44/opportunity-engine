@@ -10,18 +10,35 @@ from scripts.run_clothing_inventory_single_case import (
 
 
 def _verified_comparables(prices: tuple[int, int, int]) -> dict[str, object]:
+    sources = (
+        (
+            "https://www.finn.no/bap/forsale/ad.html?finnkode=300001",
+            "FINN.no",
+        ),
+        (
+            "https://www.auksjonen.no/auksjoner/clothing-inventory/300002",
+            "Auksjonen.no",
+        ),
+        (
+            "https://arbeidsklaer.no/produkter/clothing-inventory-300003",
+            "Arbeidsklaer.no",
+        ),
+    )
     return {
         "comparables": [
             {
                 "title": f"Verified clothing inventory comparable {index}",
-                "url": f"https://www.finn.no/bap/forsale/ad.html?finnkode=30000{index}",
+                "url": url,
                 "price_nok": price,
-                "source_name": "FINN.no",
+                "source_name": source_name,
                 "observed_at": f"2026-07-26T12:0{index}:00Z",
                 "similarity_score": 0.90 - (index * 0.03),
                 "verified": True,
             }
-            for index, price in enumerate(prices, start=1)
+            for index, (price, (url, source_name)) in enumerate(
+                zip(prices, sources, strict=True),
+                start=1,
+            )
         ]
     }
 
@@ -75,6 +92,7 @@ def test_complete_strong_case_reaches_buy_review_with_human_approval() -> None:
     report = enrich_with_costs(report, _verified_costs())
     report = enrich_with_decision(report)
 
+    assert report["market_comparables"]["accepted_count"] == 3
     assert report["final_outcome"] == "ANALYSIS_READY"
     assert report["financial_integration"]["decision_gate"] == (
         "READY_FOR_FINANCIAL_REVIEW"
