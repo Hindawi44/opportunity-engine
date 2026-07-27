@@ -1,22 +1,26 @@
 """Execute one Clothing Inventory case end to end.
 
 The default mode reuses the preserved deterministic case. Live mode fetches the
-existing public Auksjonen category, selects exactly one active clothing-related
-listing, and passes only observed source facts through the approved Discovery,
-Opportunity Dossier, eligibility, verified market-comparables, verified
-acquisition-cost, financial-integration, scoring, and canonical decision
-contracts. Missing evidence remains explicit and no automatic commercial or
-financial action is performed.
+existing public Auksjonen category and selects exactly one active clothing-related
+listing. Confirmed-intake mode accepts one validated source-agnostic evidence
+package and stops at retained Opportunity Dossier reporting. Missing evidence
+remains explicit and no automatic commercial or financial action is performed.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from opportunity_engine.discovery.classifier import classify_candidate, to_canonical_opportunity
+from opportunity_engine.discovery.confirmed_dossier_intake import (
+    ConfirmedDossierIntakeError,
+    build_confirmed_dossier_report,
+    load_confirmed_dossier_intake,
+)
 from opportunity_engine.discovery.e2e_checkpoint import (
     CheckpointOutcome,
     build_opportunity_dossier,
@@ -207,14 +211,56 @@ def enrich_with_decision(report: dict[str, Any]) -> dict[str, Any]:
     return apply_existing_scoring_and_decision(report)
 
 
+def _intake_operator_summary(
+    report: dict[str, Any],
+    dossier: dict[str, Any],
+    confirmed: dict[str, Any],
+    seller_claims: dict[str, Any],
+) -> str:
+    quantity = seller_claims.get("quantity", confirmed.get("quantity", "unknown"))
+    price = seller_claims.get(
+        "asking_price_nok",
+        confirmed.get("asking_price_nok", "unknown"),
+    )
+    missing = dossier.get("missing_evidence", [])
+    lines = [
+        "Clothing Inventory — Confirmed Dossier Intake Result",
+        f"Mode: {report.get('execution_mode', 'unknown')}",
+        f"Opportunity title: {confirmed['source_title']}",
+        f"Stable opportunity ID: {dossier['opportunity_id']}",
+        f"Source: {confirmed['source_name']}",
+        f"URL: {confirmed['source_url']}",
+        f"Scenario: {dossier['primary_scenario']}",
+        f"Opportunity status: {report['opportunity_status']}",
+        f"Dossier status: {report['dossier_status']}",
+        f"Final decision: {report['final_decision']}",
+        f"Quantity: {quantity}",
+        f"Observed price NOK: {price}",
+        "Missing required evidence: " + (
+            ", ".join(missing) if missing else "none"
+        ),
+        "Retained in opportunity report: yes",
+        "Automatic purchase/bid/contact/reservation/payment: false",
+    ]
+    return "\n".join(lines) + "\n"
+
+
 def build_operator_summary(report: dict[str, Any]) -> str:
     """Create a concise operator-readable summary from the final report."""
     dossier = report["dossier"]
     eligibility = report["eligibility"]
     confirmed = dossier["confirmed_facts"]
     seller_claims = dossier["seller_claims"]
-    missing = eligibility.get("missing_requirements", [])
 
+    if report.get("execution_mode") == "CONFIRMED_DOSSIER_INTAKE":
+        return _intake_operator_summary(
+            report,
+            dossier,
+            confirmed,
+            seller_claims,
+        )
+
+    missing = eligibility.get("missing_requirements", [])
     lines = [
         "Clothing Inventory — Single Case End-to-End Result",
         f"Mode: {report.get('execution_mode', 'unknown')}",
@@ -325,6 +371,15 @@ def main() -> int:
         help="Use a preserved HTML page instead of network access; implies live parsing.",
     )
     parser.add_argument(
+        "--confirmed-intake-file",
+        type=Path,
+        help=(
+            "Use one validated confirmed active Clothing Inventory JSON intake. "
+            "This mode writes a retained evidence-required dossier and does not "
+            "invoke financial analysis or decision intelligence."
+        ),
+    )
+    parser.add_argument(
         "--comparables-file",
         type=Path,
         help=(
@@ -341,6 +396,30 @@ def main() -> int:
         ),
     )
     args = parser.parse_args()
+
+    if args.confirmed_intake_file and (args.live or args.html_file):
+        parser.error(
+            "--confirmed-intake-file is mutually exclusive with --live and --html-file"
+        )
+    if args.confirmed_intake_file and (
+        args.comparables_file or args.costs_file
+    ):
+        parser.error(
+            "--confirmed-intake-file does not accept --comparables-file or --costs-file"
+        )
+
+    if args.confirmed_intake_file:
+        try:
+            intake = load_confirmed_dossier_intake(args.confirmed_intake_file)
+            report = build_confirmed_dossier_report(intake)
+        except ConfirmedDossierIntakeError as exc:
+            print(json.dumps(exc.to_dict(), ensure_ascii=False), file=sys.stderr)
+            return 2
+
+        paths = write_report_outputs(report, args.output_dir)
+        for label, path in paths.items():
+            print(f"{label}: {path}")
+        return 0
 
     if args.live or args.html_file:
         html = (

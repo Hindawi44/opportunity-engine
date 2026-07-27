@@ -1,0 +1,173 @@
+{
+  "schema_version": "confirmed-clothing-inventory-dossier-intake-v1",
+  "opportunity_id": "confirmed-clothing-inventory-example-001",
+  "domain": "CLOTHING_INVENTORY",
+  "primary_scenario": "COMPANY_BANKRUPTCY",
+  "record_type": "SALE_LISTING",
+  "qualification_status": "SALE_CONFIRMED",
+  "opportunity_status": "CONFIRMED_ACTIVE_CLOTHING_INVENTORY_OPPORTUNITY",
+  "listing_status": "ACTIVE",
+  "title": "Confirmed active clothing and footwear inventory sale",
+  "description": "Public evidence confirms an active sale of clothing and footwear inventory. Physical quantity, acquisition price, VAT, fees and logistics remain unverified.",
+  "observed_at": "2026-07-27T12:00:00+00:00",
+  "source": {
+    "name": "PUBLIC_SALE_EVIDENCE_PACKAGE",
+    "source_type": "PUBLIC_SALE_PAGE",
+    "primary_url": "https://inventory.example.no/opportunities/clothing-inventory-001",
+    "source_domain": "inventory.example.no",
+    "evidence_refs": [
+      "source-sale-page",
+      "source-company-record"
+    ]
+  },
+  "fields": {
+    "location": {
+      "value": "Trøndelag",
+      "classification": "CONFIRMED_SOURCE_FACT",
+      "evidence_refs": [
+        "source-sale-page"
+      ]
+    },
+    "what_is_sold": {
+      "value": "Clothing and footwear inventory from a business liquidation",
+      "classification": "CONFIRMED_SOURCE_FACT",
+      "evidence_refs": [
+        "source-sale-page",
+        "source-category-page"
+      ]
+    },
+    "quantity": {
+      "value": null,
+      "unit": "items",
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "asking_price_nok": {
+      "value": null,
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "contact": {
+      "value": null,
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "vat_statement": {
+      "value": null,
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "buyer_fees_nok": {
+      "value": null,
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "condition": {
+      "value": null,
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "pickup_terms": {
+      "value": null,
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "packing_terms": {
+      "value": null,
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "transport_terms": {
+      "value": null,
+      "classification": "UNKNOWN",
+      "evidence_refs": []
+    },
+    "product_categories": {
+      "value": [
+        "clothing",
+        "footwear"
+      ],
+      "classification": "CONFIRMED_SOURCE_FACT",
+      "evidence_refs": [
+        "source-category-page"
+      ]
+    }
+  },
+  "supported_inferences": [
+    {
+      "field": "inventory_scope",
+      "value": "The visible catalogue supports clothing and footwear relevance but not physical unit count",
+      "confidence": "MEDIUM",
+      "reason": "The public sale and category pages identify relevant categories while no verified stock list is available",
+      "evidence_refs": [
+        "source-sale-page",
+        "source-category-page"
+      ]
+    }
+  ],
+  "missing_evidence": [
+    "verified inventory list",
+    "verified physical quantity",
+    "confirmed acquisition price or offer basis",
+    "VAT treatment",
+    "buyer fees",
+    "condition distribution",
+    "pickup deadline and removal terms",
+    "packing and loading information",
+    "transport requirements",
+    "verified market comparables"
+  ],
+  "seller_questions": [
+    "Can you provide a current inventory list with quantities, brands and sizes?",
+    "What is the acquisition price or offer process, and how are VAT and buyer fees handled?",
+    "What are the inspection, pickup, packing, loading and transport terms?"
+  ],
+  "provenance": {
+    "records": [
+      {
+        "evidence_id": "source-sale-page",
+        "kind": "PUBLIC_WEB_PAGE",
+        "url": "https://inventory.example.no/opportunities/clothing-inventory-001",
+        "file_reference": null,
+        "observed_at": "2026-07-27T12:00:00+00:00",
+        "supports": [
+          "opportunity_status",
+          "listing_status",
+          "title",
+          "location",
+          "what_is_sold"
+        ]
+      },
+      {
+        "evidence_id": "source-company-record",
+        "kind": "PUBLIC_COMPANY_RECORD",
+        "url": "https://registry.example.no/entities/clothing-inventory-001",
+        "file_reference": null,
+        "observed_at": "2026-07-27T12:02:00+00:00",
+        "supports": [
+          "company_identity",
+          "primary_scenario"
+        ]
+      },
+      {
+        "evidence_id": "source-category-page",
+        "kind": "PUBLIC_WEB_PAGE",
+        "url": "https://inventory.example.no/categories/clothing",
+        "file_reference": null,
+        "observed_at": "2026-07-27T12:04:00+00:00",
+        "supports": [
+          "what_is_sold",
+          "product_categories",
+          "inventory_scope"
+        ]
+      }
+    ]
+  },
+  "safety": {
+    "automatic_purchase_decision": false,
+    "automatic_bid": false,
+    "automatic_contact": false,
+    "automatic_reservation": false,
+    "automatic_payment": false
+  }
+}
