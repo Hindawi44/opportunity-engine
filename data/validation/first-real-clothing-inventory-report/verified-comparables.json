@@ -1,0 +1,47 @@
+{
+  "schema_version": "first-real-clothing-comparables-v1",
+  "target_quantity": 25,
+  "valuation_method": "lot_equivalent_from_published_unit_price",
+  "warning": "These are new-retail ceiling references for the exact Blåkläder 3463 model, not completed second-hand lot sales. Each comparable price is the published unit price multiplied by the target quantity of 25. The decision must remain conservative and costs must be independently verified.",
+  "comparables": [
+    {
+      "title": "Blåkläder 3463 Hybridjakke — official Norway retail lot-equivalent",
+      "url": "https://www.blaklader.no/nb/produkt/34632526-hybridjakke",
+      "unit_price_nok": 1161.25,
+      "quantity_multiplier": 25,
+      "price_nok": 29031.25,
+      "source_name": "Blåkläder Norge",
+      "observed_at": "2026-07-27T06:55:00Z",
+      "similarity_score": 0.98,
+      "condition": "new retail ceiling; exact model; 25 × 1,161.25 NOK",
+      "location": "Norway",
+      "verified": true
+    },
+    {
+      "title": "Blåkläder 3463 Hybridjakke — Arbeidskle.no retail lot-equivalent",
+      "url": "https://www.arbeidskle.no/produkt/herre-1/jakker/service-1/3463-hybridjakke",
+      "unit_price_nok": 1124,
+      "quantity_multiplier": 25,
+      "price_nok": 28100,
+      "source_name": "Arbeidskle.no",
+      "observed_at": "2026-07-27T06:55:00Z",
+      "similarity_score": 0.98,
+      "condition": "new retail ceiling; exact model; 25 × 1,124 NOK",
+      "location": "Norway",
+      "verified": true
+    },
+    {
+      "title": "Blåkläder 3463-2526 Hybridjakke — Prisjakt retail lot-equivalent",
+      "url": "https://www.prisjakt.no/product.php?p=10285161",
+      "unit_price_nok": 874,
+      "quantity_multiplier": 25,
+      "price_nok": 21850,
+      "source_name": "Prisjakt Norge",
+      "observed_at": "2026-07-27T06:55:00Z",
+      "similarity_score": 0.95,
+      "condition": "new retail ceiling; exact model; 25 × 874 NOK",
+      "location": "Norway",
+      "verified": true
+    }
+  ]
+}
