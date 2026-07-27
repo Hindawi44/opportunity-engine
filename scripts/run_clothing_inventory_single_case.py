@@ -3,9 +3,9 @@
 The default mode reuses the preserved deterministic case. Live mode fetches the
 existing public Auksjonen category, selects exactly one clothing-related listing,
 and passes only observed source facts through the approved Discovery, Opportunity
-Dossier, eligibility, verified market-comparables, verified acquisition-cost, and
-financial-integration contracts. Missing evidence remains explicit and no
-automatic commercial or financial action is performed.
+Dossier, eligibility, verified market-comparables, verified acquisition-cost,
+financial-integration, scoring, and canonical decision contracts. Missing evidence
+remains explicit and no automatic commercial or financial action is performed.
 """
 from __future__ import annotations
 
@@ -25,6 +25,9 @@ from opportunity_engine.discovery.models import DiscoveryCandidate
 from opportunity_engine.discovery.real_case import run_real_clothing_inventory_case
 from opportunity_engine.discovery.single_case_cost_evidence import (
     apply_verified_acquisition_costs,
+)
+from opportunity_engine.discovery.single_case_decision_intelligence import (
+    apply_existing_scoring_and_decision,
 )
 from opportunity_engine.discovery.single_case_market_evidence import (
     apply_verified_market_comparables,
@@ -182,6 +185,11 @@ def enrich_with_costs(
     return apply_verified_acquisition_costs(report, costs_payload)
 
 
+def enrich_with_decision(report: dict[str, Any]) -> dict[str, Any]:
+    """Apply the existing score and canonical BUY_REVIEW/WATCH/REJECT policy."""
+    return apply_existing_scoring_and_decision(report)
+
+
 def build_operator_summary(report: dict[str, Any]) -> str:
     """Create a concise operator-readable summary from the final report."""
     dossier = report["dossier"]
@@ -235,6 +243,19 @@ def build_operator_summary(report: dict[str, Any]) -> str:
             lines.append(f"Expected profit NOK: {financial.get('expected_profit_nok')}")
         if financial.get("roi_percent") is not None:
             lines.append(f"ROI percent: {financial.get('roi_percent')}")
+
+    decision = report.get("decision_intelligence")
+    if isinstance(decision, dict):
+        lines.extend(
+            [
+                f"Opportunity score: {decision.get('opportunity_score', 'unknown')}",
+                f"Score grade: {decision.get('score_grade', 'unknown')}",
+                f"Final decision: {decision.get('final_decision', 'unknown')}",
+                f"Final decision Arabic: {decision.get('final_decision_ar', 'unknown')}",
+                f"Maximum safe bid NOK: {decision.get('maximum_safe_bid_nok', 'unknown')}",
+                f"Human approval required: {decision.get('requires_human_approval', False)}",
+            ]
+        )
 
     lines.append("Automatic purchase/bid/contact/payment: false")
     return "\n".join(lines) + "\n"
@@ -325,6 +346,7 @@ def main() -> int:
             load_costs_payload(args.costs_file),
         )
 
+    report = enrich_with_decision(report)
     paths = write_report_outputs(report, args.output_dir)
     for label, path in paths.items():
         print(f"{label}: {path}")
