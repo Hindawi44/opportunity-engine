@@ -46,6 +46,9 @@ def test_brave_provider_builds_norway_request_and_normalizes_hits():
     assert "search_lang" not in params
     assert "ui_lang" not in params
     assert params["result_filter"] == ["web"]
+    assert params["operators"] == ["true"]
+    assert "freshness" not in params
+    assert "extra_snippets" not in params
     assert params["count"] == ["5"]
     assert captured["token"] == "secret"
     assert captured["timeout"] == 20.0
@@ -55,6 +58,55 @@ def test_brave_provider_builds_norway_request_and_normalizes_hits():
         description="Hele lageret fra klesbutikk til salgs",
         provider="Brave Search",
     )]
+
+
+def test_brave_provider_applies_freshness_and_combines_extra_snippets():
+    captured = {}
+
+    def transport(request, timeout):
+        captured["url"] = request.full_url
+        return json.dumps({
+            "web": {"results": [{
+                "title": "Vareparti klær selges",
+                "url": "https://example.no/lot-2",
+                "description": "Hovedutdrag.",
+                "extra_snippets": [
+                    "  Hele lageret selges samlet.  ",
+                    "Hovedutdrag.",
+                    "Budfrist 31. juli.",
+                ],
+            }]}
+        }).encode()
+
+    provider = BraveSearchProvider(
+        "secret",
+        transport=transport,
+        freshness="pm",
+        extra_snippets=True,
+        operators=True,
+    )
+    hits = provider.search('"vareparti" klær -kjøpes', count=10)
+
+    params = parse_qs(urlparse(captured["url"]).query)
+    assert params["freshness"] == ["pm"]
+    assert params["extra_snippets"] == ["true"]
+    assert params["operators"] == ["true"]
+    assert params["q"] == ['"vareparti" klær -kjøpes']
+    assert hits == [SearchHit(
+        title="Vareparti klær selges",
+        url="https://example.no/lot-2",
+        description="Hovedutdrag. | Hele lageret selges samlet. | Budfrist 31. juli.",
+        provider="Brave Search",
+    )]
+
+
+@pytest.mark.parametrize(
+    "freshness",
+    ["today", "2026-07-30to2026-07-01", "2026-13-01to2026-13-02"],
+)
+def test_brave_provider_rejects_invalid_freshness(freshness):
+    with pytest.raises(ValueError):
+        BraveSearchProvider("secret", freshness=freshness)
 
 
 def test_brave_provider_exposes_safe_http_error_body():

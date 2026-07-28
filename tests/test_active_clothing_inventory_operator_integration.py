@@ -52,9 +52,13 @@ def test_manual_operation_contract_and_path_scope() -> None:
     ]
 
     for required_path in (
+        '      - "src/opportunity_engine/discovery/brave_search.py"',
+        '      - "src/opportunity_engine/discovery/brave_precision.py"',
         '      - "src/opportunity_engine/discovery/clothing_inventory_search.py"',
         '      - "scripts/run_active_clothing_inventory_scan.py"',
         '      - "scripts/run_clothing_inventory_discovery_search.py"',
+        '      - "tests/test_discovery_v11_live_search.py"',
+        '      - "tests/test_brave_precision.py"',
         '      - "tests/test_active_clothing_inventory_scan.py"',
         '      - "tests/test_clothing_inventory_discovery_search.py"',
         '      - "tests/test_active_clothing_inventory_operator_integration.py"',
@@ -131,6 +135,8 @@ def test_contract_tests_preserve_all_discovery_operation_coverage() -> None:
     contract_job = _job_block(_workflow_text(), "contract-tests")
 
     required_commands = (
+        "pytest tests/test_discovery_v11_live_search.py -q",
+        "pytest tests/test_brave_precision.py -q",
         "pytest tests/test_discovery_v16_quality_engine.py -q",
         "pytest tests/test_discovery_v15_result_filter.py -q",
         "pytest tests/test_discovery_v12_live_pilot.py -q",
