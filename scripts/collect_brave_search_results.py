@@ -36,7 +36,7 @@ def main() -> int:
     max_queries = int(config.get("max_queries_per_run", 10) or 10)
     count = int(config.get("results_per_query", 10) or 10)
     country = str(config.get("country") or "NO")
-    search_lang = str(config.get("search_lang") or "no")
+    search_lang = str(config.get("search_lang") or "nb")
 
     client = BraveSearchClient(api_key=api_key)
     combined: list[dict[str, object]] = []

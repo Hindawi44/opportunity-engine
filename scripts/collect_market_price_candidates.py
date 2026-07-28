@@ -278,7 +278,7 @@ def main() -> int:
             rejected_for_query = 0
             result_count = 0
             try:
-                results = client.search(query, count=args.results_per_query, country="NO", search_lang="no")
+                results = client.search(query, count=args.results_per_query, country="NO", search_lang="nb")
                 for result in results:
                     result_count += 1
                     candidate, rejection = _evaluate_candidate(raw_item, dict(result), query)
