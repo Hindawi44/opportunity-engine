@@ -12,6 +12,9 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     verify_public_page,
     write_discovery_artifacts,
 )
+from opportunity_engine.discovery.early_opportunity_gate import (
+    apply_early_opportunity_gate,
+)
 from opportunity_engine.discovery.source_channel_guard import (
     enforce_source_channel_identity,
 )
@@ -43,12 +46,13 @@ def main() -> int:
         raise SystemExit("BRAVE_SEARCH_API_KEY is required")
 
     provider = BraveSearchProvider(api_key)
-    result = run_clothing_inventory_discovery(
+    raw_result = run_clothing_inventory_discovery(
         provider,
         results_per_query=args.results_per_query,
         verifier=_guarded_public_verifier if args.verify_pages else None,
         verification_limit=args.verification_limit,
     )
+    result = apply_early_opportunity_gate(raw_result)
     paths = write_discovery_artifacts(result, Path(args.output_dir))
     report = result["search_run_report"]
     print(f"Status: {report['status']}")
