@@ -26,69 +26,66 @@ FINN_INDEXED_REFERENCE_ITEM_IDS = frozenset({
     "468298756",  # mixed clothes, shoes and bags with stand
 })
 
+# These intentionally copy the simple manual-search shape. Complex OR groups
+# produced broad, noisy retrieval in the first live rescue attempt.
 FINN_INDEXED_LISTING_QUERIES: tuple[DiscoveryQuery, ...] = (
     DiscoveryQuery(
         "finn-index-01",
         "LARGE_LOT_SALE",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
-        'site:finn.no/recommerce/forsale/item '
-        '("vareparti" OR "klesparti" OR "partisalg") '
-        '(klær OR plagg OR arbeidstøy) -"ønskes kjøpt" -kjøpes',
+        'site:finn.no/recommerce/forsale/item "vareparti" klær '
+        '-"ønskes kjøpt" -kjøpes',
     ),
     DiscoveryQuery(
         "finn-index-02",
-        "WAREHOUSE_SURPLUS",
+        "LARGE_LOT_SALE",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
-        'site:finn.no/recommerce/forsale/item "restlager" '
-        '(klær OR plagg OR sko OR jakker OR bukser) -"ønskes kjøpt" -kjøpes',
+        'site:finn.no/recommerce/forsale/item "vareparti" sko '
+        '-"ønskes kjøpt" -kjøpes',
     ),
     DiscoveryQuery(
         "finn-index-03",
-        "LARGE_LOT_SALE",
+        "WAREHOUSE_SURPLUS",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
-        'site:finn.no/recommerce/forsale/item '
-        '("selges samlet" OR "samlet parti") '
-        '(klær OR sko OR jakker OR bukser) -"ønskes kjøpt" -kjøpes',
+        'site:finn.no/recommerce/forsale/item "restparti" klær '
+        '-"ønskes kjøpt" -kjøpes',
     ),
     DiscoveryQuery(
         "finn-index-04",
-        "LARGE_LOT_SALE",
+        "WAREHOUSE_SURPLUS",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
-        'site:finn.no/recommerce/forsale/item ("stk" OR "par") '
-        '(jakker OR bukser OR sko OR arbeidstøy) '
-        '(parti OR partisalg OR "selges samlet") -"ønskes kjøpt" -kjøpes',
+        'site:finn.no/recommerce/forsale/item "restlager" klær '
+        '-"ønskes kjøpt" -kjøpes',
     ),
     DiscoveryQuery(
         "finn-index-05",
         "LARGE_LOT_SALE",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
-        'site:finn.no/recommerce/forsale/item Rains '
-        '(jakker OR regntøy) (parti OR "stk" OR "selges samlet") '
+        'site:finn.no/recommerce/forsale/item "vareparti" Rains '
         '-"ønskes kjøpt" -kjøpes',
         "SECONDARY",
     ),
     DiscoveryQuery(
         "finn-index-06",
-        "WAREHOUSE_SURPLUS",
+        "LARGE_LOT_SALE",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
-        'site:finn.no/recommerce/forsale/item '
-        '(arbeidsbukser OR arbeidstøy OR arbeidsjakker) '
-        '(parti OR partisalg OR "stk") -"ønskes kjøpt" -kjøpes',
+        'site:finn.no/recommerce/forsale/item "vareparti" damesko '
+        '-"ønskes kjøpt" -kjøpes',
         "SECONDARY",
     ),
     DiscoveryQuery(
         "finn-index-07",
-        "LARGE_LOT_SALE",
+        "WAREHOUSE_SURPLUS",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
-        'site:finn.no/recommerce/forsale/item (damebukser OR dameklær) '
-        '(parti OR "stk" OR "selges samlet") -"ønskes kjøpt" -kjøpes',
+        'site:finn.no/recommerce/forsale/item "partisalg" arbeidstøy '
+        '-"ønskes kjøpt" -kjøpes',
         "SECONDARY",
     ),
     DiscoveryQuery(
@@ -96,8 +93,8 @@ FINN_INDEXED_LISTING_QUERIES: tuple[DiscoveryQuery, ...] = (
         "LARGE_LOT_SALE",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
-        'site:finn.no/recommerce/forsale/item (sko OR loafers OR pumps) '
-        '("par" OR parti OR "selges samlet") -"ønskes kjøpt" -kjøpes',
+        'site:finn.no/recommerce/forsale/item "stort parti" damebukser '
+        '-"ønskes kjøpt" -kjøpes',
         "SECONDARY",
     ),
 )
@@ -107,16 +104,16 @@ _CLOTHING_TERMS = (
     "sko", "damesko", "loafers", "pumps", "arbeidstøy", "arbeidsbukser",
     "arbeidsjakker", "regntøy", "rains", "vesker",
 )
-_BULK_TERMS = (
-    "vareparti", "klesparti", "partisalg", "parti", "restlager",
-    "selges samlet", "samlet parti", "hele lageret", "hele varelageret",
-    "stort parti", "lager",
+_STRONG_BULK_TERMS = (
+    "vareparti", "klesparti", "partisalg", "restparti", "restlager",
+    "hele lageret", "hele varelageret", "stort parti", "lagerbeholdning",
 )
 _BUYER_INTENT_TERMS = (
     "ønskes kjøpt", "ønsker å kjøpe", "vil kjøpe", "kjøpes", "søker etter",
 )
 _QUANTITY_SIGNAL = re.compile(
-    r"\b\d{2,4}\s*(?:stk|par|plagg|jakker|bukser|sko|vesker)\b",
+    r"\b(?P<first>\d{2,4})(?:\s*[-–]\s*(?P<second>\d{2,4}))?\s*"
+    r"(?:stk|par|plagg|jakker|bukser|sko|vesker)\b",
     flags=re.IGNORECASE,
 )
 _FINN_ITEM_PATH = re.compile(r"^/recommerce/forsale/item/(\d+)(?:/)?$", re.I)
@@ -131,6 +128,7 @@ class FinnIndexedItem:
     found_by_queries: list[str] = field(default_factory=list)
     clothing_signal: bool = False
     bulk_signal: bool = False
+    explicit_quantity: int | None = None
     buyer_intent: bool = False
     retrieval_eligible: bool = False
     existing_classifier_state: str = ""
@@ -145,6 +143,7 @@ class FinnIndexedItem:
             "found_by_queries": list(self.found_by_queries),
             "clothing_signal": self.clothing_signal,
             "bulk_signal": self.bulk_signal,
+            "explicit_quantity": self.explicit_quantity,
             "buyer_intent": self.buyer_intent,
             "retrieval_eligible": self.retrieval_eligible,
             "existing_classifier_state": self.existing_classifier_state,
@@ -174,6 +173,19 @@ def _normalized_text(*values: str) -> str:
     return " ".join(" ".join(value.casefold().split()) for value in values if value)
 
 
+def _contains_term(text: str, term: str) -> bool:
+    return bool(re.search(rf"(?<!\w){re.escape(term)}(?!\w)", text, flags=re.I))
+
+
+def _explicit_quantity(text: str) -> int | None:
+    quantities: list[int] = []
+    for match in _QUANTITY_SIGNAL.finditer(text):
+        quantities.append(int(match.group("first")))
+        if match.group("second"):
+            quantities.append(int(match.group("second")))
+    return max(quantities) if quantities else None
+
+
 def _append_unique(values: list[str], value: str) -> None:
     if value and value not in values:
         values.append(value)
@@ -185,6 +197,7 @@ def run_finn_indexed_retrieval(
     queries: Iterable[DiscoveryQuery] = FINN_INDEXED_LISTING_QUERIES,
     results_per_query: int = 20,
     minimum_specific_items: int = 5,
+    minimum_reference_items: int = 2,
 ) -> dict[str, Any]:
     """Retrieve, deduplicate and diagnose specific FINN item pages.
 
@@ -195,6 +208,8 @@ def run_finn_indexed_retrieval(
         raise ValueError("results_per_query must be between 1 and 20")
     if minimum_specific_items < 1:
         raise ValueError("minimum_specific_items must be positive")
+    if not 0 <= minimum_reference_items <= len(FINN_INDEXED_REFERENCE_ITEM_IDS):
+        raise ValueError("minimum_reference_items is outside the reference set")
 
     query_list = tuple(queries)
     items: dict[str, FinnIndexedItem] = {}
@@ -221,12 +236,13 @@ def run_finn_indexed_retrieval(
 
             canonical_url = normalize_public_url(hit.url)
             text = _normalized_text(hit.title, hit.description)
-            clothing_signal = any(term in text for term in _CLOTHING_TERMS)
+            clothing_signal = any(_contains_term(text, term) for term in _CLOTHING_TERMS)
+            quantity = _explicit_quantity(text)
             bulk_signal = (
-                any(term in text for term in _BULK_TERMS)
-                or bool(_QUANTITY_SIGNAL.search(text))
+                any(_contains_term(text, term) for term in _STRONG_BULK_TERMS)
+                or bool(quantity is not None and quantity >= 15)
             )
-            buyer_intent = any(term in text for term in _BUYER_INTENT_TERMS)
+            buyer_intent = any(_contains_term(text, term) for term in _BUYER_INTENT_TERMS)
             classification = classify_search_hit(hit, query)
 
             existing = items.get(item_id)
@@ -246,6 +262,8 @@ def run_finn_indexed_retrieval(
             _append_unique(existing.found_by_queries, query.query_id)
             existing.clothing_signal = existing.clothing_signal or clothing_signal
             existing.bulk_signal = existing.bulk_signal or bulk_signal
+            if quantity is not None:
+                existing.explicit_quantity = max(existing.explicit_quantity or 0, quantity)
             existing.buyer_intent = existing.buyer_intent or buyer_intent
             existing.retrieval_eligible = (
                 existing.clothing_signal
@@ -261,6 +279,7 @@ def run_finn_indexed_retrieval(
         key=lambda item: (
             item.retrieval_eligible,
             item.item_id in FINN_INDEXED_REFERENCE_ITEM_IDS,
+            item.explicit_quantity or 0,
             len(item.found_by_queries),
             len(item.description),
         ),
@@ -270,10 +289,13 @@ def run_finn_indexed_retrieval(
     recovered_reference_ids = sorted(
         FINN_INDEXED_REFERENCE_ITEM_IDS.intersection(items)
     )
-    rescue_success = len(eligible) >= minimum_specific_items
+    rescue_success = (
+        len(eligible) >= minimum_specific_items
+        and len(recovered_reference_ids) >= minimum_reference_items
+    )
 
     return {
-        "schema_version": "finn-indexed-listing-rescue-1.0",
+        "schema_version": "finn-indexed-listing-rescue-1.1",
         "domain": "CLOTHING_INVENTORY",
         "provider": getattr(provider, "name", provider.__class__.__name__),
         "query_matrix": [query.to_dict() for query in query_list],
@@ -283,6 +305,7 @@ def run_finn_indexed_retrieval(
         "unique_finn_item_urls": len(items),
         "retrieval_eligible_items": len(eligible),
         "minimum_specific_items": minimum_specific_items,
+        "minimum_reference_items": minimum_reference_items,
         "rescue_success": rescue_success,
         "reference_item_ids": sorted(FINN_INDEXED_REFERENCE_ITEM_IDS),
         "reference_items_recovered": recovered_reference_ids,
