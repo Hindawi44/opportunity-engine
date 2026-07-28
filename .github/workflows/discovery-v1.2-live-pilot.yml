@@ -11,10 +11,14 @@ on:
       - "src/opportunity_engine/discovery/live_search.py"
       - "src/opportunity_engine/discovery/query_builder.py"
       - "src/opportunity_engine/discovery/search_provider.py"
+      - "src/opportunity_engine/discovery/brave_search.py"
+      - "src/opportunity_engine/discovery/brave_precision.py"
       - "src/opportunity_engine/discovery/clothing_inventory_search.py"
       - "scripts/run_discovery_v12_live_pilot.py"
       - "scripts/run_active_clothing_inventory_scan.py"
       - "scripts/run_clothing_inventory_discovery_search.py"
+      - "tests/test_discovery_v11_live_search.py"
+      - "tests/test_brave_precision.py"
       - "tests/test_discovery_v12_live_pilot.py"
       - "tests/test_discovery_v15_result_filter.py"
       - "tests/test_discovery_v16_quality_engine.py"
@@ -46,6 +50,8 @@ jobs:
         env:
           PYTHONPATH: src:.
         run: |
+          pytest tests/test_discovery_v11_live_search.py -q
+          pytest tests/test_brave_precision.py -q
           pytest tests/test_discovery_v16_quality_engine.py -q
           pytest tests/test_discovery_v15_result_filter.py -q
           pytest tests/test_discovery_v12_live_pilot.py -q
