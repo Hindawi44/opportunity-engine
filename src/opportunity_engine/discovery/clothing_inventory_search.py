@@ -93,6 +93,12 @@ _CATEGORY_TERMS = (
 )
 _SINGLE_ITEM_TERMS = ("jakke", "kjole", "bukse", "skjorte", "genser", "frakk", "dress", "skjørt")
 _ENDED_TERMS = ("avsluttet", "utløpt", "solgt", "auksjonen er avsluttet", "ended", "expired")
+_UNAVAILABLE_TERMS = (
+    "auksjon ikke tilgjengelig",
+    "auksjonen er ikke tilgjengelig",
+    "annonsen er ikke tilgjengelig",
+    "objektet er ikke tilgjengelig",
+)
 _ACTIVE_TERMS = ("aktiv", "pågående", "til salgs", "selges", "budfrist", "auksjon pågår", "gi bud")
 _SHELL_TERMS = (
     "javascript må være aktivert", "enable javascript", "prøv nå", "gå tilbake til gammelt design",
@@ -701,6 +707,23 @@ def verify_public_html(url: str, decoded: str) -> PageVerification:
     title = _extract_title(decoded)
     meta_description = _extract_meta_description(decoded)
     visible = _strip_html(decoded)[:20000]
+    unavailable_text = _normalized_text(title, visible)
+    listing_id = re.search(
+        r"(?:^|[/_-])(\d{3,})(?:$|[/_-])",
+        urlparse(canonical).path.lower(),
+    )
+    if listing_id and any(term in unavailable_text for term in _UNAVAILABLE_TERMS):
+        return PageVerification(
+            url=canonical,
+            title=title,
+            text=visible[:1000],
+            listing_status=ENDED,
+            page_role=ITEM_LISTING,
+            opportunity_identity=f"url-id:{listing_id.group(1)}",
+            identity_stable=True,
+            verified=True,
+            error="listing unavailable",
+        )
     structured_context, structured_obj, multiple_structured = _structured_listing_context(decoded)
     container_context, multiple_containers = _single_container_context(decoded)
     role = _page_role(
