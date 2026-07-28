@@ -46,7 +46,7 @@ _EVENT_TERMS: dict[str, tuple[str, ...]] = {
     "INVENTORY_LIQUIDATION": ("lager ryddes", "lageravvikling", "tømmesalg", "likvidasjon"),
     "AUCTION": ("auksjon", "nettauksjon", "budrunde"),
     "WAREHOUSE_SURPLUS": ("restlager", "overskuddslager", "overskuddsvarer"),
-    "LARGE_LOT_SALE": ("vareparti", "klesparti", "stort parti", "samlet salg"),
+    "LARGE_LOT_SALE": ("vareparti", "klesparti", "partisalg", "stort parti", "samlet salg"),
 }
 _EVENT_PRIORITY = {
     "COMPANY_BANKRUPTCY": 25,
@@ -60,11 +60,13 @@ _EVENT_PRIORITY = {
 }
 _CLOTHING_TERMS = (
     "klær", "klesbutikk", "kleslager", "sko", "arbeidstøy", "sportsklær",
-    "tekstil", "mote", "bekledning", "klesparti",
+    "tekstil", "mote", "bekledning", "klesparti", "klesmerke", "plagg",
+    "arbeidsjakke", "strømpebukse", "skjorte", "hettegenser", "genser", "joggebukse",
 )
 _INVENTORY_TERMS = (
     "varelager", "hele lageret", "hele varelageret", "komplett lager", "restlager",
     "overskuddslager", "vareparti", "klesparti", "parti med klær", "lagerbeholdning",
+    "partisalg",
 )
 _STRONG_SALE_TERMS = (
     "selges", "til salgs", "budrunde", "samlet salg", "hele lageret",
@@ -428,6 +430,12 @@ def _entity_tokens(title: str, description: str = "") -> set[str]:
 def _same_opportunity(left: CandidateObservation, right: CandidateObservation) -> bool:
     if left.canonical_url and left.canonical_url == right.canonical_url:
         return True
+    if (
+        left.identity_stable
+        and right.identity_stable
+        and left.opportunity_identity != right.opportunity_identity
+    ):
+        return False
     left_tokens = _entity_tokens(left.title)
     right_tokens = _entity_tokens(right.title)
     overlap = len(left_tokens & right_tokens)
