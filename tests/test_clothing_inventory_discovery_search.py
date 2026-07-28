@@ -19,6 +19,7 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     UNVERIFIED_EVENT,
     DiscoveryQuery,
     PageVerification,
+    _parse_money,
     classify_search_hit,
     normalize_public_url,
     run_clothing_inventory_discovery,
@@ -207,6 +208,79 @@ def test_live_regression_auksjonen_category_is_excluded_without_cross_combining_
     assert result.location is None
     assert result.inventory_type is None
     assert result.sale_evidence is False
+
+
+def test_storegutter_restlager_category_is_not_a_bulk_inventory_opportunity():
+    result = verify_public_html(
+        "https://storegutter.no/restlager-1159/",
+        fixture("storegutter-restlager-1159.html"),
+    )
+
+    assert result.page_role == CATEGORY_INDEX
+    assert result.event_scenario == UNVERIFIED_EVENT
+    assert result.price_nok is None
+    assert result.bid_price_nok is None
+    assert result.quantity is None
+    assert result.location is None
+    assert result.inventory_type is None
+    assert result.sale_evidence is False
+
+
+def test_storegutter_restlager_category_is_excluded_from_discovery_and_analysis():
+    q = DiscoveryQuery(
+        "q",
+        "WAREHOUSE_SURPLUS",
+        "SALE_INTENT",
+        "CLOTHING_INVENTORY",
+        "storegutter",
+    )
+    provider = FakeProvider({
+        "storegutter": [SearchHit(
+            "Restlager af stort tøj til mænd - Klær til store menn",
+            "https://storegutter.no/restlager-1159/",
+            "Restlager klær med flere produkter og priser.",
+            "Search",
+        )]
+    })
+    verification = verify_public_html(
+        "https://storegutter.no/restlager-1159/",
+        fixture("storegutter-restlager-1159.html"),
+    )
+
+    raw = run_clothing_inventory_discovery(
+        provider,
+        queries=[q],
+        discovered_at=NOW,
+        verifier=lambda url: verification,
+    )
+    result = apply_early_opportunity_gate(raw)
+
+    candidate = result["all_discovered_candidates"][0]
+    assert candidate["opportunity_state"] == REJECTED_NOISE
+    assert candidate["page_role"] == CATEGORY_INDEX
+    assert candidate["top5_eligible"] is False
+    assert candidate["analysis_eligible"] is False
+    assert candidate["price_nok"] is None
+    assert candidate["bid_price_nok"] is None
+    assert candidate["quantity"] is None
+    assert candidate["location"] is None
+    assert result["discovery_top5"] == []
+    assert result["search_run_report"]["analysis_eligible_count"] == 0
+    assert "dossier" not in result
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("711.22", 711.22),
+        ("1,589.00", 1589.00),
+        ("71.122", 71122),
+        ("711,22", 711.22),
+        ("100 000", 100000),
+    ],
+)
+def test_parse_money_distinguishes_decimal_and_thousands_formats(raw, expected):
+    assert _parse_money(raw) == expected
 
 
 def test_live_regression_proffsport_is_ordinary_store_and_zero_cart_is_not_price():
