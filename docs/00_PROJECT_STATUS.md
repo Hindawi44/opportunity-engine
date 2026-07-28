@@ -1,6 +1,6 @@
 # Opportunity Engine — Project Status
 
-**Last updated:** 2026-07-28
+**Last updated:** 2026-07-28  
 **Status:** ACTIVE  
 **Authoritative repository:** `Hindawi44/opportunity-engine`
 
@@ -64,7 +64,9 @@ Blocked domains remain:
 - Store fixtures
 - Other opportunity domains
 
-No new domain implementation is approved until the Clothing Inventory path repeatedly discovers specific traceable opportunities and completes the dossier and reporting cycle.
+No new domain implementation is approved until the Clothing Inventory path
+repeatedly discovers specific traceable opportunities and completes the dossier
+and reporting cycle.
 
 ## Completed and retained
 
@@ -80,13 +82,12 @@ No new domain implementation is approved until the Clothing Inventory path repea
 - PR #287–#301 implemented and hardened the first Clothing Inventory live path.
 - PR #302–#305 preserved and verified the AXL real-opportunity validation chain.
 - PR #307 defined source-agnostic confirmed dossier intake.
-- PR #308 implemented confirmed dossier intake with retained `DOSSIER_EVIDENCE_REQUIRED / NO_DECISION` reporting.
-- PR #309 added the confirmed-dossier post-merge correction task document.
-- PR #310 implemented the structured sixteen-query Clothing Inventory Discovery search.
-- PR #311 integrated `structured_clothing_discovery` into the manual operator workflow.
-- The first live structured Discovery run completed successfully and produced reviewable artifacts.
-- That live run exposed five verification-integrity false positives; none was approved for dossier intake.
-- PR #312 defined the bounded Discovery verification-integrity correction task.
+- PR #308 implemented confirmed dossier intake with retained
+  `DOSSIER_EVIDENCE_REQUIRED / NO_DECISION` reporting.
+- PR #310 implemented the structured sixteen-query Clothing Inventory Discovery
+  search.
+- PR #311 integrated `structured_clothing_discovery` into the manual operator
+  workflow.
 - PR #313 implemented the fail-closed verification-integrity correction.
 - PR #314 added the source-channel identity guard.
 - PR #315 separated Discovery Top 5 eligibility from Analysis eligibility and
@@ -94,6 +95,24 @@ No new domain implementation is approved until the Clothing Inventory path repea
 - PR #316 rejected mixed non-clothing inventory shells.
 - PR #317 added Norwegian Clothing Inventory lot vocabulary and preserved
   distinct stable listing identities.
+- PR #318 added the authorization-gated FINN Playwright pilot; live use remains
+  frozen without explicit written FINN permission.
+- PR #319 added the FINN saved-search email intake adapter.
+- PR #320 recognized explicit unavailable Auksjonen listings as ended.
+- PR #321 rejected the Storegutter retail catalogue false positive.
+- PR #322 corrected Brave Norwegian request handling.
+- PR #323 added the final post-verification Top 5 hard gate.
+- The post-merge live validation for PR #323 completed successfully with:
+
+```text
+execution_status = PASS
+post_verification_top5_hard_gate_applied = true
+top5_count = 0
+analysis_eligible_count = 0
+opportunity_quality_status = NO_VALID_OPPORTUNITIES
+```
+
+An empty Top 5 is an accepted safe outcome.
 
 ## Accepted operator surface
 
@@ -114,19 +133,25 @@ No schedule or automatic execution is added.
 
 ## Current phase
 
-**Phase:** FINN Saved-Search Email Intake Pilot
-**Status:** `IN_IMPLEMENTATION`
+**Phase:** Brave Search precision improvement  
+**Status:** `DRAFT_PR_CI_GREEN`
 
 ## Current implementation checkpoint
 
 ```text
-FINN_SAVED_SEARCH_EMAIL_INTAKE_ADAPTER_v1.0
+BRAVE_PRECISION_DISCOVERY_v1.0
 ```
 
 Current task document:
 
 ```text
-docs/FINN_SAVED_SEARCH_EMAIL_INTAKE_ADAPTER_TASK_v1.0.md
+docs/BRAVE_PRECISION_DISCOVERY_TASK_v1.0.md
+```
+
+Current pull request:
+
+```text
+PR #324 — Improve Brave Clothing Inventory search precision
 ```
 
 ## Current implementation contract
@@ -134,20 +159,19 @@ docs/FINN_SAVED_SEARCH_EMAIL_INTAKE_ADAPTER_TASK_v1.0.md
 The implementation must:
 
 1. remain limited to `CLOTHING_INVENTORY`;
-2. act only as a replaceable Discovery collection adapter;
-3. parse only operator-supplied messages from `agent@finn.no` with a FINN
-   new-advert subject;
-4. decode FINN tracking URLs locally without following them;
-5. accept only stable FINN item IDs and reject control/search links;
-6. deduplicate stable listing IDs;
-7. retain email price and location only as unverified source claims;
-8. mark symbolic prices such as `1 kr` or request/contact wording;
-9. keep every accepted lead at `STRONG_LEAD_REQUIRES_VERIFICATION`;
-10. keep `analysis_eligible=false` until the existing manual verification
-    boundary passes;
-11. write the existing four Discovery artifacts plus one sanitized intake
-    artifact;
-12. preserve all Analysis Engine and commercial-safety boundaries.
+2. preserve all sixteen approved query IDs, scenarios, intents, asset scope, and
+   rotation groups;
+3. improve only the pre-verification Brave retrieval surface;
+4. support Brave freshness presets and valid custom date ranges;
+5. enable Brave search operators explicitly for structured discovery;
+6. enable bounded extra snippets and deduplicate them before classification;
+7. exclude predictable buyer-intent, job, ordinary-shop, generic-content, and
+   stale-listing noise where appropriate;
+8. default structured discovery to `freshness=pm`, with manual selection of
+   `pd`, `pw`, `pm`, or `py`;
+9. record the active Brave precision settings in the search-run artifact;
+10. preserve all verification, dossier, Analysis Engine, and commercial-safety
+    boundaries.
 
 ## Strict confirmation conjunction
 
@@ -162,76 +186,80 @@ AND listing_status == ACTIVE
 AND successful public verification
 ```
 
-Search snippets alone cannot confirm a sale.
+Search snippets, including Brave extra snippets, cannot confirm a sale by
+themselves.
 
 ## Approved implementation scope
 
 ```text
-src/opportunity_engine/discovery/finn_email_intake.py
-scripts/run_finn_email_intake.py
-tests/test_finn_email_intake.py
-docs/FINN_SAVED_SEARCH_EMAIL_INTAKE_ADAPTER_TASK_v1.0.md
-docs/decisions/DECISION_002_FINN_SAVED_SEARCH_EMAIL_INTAKE.md
-docs/MASTER_BLUEPRINT.md
-README.md
+src/opportunity_engine/discovery/brave_search.py
+src/opportunity_engine/discovery/brave_precision.py
+scripts/run_clothing_inventory_discovery_search.py
+tests/test_discovery_v11_live_search.py
+tests/test_brave_precision.py
+tests/test_active_clothing_inventory_operator_integration.py
+.github/workflows/discovery-v1.2-live-pilot.yml
+docs/BRAVE_PRECISION_DISCOVERY_TASK_v1.0.md
 docs/00_PROJECT_STATUS.md
 ```
 
-## Required regression outcomes
+## Validation status
 
-- wrong sender or non-alert subject -> rejected message;
-- FINN click-tracking and direct item links -> one stable record;
-- saved-search, unsubscribe, edit, and help links -> rejected;
-- duplicate FINN item IDs -> one collected lead;
-- `1 kr` or request/contact wording -> symbolic, never a verified price;
-- non-Clothing saved-search results -> excluded from Discovery Top 5;
-- no page request, tracking-link visit, or browser launch;
-- raw message body, recipient, and mailbox message ID -> absent from artifacts;
-- existing Discovery report fields and safety flags -> retained.
+PR #324 checks are green:
+
+```text
+782 passed
+Discovery V1.1 Live Search Adapter = success
+1 — Discover Clothing Inventory Opportunities = success
+Full repository test workflow = success
+```
 
 ## Non-negotiable rules
 
-- Do not modify the sixteen-query matrix.
 - Do not add a new opportunity domain.
-- Do not modify Brave credentials or provider behavior.
-- Do not add or modify workflows, schedules, or automatic execution in this task.
+- Do not add a new source or browser collector in this task.
+- Do not change the canonical sixteen-query scenario structure.
+- Do not weaken page verification, the early-opportunity gate, or the
+  post-verification Top 5 hard gate.
 - Do not modify the Opportunity Dossier contract.
 - Do not modify confirmed-dossier intake.
 - Do not modify market-comparable or acquisition-cost logic.
 - Do not modify V2.8–V3.7 financial formulas.
 - Do not modify investment scoring or decision intelligence.
 - Do not invent price, quantity, company, location, or active status.
-- Do not add a mailbox poller, schedule, or workflow in this task.
+- Do not add a schedule or automatic execution.
 - Do not contact sellers.
 - Do not bid, reserve, purchase, or pay.
-- Do not log in, import session cookies, rotate proxies, bypass CAPTCHA, or bypass
-  access controls.
-- Do not follow any FINN or tracking URL from an alert message.
 - Do not run the Playwright pilot without explicit written permission from FINN.
 
 ## Definition of current-task success
 
-The implementation succeeds only when:
+The task succeeds only when:
 
-1. all mandatory focused tests pass;
-2. all repository checks pass;
-3. sender, subject, item-link, and deduplication gates fail closed;
-4. real FINN email-link shapes normalize without network access;
-5. the sixteen-query matrix remains unchanged;
-6. email price and location remain unverified source evidence;
-7. every intake candidate remains `UNKNOWN` and Analysis-blocked;
-8. sanitized capture provenance remains traceable;
-9. no live FINN collection is performed during implementation or CI;
-10. existing Playwright regressions remain passing;
-11. no Analysis Engine or commercial-action boundary is crossed.
+1. all focused and repository-wide checks pass;
+2. freshness validation fails closed for unsupported or invalid values;
+3. the structured operation sends the selected freshness window,
+   `extra_snippets=true`, and `operators=true`;
+4. extra snippets remain bounded and deduplicated;
+5. all sixteen query contracts remain unchanged;
+6. the final verification and Top 5 boundaries remain unchanged;
+7. a post-merge live run produces the existing four artifacts;
+8. the live report records the Brave precision configuration;
+9. the new run is compared against the baseline of 109 merged candidates and
+   108 rejected results;
+10. no opportunity proceeds to a dossier unless the strict confirmation
+    conjunction passes.
 
 ## Immediate next action
 
-Complete and merge the email intake adapter only after all checks pass. Then
-create Clothing Inventory saved searches in FINN and wait for the first genuine
-alert. Supply that message to the adapter, inspect all five artifacts, manually
-verify only the strongest specific advert, and pass it to the existing
-Opportunity Dossier boundary only if the strict confirmation conjunction passes.
-An empty result is acceptable and must not be replaced with an invented
-opportunity. The live Playwright pilot remains frozen until explicit written
-automation permission exists.
+Review and merge PR #324 only while all checks remain green. Then manually run:
+
+```text
+operation = structured_clothing_discovery
+```
+
+Inspect the four artifacts and compare retrieval efficiency against the previous
+baseline. A lower result count is not automatically better; the goal is fewer
+predictable false positives while preserving any genuine specific active sale.
+An empty Top 5 remains valid and must not be replaced with an invented
+opportunity.
