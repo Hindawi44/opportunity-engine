@@ -43,6 +43,7 @@ jobs:
             --freshness py \
             --results-per-query 20 \
             --minimum-specific-items 5 \
+            --minimum-reference-items 2 \
             --output-dir artifacts/finn-indexed-rescue
       - name: Show rescue summary
         if: ${{ always() }}
