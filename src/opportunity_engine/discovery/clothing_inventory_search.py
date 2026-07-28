@@ -60,7 +60,7 @@ _EVENT_PRIORITY = {
 }
 _CLOTHING_TERMS = (
     "klær", "klesbutikk", "kleslager", "sko", "arbeidstøy", "sportsklær",
-    "tekstil", "mote", "bekledning", "varelager", "restlager", "klesparti",
+    "tekstil", "mote", "bekledning", "klesparti",
 )
 _INVENTORY_TERMS = (
     "varelager", "hele lageret", "hele varelageret", "komplett lager", "restlager",
