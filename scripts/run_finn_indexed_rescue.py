@@ -25,8 +25,9 @@ def _write_summary(report: dict, path: Path) -> None:
         f"Raw hits: {report['hits_received']}",
         f"Unique FINN item URLs: {report['unique_finn_item_urls']}",
         f"Retrieval-eligible clothing lots: {report['retrieval_eligible_items']}",
-        f"Required minimum: {report['minimum_specific_items']}",
+        f"Required clothing lots: {report['minimum_specific_items']}",
         f"Reference items recovered: {len(recovered)}/{len(report['reference_item_ids'])}",
+        f"Required reference items: {report['minimum_reference_items']}",
         f"Recovered reference IDs: {', '.join(recovered) if recovered else 'none'}",
         f"Provider errors: {len(report['errors'])}",
         "",
@@ -41,6 +42,7 @@ def _write_summary(report: dict, path: Path) -> None:
         lines.extend([
             f"[{marker}] {item['title']}",
             f"ID: {item['item_id']}",
+            f"Quantity signal: {item['explicit_quantity']}",
             f"URL: {item['url']}",
             f"Queries: {', '.join(item['found_by_queries'])}",
             f"Classifier: {item['existing_classifier_state']}",
@@ -58,6 +60,7 @@ def main() -> int:
     )
     parser.add_argument("--results-per-query", type=int, default=20)
     parser.add_argument("--minimum-specific-items", type=int, default=5)
+    parser.add_argument("--minimum-reference-items", type=int, default=2)
     parser.add_argument(
         "--freshness",
         choices=("pd", "pw", "pm", "py"),
@@ -79,6 +82,7 @@ def main() -> int:
         provider,
         results_per_query=args.results_per_query,
         minimum_specific_items=args.minimum_specific_items,
+        minimum_reference_items=args.minimum_reference_items,
     )
     report["executed_at"] = datetime.now(timezone.utc).isoformat()
     report["brave_freshness"] = args.freshness
