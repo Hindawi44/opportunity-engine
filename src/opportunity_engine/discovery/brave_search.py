@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 from collections.abc import Callable
+from datetime import date
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -13,6 +15,8 @@ from opportunity_engine.discovery.search_provider import SearchHit
 
 BRAVE_WEB_SEARCH_ENDPOINT = "https://api.search.brave.com/res/v1/web/search"
 Transport = Callable[[Request, float], bytes]
+_FRESHNESS_PRESETS = frozenset({"pd", "pw", "pm", "py"})
+_CUSTOM_FRESHNESS = re.compile(r"^(\d{4}-\d{2}-\d{2})to(\d{4}-\d{2}-\d{2})$")
 
 
 def _default_transport(request: Request, timeout: float) -> bytes:
@@ -31,6 +35,49 @@ def _http_error_message(exc: HTTPError) -> str:
     return f"Brave Search returned HTTP {exc.code}{suffix}"
 
 
+def _validated_freshness(value: str | None) -> str | None:
+    """Validate Brave freshness presets or an inclusive custom date range."""
+    if value is None:
+        return None
+    cleaned = value.strip()
+    if not cleaned:
+        return None
+    if cleaned in _FRESHNESS_PRESETS:
+        return cleaned
+    match = _CUSTOM_FRESHNESS.fullmatch(cleaned)
+    if not match:
+        raise ValueError(
+            "freshness must be pd, pw, pm, py, or YYYY-MM-DDtoYYYY-MM-DD"
+        )
+    start = date.fromisoformat(match.group(1))
+    end = date.fromisoformat(match.group(2))
+    if start > end:
+        raise ValueError("freshness start date must not be after end date")
+    return cleaned
+
+
+def _combined_description(item: dict[str, Any]) -> str:
+    """Combine the main snippet with bounded, deduplicated extra snippets."""
+    values: list[str] = []
+    description = item.get("description")
+    if isinstance(description, str):
+        values.append(description)
+    extra = item.get("extra_snippets")
+    if isinstance(extra, list):
+        values.extend(value for value in extra[:5] if isinstance(value, str))
+
+    snippets: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        cleaned = " ".join(value.split())
+        marker = cleaned.casefold()
+        if not cleaned or marker in seen:
+            continue
+        seen.add(marker)
+        snippets.append(cleaned)
+    return " | ".join(snippets)[:6000]
+
+
 class BraveSearchProvider:
     """Search the public web through Brave and normalize ordinary web results."""
 
@@ -44,6 +91,9 @@ class BraveSearchProvider:
         transport: Transport | None = None,
         max_retries: int = 3,
         retry_base_seconds: float = 1.0,
+        freshness: str | None = None,
+        extra_snippets: bool = False,
+        operators: bool = True,
     ) -> None:
         token = api_key.strip()
         if not token:
@@ -59,6 +109,9 @@ class BraveSearchProvider:
         self._transport = transport or _default_transport
         self._max_retries = max_retries
         self._retry_base_seconds = retry_base_seconds
+        self._freshness = _validated_freshness(freshness)
+        self._extra_snippets = bool(extra_snippets)
+        self._operators = bool(operators)
 
     def search(self, query: str, *, count: int = 10) -> list[SearchHit]:
         clean_query = " ".join(query.split())
@@ -71,19 +124,25 @@ class BraveSearchProvider:
         # language parameters are strict enums and rejected the previous `no`
         # value with HTTP 422. Keep geographic targeting and let Brave infer
         # language from the query text.
-        params = urlencode({
+        params: dict[str, str | int] = {
             "q": clean_query,
             "count": count,
             "country": "NO",
             "safesearch": "moderate",
             "result_filter": "web",
-        })
+            "operators": "true" if self._operators else "false",
+        }
+        if self._freshness:
+            params["freshness"] = self._freshness
+        if self._extra_snippets:
+            params["extra_snippets"] = "true"
+
         request = Request(
-            f"{BRAVE_WEB_SEARCH_ENDPOINT}?{params}",
+            f"{BRAVE_WEB_SEARCH_ENDPOINT}?{urlencode(params)}",
             headers={
                 "Accept": "application/json",
                 "X-Subscription-Token": self._api_key,
-                "User-Agent": "OpportunityEngine/Discovery-1.4.2",
+                "User-Agent": "OpportunityEngine/Discovery-1.4.3",
             },
         )
 
@@ -132,7 +191,7 @@ def _parse_hits(payload: Any) -> list[SearchHit]:
             continue
         title = str(item.get("title") or "").strip()
         url = str(item.get("url") or "").strip()
-        description = str(item.get("description") or "").strip()
+        description = _combined_description(item)
         if not title or not url.startswith("https://") or url in seen_urls:
             continue
         seen_urls.add(url)
