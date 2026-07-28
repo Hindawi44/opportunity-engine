@@ -90,7 +90,10 @@ _SOURCE_CHANNEL_TERMS = (
 _CATEGORY_TERMS = (
     "filter", "sortering", "sorter", "treff", "fjern valg", "kategorier",
     "alle auksjoner", "nyeste auksjoner", "laveste bud", "høyeste bud",
+    "filtre", "pris, lav til høy", "pris, høy til lav",
+    "mest populære i kategorien", "side 1 av", "side1 av",
 )
+_RETAIL_CHECKOUT_TERMS = ("handlekurv", "til kassen", "fri frakt")
 _SINGLE_ITEM_TERMS = ("jakke", "kjole", "bukse", "skjorte", "genser", "frakk", "dress", "skjørt")
 _ENDED_TERMS = ("avsluttet", "utløpt", "solgt", "auksjonen er avsluttet", "ended", "expired")
 _UNAVAILABLE_TERMS = (
@@ -520,16 +523,32 @@ def _parse_money(raw: str) -> float | None:
     normalized = re.sub(r"[^0-9,.\s]", "", normalized)
     if not normalized:
         return None
+    normalized = normalized.replace(" ", "")
     if "," in normalized and "." in normalized:
-        if normalized.rfind(",") > normalized.rfind("."):
-            normalized = normalized.replace(".", "").replace(",", ".")
+        decimal_separator = (
+            "," if normalized.rfind(",") > normalized.rfind(".") else "."
+        )
+        thousands_separator = "." if decimal_separator == "," else ","
+        decimal_digits = len(normalized.rsplit(decimal_separator, 1)[-1])
+        if decimal_digits <= 2:
+            normalized = normalized.replace(thousands_separator, "")
+            normalized = normalized.replace(decimal_separator, ".")
         else:
-            normalized = normalized.replace(",", "")
+            normalized = normalized.replace(",", "").replace(".", "")
     elif "," in normalized:
         pieces = normalized.split(",")
-        normalized = "".join(pieces[:-1]) + "." + pieces[-1] if len(pieces[-1]) <= 2 else "".join(pieces)
-    else:
-        normalized = normalized.replace(" ", "").replace(".", "")
+        normalized = (
+            "".join(pieces[:-1]) + "." + pieces[-1]
+            if len(pieces[-1]) <= 2
+            else "".join(pieces)
+        )
+    elif "." in normalized:
+        pieces = normalized.split(".")
+        normalized = (
+            "".join(pieces[:-1]) + "." + pieces[-1]
+            if len(pieces[-1]) <= 2
+            else "".join(pieces)
+        )
     try:
         value = float(normalized)
     except ValueError:
@@ -665,8 +684,11 @@ def _page_role(
     currency_count = len(re.findall(r"(?:kr|nok)\s*[0-9]|[0-9]\s*(?:kr|nok)", visible, re.I))
     quantity_count = len(re.findall(r"\b\d{2,6}\s*(?:stk|plagg|varer|enheter|par)\b", visible, re.I))
     category_hits = sum(term in normalized for term in _CATEGORY_TERMS)
+    retail_checkout_hits = sum(term in normalized for term in _RETAIL_CHECKOUT_TERMS)
     if multiple_structured_items or multiple_containers or (
         category_hits >= 2 and (currency_count >= 2 or quantity_count >= 2)
+    ) or (
+        currency_count >= 2 and category_hits >= 1 and retail_checkout_hits >= 1
     ):
         return CATEGORY_INDEX
     event_scenario, event_hits = _scenario_from_text(normalized)
