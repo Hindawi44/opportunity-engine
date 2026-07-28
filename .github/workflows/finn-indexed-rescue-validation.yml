@@ -1,0 +1,58 @@
+name: FINN Indexed Listing Rescue Validation
+
+on:
+  push:
+    branches:
+      - agent/finn-indexed-rescue-test-v1
+    paths:
+      - ".github/workflows/finn-indexed-rescue-validation.yml"
+      - "src/opportunity_engine/discovery/finn_indexed_rescue.py"
+      - "scripts/run_finn_indexed_rescue.py"
+      - "tests/test_finn_indexed_rescue.py"
+  workflow_dispatch:
+
+jobs:
+  rescue-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run focused offline regressions
+        env:
+          PYTHONPATH: src:.
+        run: |
+          pip install pytest
+          pytest tests/test_finn_indexed_rescue.py -q
+      - name: Run live Brave FINN indexed retrieval
+        id: rescue
+        continue-on-error: true
+        env:
+          PYTHONPATH: src:.
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+        run: |
+          python scripts/run_finn_indexed_rescue.py \
+            --freshness py \
+            --results-per-query 20 \
+            --minimum-specific-items 5 \
+            --output-dir artifacts/finn-indexed-rescue
+      - name: Show rescue summary
+        if: ${{ always() }}
+        run: |
+          summary="artifacts/finn-indexed-rescue/finn-indexed-rescue-summary.txt"
+          if [ -f "$summary" ]; then
+            cat "$summary"
+          else
+            echo "FINN indexed rescue summary was not created."
+          fi
+      - name: Upload rescue artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: finn-indexed-rescue-validation
+          path: artifacts/finn-indexed-rescue/
+          if-no-files-found: error
+      - name: Preserve objective rescue result
+        if: ${{ always() && steps.rescue.outcome == 'failure' }}
+        run: exit 1
