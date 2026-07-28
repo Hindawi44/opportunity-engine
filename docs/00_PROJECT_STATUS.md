@@ -114,19 +114,19 @@ No schedule or automatic execution is added.
 
 ## Current phase
 
-**Phase:** Authorized FINN Playwright Collection Pilot
+**Phase:** FINN Saved-Search Email Intake Pilot
 **Status:** `IN_IMPLEMENTATION`
 
 ## Current implementation checkpoint
 
 ```text
-FINN_PLAYWRIGHT_PILOT_ADAPTER_v1.0
+FINN_SAVED_SEARCH_EMAIL_INTAKE_ADAPTER_v1.0
 ```
 
 Current task document:
 
 ```text
-docs/FINN_PLAYWRIGHT_PILOT_ADAPTER_TASK_v1.0.md
+docs/FINN_SAVED_SEARCH_EMAIL_INTAKE_ADAPTER_TASK_v1.0.md
 ```
 
 ## Current implementation contract
@@ -135,18 +135,19 @@ The implementation must:
 
 1. remain limited to `CLOTHING_INVENTORY`;
 2. act only as a replaceable Discovery collection adapter;
-3. require an explicit written FINN automation-permission reference before any
-   browser launch;
-4. collect only 20–50 public listings per manual run;
-5. enforce a delay of at least two seconds between public-page visits;
-6. accept only public HTTPS FINN Torget search and item URLs;
-7. collect title, URL, description, verified price and location when available,
-   public image URLs, listing status, stable listing ID, capture time, and search
-   URL;
-8. preserve unavailable values as `null`;
-9. pass rendered pages through the existing bounded Clothing Inventory verifier;
-10. write the existing four Discovery artifacts plus one raw collection artifact;
-11. preserve all Analysis Engine and commercial-safety boundaries.
+3. parse only operator-supplied messages from `agent@finn.no` with a FINN
+   new-advert subject;
+4. decode FINN tracking URLs locally without following them;
+5. accept only stable FINN item IDs and reject control/search links;
+6. deduplicate stable listing IDs;
+7. retain email price and location only as unverified source claims;
+8. mark symbolic prices such as `1 kr` or request/contact wording;
+9. keep every accepted lead at `STRONG_LEAD_REQUIRES_VERIFICATION`;
+10. keep `analysis_eligible=false` until the existing manual verification
+    boundary passes;
+11. write the existing four Discovery artifacts plus one sanitized intake
+    artifact;
+12. preserve all Analysis Engine and commercial-safety boundaries.
 
 ## Strict confirmation conjunction
 
@@ -166,23 +167,26 @@ Search snippets alone cannot confirm a sale.
 ## Approved implementation scope
 
 ```text
-src/opportunity_engine/discovery/finn_playwright_pilot.py
-scripts/run_finn_playwright_clothing_pilot.py
-tests/test_finn_playwright_clothing_pilot.py
-requirements-playwright.txt
-docs/FINN_PLAYWRIGHT_PILOT_ADAPTER_TASK_v1.0.md
+src/opportunity_engine/discovery/finn_email_intake.py
+scripts/run_finn_email_intake.py
+tests/test_finn_email_intake.py
+docs/FINN_SAVED_SEARCH_EMAIL_INTAKE_ADAPTER_TASK_v1.0.md
+docs/decisions/DECISION_002_FINN_SAVED_SEARCH_EMAIL_INTAKE.md
+docs/MASTER_BLUEPRINT.md
+README.md
 docs/00_PROJECT_STATUS.md
 ```
 
 ## Required regression outcomes
 
-- missing written-permission reference -> execution blocked before browser launch;
-- fewer than 20 or more than 50 requested listings -> rejected configuration;
-- delay below two seconds -> rejected configuration;
-- non-FINN or non-search seed URL -> rejected configuration;
-- duplicate FINN listing IDs -> one collected record;
-- rendered page verification failure -> unresolved lead, never confirmed sale;
-- public image URLs -> retained with the Discovery candidate;
+- wrong sender or non-alert subject -> rejected message;
+- FINN click-tracking and direct item links -> one stable record;
+- saved-search, unsubscribe, edit, and help links -> rejected;
+- duplicate FINN item IDs -> one collected lead;
+- `1 kr` or request/contact wording -> symbolic, never a verified price;
+- non-Clothing saved-search results -> excluded from Discovery Top 5;
+- no page request, tracking-link visit, or browser launch;
+- raw message body, recipient, and mailbox message ID -> absent from artifacts;
 - existing Discovery report fields and safety flags -> retained.
 
 ## Non-negotiable rules
@@ -197,11 +201,13 @@ docs/00_PROJECT_STATUS.md
 - Do not modify V2.8–V3.7 financial formulas.
 - Do not modify investment scoring or decision intelligence.
 - Do not invent price, quantity, company, location, or active status.
+- Do not add a mailbox poller, schedule, or workflow in this task.
 - Do not contact sellers.
 - Do not bid, reserve, purchase, or pay.
 - Do not log in, import session cookies, rotate proxies, bypass CAPTCHA, or bypass
   access controls.
-- Do not run the FINN pilot without explicit written permission from FINN.
+- Do not follow any FINN or tracking URL from an alert message.
+- Do not run the Playwright pilot without explicit written permission from FINN.
 
 ## Definition of current-task success
 
@@ -209,20 +215,23 @@ The implementation succeeds only when:
 
 1. all mandatory focused tests pass;
 2. all repository checks pass;
-3. authorization and volume gates fail closed;
-4. Playwright remains an optional dependency;
-5. the pilot supports 20–50 listings without changing the sixteen-query matrix;
-6. rendered public evidence uses the existing verifier;
-7. images and capture provenance remain traceable;
-8. `UNKNOWN` never becomes `CONFIRMED_SALE`;
+3. sender, subject, item-link, and deduplication gates fail closed;
+4. real FINN email-link shapes normalize without network access;
+5. the sixteen-query matrix remains unchanged;
+6. email price and location remain unverified source evidence;
+7. every intake candidate remains `UNKNOWN` and Analysis-blocked;
+8. sanitized capture provenance remains traceable;
 9. no live FINN collection is performed during implementation or CI;
-10. no Analysis Engine or commercial-action boundary is crossed.
+10. existing Playwright regressions remain passing;
+11. no Analysis Engine or commercial-action boundary is crossed.
 
 ## Immediate next action
 
-Complete and merge the bounded adapter only after all checks pass. Do not run the
-live FINN pilot until explicit written automation permission exists. Once it
-exists, run one manual 20-listing pilot, inspect all five artifacts, and pass only
-a confirmed, traceable specific listing to the existing Opportunity Dossier
-boundary. An empty result is acceptable and must not be replaced with an
-invented opportunity.
+Complete and merge the email intake adapter only after all checks pass. Then
+create Clothing Inventory saved searches in FINN and wait for the first genuine
+alert. Supply that message to the adapter, inspect all five artifacts, manually
+verify only the strongest specific advert, and pass it to the existing
+Opportunity Dossier boundary only if the strict confirmation conjunction passes.
+An empty result is acceptable and must not be replaced with an invented
+opportunity. The live Playwright pilot remains frozen until explicit written
+automation permission exists.

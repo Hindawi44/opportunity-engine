@@ -23,7 +23,8 @@
 - `Auksjonen.no`: ACTIVE.
 - `Konkurs.app`: ACTIVE كقناة إشارات إفلاس، وليس دليل بيع مباشر.
 - `Politiet.no`: ACTIVE كقناة أحداث مزادات عامة.
-- `FINN.no`: BLOCKED_AUTH حتى توفير الوصول الرسمي.
+- `FINN.no`: CODE_READY عبر مدخل رسائل البحث المحفوظ للـLeads فقط؛ يبقى
+  API والمتصفح الحي `BLOCKED_AUTH` حتى توفير الوصول أو الإذن الرسمي.
 - `Konkurskupp` و`Bjarøy`: BLOCKED_AUTH حتى توفير Feed مصرح.
 - بقية المصادر موثقة في `data/source_gap_matrix.json` كـ `PLANNED` أو `DEPRECATED` عند اتخاذ القرار بذلك.
 
