@@ -9,6 +9,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -128,6 +129,12 @@ _GENERIC_TITLES = (
 _LISTING_PATH_TERMS = (
     "/lot/", "/listing/", "/item/", "/product/", "/produkt/", "/annonse/",
     "/auksjon/", "/auction/",
+)
+_NUMERIC_PATH_TOKEN = re.compile(r"(?:^|[/_-])(\d{3,})(?:$|[/_-])")
+_DATED_EDITORIAL_PATH = re.compile(
+    r"(?:^|/)((?:19|20)\d{2})/"
+    r"(?:0?[1-9]|1[0-2])/"
+    r"(?:0?[1-9]|[12]\d|3[01])(?:/|$)"
 )
 
 
@@ -344,20 +351,34 @@ def _generic_title(title: str) -> bool:
     return not normalized or any(normalized == term or normalized.startswith(f"{term} |") for term in _GENERIC_TITLES)
 
 
+def _listing_id_from_path(path: str) -> str | None:
+    """Return a numeric listing ID without treating YYYY/MM/DD as an ID."""
+    dated_year_spans = [
+        match.span(1)
+        for match in _DATED_EDITORIAL_PATH.finditer(path)
+    ]
+    for match in _NUMERIC_PATH_TOKEN.finditer(path):
+        token_start = match.start(1)
+        if any(start <= token_start < end for start, end in dated_year_spans):
+            continue
+        return match.group(1)
+    return None
+
+
 def _stable_identity(url: str, title: str, text: str = "") -> tuple[bool, str | None]:
     canonical = normalize_public_url(url)
     if not canonical or _generic_title(title):
         return False, None
     parsed = urlparse(canonical)
     path = parsed.path.lower()
-    id_match = re.search(r"(?:^|[/_-])(\d{3,})(?:$|[/_-])", path)
+    listing_id = _listing_id_from_path(path)
     listing_path = any(term in path for term in _LISTING_PATH_TERMS)
     title_tokens = _entity_tokens(title)
     specific_title = len(title_tokens) >= 2 and not any(
         generic in _normalized_text(title) for generic in ("alle produkter", "kategorier", "om oss")
     )
-    if id_match:
-        return True, f"url-id:{id_match.group(1)}"
+    if listing_id:
+        return True, f"url-id:{listing_id}"
     if listing_path and specific_title:
         return True, f"item-url:{canonical}"
     event_scenario, event_hits = _scenario_from_text(_normalized_text(title, text))
@@ -390,7 +411,7 @@ def classify_search_hit(hit: SearchHit, query: DiscoveryQuery) -> CandidateObser
     parsed_path = urlparse(canonical_url).path.lower()
     page_role_hint = ITEM_LISTING if identity_stable and (
         any(term in parsed_path for term in _LISTING_PATH_TERMS)
-        or bool(re.search(r"(?:^|[/_-])\d{3,}(?:$|[/_-])", parsed_path))
+        or _listing_id_from_path(parsed_path) is not None
     ) else UNRESOLVED_SOURCE
 
     if any(term in text for term in _JOB_TERMS):
@@ -730,10 +751,7 @@ def verify_public_html(url: str, decoded: str) -> PageVerification:
     meta_description = _extract_meta_description(decoded)
     visible = _strip_html(decoded)[:20000]
     unavailable_text = _normalized_text(title, visible)
-    listing_id = re.search(
-        r"(?:^|[/_-])(\d{3,})(?:$|[/_-])",
-        urlparse(canonical).path.lower(),
-    )
+    listing_id = _listing_id_from_path(urlparse(canonical).path.lower())
     if listing_id and any(term in unavailable_text for term in _UNAVAILABLE_TERMS):
         return PageVerification(
             url=canonical,
@@ -741,7 +759,7 @@ def verify_public_html(url: str, decoded: str) -> PageVerification:
             text=visible[:1000],
             listing_status=ENDED,
             page_role=ITEM_LISTING,
-            opportunity_identity=f"url-id:{listing_id.group(1)}",
+            opportunity_identity=f"url-id:{listing_id}",
             identity_stable=True,
             verified=True,
             error="listing unavailable",
@@ -1165,6 +1183,165 @@ def run_clothing_inventory_discovery(
         "all_discovered_candidates": all_payload,
         "discovery_top5": top5_payload,
     }
+
+
+def _decisive_active_item_verification(candidate: Mapping[str, Any]) -> bool:
+    """Require bounded public evidence for the final Top 5 boundary."""
+    candidate_identity = candidate.get("opportunity_identity")
+    for verification in candidate.get("verification") or []:
+        if not isinstance(verification, Mapping):
+            continue
+        verified_identity = verification.get("opportunity_identity")
+        identity_matches = (
+            not candidate_identity
+            or not verified_identity
+            or candidate_identity == verified_identity
+        )
+        if (
+            verification.get("verified") is True
+            and verification.get("page_role") == ITEM_LISTING
+            and verification.get("identity_stable") is True
+            and verification.get("listing_status") == ACTIVE
+            and verification.get("clothing_inventory_evidence") is True
+            and verification.get("sale_evidence") is True
+            and identity_matches
+        ):
+            return True
+    return False
+
+
+def _post_verification_block_reason(candidate: Mapping[str, Any]) -> str:
+    verifications = [
+        item
+        for item in candidate.get("verification") or []
+        if isinstance(item, Mapping)
+    ]
+    if candidate.get("listing_status") == ENDED or any(
+        item.get("listing_status") == ENDED for item in verifications
+    ):
+        return "listing_ended_or_unavailable"
+    if not verifications:
+        return "verification_not_attempted"
+    if any(item.get("verified") is not True for item in verifications):
+        return "verification_failed"
+    if candidate.get("page_role") != ITEM_LISTING or not any(
+        item.get("page_role") == ITEM_LISTING for item in verifications
+    ):
+        return "specific_item_listing_not_verified"
+    if candidate.get("identity_stable") is not True:
+        return "stable_identity_not_verified"
+    if candidate.get("listing_status") != ACTIVE:
+        return "active_status_not_verified"
+    if candidate.get("opportunity_state") != CONFIRMED_SALE:
+        return "bounded_sale_evidence_not_verified"
+    return "strict_confirmation_conjunction_failed"
+
+
+def apply_post_verification_top5_hard_gate(
+    result: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Fail closed before writing structured Discovery Top 5 artifacts.
+
+    This boundary intentionally does not change collection, verification, or
+    early-lead retention. It only permits a confirmed, active, bounded item
+    listing to remain visible in the final Top 5 and Analysis eligibility set.
+    """
+    corrected = deepcopy(dict(result))
+    candidates = corrected.get("all_discovered_candidates")
+    report = corrected.get("search_run_report")
+    if not isinstance(candidates, list) or not isinstance(report, dict):
+        raise ValueError("invalid Clothing Inventory discovery result")
+
+    blocked_reasons: dict[str, int] = {}
+    blocked_count = 0
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            raise ValueError("all_discovered_candidates must contain objects")
+        was_eligible = candidate.get("top5_eligible") is True
+        decisive_verification = _decisive_active_item_verification(candidate)
+        eligible = bool(
+            was_eligible
+            and decisive_verification
+            and candidate.get("page_role") == ITEM_LISTING
+            and candidate.get("identity_stable") is True
+            and candidate.get("listing_status") == ACTIVE
+            and candidate.get("opportunity_state") == CONFIRMED_SALE
+        )
+        candidate["top5_eligible"] = eligible
+        candidate["analysis_eligible"] = bool(
+            eligible and candidate.get("analysis_eligible") is True
+        )
+        if eligible:
+            candidate.pop("post_verification_top5_block_reason", None)
+            continue
+
+        reason = _post_verification_block_reason(candidate)
+        candidate["post_verification_top5_block_reason"] = reason
+        if was_eligible:
+            blocked_count += 1
+            blocked_reasons[reason] = blocked_reasons.get(reason, 0) + 1
+
+    eligible_candidates = [
+        candidate for candidate in candidates
+        if candidate.get("top5_eligible") is True
+    ]
+    top5 = sorted(
+        eligible_candidates,
+        key=lambda item: (
+            int(item.get("discovery_score") or 0),
+            len(item.get("source_urls") or []),
+            str(item.get("title") or ""),
+        ),
+        reverse=True,
+    )[:5]
+    corrected["discovery_top5"] = deepcopy(top5)
+
+    generic_roles = {
+        CATEGORY_INDEX,
+        SOURCE_CHANNEL,
+        ORDINARY_STORE,
+        ARTICLE_OR_INFO,
+        UNRESOLVED_SOURCE,
+    }
+    report.update({
+        "schema_version": "clothing-inventory-discovery-search-1.3",
+        "post_verification_top5_hard_gate_applied": True,
+        "post_verification_top5_blocked_count": blocked_count,
+        "post_verification_top5_block_reasons": blocked_reasons,
+        "rejected_results": sum(
+            candidate.get("opportunity_state") == REJECTED_NOISE
+            for candidate in candidates
+        ),
+        "confirmed_sales": sum(
+            candidate.get("opportunity_state") == CONFIRMED_SALE
+            and candidate.get("listing_status") == ACTIVE
+            for candidate in candidates
+        ),
+        "strong_leads_requiring_verification": sum(
+            candidate.get("opportunity_state") == STRONG_LEAD_REQUIRES_VERIFICATION
+            and candidate.get("listing_status") != ENDED
+            for candidate in candidates
+        ),
+        "ended_or_historical": sum(
+            candidate.get("listing_status") == ENDED for candidate in candidates
+        ),
+        "analysis_eligible_count": sum(
+            candidate.get("analysis_eligible") is True for candidate in candidates
+        ),
+        "top5_count": len(top5),
+        "top5_eligible_count": len(eligible_candidates),
+        "generic_pages_excluded": sum(
+            candidate.get("page_role") in generic_roles for candidate in candidates
+        ),
+        "opportunity_quality_status": (
+            "PASS" if top5 else "NO_VALID_OPPORTUNITIES"
+        ),
+        "no_opportunities_found": not top5,
+    })
+    report["automatic_contact"] = False
+    report["automatic_purchase_decision"] = False
+    report["financial_ranking_used"] = False
+    return corrected
 
 
 def write_discovery_artifacts(result: Mapping[str, Any], output_dir: str | Path) -> dict[str, Path]:
