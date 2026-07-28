@@ -87,6 +87,89 @@ def test_sale_snippet_is_only_a_lead_until_bounded_verification():
     assert result.page_role_hint == ITEM_LISTING
 
 
+FINN_CLOTHING_LOT_BENCHMARK = (
+    (
+        "Restlager fra norsk klesmerke – ca. 1000 plagg selges samlet",
+        "https://www.finn.no/recommerce/forsale/item/468124077",
+    ),
+    (
+        "Klesparti fra konkursbo: 511plagg med grafisk print (T-skjorter & hettegensere)",
+        "https://www.finn.no/recommerce/forsale/item/465971753",
+    ),
+    (
+        "STORT PARTISALG +/- 250 STK STRØMPEBUKSER",
+        "https://www.finn.no/recommerce/forsale/item/451674021",
+    ),
+    (
+        "PARTISALG 50 STK ASSORTERTE ARBEIDSJAKKER",
+        "https://www.finn.no/recommerce/forsale/item/450281607",
+    ),
+    (
+        "PARTISALG 100 STK ASSORTERTE ARBEIDSKLÆR",
+        "https://www.finn.no/recommerce/forsale/item/450279300",
+    ),
+    (
+        "PARTISALG ASSORTERTE PIQUÉ-SKJORTER (KUN SAMLET PARTI)",
+        "https://www.finn.no/recommerce/forsale/item/449770891",
+    ),
+)
+
+
+@pytest.mark.parametrize(("title", "url"), FINN_CLOTHING_LOT_BENCHMARK)
+def test_real_clothing_lot_titles_are_retained_without_needing_a_search_snippet(title, url):
+    result = classify_search_hit(
+        SearchHit(title, url, "", "Fake Search"),
+        query(scenario="LARGE_LOT_SALE", intent="SALE_INTENT"),
+    )
+    assert result.state == STRONG_LEAD_REQUIRES_VERIFICATION
+    assert result.page_role_hint == ITEM_LISTING
+    assert result.identity_stable is True
+
+
+def test_distinct_stable_listing_ids_keep_all_six_benchmark_candidates_separate():
+    q = DiscoveryQuery(
+        "benchmark",
+        "LARGE_LOT_SALE",
+        "SALE_INTENT",
+        "CLOTHING_INVENTORY",
+        "benchmark",
+    )
+    provider = FakeProvider({
+        "benchmark": [
+            SearchHit(title, url, "", "Fake Search")
+            for title, url in FINN_CLOTHING_LOT_BENCHMARK
+        ]
+    })
+
+    report = run_clothing_inventory_discovery(
+        provider,
+        queries=[q],
+        discovered_at=NOW,
+    )
+
+    assert report["search_run_report"]["merged_candidates"] == 6
+    assert report["search_run_report"]["strong_leads_requiring_verification"] == 6
+    assert len(report["discovery_top5"]) == 5
+    assert {
+        item["opportunity_state"] for item in report["all_discovered_candidates"]
+    } == {STRONG_LEAD_REQUIRES_VERIFICATION}
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "PARTISALG +/- 150 STK HVITVINSGLASS",
+        "Restlager fra nettbutikk – beauty, leker og diverse småvarer selges samlet",
+    ],
+)
+def test_bulk_sale_vocabulary_alone_does_not_create_clothing_scope(title):
+    result = classify_search_hit(
+        SearchHit(title, "https://market.example.no/item/9001", "", "Fake Search"),
+        query(scenario="LARGE_LOT_SALE", intent="SALE_INTENT"),
+    )
+    assert result.state == REJECTED_NOISE
+
+
 @pytest.mark.parametrize(
     ("title", "description", "reason"),
     [
