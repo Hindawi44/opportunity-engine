@@ -23,6 +23,7 @@ def test_client_builds_authorized_bounded_request_without_exposing_key(tmp_path)
     assert "q=butikkinnredning" in captured["url"]
     assert "count=5" in captured["url"]
     assert "country=NO" in captured["url"]
+    assert "search_lang=nb" in captured["url"]
     assert "secret-value" not in captured["url"]
     assert captured["headers"]["X-Subscription-Token"] == "secret-value"
 
