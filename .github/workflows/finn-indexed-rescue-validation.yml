@@ -9,6 +9,13 @@ on:
       - "src/opportunity_engine/discovery/finn_indexed_rescue.py"
       - "scripts/run_finn_indexed_rescue.py"
       - "tests/test_finn_indexed_rescue.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/finn-indexed-rescue-validation.yml"
+      - "src/opportunity_engine/discovery/finn_indexed_rescue.py"
+      - "scripts/run_finn_indexed_rescue.py"
+      - "tests/test_finn_indexed_rescue.py"
   workflow_dispatch:
 
 jobs:
