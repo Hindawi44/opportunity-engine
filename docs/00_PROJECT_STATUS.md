@@ -1,6 +1,6 @@
 # Opportunity Engine — Project Status
 
-**Last updated:** 2026-07-27  
+**Last updated:** 2026-07-28
 **Status:** ACTIVE  
 **Authoritative repository:** `Hindawi44/opportunity-engine`
 
@@ -87,6 +87,13 @@ No new domain implementation is approved until the Clothing Inventory path repea
 - The first live structured Discovery run completed successfully and produced reviewable artifacts.
 - That live run exposed five verification-integrity false positives; none was approved for dossier intake.
 - PR #312 defined the bounded Discovery verification-integrity correction task.
+- PR #313 implemented the fail-closed verification-integrity correction.
+- PR #314 added the source-channel identity guard.
+- PR #315 separated Discovery Top 5 eligibility from Analysis eligibility and
+  restored traceable early event leads.
+- PR #316 rejected mixed non-clothing inventory shells.
+- PR #317 added Norwegian Clothing Inventory lot vocabulary and preserved
+  distinct stable listing identities.
 
 ## Accepted operator surface
 
@@ -105,73 +112,41 @@ structured_clothing_discovery
 
 No schedule or automatic execution is added.
 
-## First structured live-run finding
-
-The live run proved:
-
-- all sixteen queries executed;
-- broad search coverage works;
-- duplicate merging works;
-- four artifacts are produced;
-- the operator workflow works;
-- no financial ranking or commercial action occurs.
-
-It also proved that the previous verifier could:
-
-- combine unrelated fields from category pages;
-- treat ordinary stores as bankruptcy opportunities;
-- treat source portals as opportunities;
-- extract `0 NOK` from shopping-cart context;
-- promote unknown or unresolved pages too aggressively.
-
-Therefore:
-
-```text
-No candidate from the first live discovery-top5.json is approved for Opportunity Dossier intake.
-```
-
 ## Current phase
 
-**Phase:** Clothing Inventory Discovery Verification Integrity Correction  
+**Phase:** Authorized FINN Playwright Collection Pilot
 **Status:** `IN_IMPLEMENTATION`
 
 ## Current implementation checkpoint
 
 ```text
-CLOTHING_INVENTORY_DISCOVERY_VERIFICATION_INTEGRITY_CORRECTION_IMPLEMENTATION
+FINN_PLAYWRIGHT_PILOT_ADAPTER_v1.0
 ```
 
 Current task document:
 
 ```text
-docs/CLOTHING_INVENTORY_DISCOVERY_VERIFICATION_INTEGRITY_CORRECTION_TASK_v1.0.md
+docs/FINN_PLAYWRIGHT_PILOT_ADAPTER_TASK_v1.0.md
 ```
 
 ## Current implementation contract
 
 The implementation must:
 
-1. assign each verified page exactly one role:
-
-```text
-ITEM_LISTING
-CATEGORY_INDEX
-SOURCE_CHANNEL
-ORDINARY_STORE
-ARTICLE_OR_INFO
-UNRESOLVED_SOURCE
-```
-
-2. require stable opportunity identity before confirmation;
-3. extract price, quantity, location, inventory type, sale evidence, and status from one bounded listing context;
-4. reject zero-value cart and placeholder prices;
-5. prevent query-scenario leakage;
-6. require all confirmation conditions for `CONFIRMED_SALE`;
-7. allow `UNKNOWN` only for a specific listing retained as `STRONG_LEAD_REQUIRES_VERIFICATION`;
-8. exclude category pages, source channels, ordinary stores, information pages, and unresolved generic sources from Top 5;
-9. output up to five valid opportunities rather than filling the list with weak records;
-10. separate execution health from opportunity-quality status;
-11. retain all commercial-safety boundaries.
+1. remain limited to `CLOTHING_INVENTORY`;
+2. act only as a replaceable Discovery collection adapter;
+3. require an explicit written FINN automation-permission reference before any
+   browser launch;
+4. collect only 20–50 public listings per manual run;
+5. enforce a delay of at least two seconds between public-page visits;
+6. accept only public HTTPS FINN Torget search and item URLs;
+7. collect title, URL, description, verified price and location when available,
+   public image URLs, listing status, stable listing ID, capture time, and search
+   URL;
+8. preserve unavailable values as `null`;
+9. pass rendered pages through the existing bounded Clothing Inventory verifier;
+10. write the existing four Discovery artifacts plus one raw collection artifact;
+11. preserve all Analysis Engine and commercial-safety boundaries.
 
 ## Strict confirmation conjunction
 
@@ -190,48 +165,32 @@ Search snippets alone cannot confirm a sale.
 
 ## Approved implementation scope
 
-Only these paths may change in the current implementation PR:
-
 ```text
-src/opportunity_engine/discovery/clothing_inventory_search.py
-tests/test_clothing_inventory_discovery_search.py
-tests/fixtures/clothing_inventory_discovery_verification/
+src/opportunity_engine/discovery/finn_playwright_pilot.py
+scripts/run_finn_playwright_clothing_pilot.py
+tests/test_finn_playwright_clothing_pilot.py
+requirements-playwright.txt
+docs/FINN_PLAYWRIGHT_PILOT_ADAPTER_TASK_v1.0.md
 docs/00_PROJECT_STATUS.md
 ```
 
 ## Required regression outcomes
 
-- Auksjonen category page -> `CATEGORY_INDEX`, no cross-combined fields, not Top 5.
-- Proffsport-style ordinary store -> `ORDINARY_STORE`, no bankruptcy inheritance, no `0 NOK` price.
-- AltPåSalg-style buyer/reseller -> `SOURCE_CHANNEL`, not an opportunity.
-- Specific motorcycle-clothing listing shell -> unresolved status, never confirmed.
-- Konkursnett-style portal timeout -> no promotion and no Top 5 entry.
-- One valid active specific Clothing Inventory listing -> `CONFIRMED_SALE`.
-- Ended listing -> historical only.
-- Fewer than five valid listings -> fewer than five Top 5 records.
-- Zero valid listings -> honest empty Top 5.
-
-## Report contract after correction
-
-`search-run-report.json` must separately report:
-
-```text
-execution_status
-opportunity_quality_status
-top5_eligible_count
-generic_pages_excluded
-verification_failures
-false_positive_guard_triggered
-```
-
-The compatibility field `status` reflects execution health only.
+- missing written-permission reference -> execution blocked before browser launch;
+- fewer than 20 or more than 50 requested listings -> rejected configuration;
+- delay below two seconds -> rejected configuration;
+- non-FINN or non-search seed URL -> rejected configuration;
+- duplicate FINN listing IDs -> one collected record;
+- rendered page verification failure -> unresolved lead, never confirmed sale;
+- public image URLs -> retained with the Discovery candidate;
+- existing Discovery report fields and safety flags -> retained.
 
 ## Non-negotiable rules
 
 - Do not modify the sixteen-query matrix.
 - Do not add a new opportunity domain.
 - Do not modify Brave credentials or provider behavior.
-- Do not modify workflows in this task.
+- Do not add or modify workflows, schedules, or automatic execution in this task.
 - Do not modify the Opportunity Dossier contract.
 - Do not modify confirmed-dossier intake.
 - Do not modify market-comparable or acquisition-cost logic.
@@ -240,8 +199,9 @@ The compatibility field `status` reflects execution health only.
 - Do not invent price, quantity, company, location, or active status.
 - Do not contact sellers.
 - Do not bid, reserve, purchase, or pay.
-- Do not add schedules or automatic execution.
-- Do not hard-code production behavior around named websites; named cases are regression examples only.
+- Do not log in, import session cookies, rotate proxies, bypass CAPTCHA, or bypass
+  access controls.
+- Do not run the FINN pilot without explicit written permission from FINN.
 
 ## Definition of current-task success
 
@@ -249,33 +209,20 @@ The implementation succeeds only when:
 
 1. all mandatory focused tests pass;
 2. all repository checks pass;
-3. the five live false-positive cases produce conservative outcomes;
-4. category pages and source channels cannot enter Top 5;
-5. ordinary stores cannot inherit bankruptcy confirmation from search queries;
-6. commercial fields come from one bounded listing context;
-7. `UNKNOWN` never becomes `CONFIRMED_SALE`;
-8. Top 5 may contain fewer than five records;
-9. execution success is separate from opportunity-quality success;
+3. authorization and volume gates fail closed;
+4. Playwright remains an optional dependency;
+5. the pilot supports 20–50 listings without changing the sixteen-query matrix;
+6. rendered public evidence uses the existing verifier;
+7. images and capture provenance remain traceable;
+8. `UNKNOWN` never becomes `CONFIRMED_SALE`;
+9. no live FINN collection is performed during implementation or CI;
 10. no Analysis Engine or commercial-action boundary is crossed.
 
 ## Immediate next action
 
-Complete and merge the current correction implementation PR only after all checks pass.
-
-Then manually rerun:
-
-```text
-1 — Discover Clothing Inventory Opportunities
-operation = structured_clothing_discovery
-```
-
-Inspect:
-
-```text
-search-run-report.json
-all-discovered-candidates.json
-discovery-top5.json
-operator-summary.txt
-```
-
-Only a specific traceable candidate that passes the corrected gate may proceed to the existing Opportunity Dossier boundary. An empty result is acceptable and must not be replaced with an invented opportunity.
+Complete and merge the bounded adapter only after all checks pass. Do not run the
+live FINN pilot until explicit written automation permission exists. Once it
+exists, run one manual 20-listing pilot, inspect all five artifacts, and pass only
+a confirmed, traceable specific listing to the existing Opportunity Dossier
+boundary. An empty result is acceptable and must not be replaced with an
+invented opportunity.
