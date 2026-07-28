@@ -183,4 +183,9 @@ def test_live_runner_applies_early_opportunity_gate_before_artifact_writing():
     ).read_text(encoding="utf-8")
     assert "raw_result = run_clothing_inventory_discovery(" in script
     assert "result = apply_early_opportunity_gate(raw_result)" in script
-    assert script.index("apply_early_opportunity_gate(raw_result)") < script.index("paths = write_discovery_artifacts")
+    assert "result = apply_post_verification_top5_hard_gate(result)" in script
+    assert (
+        script.index("apply_early_opportunity_gate(raw_result)")
+        < script.index("apply_post_verification_top5_hard_gate(result)")
+        < script.index("paths = write_discovery_artifacts")
+    )

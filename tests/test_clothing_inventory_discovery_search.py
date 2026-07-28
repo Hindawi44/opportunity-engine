@@ -20,6 +20,7 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     DiscoveryQuery,
     PageVerification,
     _parse_money,
+    apply_post_verification_top5_hard_gate,
     classify_search_hit,
     normalize_public_url,
     run_clothing_inventory_discovery,
@@ -87,6 +88,36 @@ def test_sale_snippet_is_only_a_lead_until_bounded_verification():
     )
     assert result.state == STRONG_LEAD_REQUIRES_VERIFICATION
     assert result.page_role_hint == ITEM_LISTING
+
+
+@pytest.mark.parametrize(
+    ("url", "year"),
+    [
+        (
+            "https://dagsavisen.no/rogaland/roganytt/2024/01/24/"
+            "klesbutikk-pa-kjopesenter-gikk-konkurs",
+            "2024",
+        ),
+        (
+            "https://dagsavisen.no/rogalandsavis/nyheter/2020/03/17/"
+            "klesbutikk-i-kjopesenter-gikk-konkurs",
+            "2020",
+        ),
+    ],
+)
+def test_dated_editorial_url_year_is_not_a_listing_identity(url, year):
+    result = classify_search_hit(
+        SearchHit(
+            "Klesbutikk på kjøpesenter gikk konkurs – Dagsavisen",
+            url,
+            "Klesbutikk gikk konkurs. Varelager er omtalt i nyhetsartikkelen.",
+            "Search",
+        ),
+        query(),
+    )
+
+    assert result.page_role_hint == UNRESOLVED_SOURCE
+    assert result.opportunity_identity != f"url-id:{year}"
 
 
 FINN_CLOTHING_LOT_BENCHMARK = (
@@ -367,6 +398,144 @@ def test_unavailable_auksjonen_listing_is_excluded_from_top5_analysis_and_dossie
     assert result["discovery_top5"] == []
     assert result["search_run_report"]["analysis_eligible_count"] == 0
     assert "dossier" not in result
+
+
+def test_post_verification_hard_gate_rejects_live_run_76_false_top5():
+    q = DiscoveryQuery(
+        "live-76",
+        "COMPANY_BANKRUPTCY",
+        "EVENT_LEAD",
+        "CLOTHING_INVENTORY",
+        "live-76",
+    )
+    dagsavisen_2024 = (
+        "https://dagsavisen.no/rogaland/roganytt/2024/01/24/"
+        "klesbutikk-pa-kjopesenter-gikk-konkurs"
+    )
+    dagsavisen_2020 = (
+        "https://dagsavisen.no/rogalandsavis/nyheter/2020/03/17/"
+        "klesbutikk-i-kjopesenter-gikk-konkurs"
+    )
+    auksjonen_445743 = (
+        "https://auksjonen.no/auksjon/torget/"
+        "Helt_nytt_stort_vareparti_MC_utstyr__motorsykkel_kl%C3%A6r_Crossutstyr/"
+        "445743"
+    )
+    provider = FakeProvider({
+        "live-76": [
+            SearchHit(
+                "Klesbutikk på kjøpesenter gikk konkurs – Dagsavisen",
+                dagsavisen_2024,
+                "Klesbutikk gikk konkurs. Varelager er omtalt.",
+                "Brave Search",
+            ),
+            SearchHit(
+                "Klesbutikk i kjøpesenter gikk konkurs – Dagsavisen",
+                dagsavisen_2020,
+                "Klesbutikk gikk konkurs.",
+                "Brave Search",
+            ),
+            SearchHit(
+                "Helt nytt stort vareparti MC utstyr / motorsykkel klær ...",
+                auksjonen_445743,
+                "Vareparti klær på auksjon.",
+                "Brave Search",
+            ),
+        ]
+    })
+
+    def verifier(url):
+        if "dagsavisen.no" in url:
+            return PageVerification(
+                url=url,
+                page_role=UNRESOLVED_SOURCE,
+                verified=False,
+                error="HTTP Error 403: Forbidden" if "2024" in url else "HTTP Error 404: Not Found",
+            )
+        return PageVerification(
+            url=url,
+            text="Nyhet Nye Auksjonen.no er her. Raskere, ryddigere og bedre på mobil. Prøv nå →",
+            page_role=UNRESOLVED_SOURCE,
+            verified=False,
+            error="insufficient public listing content",
+        )
+
+    raw = run_clothing_inventory_discovery(
+        provider,
+        queries=[q],
+        discovered_at=NOW,
+        verifier=verifier,
+    )
+    recovered = apply_early_opportunity_gate(raw)
+    result = apply_post_verification_top5_hard_gate(recovered)
+
+    assert result["discovery_top5"] == []
+    assert result["search_run_report"]["top5_count"] == 0
+    assert result["search_run_report"]["top5_eligible_count"] == 0
+    assert result["search_run_report"]["no_opportunities_found"] is True
+    assert (
+        result["search_run_report"]["opportunity_quality_status"]
+        == "NO_VALID_OPPORTUNITIES"
+    )
+
+    by_url = {
+        url: candidate
+        for candidate in result["all_discovered_candidates"]
+        for url in candidate["source_urls"]
+    }
+    for url in (dagsavisen_2024, dagsavisen_2020):
+        assert by_url[url]["opportunity_state"] == REJECTED_NOISE
+        assert by_url[url]["top5_eligible"] is False
+        assert by_url[url]["analysis_eligible"] is False
+
+    auksjonen = by_url[auksjonen_445743]
+    assert auksjonen["opportunity_state"] == STRONG_LEAD_REQUIRES_VERIFICATION
+    assert auksjonen["listing_status"] == UNKNOWN
+    assert auksjonen["top5_eligible"] is False
+    assert auksjonen["analysis_eligible"] is False
+    assert auksjonen["post_verification_top5_block_reason"] == "verification_failed"
+    assert auksjonen["price_nok"] is None
+    assert auksjonen["bid_price_nok"] is None
+    assert auksjonen["quantity"] is None
+    assert auksjonen["location"] is None
+    assert "dossier" not in result
+
+
+def test_post_verification_hard_gate_keeps_confirmed_active_listing():
+    verified = verify_public_html(
+        "https://estate.example.no/auksjon/7001",
+        fixture("valid-active-item-listing.html"),
+    )
+    q = DiscoveryQuery(
+        "confirmed",
+        "AUCTION",
+        "SALE_INTENT",
+        "CLOTHING_INVENTORY",
+        "confirmed",
+    )
+    raw = run_clothing_inventory_discovery(
+        FakeProvider({
+            "confirmed": [SearchHit(
+                "Sport AS konkursbo – hele varelageret selges",
+                "https://estate.example.no/auksjon/7001",
+                "Sportsklær og sko i konkursbo.",
+                "Search",
+            )]
+        }),
+        queries=[q],
+        discovered_at=NOW,
+        verifier=lambda url: verified,
+    )
+    recovered = apply_early_opportunity_gate(raw)
+    result = apply_post_verification_top5_hard_gate(recovered)
+
+    assert len(result["discovery_top5"]) == 1
+    top = result["discovery_top5"][0]
+    assert top["opportunity_state"] == CONFIRMED_SALE
+    assert top["listing_status"] == ACTIVE
+    assert top["top5_eligible"] is True
+    assert top["analysis_eligible"] is True
+    assert result["search_run_report"]["opportunity_quality_status"] == "PASS"
 
 
 def test_live_regression_konkursnett_timeout_cannot_promote_generic_portal():

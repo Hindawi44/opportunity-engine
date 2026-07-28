@@ -8,6 +8,7 @@ from pathlib import Path
 
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.clothing_inventory_search import (
+    apply_post_verification_top5_hard_gate,
     run_clothing_inventory_discovery,
     verify_public_page,
     write_discovery_artifacts,
@@ -53,6 +54,7 @@ def main() -> int:
         verification_limit=args.verification_limit,
     )
     result = apply_early_opportunity_gate(raw_result)
+    result = apply_post_verification_top5_hard_gate(result)
     paths = write_discovery_artifacts(result, Path(args.output_dir))
     report = result["search_run_report"]
     print(f"Status: {report['status']}")
