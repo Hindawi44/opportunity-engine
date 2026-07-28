@@ -25,6 +25,7 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     verify_public_html,
     write_discovery_artifacts,
 )
+from opportunity_engine.discovery.early_opportunity_gate import apply_early_opportunity_gate
 from opportunity_engine.discovery.search_provider import SearchHit
 
 NOW = "2026-07-27T12:00:00+00:00"
@@ -237,6 +238,61 @@ def test_live_regression_motorcycle_listing_shell_is_unresolved():
     assert result.page_role == UNRESOLVED_SOURCE
     assert result.verified is False
     assert result.listing_status == UNKNOWN
+
+
+def test_unavailable_auksjonen_listing_is_ended_without_invented_commercial_fields():
+    result = verify_public_html(
+        "https://auksjonen.no/auksjon/torget/motorsykkel-klaer/445743",
+        fixture("auksjonen-unavailable-445743.html"),
+    )
+
+    assert result.page_role == ITEM_LISTING
+    assert result.opportunity_identity == "url-id:445743"
+    assert result.identity_stable is True
+    assert result.listing_status == ENDED
+    assert result.verified is True
+    assert result.error == "listing unavailable"
+    assert result.price_nok is None
+    assert result.bid_price_nok is None
+    assert result.quantity is None
+    assert result.location is None
+    assert result.inventory_type is None
+
+
+def test_unavailable_auksjonen_listing_is_excluded_from_top5_analysis_and_dossier():
+    q = DiscoveryQuery("q", "AUCTION", "SALE_INTENT", "CLOTHING_INVENTORY", "lead")
+    provider = FakeProvider({
+        "lead": [SearchHit(
+            "Helt nytt stort vareparti MC utstyr / motorsykkel klær / Crossutstyr",
+            "https://auksjonen.no/auksjon/torget/motorsykkel-klaer/445743",
+            "Vareparti klær på auksjon.",
+            "Search",
+        )]
+    })
+    verification = verify_public_html(
+        "https://auksjonen.no/auksjon/torget/motorsykkel-klaer/445743",
+        fixture("auksjonen-unavailable-445743.html"),
+    )
+
+    raw = run_clothing_inventory_discovery(
+        provider,
+        queries=[q],
+        discovered_at=NOW,
+        verifier=lambda url: verification,
+    )
+    result = apply_early_opportunity_gate(raw)
+
+    candidate = result["all_discovered_candidates"][0]
+    assert candidate["listing_status"] == ENDED
+    assert candidate["top5_eligible"] is False
+    assert candidate["analysis_eligible"] is False
+    assert candidate["price_nok"] is None
+    assert candidate["bid_price_nok"] is None
+    assert candidate["quantity"] is None
+    assert candidate["location"] is None
+    assert result["discovery_top5"] == []
+    assert result["search_run_report"]["analysis_eligible_count"] == 0
+    assert "dossier" not in result
 
 
 def test_live_regression_konkursnett_timeout_cannot_promote_generic_portal():
