@@ -253,6 +253,67 @@ def test_unknown_status_specific_listing_remains_lead_not_confirmed():
     assert top["listing_status"] == UNKNOWN
 
 
+def test_unresolved_auksjonen_listing_keeps_independent_clothing_inventory_lead():
+    q = DiscoveryQuery("q", "AUCTION", "SALE_INTENT", "CLOTHING_INVENTORY", "lead")
+    provider = FakeProvider({
+        "lead": [SearchHit(
+            "Helt nytt stort vareparti MC utstyr / motorsykkel klær / Crossutstyr",
+            "https://auction.example.no/auksjon/445743",
+            "Vareparti klær på auksjon.",
+            "Search",
+        )]
+    })
+
+    report = run_clothing_inventory_discovery(
+        provider,
+        queries=[q],
+        discovered_at=NOW,
+        verifier=lambda url: PageVerification(
+            url=url,
+            error="insufficient public listing content",
+        ),
+    )
+
+    top = report["discovery_top5"][0]
+    assert top["opportunity_state"] == STRONG_LEAD_REQUIRES_VERIFICATION
+    assert top["top5_eligible"] is True
+    assert top["listing_status"] == UNKNOWN
+
+
+def test_mixed_non_clothing_inventory_listing_cannot_enter_top5():
+    q = DiscoveryQuery(
+        "q",
+        "WAREHOUSE_SURPLUS",
+        "SALE_INTENT",
+        "CLOTHING_INVENTORY",
+        "mixed inventory",
+    )
+    title = "Varelager fra nedlagt nettbutikk selges samlet – masse nye varer"
+    provider = FakeProvider({
+        "mixed inventory": [SearchHit(
+            title,
+            "https://market.example.no/item/465782612",
+            "Komplett restlager med beauty, leker og diverse småvarer selges samlet.",
+            "Search",
+        )]
+    })
+
+    report = run_clothing_inventory_discovery(
+        provider,
+        queries=[q],
+        discovered_at=NOW,
+        verifier=lambda url: PageVerification(url=url, error="HTTP Error 403: Forbidden"),
+    )
+
+    assert report["discovery_top5"] == []
+    candidate = next(
+        item for item in report["all_discovered_candidates"] if item["title"] == title
+    )
+    assert candidate["opportunity_state"] == REJECTED_NOISE
+    assert candidate["top5_eligible"] is False
+    assert set(candidate["evidence_signals"]) == {"restlager", "varelager", "selges"}
+
+
 def test_ordinary_store_from_bankruptcy_query_does_not_keep_bankruptcy_scenario():
     q = DiscoveryQuery("q", "COMPANY_BANKRUPTCY", "SPECIALIZED", "CLOTHING_INVENTORY", "store")
     provider = FakeProvider({
