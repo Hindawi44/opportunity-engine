@@ -35,6 +35,7 @@ def _write_validation_summary(payload: dict, path: Path) -> None:
         "SOURCE-TARGETED CLOTHING RETRIEVAL",
         "==================================",
         f"Status: {payload['validation_status']}",
+        f"Freshness: {payload['freshness']}",
         f"Discovery queries: {payload['discovery_queries_submitted']}",
         f"Reference queries: {payload['reference_queries_submitted']}",
         f"Brave requests: {diagnostics['requests_made']}/{diagnostics['request_budget']}",
@@ -43,10 +44,27 @@ def _write_validation_summary(payload: dict, path: Path) -> None:
         f"Rejected before classification: {diagnostics['rejected_hits']}",
         f"References recovered: {len(recovered)}/{len(diagnostics['reference_cases'])}",
         f"Recovered references: {', '.join(recovered) if recovered else 'none'}",
-        "",
-        "ACCEPTED HOSTS",
-        "--------------",
     ]
+    if diagnostics["zero_raw_hits"]:
+        lines.extend([
+            "",
+            "ZERO-HIT DIAGNOSIS",
+            "------------------",
+            "Brave returned zero web results before the URL gate ran.",
+            "This is a retrieval/query-window failure, not a URL-gate rejection.",
+        ])
+
+    lines.extend(["", "PER-QUERY DIAGNOSTICS", "---------------------"])
+    for item in diagnostics["query_diagnostics"]:
+        error = f" error={item['error']}" if item["error"] else ""
+        lines.append(
+            f"{item['query_id']}: raw={item['raw_hits']} "
+            f"accepted={item['accepted_hits']} rejected={item['rejected_hits']}{error}"
+        )
+    if not diagnostics["query_diagnostics"]:
+        lines.append("none")
+
+    lines.extend(["", "ACCEPTED HOSTS", "--------------"])
     for host, count in diagnostics["accepted_hosts"].items():
         lines.append(f"{host}: {count}")
     if not diagnostics["accepted_hosts"]:
@@ -85,8 +103,12 @@ def main() -> int:
     )
     parser.add_argument(
         "--freshness",
-        choices=("pd", "pw", "pm", "py"),
+        choices=("none", "pd", "pw", "pm", "py"),
         default=SOURCE_TARGETED_FRESHNESS,
+        help=(
+            "Brave page-age filter. Default 'none' avoids hiding still-active "
+            "sales whose pages were indexed more than 31 days ago."
+        ),
     )
     parser.add_argument(
         "--skip-reference-checks",
@@ -110,10 +132,11 @@ def main() -> int:
     )
     all_queries = (*discovery_queries, *reference_queries)
     request_budget = len(all_queries)
+    brave_freshness = None if args.freshness == "none" else args.freshness
 
     brave = BraveSearchProvider(
         api_key,
-        freshness=args.freshness,
+        freshness=brave_freshness,
         extra_snippets=True,
         operators=True,
     )
@@ -157,6 +180,7 @@ def main() -> int:
     validation_status = (
         "PASS"
         if result["search_run_report"]["execution_status"] != "FAIL"
+        and not diagnostics["zero_raw_hits"]
         and reference_validation_passed
         else "FAIL"
     )
@@ -169,6 +193,7 @@ def main() -> int:
         "source_targeting_reference_checks": bool(reference_queries),
         "source_targeting_reference_validation_passed": reference_validation_passed,
         "source_targeting_reference_errors": reference_errors,
+        "source_targeting_zero_raw_hits": diagnostics["zero_raw_hits"],
         "source_targeting_url_gate": diagnostics,
         "brave_freshness": args.freshness,
         "brave_extra_snippets": True,
@@ -181,7 +206,7 @@ def main() -> int:
     artifact_paths = write_discovery_artifacts(result, output_dir)
 
     validation_payload = {
-        "schema_version": "source-targeted-clothing-retrieval-1.0",
+        "schema_version": "source-targeted-clothing-retrieval-1.1",
         "domain": "CLOTHING_INVENTORY",
         "executed_at": datetime.now(timezone.utc).isoformat(),
         "validation_status": validation_status,
