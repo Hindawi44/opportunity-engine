@@ -1,0 +1,28 @@
+name: TEMP — Auksjonen Cross-Source Schema Probe
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/temp-auksjonen-cross-source-schema.yml"
+      - "scripts/probe_auksjonen_cross_source_fields.py"
+
+jobs:
+  schema-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inspect public Auksjonen identity fields
+        env:
+          PYTHONPATH: src:.
+        run: python scripts/probe_auksjonen_cross_source_fields.py
+      - name: Upload schema report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: auksjonen-cross-source-schema
+          path: artifacts/auksjonen-cross-source-schema/
+          if-no-files-found: error
