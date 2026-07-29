@@ -16,7 +16,7 @@ from opportunity_engine.discovery.source_targeted_queries import (
 def test_source_targeted_policy_preserves_the_canonical_query_contract():
     targeted = build_source_targeted_queries()
 
-    assert SOURCE_TARGETED_FRESHNESS == "pm"
+    assert SOURCE_TARGETED_FRESHNESS == "none"
     assert SOURCE_TARGETED_QUERY_BUDGET == 8
     assert len(targeted) == 16
     assert [query.query_id for query in targeted] == [
@@ -40,10 +40,21 @@ def test_default_budget_covers_all_approved_source_families():
     assert "site:auksjonen.no" in text
     assert "site:norskavvikling.no" in text
     assert "site:stadssalg.no" in text
-    assert "site:finn.no/recommerce/forsale/item" in text
-    assert "site:forvalt.no/Konkurs" in text
+    assert "site:finn.no" in text
+    assert "site:forvalt.no" in text
     assert "site:virksomhet.brreg.no" in text
     assert "site:konkurs.app" in text
+
+
+def test_site_operators_are_host_only_and_queries_remain_short():
+    queries = (*build_source_targeted_queries(), *SOURCE_TARGETED_REFERENCE_QUERIES)
+
+    for query in queries:
+        site_token = next(
+            token for token in query.query.split() if token.casefold().startswith("site:")
+        )
+        assert "/" not in site_token.removeprefix("site:")
+        assert len(query.query.split()) <= 8
 
 
 def test_query_budget_fails_closed():
