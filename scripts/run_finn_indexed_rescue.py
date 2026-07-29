@@ -13,6 +13,9 @@ from opportunity_engine.discovery.finn_indexed_rescue import (
     FINN_INDEXED_RESCUE_FRESHNESS,
     run_finn_indexed_retrieval,
 )
+from opportunity_engine.discovery.finn_indexed_rescue_queries import (
+    FINN_INDEXED_BROAD_RESCUE_QUERIES,
+)
 
 
 def _write_summary(report: dict, path: Path) -> None:
@@ -80,6 +83,7 @@ def main() -> int:
     )
     report = run_finn_indexed_retrieval(
         provider,
+        queries=FINN_INDEXED_BROAD_RESCUE_QUERIES,
         results_per_query=args.results_per_query,
         minimum_specific_items=args.minimum_specific_items,
         minimum_reference_items=args.minimum_reference_items,
