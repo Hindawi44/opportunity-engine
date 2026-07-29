@@ -1,7 +1,8 @@
 """Direct bounded adapter for Auksjonen's public live category API.
 
 The endpoint and schema were observed from the public ny.auksjonen.no application.
-This adapter performs one HTTPS GET, keeps active clothing-like items for source
+This adapter scans every available page in the approved clothing category within
+strict request and item limits, keeps active clothing-like items for source
 visibility, and promotes only verified inventory-lot signals to opportunity
 outputs. It uses no paid search or AI API and never logs in, contacts a seller,
 bids, buys, reserves, or pays.
@@ -14,19 +15,24 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
-from urllib.parse import quote, urlparse
+from urllib.parse import parse_qs, quote, urlencode, urlparse, urlunparse
 from urllib.request import Request, urlopen
 
+DEFAULT_CATEGORY_ID = "10110508"
+DEFAULT_PAGE_SIZE = 30
+MAX_PAGE_SIZE = 30
+MAX_PAGES = 10
+MAX_LISTINGS = 300
 DEFAULT_PUBLIC_API_ENDPOINT = (
     "https://ny.auksjonen.no/api/category-search/search"
     "?category2=10110508&from=1&to=30&asc=true&orderBy=endTime"
 )
-MAX_LISTINGS = 10
 ACTIVE_STATUSES = frozenset({"ACTIVE", "INPROGRESS", "OPEN"})
 _CLOTHING_PATTERN = re.compile(
     r"\b(klær|jakke|jakker|bukse|bukser|sko|kjole|kjoler|skjorte|skjorter|"
     r"genser|gensere|frakk|frakker|dress|dresser|vest|vester|tøy|arbeidsklær|"
-    r"arbeidstøy|mc-klær|mote|tekstil|veske|vesker|overall|kjeledress|uniform)\b",
+    r"arbeidstøy|arbeidsjakke|arbeidsjakker|mc-klær|mote|tekstil|veske|vesker|"
+    r"overall|kjeledress|uniform)\b",
     re.I,
 )
 _LOT_PATTERN = re.compile(
@@ -41,14 +47,49 @@ def _compact(value: object) -> str:
     return " ".join(str(value or "").split())
 
 
+def _positive_int(value: object) -> int | None:
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number > 0 else None
+
+
 def is_approved_public_api_endpoint(url: str) -> bool:
+    """Allow only bounded reads from the observed public clothing endpoint."""
     parsed = urlparse(str(url or "").strip())
+    query = parse_qs(parsed.query)
+    category = query.get("category2", [])
+    start = _positive_int(query.get("from", [None])[0])
+    end = _positive_int(query.get("to", [None])[0])
     return (
         parsed.scheme == "https"
         and parsed.hostname == "ny.auksjonen.no"
         and parsed.path == "/api/category-search/search"
-        and "category2=10110508" in parsed.query
+        and category == [DEFAULT_CATEGORY_ID]
+        and start is not None
+        and end is not None
+        and start <= end
+        and end - start + 1 <= MAX_PAGE_SIZE
+        and end <= MAX_PAGE_SIZE * MAX_PAGES
     )
+
+
+def build_page_endpoint(endpoint: str, start: int, end: int) -> str:
+    """Move the approved endpoint to one bounded inclusive result window."""
+    if not is_approved_public_api_endpoint(endpoint):
+        raise ValueError("endpoint is outside the approved Auksjonen clothing API")
+    if start < 1 or end < start or end - start + 1 > MAX_PAGE_SIZE:
+        raise ValueError("page window is outside the approved bounds")
+    if end > MAX_PAGE_SIZE * MAX_PAGES:
+        raise ValueError("page window exceeds the maximum scan bound")
+
+    parsed = urlparse(endpoint)
+    query = parse_qs(parsed.query, keep_blank_values=True)
+    query["from"] = [str(start)]
+    query["to"] = [str(end)]
+    flattened = [(key, value) for key, values in query.items() for value in values]
+    return urlunparse(parsed._replace(query=urlencode(flattened)))
 
 
 def slugify_title(title: str) -> str:
@@ -193,6 +234,8 @@ class AuksjonenLiveClothingCollection:
     reported_size: int | None
     items_received: int
     listings: tuple[AuksjonenLiveClothingListing, ...]
+    pages_fetched: int = 1
+    page_size: int = DEFAULT_PAGE_SIZE
     errors: tuple[dict[str, str], ...] = ()
 
     @property
@@ -213,15 +256,27 @@ class AuksjonenLiveClothingCollection:
             if listing.listing_status == "ACTIVE" and not listing.inventory_lot_signal
         )
 
+    @property
+    def scan_complete(self) -> bool:
+        if self.errors or self.pages_fetched < 1:
+            return False
+        if self.reported_size is None:
+            return self.items_received < self.pages_fetched * self.page_size
+        bounded_size = min(self.reported_size, MAX_PAGES * self.page_size)
+        return self.items_received >= bounded_size
+
     def to_dict(self) -> dict[str, Any]:
         opportunities = self.inventory_opportunities
         individuals = self.individual_clothing_items
         return {
-            "schema_version": "auksjonen-live-clothing-1.1",
+            "schema_version": "auksjonen-live-clothing-1.2",
             "captured_at": self.captured_at,
             "endpoint": self.endpoint,
             "reported_size": self.reported_size,
             "items_received": self.items_received,
+            "pages_fetched": self.pages_fetched,
+            "page_size": self.page_size,
+            "scan_complete": self.scan_complete,
             "active_clothing_count": len(self.listings),
             "valid_inventory_opportunity_count": len(opportunities),
             "inventory_lot_count": len(opportunities),
@@ -240,31 +295,39 @@ class AuksjonenLiveClothingCollection:
 
 
 class AuksjonenPublicApiCollector:
-    """Perform one bounded public API read and return active clothing items."""
+    """Scan every available page in the approved public clothing category."""
 
     def __init__(
         self,
         endpoint: str = DEFAULT_PUBLIC_API_ENDPOINT,
         *,
         max_listings: int = MAX_LISTINGS,
+        page_size: int = DEFAULT_PAGE_SIZE,
+        max_pages: int = MAX_PAGES,
         timeout_seconds: float = 30.0,
     ) -> None:
         if not is_approved_public_api_endpoint(endpoint):
             raise ValueError("endpoint is outside the approved Auksjonen clothing API")
         if not 1 <= max_listings <= MAX_LISTINGS:
             raise ValueError(f"max_listings must be between 1 and {MAX_LISTINGS}")
+        if not 1 <= page_size <= MAX_PAGE_SIZE:
+            raise ValueError(f"page_size must be between 1 and {MAX_PAGE_SIZE}")
+        if not 1 <= max_pages <= MAX_PAGES:
+            raise ValueError(f"max_pages must be between 1 and {MAX_PAGES}")
         if timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
         self.endpoint = endpoint
         self.max_listings = max_listings
+        self.page_size = page_size
+        self.max_pages = max_pages
         self.timeout_seconds = timeout_seconds
 
-    def _fetch(self) -> Mapping[str, Any]:
+    def _fetch(self, url: str) -> Mapping[str, Any]:
         request = Request(
-            self.endpoint,
+            url,
             headers={
                 "Accept": "application/json",
-                "User-Agent": "OpportunityEngine/Auksjonen-Public-API-Adapter-1.1",
+                "User-Agent": "OpportunityEngine/Auksjonen-Public-API-Adapter-1.2",
             },
         )
         with urlopen(request, timeout=self.timeout_seconds) as response:  # noqa: S310
@@ -278,44 +341,65 @@ class AuksjonenPublicApiCollector:
     def collect(self) -> AuksjonenLiveClothingCollection:
         captured_at = datetime.now(timezone.utc).isoformat()
         errors: list[dict[str, str]] = []
-        payload: Mapping[str, Any] = {}
-        try:
-            payload = self._fetch()
-            raw_items = payload.get("items")
-            if not isinstance(raw_items, Sequence) or isinstance(raw_items, (str, bytes)):
-                raise RuntimeError("Auksjonen API response lacks an items array")
-            normalized = [
-                listing
-                for item in raw_items
-                if isinstance(item, Mapping)
-                for listing in (normalize_public_api_item(item),)
-                if listing is not None
-            ]
-            normalized.sort(
-                key=lambda listing: (
-                    not listing.inventory_lot_signal,
-                    listing.ends_at or "",
-                    listing.object_id,
-                )
-            )
-            listings = tuple(normalized[: self.max_listings])
-            items_received = len(raw_items)
-        except Exception as exc:
-            errors.append({"url": self.endpoint, "error": str(exc)})
-            listings = ()
-            items_received = 0
+        raw_items_all: list[Mapping[str, Any]] = []
+        reported_size: int | None = None
+        pages_fetched = 0
 
-        reported_size = payload.get("size") if isinstance(payload, Mapping) else None
-        try:
-            reported_size = int(reported_size) if reported_size is not None else None
-        except (TypeError, ValueError):
-            reported_size = None
+        for page_index in range(self.max_pages):
+            start = page_index * self.page_size + 1
+            end = start + self.page_size - 1
+            page_url = build_page_endpoint(self.endpoint, start, end)
+            try:
+                payload = self._fetch(page_url)
+                raw_items = payload.get("items")
+                if not isinstance(raw_items, Sequence) or isinstance(
+                    raw_items, (str, bytes)
+                ):
+                    raise RuntimeError("Auksjonen API response lacks an items array")
+            except Exception as exc:
+                errors.append({"url": page_url, "error": str(exc)})
+                break
+
+            pages_fetched += 1
+            raw_items_all.extend(
+                item for item in raw_items if isinstance(item, Mapping)
+            )
+
+            payload_size = _positive_int(payload.get("size"))
+            if reported_size is None and payload_size is not None:
+                reported_size = payload_size
+
+            if not raw_items:
+                break
+            if reported_size is not None and end >= reported_size:
+                break
+            if reported_size is None and len(raw_items) < self.page_size:
+                break
+
+        normalized_by_object_id: dict[int, AuksjonenLiveClothingListing] = {}
+        for item in raw_items_all:
+            listing = normalize_public_api_item(item)
+            if listing is not None:
+                normalized_by_object_id[listing.object_id] = listing
+
+        normalized = list(normalized_by_object_id.values())
+        normalized.sort(
+            key=lambda listing: (
+                not listing.inventory_lot_signal,
+                listing.ends_at or "",
+                listing.object_id,
+            )
+        )
+        listings = tuple(normalized[: self.max_listings])
+
         return AuksjonenLiveClothingCollection(
             captured_at=captured_at,
             endpoint=self.endpoint,
             reported_size=reported_size,
-            items_received=items_received,
+            items_received=len(raw_items_all),
             listings=listings,
+            pages_fetched=pages_fetched,
+            page_size=self.page_size,
             errors=tuple(errors),
         )
 
@@ -357,7 +441,10 @@ def write_live_clothing_artifacts(
     summary_lines = [
         "Auksjonen live clothing inventory adapter",
         f"Reported category size: {collection.reported_size}",
-        f"Items received: {collection.items_received}",
+        f"Pages fetched: {collection.pages_fetched}",
+        f"Page size: {collection.page_size}",
+        f"Items received across all pages: {collection.items_received}",
+        f"Full bounded scan complete: {collection.scan_complete}",
         f"Active clothing items: {len(collection.listings)}",
         f"Valid inventory opportunities: {len(opportunities)}",
         f"Individual clothing items excluded from Top 5: {len(individuals)}",
