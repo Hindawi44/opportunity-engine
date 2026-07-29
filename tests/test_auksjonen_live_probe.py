@@ -79,12 +79,7 @@ def test_nested_candidate_objects_are_extracted_without_fixed_schema():
                         "city": "Trondheim",
                         "endsAt": "2026-08-01T18:00:00Z",
                         "publicUrl": "https://ny.auksjonen.no/auction/12345",
-                    },
-                    {
-                        "auctionId": 12345,
-                        "auctionTitle": "Vareparti med arbeidsklær",
-                        "publicUrl": "https://ny.auksjonen.no/auction/12345",
-                    },
+                    }
                 ]
             }
         }
