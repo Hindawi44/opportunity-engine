@@ -187,7 +187,7 @@ jobs:
         run: |
           python scripts/run_source_targeted_retrieval.py \
             --query-budget 8 \
-            --freshness pm \
+            --freshness none \
             --results-per-query 10 \
             --output-dir artifacts/source-targeted-retrieval
       - name: Show source-targeted validation summary
