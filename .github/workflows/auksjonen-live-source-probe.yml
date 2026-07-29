@@ -8,6 +8,7 @@ on:
       - "src/opportunity_engine/discovery/auksjonen_live_probe.py"
       - "scripts/run_auksjonen_live_probe.py"
       - "scripts/run_auksjonen_public_api_probe.py"
+      - "scripts/run_auksjonen_clothing_page_links.py"
       - "tests/test_auksjonen_live_probe.py"
   workflow_dispatch:
 
@@ -52,12 +53,18 @@ jobs:
         run: |
           python scripts/run_auksjonen_public_api_probe.py \
             --output-dir artifacts/auksjonen-public-api-probe
+      - name: Capture exact public clothing auction links
+        env:
+          PYTHONPATH: src:.
+        run: python scripts/run_auksjonen_clothing_page_links.py
       - name: Show operator summaries
         if: ${{ always() }}
         run: |
           cat artifacts/auksjonen-live-source-probe/operator-summary.txt || true
           echo "---"
           cat artifacts/auksjonen-public-api-probe/operator-summary.txt || true
+          echo "---"
+          cat artifacts/auksjonen-clothing-page-links/operator-summary.txt || true
       - name: Upload live-source evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -66,4 +73,5 @@ jobs:
           path: |
             artifacts/auksjonen-live-source-probe/
             artifacts/auksjonen-public-api-probe/
+            artifacts/auksjonen-clothing-page-links/
           if-no-files-found: error
