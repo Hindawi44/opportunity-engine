@@ -31,7 +31,8 @@ ACTIVE_STATUSES = frozenset({"ACTIVE", "INPROGRESS", "OPEN"})
 _CLOTHING_PATTERN = re.compile(
     r"\b(klær|jakke|jakker|bukse|bukser|sko|kjole|kjoler|skjorte|skjorter|"
     r"genser|gensere|frakk|frakker|dress|dresser|vest|vester|tøy|arbeidsklær|"
-    r"arbeidstøy|mc-klær|mote|tekstil|veske|vesker|overall|kjeledress|uniform)\b",
+    r"arbeidstøy|arbeidsjakke|arbeidsjakker|mc-klær|mote|tekstil|veske|vesker|"
+    r"overall|kjeledress|uniform)\b",
     re.I,
 )
 _LOT_PATTERN = re.compile(
