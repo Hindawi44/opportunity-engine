@@ -73,6 +73,10 @@ def test_reference_queries_are_bounded_and_traceable():
     assert all(query.rotation_group == "SECONDARY" for query in SOURCE_TARGETED_REFERENCE_QUERIES)
     assert all(query.query.count("site:") == 1 for query in SOURCE_TARGETED_REFERENCE_QUERIES)
 
+    by_id = {query.query_id: query.query for query in SOURCE_TARGETED_REFERENCE_QUERIES}
+    assert '"ANNA J AS" Namsos konkurs' in by_id["reference-by-fiona"]
+    assert "932113309 TOMMELITEN" in by_id["reference-tommeliten"]
+
 
 def test_source_targeted_policy_fails_when_the_base_matrix_changes():
     changed = (*CLOTHING_INVENTORY_QUERY_MATRIX, DiscoveryQuery(
