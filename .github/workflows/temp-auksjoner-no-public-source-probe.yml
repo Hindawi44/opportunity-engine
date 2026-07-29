@@ -1,0 +1,26 @@
+name: TEMP — Auksjoner.no Public Source Probe
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/temp-auksjoner-no-public-source-probe.yml"
+      - "scripts/probe_auksjoner_no_public_source.py"
+
+jobs:
+  public-source-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inspect current and past auction index schemas
+        run: python scripts/probe_auksjoner_no_public_source.py
+      - name: Upload probe evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: auksjoner-no-public-source-probe
+          path: artifacts/auksjoner-no-public-source-probe/
+          if-no-files-found: error
