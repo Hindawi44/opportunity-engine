@@ -66,6 +66,11 @@ _SOURCE_TARGETED_PRIORITY = (
     "lead-05",
 )
 
+# Reference checks use stable organisation numbers rather than names. Live Brave
+# evidence showed that name-heavy queries either returned no results or returned
+# other organisations from the same registry. The number is also present in the
+# canonical public organisation URL, allowing identity recovery without relaxing
+# the URL gate or any downstream verification rule.
 SOURCE_TARGETED_REFERENCE_QUERIES: tuple[DiscoveryQuery, ...] = (
     DiscoveryQuery(
         "reference-axl",
@@ -80,7 +85,7 @@ SOURCE_TARGETED_REFERENCE_QUERIES: tuple[DiscoveryQuery, ...] = (
         "COMPANY_BANKRUPTCY",
         "EVENT_LEAD",
         "CLOTHING_INVENTORY",
-        '"ANNA J AS" Namsos konkurs site:forvalt.no',
+        "989324217 site:forvalt.no",
         "SECONDARY",
     ),
     DiscoveryQuery(
@@ -88,7 +93,7 @@ SOURCE_TARGETED_REFERENCE_QUERIES: tuple[DiscoveryQuery, ...] = (
         "COMPANY_BANKRUPTCY",
         "EVENT_LEAD",
         "CLOTHING_INVENTORY",
-        "932113309 TOMMELITEN site:virksomhet.brreg.no",
+        "932113309 site:virksomhet.brreg.no",
         "SECONDARY",
     ),
 )
