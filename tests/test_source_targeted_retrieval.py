@@ -20,6 +20,13 @@ class StubProvider:
         return self.results.get(query, ())
 
 
+class FailingProvider:
+    name = "Failing Search"
+
+    def search(self, query, *, count=10):
+        raise RuntimeError("provider failure")
+
+
 def _query(query_id, text, intent="SALE_INTENT"):
     return DiscoveryQuery(
         query_id,
@@ -33,7 +40,7 @@ def _query(query_id, text, intent="SALE_INTENT"):
 def test_gate_accepts_axl_active_sale_channel_but_rejects_generic_homepage():
     query = _query(
         "reference-axl",
-        'site:norskavvikling.no "AXL Sport Og Fritid" Kolvereid',
+        "AXL Sport Og Fritid Kolvereid site:norskavvikling.no",
     )
     accepted = source_gate_decision(
         SearchHit(
@@ -60,7 +67,7 @@ def test_gate_accepts_axl_active_sale_channel_but_rejects_generic_homepage():
 def test_gate_accepts_specific_finn_item_only():
     query = _query(
         "sale-02",
-        'site:finn.no/recommerce/forsale/item "hele lageret" klær',
+        "vareparti klær site:finn.no",
     )
     item = source_gate_decision(
         SearchHit(
@@ -85,7 +92,7 @@ def test_gate_accepts_specific_finn_item_only():
 
 
 def test_gate_rejects_editorial_auction_pages_before_classification():
-    query = _query("sale-03", "site:auksjonen.no vareparti klær auksjon")
+    query = _query("sale-03", "vareparti klær site:auksjonen.no")
     decision = source_gate_decision(
         SearchHit(
             "Nyheter om konkurser",
@@ -102,7 +109,7 @@ def test_gate_rejects_editorial_auction_pages_before_classification():
 def test_gate_accepts_specific_registry_pages_as_event_sources():
     query = _query(
         "reference-tommeliten",
-        'site:virksomhet.brreg.no "TOMMELITEN BARNEKLÆR AS" konkurs',
+        "TOMMELITEN BARNEKLÆR AS site:virksomhet.brreg.no",
         "EVENT_LEAD",
     )
     decision = source_gate_decision(
@@ -121,11 +128,11 @@ def test_gate_accepts_specific_registry_pages_as_event_sources():
 def test_wrapper_enforces_budget_filters_noise_and_records_reference_recall():
     axl = _query(
         "reference-axl",
-        'site:norskavvikling.no "AXL Sport Og Fritid" Kolvereid',
+        "AXL Sport Og Fritid Kolvereid site:norskavvikling.no",
     )
     fiona = _query(
         "reference-by-fiona",
-        'site:forvalt.no/Konkurs "ANNA J AS" Namsos',
+        "ANNA J AS Namsos site:forvalt.no",
         "EVENT_LEAD",
     )
     provider = StubProvider({
@@ -163,16 +170,68 @@ def test_wrapper_enforces_budget_filters_noise_and_records_reference_recall():
     assert diagnostics["raw_hits"] == 3
     assert diagnostics["accepted_hits"] == 2
     assert diagnostics["rejected_hits"] == 1
+    assert diagnostics["zero_raw_hits"] is False
     assert diagnostics["reference_cases_recovered"] == [
         "axl-sport-og-fritid",
         "by-fiona",
+    ]
+    assert diagnostics["query_diagnostics"] == [
+        {
+            "query_id": "reference-axl",
+            "query": axl.query,
+            "raw_hits": 2,
+            "accepted_hits": 1,
+            "rejected_hits": 1,
+            "error": None,
+        },
+        {
+            "query_id": "reference-by-fiona",
+            "query": fiona.query,
+            "raw_hits": 1,
+            "accepted_hits": 1,
+            "rejected_hits": 0,
+            "error": None,
+        },
     ]
     with pytest.raises(RuntimeError, match="budget exhausted"):
         wrapped.search(axl.query)
 
 
+def test_wrapper_distinguishes_zero_provider_hits_from_gate_rejections():
+    query = _query("sale-03", "vareparti klær site:auksjonen.no")
+    wrapped = SourceTargetedSearchProvider(
+        StubProvider({}),
+        queries=(query,),
+        request_budget=1,
+    )
+
+    assert wrapped.search(query.query) == []
+    diagnostics = wrapped.diagnostics()
+
+    assert diagnostics["zero_raw_hits"] is True
+    assert diagnostics["raw_hits"] == 0
+    assert diagnostics["rejected_hits"] == 0
+    assert diagnostics["rejection_reasons"] == {}
+    assert diagnostics["query_diagnostics"][0]["raw_hits"] == 0
+
+
+def test_wrapper_records_provider_error_by_query_before_reraising():
+    query = _query("sale-03", "vareparti klær site:auksjonen.no")
+    wrapped = SourceTargetedSearchProvider(
+        FailingProvider(),
+        queries=(query,),
+        request_budget=1,
+    )
+
+    with pytest.raises(RuntimeError, match="provider failure"):
+        wrapped.search(query.query)
+
+    diagnostics = wrapped.diagnostics()
+    assert diagnostics["query_diagnostics"][0]["error"] == "provider failure"
+
+
 def test_wrapper_rejects_unregistered_query():
-    query = _query("sale-03", "site:auksjonen.no vareparti klær auksjon")
+    query = _query("sale-03", "vareparti klær site:auksjonen.no")
     wrapped = SourceTargetedSearchProvider(
         StubProvider({}),
         queries=(query,),
@@ -180,4 +239,4 @@ def test_wrapper_rejects_unregistered_query():
     )
 
     with pytest.raises(ValueError, match="not registered"):
-        wrapped.search("site:example.com klær")
+        wrapped.search("klær site:example.com")
