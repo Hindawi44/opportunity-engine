@@ -5,6 +5,7 @@ The default operator run combines:
 
 * Konkurs.app bankruptcy leads cross-verified against Auksjonen inventory lots.
 * Direct active clothing inventory lots from Vareauksjonen.
+* Current active clothing inventory auctions from Auksjoner.no.
 
 Only commercially verified active inventory lots enter the unified Top 5.
 """
@@ -13,8 +14,15 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
+from opportunity_engine.discovery.auksjoner_no_public_adapter import (
+    MAX_AUCTIONS,
+    AuksjonerNoCollection,
+    AuksjonerNoLiveClothingAuction,
+    AuksjonerNoPublicCollector,
+    write_auksjoner_no_artifacts,
+)
 from opportunity_engine.discovery.cross_source_clothing_sale_verifier import (
     CrossSourceClothingSaleVerifier,
     CrossSourceVerificationRecord,
@@ -80,9 +88,36 @@ def _vareauksjonen_opportunity(
     }
 
 
+def _auksjoner_no_opportunity(
+    auction: AuksjonerNoLiveClothingAuction,
+) -> dict[str, Any]:
+    return {
+        "title": auction.title,
+        "url": auction.url,
+        "listing_status": auction.listing_status,
+        "price_nok": None,
+        "quantity": None,
+        "location": None,
+        "inventory_lot_signal": auction.inventory_lot_signal,
+        "verification_state": "VERIFIED_ACTIVE_CURRENT_INVENTORY_AUCTION",
+        "source_channel": "AUKSJONER_NO_CURRENT_ACTIVE_LOT",
+        "source": auction.source,
+        "starts_at": auction.starts_at,
+        "ends_at": auction.ends_at,
+        "buyers_premium_percent": auction.buyers_premium_percent,
+        "top5_eligible": True,
+        "analysis_eligible": True,
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase_decision": False,
+        "automatic_payment": False,
+    }
+
+
 def build_combined_top5(
     cross_source: CrossSourceVerificationResult,
     vareauksjonen: VareauksjonenCollection,
+    auksjoner_no: AuksjonerNoCollection,
 ) -> list[dict[str, Any]]:
     """Combine only verified opportunities, preserving evidence strength order."""
     candidates = [
@@ -90,6 +125,10 @@ def build_combined_top5(
         *(
             _vareauksjonen_opportunity(listing)
             for listing in vareauksjonen.inventory_opportunities
+        ),
+        *(
+            _auksjoner_no_opportunity(auction)
+            for auction in auksjoner_no.inventory_opportunities
         ),
     ]
     unique: list[dict[str, Any]] = []
@@ -111,14 +150,23 @@ def write_combined_outputs(
     *,
     cross_source: CrossSourceVerificationResult,
     vareauksjonen: VareauksjonenCollection,
+    auksjoner_no: AuksjonerNoCollection,
     output_dir: Path,
 ) -> dict[str, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    top5 = build_combined_top5(cross_source, vareauksjonen)
-    scan_complete = cross_source.scan_complete and vareauksjonen.scan_complete
-    error_count = len(cross_source.errors) + len(vareauksjonen.errors)
+    top5 = build_combined_top5(cross_source, vareauksjonen, auksjoner_no)
+    scan_complete = (
+        cross_source.scan_complete
+        and vareauksjonen.scan_complete
+        and auksjoner_no.scan_complete
+    )
+    error_count = (
+        len(cross_source.errors)
+        + len(vareauksjonen.errors)
+        + len(auksjoner_no.errors)
+    )
     report = {
-        "schema_version": "multi-source-live-clothing-verification-1.0",
+        "schema_version": "multi-source-live-clothing-verification-1.1",
         "scan_complete": scan_complete,
         "commercial_top5_count": len(top5),
         "sources": {
@@ -142,6 +190,16 @@ def write_combined_outputs(
                 ),
                 "scan_complete": vareauksjonen.scan_complete,
                 "errors": len(vareauksjonen.errors),
+            },
+            "auksjoner_no": {
+                "current_auctions_received": auksjoner_no.items_received,
+                "verified_inventory_auctions": len(
+                    auksjoner_no.inventory_opportunities
+                ),
+                "clothing_non_lots": len(auksjoner_no.clothing_non_lots),
+                "past_page_queried": False,
+                "scan_complete": auksjoner_no.scan_complete,
+                "errors": len(auksjoner_no.errors),
             },
         },
         "live_clothing_top5": top5,
@@ -181,6 +239,13 @@ def write_combined_outputs(
         f"- Verified direct inventory sales: {len(vareauksjonen.inventory_opportunities)}",
         f"- Individual clothing items excluded: {len(vareauksjonen.individual_clothing_items)}",
         "",
+        "Auksjoner.no:",
+        f"- Current auctions received: {auksjoner_no.items_received}",
+        f"- Crawl delay respected: {auksjoner_no.crawl_delay_seconds:g} seconds",
+        f"- Verified current inventory auctions: {len(auksjoner_no.inventory_opportunities)}",
+        f"- Clothing auctions without lot evidence excluded: {len(auksjoner_no.clothing_non_lots)}",
+        "- Past auction page queried: false",
+        "",
         f"Unified commercial Top 5 count: {len(top5)}",
         f"Scan complete: {scan_complete}",
         f"Errors: {error_count}",
@@ -215,6 +280,11 @@ def main() -> int:
         type=int,
         default=MAX_CANDIDATE_DETAILS,
     )
+    parser.add_argument(
+        "--max-auksjoner-no-auctions",
+        type=int,
+        default=MAX_AUCTIONS,
+    )
     args = parser.parse_args()
 
     cross_source = CrossSourceClothingSaleVerifier(
@@ -225,6 +295,9 @@ def main() -> int:
     vareauksjonen = VareauksjonenPublicCollector(
         max_candidate_details=args.max_vareauksjonen_details,
     ).collect()
+    auksjoner_no = AuksjonerNoPublicCollector(
+        max_auctions=args.max_auksjoner_no_auctions,
+    ).collect()
 
     cross_paths = write_cross_source_artifacts(
         cross_source,
@@ -234,9 +307,14 @@ def main() -> int:
         vareauksjonen,
         args.output_dir / "vareauksjonen",
     )
+    auksjoner_no_paths = write_auksjoner_no_artifacts(
+        auksjoner_no,
+        args.output_dir / "auksjoner-no",
+    )
     combined_paths = write_combined_outputs(
         cross_source=cross_source,
         vareauksjonen=vareauksjonen,
+        auksjoner_no=auksjoner_no,
         output_dir=args.output_dir,
     )
 
@@ -251,22 +329,33 @@ def main() -> int:
         "Vareauksjonen verified inventory sales: "
         f"{len(vareauksjonen.inventory_opportunities)}"
     )
-    combined = build_combined_top5(cross_source, vareauksjonen)
+    print(f"Auksjoner.no current auctions received: {auksjoner_no.items_received}")
+    print(
+        "Auksjoner.no verified inventory auctions: "
+        f"{len(auksjoner_no.inventory_opportunities)}"
+    )
+    combined = build_combined_top5(cross_source, vareauksjonen, auksjoner_no)
     print(f"Unified commercial Top 5 count: {len(combined)}")
-    scan_complete = cross_source.scan_complete and vareauksjonen.scan_complete
+    scan_complete = (
+        cross_source.scan_complete
+        and vareauksjonen.scan_complete
+        and auksjoner_no.scan_complete
+    )
     print(f"Scan complete: {scan_complete}")
-    print(f"Errors: {len(cross_source.errors) + len(vareauksjonen.errors)}")
+    print(
+        "Errors: "
+        f"{len(cross_source.errors) + len(vareauksjonen.errors) + len(auksjoner_no.errors)}"
+    )
     print("Paid Brave/OpenAI calls: 0")
     for prefix, paths in (
         ("konkurs_auksjonen", cross_paths),
         ("vareauksjonen", vare_paths),
+        ("auksjoner_no", auksjoner_no_paths),
         ("combined", combined_paths),
     ):
         for label, path in paths.items():
             print(f"{prefix}_{label}: {path}")
 
-    # A truthful empty commercial Top 5 is a successful scan. Fail only when a
-    # required bounded source read failed or was incomplete.
     return 0 if scan_complete else 2
 
 
