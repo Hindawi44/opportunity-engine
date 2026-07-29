@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/temp-auksjonen-cross-source-schema.yml"
       - "scripts/probe_auksjonen_cross_source_fields.py"
+      - "scripts/probe_auksjonen_item_api.py"
 
 jobs:
   schema-probe:
@@ -25,4 +26,27 @@ jobs:
         with:
           name: auksjonen-cross-source-schema
           path: artifacts/auksjonen-cross-source-schema/
+          if-no-files-found: error
+
+  item-api-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install bounded Chromium probe
+        run: |
+          python -m pip install -r requirements-playwright.txt
+          python -m playwright install --with-deps chromium
+      - name: Observe one public item API flow
+        env:
+          PYTHONPATH: src:.
+        run: python scripts/probe_auksjonen_item_api.py
+      - name: Upload item API report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: auksjonen-item-api-probe
+          path: artifacts/auksjonen-item-api-probe/
           if-no-files-found: error
