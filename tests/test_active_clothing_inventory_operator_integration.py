@@ -37,7 +37,7 @@ def test_manual_operation_contract_and_path_scope() -> None:
     assert dispatch_match is not None
     dispatch = dispatch_match.group("body")
 
-    assert "default: brave_discovery" in dispatch
+    assert "default: auksjonen_live_clothing" in dispatch
     assert "type: choice" in dispatch
     options_match = re.search(r"        options:\n(?P<options>(?:          - .*\n)+)", dispatch)
     assert options_match is not None
@@ -46,6 +46,7 @@ def test_manual_operation_contract_and_path_scope() -> None:
         for line in options_match.group("options").splitlines()
     ]
     assert options == [
+        "auksjonen_live_clothing",
         "brave_discovery",
         "active_clothing_scan",
         "structured_clothing_discovery",
@@ -58,10 +59,12 @@ def test_manual_operation_contract_and_path_scope() -> None:
         '      - "src/opportunity_engine/discovery/brave_precision.py"',
         '      - "src/opportunity_engine/discovery/brave_retrieval_probe.py"',
         '      - "src/opportunity_engine/discovery/clothing_inventory_search.py"',
+        '      - "src/opportunity_engine/discovery/auksjonen_public_api_adapter.py"',
         '      - "src/opportunity_engine/discovery/source_targeted_queries.py"',
         '      - "src/opportunity_engine/discovery/source_targeted_retrieval.py"',
         '      - "scripts/run_active_clothing_inventory_scan.py"',
         '      - "scripts/run_clothing_inventory_discovery_search.py"',
+        '      - "scripts/run_auksjonen_live_clothing.py"',
         '      - "scripts/run_source_targeted_retrieval.py"',
         '      - "scripts/run_brave_retrieval_probe.py"',
         '      - "tests/test_discovery_v11_live_search.py"',
@@ -69,6 +72,7 @@ def test_manual_operation_contract_and_path_scope() -> None:
         '      - "tests/test_brave_retrieval_probe.py"',
         '      - "tests/test_active_clothing_inventory_scan.py"',
         '      - "tests/test_clothing_inventory_discovery_search.py"',
+        '      - "tests/test_auksjonen_public_api_adapter.py"',
         '      - "tests/test_source_targeted_queries.py"',
         '      - "tests/test_source_targeted_retrieval.py"',
         '      - "tests/test_active_clothing_inventory_operator_integration.py"',
@@ -78,12 +82,17 @@ def test_manual_operation_contract_and_path_scope() -> None:
 
 def test_all_discovery_jobs_are_mutually_selected() -> None:
     workflow = _workflow_text()
+    auksjonen_job = _job_block(workflow, "auksjonen-live-clothing")
     brave_job = _job_block(workflow, "live-pilot")
     active_job = _job_block(workflow, "active-clothing-inventory-scan")
     structured_job = _job_block(workflow, "structured-clothing-discovery")
     targeted_job = _job_block(workflow, "source-targeted-validation")
     probe_job = _job_block(workflow, "brave-retrieval-probe")
 
+    assert (
+        "if: ${{ github.event_name == 'workflow_dispatch' && "
+        "inputs.operation == 'auksjonen_live_clothing' }}"
+    ) in auksjonen_job
     assert (
         "if: ${{ github.event_name == 'workflow_dispatch' && "
         "inputs.operation == 'brave_discovery' }}"
@@ -105,14 +114,29 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
         "inputs.operation == 'brave_retrieval_probe' }}"
     ) in probe_job
 
+    assert "BRAVE_SEARCH_API_KEY" not in auksjonen_job
+    assert auksjonen_job.count("python scripts/run_auksjonen_live_clothing.py") == 1
+    assert "--max-listings 10" in auksjonen_job
+    assert "--output-dir artifacts/auksjonen-live-clothing" in auksjonen_job
+    for unrelated in (
+        "run_discovery_v12_live_pilot.py",
+        "run_active_clothing_inventory_scan.py",
+        "run_clothing_inventory_discovery_search.py",
+        "run_source_targeted_retrieval.py",
+        "run_brave_retrieval_probe.py",
+    ):
+        assert unrelated not in auksjonen_job
+
     assert "python scripts/run_discovery_v12_live_pilot.py" in brave_job
     assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in brave_job
+    assert "run_auksjonen_live_clothing.py" not in brave_job
     assert "run_active_clothing_inventory_scan.py" not in brave_job
     assert "run_clothing_inventory_discovery_search.py" not in brave_job
     assert "run_source_targeted_retrieval.py" not in brave_job
     assert "run_brave_retrieval_probe.py" not in brave_job
 
     assert "BRAVE_SEARCH_API_KEY" not in active_job
+    assert "run_auksjonen_live_clothing.py" not in active_job
     assert "run_discovery_v12_live_pilot.py" not in active_job
     assert "run_clothing_inventory_discovery_search.py" not in active_job
     assert "run_source_targeted_retrieval.py" not in active_job
@@ -121,6 +145,7 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
     assert "--output-dir artifacts/active-clothing-inventory-scan" in active_job
 
     assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in structured_job
+    assert "run_auksjonen_live_clothing.py" not in structured_job
     assert "run_discovery_v12_live_pilot.py" not in structured_job
     assert "run_active_clothing_inventory_scan.py" not in structured_job
     assert "run_source_targeted_retrieval.py" not in structured_job
@@ -132,6 +157,7 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
     assert "--output-dir artifacts/clothing-inventory-discovery" in structured_job
 
     assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in targeted_job
+    assert "run_auksjonen_live_clothing.py" not in targeted_job
     assert "run_discovery_v12_live_pilot.py" not in targeted_job
     assert "run_active_clothing_inventory_scan.py" not in targeted_job
     assert "run_clothing_inventory_discovery_search.py" not in targeted_job
@@ -142,12 +168,24 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
     assert "--output-dir artifacts/source-targeted-retrieval" in targeted_job
 
     assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in probe_job
+    assert "run_auksjonen_live_clothing.py" not in probe_job
     assert "run_discovery_v12_live_pilot.py" not in probe_job
     assert "run_active_clothing_inventory_scan.py" not in probe_job
     assert "run_clothing_inventory_discovery_search.py" not in probe_job
     assert "run_source_targeted_retrieval.py" not in probe_job
     assert probe_job.count("python scripts/run_brave_retrieval_probe.py") == 1
     assert "--output-dir artifacts/brave-retrieval-probe" in probe_job
+
+
+def test_auksjonen_live_summary_and_artifact_contract() -> None:
+    live_job = _job_block(_workflow_text(), "auksjonen-live-clothing")
+
+    assert "if: ${{ always() }}" in live_job
+    assert 'summary="artifacts/auksjonen-live-clothing/operator-summary.txt"' in live_job
+    assert 'cat "$summary"' in live_job
+    assert "name: auksjonen-live-clothing" in live_job
+    assert "path: artifacts/auksjonen-live-clothing/" in live_job
+    assert "if-no-files-found: error" in live_job
 
 
 def test_active_scan_summary_and_artifact_contract() -> None:
@@ -217,6 +255,7 @@ def test_contract_tests_preserve_all_discovery_operation_coverage() -> None:
         "pytest tests/test_discovery_v12_live_pilot.py -q",
         "pytest tests/test_active_clothing_inventory_scan.py -q",
         "pytest tests/test_clothing_inventory_discovery_search.py -q",
+        "pytest tests/test_auksjonen_public_api_adapter.py -q",
         "pytest tests/test_source_targeted_queries.py -q",
         "pytest tests/test_source_targeted_retrieval.py -q",
         "pytest tests/test_active_clothing_inventory_operator_integration.py -q",
@@ -230,6 +269,8 @@ def test_review_workflow_and_commercial_safety_remain_separate() -> None:
     review_workflow = REVIEW_WORKFLOW.read_text(encoding="utf-8")
 
     for discovery_only_term in (
+        "run_auksjonen_live_clothing.py",
+        "auksjonen_live_clothing",
         "run_active_clothing_inventory_scan.py",
         "active_clothing_scan",
         "run_clothing_inventory_discovery_search.py",
