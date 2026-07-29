@@ -5,7 +5,7 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Iterable, Sequence
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     DiscoveryQuery,
@@ -40,10 +40,20 @@ _BAD_PATH_TERMS = (
     "/vilkar",
 )
 _FINN_ITEM_PATH = re.compile(r"^/recommerce/forsale/item/\d+/?$", re.I)
+_FINN_LEGACY_ITEM_PATH = re.compile(r"^/bap/forsale/ad\.html/?$", re.I)
 _BRREG_ENTITY_PATH = re.compile(
     r"^/(?:nb|nn|en)?/?oppslag/(?:enheter|underenheter)/\d+/?$",
     re.I,
 )
+_AUKSJONEN_ITEM_PATH = re.compile(r"^/auksjon(?:/[^/]+)+/\d+/?$", re.I)
+_STADSSALG_ITEM_PATH = re.compile(r"^/items/\d+/?$", re.I)
+_FORVALT_DETAIL_PATH = re.compile(
+    r"^/konkurs/firmadetaljer/\d+/\d+/?$",
+    re.I,
+)
+_KONKURS_APP_BO_PATH = re.compile(r"^/konkursbo/\d+/?$", re.I)
+_NORSKAVVIKLING_PRODUCT_PATH = re.compile(r"^/produkt/[^/]+/?$", re.I)
+
 _COMMERCIAL_TERMS = (
     "konkurssalg",
     "konkursbo",
@@ -64,6 +74,15 @@ _CLOTHING_TERMS = (
     "arbeidstøy",
     "sko",
     "barneklær",
+)
+_EVENT_TERMS = (
+    "konkurs",
+    "konkursåpning",
+    "tvangsavvikling",
+    "avvikling",
+    "opphør",
+    "stenger",
+    "lagt ned",
 )
 
 _REFERENCE_MARKERS: dict[str, tuple[tuple[str, ...], ...]] = {
@@ -119,16 +138,30 @@ def _host_matches_site(host: str, path: str, declared_site: str) -> bool:
     return not site_path or path.casefold().startswith(f"/{site_path}")
 
 
-def _looks_commercial_and_clothing(hit: SearchHit) -> bool:
+def _has_terms(hit: SearchHit, terms: Sequence[str]) -> bool:
     text = _compact_text(hit.title, hit.description)
-    return (
-        any(term in text for term in _COMMERCIAL_TERMS)
-        and any(term in text for term in _CLOTHING_TERMS)
-    )
+    return any(term in text for term in terms)
+
+
+def _looks_commercial_and_clothing(hit: SearchHit) -> bool:
+    return _has_terms(hit, _COMMERCIAL_TERMS) and _has_terms(hit, _CLOTHING_TERMS)
+
+
+def _looks_clothing_event(hit: SearchHit) -> bool:
+    return _has_terms(hit, _CLOTHING_TERMS) and _has_terms(hit, _EVENT_TERMS)
+
+
+def _specific_finn_item(parsed) -> bool:
+    if _FINN_ITEM_PATH.fullmatch(parsed.path or "/"):
+        return True
+    if not _FINN_LEGACY_ITEM_PATH.fullmatch(parsed.path or "/"):
+        return False
+    finnkode = parse_qs(parsed.query).get("finnkode", ())
+    return bool(finnkode and finnkode[0].isdigit())
 
 
 def source_gate_decision(hit: SearchHit, query: DiscoveryQuery) -> SourceGateDecision:
-    """Fail closed before classification when a hit is outside approved sources."""
+    """Fail closed before classification when a hit is not one bounded source page."""
     canonical = normalize_public_url(hit.url)
     if not canonical:
         return SourceGateDecision(False, "", "", "REJECTED", "invalid public HTTPS URL")
@@ -151,7 +184,7 @@ def source_gate_decision(hit: SearchHit, query: DiscoveryQuery) -> SourceGateDec
         return SourceGateDecision(False, canonical, host, "REJECTED", "editorial or generic path")
 
     if host == "finn.no":
-        if not _FINN_ITEM_PATH.fullmatch(path):
+        if not _specific_finn_item(parsed):
             return SourceGateDecision(
                 False,
                 canonical,
@@ -170,32 +203,57 @@ def source_gate_decision(hit: SearchHit, query: DiscoveryQuery) -> SourceGateDec
                 "REJECTED",
                 "Brønnøysund URL is not one specific organisation page",
             )
-        return SourceGateDecision(True, canonical, host, "EVENT_REGISTRY_SOURCE", "specific organisation page")
+        if not _looks_clothing_event(hit):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "organisation page lacks clothing bankruptcy evidence",
+            )
+        return SourceGateDecision(True, canonical, host, "EVENT_REGISTRY_SOURCE", "specific clothing event organisation page")
 
     if host == "forvalt.no":
-        if "/konkurs" not in path.casefold():
+        if not _FORVALT_DETAIL_PATH.fullmatch(path):
             return SourceGateDecision(
                 False,
                 canonical,
                 host,
                 "REJECTED",
-                "Forvalt URL is outside the bankruptcy register",
+                "Forvalt URL is not one specific bankruptcy detail page",
             )
-        return SourceGateDecision(True, canonical, host, "EVENT_REGISTRY_SOURCE", "bankruptcy register page")
+        if not _looks_clothing_event(hit):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "Forvalt detail page lacks clothing bankruptcy evidence",
+            )
+        return SourceGateDecision(True, canonical, host, "EVENT_REGISTRY_SOURCE", "specific clothing bankruptcy detail page")
 
     if host == "konkurs.app":
-        if path == "/" and not _looks_commercial_and_clothing(hit):
+        if not _KONKURS_APP_BO_PATH.fullmatch(path):
             return SourceGateDecision(
                 False,
                 canonical,
                 host,
                 "REJECTED",
-                "generic bankruptcy portal page",
+                "Konkurs.app URL is not one specific bankruptcy estate page",
             )
-        return SourceGateDecision(True, canonical, host, "EVENT_REGISTRY_SOURCE", "bankruptcy event source")
+        if not _looks_clothing_event(hit):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "bankruptcy estate page lacks clothing evidence",
+            )
+        return SourceGateDecision(True, canonical, host, "EVENT_REGISTRY_SOURCE", "specific clothing bankruptcy estate page")
 
     if host == "norskavvikling.no":
-        if path == "/" or path.casefold().startswith("/aktive-salg"):
+        channel_path = path.casefold() in {"/", "/butikk", "/butikk/"} or path.casefold().startswith("/aktive-salg")
+        if channel_path:
             if not _looks_commercial_and_clothing(hit):
                 return SourceGateDecision(
                     False,
@@ -211,12 +269,61 @@ def source_gate_decision(hit: SearchHit, query: DiscoveryQuery) -> SourceGateDec
                 "SALE_CHANNEL_SOURCE",
                 "bounded active-sale channel evidence",
             )
-        return SourceGateDecision(True, canonical, host, "SALE_LISTING_SOURCE", "liquidation sale page")
+        if not _NORSKAVVIKLING_PRODUCT_PATH.fullmatch(path):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "Norsk Avvikling URL is not a bounded sale page",
+            )
+        if not _looks_commercial_and_clothing(hit):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "liquidation product page lacks clothing sale evidence",
+            )
+        return SourceGateDecision(True, canonical, host, "SALE_LISTING_SOURCE", "specific clothing liquidation sale page")
 
-    if host in {"auksjonen.no", "stadssalg.no"}:
-        if path == "/":
-            return SourceGateDecision(False, canonical, host, "REJECTED", "generic auction homepage")
-        return SourceGateDecision(True, canonical, host, "SALE_LISTING_SOURCE", "auction or clearance page")
+    if host == "auksjonen.no":
+        if not _AUKSJONEN_ITEM_PATH.fullmatch(path):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "Auksjonen URL is not one specific auction item page",
+            )
+        if not _looks_commercial_and_clothing(hit):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "auction item page lacks clothing sale evidence",
+            )
+        return SourceGateDecision(True, canonical, host, "SALE_LISTING_SOURCE", "specific clothing auction item page")
+
+    if host == "stadssalg.no":
+        if not _STADSSALG_ITEM_PATH.fullmatch(path):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "Stadssalg URL is not one specific item page",
+            )
+        if not _looks_commercial_and_clothing(hit):
+            return SourceGateDecision(
+                False,
+                canonical,
+                host,
+                "REJECTED",
+                "clearance item page lacks clothing sale evidence",
+            )
+        return SourceGateDecision(True, canonical, host, "SALE_LISTING_SOURCE", "specific clothing clearance item page")
 
     return SourceGateDecision(False, canonical, host, "REJECTED", "source policy fallthrough")
 
@@ -326,9 +433,7 @@ class SourceTargetedSearchProvider:
             ],
             "reference_cases": sorted(_REFERENCE_MARKERS),
             "reference_cases_recovered": sorted(self._recovered_references),
-            "reference_recall": (
-                len(self._recovered_references) / len(_REFERENCE_MARKERS)
-            ),
+            "reference_recall": len(self._recovered_references) / len(_REFERENCE_MARKERS),
             "playwright_used": False,
             "page_verification_performed_by_gate": False,
         }
