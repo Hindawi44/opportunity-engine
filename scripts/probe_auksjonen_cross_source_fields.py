@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Inspect public Auksjonen item keys needed for truthful cross-source matching.
 
-This temporary diagnostic prints field names and only identity-related values. It
-never logs addresses, personal names, contacts, bids, purchases, or payments.
+This temporary diagnostic prints field names and a bounded set of public source
+identity values. It never logs addresses, contacts, bids, purchases, or payments.
 """
 from __future__ import annotations
 
@@ -29,6 +29,7 @@ IDENTITY_HINTS = (
     "provider",
     "vendor",
     "business",
+    "principal",
 )
 SAFE_SAMPLE_KEYS = {
     "title",
@@ -39,7 +40,17 @@ SAFE_SAMPLE_KEYS = {
     "category2",
     "category3",
     "city",
+    "principal",
+    "organizationCode",
+    "organizationId",
+    "projectId",
 }
+IDENTITY_VALUE_KEYS = (
+    "principal",
+    "organizationCode",
+    "organizationId",
+    "projectId",
+)
 
 
 def _safe_value(key: str, value: object) -> object | None:
@@ -54,12 +65,31 @@ def _safe_value(key: str, value: object) -> object | None:
     return None
 
 
+def _identity_value_summary(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    summary: dict[str, Any] = {}
+    for key in IDENTITY_VALUE_KEYS:
+        values: list[object] = []
+        for item in items:
+            value = item.get(key)
+            if value in (None, ""):
+                continue
+            if value not in values:
+                values.append(value)
+            if len(values) >= 10:
+                break
+        summary[key] = {
+            "nonempty_count": sum(1 for item in items if item.get(key) not in (None, "")),
+            "unique_values_bounded": values,
+        }
+    return summary
+
+
 def main() -> int:
     request = Request(
         ENDPOINT,
         headers={
             "Accept": "application/json",
-            "User-Agent": "OpportunityEngine/Auksjonen-Cross-Source-Schema-Probe-1.0",
+            "User-Agent": "OpportunityEngine/Auksjonen-Cross-Source-Schema-Probe-1.1",
         },
     )
     with urlopen(request, timeout=30) as response:  # noqa: S310
@@ -75,6 +105,7 @@ def main() -> int:
     identity_keys = [
         key for key in keys if any(hint in key.casefold() for hint in IDENTITY_HINTS)
     ]
+    identity_values = _identity_value_summary(mappings)
     samples: list[dict[str, Any]] = []
     for item in mappings[:5]:
         sample: dict[str, Any] = {}
@@ -90,6 +121,7 @@ def main() -> int:
         "items_received": len(mappings),
         "raw_item_keys": keys,
         "identity_candidate_keys": identity_keys,
+        "identity_value_summary": identity_values,
         "safe_samples": samples,
         "address_values_logged": False,
         "contact_values_logged": False,
@@ -105,6 +137,10 @@ def main() -> int:
     print(f"Items received: {len(mappings)}")
     print(f"Raw item keys: {keys}")
     print(f"Identity candidate keys: {identity_keys}")
+    print(
+        "Identity value summary: "
+        + json.dumps(identity_values, ensure_ascii=False, sort_keys=True)
+    )
     for index, sample in enumerate(samples, start=1):
         print(f"Safe sample {index}: {json.dumps(sample, ensure_ascii=False, sort_keys=True)}")
     print(f"Report: {path}")
