@@ -7,6 +7,11 @@ import os
 from pathlib import Path
 from typing import Any, Mapping
 
+from opportunity_engine.discovery.auksjonen_current_category import (
+    AuksjonenCurrentCategoryAugmentedProvider,
+    AuksjonenCurrentCategoryCollector,
+    AuksjonenCurrentCategoryConfig,
+)
 from opportunity_engine.discovery.auksjonen_playwright_fallback import (
     AuksjonenPlaywrightFallbackConfig,
     AuksjonenPlaywrightFallbackVerifier,
@@ -96,6 +101,25 @@ def _disabled_playwright_diagnostics() -> dict[str, object]:
     }
 
 
+def _disabled_current_category_diagnostics() -> dict[str, object]:
+    return {
+        "enabled": False,
+        "scope": "one_approved_auksjonen_clothing_category",
+        "category_url": None,
+        "final_url": None,
+        "pages_visited": 0,
+        "rows_seen": 0,
+        "specific_item_hits": 0,
+        "item_urls": [],
+        "errors": [],
+        "used": False,
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase_decision": False,
+        "automatic_payment": False,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -142,12 +166,28 @@ def main() -> int:
         default=2.5,
         help="Minimum delay after each bounded browser navigation",
     )
+    parser.add_argument(
+        "--auksjonen-current-category",
+        action="store_true",
+        help=(
+            "Supplement Brave with specific item links from one approved public "
+            "Auksjonen clothing/workwear category page"
+        ),
+    )
+    parser.add_argument(
+        "--auksjonen-current-limit",
+        type=int,
+        default=10,
+        help="Maximum current Auksjonen item links added from the category (1-10)",
+    )
     args = parser.parse_args()
 
     if not 1 <= args.results_per_query <= 20:
         raise SystemExit("--results-per-query must be between 1 and 20")
     if args.playwright_fallback and not args.verify_pages:
         raise SystemExit("--playwright-fallback requires --verify-pages")
+    if args.auksjonen_current_category and not args.verify_pages:
+        raise SystemExit("--auksjonen-current-category requires --verify-pages")
 
     api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
     if not api_key:
@@ -161,11 +201,35 @@ def main() -> int:
         extra_snippets=True,
         operators=True,
     )
-    provider = SourceTargetedSearchProvider(
+    source_provider = SourceTargetedSearchProvider(
         brave,
         queries=discovery_queries,
         request_budget=len(discovery_queries),
     )
+    provider = source_provider
+    current_category_diagnostics = _disabled_current_category_diagnostics()
+
+    if args.auksjonen_current_category:
+        try:
+            auksjonen_query = next(
+                query for query in discovery_queries if query.query_id == "sale-03"
+            )
+        except StopIteration as exc:
+            raise SystemExit(
+                "--auksjonen-current-category requires the sale-03 query in the budget"
+            ) from exc
+        collection = AuksjonenCurrentCategoryCollector(
+            AuksjonenCurrentCategoryConfig(
+                max_listings=args.auksjonen_current_limit,
+                delay_seconds=args.playwright_delay_seconds,
+            )
+        ).collect(query=auksjonen_query)
+        current_category_diagnostics = collection.diagnostics()
+        provider = AuksjonenCurrentCategoryAugmentedProvider(
+            source_provider,
+            target_query=auksjonen_query.query,
+            current_hits=collection.hits,
+        )
 
     playwright_verifier: AuksjonenPlaywrightFallbackVerifier | None = None
     verifier = None
@@ -197,7 +261,7 @@ def main() -> int:
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
     report = result["search_run_report"]
-    diagnostics = provider.diagnostics()
+    diagnostics = source_provider.diagnostics()
     verification_failures = collect_verification_failure_details(result)
     playwright_diagnostics = (
         playwright_verifier.diagnostics()
@@ -210,11 +274,14 @@ def main() -> int:
     report["source_targeting_url_gate"] = diagnostics
     report["verification_failure_details"] = verification_failures
     report["verification_failure_detail_count"] = len(verification_failures)
+    report["auksjonen_current_category_discovery"] = current_category_diagnostics
     report["auksjonen_playwright_fallback"] = playwright_diagnostics
     report["brave_freshness"] = args.freshness
     report["brave_extra_snippets"] = True
     report["brave_operators"] = True
-    report["playwright_used"] = bool(playwright_diagnostics["used"])
+    report["playwright_used"] = bool(
+        playwright_diagnostics["used"] or current_category_diagnostics["used"]
+    )
 
     paths = write_discovery_artifacts(result, Path(args.output_dir))
     print(f"Status: {report['status']}")
@@ -223,6 +290,10 @@ def main() -> int:
     print(f"Raw hits: {diagnostics['raw_hits']}")
     print(f"Accepted by URL gate: {diagnostics['accepted_hits']}")
     print(f"Rejected before classification: {diagnostics['rejected_hits']}")
+    print(
+        "Current Auksjonen category hits: "
+        f"{current_category_diagnostics['specific_item_hits']}"
+    )
     print(f"Playwright attempts: {playwright_diagnostics['attempted']}")
     print(f"Playwright successes: {playwright_diagnostics['succeeded']}")
     print(f"Verification failures detailed: {len(verification_failures)}")
