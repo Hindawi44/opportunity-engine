@@ -15,6 +15,7 @@ on:
       - "src/opportunity_engine/discovery/brave_precision.py"
       - "src/opportunity_engine/discovery/brave_retrieval_probe.py"
       - "src/opportunity_engine/discovery/clothing_inventory_search.py"
+      - "src/opportunity_engine/discovery/auksjonen_playwright_fallback.py"
       - "src/opportunity_engine/discovery/source_targeted_queries.py"
       - "src/opportunity_engine/discovery/source_targeted_retrieval.py"
       - "scripts/run_discovery_v12_live_pilot.py"
@@ -30,6 +31,7 @@ on:
       - "tests/test_discovery_v16_quality_engine.py"
       - "tests/test_active_clothing_inventory_scan.py"
       - "tests/test_clothing_inventory_discovery_search.py"
+      - "tests/test_auksjonen_playwright_fallback.py"
       - "tests/test_source_targeted_queries.py"
       - "tests/test_source_targeted_retrieval.py"
       - "tests/test_active_clothing_inventory_operator_integration.py"
@@ -69,6 +71,7 @@ jobs:
           pytest tests/test_discovery_v12_live_pilot.py -q
           pytest tests/test_active_clothing_inventory_scan.py -q
           pytest tests/test_clothing_inventory_discovery_search.py -q
+          pytest tests/test_auksjonen_playwright_fallback.py -q
           pytest tests/test_source_targeted_queries.py -q
           pytest tests/test_source_targeted_retrieval.py -q
           pytest tests/test_active_clothing_inventory_operator_integration.py -q
@@ -151,6 +154,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install bounded Chromium verifier
+        run: |
+          python -m pip install -r requirements-playwright.txt
+          python -m playwright install --with-deps chromium
       - name: Run structured Clothing Inventory Discovery
         env:
           PYTHONPATH: src:.
@@ -158,6 +165,9 @@ jobs:
         run: |
           python scripts/run_clothing_inventory_discovery_search.py \
             --verify-pages \
+            --playwright-fallback \
+            --playwright-limit 3 \
+            --playwright-delay-seconds 2.5 \
             --output-dir artifacts/clothing-inventory-discovery
       - name: Show structured Discovery operator summary
         if: ${{ always() }}

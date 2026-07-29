@@ -128,4 +128,6 @@ def test_live_structured_discovery_runner_applies_the_guard():
     assert "enforce_source_channel_identity" in script
     assert "def _guarded_public_verifier" in script
     assert "return enforce_source_channel_identity(verify_public_page(url))" in script
-    assert "verifier=_guarded_public_verifier if args.verify_pages else None" in script
+    assert "verifier = _guarded_public_verifier" in script
+    assert "AuksjonenPlaywrightFallbackVerifier(" in script
+    assert "_guarded_public_verifier," in script
