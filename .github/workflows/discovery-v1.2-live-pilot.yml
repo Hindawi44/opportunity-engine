@@ -14,9 +14,12 @@ on:
       - "src/opportunity_engine/discovery/brave_search.py"
       - "src/opportunity_engine/discovery/brave_precision.py"
       - "src/opportunity_engine/discovery/clothing_inventory_search.py"
+      - "src/opportunity_engine/discovery/source_targeted_queries.py"
+      - "src/opportunity_engine/discovery/source_targeted_retrieval.py"
       - "scripts/run_discovery_v12_live_pilot.py"
       - "scripts/run_active_clothing_inventory_scan.py"
       - "scripts/run_clothing_inventory_discovery_search.py"
+      - "scripts/run_source_targeted_retrieval.py"
       - "tests/test_discovery_v11_live_search.py"
       - "tests/test_brave_precision.py"
       - "tests/test_discovery_v12_live_pilot.py"
@@ -24,7 +27,10 @@ on:
       - "tests/test_discovery_v16_quality_engine.py"
       - "tests/test_active_clothing_inventory_scan.py"
       - "tests/test_clothing_inventory_discovery_search.py"
+      - "tests/test_source_targeted_queries.py"
+      - "tests/test_source_targeted_retrieval.py"
       - "tests/test_active_clothing_inventory_operator_integration.py"
+      - "docs/SOURCE_TARGETED_RETRIEVAL_TASK_v1.0.md"
   workflow_dispatch:
     inputs:
       operation:
@@ -36,6 +42,7 @@ on:
           - brave_discovery
           - active_clothing_scan
           - structured_clothing_discovery
+          - source_targeted_validation
 
 jobs:
   contract-tests:
@@ -57,6 +64,8 @@ jobs:
           pytest tests/test_discovery_v12_live_pilot.py -q
           pytest tests/test_active_clothing_inventory_scan.py -q
           pytest tests/test_clothing_inventory_discovery_search.py -q
+          pytest tests/test_source_targeted_queries.py -q
+          pytest tests/test_source_targeted_retrieval.py -q
           pytest tests/test_active_clothing_inventory_operator_integration.py -q
 
   live-pilot:
@@ -161,4 +170,40 @@ jobs:
         with:
           name: clothing-inventory-discovery-top5
           path: artifacts/clothing-inventory-discovery/
+          if-no-files-found: error
+
+  source-targeted-validation:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'source_targeted_validation' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run bounded source-targeted retrieval
+        env:
+          PYTHONPATH: src:.
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+        run: |
+          python scripts/run_source_targeted_retrieval.py \
+            --query-budget 8 \
+            --freshness pm \
+            --results-per-query 10 \
+            --output-dir artifacts/source-targeted-retrieval
+      - name: Show source-targeted validation summary
+        if: ${{ always() }}
+        run: |
+          summary="artifacts/source-targeted-retrieval/source-targeted-validation-summary.txt"
+          if [ -f "$summary" ]; then
+            cat "$summary"
+          else
+            echo "Source-targeted validation summary was not created."
+            exit 1
+          fi
+      - name: Upload source-targeted validation artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-targeted-clothing-retrieval
+          path: artifacts/source-targeted-retrieval/
           if-no-files-found: error
