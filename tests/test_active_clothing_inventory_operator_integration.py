@@ -125,7 +125,7 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
     assert "run_clothing_inventory_discovery_search.py" not in targeted_job
     assert targeted_job.count("python scripts/run_source_targeted_retrieval.py") == 1
     assert "--query-budget 8" in targeted_job
-    assert "--freshness pm" in targeted_job
+    assert "--freshness none" in targeted_job
     assert "--output-dir artifacts/source-targeted-retrieval" in targeted_job
 
 
