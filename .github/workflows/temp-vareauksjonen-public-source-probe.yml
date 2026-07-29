@@ -1,44 +1,56 @@
-name: TEMP — Vareauksjonen Public Source Probe
+name: TEMP — Vareauksjonen Live Clothing Validation
 
 on:
   pull_request:
     branches: [main]
     paths:
       - ".github/workflows/temp-vareauksjonen-public-source-probe.yml"
-      - "scripts/probe_vareauksjonen_public_source.py"
-      - "scripts/probe_vareauksjonen_listing_detail.py"
+      - "src/opportunity_engine/discovery/vareauksjonen_public_adapter.py"
+      - "scripts/run_vareauksjonen_live_clothing.py"
+      - "tests/test_vareauksjonen_public_adapter.py"
 
 jobs:
-  public-source-probe:
+  focused-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Inspect Vareauksjonen public categories
-        run: python scripts/probe_vareauksjonen_public_source.py
-      - name: Upload public source evidence
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: vareauksjonen-public-source-probe
-          path: artifacts/vareauksjonen-public-source-probe/
-          if-no-files-found: error
+      - run: pip install pytest
+      - name: Test Vareauksjonen adapter
+        env:
+          PYTHONPATH: src:.
+        run: pytest tests/test_vareauksjonen_public_adapter.py -q
 
-  listing-detail-probe:
+  bounded-live-scan:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Inspect one active public listing
-        run: python scripts/probe_vareauksjonen_listing_detail.py
-      - name: Upload listing detail evidence
+      - name: Scan permitted Vareauksjonen public pages
+        env:
+          PYTHONPATH: src:.
+        run: |
+          python scripts/run_vareauksjonen_live_clothing.py \
+            --max-candidate-details 10 \
+            --output-dir artifacts/vareauksjonen-live-clothing
+      - name: Show operator summary
+        if: ${{ always() }}
+        run: |
+          summary="artifacts/vareauksjonen-live-clothing/operator-summary.txt"
+          if [ -f "$summary" ]; then
+            cat "$summary"
+          else
+            echo "Vareauksjonen operator summary was not created."
+            exit 1
+          fi
+      - name: Upload live evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: vareauksjonen-listing-detail-probe
-          path: artifacts/vareauksjonen-listing-detail-probe/
+          name: vareauksjonen-live-clothing
+          path: artifacts/vareauksjonen-live-clothing/
           if-no-files-found: error
