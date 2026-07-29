@@ -7,6 +7,7 @@ on:
       - ".github/workflows/auksjonen-live-source-probe.yml"
       - "src/opportunity_engine/discovery/auksjonen_live_probe.py"
       - "scripts/run_auksjonen_live_probe.py"
+      - "scripts/run_auksjonen_public_api_probe.py"
       - "tests/test_auksjonen_live_probe.py"
   workflow_dispatch:
 
@@ -45,13 +46,24 @@ jobs:
             --delay-seconds 7 \
             --max-responses 60 \
             --output-dir artifacts/auksjonen-live-source-probe
-      - name: Show operator summary
+      - name: Read the discovered public clothing API directly
+        env:
+          PYTHONPATH: src:.
+        run: |
+          python scripts/run_auksjonen_public_api_probe.py \
+            --output-dir artifacts/auksjonen-public-api-probe
+      - name: Show operator summaries
         if: ${{ always() }}
-        run: cat artifacts/auksjonen-live-source-probe/operator-summary.txt
+        run: |
+          cat artifacts/auksjonen-live-source-probe/operator-summary.txt || true
+          echo "---"
+          cat artifacts/auksjonen-public-api-probe/operator-summary.txt || true
       - name: Upload live-source evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: auksjonen-live-source-probe
-          path: artifacts/auksjonen-live-source-probe/
+          name: auksjonen-live-source-evidence
+          path: |
+            artifacts/auksjonen-live-source-probe/
+            artifacts/auksjonen-public-api-probe/
           if-no-files-found: error
