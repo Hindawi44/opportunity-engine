@@ -11,6 +11,9 @@ from opportunity_engine.discovery.source_targeted_queries import (
     build_source_targeted_queries,
     select_source_targeted_queries,
 )
+from scripts.run_clothing_inventory_discovery_search import (
+    build_structured_discovery_queries,
+)
 
 
 def test_source_targeted_policy_preserves_the_canonical_query_contract():
@@ -44,6 +47,14 @@ def test_default_budget_covers_all_approved_source_families():
     assert "site:forvalt.no" in text
     assert "site:virksomhet.brreg.no" in text
     assert "site:konkurs.app" in text
+
+
+def test_structured_discovery_uses_source_targeted_default_budget():
+    selected = build_structured_discovery_queries()
+
+    assert selected == select_source_targeted_queries()
+    assert len(selected) == SOURCE_TARGETED_QUERY_BUDGET
+    assert all(query.query.count("site:") == 1 for query in selected)
 
 
 def test_site_operators_are_host_only_and_queries_remain_short():
