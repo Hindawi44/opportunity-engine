@@ -258,6 +258,7 @@ class SourceTargetedSearchProvider:
         self._accepted_hosts: Counter[str] = Counter()
         self._recovered_references: set[str] = set()
         self._accepted_urls: list[str] = []
+        self._query_diagnostics: dict[str, dict[str, Any]] = {}
         self.name = f"{getattr(provider, 'name', provider.__class__.__name__)} + Source Targeting"
 
     def search(self, query: str, *, count: int = 10) -> Sequence[SearchHit]:
@@ -268,12 +269,28 @@ class SourceTargetedSearchProvider:
             raise RuntimeError("source-targeted Brave request budget exhausted")
 
         self._requests_made += 1
-        hits = self._provider.search(query, count=count)
+        stats = {
+            "query_id": discovery_query.query_id,
+            "query": query,
+            "raw_hits": 0,
+            "accepted_hits": 0,
+            "rejected_hits": 0,
+            "error": None,
+        }
+        self._query_diagnostics[discovery_query.query_id] = stats
+        try:
+            hits = self._provider.search(query, count=count)
+        except Exception as exc:
+            stats["error"] = str(exc)
+            raise
+
+        stats["raw_hits"] = len(hits)
         self._raw_hits += len(hits)
         accepted: list[SearchHit] = []
         for hit in hits:
             decision = source_gate_decision(hit, discovery_query)
             if not decision.accepted:
+                stats["rejected_hits"] += 1
                 self._rejected_hits += 1
                 self._rejection_reasons[decision.reason] += 1
                 continue
@@ -284,6 +301,7 @@ class SourceTargetedSearchProvider:
                 provider=hit.provider or getattr(self._provider, "name", ""),
             )
             accepted.append(accepted_hit)
+            stats["accepted_hits"] += 1
             self._accepted_hits += 1
             self._accepted_hosts[decision.host] += 1
             if decision.canonical_url not in self._accepted_urls:
@@ -298,9 +316,14 @@ class SourceTargetedSearchProvider:
             "raw_hits": self._raw_hits,
             "accepted_hits": self._accepted_hits,
             "rejected_hits": self._rejected_hits,
+            "zero_raw_hits": self._raw_hits == 0,
             "rejection_reasons": dict(sorted(self._rejection_reasons.items())),
             "accepted_hosts": dict(sorted(self._accepted_hosts.items())),
             "accepted_urls": list(self._accepted_urls),
+            "query_diagnostics": [
+                dict(self._query_diagnostics[query_id])
+                for query_id in self._query_diagnostics
+            ],
             "reference_cases": sorted(_REFERENCE_MARKERS),
             "reference_cases_recovered": sorted(self._recovered_references),
             "reference_recall": (
