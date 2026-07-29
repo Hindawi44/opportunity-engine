@@ -14,82 +14,37 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     DiscoveryQuery,
 )
 
-SOURCE_TARGETED_FRESHNESS = "pm"
+# Source targeting already constrains the host, while the URL gate constrains the
+# page shape. Do not apply a date filter by default: Brave freshness is based on
+# the page's indexed date, not whether a sale is still active.
+SOURCE_TARGETED_FRESHNESS = "none"
 SOURCE_TARGETED_QUERY_BUDGET = 8
 
+# Keep queries deliberately short. The previous live run combined path-scoped
+# site operators, exact phrases, many exclusions, and freshness=pm; Brave
+# returned zero raw hits for all eleven requests. Host-only site restrictions
+# plus the existing URL gate provide precision without suppressing recall.
 _SOURCE_TARGETED_QUERY_TEXT: dict[str, str] = {
-    "sale-01": (
-        "site:norskavvikling.no klesbutikk varelager selges "
-        "-nyheter -artikkel -jobb -stilling -nettbutikk "
-        '-"ønskes kjøpt" -kjøpes'
-    ),
+    "sale-01": "klesbutikk varelager selges site:norskavvikling.no",
     "sale-02": (
-        'site:finn.no/recommerce/forsale/item "hele lageret" klær "til salgs" '
-        "-nyheter -artikkel -jobb -nettbutikk "
-        '-"ønskes kjøpt" -kjøpes'
+        'vareparti klær site:finn.no -"ønskes kjøpt" -kjøpes'
     ),
-    "sale-03": (
-        "site:auksjonen.no vareparti klær auksjon "
-        "-nyheter -artikkel -blogg -avsluttet -solgt "
-        '-"ønskes kjøpt" -kjøpes'
-    ),
-    "sale-04": (
-        "site:stadssalg.no restlager klær selges "
-        "-nyheter -artikkel -blogg -jobb -nettbutikk "
-        '-"ønskes kjøpt" -kjøpes'
-    ),
-    "sale-05": (
-        "site:norskavvikling.no konkursbo klær auksjon "
-        "-nyheter -artikkel -jobb -stilling -avsluttet -solgt"
-    ),
-    "sale-06": (
-        'site:stadssalg.no opphørssalg klesbutikk "hele lageret" '
-        "-nyheter -artikkel -jobb -nettbutikk "
-        '-"ønskes kjøpt" -kjøpes'
-    ),
-    "lead-01": (
-        "site:forvalt.no/Konkurs konkurs klesbutikk varelager "
-        "-jobb -stilling -nettbutikk -wikipedia -podcast"
-    ),
-    "lead-02": (
-        'site:virksomhet.brreg.no konkurs "Detaljhandel med klær" '
-        "-jobb -stilling -nettbutikk -wikipedia -podcast"
-    ),
-    "lead-03": (
-        "site:konkurs.app klesbutikk konkurs "
-        "-jobb -stilling -nettbutikk -wikipedia -podcast"
-    ),
-    "lead-04": (
-        'site:forvalt.no/Konkurs "filial legges ned" klesbutikk '
-        "-jobb -stilling -nettbutikk -wikipedia -podcast"
-    ),
-    "lead-05": (
-        'site:norskavvikling.no "lager ryddes" klesbutikk '
-        "-jobb -stilling -nettbutikk -wikipedia -podcast"
-    ),
-    "lead-06": (
-        "site:forvalt.no/Konkurs opphør klesbutikk Trøndelag "
-        "-jobb -stilling -nettbutikk -wikipedia -podcast"
-    ),
-    "special-01": (
-        'site:auksjonen.no "hele varelageret" klær "samlet salg" '
-        "-nyheter -artikkel -blogg -jobb -nettbutikk "
-        '-"ønskes kjøpt" -kjøpes'
-    ),
+    "sale-03": "vareparti klær site:auksjonen.no",
+    "sale-04": "restlager klær site:stadssalg.no",
+    "sale-05": "konkursbo klær site:norskavvikling.no",
+    "sale-06": "opphørssalg klesbutikk site:stadssalg.no",
+    "lead-01": "konkurs klesbutikk site:forvalt.no",
+    "lead-02": "detaljhandel klær konkurs site:virksomhet.brreg.no",
+    "lead-03": "klesbutikk konkurs site:konkurs.app",
+    "lead-04": "filial stenger klesbutikk site:forvalt.no",
+    "lead-05": "lager ryddes klesbutikk site:norskavvikling.no",
+    "lead-06": "opphør klesbutikk Trøndelag site:forvalt.no",
+    "special-01": "hele varelageret klær site:auksjonen.no",
     "special-02": (
-        'site:finn.no/recommerce/forsale/item "stort klesparti" selges '
-        "-nyheter -artikkel -jobb -nettbutikk "
-        '-"ønskes kjøpt" -kjøpes'
+        'stort klesparti site:finn.no -"ønskes kjøpt" -kjøpes'
     ),
-    "special-03": (
-        "site:auksjonen.no arbeidstøy restlager parti "
-        "-nyheter -artikkel -blogg -jobb -nettbutikk "
-        '-"ønskes kjøpt" -kjøpes'
-    ),
-    "special-04": (
-        "site:norskavvikling.no sportsklær konkursbo varelager "
-        "-nyheter -artikkel -jobb -stilling -nettbutikk -podcast"
-    ),
+    "special-03": "arbeidstøy parti site:auksjonen.no",
+    "special-04": "sportsklær konkursbo site:norskavvikling.no",
 }
 
 _SOURCE_TARGETED_PRIORITY = (
@@ -111,13 +66,18 @@ _SOURCE_TARGETED_PRIORITY = (
     "lead-05",
 )
 
+# Reference checks use stable organisation numbers rather than names. Live Brave
+# evidence showed that name-heavy queries either returned no results or returned
+# other organisations from the same registry. The number is also present in the
+# canonical public organisation URL, allowing identity recovery without relaxing
+# the URL gate or any downstream verification rule.
 SOURCE_TARGETED_REFERENCE_QUERIES: tuple[DiscoveryQuery, ...] = (
     DiscoveryQuery(
         "reference-axl",
         "COMPANY_BANKRUPTCY",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
-        'site:norskavvikling.no "AXL Sport Og Fritid" Kolvereid',
+        "AXL Sport Og Fritid Kolvereid site:norskavvikling.no",
         "SECONDARY",
     ),
     DiscoveryQuery(
@@ -125,7 +85,7 @@ SOURCE_TARGETED_REFERENCE_QUERIES: tuple[DiscoveryQuery, ...] = (
         "COMPANY_BANKRUPTCY",
         "EVENT_LEAD",
         "CLOTHING_INVENTORY",
-        'site:forvalt.no/Konkurs "ANNA J AS" Namsos',
+        "989324217 site:forvalt.no",
         "SECONDARY",
     ),
     DiscoveryQuery(
@@ -133,7 +93,7 @@ SOURCE_TARGETED_REFERENCE_QUERIES: tuple[DiscoveryQuery, ...] = (
         "COMPANY_BANKRUPTCY",
         "EVENT_LEAD",
         "CLOTHING_INVENTORY",
-        'site:virksomhet.brreg.no "TOMMELITEN BARNEKLÆR AS" konkurs',
+        "932113309 site:virksomhet.brreg.no",
         "SECONDARY",
     ),
 )

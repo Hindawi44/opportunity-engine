@@ -50,19 +50,23 @@ def test_manual_operation_contract_and_path_scope() -> None:
         "active_clothing_scan",
         "structured_clothing_discovery",
         "source_targeted_validation",
+        "brave_retrieval_probe",
     ]
 
     for required_path in (
         '      - "src/opportunity_engine/discovery/brave_search.py"',
         '      - "src/opportunity_engine/discovery/brave_precision.py"',
+        '      - "src/opportunity_engine/discovery/brave_retrieval_probe.py"',
         '      - "src/opportunity_engine/discovery/clothing_inventory_search.py"',
         '      - "src/opportunity_engine/discovery/source_targeted_queries.py"',
         '      - "src/opportunity_engine/discovery/source_targeted_retrieval.py"',
         '      - "scripts/run_active_clothing_inventory_scan.py"',
         '      - "scripts/run_clothing_inventory_discovery_search.py"',
         '      - "scripts/run_source_targeted_retrieval.py"',
+        '      - "scripts/run_brave_retrieval_probe.py"',
         '      - "tests/test_discovery_v11_live_search.py"',
         '      - "tests/test_brave_precision.py"',
+        '      - "tests/test_brave_retrieval_probe.py"',
         '      - "tests/test_active_clothing_inventory_scan.py"',
         '      - "tests/test_clothing_inventory_discovery_search.py"',
         '      - "tests/test_source_targeted_queries.py"',
@@ -78,6 +82,7 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
     active_job = _job_block(workflow, "active-clothing-inventory-scan")
     structured_job = _job_block(workflow, "structured-clothing-discovery")
     targeted_job = _job_block(workflow, "source-targeted-validation")
+    probe_job = _job_block(workflow, "brave-retrieval-probe")
 
     assert (
         "if: ${{ github.event_name == 'workflow_dispatch' && "
@@ -95,17 +100,23 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
         "if: ${{ github.event_name == 'workflow_dispatch' && "
         "inputs.operation == 'source_targeted_validation' }}"
     ) in targeted_job
+    assert (
+        "if: ${{ github.event_name == 'workflow_dispatch' && "
+        "inputs.operation == 'brave_retrieval_probe' }}"
+    ) in probe_job
 
     assert "python scripts/run_discovery_v12_live_pilot.py" in brave_job
     assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in brave_job
     assert "run_active_clothing_inventory_scan.py" not in brave_job
     assert "run_clothing_inventory_discovery_search.py" not in brave_job
     assert "run_source_targeted_retrieval.py" not in brave_job
+    assert "run_brave_retrieval_probe.py" not in brave_job
 
     assert "BRAVE_SEARCH_API_KEY" not in active_job
     assert "run_discovery_v12_live_pilot.py" not in active_job
     assert "run_clothing_inventory_discovery_search.py" not in active_job
     assert "run_source_targeted_retrieval.py" not in active_job
+    assert "run_brave_retrieval_probe.py" not in active_job
     assert active_job.count("python scripts/run_active_clothing_inventory_scan.py") == 1
     assert "--output-dir artifacts/active-clothing-inventory-scan" in active_job
 
@@ -113,6 +124,7 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
     assert "run_discovery_v12_live_pilot.py" not in structured_job
     assert "run_active_clothing_inventory_scan.py" not in structured_job
     assert "run_source_targeted_retrieval.py" not in structured_job
+    assert "run_brave_retrieval_probe.py" not in structured_job
     assert structured_job.count(
         "python scripts/run_clothing_inventory_discovery_search.py"
     ) == 1
@@ -123,10 +135,19 @@ def test_all_discovery_jobs_are_mutually_selected() -> None:
     assert "run_discovery_v12_live_pilot.py" not in targeted_job
     assert "run_active_clothing_inventory_scan.py" not in targeted_job
     assert "run_clothing_inventory_discovery_search.py" not in targeted_job
+    assert "run_brave_retrieval_probe.py" not in targeted_job
     assert targeted_job.count("python scripts/run_source_targeted_retrieval.py") == 1
     assert "--query-budget 8" in targeted_job
-    assert "--freshness pm" in targeted_job
+    assert "--freshness none" in targeted_job
     assert "--output-dir artifacts/source-targeted-retrieval" in targeted_job
+
+    assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in probe_job
+    assert "run_discovery_v12_live_pilot.py" not in probe_job
+    assert "run_active_clothing_inventory_scan.py" not in probe_job
+    assert "run_clothing_inventory_discovery_search.py" not in probe_job
+    assert "run_source_targeted_retrieval.py" not in probe_job
+    assert probe_job.count("python scripts/run_brave_retrieval_probe.py") == 1
+    assert "--output-dir artifacts/brave-retrieval-probe" in probe_job
 
 
 def test_active_scan_summary_and_artifact_contract() -> None:
@@ -169,12 +190,28 @@ def test_source_targeted_summary_and_artifact_contract() -> None:
     assert "if-no-files-found: error" in targeted_job
 
 
+def test_brave_retrieval_probe_summary_and_artifact_contract() -> None:
+    probe_job = _job_block(_workflow_text(), "brave-retrieval-probe")
+
+    assert "if: ${{ always() }}" in probe_job
+    assert (
+        'summary="artifacts/brave-retrieval-probe/'
+        'brave-retrieval-probe-summary.txt"'
+        in probe_job
+    )
+    assert 'cat "$summary"' in probe_job
+    assert "name: brave-retrieval-probe" in probe_job
+    assert "path: artifacts/brave-retrieval-probe/" in probe_job
+    assert "if-no-files-found: error" in probe_job
+
+
 def test_contract_tests_preserve_all_discovery_operation_coverage() -> None:
     contract_job = _job_block(_workflow_text(), "contract-tests")
 
     required_commands = (
         "pytest tests/test_discovery_v11_live_search.py -q",
         "pytest tests/test_brave_precision.py -q",
+        "pytest tests/test_brave_retrieval_probe.py -q",
         "pytest tests/test_discovery_v16_quality_engine.py -q",
         "pytest tests/test_discovery_v15_result_filter.py -q",
         "pytest tests/test_discovery_v12_live_pilot.py -q",
@@ -199,6 +236,8 @@ def test_review_workflow_and_commercial_safety_remain_separate() -> None:
         "structured_clothing_discovery",
         "run_source_targeted_retrieval.py",
         "source_targeted_validation",
+        "run_brave_retrieval_probe.py",
+        "brave_retrieval_probe",
     ):
         assert discovery_only_term not in review_workflow
 
