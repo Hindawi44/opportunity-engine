@@ -80,7 +80,7 @@ SOURCE_TARGETED_REFERENCE_QUERIES: tuple[DiscoveryQuery, ...] = (
         "COMPANY_BANKRUPTCY",
         "EVENT_LEAD",
         "CLOTHING_INVENTORY",
-        "ANNA J AS Namsos site:forvalt.no",
+        '"ANNA J AS" Namsos konkurs site:forvalt.no',
         "SECONDARY",
     ),
     DiscoveryQuery(
@@ -88,7 +88,7 @@ SOURCE_TARGETED_REFERENCE_QUERIES: tuple[DiscoveryQuery, ...] = (
         "COMPANY_BANKRUPTCY",
         "EVENT_LEAD",
         "CLOTHING_INVENTORY",
-        "TOMMELITEN BARNEKLÆR AS site:virksomhet.brreg.no",
+        "932113309 TOMMELITEN site:virksomhet.brreg.no",
         "SECONDARY",
     ),
 )
