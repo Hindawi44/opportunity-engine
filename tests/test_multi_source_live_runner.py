@@ -7,6 +7,10 @@ from opportunity_engine.discovery.auksjonen_multi_category_adapter import (
 from opportunity_engine.discovery.auksjonen_public_api_adapter import (
     AuksjonenLiveClothingListing,
 )
+from opportunity_engine.discovery.auksjoner_no_public_adapter import (
+    AuksjonerNoCollection,
+    AuksjonerNoLiveClothingAuction,
+)
 from opportunity_engine.discovery.cross_source_clothing_sale_verifier import (
     AuksjonenItemIdentityEvidence,
     CrossSourceVerificationRecord,
@@ -119,14 +123,49 @@ def vare_collection(*, with_opportunity=True, duplicate_url=None):
     )
 
 
-def test_combined_top5_contains_only_verified_opportunities_in_evidence_order():
-    combined = build_combined_top5(cross_result(), vare_collection())
+def auksjoner_no_collection(*, with_opportunity=True, duplicate_url=None):
+    auctions = ()
+    if with_opportunity:
+        auctions = (
+            AuksjonerNoLiveClothingAuction(
+                auction_id=41,
+                title="Konkursbo med 500 Fjellreven plagg",
+                description="Ca. 500 jakker og bukser selges samlet.",
+                url=duplicate_url or "https://www.auksjoner.no/nb-NO/auctions/41",
+                listing_status="ACTIVE",
+                state_name="Active",
+                starts_at="2026-07-20T10:00:00+00:00",
+                ends_at="2026-08-10T18:00:00+00:00",
+                buyers_premium_percent=20.0,
+                clothing_signal=True,
+                inventory_lot_signal=True,
+            ),
+        )
+    return AuksjonerNoCollection(
+        captured_at="2026-07-30T00:00:00+00:00",
+        endpoint="https://www.auksjoner.no/nb-NO/auctions",
+        crawl_delay_seconds=2.0,
+        items_received=len(auctions),
+        auctions=auctions,
+        scan_complete=True,
+        errors=(),
+    )
 
-    assert len(combined) == 2
+
+def test_combined_top5_contains_only_verified_opportunities_in_evidence_order():
+    combined = build_combined_top5(
+        cross_result(),
+        vare_collection(),
+        auksjoner_no_collection(),
+    )
+
+    assert len(combined) == 3
     assert combined[0]["source_channel"] == "KONKURS_APP_AUKSJONEN_EXACT_ORGNR"
     assert combined[0]["price_nok"] == 20_000.0
     assert combined[1]["source_channel"] == "VAREAUKSJONEN_DIRECT_ACTIVE_LOT"
     assert combined[1]["quantity"] == 120
+    assert combined[2]["source_channel"] == "AUKSJONER_NO_CURRENT_ACTIVE_LOT"
+    assert combined[2]["buyers_premium_percent"] == 20.0
     assert all(item["top5_eligible"] for item in combined)
     assert all(item["automatic_purchase_decision"] is False for item in combined)
 
@@ -135,17 +174,19 @@ def test_unverified_cross_source_record_is_not_promoted():
     combined = build_combined_top5(
         cross_result(verified=False),
         vare_collection(with_opportunity=False),
+        auksjoner_no_collection(with_opportunity=False),
     )
 
     assert combined == []
 
 
-def test_combined_top5_deduplicates_by_exact_url():
+def test_combined_top5_deduplicates_by_exact_url_across_all_sources():
     cross = cross_result()
     cross_url = cross.records[0].listing.url
     combined = build_combined_top5(
         cross,
         vare_collection(duplicate_url=cross_url),
+        auksjoner_no_collection(duplicate_url=cross_url),
     )
 
     assert len(combined) == 1
@@ -156,6 +197,7 @@ def test_combined_outputs_keep_one_canonical_commercial_file(tmp_path: Path):
     paths = write_combined_outputs(
         cross_source=cross_result(),
         vareauksjonen=vare_collection(),
+        auksjoner_no=auksjoner_no_collection(),
         output_dir=tmp_path,
     )
 
@@ -163,9 +205,12 @@ def test_combined_outputs_keep_one_canonical_commercial_file(tmp_path: Path):
     report = json.loads(paths["report"].read_text(encoding="utf-8"))
     summary = paths["summary"].read_text(encoding="utf-8")
 
-    assert len(top5) == 2
-    assert report["commercial_top5_count"] == 2
+    assert len(top5) == 3
+    assert report["commercial_top5_count"] == 3
     assert report["scan_complete"] is True
     assert report["paid_search_used"] is False
-    assert "Unified commercial Top 5 count: 2" in summary
+    assert report["sources"]["auksjoner_no"]["past_page_queried"] is False
+    assert "Unified commercial Top 5 count: 3" in summary
+    assert "Auksjoner.no:" in summary
+    assert "Past auction page queried: false" in summary
     assert "Paid Brave/OpenAI calls: 0" in summary
