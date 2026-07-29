@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Observe public API calls made by one Auksjonen item page.
+"""Observe public identity evidence exposed by two Auksjonen item pages.
 
-Temporary bounded diagnostic: one public item page, no login, no interaction, no
-contact, no bid, no purchase, and no payment. Only API URLs, JSON keys, and
-identity-related values are retained.
+Temporary bounded diagnostic: two public item pages, no login, no interaction, no
+contact, no bid, no purchase, and no payment. It retains only API URLs, JSON keys,
+public identity-related text lines, and bounded structured-data snippets.
 """
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -15,29 +16,47 @@ from opportunity_engine.discovery.auksjonen_public_api_adapter import (
     build_public_item_url,
 )
 
-TITLE = "TOLLAUKSJON - Smykkesett i 21k gull – flere sett (samlet)"
-OBJECT_ID = 564704
-ITEM_URL = build_public_item_url(TITLE, OBJECT_ID)
+ITEMS = (
+    (
+        "TOLLAUKSJON - Smykkesett i 21k gull – flere sett (samlet)",
+        564704,
+    ),
+    (
+        "Fxr jakke snøscooter, strl XL",
+        609460,
+    ),
+)
 IDENTITY_HINTS = (
     "principal",
     "organization",
     "organisation",
     "seller",
+    "selger",
+    "oppdragsgiver",
     "customer",
     "company",
+    "firma",
     "owner",
     "debtor",
     "debitor",
     "orgnr",
     "orgnumber",
+    "organisasjonsnummer",
     "business",
+    "på vegne av",
+    "salg på vegne",
+    "konkursbo",
 )
 SENSITIVE_HINTS = (
     "address",
+    "adresse",
     "email",
+    "e-post",
     "phone",
+    "telefon",
     "mobile",
     "contact",
+    "kontakt",
     "person",
 )
 
@@ -93,50 +112,138 @@ def _shape(value: object, *, depth: int = 0) -> object:
     return type(value).__name__
 
 
+def _identity_text_lines(body_text: str) -> list[str]:
+    lines: list[str] = []
+    for raw_line in body_text.splitlines():
+        line = " ".join(raw_line.split())
+        lowered = line.casefold()
+        if not line or len(line) > 500:
+            continue
+        if any(hint in lowered for hint in SENSITIVE_HINTS):
+            continue
+        if any(hint in lowered for hint in IDENTITY_HINTS):
+            if line not in lines:
+                lines.append(line)
+        if len(lines) >= 40:
+            break
+    return lines
+
+
+def _bounded_script_snippets(scripts: Sequence[Mapping[str, Any]], object_id: int) -> list[dict[str, Any]]:
+    observations: list[dict[str, Any]] = []
+    markers = (str(object_id),) + IDENTITY_HINTS
+    for script in scripts:
+        text = str(script.get("text") or "")
+        lowered = text.casefold()
+        matched = [marker for marker in markers if marker.casefold() in lowered]
+        if not matched:
+            continue
+        snippets: list[str] = []
+        for marker in matched[:8]:
+            index = lowered.find(marker.casefold())
+            if index < 0:
+                continue
+            start = max(0, index - 120)
+            end = min(len(text), index + len(marker) + 180)
+            snippet = re.sub(r"\s+", " ", text[start:end]).strip()
+            if not any(hint in snippet.casefold() for hint in SENSITIVE_HINTS):
+                snippets.append(snippet)
+        observations.append(
+            {
+                "id": script.get("id"),
+                "type": script.get("type"),
+                "src": script.get("src"),
+                "text_length": len(text),
+                "matched_markers": matched[:12],
+                "snippets": snippets[:12],
+            }
+        )
+        if len(observations) >= 20:
+            break
+    return observations
+
+
 def main() -> int:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError as exc:
         raise RuntimeError("Playwright is required for this temporary probe") from exc
 
-    observations: list[dict[str, Any]] = []
+    page_reports: list[dict[str, Any]] = []
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
         context = browser.new_context(
-            user_agent="OpportunityEngine/Auksjonen-Item-API-Probe-1.0"
+            user_agent="OpportunityEngine/Auksjonen-Item-Identity-Probe-1.1"
         )
         page = context.new_page()
 
-        def observe(response: Any) -> None:
-            if not response.url.startswith("https://ny.auksjonen.no/api/"):
-                return
-            record: dict[str, Any] = {
-                "url": response.url,
-                "status": response.status,
-                "content_type": response.headers.get("content-type", ""),
-            }
-            if "application/json" in record["content_type"].casefold():
-                try:
-                    payload = response.json()
-                    record["json_shape"] = _shape(payload)
-                    record["identity_values"] = _walk_identity(payload)[:50]
-                except Exception as exc:  # diagnostic only
-                    record["json_error"] = str(exc)
-            observations.append(record)
+        for title, object_id in ITEMS:
+            item_url = build_public_item_url(title, object_id)
+            observations: list[dict[str, Any]] = []
 
-        page.on("response", observe)
-        page.goto(ITEM_URL, wait_until="domcontentloaded", timeout=45_000)
-        page.wait_for_timeout(5_000)
+            def observe(response: Any) -> None:
+                content_type = response.headers.get("content-type", "")
+                if not (
+                    response.url.startswith("https://ny.auksjonen.no/api/")
+                    or "application/json" in content_type.casefold()
+                    or str(object_id) in response.url
+                ):
+                    return
+                record: dict[str, Any] = {
+                    "url": response.url,
+                    "status": response.status,
+                    "content_type": content_type,
+                }
+                if "application/json" in content_type.casefold():
+                    try:
+                        payload = response.json()
+                        record["json_shape"] = _shape(payload)
+                        record["identity_values"] = _walk_identity(payload)[:50]
+                    except Exception as exc:  # diagnostic only
+                        record["json_error"] = str(exc)
+                observations.append(record)
+
+            page.on("response", observe)
+            page.goto(item_url, wait_until="domcontentloaded", timeout=45_000)
+            page.wait_for_timeout(4_000)
+            body_text = page.locator("body").inner_text(timeout=10_000)
+            scripts = page.locator("script").evaluate_all(
+                """nodes => nodes.map(node => ({
+                    id: node.id || '',
+                    type: node.type || '',
+                    src: node.src || '',
+                    text: node.textContent || ''
+                }))"""
+            )
+            meta = page.evaluate(
+                """() => ({
+                    title: document.title || '',
+                    description: document.querySelector('meta[name="description"]')?.content || '',
+                    ogTitle: document.querySelector('meta[property="og:title"]')?.content || '',
+                    ogDescription: document.querySelector('meta[property="og:description"]')?.content || ''
+                })"""
+            )
+            page.remove_listener("response", observe)
+
+            by_url: dict[str, dict[str, Any]] = {}
+            for observation in observations:
+                by_url[observation["url"]] = observation
+            page_reports.append(
+                {
+                    "title": title,
+                    "object_id": object_id,
+                    "item_url": item_url,
+                    "meta": meta,
+                    "identity_text_lines": _identity_text_lines(body_text),
+                    "script_observations": _bounded_script_snippets(scripts, object_id),
+                    "network_observations": list(by_url.values()),
+                }
+            )
         browser.close()
 
-    by_url: dict[str, dict[str, Any]] = {}
-    for observation in observations:
-        by_url[observation["url"]] = observation
     report = {
-        "item_url": ITEM_URL,
-        "object_id": OBJECT_ID,
-        "api_response_count": len(by_url),
-        "api_responses": list(by_url.values()),
+        "page_count": len(page_reports),
+        "pages": page_reports,
         "address_values_logged": False,
         "contact_values_logged": False,
         "automatic_contact": False,
@@ -149,19 +256,19 @@ def main() -> int:
     path = output / "item-api-report.json"
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    print(f"Item URL: {ITEM_URL}")
-    print(f"API response count: {len(by_url)}")
-    for response in by_url.values():
-        print(f"API: {response['status']} {response['url']}")
+    for page_report in page_reports:
+        print(f"Item URL: {page_report['item_url']}")
         print(
-            "Identity values: "
-            + json.dumps(response.get("identity_values", []), ensure_ascii=False)
+            "Identity text lines: "
+            + json.dumps(page_report["identity_text_lines"], ensure_ascii=False)
         )
-        shape = response.get("json_shape")
-        if isinstance(shape, Mapping):
-            print(f"Top-level JSON keys: {sorted(shape)}")
+        print(
+            "Script observations: "
+            + json.dumps(page_report["script_observations"], ensure_ascii=False)
+        )
+        print(f"Observed network responses: {len(page_report['network_observations'])}")
     print(f"Report: {path}")
-    return 0 if by_url else 2
+    return 0 if page_reports else 2
 
 
 if __name__ == "__main__":
