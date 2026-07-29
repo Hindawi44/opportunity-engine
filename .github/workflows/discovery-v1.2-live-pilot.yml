@@ -18,12 +18,16 @@ on:
       - "src/opportunity_engine/discovery/auksjonen_playwright_fallback.py"
       - "src/opportunity_engine/discovery/auksjonen_current_category.py"
       - "src/opportunity_engine/discovery/auksjonen_public_api_adapter.py"
+      - "src/opportunity_engine/discovery/auksjonen_multi_category_adapter.py"
+      - "src/opportunity_engine/discovery/konkurs_app_clothing_adapter.py"
+      - "src/opportunity_engine/discovery/cross_source_clothing_sale_verifier.py"
       - "src/opportunity_engine/discovery/source_targeted_queries.py"
       - "src/opportunity_engine/discovery/source_targeted_retrieval.py"
       - "scripts/run_discovery_v12_live_pilot.py"
       - "scripts/run_active_clothing_inventory_scan.py"
       - "scripts/run_clothing_inventory_discovery_search.py"
       - "scripts/run_auksjonen_live_clothing.py"
+      - "scripts/run_cross_source_clothing_verification.py"
       - "scripts/run_source_targeted_retrieval.py"
       - "scripts/run_brave_retrieval_probe.py"
       - "tests/test_discovery_v11_live_search.py"
@@ -37,6 +41,9 @@ on:
       - "tests/test_auksjonen_playwright_fallback.py"
       - "tests/test_auksjonen_current_category.py"
       - "tests/test_auksjonen_public_api_adapter.py"
+      - "tests/test_auksjonen_multi_category_adapter.py"
+      - "tests/test_konkurs_app_clothing_adapter.py"
+      - "tests/test_cross_source_clothing_sale_verifier.py"
       - "tests/test_source_targeted_queries.py"
       - "tests/test_source_targeted_retrieval.py"
       - "tests/test_active_clothing_inventory_operator_integration.py"
@@ -46,9 +53,10 @@ on:
       operation:
         description: Select the Discovery operation
         required: true
-        default: auksjonen_live_clothing
+        default: cross_source_clothing_verification
         type: choice
         options:
+          - cross_source_clothing_verification
           - auksjonen_live_clothing
           - brave_discovery
           - active_clothing_scan
@@ -80,9 +88,47 @@ jobs:
           pytest tests/test_auksjonen_playwright_fallback.py -q
           pytest tests/test_auksjonen_current_category.py -q
           pytest tests/test_auksjonen_public_api_adapter.py -q
+          pytest tests/test_auksjonen_multi_category_adapter.py -q
+          pytest tests/test_konkurs_app_clothing_adapter.py -q
+          pytest tests/test_cross_source_clothing_sale_verifier.py -q
           pytest tests/test_source_targeted_queries.py -q
           pytest tests/test_source_targeted_retrieval.py -q
           pytest tests/test_active_clothing_inventory_operator_integration.py -q
+
+  cross-source-clothing-verification:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'cross_source_clothing_verification' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify bankruptcy-linked active clothing inventory sales
+        env:
+          PYTHONPATH: src:.
+        run: |
+          python scripts/run_cross_source_clothing_verification.py \
+            --lookback-days 365 \
+            --max-bankruptcy-leads 100 \
+            --max-detail-pages 5 \
+            --output-dir artifacts/cross-source-clothing-verification
+      - name: Show cross-source verification summary
+        if: ${{ always() }}
+        run: |
+          summary="artifacts/cross-source-clothing-verification/operator-summary.txt"
+          if [ -f "$summary" ]; then
+            cat "$summary"
+          else
+            echo "Cross-source verification summary was not created."
+            exit 1
+          fi
+      - name: Upload cross-source verification results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-source-clothing-verification
+          path: artifacts/cross-source-clothing-verification/
+          if-no-files-found: error
 
   auksjonen-live-clothing:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'auksjonen_live_clothing' }}
