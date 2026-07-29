@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Collect active clothing listings from the discovered public Auksjonen API."""
+"""Collect live Auksjonen clothing items and promote inventory lots only."""
 from __future__ import annotations
 
 import argparse
@@ -25,18 +25,27 @@ def main() -> int:
     ).collect()
     paths = write_live_clothing_artifacts(collection, Path(args.output_dir))
 
+    opportunities = collection.inventory_opportunities
+    individuals = collection.individual_clothing_items
     print(f"Reported category size: {collection.reported_size}")
     print(f"Items received: {collection.items_received}")
-    print(f"Active clothing listings: {len(collection.listings)}")
+    print(f"Active clothing items: {len(collection.listings)}")
+    print(f"Valid inventory opportunities: {len(opportunities)}")
+    print(f"Individual clothing items excluded from Top 5: {len(individuals)}")
     print(f"Errors: {len(collection.errors)}")
     print("Paid Brave/OpenAI calls: 0")
-    if collection.listings:
-        first = collection.listings[0]
-        print(f"First listing: {first.title}")
-        print(f"First URL: {first.url}")
+    if opportunities:
+        first = opportunities[0]
+        print(f"First inventory opportunity: {first.title}")
+        print(f"First inventory URL: {first.url}")
+    else:
+        print("No valid inventory-lot opportunities found.")
     for name, path in paths.items():
         print(f"{name}: {path}")
-    return 0 if collection.listings else 2
+
+    # An empty Top 5 is a valid commercial result when the source was read
+    # successfully. Fail only when the live source adapter recorded errors.
+    return 0 if not collection.errors else 2
 
 
 if __name__ == "__main__":

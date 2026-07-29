@@ -1,9 +1,10 @@
 """Direct bounded adapter for Auksjonen's public live category API.
 
 The endpoint and schema were observed from the public ny.auksjonen.no application.
-This adapter performs one HTTPS GET, keeps active clothing-like listings only,
-and builds their exact public item URLs. It uses no paid search or AI API and
-never logs in, contacts a seller, bids, buys, reserves, or pays.
+This adapter performs one HTTPS GET, keeps active clothing-like items for source
+visibility, and promotes only verified inventory-lot signals to opportunity
+outputs. It uses no paid search or AI API and never logs in, contacts a seller,
+bids, buys, reserves, or pays.
 """
 from __future__ import annotations
 
@@ -23,13 +24,15 @@ DEFAULT_PUBLIC_API_ENDPOINT = (
 MAX_LISTINGS = 10
 ACTIVE_STATUSES = frozenset({"ACTIVE", "INPROGRESS", "OPEN"})
 _CLOTHING_PATTERN = re.compile(
-    r"\b(klær|jakke|bukse|bukser|sko|kjole|kjoler|skjorte|skjorter|genser|gensere|"
-    r"frakk|frakker|dress|dresser|vest|vester|tøy|arbeidsklær|arbeidstøy|mc-klær|"
-    r"mote|tekstil|veske|vesker|overall|kjeledress|uniform)\b",
+    r"\b(klær|jakke|jakker|bukse|bukser|sko|kjole|kjoler|skjorte|skjorter|"
+    r"genser|gensere|frakk|frakker|dress|dresser|vest|vester|tøy|arbeidsklær|"
+    r"arbeidstøy|mc-klær|mote|tekstil|veske|vesker|overall|kjeledress|uniform)\b",
     re.I,
 )
 _LOT_PATTERN = re.compile(
-    r"\b(vareparti|parti|restlager|lager|konkursbo|samlet|mengde|pakke|bulk)\b",
+    r"\b(?:vareparti|restlager|konkursbo|lagerbeholdning|varelager|parti|bulk|"
+    r"samlet|pall(?:er)?|pakke\s+med|eske\s+med|flere\s+(?:stk|plagg|varer)|"
+    r"\d+\s*(?:stk|plagg|jakker|bukser|kjoler|skjorter|gensere|sko|varer))\b",
     re.I,
 )
 
@@ -63,6 +66,11 @@ def build_public_item_url(title: str, object_id: int | str) -> str:
     if not slug:
         raise ValueError("title must produce a non-empty public slug")
     return f"https://ny.auksjonen.no/auksjon/torget/{slug}/{object_text}"
+
+
+def has_inventory_lot_signal(title: str) -> bool:
+    """Return true only when the title contains explicit multi-item evidence."""
+    return bool(_LOT_PATTERN.search(_compact(title)))
 
 
 def _number(value: object) -> float | None:
@@ -139,7 +147,7 @@ def normalize_public_api_item(
     *,
     now: datetime | None = None,
 ) -> AuksjonenLiveClothingListing | None:
-    """Convert one observed API object into a verified active clothing listing."""
+    """Convert one observed API object into a verified active clothing item."""
     now = now or datetime.now(timezone.utc)
     title = _compact(item.get("title"))
     if not title or not _CLOTHING_PATTERN.search(title):
@@ -174,7 +182,7 @@ def normalize_public_api_item(
         address=_compact(item.get("address")) or None,
         ends_at=_epoch_ms_to_iso(item.get("endTime")),
         main_image=_compact(item.get("mainImage")) or None,
-        inventory_lot_signal=bool(_LOT_PATTERN.search(title)),
+        inventory_lot_signal=has_inventory_lot_signal(title),
     )
 
 
@@ -187,17 +195,38 @@ class AuksjonenLiveClothingCollection:
     listings: tuple[AuksjonenLiveClothingListing, ...]
     errors: tuple[dict[str, str], ...] = ()
 
+    @property
+    def inventory_opportunities(self) -> tuple[AuksjonenLiveClothingListing, ...]:
+        """Active clothing listings with explicit inventory-lot evidence only."""
+        return tuple(
+            listing
+            for listing in self.listings
+            if listing.listing_status == "ACTIVE" and listing.inventory_lot_signal
+        )
+
+    @property
+    def individual_clothing_items(self) -> tuple[AuksjonenLiveClothingListing, ...]:
+        """Active clothing items retained for diagnostics, never for Top 5."""
+        return tuple(
+            listing
+            for listing in self.listings
+            if listing.listing_status == "ACTIVE" and not listing.inventory_lot_signal
+        )
+
     def to_dict(self) -> dict[str, Any]:
+        opportunities = self.inventory_opportunities
+        individuals = self.individual_clothing_items
         return {
-            "schema_version": "auksjonen-live-clothing-1.0",
+            "schema_version": "auksjonen-live-clothing-1.1",
             "captured_at": self.captured_at,
             "endpoint": self.endpoint,
             "reported_size": self.reported_size,
             "items_received": self.items_received,
             "active_clothing_count": len(self.listings),
-            "inventory_lot_count": sum(
-                1 for listing in self.listings if listing.inventory_lot_signal
-            ),
+            "valid_inventory_opportunity_count": len(opportunities),
+            "inventory_lot_count": len(opportunities),
+            "active_individual_clothing_count": len(individuals),
+            "top5_count": min(5, len(opportunities)),
             "listings": [listing.to_dict() for listing in self.listings],
             "errors": list(self.errors),
             "paid_search_used": False,
@@ -211,7 +240,7 @@ class AuksjonenLiveClothingCollection:
 
 
 class AuksjonenPublicApiCollector:
-    """Perform one bounded public API read and return active clothing listings."""
+    """Perform one bounded public API read and return active clothing items."""
 
     def __init__(
         self,
@@ -235,7 +264,7 @@ class AuksjonenPublicApiCollector:
             self.endpoint,
             headers={
                 "Accept": "application/json",
-                "User-Agent": "OpportunityEngine/Auksjonen-Public-API-Adapter-1.0",
+                "User-Agent": "OpportunityEngine/Auksjonen-Public-API-Adapter-1.1",
             },
         )
         with urlopen(request, timeout=self.timeout_seconds) as response:  # noqa: S310
@@ -299,9 +328,14 @@ def write_live_clothing_artifacts(
     target.mkdir(parents=True, exist_ok=True)
     report_path = target / "auksjonen-live-clothing-listings.json"
     top5_path = target / "live-clothing-top5.json"
+    individual_path = target / "active_individual_clothing_items.json"
     summary_path = target / "operator-summary.txt"
+
     report = collection.to_dict()
-    top5 = [listing.to_dict() for listing in collection.listings[:5]]
+    opportunities = collection.inventory_opportunities
+    individuals = collection.individual_clothing_items
+    top5 = [listing.to_dict() for listing in opportunities[:5]]
+
     report_path.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
@@ -310,25 +344,42 @@ def write_live_clothing_artifacts(
         json.dumps(top5, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+    individual_path.write_text(
+        json.dumps(
+            [listing.to_dict() for listing in individuals],
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
     summary_lines = [
-        "Auksjonen live clothing adapter",
+        "Auksjonen live clothing inventory adapter",
         f"Reported category size: {collection.reported_size}",
         f"Items received: {collection.items_received}",
-        f"Active clothing listings: {len(collection.listings)}",
-        f"Inventory-lot signals: {sum(1 for item in collection.listings if item.inventory_lot_signal)}",
+        f"Active clothing items: {len(collection.listings)}",
+        f"Valid inventory opportunities: {len(opportunities)}",
+        f"Individual clothing items excluded from Top 5: {len(individuals)}",
+        f"Top 5 count: {len(top5)}",
         f"Errors: {len(collection.errors)}",
         "Paid Brave/OpenAI calls: 0",
         "",
     ]
-    for listing in collection.listings[:5]:
-        price = listing.current_bid_nok
-        summary_lines.append(
-            f"- {listing.title} | {listing.city or 'unknown'} | "
-            f"current bid {price if price is not None else 'unknown'} NOK | {listing.url}"
-        )
+    if opportunities:
+        for listing in opportunities[:5]:
+            price = listing.current_bid_nok
+            summary_lines.append(
+                f"- {listing.title} | {listing.city or 'unknown'} | "
+                f"current bid {price if price is not None else 'unknown'} NOK | {listing.url}"
+            )
+    else:
+        summary_lines.append("No valid inventory-lot opportunities found.")
+
     summary_path.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
     return {
         "report": report_path,
         "top5": top5_path,
+        "individual_items": individual_path,
         "summary": summary_path,
     }

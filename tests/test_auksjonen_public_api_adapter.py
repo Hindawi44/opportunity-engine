@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -5,6 +6,7 @@ from opportunity_engine.discovery.auksjonen_public_api_adapter import (
     AuksjonenLiveClothingCollection,
     AuksjonenLiveClothingListing,
     build_public_item_url,
+    has_inventory_lot_signal,
     is_approved_public_api_endpoint,
     normalize_public_api_item,
     slugify_title,
@@ -42,6 +44,28 @@ def live_item(**overrides):
     return item
 
 
+def listing(*, title: str, object_id: int, inventory_lot_signal: bool):
+    return AuksjonenLiveClothingListing(
+        title=title,
+        url=build_public_item_url(title, object_id),
+        auction_id=888000 + object_id,
+        object_id=object_id,
+        status="INPROGRESS",
+        listing_status="ACTIVE",
+        current_bid_nok=250.0,
+        buy_now_price_nok=None,
+        start_price_nok=0.0,
+        bid_count=1,
+        bidder_count=1,
+        city="Åmli",
+        zip_code="4865",
+        address=None,
+        ends_at="2026-08-02T10:00:00+00:00",
+        main_image=f"{object_id}.jpg",
+        inventory_lot_signal=inventory_lot_signal,
+    )
+
+
 def test_approved_endpoint_is_exact_public_clothing_api():
     assert is_approved_public_api_endpoint(
         "https://ny.auksjonen.no/api/category-search/search?category2=10110508&from=1&to=30"
@@ -67,16 +91,16 @@ def test_public_slug_and_url_match_observed_live_route():
     )
 
 
-def test_live_api_item_becomes_active_public_listing():
-    listing = normalize_public_api_item(live_item(), now=NOW)
+def test_live_api_item_becomes_active_public_diagnostic_item():
+    normalized = normalize_public_api_item(live_item(), now=NOW)
 
-    assert listing is not None
-    assert listing.title == "2026 Ny Klim jakke, large"
-    assert listing.listing_status == "ACTIVE"
-    assert listing.current_bid_nok == 250.0
-    assert listing.city == "Åmli"
-    assert listing.url.endswith("/2026_Ny_Klim_jakke_large/609462")
-    assert listing.inventory_lot_signal is False
+    assert normalized is not None
+    assert normalized.title == "2026 Ny Klim jakke, large"
+    assert normalized.listing_status == "ACTIVE"
+    assert normalized.current_bid_nok == 250.0
+    assert normalized.city == "Åmli"
+    assert normalized.url.endswith("/2026_Ny_Klim_jakke_large/609462")
+    assert normalized.inventory_lot_signal is False
 
 
 def test_non_clothing_and_ended_items_are_rejected():
@@ -98,37 +122,33 @@ def test_non_clothing_and_ended_items_are_rejected():
     ) is None
 
 
+def test_inventory_lot_signal_requires_explicit_multi_item_evidence():
+    assert has_inventory_lot_signal("Vareparti med arbeidsklær samlet")
+    assert has_inventory_lot_signal("Restlager: 25 stk jakker")
+    assert has_inventory_lot_signal("Flere plagg og bukser")
+    assert not has_inventory_lot_signal("Fxr jakke snøscooter, strl XL")
+    assert not has_inventory_lot_signal("2026 Ny Klim jakke, large")
+
+
 def test_inventory_lot_signal_is_preserved_without_inventing_quantity():
-    listing = normalize_public_api_item(
+    normalized = normalize_public_api_item(
         live_item(title="Vareparti med arbeidsklær samlet"),
         now=NOW,
     )
-    assert listing is not None
-    assert listing.inventory_lot_signal is True
+    assert normalized is not None
+    assert normalized.inventory_lot_signal is True
 
 
-def test_artifacts_contain_real_listing_fields_and_no_paid_calls(tmp_path: Path):
-    listing = AuksjonenLiveClothingListing(
+def test_collection_separates_opportunities_from_individual_items():
+    individual = listing(
         title="Fxr jakke snøscooter, strl XL",
-        url=(
-            "https://ny.auksjonen.no/auksjon/torget/"
-            "Fxr_jakke_sn%C3%B8scooter_strl_XL/609460"
-        ),
-        auction_id=888269,
         object_id=609460,
-        status="INPROGRESS",
-        listing_status="ACTIVE",
-        current_bid_nok=0.0,
-        buy_now_price_nok=None,
-        start_price_nok=0.0,
-        bid_count=0,
-        bidder_count=0,
-        city="Åmli",
-        zip_code="4865",
-        address=None,
-        ends_at="2026-08-02T10:00:00+00:00",
-        main_image="609460.jpg",
         inventory_lot_signal=False,
+    )
+    lot = listing(
+        title="Vareparti med 25 stk arbeidsjakker",
+        object_id=609500,
+        inventory_lot_signal=True,
     )
     collection = AuksjonenLiveClothingCollection(
         captured_at="2026-07-29T18:00:00+00:00",
@@ -138,15 +158,91 @@ def test_artifacts_contain_real_listing_fields_and_no_paid_calls(tmp_path: Path)
         ),
         reported_size=67,
         items_received=30,
-        listings=(listing,),
+        listings=(lot, individual),
+    )
+
+    assert collection.inventory_opportunities == (lot,)
+    assert collection.individual_clothing_items == (individual,)
+    report = collection.to_dict()
+    assert report["valid_inventory_opportunity_count"] == 1
+    assert report["active_individual_clothing_count"] == 1
+    assert report["top5_count"] == 1
+
+
+def test_individual_items_are_excluded_from_top5_and_written_separately(tmp_path: Path):
+    individual = listing(
+        title="Fxr jakke snøscooter, strl XL",
+        object_id=609460,
+        inventory_lot_signal=False,
+    )
+    lot = listing(
+        title="Vareparti med 25 stk arbeidsjakker",
+        object_id=609500,
+        inventory_lot_signal=True,
+    )
+    collection = AuksjonenLiveClothingCollection(
+        captured_at="2026-07-29T18:00:00+00:00",
+        endpoint=(
+            "https://ny.auksjonen.no/api/category-search/search"
+            "?category2=10110508&from=1&to=30&asc=true&orderBy=endTime"
+        ),
+        reported_size=67,
+        items_received=30,
+        listings=(lot, individual),
     )
 
     paths = write_live_clothing_artifacts(collection, tmp_path)
-    report = paths["report"].read_text(encoding="utf-8")
-    top5 = paths["top5"].read_text(encoding="utf-8")
+    report = json.loads(paths["report"].read_text(encoding="utf-8"))
+    top5 = json.loads(paths["top5"].read_text(encoding="utf-8"))
+    individuals = json.loads(paths["individual_items"].read_text(encoding="utf-8"))
+    summary = paths["summary"].read_text(encoding="utf-8")
 
-    assert '"active_clothing_count": 1' in report
-    assert '"paid_search_used": false' in report
-    assert '"openai_api_used": false' in report
-    assert "Fxr jakke snøscooter" in top5
-    assert "609460" in top5
+    assert report["active_clothing_count"] == 2
+    assert report["valid_inventory_opportunity_count"] == 1
+    assert report["paid_search_used"] is False
+    assert report["openai_api_used"] is False
+    assert [item["title"] for item in top5] == ["Vareparti med 25 stk arbeidsjakker"]
+    assert all(item["inventory_lot_signal"] is True for item in top5)
+    assert [item["title"] for item in individuals] == ["Fxr jakke snøscooter, strl XL"]
+    assert "Fxr jakke" not in summary
+    assert "Valid inventory opportunities: 1" in summary
+
+
+def test_current_three_individual_jackets_produce_empty_top5(tmp_path: Path):
+    current_items = (
+        listing(
+            title="Fxr jakke snøscooter, strl XL",
+            object_id=609460,
+            inventory_lot_signal=False,
+        ),
+        listing(
+            title="2026 Ny Klim jakke, large",
+            object_id=609462,
+            inventory_lot_signal=False,
+        ),
+        listing(
+            title="Ski doo jakke, strl XL",
+            object_id=609461,
+            inventory_lot_signal=False,
+        ),
+    )
+    collection = AuksjonenLiveClothingCollection(
+        captured_at="2026-07-29T18:00:00+00:00",
+        endpoint=(
+            "https://ny.auksjonen.no/api/category-search/search"
+            "?category2=10110508&from=1&to=30&asc=true&orderBy=endTime"
+        ),
+        reported_size=67,
+        items_received=30,
+        listings=current_items,
+    )
+
+    paths = write_live_clothing_artifacts(collection, tmp_path)
+    assert json.loads(paths["top5"].read_text(encoding="utf-8")) == []
+    individuals = json.loads(paths["individual_items"].read_text(encoding="utf-8"))
+    assert len(individuals) == 3
+    assert all(item["inventory_lot_signal"] is False for item in individuals)
+    summary = paths["summary"].read_text(encoding="utf-8")
+    assert "Valid inventory opportunities: 0" in summary
+    assert "Top 5 count: 0" in summary
+    assert "No valid inventory-lot opportunities found." in summary
