@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
+from typing import Any, Mapping
 
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.clothing_inventory_search import (
@@ -37,6 +38,37 @@ def _guarded_public_verifier(url: str):
 def build_structured_discovery_queries(query_budget: int = SOURCE_TARGETED_QUERY_BUDGET):
     """Return the approved source-diverse query set used by live discovery."""
     return select_source_targeted_queries(query_budget)
+
+
+def collect_verification_failure_details(result: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Expose bounded verifier failures without weakening the final Hard Gate."""
+    details: list[dict[str, Any]] = []
+    candidates = result.get("all_discovered_candidates")
+    if not isinstance(candidates, list):
+        return details
+
+    for candidate in candidates:
+        if not isinstance(candidate, Mapping):
+            continue
+        if candidate.get("post_verification_top5_block_reason") != "verification_failed":
+            continue
+        verifications = candidate.get("verification")
+        if not isinstance(verifications, list):
+            continue
+        for verification in verifications:
+            if not isinstance(verification, Mapping):
+                continue
+            if verification.get("verified") is True:
+                continue
+            details.append({
+                "title": candidate.get("title"),
+                "url": verification.get("url") or (candidate.get("source_urls") or [None])[0],
+                "error": verification.get("error"),
+                "page_role": verification.get("page_role"),
+                "listing_status": verification.get("listing_status"),
+                "opportunity_identity": candidate.get("opportunity_identity"),
+            })
+    return details
 
 
 def main() -> int:
@@ -98,10 +130,13 @@ def main() -> int:
     result = apply_post_verification_top5_hard_gate(result)
     report = result["search_run_report"]
     diagnostics = provider.diagnostics()
+    verification_failures = collect_verification_failure_details(result)
     report["source_targeting_policy_applied"] = True
     report["source_targeting_query_budget"] = args.query_budget
     report["source_targeting_request_budget"] = len(discovery_queries)
     report["source_targeting_url_gate"] = diagnostics
+    report["verification_failure_details"] = verification_failures
+    report["verification_failure_detail_count"] = len(verification_failures)
     report["brave_freshness"] = args.freshness
     report["brave_extra_snippets"] = True
     report["brave_operators"] = True
@@ -114,6 +149,7 @@ def main() -> int:
     print(f"Raw hits: {diagnostics['raw_hits']}")
     print(f"Accepted by URL gate: {diagnostics['accepted_hits']}")
     print(f"Rejected before classification: {diagnostics['rejected_hits']}")
+    print(f"Verification failures detailed: {len(verification_failures)}")
     print(f"Top opportunities: {report['top5_count']}")
     for name, path in paths.items():
         print(f"{name}: {path}")
