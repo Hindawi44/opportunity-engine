@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/temp-vareauksjonen-public-source-probe.yml"
       - "scripts/probe_vareauksjonen_public_source.py"
+      - "scripts/probe_vareauksjonen_listing_detail.py"
 
 jobs:
   public-source-probe:
@@ -17,10 +18,27 @@ jobs:
           python-version: '3.11'
       - name: Inspect Vareauksjonen public categories
         run: python scripts/probe_vareauksjonen_public_source.py
-      - name: Upload probe evidence
+      - name: Upload public source evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: vareauksjonen-public-source-probe
           path: artifacts/vareauksjonen-public-source-probe/
+          if-no-files-found: error
+
+  listing-detail-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inspect one active public listing
+        run: python scripts/probe_vareauksjonen_listing_detail.py
+      - name: Upload listing detail evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: vareauksjonen-listing-detail-probe
+          path: artifacts/vareauksjonen-listing-detail-probe/
           if-no-files-found: error
