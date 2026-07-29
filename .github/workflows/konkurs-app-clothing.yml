@@ -1,0 +1,58 @@
+name: 2 — Discover Clothing Bankruptcy Leads
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/konkurs-app-clothing.yml"
+      - "src/opportunity_engine/discovery/konkurs_app_clothing_adapter.py"
+      - "scripts/run_konkurs_app_clothing.py"
+      - "tests/test_konkurs_app_clothing_adapter.py"
+  workflow_dispatch:
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest
+      - name: Test bounded Konkurs.app adapter
+        env:
+          PYTHONPATH: src:.
+        run: pytest tests/test_konkurs_app_clothing_adapter.py -q
+
+  bounded-live-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Read two active clothing-industry queries
+        env:
+          PYTHONPATH: src:.
+        run: |
+          python scripts/run_konkurs_app_clothing.py \
+            --lookback-days 365 \
+            --page-size 50 \
+            --output-dir artifacts/konkurs-app-clothing
+      - name: Show operator summary
+        if: ${{ always() }}
+        run: |
+          summary="artifacts/konkurs-app-clothing/operator-summary.txt"
+          if [ -f "$summary" ]; then
+            cat "$summary"
+          else
+            echo "Konkurs.app operator summary was not created."
+            exit 1
+          fi
+      - name: Upload bounded lead results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: konkurs-app-clothing-leads
+          path: artifacts/konkurs-app-clothing/
+          if-no-files-found: error
