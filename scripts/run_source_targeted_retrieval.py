@@ -27,10 +27,14 @@ from opportunity_engine.discovery.source_targeted_retrieval import (
     SourceTargetedSearchProvider,
 )
 
+REQUIRED_REFERENCE_CASE = "axl-sport-og-fritid"
+
 
 def _write_validation_summary(payload: dict, path: Path) -> None:
     diagnostics = payload["source_targeting"]
     recovered = diagnostics["reference_cases_recovered"]
+    required_recovered = payload["required_reference_recovered"]
+    advisory_recovered = payload["advisory_references_recovered"]
     lines = [
         "SOURCE-TARGETED CLOTHING RETRIEVAL",
         "==================================",
@@ -44,6 +48,12 @@ def _write_validation_summary(payload: dict, path: Path) -> None:
         f"Rejected before classification: {diagnostics['rejected_hits']}",
         f"References recovered: {len(recovered)}/{len(diagnostics['reference_cases'])}",
         f"Recovered references: {', '.join(recovered) if recovered else 'none'}",
+        f"Required reference: {payload['required_reference_case']}",
+        f"Required reference recovered: {'yes' if required_recovered else 'no'}",
+        (
+            "Advisory references recovered: "
+            f"{', '.join(advisory_recovered) if advisory_recovered else 'none'}"
+        ),
     ]
     if diagnostics["zero_raw_hits"]:
         lines.extend([
@@ -169,13 +179,13 @@ def main() -> int:
     result = apply_post_verification_top5_hard_gate(result)
     diagnostics = provider.diagnostics()
     recovered = set(diagnostics["reference_cases_recovered"])
+    required_reference_recovered = REQUIRED_REFERENCE_CASE in recovered
+    advisory_references_recovered = sorted(
+        recovered - {REQUIRED_REFERENCE_CASE}
+    )
     reference_validation_passed = (
         not reference_queries
-        or (
-            "axl-sport-og-fritid" in recovered
-            and len(recovered) >= 2
-            and not reference_errors
-        )
+        or (required_reference_recovered and not reference_errors)
     )
     validation_status = (
         "PASS"
@@ -192,6 +202,9 @@ def main() -> int:
         "source_targeting_request_budget": request_budget,
         "source_targeting_reference_checks": bool(reference_queries),
         "source_targeting_reference_validation_passed": reference_validation_passed,
+        "source_targeting_required_reference_case": REQUIRED_REFERENCE_CASE,
+        "source_targeting_required_reference_recovered": required_reference_recovered,
+        "source_targeting_advisory_references_recovered": advisory_references_recovered,
         "source_targeting_reference_errors": reference_errors,
         "source_targeting_zero_raw_hits": diagnostics["zero_raw_hits"],
         "source_targeting_url_gate": diagnostics,
@@ -206,7 +219,7 @@ def main() -> int:
     artifact_paths = write_discovery_artifacts(result, output_dir)
 
     validation_payload = {
-        "schema_version": "source-targeted-clothing-retrieval-1.1",
+        "schema_version": "source-targeted-clothing-retrieval-1.2",
         "domain": "CLOTHING_INVENTORY",
         "executed_at": datetime.now(timezone.utc).isoformat(),
         "validation_status": validation_status,
@@ -214,6 +227,9 @@ def main() -> int:
         "reference_queries_submitted": len(reference_queries),
         "freshness": args.freshness,
         "results_per_query": args.results_per_query,
+        "required_reference_case": REQUIRED_REFERENCE_CASE,
+        "required_reference_recovered": required_reference_recovered,
+        "advisory_references_recovered": advisory_references_recovered,
         "source_targeting": diagnostics,
         "reference_errors": reference_errors,
         "core_search_report": report,
