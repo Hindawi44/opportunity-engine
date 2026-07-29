@@ -7,6 +7,10 @@ import os
 from pathlib import Path
 from typing import Any, Mapping
 
+from opportunity_engine.discovery.auksjonen_playwright_fallback import (
+    AuksjonenPlaywrightFallbackConfig,
+    AuksjonenPlaywrightFallbackVerifier,
+)
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.clothing_inventory_search import (
     apply_post_verification_top5_hard_gate,
@@ -71,6 +75,27 @@ def collect_verification_failure_details(result: Mapping[str, Any]) -> list[dict
     return details
 
 
+def _disabled_playwright_diagnostics() -> dict[str, object]:
+    return {
+        "enabled": False,
+        "scope": "specific_auksjonen_item_pages_only",
+        "max_pages": 0,
+        "attempted": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "budget_exhausted": 0,
+        "attempted_urls": [],
+        "successful_urls": [],
+        "failed_urls": [],
+        "errors": [],
+        "used": False,
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase_decision": False,
+        "automatic_payment": False,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -97,10 +122,32 @@ def main() -> int:
         help="Read the public HTTPS pages of the highest-ranked candidates",
     )
     parser.add_argument("--verification-limit", type=int, default=20)
+    parser.add_argument(
+        "--playwright-fallback",
+        action="store_true",
+        help=(
+            "Render only specific Auksjonen item pages when the normal verifier "
+            "returns insufficient public listing content"
+        ),
+    )
+    parser.add_argument(
+        "--playwright-limit",
+        type=int,
+        default=3,
+        help="Maximum Auksjonen item pages rendered by Chromium (1-3)",
+    )
+    parser.add_argument(
+        "--playwright-delay-seconds",
+        type=float,
+        default=2.5,
+        help="Minimum delay after each bounded browser navigation",
+    )
     args = parser.parse_args()
 
     if not 1 <= args.results_per_query <= 20:
         raise SystemExit("--results-per-query must be between 1 and 20")
+    if args.playwright_fallback and not args.verify_pages:
+        raise SystemExit("--playwright-fallback requires --verify-pages")
 
     api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
     if not api_key:
@@ -119,28 +166,55 @@ def main() -> int:
         queries=discovery_queries,
         request_budget=len(discovery_queries),
     )
-    raw_result = run_clothing_inventory_discovery(
-        provider,
-        queries=discovery_queries,
-        results_per_query=args.results_per_query,
-        verifier=_guarded_public_verifier if args.verify_pages else None,
-        verification_limit=args.verification_limit,
-    )
+
+    playwright_verifier: AuksjonenPlaywrightFallbackVerifier | None = None
+    verifier = None
+    if args.verify_pages:
+        if args.playwright_fallback:
+            playwright_verifier = AuksjonenPlaywrightFallbackVerifier(
+                _guarded_public_verifier,
+                config=AuksjonenPlaywrightFallbackConfig(
+                    max_pages=args.playwright_limit,
+                    delay_seconds=args.playwright_delay_seconds,
+                ),
+            )
+            verifier = playwright_verifier
+        else:
+            verifier = _guarded_public_verifier
+
+    try:
+        raw_result = run_clothing_inventory_discovery(
+            provider,
+            queries=discovery_queries,
+            results_per_query=args.results_per_query,
+            verifier=verifier,
+            verification_limit=args.verification_limit,
+        )
+    finally:
+        if playwright_verifier is not None:
+            playwright_verifier.close()
+
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
     report = result["search_run_report"]
     diagnostics = provider.diagnostics()
     verification_failures = collect_verification_failure_details(result)
+    playwright_diagnostics = (
+        playwright_verifier.diagnostics()
+        if playwright_verifier is not None
+        else _disabled_playwright_diagnostics()
+    )
     report["source_targeting_policy_applied"] = True
     report["source_targeting_query_budget"] = args.query_budget
     report["source_targeting_request_budget"] = len(discovery_queries)
     report["source_targeting_url_gate"] = diagnostics
     report["verification_failure_details"] = verification_failures
     report["verification_failure_detail_count"] = len(verification_failures)
+    report["auksjonen_playwright_fallback"] = playwright_diagnostics
     report["brave_freshness"] = args.freshness
     report["brave_extra_snippets"] = True
     report["brave_operators"] = True
-    report["playwright_used"] = False
+    report["playwright_used"] = bool(playwright_diagnostics["used"])
 
     paths = write_discovery_artifacts(result, Path(args.output_dir))
     print(f"Status: {report['status']}")
@@ -149,6 +223,8 @@ def main() -> int:
     print(f"Raw hits: {diagnostics['raw_hits']}")
     print(f"Accepted by URL gate: {diagnostics['accepted_hits']}")
     print(f"Rejected before classification: {diagnostics['rejected_hits']}")
+    print(f"Playwright attempts: {playwright_diagnostics['attempted']}")
+    print(f"Playwright successes: {playwright_diagnostics['succeeded']}")
     print(f"Verification failures detailed: {len(verification_failures)}")
     print(f"Top opportunities: {report['top5_count']}")
     for name, path in paths.items():
