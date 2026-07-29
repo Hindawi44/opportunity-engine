@@ -1,52 +1,58 @@
-name: TEMP — Auksjonen Cross-Source Schema Probe
+name: TEMP — Cross-Source Clothing Verification
 
 on:
   pull_request:
     branches: [main]
     paths:
       - ".github/workflows/temp-auksjonen-cross-source-schema.yml"
-      - "scripts/probe_auksjonen_cross_source_fields.py"
-      - "scripts/probe_auksjonen_item_api.py"
+      - "src/opportunity_engine/discovery/cross_source_clothing_sale_verifier.py"
+      - "scripts/run_cross_source_clothing_verification.py"
+      - "tests/test_cross_source_clothing_sale_verifier.py"
 
 jobs:
-  schema-probe:
+  focused-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Inspect public Auksjonen identity fields
+      - run: pip install pytest
+      - name: Test strict cross-source verification
         env:
           PYTHONPATH: src:.
-        run: python scripts/probe_auksjonen_cross_source_fields.py
-      - name: Upload schema report
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: auksjonen-cross-source-schema
-          path: artifacts/auksjonen-cross-source-schema/
-          if-no-files-found: error
+        run: pytest tests/test_cross_source_clothing_sale_verifier.py -q
 
-  item-api-probe:
+  bounded-live-verification:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install bounded Chromium probe
-        run: |
-          python -m pip install -r requirements-playwright.txt
-          python -m playwright install --with-deps chromium
-      - name: Observe one public item API flow
+      - name: Verify bankruptcy-linked active clothing inventory sales
         env:
           PYTHONPATH: src:.
-        run: python scripts/probe_auksjonen_item_api.py
-      - name: Upload item API report
+        run: |
+          python scripts/run_cross_source_clothing_verification.py \
+            --lookback-days 365 \
+            --max-bankruptcy-leads 100 \
+            --max-detail-pages 5 \
+            --output-dir artifacts/cross-source-clothing-verification
+      - name: Show operator summary
+        if: ${{ always() }}
+        run: |
+          summary="artifacts/cross-source-clothing-verification/operator-summary.txt"
+          if [ -f "$summary" ]; then
+            cat "$summary"
+          else
+            echo "Cross-source operator summary was not created."
+            exit 1
+          fi
+      - name: Upload verification evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: auksjonen-item-api-probe
-          path: artifacts/auksjonen-item-api-probe/
+          name: cross-source-clothing-verification
+          path: artifacts/cross-source-clothing-verification/
           if-no-files-found: error
