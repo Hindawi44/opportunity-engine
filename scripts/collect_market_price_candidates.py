@@ -103,6 +103,39 @@ def _query_variants(item: dict[str, object]) -> list[str]:
     return unique[:_MAX_QUERY_VARIANTS]
 
 
+def _allocate_query_budget(
+    items: list[dict[str, object]], request_budget: int
+) -> list[list[str]]:
+    """Allocate a global request budget fairly across selected opportunities.
+
+    Query variants are assigned round-robin so one opportunity cannot consume the
+    entire Brave client budget before later opportunities are inspected.
+    """
+    if request_budget < 0:
+        raise ValueError("request_budget cannot be negative")
+
+    available = [_query_variants(item) for item in items]
+    allocated: list[list[str]] = [[] for _ in items]
+    remaining = request_budget
+    variant_index = 0
+
+    while remaining > 0:
+        made_progress = False
+        for item_index, variants in enumerate(available):
+            if remaining == 0:
+                break
+            if variant_index >= len(variants):
+                continue
+            allocated[item_index].append(variants[variant_index])
+            remaining -= 1
+            made_progress = True
+        if not made_progress:
+            break
+        variant_index += 1
+
+    return allocated
+
+
 def _query_target_domain(query: str) -> str | None:
     match = re.search(r"(?:^|\s)site:([^\s]+)", query, re.IGNORECASE)
     return match.group(1).casefold() if match else None
@@ -260,14 +293,17 @@ def main() -> int:
         raise ValueError("review queue must be a list")
 
     client = BraveSearchClient(api_key=api_key)
+    selected_items = [
+        item for item in queue[: max(args.limit, 0)] if isinstance(item, dict)
+    ]
+    request_budget = int(getattr(client, "max_requests_per_run", 8))
+    query_plans = _allocate_query_budget(selected_items, request_budget)
     records: list[dict[str, object]] = []
     errors: dict[str, str] = {}
 
-    for raw_item in queue[: max(args.limit, 0)]:
-        if not isinstance(raw_item, dict):
-            continue
+    for raw_item, queries in zip(selected_items, query_plans):
         opportunity_id = _clean(raw_item.get("opportunity_id"))
-        queries = _query_variants(raw_item)
+        available_queries = _query_variants(raw_item)
         candidates_by_url: dict[str, dict[str, object]] = {}
         rejected_candidates: list[dict[str, object]] = []
         source_url = _canonical_url(raw_item.get("url"))
@@ -320,6 +356,8 @@ def main() -> int:
             "market_search_query": queries[0] if queries else "",
             "market_search_queries": queries,
             "query_count": len(queries),
+            "available_query_count": len(available_queries),
+            "query_budget_truncated": len(queries) < len(available_queries),
             "query_stats": query_stats,
             "candidate_count": len(candidates),
             "distinct_domain_count": distinct_domains,
@@ -352,6 +390,16 @@ def main() -> int:
         "required_comparables": _REQUIRED_COMPARABLES,
         "max_query_variants": _MAX_QUERY_VARIANTS,
         "target_domains": list(_TARGET_DOMAINS),
+        "request_budget": request_budget,
+        "planned_request_count": sum(len(queries) for queries in query_plans),
+        "requests_made": int(
+            getattr(client, "request_count", sum(len(queries) for queries in query_plans))
+        ),
+        "query_budget_exhausted": (
+            sum(len(queries) for queries in query_plans) >= request_budget
+            and sum(len(_query_variants(item)) for item in selected_items)
+            > request_budget
+        ),
         "opportunity_count": len(records),
         "candidate_count": sum(int(item["candidate_count"]) for item in records),
         "rejected_candidate_count": sum(int(item["rejected_candidate_count"]) for item in records),
@@ -369,6 +417,9 @@ def main() -> int:
         "opportunity_count": len(records),
         "candidate_count": output_payload["candidate_count"],
         "rejected_candidate_count": output_payload["rejected_candidate_count"],
+        "request_budget": output_payload["request_budget"],
+        "planned_request_count": output_payload["planned_request_count"],
+        "requests_made": output_payload["requests_made"],
         "error_count": len(errors),
     }, ensure_ascii=False))
     return 0 if not errors else 2
