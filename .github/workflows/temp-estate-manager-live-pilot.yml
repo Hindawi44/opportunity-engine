@@ -1,0 +1,38 @@
+name: Temporary Estate Manager Live Pilot
+
+on:
+  push:
+    branches:
+      - feat/pre-market-clothing-leads-pilot
+
+permissions:
+  contents: read
+
+jobs:
+  live-pilot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out pilot branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run bounded single-estate enrichment
+        env:
+          PYTHONPATH: src
+        run: |
+          python scripts/run_estate_manager_enrichment_pilot.py \
+            --estate-orgnr 938018014 \
+            --output-dir artifacts/estate-manager-enrichment
+          cat artifacts/estate-manager-enrichment/operator-summary.txt
+
+      - name: Upload bounded enrichment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: estate-manager-live-pilot
+          path: artifacts/estate-manager-enrichment
+          if-no-files-found: error
