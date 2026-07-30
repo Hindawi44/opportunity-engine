@@ -1,0 +1,74 @@
+name: Temporary PR347 Live Accounting Validation
+
+on:
+  push:
+    branches:
+      - fix/cross-source-record-accounting
+
+permissions:
+  contents: read
+
+jobs:
+  live-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+      PIPELINE_TRIGGER: pr347_live_validation
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      FINN_API_KEY: ${{ secrets.FINN_API_KEY }}
+      FINN_ORG_ID: ${{ secrets.FINN_ORG_ID }}
+      FINN_MARKET: ${{ vars.FINN_MARKET }}
+      KONKURSKUPP_FEED_URL: ${{ secrets.KONKURSKUPP_FEED_URL }}
+      KONKURSKUPP_FEED_TOKEN: ${{ secrets.KONKURSKUPP_FEED_TOKEN }}
+      BJAROY_FEED_URL: ${{ secrets.BJAROY_FEED_URL }}
+      BJAROY_FEED_TOKEN: ${{ secrets.BJAROY_FEED_TOKEN }}
+      KONKURS_APP_FEED_URL: ${{ secrets.KONKURS_APP_FEED_URL }}
+      KONKURS_APP_FEED_TOKEN: ${{ secrets.KONKURS_APP_FEED_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/cross-source-record-accounting
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run full live pipeline
+        run: python scripts/run_v2_automated_pipeline.py --trigger "$PIPELINE_TRIGGER"
+      - name: Verify exact record accounting
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          audit = json.loads(Path('data/cross_source_deduplication_audit.json').read_text(encoding='utf-8'))
+          accounting = audit.get('verified_source_record_accounting', {})
+          assert audit.get('verified_source_record_accounting_valid') is True, audit
+          for source in ('Auksjonen.no', 'Konkurs.app', 'Politiet.no'):
+              row = accounting.get(source, {})
+              assert row.get('status') == 'RECONCILED', (source, row)
+              assert row.get('difference') == 0, (source, row)
+          summary = {
+              'valid': audit.get('verified_source_record_accounting_valid'),
+              'by_source': accounting,
+              'pipeline_status': json.loads(Path('data/automated_pipeline_status.json').read_text(encoding='utf-8')).get('status'),
+          }
+          Path('artifacts/pr347-live-validation').mkdir(parents=True, exist_ok=True)
+          Path('artifacts/pr347-live-validation/summary.json').write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
+          PY
+      - name: Upload live validation audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr347-live-accounting-${{ github.run_id }}
+          path: |
+            artifacts/pr347-live-validation
+            data/cross_source_deduplication_audit.json
+            data/source_funnel.json
+            data/automated_pipeline_status.json
+            data/pipeline_run_status.json
+          retention-days: 30
+          if-no-files-found: warn
