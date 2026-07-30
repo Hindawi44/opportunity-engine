@@ -25,6 +25,10 @@ separate review-priority layer. It remains limited to:
 - reported company asset scale;
 - reported company revenue scale.
 
+Bankruptcies older than 180 days receive a visible `-30` stale-lead penalty so
+large old companies do not outrank genuinely early cases merely because their
+historic accounts were large.
+
 It is **not** a statistical probability, inventory evidence, sale evidence, or
 valuation. Missing financial values add no points and remain unknown.
 
@@ -63,11 +67,13 @@ python scripts/run_pre_market_clothing_leads.py \
 1. The bounded Konkurs.app source scan completes without errors.
 2. The score is deterministic and exposes its complete breakdown.
 3. Large, recent clothing wholesalers rank ahead of weak old retail records.
-4. No bankruptcy lead enters the commercial Top 5 or Analysis Engine.
-5. No personal name or detailed address is retained.
-6. No contact, bid, purchase, reservation, payment, schedule, or automatic
+4. Stale bankruptcies cannot dominate the early-access queue only because their
+   historic revenue or assets were large.
+5. No bankruptcy lead enters the commercial Top 5 or Analysis Engine.
+6. No personal name or detailed address is retained.
+7. No contact, bid, purchase, reservation, payment, schedule, or automatic
    investment decision is added.
-7. Human review of the first 5–10 results determines whether the signal is useful
+8. Human review of the first 5–10 results determines whether the signal is useful
    enough to justify a later estate-manager enrichment pilot.
 
 ## Explicitly deferred
