@@ -3,47 +3,47 @@
   "average_expected_profit_nok": null,
   "average_maximum_safe_bid_nok": null,
   "decision_counts": {
-    "WATCH": 3
+    "WATCH": 8
   },
-  "generated_at": "2026-07-23T07:47:32.959422+00:00",
+  "generated_at": "2026-07-30T17:09:12.411838+00:00",
   "learning_status": "INSUFFICIENT_VERIFIED_OUTCOMES",
   "mode": "OBSERVATION_ONLY",
   "schema_version": 1,
   "top_missing_evidence": [
     {
-      "count": 3,
+      "count": 8,
       "evidence": "auction_fee_nok"
     },
     {
-      "count": 3,
+      "count": 8,
       "evidence": "dismantling_cost_nok"
     },
     {
-      "count": 3,
+      "count": 8,
       "evidence": "other_costs_nok"
     },
     {
-      "count": 3,
+      "count": 8,
       "evidence": "repair_cost_nok"
     },
     {
-      "count": 3,
+      "count": 8,
       "evidence": "storage_cost_nok"
     },
     {
-      "count": 3,
+      "count": 8,
       "evidence": "three_verified_market_comparables"
     },
     {
-      "count": 3,
+      "count": 8,
       "evidence": "transport_cost_nok"
     },
     {
-      "count": 3,
+      "count": 8,
       "evidence": "vat_nok"
     }
   ],
-  "total_opportunities": 3,
+  "total_opportunities": 8,
   "verified_outcome_count": 0,
   "weight_change_recommendations": []
 }

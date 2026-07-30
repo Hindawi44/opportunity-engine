@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-07-23T07:47:14.460573+00:00",
+  "generated_at": "2026-07-30T17:09:06.930749+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
-  "search_required_count": 3,
+  "search_required_count": 6,
   "source_queue": "data/opportunity_review_queue.json",
-  "task_count": 3,
+  "task_count": 6,
   "tasks": [
     {
       "accepted_comparable_fields": [
@@ -15,33 +15,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 6800.0,
+      "asking_price_nok": 2600.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+68+bud",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=4+stk+komplette+Lagerreoler+120%C3%9760%C3%97200cm+%E2%80%93+200kg+pr.+hylle+%E2%80%93+total+800kg+T%C3%B8nsberg+19+bud",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+68+bud",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=4+stk+komplette+Lagerreoler+120%C3%9760%C3%97200cm+%E2%80%93+200kg+pr.+hylle+%E2%80%93+total+800kg+T%C3%B8nsberg+19+bud",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart+1200kg+T%C3%B8nsberg+68+bud+pris+Norge",
+          "search_url": "https://www.google.com/search?q=4+stk+komplette+Lagerreoler+120%C3%9760%C3%97200cm+%E2%80%93+200kg+pr.+hylle+%E2%80%93+total+800kg+T%C3%B8nsberg+19+bud+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud",
-      "opportunity_id": "unified-auksjonen-611253",
-      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
+      "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud",
+      "opportunity_id": "unified-auksjonen-614288",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 4t 56m 48s",
+      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud 18t 12m 58s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -53,33 +53,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 5000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Parti+med+VVS-deler%2C+r%C3%B8r%2C+r%C3%B8rdeler%2C+reol+og+installasjonsmateriell+Lierstranda+1+bud+6d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+23+bud+3d",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=Parti+med+VVS-deler%2C+r%C3%B8r%2C+r%C3%B8rdeler%2C+reol+og+installasjonsmateriell+Lierstranda+1+bud+6d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+23+bud+3d",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=Parti+med+VVS-deler%2C+r%C3%B8r%2C+r%C3%B8rdeler%2C+reol+og+installasjonsmateriell+Lierstranda+1+bud+6d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+23+bud+3d+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d",
-      "opportunity_id": "unified-auksjonen-613168",
-      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d",
+      "opportunity_id": "unified-auksjonen-614289",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 11t 12m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d 17t 30m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -91,33 +91,147 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 1000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+7d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=10+stk+nye+Eskoleia+Garderobeskap+med+2+d%C3%B8rer+Mathopen+2+bud",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+7d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=10+stk+nye+Eskoleia+Garderobeskap+med+2+d%C3%B8rer+Mathopen+2+bud",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+1+bud+7d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=10+stk+nye+Eskoleia+Garderobeskap+med+2+d%C3%B8rer+Mathopen+2+bud+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d",
+      "market_search_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud",
+      "opportunity_id": "unified-auksjonen-610671",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 23t 57m 0s",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    },
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 3000.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Stort+varelager+for+kj%C3%B8kken-+og+m%C3%B8belproduksjon+-+Blum%2C+H%C3%A4fele%2C+Kessebb%C3%B6hmer+og+Blanco+beslag+-+m%C3%B8belplater%2C+fronter+og+topplater+-+lim+og+kantb%C3%A5nd+-+skruer%2C+h%C3%A5ndtak+og+festemateriell+Vigrestad+3+bud+2d",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=Stort+varelager+for+kj%C3%B8kken-+og+m%C3%B8belproduksjon+-+Blum%2C+H%C3%A4fele%2C+Kessebb%C3%B6hmer+og+Blanco+beslag+-+m%C3%B8belplater%2C+fronter+og+topplater+-+lim+og+kantb%C3%A5nd+-+skruer%2C+h%C3%A5ndtak+og+festemateriell+Vigrestad+3+bud+2d",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=Stort+varelager+for+kj%C3%B8kken-+og+m%C3%B8belproduksjon+-+Blum%2C+H%C3%A4fele%2C+Kessebb%C3%B6hmer+og+Blanco+beslag+-+m%C3%B8belplater%2C+fronter+og+topplater+-+lim+og+kantb%C3%A5nd+-+skruer%2C+h%C3%A5ndtak+og+festemateriell+Vigrestad+3+bud+2d+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d",
+      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d 19t 29m",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    },
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 9500.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=2026+Garasjeinnredning+Komplett+verkt%C3%B8yskap+med+arbeidsbenk+%E2%80%93+Ny+i+eske+%C3%A5+T%C3%B8nsberg+63+bud",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=2026+Garasjeinnredning+Komplett+verkt%C3%B8yskap+med+arbeidsbenk+%E2%80%93+Ny+i+eske+%C3%A5+T%C3%B8nsberg+63+bud",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=2026+Garasjeinnredning+Komplett+verkt%C3%B8yskap+med+arbeidsbenk+%E2%80%93+Ny+i+eske+%C3%A5+T%C3%B8nsberg+63+bud+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud",
+      "opportunity_id": "unified-auksjonen-614290",
+      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290",
+      "required_verified_comparables": 3,
+      "status": "SEARCH_REQUIRED",
+      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud 17t 58m 58s",
+      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
+    },
+    {
+      "accepted_comparable_fields": [
+        "source",
+        "url",
+        "price_nok",
+        "condition",
+        "captured_at",
+        "verified"
+      ],
+      "asking_price_nok": 900.0,
+      "candidate_sources": [
+        {
+          "authorized": false,
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+9+bud",
+          "source": "FINN Torget",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": true,
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+9+bud",
+          "source": "Auksjonen.no",
+          "status": "REVIEW_REQUIRED"
+        },
+        {
+          "authorized": false,
+          "search_url": "https://www.google.com/search?q=Parti+med+VVS-materiell+%E2%80%93+Roth%2Creol%2C+Uponor%2C+Joti%2C+Purus%2C+Bl%C3%BCcher+og+Geberit+Lierstranda+9+bud+pris+Norge",
+          "source": "Google Norway",
+          "status": "REVIEW_REQUIRED"
+        }
+      ],
+      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud",
       "opportunity_id": "unified-auksjonen-613169",
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 11t 12m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud 1t 51m 1s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]

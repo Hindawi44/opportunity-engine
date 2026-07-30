@@ -1,30 +1,20 @@
 {
-  "enriched_count": 3,
+  "enriched_count": 6,
   "error_count": 0,
   "errors": {},
   "evidence": {
-    "unified-auksjonen-611253": {
-      "captured_at": "2026-07-23T07:47:12.958403+00:00",
+    "unified-auksjonen-610671": {
+      "captured_at": "2026-07-30T17:09:04.588712+00:00",
       "observed": {
-        "city": "Tønsberg",
-        "ends_at": "1784810640000"
+        "city": "Mathopen",
+        "ends_at": "1785517560000"
       },
       "source": "Auksjonen.no public listing page",
-      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
-      "verified": true
-    },
-    "unified-auksjonen-613168": {
-      "captured_at": "2026-07-23T07:47:13.843096+00:00",
-      "observed": {
-        "city": "Lierstranda",
-        "ends_at": "1785351600000"
-      },
-      "source": "Auksjonen.no public listing page",
-      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168",
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
       "verified": true
     },
     "unified-auksjonen-613169": {
-      "captured_at": "2026-07-23T07:47:14.426071+00:00",
+      "captured_at": "2026-07-30T17:09:06.893478+00:00",
       "observed": {
         "city": "Lierstranda",
         "ends_at": "1785438000000"
@@ -32,8 +22,48 @@
       "source": "Auksjonen.no public listing page",
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
       "verified": true
+    },
+    "unified-auksjonen-613944": {
+      "captured_at": "2026-07-30T17:09:06.027126+00:00",
+      "observed": {
+        "city": "Vigrestad",
+        "ends_at": "1785674280000"
+      },
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
+      "verified": true
+    },
+    "unified-auksjonen-614288": {
+      "captured_at": "2026-07-30T17:09:03.351754+00:00",
+      "observed": {
+        "city": "Tønsberg",
+        "ends_at": "1785496920000"
+      },
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288",
+      "verified": true
+    },
+    "unified-auksjonen-614289": {
+      "captured_at": "2026-07-30T17:09:03.997459+00:00",
+      "observed": {
+        "city": "Tønsberg",
+        "ends_at": "1785753600000"
+      },
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
+      "verified": true
+    },
+    "unified-auksjonen-614290": {
+      "captured_at": "2026-07-30T17:09:06.467371+00:00",
+      "observed": {
+        "city": "Tønsberg",
+        "ends_at": "1785496080000"
+      },
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290",
+      "verified": true
     }
   },
-  "generated_at": "2026-07-23T07:47:14.426088+00:00",
+  "generated_at": "2026-07-30T17:09:06.893488+00:00",
   "schema_version": 2
 }

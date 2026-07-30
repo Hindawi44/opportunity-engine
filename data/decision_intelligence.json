@@ -1,9 +1,9 @@
 {
   "buy_review_count": 0,
-  "decision_count": 3,
+  "decision_count": 6,
   "decisions": [
     {
-      "asking_price_nok": 6800.0,
+      "asking_price_nok": 2600.0,
       "automatic_purchase": false,
       "city": "Tønsberg",
       "conservative_resale_value_nok": null,
@@ -15,7 +15,7 @@
       "decision_warnings_ar": [
         "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
       ],
-      "ends_at": "1784810640000",
+      "ends_at": "1785496920000",
       "evidence_needed": [
         "three_verified_market_comparables",
         "auction_fee",
@@ -28,7 +28,293 @@
       "expected_profit_nok": null,
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud",
+      "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud",
+      "matched_target_terms": [
+        "lagerreol",
+        "reol",
+        "hylle"
+      ],
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "missing_evidence_ar": [
+        "عمولة المزاد",
+        "تكلفة الفك",
+        "التكاليف الأخرى",
+        "تكلفة الإصلاح",
+        "تكلفة التخزين",
+        "ثلاث مقارنات سوقية موثقة",
+        "تكلفة النقل",
+        "قيمة ضريبة القيمة المضافة"
+      ],
+      "next_actions_ar": [
+        "استكمال ثلاث مقارنات سوقية موثقة.",
+        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
+      ],
+      "official_decision_field": "final_decision",
+      "opportunity_id": "unified-auksjonen-614288",
+      "opportunity_score": 34.59,
+      "priority": 1,
+      "reasons": [
+        "target:lagerreol+15",
+        "target:reol+9",
+        "target:hylle+8",
+        "asking_price_present+5"
+      ],
+      "recommendation": "WATCH",
+      "recommendation_ar": "مراقبة وجمع الأدلة",
+      "relevance_score": 37,
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "score_components": {
+        "evidence": 0.0,
+        "listing_quality": 9.59,
+        "logistics": 10.0,
+        "marketability": 15.0,
+        "verified_economics": 0.0
+      },
+      "score_grade": "E",
+      "score_reasons": [
+        "verified_economics:0/35",
+        "evidence_completeness:0.0/15",
+        "verified_comparables:0.0/10",
+        "marketability:15.0/15",
+        "logistics:10.0/10",
+        "relevance:2.6/7",
+        "listing_fields:7.0/8",
+        "evidence_gate:EVIDENCE_REQUIRED"
+      ],
+      "status": "review_first",
+      "target_profit_buffer_nok": null,
+      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud 18t 12m 58s",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288",
+      "verified_operating_costs_nok": null
+    },
+    {
+      "asking_price_nok": 9500.0,
+      "automatic_purchase": false,
+      "city": "Tønsberg",
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "decision_confidence": "LOW",
+      "decision_reasons_ar": [
+        "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
+      ],
+      "decision_warnings_ar": [
+        "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
+      ],
+      "ends_at": "1785496080000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "final_decision_ar": "مراقبة وجمع الأدلة",
+      "market_search_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud",
+      "matched_target_terms": [
+        "arbeidsbenk",
+        "skap"
+      ],
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "missing_evidence_ar": [
+        "عمولة المزاد",
+        "تكلفة الفك",
+        "التكاليف الأخرى",
+        "تكلفة الإصلاح",
+        "تكلفة التخزين",
+        "ثلاث مقارنات سوقية موثقة",
+        "تكلفة النقل",
+        "قيمة ضريبة القيمة المضافة"
+      ],
+      "next_actions_ar": [
+        "استكمال ثلاث مقارنات سوقية موثقة.",
+        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
+      ],
+      "official_decision_field": "final_decision",
+      "opportunity_id": "unified-auksjonen-614290",
+      "opportunity_score": 33.33,
+      "priority": 2,
+      "reasons": [
+        "target:arbeidsbenk+13",
+        "target:skap+7",
+        "generic:verktøy-6",
+        "asking_price_present+5"
+      ],
+      "recommendation": "WATCH",
+      "recommendation_ar": "مراقبة وجمع الأدلة",
+      "relevance_score": 19,
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "score_components": {
+        "evidence": 0.0,
+        "listing_quality": 8.33,
+        "logistics": 10.0,
+        "marketability": 15.0,
+        "verified_economics": 0.0
+      },
+      "score_grade": "E",
+      "score_reasons": [
+        "verified_economics:0/35",
+        "evidence_completeness:0.0/15",
+        "verified_comparables:0.0/10",
+        "marketability:15.0/15",
+        "logistics:10.0/10",
+        "relevance:1.3/7",
+        "listing_fields:7.0/8",
+        "evidence_gate:EVIDENCE_REQUIRED"
+      ],
+      "status": "review_if_capacity",
+      "target_profit_buffer_nok": null,
+      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud 17t 58m 58s",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290",
+      "verified_operating_costs_nok": null
+    },
+    {
+      "asking_price_nok": 3000.0,
+      "automatic_purchase": false,
+      "city": "Vigrestad",
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "decision_confidence": "LOW",
+      "decision_reasons_ar": [
+        "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
+      ],
+      "decision_warnings_ar": [
+        "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
+      ],
+      "ends_at": "1785674280000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "final_decision_ar": "مراقبة وجمع الأدلة",
+      "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d",
+      "matched_target_terms": [
+        "varelager"
+      ],
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "missing_evidence_ar": [
+        "عمولة المزاد",
+        "تكلفة الفك",
+        "التكاليف الأخرى",
+        "تكلفة الإصلاح",
+        "تكلفة التخزين",
+        "ثلاث مقارنات سوقية موثقة",
+        "تكلفة النقل",
+        "قيمة ضريبة القيمة المضافة"
+      ],
+      "next_actions_ar": [
+        "استكمال ثلاث مقارنات سوقية موثقة.",
+        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
+      ],
+      "official_decision_field": "final_decision",
+      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_score": 30.61,
+      "priority": 1,
+      "reasons": [
+        "target:varelager+18",
+        "asking_price_present+5"
+      ],
+      "recommendation": "WATCH",
+      "recommendation_ar": "مراقبة وجمع الأدلة",
+      "relevance_score": 23,
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "score_components": {
+        "evidence": 0.0,
+        "listing_quality": 8.61,
+        "logistics": 7.0,
+        "marketability": 15.0,
+        "verified_economics": 0.0
+      },
+      "score_grade": "E",
+      "score_reasons": [
+        "verified_economics:0/35",
+        "evidence_completeness:0.0/15",
+        "verified_comparables:0.0/10",
+        "marketability:15.0/15",
+        "logistics:7.0/10",
+        "relevance:1.6/7",
+        "listing_fields:7.0/8",
+        "evidence_gate:EVIDENCE_REQUIRED"
+      ],
+      "status": "review_first",
+      "target_profit_buffer_nok": null,
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d 19t 29m",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
+      "verified_operating_costs_nok": null
+    },
+    {
+      "asking_price_nok": 5000.0,
+      "automatic_purchase": false,
+      "city": "Tønsberg",
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "decision_confidence": "LOW",
+      "decision_reasons_ar": [
+        "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
+      ],
+      "decision_warnings_ar": [
+        "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
+      ],
+      "ends_at": "1785753600000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "expected_profit_nok": null,
+      "final_decision": "WATCH",
+      "final_decision_ar": "مراقبة وجمع الأدلة",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d",
       "matched_target_terms": [
         "lagerreol",
         "reol"
@@ -59,7 +345,7 @@
         "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
       ],
       "official_decision_field": "final_decision",
-      "opportunity_id": "unified-auksjonen-611253",
+      "opportunity_id": "unified-auksjonen-614289",
       "opportunity_score": 28.03,
       "priority": 1,
       "reasons": [
@@ -92,15 +378,15 @@
       ],
       "status": "review_first",
       "target_profit_buffer_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 4t 56m 48s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d 17t 30m",
       "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253",
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "verified_operating_costs_nok": null
     },
     {
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 1000.0,
       "automatic_purchase": false,
-      "city": "Lierstranda",
+      "city": "Mathopen",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "decision_confidence": "LOW",
@@ -110,7 +396,7 @@
       "decision_warnings_ar": [
         "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
       ],
-      "ends_at": "1785351600000",
+      "ends_at": "1785517560000",
       "evidence_needed": [
         "three_verified_market_comparables",
         "auction_fee",
@@ -123,9 +409,10 @@
       "expected_profit_nok": null,
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
-      "market_search_query": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d",
+      "market_search_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud",
       "matched_target_terms": [
-        "reol"
+        "skap",
+        "garderobeskap"
       ],
       "maximum_safe_bid_nok": null,
       "missing_evidence": [
@@ -153,21 +440,22 @@
         "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
       ],
       "official_decision_field": "final_decision",
-      "opportunity_id": "unified-auksjonen-613168",
-      "opportunity_score": 23.98,
-      "priority": 2,
+      "opportunity_id": "unified-auksjonen-610671",
+      "opportunity_score": 24.68,
+      "priority": 1,
       "reasons": [
-        "target:reol+9",
+        "target:skap+7",
+        "target:garderobeskap+12",
         "asking_price_present+5"
       ],
       "recommendation": "WATCH",
       "recommendation_ar": "مراقبة وجمع الأدلة",
-      "relevance_score": 14,
+      "relevance_score": 24,
       "requires_human_approval": false,
       "roi_percent": null,
       "score_components": {
         "evidence": 0.0,
-        "listing_quality": 7.98,
+        "listing_quality": 8.68,
         "logistics": 7.0,
         "marketability": 9.0,
         "verified_economics": 0.0
@@ -179,19 +467,19 @@
         "verified_comparables:0.0/10",
         "marketability:9.0/15",
         "logistics:7.0/10",
-        "relevance:1.0/7",
+        "relevance:1.7/7",
         "listing_fields:7.0/8",
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
-      "status": "review_if_capacity",
+      "status": "review_first",
       "target_profit_buffer_nok": null,
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 11t 12m",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 23t 57m 0s",
       "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168",
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
       "verified_operating_costs_nok": null
     },
     {
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 900.0,
       "automatic_purchase": false,
       "city": "Lierstranda",
       "conservative_resale_value_nok": null,
@@ -216,7 +504,7 @@
       "expected_profit_nok": null,
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
-      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d",
+      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud",
       "matched_target_terms": [
         "reol"
       ],
@@ -278,16 +566,16 @@
       ],
       "status": "review_if_capacity",
       "target_profit_buffer_nok": null,
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 11t 12m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud 1t 51m 1s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
       "verified_operating_costs_nok": null
     }
   ],
-  "generated_at": "2026-07-23T07:47:32.809807+00:00",
+  "generated_at": "2026-07-30T17:09:12.249412+00:00",
   "method": "canonical final decision, verified evidence, conservative target-profit buffer, human approval required",
   "official_decision_field": "final_decision",
   "reject_count": 0,
   "schema_version": 2,
-  "watch_count": 3
+  "watch_count": 6
 }

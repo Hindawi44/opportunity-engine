@@ -1,119 +1,19 @@
 {
   "category_counts": {
-    "auction": 3,
+    "auction": 1,
     "bankruptcy": 18,
-    "estate_sale": 2,
+    "estate_sale": 3,
     "inventory": 27,
-    "liquidation": 14,
-    "office_furniture": 10,
-    "sale_listing": 15,
-    "salon_equipment": 9,
-    "shop_equipment": 11
+    "liquidation": 9,
+    "office_furniture": 1,
+    "sale_listing": 10,
+    "salon_equipment": 7,
+    "shop_equipment": 10
   },
-  "deduplicated_lead_count": 71,
-  "generated_at": "2026-07-23T07:47:07.442048+00:00",
-  "input_result_count": 100,
+  "deduplicated_lead_count": 61,
+  "generated_at": "2026-07-30T17:08:56.871822+00:00",
+  "input_result_count": 80,
   "items": [
-    {
-      "canonical_url": "http://sminkebord.ru/reolteknikk",
-      "categories": [
-        "inventory",
-        "sale_listing",
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440697+00:00",
-      "image_count": null,
-      "lead_id": "web-f4aa2c103c9b5b4c9b71",
-      "price_nok": null,
-      "priority_score": 54,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22",
-        "category:sale_listing+10",
-        "category:shop_equipment+22"
-      ],
-      "snippet": "Svart arbeidsstol i god stand selges. Ta kontakt for hjelp eller spørsmål – Epost. Det hele startet med ønske om en løsning for enkelt og sikker oppbevaring av biler. Vi holder til i egne, tidsriktige lokaler i Gjerdrum, km nord. Lagerinnredninger og -utstyr. Finn veibeskrivelse, kontaktinfo, regnskapstall, ledelse, styre og eiere og kunngjøringer. Vi fører produktkategorier som arkivinnredning, resepsjonsdisker, garderobeskap, grenreoler, lagerreoler, pallereoler, plastkasser, trelastreoler, butikkinnredning og verkstedinnredning, samt montasje og HMS sikkerhetskontroll av lager.",
-      "source": "Brave Search",
-      "title": "Reolteknikk – Integrert kjokkenet",
-      "url": "http://sminkebord.ru/reolteknikk/"
-    },
-    {
-      "canonical_url": "https://www.retrade.eu/en/aitem/448549/KONKURSSALG_VARELAGER_EL-MATERIELL",
-      "categories": [
-        "auction",
-        "bankruptcy",
-        "inventory",
-        "sale_listing"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437731+00:00",
-      "image_count": null,
-      "lead_id": "web-a4fee36016437587aaef",
-      "price_nok": null,
-      "priority_score": 52,
-      "published_at": null,
-      "score_reasons": [
-        "category:auction+12",
-        "category:bankruptcy+8",
-        "category:inventory+22",
-        "category:sale_listing+10"
-      ],
-      "snippet": "All auctions Construction Machines KONKURSSALG VARELAGER EL-MATERIELL · Technical Condition · konkursbo disclaimer(1).pdf · varelager efinstad 27012020.pdf · <strong>Varelager selges etter konkurs</strong>.",
-      "source": "Brave Search",
-      "title": "KONKURSSALG VARELAGER EL-MATERIELL for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
-      "url": "https://www.retrade.eu/en/aitem/448549/KONKURSSALG_VARELAGER_EL-MATERIELL"
-    },
-    {
-      "canonical_url": "https://www.tb.no/dorene-matte-stenges-for-et-par-uker-siden-na-kan-det-igjen-handles-her/s/5-76-2797970",
-      "categories": [
-        "bankruptcy",
-        "inventory",
-        "liquidation"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441761+00:00",
-      "image_count": null,
-      "lead_id": "web-ca1ad62b7e7d8ad4d383",
-      "price_nok": null,
-      "priority_score": 52,
-      "published_at": "2026-02-26T18:19:57",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "category:inventory+22",
-        "category:liquidation+16",
-        "published_at_present+6"
-      ],
-      "snippet": "AVSLUTTES: Det drives nå avsluttende utsalg av fra butikklokalet til <strong>Poulssons Interiørtekstil</strong>. Foto: Erik Munsterhjelm ... Etter Poulsson Interiørtekstil-konkursen ble varelager og inventar solgt videre.",
-      "source": "Brave Search",
-      "title": "Opphørssalg, Tønsberg | Dørene måtte stenges for et par uker siden – nå kan det igjen handles her",
-      "url": "https://www.tb.no/dorene-matte-stenges-for-et-par-uker-siden-na-kan-det-igjen-handles-her/s/5-76-2797970"
-    },
-    {
-      "canonical_url": "https://www.pinterest.com/pin/557179785159152441",
-      "categories": [
-        "bankruptcy",
-        "inventory",
-        "sale_listing"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438117+00:00",
-      "image_count": null,
-      "lead_id": "web-fd34f7ffe57de15e0cfb",
-      "price_nok": null,
-      "priority_score": 46,
-      "published_at": "2022-01-06T09:57:51",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "category:inventory+22",
-        "category:sale_listing+10",
-        "published_at_present+6"
-      ],
-      "snippet": "Skip to content · When autocomplete results are available use up and down arrows to review and enter to select. Touch device users, explore by touch or with swipe gestures · Log in · Sign up",
-      "source": "Brave Search",
-      "title": "Varelager fra interiørbutikk selges fra konkursbo | FINN.no",
-      "url": "https://www.pinterest.com/pin/557179785159152441/"
-    },
     {
       "canonical_url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324",
       "categories": [
@@ -121,7 +21,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441967+00:00",
+      "discovered_at": "2026-07-30T17:08:56.867964+00:00",
       "image_count": null,
       "lead_id": "web-340bfb344e98a6d682c6",
       "price_nok": null,
@@ -138,189 +38,95 @@
       "url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324"
     },
     {
-      "canonical_url": "https://www.billigsoppeltaxi.no/kontoravvikling",
+      "canonical_url": "https://www.auksjonen.no/auksjon/torget/Lagerreoler_og_lagerinventar_selges_samlet/563904",
       "categories": [
-        "liquidation",
-        "office_furniture",
+        "auction",
+        "inventory",
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438568+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870825+00:00",
       "image_count": null,
-      "lead_id": "web-fdc9844ca40ffc16438b",
+      "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
-      "priority_score": 42,
+      "priority_score": 44,
       "published_at": null,
       "score_reasons": [
-        "category:liquidation+16",
-        "category:office_furniture+16",
+        "category:auction+12",
+        "category:inventory+22",
         "category:sale_listing+10"
       ],
-      "snippet": "Vi kan også bistå med møbelmontasje der vi demonterer alt av møbler som enten skal flyttes til et nytt sted, selges, kjøp av brukte kontormøbler eller gjenvinnes.",
+      "snippet": "Kjøp og selg brukte maskiner, kjøretøy, utstyr og overskuddsvarer på Norges største nettauksjon.",
       "source": "Brave Search",
-      "title": "Avvikling og tilbakestilling av kontor - Billig Søppeltaxi Norge",
-      "url": "https://www.billigsoppeltaxi.no/kontoravvikling"
+      "title": "Lagerreoler og lagerinventar selges samlet",
+      "url": "https://www.auksjonen.no/auksjon/torget/Lagerreoler_og_lagerinventar_selges_samlet/563904"
     },
     {
-      "canonical_url": "https://kontorflytting.net/avvikling-av-kontor-eller-bedriften",
+      "canonical_url": "https://www.krosby.no/opphorssalg",
       "categories": [
-        "liquidation",
-        "office_furniture"
+        "inventory",
+        "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438620+00:00",
+      "discovered_at": "2026-07-30T17:08:56.867842+00:00",
       "image_count": null,
-      "lead_id": "web-b205421e9bc5c469c688",
+      "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
-      "priority_score": 38,
-      "published_at": "2025-09-11T19:22:39",
+      "priority_score": 44,
+      "published_at": "2023-10-03T11:12:14",
       "score_reasons": [
+        "category:inventory+22",
         "category:liquidation+16",
-        "category:office_furniture+16",
         "published_at_present+6"
       ],
-      "snippet": "Kontorflytting, avvikling av kontorlokaler, tilbakelevering og kontormøbler. Gå til Review ... Utfører bedriftsflytting både nasjonalt i Norge og flytting til utlandet.",
+      "snippet": "<strong>Vi holder åpent til 31.12.2023.</strong> Hele butikken på 700 kvm, samt lager skal tømmes",
       "source": "Brave Search",
-      "title": "Avvikling av kontor: Få hjelp fra flyttebyrå med kontoravvikling",
-      "url": "https://kontorflytting.net/avvikling-av-kontor-eller-bedriften/"
+      "title": "Opphørssalg - Krosby Møbler AS - Oslo",
+      "url": "https://www.krosby.no/opphorssalg/"
     },
     {
-      "canonical_url": "https://www.billigsoppeltaxi.no/kaste-mobler",
+      "canonical_url": "https://www.gulesider.no/butikkinnredning+%C3%B8stlandet/bedrifter",
       "categories": [
-        "liquidation",
-        "office_furniture"
+        "office_furniture",
+        "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438687+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870028+00:00",
       "image_count": null,
-      "lead_id": "web-4c4e1e08bb5aace3eaf9",
+      "lead_id": "web-09fdcc107a66ac1b45ab",
       "price_nok": null,
       "priority_score": 38,
-      "published_at": "2026-03-18T16:05:18",
+      "published_at": null,
       "score_reasons": [
-        "category:liquidation+16",
         "category:office_furniture+16",
-        "published_at_present+6"
+        "category:shop_equipment+22"
       ],
-      "snippet": "Avvikling av kontor · Store og tunge gjenstander som sofa, seng og garderobeskap kan være krevende å håndtere alene. Vi sørger for trygg og effektiv bortkjøring. Vi hjelper med å kaste blant annet: Sofa og hjørnesofa · Senger og madrasser · Skap og kommoder · Bord og stoler · TV-benker · Garderobeskap · Kontormøbler ·",
+      "snippet": "Butikkinnredning Østlandet - brosjyreholder, butikkdesign, garderobeskap, kontorlandskap, benker, bord, garderobe, kontorstol, kontormøbler, skrivebord, brosjyrestativ, arkivskap - Finn firmaer, adresser, telefonnumre.",
       "source": "Brave Search",
-      "title": "Kaste møbler | Rask bortkjøring av gamle møbler",
-      "url": "https://www.billigsoppeltaxi.no/kaste-mobler/"
+      "title": "Butikkinnredning Østlandet | bedrifter | gulesider.no",
+      "url": "https://www.gulesider.no/butikkinnredning+%C3%B8stlandet/bedrifter"
     },
     {
-      "canonical_url": "https://flyttefirmaoslo.no/kontorflytting-oslo/kjope-kontormobler",
+      "canonical_url": "https://www.lagersalg.no/sport-og-fritid/-g-sport-og-g-max-opph-rssalg-2",
       "categories": [
-        "liquidation",
-        "office_furniture"
+        "inventory",
+        "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438945+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868085+00:00",
       "image_count": null,
-      "lead_id": "web-b44ebb69f18d9ff07967",
+      "lead_id": "web-ef2f88a92a8f9400d376",
       "price_nok": null,
       "priority_score": 38,
-      "published_at": "2026-03-15T21:28:31",
+      "published_at": null,
       "score_reasons": [
-        "category:liquidation+16",
-        "category:office_furniture+16",
-        "published_at_present+6"
+        "category:inventory+22",
+        "category:liquidation+16"
       ],
-      "snippet": "<strong>Relok Flyttebyrå</strong> tilbyr mer enn bare salg av brukte kontormøbler. Vi er også din partner for kontorflytting og avvikling. Vår tjeneste hjelper bedrifter med å gjøre flytteprosessen så enkel og effektiv som mulig for din bedrift.",
+      "snippet": "Opphørssalget starter torsdag 2/7 - varer hele sommeren. Mengder av sportsutstyr skal bort! Se hvilke butikker det gjelder her: tomming.gsport.no",
       "source": "Brave Search",
-      "title": "Kjøpe kontormøbler: Vi kjøper opp brukte kontormøbler i Oslo",
-      "url": "https://flyttefirmaoslo.no/kontorflytting-oslo/kjope-kontormobler/"
-    },
-    {
-      "canonical_url": "https://kontorflytting.no/kontoravvikling",
-      "categories": [
-        "liquidation",
-        "office_furniture"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439125+00:00",
-      "image_count": null,
-      "lead_id": "web-59562469ad1ad6328d68",
-      "price_nok": null,
-      "priority_score": 38,
-      "published_at": "2025-10-23T18:01:09",
-      "score_reasons": [
-        "category:liquidation+16",
-        "category:office_furniture+16",
-        "published_at_present+6"
-      ],
-      "snippet": "<strong>Skal bedriften avvikle kontorlokaler hjelper vi dere med demontering av møbler, tømming, utvask og tilbakestilling av kontorlokalene</strong>. Vi kan også bistå med kjøp og salg av brukte kontormøbler hvis bedriften ønsker å kvitte seg med møbler ...",
-      "source": "Brave Search",
-      "title": "Kontoravvikling Oslo | Avvikling og tilbakestilling av kontorlokaler",
-      "url": "https://kontorflytting.no/kontoravvikling/"
-    },
-    {
-      "canonical_url": "https://www.flyttefirmaoslo.no/kontorflytting-oslo/kontoravvikling-bedrift",
-      "categories": [
-        "liquidation",
-        "office_furniture"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438883+00:00",
-      "image_count": null,
-      "lead_id": "web-308c25eccf104775fa2e",
-      "price_nok": null,
-      "priority_score": 38,
-      "published_at": "2024-09-04T17:42:27",
-      "score_reasons": [
-        "category:liquidation+16",
-        "category:office_furniture+16",
-        "published_at_present+6"
-      ],
-      "snippet": "<strong>Vi har lang erfaring i proffmarkedet og bistår alle typer bedrifter med å avvikle kontorlokaler</strong>. Vi bistår gjennom hele prosessen med å rydde ut av gamle kontorlokaler, håndterer alt fra brukte kontormøbler til utstyr, elektronikk og andre ...",
-      "source": "Brave Search",
-      "title": "Kontoravvikling: Komplett ekspert på avvikling og tilbakestilling",
-      "url": "https://www.flyttefirmaoslo.no/kontorflytting-oslo/kontoravvikling-bedrift/"
-    },
-    {
-      "canonical_url": "https://kontorflytting.net/",
-      "categories": [
-        "liquidation",
-        "office_furniture"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438739+00:00",
-      "image_count": null,
-      "lead_id": "web-0947f69839d91d0acbd1",
-      "price_nok": null,
-      "priority_score": 38,
-      "published_at": "2025-09-30T22:19:05",
-      "score_reasons": [
-        "category:liquidation+16",
-        "category:office_furniture+16",
-        "published_at_present+6"
-      ],
-      "snippet": "Kontorflytting, avvikling av kontorlokaler, tilbakelevering og kontormøbler. Gå til Review ... Utfører bedriftsflytting både nasjonalt i Norge og flytting til utlandet.",
-      "source": "Brave Search",
-      "title": "Kontorflytting Oslo: Finn flyttebyrå til å flytte kontor (august 2025)",
-      "url": "https://kontorflytting.net/"
-    },
-    {
-      "canonical_url": "https://xn--flyttebyr-e3a.org/mobelmontering",
-      "categories": [
-        "liquidation",
-        "office_furniture"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439020+00:00",
-      "image_count": null,
-      "lead_id": "web-748bb4c57086428778a6",
-      "price_nok": null,
-      "priority_score": 38,
-      "published_at": "2024-05-16T16:21:18",
-      "score_reasons": [
-        "category:liquidation+16",
-        "category:office_furniture+16",
-        "published_at_present+6"
-      ],
-      "snippet": "Flyttebyrå.org er en portal som formidler flyttetjenester i Norge, og her får du en oversikt over flyttebyrå som kan gjennomføre firmaflytting på en effektiv og stressfri måte.’ · Logo · Tjenester · Firma · Evaluering · Gå til · 1 · Prosjektledelse, kontorflytting, montering, kontormøbler, avvikling av kontorlokaler.",
-      "source": "Brave Search",
-      "title": "Møbelmontering: Hjelp til montering av møbler for private og kontor",
-      "url": "https://xn--flyttebyr-e3a.org/mobelmontering/"
+      "title": "G SPORT og G MAX OPPHØRSSALG! - Lagersalg.no",
+      "url": "https://www.lagersalg.no/sport-og-fritid/-g-sport-og-g-max-opph-rssalg-2"
     },
     {
       "canonical_url": "https://www.ordlista.no/ord/opph%C3%B8rssalga",
@@ -329,7 +135,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441529+00:00",
+      "discovered_at": "2026-07-30T17:08:56.867674+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -351,7 +157,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441829+00:00",
+      "discovered_at": "2026-07-30T17:08:56.867896+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -373,7 +179,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437790+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868381+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -396,7 +202,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441302+00:00",
+      "discovered_at": "2026-07-30T17:08:56.867266+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -413,6 +219,30 @@
       "url": "https://www.nrk.no/norge/krever-at-kommunene-samler-inn-tekstilavfall--_-ingen-vet-hvor-det-skal-gjenvinnes-1.16792050"
     },
     {
+      "canonical_url": "https://norskavvikling.no/",
+      "categories": [
+        "bankruptcy",
+        "liquidation",
+        "sale_listing"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.871600+00:00",
+      "image_count": null,
+      "lead_id": "web-d6946302664e2cf64951",
+      "price_nok": null,
+      "priority_score": 34,
+      "published_at": null,
+      "score_reasons": [
+        "category:bankruptcy+8",
+        "category:liquidation+16",
+        "category:sale_listing+10"
+      ],
+      "snippet": "Der salgsobjektet -ene stammer fra et konkursbo har selger liten eller ingen kjennskap til produktet -ene. Produktet -ene selges som de står og uten noen form for garanti. I tilfeller der salget er et parti salg, kan ikke Norsk Avvikling AS innestå for antall, kvalitet osv.",
+      "source": "Brave Search",
+      "title": "Norsk Avvikling",
+      "url": "https://norskavvikling.no/"
+    },
+    {
       "canonical_url": "https://www.verdirealisering.no/konkursbo-b/tag/varelager",
       "categories": [
         "bankruptcy",
@@ -420,7 +250,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437669+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868711+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -443,7 +273,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.436617+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869496+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -453,9 +283,9 @@
         "category:sale_listing+10",
         "category:shop_equipment+22"
       ],
-      "snippet": "Har stått i en gammel butikk fra omkring 1910. I god stand. Butikkinnredning. Landhandel. Selges 2500kr eller høystbydende. ... Butikkinvetar T, L osv kjøpt av Systemhyller i Norge. T - Stender 20 stykker, Veil. Pris ca 1300kr pr stender, selges for 350.-/stk L - Stender 23 stykker.",
+      "snippet": "Lekker butikkinnredning brukt på <strong>Day Birger et Mikkelsen på Sandvika selges</strong>.",
       "source": "Brave Search",
-      "title": "Butikkinnredning selges - Mars 2024",
+      "title": "Butikkinnredning selges - August 2021",
       "url": "https://www.rubrikk.no/torget-brukt-til-salgs/butikkinnredning-selges.html"
     },
     {
@@ -465,7 +295,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437592+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869705+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -475,21 +305,21 @@
         "category:sale_listing+10",
         "category:shop_equipment+22"
       ],
-      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
-      "title": "Butikkinnredning | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
+      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
     },
     {
-      "canonical_url": "https://www.finn.no/bap/webstore/ad.html",
+      "canonical_url": "https://www.machineseeker.no/Tekstilmaskiner/ci-19",
       "categories": [
         "inventory",
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440607+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870380+00:00",
       "image_count": null,
-      "lead_id": "web-c1e3e1a07794eb2a24ac",
+      "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
       "priority_score": 32,
       "published_at": null,
@@ -497,43 +327,21 @@
         "category:inventory+22",
         "category:sale_listing+10"
       ],
-      "snippet": "Reolen er også kjent som Electrolux og Høvik-lagerreoler. Den kan leveres åpen, eventuelt med tette rygger og endevegger. Pent brukte gavler, hyller og mellomvegger. Ta kontakt for spørsmål og tilbud. Vi skaffer også nytt, hvis ikke du finner ønsket dimensjon over. Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt. ... Ta kontakt om du ønsker mer informasjon om reolene. Utstyret selges meget prisgunstige og er enkle å montere, demontere, bygge på og bygge om.",
+      "snippet": "Tilstand: ny, Byggeår: 2025, <strong>Dürkopp Adler 868 ECO</strong> – 6 mm nålavstand – Ny – Ho Hsing G60-motor – Direkte fra lager – €5.000 eks. mva. Til salgs: Helt ny <strong>Dürkopp Adler 868 ECO</strong>, umiddelbart tilgjengelig fra lager.",
       "source": "Brave Search",
-      "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
-      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
+      "title": "▷ Brukt tekstilmaskiner til salgs - Machineseeker",
+      "url": "https://www.machineseeker.no/Tekstilmaskiner/ci-19"
     },
     {
-      "canonical_url": "https://machineryline.co.no/-/restaurantutstyr--c2008",
-      "categories": [
-        "inventory",
-        "sale_listing"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439280+00:00",
-      "image_count": null,
-      "lead_id": "web-7d98d2dca9d156e72493",
-      "price_nok": null,
-      "priority_score": 32,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22",
-        "category:sale_listing+10"
-      ],
-      "snippet": "Restaurantutstyr ➤ 953 tilbud ✓ Pris fra 16 € ✓ Abat, Hurakan, Unox, og andre ✓ Nye og brukte ✓ Pålitelige selgere ✓ På lager for øyeblikket ✓ Anleggsmaskiner av høy kvalitet for salg på <strong>Machineryline Norge</strong>",
-      "source": "Brave Search",
-      "title": "Restaurantutstyr, brukt restaurantutstyr til salgs | Machineryline Norge",
-      "url": "https://machineryline.co.no/-/restaurantutstyr--c2008"
-    },
-    {
-      "canonical_url": "https://www.facebook.com/p/Konkurs-og-Varelager-Salg-Sandnes-100057387611906",
+      "canonical_url": "https://www.altpasalg.no/",
       "categories": [
         "bankruptcy",
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437939+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868891+00:00",
       "image_count": null,
-      "lead_id": "web-e6c891e1c13bdc192b3d",
+      "lead_id": "web-08c1c3148277e6eb31ea",
       "price_nok": null,
       "priority_score": 30,
       "published_at": null,
@@ -541,10 +349,32 @@
         "category:bankruptcy+8",
         "category:inventory+22"
       ],
-      "snippet": "Konkurs og Varelager Salg Sandnes. 3,574 likes. Masse kjekt, rart å litt kult kan du finna i vår butikk rett bak tinghuset i Sandnes� Vågsgata 42, Sandnes",
+      "snippet": "<strong>AltPåSalg er en nettbutikk som videreselger oppkjøpte varelager, varepartier og varer fra konkursbo med minst 50-80% avslag fra ordinære butikkpriser</strong>",
       "source": "Brave Search",
-      "title": "Konkurs og Varelager Salg Sandnes",
-      "url": "https://www.facebook.com/p/Konkurs-og-Varelager-Salg-Sandnes-100057387611906/"
+      "title": "AltPåSalg",
+      "url": "https://www.altpasalg.no/"
+    },
+    {
+      "canonical_url": "https://arbinn.nho.no/forretningsdrift/styrearbeid-og-okonomi/styrearbeid/artikler/hva-innebarer-en-konkurs",
+      "categories": [
+        "bankruptcy",
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.868968+00:00",
+      "image_count": null,
+      "lead_id": "web-7c85d59249f9065a7874",
+      "price_nok": null,
+      "priority_score": 30,
+      "published_at": null,
+      "score_reasons": [
+        "category:bankruptcy+8",
+        "category:inventory+22"
+      ],
+      "snippet": "Eksempler på eiendeler og rettigheter ... varelager, driftsmidler, krav på ytelser fra leverandører (som leide lokaler), patenter, lisenser og varemerker. Det er tingretten som åpner konkurs, etter krav fra selskapet selv eller kreditorer (f.eks. skattemyndighetene). Fra det tidspunkt (dato og klokkeslett) konkurs er åpnet, blir eiendeler og rettigheter &quot;beslaglagt&quot; av konkursboet, som ledes ...",
+      "source": "Brave Search",
+      "title": "Hva innebærer en konkurs?",
+      "url": "https://arbinn.nho.no/forretningsdrift/styrearbeid-og-okonomi/styrearbeid/artikler/hva-innebarer-en-konkurs/"
     },
     {
       "canonical_url": "https://www.varelageret.net/salg-av-konkursbo",
@@ -553,7 +383,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437887+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868425+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -569,15 +399,15 @@
       "url": "https://www.varelageret.net/salg-av-konkursbo"
     },
     {
-      "canonical_url": "https://www.netauktion.se/auktion/produkt/konkurslager-fran-internetshoppen-ab-157-artiklar",
+      "canonical_url": "https://www.konkurskupp.no/guide/slik-kjoper-du-fra-konkursbo",
       "categories": [
         "bankruptcy",
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441112+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868781+00:00",
       "image_count": null,
-      "lead_id": "web-1f73a24540df445fd318",
+      "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
       "priority_score": 30,
       "published_at": null,
@@ -585,10 +415,10 @@
         "category:bankruptcy+8",
         "category:inventory+22"
       ],
-      "snippet": "Just nu hos Netauktion. Konkurslager från Internetshoppen AB, 157 artiklar. Konkurslager från Internetshoppen AB. Inneh...",
+      "snippet": "Ved konkurs skjer kjøp nesten alltid som kjøp av eiendeler, ikke kjøp av aksjer. <strong>Du kjøper altså driftsmidlene, varelager, kundeavtaler og eventuelt varemerker — men ikke selskapet i seg selv</strong>.",
       "source": "Brave Search",
-      "title": "Netauktion - Konkurslager från Internetshoppen AB, 157 artiklar",
-      "url": "https://www.netauktion.se/auktion/produkt/konkurslager-fran-internetshoppen-ab-157-artiklar"
+      "title": "Slik kjøper du fra konkursbo — komplett guide 2026 | Konkurskupp",
+      "url": "https://www.konkurskupp.no/guide/slik-kjoper-du-fra-konkursbo"
     },
     {
       "canonical_url": "https://www.tb.no/opphorssalg-etter-konkurs-viktig-beskjed-til-kunder/s/5-76-2517965",
@@ -597,7 +427,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441697+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868317+00:00",
       "image_count": null,
       "lead_id": "web-05170ee30473a1493dd3",
       "price_nok": null,
@@ -614,47 +444,25 @@
       "url": "https://www.tb.no/opphorssalg-etter-konkurs-viktig-beskjed-til-kunder/s/5-76-2517965"
     },
     {
-      "canonical_url": "https://www.blocket.se/recommerce/forsale/search",
+      "canonical_url": "https://avabutikkinnredning.no/",
       "categories": [
-        "bankruptcy",
-        "inventory"
+        "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440992+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869543+00:00",
       "image_count": null,
-      "lead_id": "web-eecaf76c7cb772f25373",
-      "price_nok": null,
-      "priority_score": 30,
-      "published_at": null,
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "category:inventory+22"
-      ],
-      "snippet": "Det finns 129 annonser med varupartier och konkurslager till salu på Blocket. Här kan du göra stora fynd i konkurslager till ett överkomligt pris.",
-      "source": "Brave Search",
-      "title": "Varupartier och konkurslager | Till salu | Blocket",
-      "url": "https://www.blocket.se/recommerce/forsale/search?product_category=2.91.3108.363"
-    },
-    {
-      "canonical_url": "https://www.collicare.no/en/freight/third-party-logistics",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438275+00:00",
-      "image_count": null,
-      "lead_id": "web-cd259dfa5072e807b3b3",
+      "lead_id": "web-7c78687e8f228b645e34",
       "price_nok": null,
       "priority_score": 28,
-      "published_at": "2020-10-03T16:33:09",
+      "published_at": "2025-09-22T20:13:33",
       "score_reasons": [
-        "category:inventory+22",
+        "category:shop_equipment+22",
         "published_at_present+6"
       ],
-      "snippet": "Storage solutions, warehousing, 3PL, 4PL, WM systems – smart warehousing solutions streamlines your flow of goods and increase your bottom line",
+      "snippet": "Butikkinnredning, rillepanel, klesstativ, utstillingsdukker og glassmonter. Norges beste priser med rask levering",
       "source": "Brave Search",
-      "title": "3PL lagerløsninger for din bedrift | ColliCare Logistics Norge",
-      "url": "https://www.collicare.no/en/freight/third-party-logistics"
+      "title": "AVA Butikkinnredning, Utstillingsdukker, Rillepanel, Glassmonter",
+      "url": "https://avabutikkinnredning.no/"
     },
     {
       "canonical_url": "https://bdn.no/",
@@ -662,7 +470,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437426+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870082+00:00",
       "image_count": null,
       "lead_id": "web-f5e25a1bdcd9e106de57",
       "price_nok": null,
@@ -678,25 +486,25 @@
       "url": "https://bdn.no"
     },
     {
-      "canonical_url": "https://www.hestra.com/",
+      "canonical_url": "https://www.hestra.no/",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437358+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869785+00:00",
       "image_count": null,
-      "lead_id": "web-3711ef931e2562238b3e",
+      "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
       "priority_score": 28,
-      "published_at": "2024-08-21T08:16:24",
+      "published_at": "2024-08-21T08:17:24",
       "score_reasons": [
         "category:shop_equipment+22",
         "published_at_present+6"
       ],
-      "snippet": "We’ve been creating busy retail stores, welcoming hotels and quality restaurants since the year 1900. We know all about shop fitting and interiors for restaurants and hotels. We’re great at concept development, we’re strong on manufacturing and we’re in full control of the logistics.",
+      "snippet": "<strong>Skap en attraktiv butiksmiljø med vår omfattende butikkinnredningstjeneste</strong>. Et attraktivt konsept er en blanding av tiltalende miljøer, eksponeringer som selger, og en godt planlagt layout. Våre engasjerte prosjektgrupper settes sammen før hvert prosjekt for å sikre at dine behov blir ...",
       "source": "Brave Search",
-      "title": "Hestra: Butikkinnredning - Attraktiv innredning for alle bransjer",
-      "url": "https://www.hestra.com/"
+      "title": "Butikkinnredning - Attraktiv innredning for alle bransjer - Hestra",
+      "url": "https://www.hestra.no/"
     },
     {
       "canonical_url": "https://reolteknikk.no/",
@@ -704,7 +512,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440904+00:00",
+      "discovered_at": "2026-07-30T17:08:56.871128+00:00",
       "image_count": null,
       "lead_id": "web-63600f85f4126e808e67",
       "price_nok": null,
@@ -720,35 +528,13 @@
       "url": "https://reolteknikk.no/"
     },
     {
-      "canonical_url": "https://tise.com/search/tise",
-      "categories": [
-        "sale_listing",
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439899+00:00",
-      "image_count": null,
-      "lead_id": "web-ab264ec5f9606558d60d",
-      "price_nok": null,
-      "priority_score": 26,
-      "published_at": null,
-      "score_reasons": [
-        "category:sale_listing+10",
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Find great &#x27;frisørutstyr&#x27; items secondhand",
-      "source": "Brave Search",
-      "title": "'frisørutstyr' items for sale · Tise",
-      "url": "https://tise.com/search/tise?country_code=NO&search=fris%C3%B8rutstyr&location_max=country"
-    },
-    {
       "canonical_url": "https://www.finn.no/bap/forsale/search.html",
       "categories": [
         "bankruptcy",
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438173+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868543+00:00",
       "image_count": null,
       "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
@@ -765,32 +551,12 @@
       "url": "https://www.finn.no/bap/forsale/search.html?product_category=2.91.3108.363"
     },
     {
-      "canonical_url": "http://www.agitoretail.com/",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.436761+00:00",
-      "image_count": null,
-      "lead_id": "web-123271c51c6da4a9405e",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:shop_equipment+22"
-      ],
-      "snippet": "<strong>Agito Retail Design utvikler og leverer butikkinnredning og eksponeringsløsninger av høy kvalitet</strong>. Vi holder til i Oslo, men har kunder i hele Norge!",
-      "source": "Brave Search",
-      "title": "Agito Retail Design Butikkinnredning",
-      "url": "http://www.agitoretail.com/"
-    },
-    {
       "canonical_url": "https://billige-arbeidsklaer.no/arbeidsklaer",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438329+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869027+00:00",
       "image_count": null,
       "lead_id": "web-0658ba89b4c5fc6f74ea",
       "price_nok": null,
@@ -805,33 +571,12 @@
       "url": "https://billige-arbeidsklaer.no/arbeidsklaer"
     },
     {
-      "canonical_url": "https://crifo-centura.no/",
-      "categories": [
-        "office_furniture"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439066+00:00",
-      "image_count": null,
-      "lead_id": "web-74a81ba296fd20b830eb",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": "2025-02-20T10:23:46",
-      "score_reasons": [
-        "category:office_furniture+16",
-        "published_at_present+6"
-      ],
-      "snippet": "Vi tilbyr et stort utvalg av brukte kontormøbler, kontorstoler, hev/senk kontorpulter, møtebord, møtestoler, kontorskap og skjermvegger.",
-      "source": "Brave Search",
-      "title": "Brukte kontormøbler av høy kvalitet - Crifo Centura",
-      "url": "https://crifo-centura.no/"
-    },
-    {
       "canonical_url": "https://www.1881.no/butikkinnredning-og-utstyr",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437221+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869972+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -846,34 +591,14 @@
       "url": "https://www.1881.no/butikkinnredning-og-utstyr/"
     },
     {
-      "canonical_url": "https://www.gerdmans.no/kontor-og-konferanse/butikkinnredning",
+      "canonical_url": "https://www.supersellerskatalog.no/",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437280+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869908+00:00",
       "image_count": null,
-      "lead_id": "web-e42d52eb07a436ed3cfe",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:shop_equipment+22"
-      ],
-      "snippet": "<strong>Vi tilbyr et bredt sortiment av butikkinnredning</strong>. Alt fra butikkhyller og informasjonsstativ, til kurver og butikkspeil. Alltid fri frakt og 7 års garanti.",
-      "source": "Brave Search",
-      "title": "Butikkinnredning på Nett | Fri Frakt | Gerdmans",
-      "url": "https://www.gerdmans.no/kontor-og-konferanse/butikkinnredning"
-    },
-    {
-      "canonical_url": "https://www.supersellerskatalog.no/inspirasjon",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.436701+00:00",
-      "image_count": null,
-      "lead_id": "web-72d343831b08e2486a3f",
+      "lead_id": "web-e71772deae49d9ffbeb5",
       "price_nok": null,
       "priority_score": 22,
       "published_at": null,
@@ -883,7 +608,27 @@
       "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
       "source": "Brave Search",
       "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
-      "url": "https://www.supersellerskatalog.no/inspirasjon"
+      "url": "https://www.supersellerskatalog.no/"
+    },
+    {
+      "canonical_url": "https://www.supersellers.no/",
+      "categories": [
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.868157+00:00",
+      "image_count": null,
+      "lead_id": "web-7cad0e8a59e6e6643424",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS&#x27; butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
+      "source": "Brave Search",
+      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
+      "url": "https://www.supersellers.no/"
     },
     {
       "canonical_url": "https://www.sono.no/lager-industri/lager.html",
@@ -891,7 +636,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440750+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870773+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -906,33 +651,12 @@
       "url": "https://www.sono.no/lager-industri/lager.html"
     },
     {
-      "canonical_url": "https://firstmovergroup.no/kontormobler-og-baerekraft-hva-kan-vi-gjore-med-de-gamle-kontormoblene-vare",
-      "categories": [
-        "office_furniture"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438820+00:00",
-      "image_count": null,
-      "lead_id": "web-9a0e8109970eed5a090d",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": "2023-02-15T16:00:16",
-      "score_reasons": [
-        "category:office_furniture+16",
-        "published_at_present+6"
-      ],
-      "snippet": "Plattformen er tilpasset mobil for enklest mulig registrering av møblene som merkes med QR-koder og lastes automatisk inn i et Dashboard som gir full oversikt over møbelporteføljen. Møbleringsplaner kan lastes opp i plattformen og markedsplassen gjør det enkelt å både kjøpe og selge pent brukte kontormøbler tilpasset deres virksomhet og lokaler.",
-      "source": "Brave Search",
-      "title": "Hva kan vi gjøre med de gamle kontormøblene våre? – First Mover Group",
-      "url": "https://firstmovergroup.no/kontormobler-og-baerekraft-hva-kan-vi-gjore-med-de-gamle-kontormoblene-vare/"
-    },
-    {
       "canonical_url": "https://www.supersellers.no/katalog",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437533+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869631+00:00",
       "image_count": null,
       "lead_id": "web-bd6977fd8acb108de839",
       "price_nok": null,
@@ -952,7 +676,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440460+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870686+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -967,44 +691,24 @@
       "url": "https://www.witre.no/no/wno/lagerhyller-pallestativer"
     },
     {
-      "canonical_url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler",
+      "canonical_url": "https://www.finn.no/recommerce/forsale/item/412276314",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440853+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870966+00:00",
       "image_count": null,
-      "lead_id": "web-bac4413824a804dd34ad",
+      "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
       "priority_score": 22,
       "published_at": null,
       "score_reasons": [
         "category:inventory+22"
       ],
-      "snippet": "Stabila grovhyllor med hög bärkraft. Perfekta för förvaring av tunga maskiner, verktyg och material. Beställ enkelt online idag!",
+      "snippet": "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!",
       "source": "Brave Search",
-      "title": "Lagerreol I Hyller I Oppbevaring til verkstedet I P. Lindberg",
-      "url": "https://www.p-lindberg.no/verksted-bygg-anlegg/verksted/lagerreoler-og-oppbevaring/lagerreoler/"
-    },
-    {
-      "canonical_url": "https://reolhansen.dk/produkt-kategori/lagerreoler-arkivreoler",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440806+00:00",
-      "image_count": null,
-      "lead_id": "web-04376fdce8cb350aa3a8",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "Lagerreoler er uundværlige på enhver virksomheds lager eller hjemme i garagen, værkstedet eller kælderen. <strong>Hos ReolHansen har vi reoler til alle formål og priser, og vi sælger til både erhverv og private</strong>. Forskellige formål kræver ...",
-      "source": "Brave Search",
-      "title": "Lagerreol | Køb nye reoler til dit Lager hos Reolhansen",
-      "url": "https://reolhansen.dk/produkt-kategori/lagerreoler-arkivreoler/"
+      "title": "Lagerreoler | FINN-torget",
+      "url": "https://www.finn.no/recommerce/forsale/item/412276314"
     },
     {
       "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
@@ -1012,7 +716,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440409+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870632+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -1027,24 +731,24 @@
       "url": "https://fasadenor.no/product-category/lagerreoler/"
     },
     {
-      "canonical_url": "https://www.supersellers.dk/en/collections/warehouse-shelving",
+      "canonical_url": "https://www.supersellers.no/collections/lagerreoler",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440519+00:00",
+      "discovered_at": "2026-07-30T17:08:56.871020+00:00",
       "image_count": null,
-      "lead_id": "web-613dd332d95369012b20",
+      "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
       "priority_score": 22,
       "published_at": null,
       "score_reasons": [
         "category:inventory+22"
       ],
-      "snippet": "Large selection of warehouse shelving for efficient storage. Customize to suit your needs. Buy online from SuperSellerS with a price guarantee and fast delivery.",
+      "snippet": "Stort utvalg av lagerreoler for effektiv lagring. Tilpass etter behov. Kjøp online hos SuperSellerS med prisgaranti og rask levering.",
       "source": "Brave Search",
-      "title": "Lagerreoler – Sterke og fleksible reoler",
-      "url": "https://www.supersellers.dk/en/collections/warehouse-shelving"
+      "title": "Lagerreoler – Sterke og fleksible reoler | SuperSellerS",
+      "url": "https://www.supersellers.no/collections/lagerreoler"
     },
     {
       "canonical_url": "https://luminx.no/",
@@ -1052,7 +756,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439997+00:00",
+      "discovered_at": "2026-07-30T17:08:56.871480+00:00",
       "image_count": null,
       "lead_id": "web-7570d71d9b328c0f5b6d",
       "price_nok": null,
@@ -1068,26 +772,125 @@
       "url": "https://luminx.no/"
     },
     {
-      "canonical_url": "https://merkandi.us/wholesale/sewing-machines-clearance",
+      "canonical_url": "https://www.kom24.no/annonse-facebook-forbrukerradet/reklamerer-med-falske-opphorssalg-forbudt/754219",
       "categories": [
-        "auction",
-        "sale_listing"
+        "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440202+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868244+00:00",
       "image_count": null,
-      "lead_id": "web-4294bca182e47934c662",
+      "lead_id": "web-81550ca51413d1e1ac66",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": "2024-09-23T13:11:43",
+      "score_reasons": [
+        "category:liquidation+16",
+        "published_at_present+6"
+      ],
+      "snippet": "Norry Oslo har siden minst 30. august reklamert med at de skal legge ned, med løfte om et 24-timers opphørssalg. Flere uker senere er verken salget avsluttet eller nettbutikken nedlagt, skriver NRK. ... Flere nettbutikker markedsfører seg med annonser som gir inntrykk av at de skal legge ned, men butikken fortsetter salget langt utover det oppgitte tidspunktet.",
+      "source": "Brave Search",
+      "title": "Reklamerer med falske opphørssalg: – Forbudt",
+      "url": "https://www.kom24.no/annonse-facebook-forbrukerradet/reklamerer-med-falske-opphorssalg-forbudt/754219"
+    },
+    {
+      "canonical_url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.871071+00:00",
+      "image_count": null,
+      "lead_id": "web-0623254318f1aaf8f835",
       "price_nok": null,
       "priority_score": 22,
       "published_at": null,
       "score_reasons": [
-        "category:auction+12",
-        "category:sale_listing+10"
+        "category:inventory+22"
       ],
-      "snippet": "The promotion has ended · Follow the latest offers from your chosen industry, follow the brands you want - and react faster to occasional deals",
+      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
       "source": "Brave Search",
-      "title": "Sewing Machines for Sale - Wholesale Industrial Sewing Machines from Clearance and Auctions | B2B Merkandi.us",
-      "url": "https://merkandi.us/wholesale/sewing-machines-clearance"
+      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
+      "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
+    },
+    {
+      "canonical_url": "https://naob.no/ordbok/restparti",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.869309+00:00",
+      "image_count": null,
+      "lead_id": "web-921037454eb852a23c0d",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "restparti · substantiv · MODERAT BOKMÅLet · genus · nøytrum · ubestemt artikkel · et · FULL BOKMÅLSNORM · BETYDNING OG BRUK · <strong>resterende, ikke solgt parti av varer</strong> · | jf. rest · SITAT · [de skulde få avhendet] hele restpartiet af deres poteter ·",
+      "source": "Brave Search",
+      "title": "restparti - Det Norske Akademis ordbok",
+      "url": "https://naob.no/ordbok/restparti"
+    },
+    {
+      "canonical_url": "https://www.esska-no.com/shop/Tilbud/Restparti-sikkerhet/Restparti-arbeidshansker--24370",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.869247+00:00",
+      "image_count": null,
+      "lead_id": "web-b1965bf33313f5b36f22",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "Restparti oppvarming · vvakuumteknologi · Restparti slanger + klemmer · Restparti renseteknologi · Restparti sugeteknikk · Restparti slipemidler · Restparti smøring · Restparti sikkerhet · Restparti yrkesklær · Restparti varselklær · Restparti kuldebeskyttende klær ·",
+      "source": "Brave Search",
+      "title": "Restparti arbeidshansker Restparti sikkerhet",
+      "url": "https://www.esska-no.com/shop/Tilbud/Restparti-sikkerhet/Restparti-arbeidshansker--24370"
+    },
+    {
+      "canonical_url": "https://www.finn.no/recommerce/forsale/item/453940131",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.869451+00:00",
+      "image_count": null,
+      "lead_id": "web-dfc1cdb6d21849294976",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "Hardvoksolje. <strong>Fargerike Christensen</strong> er en butikk som leverer gulv fra etablerte leverandører i god kvalitet. Vi selger parkett, laminat og andre typer gulv billig pga store innkjøp, og det kommer kundene til gode.",
+      "source": "Brave Search",
+      "title": "Restparti Parkett Prestige Ask Seashell 1 stav | FINN-torget",
+      "url": "https://www.finn.no/recommerce/forsale/item/453940131"
+    },
+    {
+      "canonical_url": "https://www.finn.no/bap/webstore/ad.html",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.869392+00:00",
+      "image_count": null,
+      "lead_id": "web-c1e3e1a07794eb2a24ac",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "Bla kan du bestille takstein, undertak, ... knotteplast, parkett og mye mer i vår butikk. <strong>Via www.eliteprodukter.no kan du bestille byggevarer til Norges garantert beste priser</strong>. Registrer din bedrift i dag og ta del i landets beste ...",
+      "source": "Brave Search",
+      "title": "Solgt! Dumpingpris på parkett! Restparti ! | FINN-torget",
+      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=104269917"
     },
     {
       "canonical_url": "https://www.europages.no/no/products/stk",
@@ -1095,7 +898,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438392+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869117+00:00",
       "image_count": null,
       "lead_id": "web-067ceeb7a126feb9836a",
       "price_nok": null,
@@ -1110,44 +913,27 @@
       "url": "https://www.europages.no/no/products/stk"
     },
     {
-      "canonical_url": "https://www.maskinregisteret.no/product/search/5017/stalreoler_lagerreoler",
+      "canonical_url": "https://konkurs-bo.no/",
       "categories": [
-        "inventory"
+        "bankruptcy",
+        "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440945+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868844+00:00",
       "image_count": null,
-      "lead_id": "web-f233ebf2b059bd695449",
+      "lead_id": "web-69939d672dc42fe60d24",
       "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
+      "priority_score": 18,
+      "published_at": "2026-01-29T14:08:41",
       "score_reasons": [
-        "category:inventory+22"
+        "category:bankruptcy+8",
+        "category:estate_sale+4",
+        "published_at_present+6"
       ],
-      "snippet": "<strong>PR Maskin AS 4323 Sandnes Norge</strong>",
+      "snippet": "<strong>Vi har snart 40 års erfaring med håndtering av konkursbo og dødsbo</strong>. Som oppdragsgiver får du den kompetanse og erfaring som er nødvendig for å sikre og behandle verdier i ulike typer bo.",
       "source": "Brave Search",
-      "title": "Stålreoler, lagerreoler - Verksteds- og lagerinventar - Inventar og Innretning - Produkter",
-      "url": "https://www.maskinregisteret.no/product/search/5017/stalreoler_lagerreoler"
-    },
-    {
-      "canonical_url": "https://www.supersellers.dk/en",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437148+00:00",
-      "image_count": null,
-      "lead_id": "web-0c92990a089dcd62f0a5",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:shop_equipment+22"
-      ],
-      "snippet": "<strong>SuperSellerS tilbyder butiksinventar, der dækker hele butikken</strong>: gondoler, rillepaneler, TUBO-reoler, tøjstativer, bøjler, mannequinfigurer og gaveemballage. Alt i god og gennemprøvet kvalitet, så du kan præsentere dine varer flot og ...",
-      "source": "Brave Search",
-      "title": "SuperSellerS: Butikkinnredning og inventar. 5–7 dagers ...",
-      "url": "https://www.supersellers.dk/en"
+      "title": "Asbjørn Neverdal AS - Håndtering av konkursbo og dødsbo",
+      "url": "https://konkurs-bo.no/"
     },
     {
       "canonical_url": "https://www.bull.no/artikler/immaterialrett-og-markedsfringsrett/falske-opphrssalg",
@@ -1155,7 +941,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441638+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868032+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -1175,7 +961,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439950+00:00",
+      "discovered_at": "2026-07-30T17:08:56.871407+00:00",
       "image_count": null,
       "lead_id": "web-109ce00732f8f63fe37d",
       "price_nok": null,
@@ -1190,12 +976,32 @@
       "url": "https://www.expondo.no/frisoerutstyr/"
     },
     {
+      "canonical_url": "https://www.expondo.no/frisoerutstyr-ddabagfa",
+      "categories": [
+        "salon_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.871651+00:00",
+      "image_count": null,
+      "lead_id": "web-37576540e0a1acdec6b9",
+      "price_nok": null,
+      "priority_score": 16,
+      "published_at": null,
+      "score_reasons": [
+        "category:salon_equipment+16"
+      ],
+      "snippet": "Gratis frakt og retur ✓ 30 dagers returrett ✓ 3 års garanti ✓ Besøk expondo nå og finn den perfekte",
+      "source": "Brave Search",
+      "title": "Frisørutstyr - Skjønnhet starter innvendig",
+      "url": "https://www.expondo.no/frisoerutstyr-ddabagfa/"
+    },
+    {
       "canonical_url": "https://www.gulesider.no/fris%C3%B8rutstyr/bedrifter",
       "categories": [
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439650+00:00",
+      "discovered_at": "2026-07-30T17:08:56.871273+00:00",
       "image_count": null,
       "lead_id": "web-c357ac15a9bf75a0ba5e",
       "price_nok": null,
@@ -1215,7 +1021,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439600+00:00",
+      "discovered_at": "2026-07-30T17:08:56.871222+00:00",
       "image_count": null,
       "lead_id": "web-a55e3a6ff81e23b22f21",
       "price_nok": null,
@@ -1230,33 +1036,12 @@
       "url": "https://www.wellnessnorge.no/frisor/frisorutstyr-stoler-haartorkere-traller"
     },
     {
-      "canonical_url": "https://www.rubrikk.no/torget-brukt-til-salgs/industri-symaskin-til-salgs.html",
-      "categories": [
-        "sale_listing"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440124+00:00",
-      "image_count": null,
-      "lead_id": "web-14af6bcacbb8835cea55",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": "2022-09-26T09:05:02",
-      "score_reasons": [
-        "category:sale_listing+10",
-        "published_at_present+6"
-      ],
-      "snippet": "Veldig pent brukt,8 mnd gammel og nyoverhalt av Janome. Alt standardutstyr følger med. Fortsatt garanti. Selges da jeg kjøper en større maskin. <strong>Janome MC6700</strong> er en kjempegod , robust maskin til Quilting og all annen søm.",
-      "source": "Brave Search",
-      "title": "Industri symaskin til salgs - Februar 2024",
-      "url": "https://www.rubrikk.no/torget-brukt-til-salgs/industri-symaskin-til-salgs.html"
-    },
-    {
       "canonical_url": "https://salonambience.no/",
       "categories": [
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439698+00:00",
+      "discovered_at": "2026-07-30T17:08:56.871535+00:00",
       "image_count": null,
       "lead_id": "web-dcc37d09e23b72b09f7d",
       "price_nok": null,
@@ -1276,7 +1061,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439836+00:00",
+      "discovered_at": "2026-07-30T17:08:56.871352+00:00",
       "image_count": null,
       "lead_id": "web-6075e05144b5e4b48b80",
       "price_nok": null,
@@ -1291,52 +1076,12 @@
       "url": "https://www.osfrisorartikler.no/"
     },
     {
-      "canonical_url": "https://www.wellnessnorge.no/artikler/rem-frisorinnredning-/-frisorutstyr",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439789+00:00",
-      "image_count": null,
-      "lead_id": "web-87e12a4a9439030a48a2",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Frisørinnredning / Utstyr fra REM. Engelsk håndlagede kvalitetsprodukter. 3 års garanti.",
-      "source": "Brave Search",
-      "title": "REM Frisørinnredning / Frisørutstyr - Wellness Norge",
-      "url": "https://www.wellnessnorge.no/artikler/rem-frisorinnredning-/-frisorutstyr"
-    },
-    {
-      "canonical_url": "https://www.wellnessnorge.no/",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439746+00:00",
-      "image_count": null,
-      "lead_id": "web-b84b1185b121f5c1b96e",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Behandlingsbenker, frisørutstyr, klinikkinnredninger. Alt du trenger som hudpleier og frisør finner du hos Wellness Norge.",
-      "source": "Brave Search",
-      "title": "Wellness Norge - Alt til hudpleie, fotpleie, spa- og frisør (tidligere Solguden) - Wellness Norge",
-      "url": "https://www.wellnessnorge.no/"
-    },
-    {
       "canonical_url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095",
       "categories": [
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441355+00:00",
+      "discovered_at": "2026-07-30T17:08:56.867414+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1352,33 +1097,12 @@
       "url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095"
     },
     {
-      "canonical_url": "https://www.tekstilforum.no/konkurser/konkurstallet-oker/902647",
-      "categories": [
-        "bankruptcy"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441232+00:00",
-      "image_count": null,
-      "lead_id": "web-6224c6a7d5c6caafdd61",
-      "price_nok": null,
-      "priority_score": 14,
-      "published_at": "2023-04-04T10:32:18",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "published_at_present+6"
-      ],
-      "snippet": "Antall konkurser i tekstilbransjen fortsetter å øke. <strong>I mars ble 12 bedrifter i bransjer slått konkurs</strong>. Hittil i år har 36 virksomheter i bransjen gått over ende. Det er over 50 prosent flere enn i første kvartal i fjor.",
-      "source": "Brave Search",
-      "title": "(+) Konkurstallet øker",
-      "url": "https://www.tekstilforum.no/konkurser/konkurstallet-oker/902647"
-    },
-    {
       "canonical_url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861",
       "categories": [
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.441410+00:00",
+      "discovered_at": "2026-07-30T17:08:56.867484+00:00",
       "image_count": null,
       "lead_id": "web-d2192f749651b034d4eb",
       "price_nok": null,
@@ -1394,13 +1118,34 @@
       "url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861"
     },
     {
+      "canonical_url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617",
+      "categories": [
+        "bankruptcy"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.867599+00:00",
+      "image_count": null,
+      "lead_id": "web-ccf7065118a5bf95db40",
+      "price_nok": null,
+      "priority_score": 14,
+      "published_at": "2003-10-28T10:11:00",
+      "score_reasons": [
+        "category:bankruptcy+8",
+        "published_at_present+6"
+      ],
+      "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
+      "source": "Brave Search",
+      "title": "Devold Tekstil frifunne",
+      "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
+    },
+    {
       "canonical_url": "https://empus.no/konkursbo",
       "categories": [
         "bankruptcy",
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.438061+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868615+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1416,84 +1161,84 @@
       "url": "https://empus.no/konkursbo"
     },
     {
-      "canonical_url": "https://www.machineseeker.com/Sewing-machines/ci-579",
-      "categories": [
-        "auction"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440050+00:00",
-      "image_count": null,
-      "lead_id": "web-cf6b50eeda9575ca51c2",
-      "price_nok": null,
-      "priority_score": 12,
-      "published_at": null,
-      "score_reasons": [
-        "category:auction+12"
-      ],
-      "snippet": "Buy used sewing machines ✔️ numerous classifieds &amp; auctions online now ✔️ buy or sell used machines with Machineseeker",
-      "source": "Brave Search",
-      "title": "➤ Used & new sewing machines on Machineseeker.com - great brands & offers 🏷️",
-      "url": "https://www.machineseeker.com/Sewing-machines/ci-579"
-    },
-    {
-      "canonical_url": "https://www.finn.no/recommerce/forsale/item/459551127",
+      "canonical_url": "https://bedriftsborsen.no/bedrift-til-salgs",
       "categories": [
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439401+00:00",
+      "discovered_at": "2026-07-30T17:08:56.869186+00:00",
       "image_count": null,
-      "lead_id": "web-da37cba0876e2ce205f6",
+      "lead_id": "web-a1a542fe748539aeeead",
       "price_nok": null,
       "priority_score": 10,
       "published_at": null,
       "score_reasons": [
         "category:sale_listing+10"
       ],
-      "snippet": "Utstyret er tilpasset standard gastronorm-bakker og gir oppbevaring og servering av mat i varme beholdere.Dekketøy Porsgrunn middags/kaffe service til 120 ++ m masse tilbehør store salat/ saus skåler. Fine uteservering møbler til 80 personer. Pene Skinn stoler med bord 90 personer. Selges helst samlet eller deler.",
+      "snippet": "Velutrustet lokalbutikk med apotek, netthandel og selvscannings-kasser i Norges ... Kr. 1.950.000 · Bedrift med solid økonomi, moderne utstyrspark og kapasitet for vekst.",
       "source": "Brave Search",
-      "title": "Komplett Restaurant utstyr til salgs. Hatt service hvert år! | FINN-torget",
-      "url": "https://www.finn.no/recommerce/forsale/item/459551127"
+      "title": "Bedrift til salgs : Bedriftsbørsen",
+      "url": "https://bedriftsborsen.no/bedrift-til-salgs/"
     },
     {
-      "canonical_url": "https://www.finn.no/recommerce/forsale/item/458192581",
+      "canonical_url": "https://www.machineseeker.no/mss/industrielle+symaskin",
       "categories": [
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.439212+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870443+00:00",
       "image_count": null,
-      "lead_id": "web-a15c941973346178a470",
+      "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
       "priority_score": 10,
       "published_at": null,
       "score_reasons": [
         "category:sale_listing+10"
       ],
-      "snippet": "<strong>Selger diverse restaurant- og storkjøkkenutstyr i god stand</strong>. Perfekt for deg som skal starte restaurant, takeaway eller kafé. Utstyret er pent brukt og fungere",
+      "snippet": "Tilstand: klar til bruk (brukt), <strong>To 1-nåls rettsøm industrisymaskiner fra Juki tilgjengelig</strong>. Syinghastighet: 2500/min, maks. stinglengde forover/bakover: 9mm/9mm, nålesystem: 134x35 (DPx35), nålestørrelser: Nm110-Nm160, trådstyrkeområde: ...",
       "source": "Brave Search",
-      "title": "Restaurantutstyr selges – komplett kjøkken / enkeltvis | FINN-torget",
-      "url": "https://www.finn.no/recommerce/forsale/item/458192581"
+      "title": "▷ Brukt Industrielle Symaskin til salgs - Machineseeker",
+      "url": "https://www.machineseeker.no/mss/industrielle+symaskin"
     },
     {
-      "canonical_url": "https://www.machineseeker.com/s/ci-1",
+      "canonical_url": "https://www.machineseeker.no/mss/symaskin",
       "categories": [
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.440346+00:00",
+      "discovered_at": "2026-07-30T17:08:56.870267+00:00",
       "image_count": null,
-      "lead_id": "web-70716dae96a45635c972",
+      "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
       "priority_score": 10,
       "published_at": null,
       "score_reasons": [
         "category:sale_listing+10"
       ],
-      "snippet": "Sell used machines now · Get information now +44 20 806 810 84",
+      "snippet": "- Produsent: Dohle, industrisymaskin type 751-914, kjedesting-symaskin på stativ - Drift: Kobold 0,37 kW - Betjening: med fotpedal - Mål: 630/470/H1360 mm - Vekt: 93 kg Lrecova Acpj Icxn Sop · Prisinformasjon Prisinformasjon Allerede forespurt Se detaljer ... Tilstand: god (brukt), Byggeår: 1966, Symaskin, kjedesting-symaskin på stativ, industrisymaskin, industrisymaskin på stativ, overlockmaskin på rullestativ, stofftransport via skyvehjul -Produsent: Dohle, industrisymaskin, type 751-914, kjedesting-symaskin på stativ Lecovcxrls Icxn Serp -Drift: Loher 0,37 kW -Betjening: med fotpedal -Mål: 750/600/H1330 mm -Vekt: 101 kg",
       "source": "Brave Search",
-      "title": "▷ Brukte maskiner til salgs hos machineseeker Norge",
-      "url": "https://www.machineseeker.com/s/ci-1"
+      "title": "▷ Brukt Symaskin til salgs - Machineseeker",
+      "url": "https://www.machineseeker.no/mss/symaskin"
+    },
+    {
+      "canonical_url": "https://www.machineseeker.no/Symaskiner/ci-579",
+      "categories": [
+        "sale_listing"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.870139+00:00",
+      "image_count": null,
+      "lead_id": "web-5cc051d2ee52f67fd96b",
+      "price_nok": null,
+      "priority_score": 10,
+      "published_at": null,
+      "score_reasons": [
+        "category:sale_listing+10"
+      ],
+      "snippet": "Selvfølgelig stopper ikke vår ... ALL INFORMASJON, KONTAKT OSS INGEN BILLIGERE ENN HOS MERHALETEX <strong>Vi kjøper og selger nye og brukte industrisymaskiner</strong>....",
+      "source": "Brave Search",
+      "title": "▷ Brukt symaskiner til salgs - Machineseeker",
+      "url": "https://www.machineseeker.no/Symaskiner/ci-579"
     },
     {
       "canonical_url": "https://norway.dlapiper.com/no/nyhet/hvis-kunden-gar-konkurs",
@@ -1501,7 +1246,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437994+00:00",
+      "discovered_at": "2026-07-30T17:08:56.868484+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1516,29 +1261,49 @@
       "url": "https://norway.dlapiper.com/no/nyhet/hvis-kunden-gar-konkurs"
     },
     {
-      "canonical_url": "https://www.varelageret.net/",
+      "canonical_url": "https://forvalt.no/Konkurs/Firmadetaljer/924328703/634636",
       "categories": [
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-23T07:47:07.437841+00:00",
+      "discovered_at": "2026-07-30T17:08:56.867085+00:00",
       "image_count": null,
-      "lead_id": "web-a8b396d321a9a13c10d3",
+      "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,
       "priority_score": 8,
       "published_at": null,
       "score_reasons": [
         "category:bankruptcy+8"
       ],
-      "snippet": "Trenger selskapet tilgang på kapital ved å realisere varebeholdningen eller andre aktiva ta kontakt med oss. Vi bistår advokater og bobestyrere med verdivurdering og realisering av konkursbo.",
+      "snippet": "Mer informasjon om konkurs i <strong>Sønstebø Tekstil AS</strong> 924328703",
       "source": "Brave Search",
-      "title": "Spesialister på kjøp og salg av varepartier",
-      "url": "https://www.varelageret.net/"
+      "title": "Konkurs: Sønstebø Tekstil AS | Proff® Forvalt",
+      "url": "https://forvalt.no/Konkurs/Firmadetaljer/924328703/634636"
+    },
+    {
+      "canonical_url": "https://www.proff.no/konkurser",
+      "categories": [
+        "bankruptcy"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T17:08:56.867545+00:00",
+      "image_count": null,
+      "lead_id": "web-ff05dbb792cccc1b5cc5",
+      "price_nok": null,
+      "priority_score": 8,
+      "published_at": null,
+      "score_reasons": [
+        "category:bankruptcy+8"
+      ],
+      "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
+      "source": "Brave Search",
+      "title": "Proff™ - Konkurser og tvangsaviklinger",
+      "url": "https://www.proff.no/konkurser"
     }
   ],
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 71
+    "Brave Search": 61
   }
 }

@@ -1,15 +1,14 @@
 {
-  "excluded_count": 7,
+  "excluded_count": 4,
   "excluded_summary": {
-    "generic_unspecified_lot": 7,
-    "low_relevance_goods": 3
+    "generic_unspecified_lot": 4
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-07-23T07:47:12.013050+00:00",
+  "generated_at": "2026-07-30T17:09:02.222988+00:00",
   "input_count": 25,
   "listing_metadata_enrichment": {
-    "enriched_count": 3,
+    "enriched_count": 6,
     "error_count": 0,
     "method": "directly observed public listing metadata only; no estimates"
   },
@@ -17,9 +16,9 @@
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [
     {
-      "asking_price_nok": 6800.0,
+      "asking_price_nok": 2600.0,
       "city": "Tønsberg",
-      "ends_at": "1784810640000",
+      "ends_at": "1785496920000",
       "evidence_needed": [
         "three_verified_market_comparables",
         "auction_fee",
@@ -29,12 +28,44 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud",
+      "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud",
+      "matched_target_terms": [
+        "lagerreol",
+        "reol",
+        "hylle"
+      ],
+      "opportunity_id": "unified-auksjonen-614288",
+      "priority": 1,
+      "reasons": [
+        "target:lagerreol+15",
+        "target:reol+9",
+        "target:hylle+8",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 37,
+      "status": "review_first",
+      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud 18t 12m 58s",
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288"
+    },
+    {
+      "asking_price_nok": 5000.0,
+      "city": "Tønsberg",
+      "ends_at": "1785753600000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d",
       "matched_target_terms": [
         "lagerreol",
         "reol"
       ],
-      "opportunity_id": "unified-auksjonen-611253",
+      "opportunity_id": "unified-auksjonen-614289",
       "priority": 1,
       "reasons": [
         "target:lagerreol+15",
@@ -43,13 +74,13 @@
       ],
       "relevance_score": 29,
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 4t 56m 48s",
-      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d 17t 30m",
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     },
     {
-      "asking_price_nok": 100.0,
-      "city": "Lierstranda",
-      "ends_at": "1785351600000",
+      "asking_price_nok": 1000.0,
+      "city": "Mathopen",
+      "ends_at": "1785517560000",
       "evidence_needed": [
         "three_verified_market_comparables",
         "auction_fee",
@@ -59,23 +90,84 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d",
+      "market_search_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud",
       "matched_target_terms": [
-        "reol"
+        "skap",
+        "garderobeskap"
       ],
-      "opportunity_id": "unified-auksjonen-613168",
-      "priority": 2,
+      "opportunity_id": "unified-auksjonen-610671",
+      "priority": 1,
       "reasons": [
-        "target:reol+9",
+        "target:skap+7",
+        "target:garderobeskap+12",
         "asking_price_present+5"
       ],
-      "relevance_score": 14,
-      "status": "review_if_capacity",
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 11t 12m",
-      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
+      "relevance_score": 24,
+      "status": "review_first",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 23t 57m 0s",
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
     },
     {
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 3000.0,
+      "city": "Vigrestad",
+      "ends_at": "1785674280000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d",
+      "matched_target_terms": [
+        "varelager"
+      ],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": 1,
+      "reasons": [
+        "target:varelager+18",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 23,
+      "status": "review_first",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d 19t 29m",
+      "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+    },
+    {
+      "asking_price_nok": 9500.0,
+      "city": "Tønsberg",
+      "ends_at": "1785496080000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud",
+      "matched_target_terms": [
+        "arbeidsbenk",
+        "skap"
+      ],
+      "opportunity_id": "unified-auksjonen-614290",
+      "priority": 2,
+      "reasons": [
+        "target:arbeidsbenk+13",
+        "target:skap+7",
+        "generic:verktøy-6",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 19,
+      "status": "review_if_capacity",
+      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud 17t 58m 58s",
+      "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290"
+    },
+    {
+      "asking_price_nok": 900.0,
       "city": "Lierstranda",
       "ends_at": "1785438000000",
       "evidence_needed": [
@@ -87,7 +179,7 @@
         "condition_and_missing_parts"
       ],
       "exclusion_reasons": [],
-      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d",
+      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud",
       "matched_target_terms": [
         "reol"
       ],
@@ -99,12 +191,12 @@
       ],
       "relevance_score": 14,
       "status": "review_if_capacity",
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 11t 12m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud 1t 51m 1s",
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
     }
   ],
-  "review_first_count": 1,
+  "review_first_count": 4,
   "schema_version": 6,
-  "selected_count": 3,
+  "selected_count": 6,
   "source_snapshot": "data/todays_opportunities.json"
 }

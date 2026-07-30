@@ -1,8 +1,8 @@
 {
-  "evaluation_count": 3,
+  "evaluation_count": 6,
   "evaluations": [
     {
-      "asking_price_nok": 6800.0,
+      "asking_price_nok": 2600.0,
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "evidence": {
@@ -27,15 +27,15 @@
         "transport_cost_nok",
         "vat_nok"
       ],
-      "opportunity_id": "unified-auksjonen-611253",
+      "opportunity_id": "unified-auksjonen-614288",
       "priority": 1,
       "roi_percent": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart 1200kg Tønsberg 68 bud 4t 56m 48s",
+      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud 18t 12m 58s",
       "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svart_1200kg/611253"
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288"
     },
     {
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 5000.0,
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "evidence": {
@@ -60,15 +60,114 @@
         "transport_cost_nok",
         "vat_nok"
       ],
-      "opportunity_id": "unified-auksjonen-613168",
-      "priority": 2,
+      "opportunity_id": "unified-auksjonen-614289",
+      "priority": 1,
       "roi_percent": null,
-      "title": "Parti med VVS-deler, rør, rørdeler, reol og installasjonsmateriell Lierstranda 1 bud 6d 11t 12m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d 17t 30m",
       "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-deler_r%C3%B8r_r%C3%B8rdeler_reol_og_installasjonsmateriell/613168"
+      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     },
     {
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 1000.0,
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "evidence": {
+        "auction_fee_nok": null,
+        "dismantling_cost_nok": null,
+        "market_comparables_nok": [],
+        "other_costs_nok": null,
+        "repair_cost_nok": null,
+        "storage_cost_nok": null,
+        "transport_cost_nok": null,
+        "vat_nok": null
+      },
+      "expected_profit_nok": null,
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-610671",
+      "priority": 1,
+      "roi_percent": null,
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 23t 57m 0s",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
+    },
+    {
+      "asking_price_nok": 3000.0,
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "evidence": {
+        "auction_fee_nok": null,
+        "dismantling_cost_nok": null,
+        "market_comparables_nok": [],
+        "other_costs_nok": null,
+        "repair_cost_nok": null,
+        "storage_cost_nok": null,
+        "transport_cost_nok": null,
+        "vat_nok": null
+      },
+      "expected_profit_nok": null,
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": 1,
+      "roi_percent": null,
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d 19t 29m",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+    },
+    {
+      "asking_price_nok": 9500.0,
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "evidence": {
+        "auction_fee_nok": null,
+        "dismantling_cost_nok": null,
+        "market_comparables_nok": [],
+        "other_costs_nok": null,
+        "repair_cost_nok": null,
+        "storage_cost_nok": null,
+        "transport_cost_nok": null,
+        "vat_nok": null
+      },
+      "expected_profit_nok": null,
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-614290",
+      "priority": 2,
+      "roi_percent": null,
+      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud 17t 58m 58s",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290"
+    },
+    {
+      "asking_price_nok": 900.0,
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "evidence": {
@@ -96,14 +195,14 @@
       "opportunity_id": "unified-auksjonen-613169",
       "priority": 2,
       "roi_percent": null,
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 1 bud 7d 11t 12m",
+      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud 1t 51m 1s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169"
     }
   ],
-  "evidence_required_count": 3,
+  "evidence_required_count": 6,
   "evidence_source": "data/opportunity_evidence.json",
-  "generated_at": "2026-07-23T07:47:32.195516+00:00",
+  "generated_at": "2026-07-30T17:09:11.678314+00:00",
   "method": "verified-evidence-gated conservative economics; missing values remain null and block recommendations",
   "ready_for_numeric_review_count": 0,
   "schema_version": 2,
