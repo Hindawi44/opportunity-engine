@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - feat/pre-market-daily-monitor
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
 
 permissions:
   contents: read
