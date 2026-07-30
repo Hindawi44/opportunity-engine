@@ -1,6 +1,6 @@
 {
   "schema_version": "pre-market-daily-monitor-1.0",
-  "captured_at": "2026-07-30T13:40:27.839879+00:00",
+  "captured_at": "2026-07-30T14:10:14.349382+00:00",
   "source_status": "COMPLETE",
   "monitor_complete": true,
   "lead_scan_complete": true,
@@ -16,7 +16,7 @@
   "allocated_query_budget": 50,
   "requests_made": 50,
   "retained_case_count": 10,
-  "material_change_count": 10,
+  "material_change_count": 0,
   "alert_count": 0,
   "verified_active_inventory_sale_count": 0,
   "commercial_top5_count": 0,
