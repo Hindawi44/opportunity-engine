@@ -1,0 +1,102 @@
+[
+  {
+    "case_id": "estate:938018014",
+    "debtor_name": "MENSWEAR NORGE AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:938022038",
+    "debtor_name": "KEEPFIT AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:938119295",
+    "debtor_name": "BIRKHANS AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:937884796",
+    "debtor_name": "MARK AND BRANDY AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:938108897",
+    "debtor_name": "CHEERMANIA AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:938053456",
+    "debtor_name": "KINO LIERTOPPEN AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:938143617",
+    "debtor_name": "ELEVEN POINTS AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:937982879",
+    "debtor_name": "VINGENZA BY FRATI AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:938143978",
+    "debtor_name": "ANNA J AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  },
+  {
+    "case_id": "estate:938065187",
+    "debtor_name": "SADOL AS",
+    "change_type": "CASE_CREATED",
+    "detected_at": "2026-07-30T13:40:27.839879+00:00",
+    "previous_state": null,
+    "current_state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
+    "new_urls": [],
+    "alert_worthy": false
+  }
+]
