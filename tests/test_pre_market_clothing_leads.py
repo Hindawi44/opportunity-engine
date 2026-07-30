@@ -68,7 +68,10 @@ def test_recent_large_wholesaler_gets_high_review_signal_without_sale_claim():
     result = build_pre_market_pilot(collection(clothing_lead()), today=TODAY)
     payload = result.review_top[0].to_dict()
     assert payload["inventory_signal_band"] == "HIGH"
-    assert payload["score_is_verified_probability"] if False else True
+    assert (
+        payload["score_basis"]
+        == "HEURISTIC_COMPANY_SIGNAL_NOT_VERIFIED_INVENTORY_PROBABILITY"
+    )
     assert payload["public_sale_found"] is False
     assert payload["inventory_sale_verified"] is False
     assert payload["top5_eligible"] is False
