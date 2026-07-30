@@ -1,0 +1,43 @@
+name: Temporary Pre-Market Daily Monitor Validation
+
+on:
+  push:
+    branches:
+      - feat/pre-market-daily-monitor
+
+permissions:
+  contents: read
+
+jobs:
+  live-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run bounded live monitor
+        run: |
+          python scripts/run_pre_market_daily_monitor.py \
+            --previous-registry artifacts/nonexistent-registry.json \
+            --case-limit 5 \
+            --results-per-query 5 \
+            --lookback-days 365 \
+            --freshness py \
+            --output-dir artifacts/pre-market-daily-monitor
+          cat artifacts/pre-market-daily-monitor/daily-monitor-summary.txt
+
+      - name: Upload live validation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-market-daily-monitor-live-validation
+          path: artifacts/pre-market-daily-monitor
+          if-no-files-found: error
