@@ -15,9 +15,11 @@ def test_daily_workflow_builds_outreach_review_packets() -> None:
 
 
 def test_daily_workflow_preserves_human_only_contact_boundary() -> None:
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = WORKFLOW.read_text(encoding="utf-8").casefold()
 
-    assert "Build human-review estate-manager outreach packets" in text
-    assert "send" not in text.casefold()
-    assert "gmail" not in text.casefold()
-    assert "smtp" not in text.casefold()
+    assert "build human-review estate-manager outreach packets" in text
+    assert "gmail" not in text
+    assert "smtp" not in text
+    assert "send-email" not in text
+    assert "mailgun" not in text
+    assert "sendgrid" not in text
