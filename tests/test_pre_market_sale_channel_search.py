@@ -50,7 +50,13 @@ def test_query_pack_is_bounded_and_uses_exact_company_identities():
     queries = build_sale_channel_queries(enrichment())
 
     assert len(queries) == 5
-    assert all('"MENSWEAR NORGE AS"' in query or "986425284" in query for query in queries)
+    assert all(
+        '"MENSWEAR NORGE AS"' in query
+        or '"MENSWEAR NORGE AS KONKURSBO"' in query
+        or "986425284" in query
+        or "938018014" in query
+        for query in queries
+    )
     assert any('"MENSWEAR NORGE AS KONKURSBO"' in query for query in queries)
     assert any('"938018014"' in query for query in queries)
     assert any("site:auksjonen.no" in query for query in queries)
@@ -83,7 +89,7 @@ def test_exact_orgnr_and_sale_wording_create_unverified_sale_candidate():
 
 def test_liquidator_wording_creates_channel_candidate_without_sale_claim():
     hit = SearchHit(
-        title="MENSWEAR NORGE AS konkursbo",
+        title="MENSWEAR NORGE AS",
         url="https://example-law.no/konkursbo/menswear-norge",
         description="Boet håndteres av bostyrer. Realiseres på vegne av boet.",
         provider="Brave Search",
