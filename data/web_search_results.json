@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-07-30T17:08:56.731356+00:00",
+  "generated_at": "2026-07-30T19:51:12.209570+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -124,18 +124,6 @@
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [],
-      "id": "ff05dbb792cccc1b5cc5b636",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
-      "source": "Brave Search",
-      "source_rank": 9,
-      "title": "Proff™ - Konkurser og tvangsaviklinger",
-      "url": "https://www.proff.no/konkurser"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [
         "Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta."
       ],
@@ -144,9 +132,21 @@
       "published_at": "2003-10-28T10:11:00",
       "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
       "source": "Brave Search",
-      "source_rank": 10,
+      "source_rank": 9,
       "title": "Devold Tekstil frifunne",
       "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "extra_snippets": [],
+      "id": "ff05dbb792cccc1b5cc5b636",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
+      "source": "Brave Search",
+      "source_rank": 10,
+      "title": "Proff™ - Konkurser og tvangsaviklinger",
+      "url": "https://www.proff.no/konkurser"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -260,23 +260,6 @@
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
       "extra_snippets": [
-        "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk.",
-        "Din leverandør av butikkinventar og salgsfremmende produkter, et sortiment som spenner fra kroker og kleshengere til disker og prøverom. ... Ring eller skriv gjerne, hvis du har spørsmål. Vi tilbyr support både på e-post og telefon: 69 25 38 88. Vi legger oss i selen for å gi deg gode priser. Pålitelig standard inventar og butikktilbehør til konkurransedyktige priser.",
-        "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
-        "I vårt utvalg av systemer finner du blant annet rillepanelsinventar, som gir deg et vell av muligheter for å innrede butikken. Rillepaneler, også kjent som Slatboard, rillepaneler eller slatwall, er en utrolig flott og enkel type inventarsystem som gir deg utallige muligheter for display."
-      ],
-      "id": "7cad0e8a59e6e66434244c4f",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS&#x27; butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
-      "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
-      "url": "https://www.supersellers.no/"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
         "Forbrukerrådet advarer mot villedende markedsføring i nettbutikker som reklamerer med opphørssalg uten å faktisk stenge. Lær mer om hvordan du kan beskytte deg mot slike praksiser.",
         "Norry Oslo har siden minst 30. august reklamert med at de skal legge ned, med løfte om et 24-timers opphørssalg. Flere uker senere er verken salget avsluttet eller nettbutikken nedlagt, skriver NRK. ... Flere nettbutikker markedsfører seg med annonser som gir inntrykk av at de skal legge ned, men butikken fortsetter salget langt utover det oppgitte tidspunktet.",
         "– Når en butikk reklamerer med opphørssalg, gir de et klart inntrykk av at prisene er satt ned på grunn av at virksomheten legges ned og at det er knapphet på varer.",
@@ -287,9 +270,26 @@
       "published_at": "2024-09-23T13:11:43",
       "snippet": "Norry Oslo har siden minst 30. august reklamert med at de skal legge ned, med løfte om et 24-timers opphørssalg. Flere uker senere er verken salget avsluttet eller nettbutikken nedlagt, skriver NRK. ... Flere nettbutikker markedsfører seg med annonser som gir inntrykk av at de skal legge ned, men butikken fortsetter salget langt utover det oppgitte tidspunktet.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Reklamerer med falske opphørssalg: – Forbudt",
       "url": "https://www.kom24.no/annonse-facebook-forbrukerradet/reklamerer-med-falske-opphorssalg-forbudt/754219"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk.",
+        "Din leverandør av butikkinventar og salgsfremmende produkter, et sortiment som spenner fra kroker og kleshengere til disker og prøverom. ... Ring eller skriv gjerne, hvis du har spørsmål. Vi tilbyr support både på e-post og telefon: 69 25 38 88. Vi legger oss i selen for å gi deg gode priser. Pålitelig standard inventar og butikktilbehør til konkurransedyktige priser.",
+        "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
+        "I vårt utvalg av systemer finner du blant annet rillepanelsinventar, som gir deg et vell av muligheter for å innrede butikken. Rillepaneler, også kjent som Slatboard, rillepaneler eller slatwall, er en utrolig flott og enkel type inventarsystem som gir deg utallige muligheter for display."
+      ],
+      "id": "7cad0e8a59e6e66434244c4f",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS&#x27; butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
+      "url": "https://www.supersellers.no/"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -418,6 +418,23 @@
     {
       "discovery_query": "varelager konkursbo Norge",
       "extra_snippets": [
+        "Eksempler på eiendeler og rettigheter er bankkonto, kontanter, kundefordringer, varelager, driftsmidler, krav på ytelser fra leverandører (som leide lokaler), patenter, lisenser og varemerker. Det er tingretten som åpner konkurs, etter krav fra selskapet selv eller kreditorer (f.eks. skattemyndighetene). Fra det tidspunkt (dato og klokkeslett) konkurs er åpnet, blir eiendeler og rettigheter \"beslaglagt\" av konkursboet, som ledes av en bostyrer.",
+        "Hva innebærer en konkurs for selskapet, aksjonærene, styremedlemmer, de ansatte, kunder mv.? Les mer om dette her.",
+        "Konkursboet overtar i utgangspunktet alle selskapets kontrakter. Selskapets avtaleparter forblir altså bundet av de avtalene som er inngått. Men ved konkurs vil konkursboet som regel ikke være i stand til å betale leverandører eller oppfylle avtaler overfor kunder.",
+        "Konkurs fører til at kreditorene ikke får hele den ytelsen de skulle hatt. Først når konkursen er ferdig behandlet og konkursboet gjøres opp, viser det seg hvor mye kreditorene får. Det kan være alt fra null til (i teorien) 99 prosent. Kreditorene får sjelden dekket mer enn en brøkdel av kravet."
+      ],
+      "id": "023bc5fa9e90ebae18681e43",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Eksempler på eiendeler og rettigheter ... varelager, driftsmidler, krav på ytelser fra leverandører (som leide lokaler), patenter, lisenser og varemerker. Det er tingretten som åpner konkurs, etter krav fra selskapet selv eller kreditorer (f.eks. skattemyndighetene). Fra det tidspunkt (dato og klokkeslett) konkurs er åpnet, blir eiendeler og rettigheter &quot;beslaglagt&quot; av konkursboet, som ledes ...",
+      "source": "Brave Search",
+      "source_rank": 8,
+      "title": "Hva innebærer en konkurs?",
+      "url": "https://arbinn.nho.no/forretningsdrift/styrearbeid-og-okonomi/styrearbeid/artikler/hva-innebarer-en-konkurs/"
+    },
+    {
+      "discovery_query": "varelager konkursbo Norge",
+      "extra_snippets": [
         "Vi priser og selger varelager og utstyr."
       ],
       "id": "69939d672dc42fe60d2487b1",
@@ -425,7 +442,7 @@
       "published_at": "2026-01-29T14:08:41",
       "snippet": "<strong>Vi har snart 40 års erfaring med håndtering av konkursbo og dødsbo</strong>. Som oppdragsgiver får du den kompetanse og erfaring som er nødvendig for å sikre og behandle verdier i ulike typer bo.",
       "source": "Brave Search",
-      "source_rank": 8,
+      "source_rank": 9,
       "title": "Asbjørn Neverdal AS - Håndtering av konkursbo og dødsbo",
       "url": "https://konkurs-bo.no/"
     },
@@ -439,26 +456,9 @@
       "published_at": null,
       "snippet": "<strong>AltPåSalg er en nettbutikk som videreselger oppkjøpte varelager, varepartier og varer fra konkursbo med minst 50-80% avslag fra ordinære butikkpriser</strong>",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 10,
       "title": "AltPåSalg",
       "url": "https://www.altpasalg.no/"
-    },
-    {
-      "discovery_query": "varelager konkursbo Norge",
-      "extra_snippets": [
-        "Eksempler på eiendeler og rettigheter er bankkonto, kontanter, kundefordringer, varelager, driftsmidler, krav på ytelser fra leverandører (som leide lokaler), patenter, lisenser og varemerker. Det er tingretten som åpner konkurs, etter krav fra selskapet selv eller kreditorer (f.eks. skattemyndighetene). Fra det tidspunkt (dato og klokkeslett) konkurs er åpnet, blir eiendeler og rettigheter \"beslaglagt\" av konkursboet, som ledes av en bostyrer.",
-        "Hva innebærer en konkurs for selskapet, aksjonærene, styremedlemmer, de ansatte, kunder mv.? Les mer om dette her.",
-        "Konkursboet overtar i utgangspunktet alle selskapets kontrakter. Selskapets avtaleparter forblir altså bundet av de avtalene som er inngått. Men ved konkurs vil konkursboet som regel ikke være i stand til å betale leverandører eller oppfylle avtaler overfor kunder.",
-        "Konkurs fører til at kreditorene ikke får hele den ytelsen de skulle hatt. Først når konkursen er ferdig behandlet og konkursboet gjøres opp, viser det seg hvor mye kreditorene får. Det kan være alt fra null til (i teorien) 99 prosent. Kreditorene får sjelden dekket mer enn en brøkdel av kravet."
-      ],
-      "id": "023bc5fa9e90ebae18681e43",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Eksempler på eiendeler og rettigheter ... varelager, driftsmidler, krav på ytelser fra leverandører (som leide lokaler), patenter, lisenser og varemerker. Det er tingretten som åpner konkurs, etter krav fra selskapet selv eller kreditorer (f.eks. skattemyndighetene). Fra det tidspunkt (dato og klokkeslett) konkurs er åpnet, blir eiendeler og rettigheter &quot;beslaglagt&quot; av konkursboet, som ledes ...",
-      "source": "Brave Search",
-      "source_rank": 10,
-      "title": "Hva innebærer en konkurs?",
-      "url": "https://arbinn.nho.no/forretningsdrift/styrearbeid-og-okonomi/styrearbeid/artikler/hva-innebarer-en-konkurs/"
     },
     {
       "discovery_query": "restparti bedrift Norge",
@@ -575,20 +575,6 @@
     {
       "discovery_query": "restparti bedrift Norge",
       "extra_snippets": [
-        "Du kan få gratis veiledning fra Altinn om å starte og drive bedrift i Norge."
-      ],
-      "id": "fec1e248056074ee79b92993",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Vil du starte egen bedrift i Norge? Her får du en kort oversikt over hvor du kan lese mer, få veiledning og finne hjelp der du bor.",
-      "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Starte bedrift | Ny i Norge",
-      "url": "https://www.nyinorge.no/Arbeid/starte-bedrift/"
-    },
-    {
-      "discovery_query": "restparti bedrift Norge",
-      "extra_snippets": [
         "1 - Stav parkett blir ikke billigere enn dette!Nedsatt pris på TREND sortering.Dette er et TREND gulv fra Moland i en lekker sortering. ( lite kvist )1 Stav Excellent Trend Wideplank 2200x180x14M5 Easy - Super enkel og rask legging. Et fantastisk gulv av ypperste kvalitet!Flott sortering i matt lakk naturlig eik.Tradisjonell og tidløs eikeparkett.Butikkpriser er på: 600,- - 1000,- pr m2.",
         "Bla kan du bestille takstein, undertak, mønebånd, mønebraketter, fuglebånd, takstige, snøsikring, vindsperrer, tape - systemer, knotteplast, parkett og mye mer i vår butikk. Via www.eliteprodukter.no kan du bestille byggevarer til Norges garantert beste priser. Registrer din bedrift i dag og ta del i landets beste proffbetingelser."
       ],
@@ -597,7 +583,7 @@
       "published_at": null,
       "snippet": "Bla kan du bestille takstein, undertak, ... knotteplast, parkett og mye mer i vår butikk. <strong>Via www.eliteprodukter.no kan du bestille byggevarer til Norges garantert beste priser</strong>. Registrer din bedrift i dag og ta del i landets beste ...",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Solgt! Dumpingpris på parkett! Restparti ! | FINN-torget",
       "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=104269917"
     },
@@ -612,9 +598,26 @@
       "published_at": null,
       "snippet": "Hardvoksolje. <strong>Fargerike Christensen</strong> er en butikk som leverer gulv fra etablerte leverandører i god kvalitet. Vi selger parkett, laminat og andre typer gulv billig pga store innkjøp, og det kommer kundene til gode.",
       "source": "Brave Search",
-      "source_rank": 10,
+      "source_rank": 9,
       "title": "Restparti Parkett Prestige Ask Seashell 1 stav | FINN-torget",
       "url": "https://www.finn.no/recommerce/forsale/item/453940131"
+    },
+    {
+      "discovery_query": "restparti bedrift Norge",
+      "extra_snippets": [
+        "9 av 10 bedrifter i Europa kan betegnes som en små eller mellomstor bedrift, og disse genererer to av tre arbeidsplasser. Som en del av Lisboa-strategien vil EU ha særlig fokus på små og mellomstore bedrifter. I Norge er det vanlig å definere små og mellomstore bedrifter som bedrifter med under 100 ansatte.",
+        "Den europeiske unions (EU) nåværende definisjon er at bedriften tilhører kategorien «mikro» hvis den har under 10 ansatte, og en årlig omsetning på mindre enn 2 millioner euro, «små» hvis den har under 50 ansatte, og en årlig omsetning eller en samlet årlig balanse på ikke over 10 millioner euro, og kategorien «mellomstor» hvis den har er 50 eller flere, men under 250 ansatte og en årlig omsetning på ikke over 50 millioner euro eller en årlig samlet balanse på ikke over 43 millioner euro.",
+        "Da langt de fleste danske bedrifter vil kvalifiseres som små eller mellomstore, anvendes til tider i Danmark andre definisjoner. Håndværksrådet vurderer alene bedriftene ut fra antallet ansatte, idet Håndværksrådet anser en «liten bedrift» som en bedrift med under 10 ansatte, og en mellomstor bedrift som en bedrift med under 100 ansatte.",
+        "Små og mellomstore bedrifter (SMB) er et begrep innen næringspolitikk. Den europeiske unions (EU) nåværende definisjon er at bedriften tilhører kategorien «mikro» hvis den har under 10 ansatte, og en årlig omsetning på mindre enn 2 millioner euro, «små» hvis den har under 50 ansatte, ..."
+      ],
+      "id": "05b5fd5760be180904746cff",
+      "language": "nb",
+      "published_at": "2024-11-29T07:22:20",
+      "snippet": "<strong>Bedrifter</strong> med 1-20 ansatte defineres som små, mens <strong>bedrifter</strong> med 21-100 ansatte defineres som mellomstore. Følgelig vil <strong>bedrifter</strong> med mer enn 100 ansatte omtales som store. Det er ikke vanlig å bruke betegnelsen «mikrobedrift» i <strong>Norge</strong>.",
+      "source": "Brave Search",
+      "source_rank": 10,
+      "title": "Små og mellomstore bedrifter – Wikipedia",
+      "url": "https://no.wikipedia.org/wiki/Sm%C3%A5_og_mellomstore_bedrifter"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -650,6 +653,23 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [
+        "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk.",
+        "Vårt profesjonelle og moderne utvalg av butikkinnredning. Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
+        "Vi tilbyr inventar til butikkinnredning til gode priser.",
+        "Under vårt utvalg av løst butikkinnredning finner du for eksempel stativer, salgsbord, utstillingsbord, puffer, podier, gardinstenger til prøverom samt TUBO-/wirereoler."
+      ],
+      "id": "7cad0e8a59e6e66434244c4f",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "<strong>SuperSellerS tilbyr butikkinnredning som dekker hele butikken</strong>: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert ...",
+      "source": "Brave Search",
+      "source_rank": 3,
+      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
+      "url": "https://www.supersellers.no/"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "extra_snippets": [
         "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
         "Alt innen butikkinnredning – over 7000 artikler klare for rask levering."
       ],
@@ -658,21 +678,9 @@
       "published_at": null,
       "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 4,
       "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
       "url": "https://www.supersellers.no/katalog"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [],
-      "id": "875f71823b7227328ea295d7",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -693,20 +701,15 @@
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [
-        "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk.",
-        "Vårt profesjonelle og moderne utvalg av butikkinnredning. Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
-        "Vi tilbyr inventar til butikkinnredning til gode priser.",
-        "Under vårt utvalg av løst butikkinnredning finner du for eksempel stativer, salgsbord, utstillingsbord, puffer, podier, gardinstenger til prøverom samt TUBO-/wirereoler."
-      ],
-      "id": "7cad0e8a59e6e66434244c4f",
+      "extra_snippets": [],
+      "id": "875f71823b7227328ea295d7",
       "language": "nb",
       "published_at": null,
-      "snippet": "<strong>SuperSellerS tilbyr butikkinnredning som dekker hele butikken</strong>: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert ...",
+      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
       "source_rank": 6,
-      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
-      "url": "https://www.supersellers.no/"
+      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -888,6 +891,20 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "extra_snippets": [
+        "Brukt · kr 225,48 /stykke · 5430 St. Brukt · kr 225,48 /stykke · 5450 St. Brukt · kr 208 134,36 /lastebil · 830 St. Brukt · kr 115,63 /stykke · -5% for din første bestilling! 5 St. Ny · kr 208,13 /stykke · 4550 St. Brukt · Landing... Innholdet lastes inn..."
+      ],
+      "id": "ee0f03d25cc2b85496a9c656",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Brukt · <strong>kr 370,02 /stykke</strong> · 1500 St. Brukt · kr 23,13 /stykke · -5% for din første bestilling! uten grenser · Ny · kr 404,71 /stykke · 650 St. Ny · <strong>kr 370,02 /stykke</strong> · uten grenser · Brukt · kr 228,37 /stykke · 5500 St.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Restesalg av symaskiner - Engros industrisymaskiner fra auksjoner og restpartier | B2B Merkandi.no",
+      "url": "https://merkandi.no/engros/restesalg-av-symaskiner"
+    },
+    {
+      "discovery_query": "industrisymaskin brukt Norge",
+      "extra_snippets": [
         "Vi er i dag en totalleverandør av maskiner og utstyr for søm, tilskjæring pressing, brodering, lasergravering, strikking m.m. Dette strekker seg fra enkle maskiner for håndverk og småindustri opp til store komplekse automater for industrien. Vi yter også bistand i form av opplæring og teknisk service på våre produkter.Ta kontakt for nærmere informasjon, eller klikk på logo for å komme inn på vår hjemmeside. Her finner du også oversikt over alle våre brukte maskiner."
       ],
       "id": "a28b1ec8fa4760f37eb9c1bc",
@@ -895,21 +912,9 @@
       "published_at": null,
       "snippet": "Vi er i dag en totalleverandør av maskiner og utstyr for søm, tilskjæring pressing, brodering, lasergravering, strikking m.m. Dette strekker seg fra enkle maskiner for håndverk og småindustri opp til store komplekse automater for industrien. Vi yter også bistand i form av opplæring og teknisk service på våre produkter.Ta kontakt for nærmere informasjon, eller klikk på logo for å komme inn på vår hjemmeside. Her finner du også oversikt over alle våre brukte maskiner.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 10,
       "title": "JUKI DDL-8700H industrisymaskin | FINN-torget",
       "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=68285526"
-    },
-    {
-      "discovery_query": "industrisymaskin brukt Norge",
-      "extra_snippets": [],
-      "id": "f413b0e27b2c75607ca7fca6",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 1 278 annonse(r) i kategorien Symaskiner under Fritid, hobby og underholdning til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 10,
-      "title": "Symaskiner | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.86.7734.123"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -973,6 +978,20 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
+        "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!"
+      ],
+      "id": "5cfdee104ddf209ca63fadf4",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!",
+      "source": "Brave Search",
+      "source_rank": 5,
+      "title": "Lagerreoler | FINN-torget",
+      "url": "https://www.finn.no/recommerce/forsale/item/412276314"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "extra_snippets": [
         "NoBolt småvare- og lagerreol: Et særdeles robust, fleksibelt og stilrent reolsystem uten noen form for skruer! NoBolt lagerreol er spesielt utviklet for oppbevaring av diverse varer, gods og utstyr i ulike vektklasser, og representerer det ypperste innen dagens reolteknikk.Reolen innehar åpne gavler bestående av solide stolper med justerbare stagplater i øvre og nedre del av reol samt forsterkende X-stag i bakkant, noe som sikrer god stabilitet og et nett uttrykk.",
         "Foruten å være produktbasert, så er også Integro AS et prosjektbasert selskap, dvs. at vi kan tilby komplette leveranser fra A-Å gjennom utvalgte transportører og montører. Hos oss er du uansett velkommen være seg privat- eller bedriftskunde, Norge rundt."
       ],
@@ -981,23 +1000,9 @@
       "published_at": null,
       "snippet": "<strong>NoBolt småvare- og lagerreol</strong>: Et særdeles robust, fleksibelt og stilrent reolsystem uten noen form for skruer! NoBolt lagerreol er spesielt utviklet for oppbevaring av diverse varer, gods og utstyr i ulike vektklasser, og representerer det ...",
       "source": "Brave Search",
-      "source_rank": 5,
+      "source_rank": 6,
       "title": "Div. reoler / reol / lagerreol / småvarereol / universalreol / stålreol / arkiv | FINN-torget",
       "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "extra_snippets": [
-        "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!"
-      ],
-      "id": "5cfdee104ddf209ca63fadf4",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Lagerreoler | FINN-torget",
-      "url": "https://www.finn.no/recommerce/forsale/item/412276314"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -1014,6 +1019,21 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
+        "Våre dyktige montører har utallige montasjejobber under beltet, og monterer både stort og smått enten det skulle være helt nord eller sør i Norge.",
+        "Vi leverer løsninger for lager og verksted"
+      ],
+      "id": "63600f85f4126e808e6723ff",
+      "language": "nb",
+      "published_at": "2025-12-29T07:03:58",
+      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
+      "source": "Brave Search",
+      "source_rank": 8,
+      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
+      "url": "https://reolteknikk.no/"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "extra_snippets": [
         "Montering av lagerreoler skjer i to trinn og utføres av kvalifisert personell. Først vurderer montørene forholdene på stedet, som gulv, plassering og eksisterende utstyr. Våre spesialister finner den sikreste og mest effektive måten å sette opp reolsystemet på.",
         "Lastekapasiteten til lagerreoler avhenger av flere faktorer, blant annet hvilken type reolsystem som brukes. Hos Jungheinrich beregner vi bæreevnen for hvert enkelt system, med høy nøyaktighet, ved å analysere ulike komponenter og konstruksjonsdetaljer.",
         "Kjøp lagerreoler på nett via vår nettbutikk www.jungheinrich-shop.no, eller send en produktforespørsel og få grundig rådgivning.",
@@ -1024,39 +1044,24 @@
       "published_at": null,
       "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
       "source": "Brave Search",
-      "source_rank": 8,
+      "source_rank": 9,
       "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
       "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
-        "Våre dyktige montører har utallige montasjejobber under beltet, og monterer både stort og smått enten det skulle være helt nord eller sør i Norge.",
-        "Vi leverer løsninger for lager og verksted"
+        "Den store fordelen er at man får ting opp fra gulvet og inn i et oversiktlig system, noe som frigjør verdifull gulvplass og gjør det mye enklere å finne det man leter etter. En oppbevaringshylle, ofte kalt en lagerreol eller garasjehylle, er bygget for å tåle en støyt.",
+        "Selges kun i varehus."
       ],
-      "id": "63600f85f4126e808e6723ff",
+      "id": "160151c1bf94bd6180ce878d",
       "language": "nb",
-      "published_at": "2025-12-29T07:03:58",
-      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
-      "source": "Brave Search",
-      "source_rank": 9,
-      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
-      "url": "https://reolteknikk.no/"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "extra_snippets": [
-        "Det finnes ikke mange i Norge som har så mye erfaringer med pallereoler som Areol. Her finner du alltid et utvalg av brukte og nye pallereoler.",
-        "Areol har over flere tiår levert lagerinnredninger og pallereoler til fornøyde kunder rundt om i Norge. Våre pallereoler er kvalitetsprodukter fra kjente produsenter, dette gir deg som kunde trygghet da du får ekstremt slitesterke produkter som du kan supplere ved behov i årevis."
-      ],
-      "id": "f3c827e45a9a3dd335062042",
-      "language": "nb",
-      "published_at": "2024-04-24T13:12:56",
-      "snippet": "Det finnes ikke mange i Norge som har så mye erfaringer med pallereoler som Areol. <strong>Her finner du alltid et utvalg av brukte og nye pallereoler</strong>.",
+      "published_at": null,
+      "snippet": "Organiser boden, garasjen eller lageret med en solid oppbevaringshylle. Vi har hyller i metall og plast i mange størrelser. Kjøp online.",
       "source": "Brave Search",
       "source_rank": 10,
-      "title": "Pallereoler - Brukte og Nye - Areol Innredninger AS",
-      "url": "https://areol.no/pallereoler/"
+      "title": "Oppbevaringshyller | For et organisert hjem, bod og garasje | Jula",
+      "url": "https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/oppbevaringshyller/"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
@@ -1072,42 +1077,15 @@
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
-      "extra_snippets": [
-        "CUTRIN NORGE leverer salgsvarer, kjemivarer, rekvisita, utstyr og totale innredningsløsninger til så vel små som store salonger over hele landet....Les mer",
-        "Cutrin Norge leverer salgsvarer, kjemivarer, rekvisita, utstyr og totale innredningsløsninger til så vel små som store salonger over hele landet....Les mer"
-      ],
-      "id": "c357ac15a9bf75a0ba5eb432",
-      "language": "en",
-      "published_at": null,
-      "snippet": "Frisørutstyr - arbeidsstol, bandasjesaks, applikator, blomdahl, bor, føner, argiletz, aurora, bio+, camillen60, ainoa, carbid - Finn firmaer, adresser, telefonnumre.",
-      "source": "Brave Search",
-      "source_rank": 2,
-      "title": "Frisørutstyr | bedrifter | gulesider.no | side 1",
-      "url": "https://www.gulesider.no/fris%C3%B8rutstyr/bedrifter"
-    },
-    {
-      "discovery_query": "frisørutstyr avvikling Norge",
       "extra_snippets": [],
       "id": "b5a51787285c387352632e0c",
       "language": "nb",
       "published_at": null,
       "snippet": "Sjekk nyheter og oppdateringer av frisør- og velværeindustrien. NFVB skal være den største arbeidsgiverorganisasjonen i frisør- og velværebransjen.",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 2,
       "title": "Norske frisør- og velværebedrifter - Aktuelt - NFVB",
       "url": "https://nfvb.no/"
-    },
-    {
-      "discovery_query": "frisørutstyr avvikling Norge",
-      "extra_snippets": [],
-      "id": "6075e05144b5e4b48b800f0e",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Hos OS Frisørartikler finner du et bredt utvalg av profesjonelle frisørartikler, hårprodukter og salongutstyr i høy kvalitet. Bestill enkelt på nett.",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "OS Frisørartikler - Profesjonelle frisørartikler & frisørutstyr",
-      "url": "https://www.osfrisorartikler.no/"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
@@ -1117,9 +1095,24 @@
       "published_at": null,
       "snippet": "Utmerket service ✓ Rask bestilling ✓ Topp merker ✓ Utforsk vårt store utvalg av frisørutstyr og finn riktig utstyr for din bedrift.",
       "source": "Brave Search",
-      "source_rank": 5,
+      "source_rank": 3,
       "title": "Frisørutstyr - kjøp frisørutstyr gunstig hos expondo.no",
       "url": "https://www.expondo.no/frisoerutstyr/"
+    },
+    {
+      "discovery_query": "frisørutstyr avvikling Norge",
+      "extra_snippets": [
+        "CUTRIN NORGE leverer salgsvarer, kjemivarer, rekvisita, utstyr og totale innredningsløsninger til så vel små som store salonger over hele landet....Les mer",
+        "Cutrin Norge leverer salgsvarer, kjemivarer, rekvisita, utstyr og totale innredningsløsninger til så vel små som store salonger over hele landet....Les mer"
+      ],
+      "id": "c357ac15a9bf75a0ba5eb432",
+      "language": "en",
+      "published_at": null,
+      "snippet": "Frisørutstyr - arbeidsstol, bandasjesaks, applikator, blomdahl, bor, føner, argiletz, aurora, bio+, camillen60, ainoa, carbid - Finn firmaer, adresser, telefonnumre.",
+      "source": "Brave Search",
+      "source_rank": 4,
+      "title": "Frisørutstyr | bedrifter | gulesider.no | side 1",
+      "url": "https://www.gulesider.no/fris%C3%B8rutstyr/bedrifter"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
@@ -1132,9 +1125,21 @@
       "published_at": null,
       "snippet": "Alt til frisørsalongen · Velkommen til Hair Collection! Er du frisør og vil du ha tilgang til eksklusive tilbud og vårt brede utvalg av profesjonelle produkter",
       "source": "Brave Search",
-      "source_rank": 6,
+      "source_rank": 5,
       "title": "Hair Collection AS",
       "url": "https://www.haircollection.no/"
+    },
+    {
+      "discovery_query": "frisørutstyr avvikling Norge",
+      "extra_snippets": [],
+      "id": "6075e05144b5e4b48b800f0e",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Hos OS Frisørartikler finner du et bredt utvalg av profesjonelle frisørartikler, hårprodukter og salongutstyr i høy kvalitet. Bestill enkelt på nett.",
+      "source": "Brave Search",
+      "source_rank": 6,
+      "title": "OS Frisørartikler - Profesjonelle frisørartikler & frisørutstyr",
+      "url": "https://www.osfrisorartikler.no/"
     },
     {
       "discovery_query": "frisørutstyr avvikling Norge",
@@ -1181,14 +1186,14 @@
     {
       "discovery_query": "frisørutstyr avvikling Norge",
       "extra_snippets": [],
-      "id": "0c3638e1fd929382450ff91e",
-      "language": "nb",
+      "id": "b1f8c07c3db873b5a31a73b8",
+      "language": "en",
       "published_at": null,
-      "snippet": "Gratis frakt og retur ✓ 30 dagers returrett ✓ 3 års garanti ✓ Besøk expondo nå og finn den perfekte",
+      "snippet": "Hairstore har en stort utvalg av frisørutstyr til små og store frisørsalonger.",
       "source": "Brave Search",
       "source_rank": 10,
-      "title": "Frisørutstyr - Skjønnhet starter innvendig",
-      "url": "https://www.expondo.no/frisoerutstyr-ddabagfa/"
+      "title": "Hairstore er en av landets ledende leverandører av rekvisita og utstyr til frisørbransjen.",
+      "url": "https://www.hairstore.no/produkter/utstyr"
     }
   ],
   "schema_version": 1

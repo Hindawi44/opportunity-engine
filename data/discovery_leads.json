@@ -1,17 +1,17 @@
 {
   "category_counts": {
-    "auction": 1,
+    "auction": 2,
     "bankruptcy": 18,
     "estate_sale": 3,
-    "inventory": 27,
+    "inventory": 29,
     "liquidation": 9,
     "office_furniture": 1,
     "sale_listing": 10,
     "salon_equipment": 7,
     "shop_equipment": 10
   },
-  "deduplicated_lead_count": 61,
-  "generated_at": "2026-07-30T17:08:56.871822+00:00",
+  "deduplicated_lead_count": 63,
+  "generated_at": "2026-07-30T19:51:12.351729+00:00",
   "input_result_count": 80,
   "items": [
     {
@@ -21,7 +21,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867964+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347819+00:00",
       "image_count": null,
       "lead_id": "web-340bfb344e98a6d682c6",
       "price_nok": null,
@@ -45,7 +45,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870825+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350680+00:00",
       "image_count": null,
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
@@ -68,7 +68,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867842+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347699+00:00",
       "image_count": null,
       "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
@@ -91,7 +91,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870028+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349894+00:00",
       "image_count": null,
       "lead_id": "web-09fdcc107a66ac1b45ab",
       "price_nok": null,
@@ -113,7 +113,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868085+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347933+00:00",
       "image_count": null,
       "lead_id": "web-ef2f88a92a8f9400d376",
       "price_nok": null,
@@ -135,7 +135,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867674+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347587+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -157,7 +157,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867896+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347751+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -179,7 +179,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868381+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348253+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -202,7 +202,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867266+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347168+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -226,7 +226,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871600+00:00",
+      "discovered_at": "2026-07-30T19:51:12.351603+00:00",
       "image_count": null,
       "lead_id": "web-d6946302664e2cf64951",
       "price_nok": null,
@@ -243,6 +243,28 @@
       "url": "https://norskavvikling.no/"
     },
     {
+      "canonical_url": "https://merkandi.no/engros/restesalg-av-symaskiner",
+      "categories": [
+        "auction",
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T19:51:12.350412+00:00",
+      "image_count": null,
+      "lead_id": "web-ee0f03d25cc2b85496a9",
+      "price_nok": null,
+      "priority_score": 34,
+      "published_at": null,
+      "score_reasons": [
+        "category:auction+12",
+        "category:inventory+22"
+      ],
+      "snippet": "Brukt · <strong>kr 370,02 /stykke</strong> · 1500 St. Brukt · kr 23,13 /stykke · -5% for din første bestilling! uten grenser · Ny · kr 404,71 /stykke · 650 St. Ny · <strong>kr 370,02 /stykke</strong> · uten grenser · Brukt · kr 228,37 /stykke · 5500 St.",
+      "source": "Brave Search",
+      "title": "Restesalg av symaskiner - Engros industrisymaskiner fra auksjoner og restpartier | B2B Merkandi.no",
+      "url": "https://merkandi.no/engros/restesalg-av-symaskiner"
+    },
+    {
       "canonical_url": "https://www.verdirealisering.no/konkursbo-b/tag/varelager",
       "categories": [
         "bankruptcy",
@@ -250,7 +272,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868711+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348569+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -273,7 +295,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869496+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349403+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -295,7 +317,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869705+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349722+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -317,7 +339,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870380+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350264+00:00",
       "image_count": null,
       "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
@@ -339,7 +361,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868891+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348822+00:00",
       "image_count": null,
       "lead_id": "web-08c1c3148277e6eb31ea",
       "price_nok": null,
@@ -361,7 +383,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868968+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348712+00:00",
       "image_count": null,
       "lead_id": "web-7c85d59249f9065a7874",
       "price_nok": null,
@@ -383,7 +405,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868425+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348299+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -405,7 +427,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868781+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348633+00:00",
       "image_count": null,
       "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
@@ -427,7 +449,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868317+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348188+00:00",
       "image_count": null,
       "lead_id": "web-05170ee30473a1493dd3",
       "price_nok": null,
@@ -449,7 +471,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869543+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349454+00:00",
       "image_count": null,
       "lead_id": "web-7c78687e8f228b645e34",
       "price_nok": null,
@@ -470,7 +492,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870082+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349948+00:00",
       "image_count": null,
       "lead_id": "web-f5e25a1bdcd9e106de57",
       "price_nok": null,
@@ -491,7 +513,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869785+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349667+00:00",
       "image_count": null,
       "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
@@ -512,7 +534,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871128+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350924+00:00",
       "image_count": null,
       "lead_id": "web-63600f85f4126e808e67",
       "price_nok": null,
@@ -534,7 +556,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868543+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348422+00:00",
       "image_count": null,
       "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
@@ -556,7 +578,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869027+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348881+00:00",
       "image_count": null,
       "lead_id": "web-0658ba89b4c5fc6f74ea",
       "price_nok": null,
@@ -576,7 +598,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869972+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349839+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -596,7 +618,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869908+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349775+00:00",
       "image_count": null,
       "lead_id": "web-e71772deae49d9ffbeb5",
       "price_nok": null,
@@ -616,7 +638,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868157+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348113+00:00",
       "image_count": null,
       "lead_id": "web-7cad0e8a59e6e6643424",
       "price_nok": null,
@@ -636,7 +658,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870773+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350634+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -656,7 +678,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869631+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349598+00:00",
       "image_count": null,
       "lead_id": "web-bd6977fd8acb108de839",
       "price_nok": null,
@@ -676,7 +698,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870686+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350574+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -696,7 +718,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870966+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350750+00:00",
       "image_count": null,
       "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
@@ -716,7 +738,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870632+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350519+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -736,7 +758,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871020+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350867+00:00",
       "image_count": null,
       "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
@@ -751,12 +773,32 @@
       "url": "https://www.supersellers.no/collections/lagerreoler"
     },
     {
+      "canonical_url": "https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/oppbevaringshyller",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T19:51:12.351063+00:00",
+      "image_count": null,
+      "lead_id": "web-3e6562fbc17417ace477",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "Organiser boden, garasjen eller lageret med en solid oppbevaringshylle. Vi har hyller i metall og plast i mange størrelser. Kjøp online.",
+      "source": "Brave Search",
+      "title": "Oppbevaringshyller | For et organisert hjem, bod og garasje | Jula",
+      "url": "https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/oppbevaringshyller/"
+    },
+    {
       "canonical_url": "https://luminx.no/",
       "categories": [
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871480+00:00",
+      "discovered_at": "2026-07-30T19:51:12.351428+00:00",
       "image_count": null,
       "lead_id": "web-7570d71d9b328c0f5b6d",
       "price_nok": null,
@@ -777,7 +819,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868244+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348015+00:00",
       "image_count": null,
       "lead_id": "web-81550ca51413d1e1ac66",
       "price_nok": null,
@@ -798,7 +840,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871071+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350974+00:00",
       "image_count": null,
       "lead_id": "web-0623254318f1aaf8f835",
       "price_nok": null,
@@ -818,7 +860,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869309+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349193+00:00",
       "image_count": null,
       "lead_id": "web-921037454eb852a23c0d",
       "price_nok": null,
@@ -838,7 +880,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869247+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349130+00:00",
       "image_count": null,
       "lead_id": "web-b1965bf33313f5b36f22",
       "price_nok": null,
@@ -858,7 +900,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869451+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349320+00:00",
       "image_count": null,
       "lead_id": "web-dfc1cdb6d21849294976",
       "price_nok": null,
@@ -878,7 +920,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869392+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349260+00:00",
       "image_count": null,
       "lead_id": "web-c1e3e1a07794eb2a24ac",
       "price_nok": null,
@@ -898,7 +940,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869117+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348974+00:00",
       "image_count": null,
       "lead_id": "web-067ceeb7a126feb9836a",
       "price_nok": null,
@@ -919,7 +961,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868844+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348775+00:00",
       "image_count": null,
       "lead_id": "web-69939d672dc42fe60d24",
       "price_nok": null,
@@ -941,7 +983,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868032+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347880+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -961,7 +1003,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871407+00:00",
+      "discovered_at": "2026-07-30T19:51:12.351241+00:00",
       "image_count": null,
       "lead_id": "web-109ce00732f8f63fe37d",
       "price_nok": null,
@@ -976,32 +1018,12 @@
       "url": "https://www.expondo.no/frisoerutstyr/"
     },
     {
-      "canonical_url": "https://www.expondo.no/frisoerutstyr-ddabagfa",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871651+00:00",
-      "image_count": null,
-      "lead_id": "web-37576540e0a1acdec6b9",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Gratis frakt og retur ✓ 30 dagers returrett ✓ 3 års garanti ✓ Besøk expondo nå og finn den perfekte",
-      "source": "Brave Search",
-      "title": "Frisørutstyr - Skjønnhet starter innvendig",
-      "url": "https://www.expondo.no/frisoerutstyr-ddabagfa/"
-    },
-    {
       "canonical_url": "https://www.gulesider.no/fris%C3%B8rutstyr/bedrifter",
       "categories": [
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871273+00:00",
+      "discovered_at": "2026-07-30T19:51:12.351294+00:00",
       "image_count": null,
       "lead_id": "web-c357ac15a9bf75a0ba5e",
       "price_nok": null,
@@ -1021,7 +1043,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871222+00:00",
+      "discovered_at": "2026-07-30T19:51:12.351159+00:00",
       "image_count": null,
       "lead_id": "web-a55e3a6ff81e23b22f21",
       "price_nok": null,
@@ -1036,12 +1058,32 @@
       "url": "https://www.wellnessnorge.no/frisor/frisorutstyr-stoler-haartorkere-traller"
     },
     {
+      "canonical_url": "https://www.hairstore.no/produkter/utstyr",
+      "categories": [
+        "salon_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-30T19:51:12.351654+00:00",
+      "image_count": null,
+      "lead_id": "web-b1f8c07c3db873b5a31a",
+      "price_nok": null,
+      "priority_score": 16,
+      "published_at": null,
+      "score_reasons": [
+        "category:salon_equipment+16"
+      ],
+      "snippet": "Hairstore har en stort utvalg av frisørutstyr til små og store frisørsalonger.",
+      "source": "Brave Search",
+      "title": "Hairstore er en av landets ledende leverandører av rekvisita og utstyr til frisørbransjen.",
+      "url": "https://www.hairstore.no/produkter/utstyr"
+    },
+    {
       "canonical_url": "https://salonambience.no/",
       "categories": [
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871535+00:00",
+      "discovered_at": "2026-07-30T19:51:12.351480+00:00",
       "image_count": null,
       "lead_id": "web-dcc37d09e23b72b09f7d",
       "price_nok": null,
@@ -1061,7 +1103,7 @@
         "salon_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.871352+00:00",
+      "discovered_at": "2026-07-30T19:51:12.351373+00:00",
       "image_count": null,
       "lead_id": "web-6075e05144b5e4b48b80",
       "price_nok": null,
@@ -1081,7 +1123,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867414+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347326+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1102,7 +1144,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867484+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347396+00:00",
       "image_count": null,
       "lead_id": "web-d2192f749651b034d4eb",
       "price_nok": null,
@@ -1123,7 +1165,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867599+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347452+00:00",
       "image_count": null,
       "lead_id": "web-ccf7065118a5bf95db40",
       "price_nok": null,
@@ -1145,7 +1187,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868615+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348492+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1166,7 +1208,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.869186+00:00",
+      "discovered_at": "2026-07-30T19:51:12.349065+00:00",
       "image_count": null,
       "lead_id": "web-a1a542fe748539aeeead",
       "price_nok": null,
@@ -1186,7 +1228,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870443+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350327+00:00",
       "image_count": null,
       "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
@@ -1206,7 +1248,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870267+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350151+00:00",
       "image_count": null,
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
@@ -1226,7 +1268,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.870139+00:00",
+      "discovered_at": "2026-07-30T19:51:12.350003+00:00",
       "image_count": null,
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "price_nok": null,
@@ -1246,7 +1288,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.868484+00:00",
+      "discovered_at": "2026-07-30T19:51:12.348359+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1266,7 +1308,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867085+00:00",
+      "discovered_at": "2026-07-30T19:51:12.346937+00:00",
       "image_count": null,
       "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,
@@ -1286,7 +1328,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-30T17:08:56.867545+00:00",
+      "discovered_at": "2026-07-30T19:51:12.347511+00:00",
       "image_count": null,
       "lead_id": "web-ff05dbb792cccc1b5cc5",
       "price_nok": null,
@@ -1304,6 +1346,6 @@
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 61
+    "Brave Search": 63
   }
 }

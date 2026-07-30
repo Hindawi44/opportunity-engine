@@ -1,6 +1,6 @@
 {
   "buy_review_count": 0,
-  "decision_count": 6,
+  "decision_count": 5,
   "decisions": [
     {
       "asking_price_nok": 2600.0,
@@ -94,7 +94,7 @@
       ],
       "status": "review_first",
       "target_profit_buffer_nok": null,
-      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud 18t 12m 58s",
+      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud 15t 30m 44s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288",
       "verified_operating_costs_nok": null
@@ -190,7 +190,7 @@
       ],
       "status": "review_if_capacity",
       "target_profit_buffer_nok": null,
-      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud 17t 58m 58s",
+      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud 15t 16m 44s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290",
       "verified_operating_costs_nok": null
@@ -283,7 +283,7 @@
       ],
       "status": "review_first",
       "target_profit_buffer_nok": null,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d 19t 29m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d 16t 46m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
       "verified_operating_costs_nok": null
@@ -378,7 +378,7 @@
       ],
       "status": "review_first",
       "target_profit_buffer_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d 17t 30m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d 14t 48m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "verified_operating_costs_nok": null
@@ -473,109 +473,16 @@
       ],
       "status": "review_first",
       "target_profit_buffer_nok": null,
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 23t 57m 0s",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 21t 14m 45s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
       "verified_operating_costs_nok": null
-    },
-    {
-      "asking_price_nok": 900.0,
-      "automatic_purchase": false,
-      "city": "Lierstranda",
-      "conservative_resale_value_nok": null,
-      "decision": "EVIDENCE_REQUIRED",
-      "decision_confidence": "LOW",
-      "decision_reasons_ar": [
-        "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
-      ],
-      "decision_warnings_ar": [
-        "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
-      ],
-      "ends_at": "1785438000000",
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "expected_profit_nok": null,
-      "final_decision": "WATCH",
-      "final_decision_ar": "مراقبة وجمع الأدلة",
-      "market_search_query": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud",
-      "matched_target_terms": [
-        "reol"
-      ],
-      "maximum_safe_bid_nok": null,
-      "missing_evidence": [
-        "auction_fee_nok",
-        "dismantling_cost_nok",
-        "other_costs_nok",
-        "repair_cost_nok",
-        "storage_cost_nok",
-        "three_verified_market_comparables",
-        "transport_cost_nok",
-        "vat_nok"
-      ],
-      "missing_evidence_ar": [
-        "عمولة المزاد",
-        "تكلفة الفك",
-        "التكاليف الأخرى",
-        "تكلفة الإصلاح",
-        "تكلفة التخزين",
-        "ثلاث مقارنات سوقية موثقة",
-        "تكلفة النقل",
-        "قيمة ضريبة القيمة المضافة"
-      ],
-      "next_actions_ar": [
-        "استكمال ثلاث مقارنات سوقية موثقة.",
-        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
-      ],
-      "official_decision_field": "final_decision",
-      "opportunity_id": "unified-auksjonen-613169",
-      "opportunity_score": 23.98,
-      "priority": 2,
-      "reasons": [
-        "target:reol+9",
-        "asking_price_present+5"
-      ],
-      "recommendation": "WATCH",
-      "recommendation_ar": "مراقبة وجمع الأدلة",
-      "relevance_score": 14,
-      "requires_human_approval": false,
-      "roi_percent": null,
-      "score_components": {
-        "evidence": 0.0,
-        "listing_quality": 7.98,
-        "logistics": 7.0,
-        "marketability": 9.0,
-        "verified_economics": 0.0
-      },
-      "score_grade": "E",
-      "score_reasons": [
-        "verified_economics:0/35",
-        "evidence_completeness:0.0/15",
-        "verified_comparables:0.0/10",
-        "marketability:9.0/15",
-        "logistics:7.0/10",
-        "relevance:1.0/7",
-        "listing_fields:7.0/8",
-        "evidence_gate:EVIDENCE_REQUIRED"
-      ],
-      "status": "review_if_capacity",
-      "target_profit_buffer_nok": null,
-      "title": "Parti med VVS-materiell – Roth,reol, Uponor, Joti, Purus, Blücher og Geberit Lierstranda 9 bud 1t 51m 1s",
-      "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_VVS-materiell__Rothreol_Uponor_Joti_Purus_Blcher_og_Geberit/613169",
-      "verified_operating_costs_nok": null
     }
   ],
-  "generated_at": "2026-07-30T17:09:12.249412+00:00",
+  "generated_at": "2026-07-30T19:51:26.716314+00:00",
   "method": "canonical final decision, verified evidence, conservative target-profit buffer, human approval required",
   "official_decision_field": "final_decision",
   "reject_count": 0,
   "schema_version": 2,
-  "watch_count": 6
+  "watch_count": 5
 }
