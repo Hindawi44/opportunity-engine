@@ -1,0 +1,83 @@
+name: Temporary Apply Market Price Budget Fix
+
+on:
+  push:
+    branches:
+      - fix/market-price-query-budget
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/market-price-query-budget
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Apply bounded round-robin query allocation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          script_path = Path("scripts/collect_market_price_candidates.py")
+          text = script_path.read_text(encoding="utf-8")
+
+          marker = "    return unique[:_MAX_QUERY_VARIANTS]\n\n\n"
+          helper = '''    return unique[:_MAX_QUERY_VARIANTS]\n\n\ndef _allocate_query_budget(\n    items: list[dict[str, object]], request_budget: int\n) -> list[list[str]]:\n    \"\"\"Allocate a global request budget fairly across selected opportunities.\n\n    Query variants are assigned round-robin so one opportunity cannot consume the\n    entire Brave client budget before later opportunities are inspected.\n    \"\"\"\n    if request_budget < 0:\n        raise ValueError("request_budget cannot be negative")\n\n    available = [_query_variants(item) for item in items]\n    allocated: list[list[str]] = [[] for _ in items]\n    remaining = request_budget\n    variant_index = 0\n\n    while remaining > 0:\n        made_progress = False\n        for item_index, variants in enumerate(available):\n            if remaining == 0:\n                break\n            if variant_index >= len(variants):\n                continue\n            allocated[item_index].append(variants[variant_index])\n            remaining -= 1\n            made_progress = True\n        if not made_progress:\n            break\n        variant_index += 1\n\n    return allocated\n\n\n'''
+          if "def _allocate_query_budget(" not in text:
+              if marker not in text:
+                  raise SystemExit("query variant insertion marker not found")
+              text = text.replace(marker, helper, 1)
+
+          old = '''    client = BraveSearchClient(api_key=api_key)\n    records: list[dict[str, object]] = []\n    errors: dict[str, str] = {}\n\n    for raw_item in queue[: max(args.limit, 0)]:\n        if not isinstance(raw_item, dict):\n            continue\n        opportunity_id = _clean(raw_item.get("opportunity_id"))\n        queries = _query_variants(raw_item)\n'''
+          new = '''    client = BraveSearchClient(api_key=api_key)\n    selected_items = [\n        item for item in queue[: max(args.limit, 0)] if isinstance(item, dict)\n    ]\n    query_plans = _allocate_query_budget(selected_items, client.max_requests_per_run)\n    records: list[dict[str, object]] = []\n    errors: dict[str, str] = {}\n\n    for raw_item, queries in zip(selected_items, query_plans):\n        opportunity_id = _clean(raw_item.get("opportunity_id"))\n        available_queries = _query_variants(raw_item)\n'''
+          if old not in text:
+              raise SystemExit("main allocation block not found")
+          text = text.replace(old, new, 1)
+
+          old = '''            "market_search_query": queries[0] if queries else "",\n            "market_search_queries": queries,\n            "query_count": len(queries),\n            "query_stats": query_stats,\n'''
+          new = '''            "market_search_query": queries[0] if queries else "",\n            "market_search_queries": queries,\n            "query_count": len(queries),\n            "available_query_count": len(available_queries),\n            "query_budget_truncated": len(queries) < len(available_queries),\n            "query_stats": query_stats,\n'''
+          if old not in text:
+              raise SystemExit("record query audit block not found")
+          text = text.replace(old, new, 1)
+
+          old = '''        "max_query_variants": _MAX_QUERY_VARIANTS,\n        "target_domains": list(_TARGET_DOMAINS),\n        "opportunity_count": len(records),\n'''
+          new = '''        "max_query_variants": _MAX_QUERY_VARIANTS,\n        "target_domains": list(_TARGET_DOMAINS),\n        "request_budget": client.max_requests_per_run,\n        "planned_request_count": sum(len(queries) for queries in query_plans),\n        "requests_made": client.request_count,\n        "query_budget_exhausted": (\n            sum(len(queries) for queries in query_plans) >= client.max_requests_per_run\n            and sum(len(_query_variants(item)) for item in selected_items)\n            > client.max_requests_per_run\n        ),\n        "opportunity_count": len(records),\n'''
+          if old not in text:
+              raise SystemExit("output audit block not found")
+          text = text.replace(old, new, 1)
+
+          old = '''        "rejected_candidate_count": output_payload["rejected_candidate_count"],\n        "error_count": len(errors),\n'''
+          new = '''        "rejected_candidate_count": output_payload["rejected_candidate_count"],\n        "request_budget": output_payload["request_budget"],\n        "planned_request_count": output_payload["planned_request_count"],\n        "requests_made": output_payload["requests_made"],\n        "error_count": len(errors),\n'''
+          if old not in text:
+              raise SystemExit("summary audit block not found")
+          text = text.replace(old, new, 1)
+
+          script_path.write_text(text, encoding="utf-8")
+
+          test_path = Path("tests/test_market_search_engine_v2.py")
+          tests = test_path.read_text(encoding="utf-8")
+          addition = '''\n\ndef test_query_budget_is_allocated_round_robin_and_bounded() -> None:\n    items = [{"title": f"opportunity {index}"} for index in range(5)]\n\n    plans = module._allocate_query_budget(items, request_budget=8)\n\n    assert [len(plan) for plan in plans] == [2, 2, 2, 1, 1]\n    assert sum(len(plan) for plan in plans) == 8\n    assert all(plan for plan in plans)\n\n\ndef test_query_budget_zero_allocates_no_queries() -> None:\n    plans = module._allocate_query_budget([{"title": "lagerreoler"}], request_budget=0)\n\n    assert plans == [[]]\n'''
+          if "test_query_budget_is_allocated_round_robin_and_bounded" not in tests:
+              test_path.write_text(tests.rstrip() + addition + "\n", encoding="utf-8")
+
+          compile(script_path.read_text(encoding="utf-8"), str(script_path), "exec")
+          compile(test_path.read_text(encoding="utf-8"), str(test_path), "exec")
+          PY
+      - name: Commit applied fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/collect_market_price_candidates.py tests/test_market_search_engine_v2.py
+          if git diff --cached --quiet; then
+            echo "Fix already applied"
+            exit 0
+          fi
+          git commit -m "Bound market-price queries to the Brave request budget"
+          git push origin fix/market-price-query-budget
