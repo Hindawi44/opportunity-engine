@@ -72,3 +72,19 @@ def test_candidate_records_source_class_and_correct_price() -> None:
     assert candidate["domain"] == "finn.no"
     assert candidate["source_class"] == "marketplace"
     assert "utm_source" not in candidate["canonical_url"]
+
+def test_query_budget_is_allocated_round_robin_and_bounded() -> None:
+    items = [{"title": f"opportunity {index}"} for index in range(5)]
+
+    plans = module._allocate_query_budget(items, request_budget=8)
+
+    assert [len(plan) for plan in plans] == [2, 2, 2, 1, 1]
+    assert sum(len(plan) for plan in plans) == 8
+    assert all(plan for plan in plans)
+
+
+def test_query_budget_zero_allocates_no_queries() -> None:
+    plans = module._allocate_query_budget([{"title": "lagerreoler"}], request_budget=0)
+
+    assert plans == [[]]
+
