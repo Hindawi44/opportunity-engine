@@ -34,7 +34,10 @@ def _opened_age_days(opened_date: str | None, *, today: date) -> int | None:
     return max(0, (today - opened).days)
 
 
-def _financial_signal_points(value: float | None, thresholds: tuple[tuple[float, int], ...]) -> int:
+def _financial_signal_points(
+    value: float | None,
+    thresholds: tuple[tuple[float, int], ...],
+) -> int:
     if value is None:
         return 0
     for threshold, points in thresholds:
@@ -67,8 +70,9 @@ def score_pre_market_lead(
         breakdown["recency"] = 10
         reasons.append("bankruptcy opened within 180 days")
     else:
-        breakdown["recency"] = 5
-        reasons.append("bankruptcy is older than 180 days")
+        breakdown["recency"] = 0
+        breakdown["stale_lead_penalty"] = -30
+        reasons.append("bankruptcy is older than 180 days and is stale for early access")
 
     if lead.industry_code == "46.420":
         breakdown["industry"] = 25
@@ -95,7 +99,8 @@ def score_pre_market_lead(
     if breakdown["revenue_scale"]:
         reasons.append("reported revenue adds trading-activity evidence")
 
-    return min(sum(breakdown.values()), 100), breakdown, tuple(reasons)
+    score = max(0, min(sum(breakdown.values()), 100))
+    return score, breakdown, tuple(reasons)
 
 
 def signal_band(score: int) -> str:
@@ -137,9 +142,13 @@ class PreMarketClothingLead:
             "inventory_signal_band": self.inventory_signal_band,
             "score_breakdown": dict(self.score_breakdown),
             "score_reasons": list(self.score_reasons),
-            "score_basis": "HEURISTIC_COMPANY_SIGNAL_NOT_VERIFIED_INVENTORY_PROBABILITY",
+            "score_basis": (
+                "HEURISTIC_COMPANY_SIGNAL_NOT_VERIFIED_INVENTORY_PROBABILITY"
+            ),
             "lead_stage": "PRE_MARKET_LEAD",
-            "opportunity_state": "EARLY_LEAD_REQUIRES_INVENTORY_AND_SALE_VERIFICATION",
+            "opportunity_state": (
+                "EARLY_LEAD_REQUIRES_INVENTORY_AND_SALE_VERIFICATION"
+            ),
             "listing_status": "UNKNOWN",
             "public_sale_found": False,
             "inventory_sale_verified": False,
@@ -290,8 +299,8 @@ def write_pre_market_artifacts(
             lines.append(
                 f"- {source.debtor_name} | {source.municipality or 'unknown'} | "
                 f"opened {source.opened_date or 'unknown'} | "
-                f"signal {lead.inventory_signal_score}/100 ({lead.inventory_signal_band}) | "
-                f"{source.url}"
+                f"signal {lead.inventory_signal_score}/100 "
+                f"({lead.inventory_signal_band}) | {source.url}"
             )
     else:
         lines.append("No recent clothing bankruptcy leads were available for review.")
