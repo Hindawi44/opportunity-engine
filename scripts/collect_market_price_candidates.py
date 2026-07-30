@@ -296,7 +296,8 @@ def main() -> int:
     selected_items = [
         item for item in queue[: max(args.limit, 0)] if isinstance(item, dict)
     ]
-    query_plans = _allocate_query_budget(selected_items, client.max_requests_per_run)
+    request_budget = int(getattr(client, "max_requests_per_run", 8))
+    query_plans = _allocate_query_budget(selected_items, request_budget)
     records: list[dict[str, object]] = []
     errors: dict[str, str] = {}
 
@@ -389,13 +390,13 @@ def main() -> int:
         "required_comparables": _REQUIRED_COMPARABLES,
         "max_query_variants": _MAX_QUERY_VARIANTS,
         "target_domains": list(_TARGET_DOMAINS),
-        "request_budget": client.max_requests_per_run,
+        "request_budget": request_budget,
         "planned_request_count": sum(len(queries) for queries in query_plans),
         "requests_made": client.request_count,
         "query_budget_exhausted": (
-            sum(len(queries) for queries in query_plans) >= client.max_requests_per_run
+            sum(len(queries) for queries in query_plans) >= request_budget
             and sum(len(_query_variants(item)) for item in selected_items)
-            > client.max_requests_per_run
+            > request_budget
         ),
         "opportunity_count": len(records),
         "candidate_count": sum(int(item["candidate_count"]) for item in records),
