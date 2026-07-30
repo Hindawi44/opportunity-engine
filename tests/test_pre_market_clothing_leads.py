@@ -79,7 +79,7 @@ def test_recent_large_wholesaler_gets_high_review_signal_without_sale_claim():
     assert payload["automatic_contact"] is False
 
 
-def test_ranking_prefers_stronger_recent_company_signal():
+def test_ranking_penalizes_stale_weak_record():
     weak = clothing_lead(
         estate_orgnr="936798446",
         estate_name="SMALL SHOP AS KONKURSBO",
@@ -97,6 +97,14 @@ def test_ranking_prefers_stronger_recent_company_signal():
     )
     strong = clothing_lead()
 
+    stale_score, stale_breakdown, stale_reasons = score_pre_market_lead(
+        weak,
+        today=TODAY,
+    )
+    assert stale_score == 0
+    assert stale_breakdown["stale_lead_penalty"] == -30
+    assert any("stale for early access" in reason for reason in stale_reasons)
+
     result = build_pre_market_pilot(
         collection(weak, strong),
         review_limit=1,
@@ -105,7 +113,7 @@ def test_ranking_prefers_stronger_recent_company_signal():
 
     assert result.review_top[0].source_lead.debtor_name == "YELLOW RETAIL AS"
     assert result.review_top[0].inventory_signal_score == 100
-    assert result.leads[1].inventory_signal_score == 20
+    assert result.leads[1].inventory_signal_score == 0
 
 
 def test_artifacts_create_review_queue_but_keep_commercial_top5_empty(tmp_path: Path):
