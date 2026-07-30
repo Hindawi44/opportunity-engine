@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - fix/cross-source-record-accounting
+    paths-ignore:
+      - data/pr347_live_validation_summary.json
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   live-validation:
@@ -29,12 +31,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: fix/cross-source-record-accounting
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Run full live pipeline
+        id: pipeline
+        continue-on-error: true
         run: python scripts/run_v2_automated_pipeline.py --trigger "$PIPELINE_TRIGGER"
       - name: Verify exact record accounting
+        id: verify
+        if: ${{ steps.pipeline.outcome == 'success' }}
+        continue-on-error: true
         run: |
           python - <<'PY'
           import json
@@ -47,28 +55,73 @@ jobs:
               row = accounting.get(source, {})
               assert row.get('status') == 'RECONCILED', (source, row)
               assert row.get('difference') == 0, (source, row)
+          PY
+      - name: Persist validation result marker
+        if: always()
+        env:
+          PIPELINE_OUTCOME: ${{ steps.pipeline.outcome }}
+          VERIFY_OUTCOME: ${{ steps.verify.outcome }}
+          WORKFLOW_RUN_ID: ${{ github.run_id }}
+          WORKFLOW_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          def read_json(path):
+              file_path = Path(path)
+              if not file_path.is_file():
+                  return {}
+              try:
+                  payload = json.loads(file_path.read_text(encoding='utf-8'))
+              except (OSError, json.JSONDecodeError):
+                  return {}
+              return payload if isinstance(payload, dict) else {}
+
+          audit = read_json('data/cross_source_deduplication_audit.json')
+          automated = read_json('data/automated_pipeline_status.json')
+          pipeline = read_json('data/pipeline_run_status.json')
           summary = {
-              'valid': audit.get('verified_source_record_accounting_valid'),
-              'by_source': accounting,
-              'pipeline_status': json.loads(Path('data/automated_pipeline_status.json').read_text(encoding='utf-8')).get('status'),
+              'schema_version': 1,
+              'workflow_run_id': os.environ.get('WORKFLOW_RUN_ID'),
+              'workflow_sha': os.environ.get('WORKFLOW_SHA'),
+              'pipeline_step_outcome': os.environ.get('PIPELINE_OUTCOME'),
+              'verification_step_outcome': os.environ.get('VERIFY_OUTCOME'),
+              'automated_pipeline_status': automated.get('status'),
+              'failed_stage': automated.get('failed_stage'),
+              'pipeline_run_status': pipeline.get('status'),
+              'verified_source_record_accounting_valid': audit.get('verified_source_record_accounting_valid'),
+              'verified_source_record_accounting': audit.get('verified_source_record_accounting', {}),
           }
-          Path('artifacts/pr347-live-validation').mkdir(parents=True, exist_ok=True)
-          Path('artifacts/pr347-live-validation/summary.json').write_text(
+          Path('data/pr347_live_validation_summary.json').write_text(
               json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + '\n',
               encoding='utf-8',
           )
           print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
           PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/pr347_live_validation_summary.json
+          if git diff --cached --quiet; then
+            echo "Validation marker unchanged"
+          else
+            git commit -m "Record PR347 live validation result"
+            git push origin HEAD:fix/cross-source-record-accounting
+          fi
       - name: Upload live validation audit
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pr347-live-accounting-${{ github.run_id }}
           path: |
-            artifacts/pr347-live-validation
+            data/pr347_live_validation_summary.json
             data/cross_source_deduplication_audit.json
             data/source_funnel.json
             data/automated_pipeline_status.json
             data/pipeline_run_status.json
           retention-days: 30
           if-no-files-found: warn
+      - name: Fail when validation failed
+        if: ${{ steps.pipeline.outcome != 'success' || steps.verify.outcome != 'success' }}
+        run: exit 1
