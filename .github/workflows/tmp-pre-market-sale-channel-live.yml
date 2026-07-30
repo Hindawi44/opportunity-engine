@@ -1,0 +1,65 @@
+name: Temporary Pre-Market Sale Channel Live Pilot
+
+on:
+  push:
+    branches:
+      - feat/pre-market-clothing-leads-pilot
+
+permissions:
+  contents: read
+
+jobs:
+  live-pilot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      PYTHONPATH: src
+    steps:
+      - name: Check out pilot branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run targeted searches for five estates
+        run: |
+          set -euo pipefail
+          python scripts/run_pre_market_sale_channel_search.py \
+            --estate-orgnr 938018014 \
+            --freshness py \
+            --results-per-query 10 \
+            --output-dir artifacts/sale-channel/menswear
+          python scripts/run_pre_market_sale_channel_search.py \
+            --estate-orgnr 938022038 \
+            --freshness py \
+            --results-per-query 10 \
+            --output-dir artifacts/sale-channel/keepfit
+          python scripts/run_pre_market_sale_channel_search.py \
+            --estate-orgnr 938119295 \
+            --freshness py \
+            --results-per-query 10 \
+            --output-dir artifacts/sale-channel/birkhans
+          python scripts/run_pre_market_sale_channel_search.py \
+            --estate-orgnr 937884796 \
+            --freshness py \
+            --results-per-query 10 \
+            --output-dir artifacts/sale-channel/mark-and-brandy
+          python scripts/run_pre_market_sale_channel_search.py \
+            --estate-orgnr 938108897 \
+            --freshness py \
+            --results-per-query 10 \
+            --output-dir artifacts/sale-channel/cheermania
+          for summary in artifacts/sale-channel/*/operator-summary.txt; do
+            echo "===== ${summary} ====="
+            cat "${summary}"
+          done
+
+      - name: Upload bounded search artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-market-sale-channel-live-pilot
+          path: artifacts/sale-channel
+          if-no-files-found: error
