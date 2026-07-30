@@ -49,9 +49,24 @@ def test_exact_accounting_records_report_limit_and_unsupported_leads() -> None:
 
     auksjonen = accounting["sources"]["Auksjonen.no"]
     konkurs = accounting["sources"]["Konkurs.app"]
+    assert accounting["schema_version"] == 2
     assert accounting["valid"] is True
     assert auksjonen["fetched_count"] == 3
     assert auksjonen["published_audit_record_count"] == 2
+    assert auksjonen["published_audit_records"] == [
+        {
+            "record_id": "auksjonen-1",
+            "opportunity_id": "unified-auksjonen-1",
+        },
+        {
+            "record_id": "auksjonen-2",
+            "opportunity_id": "unified-auksjonen-2",
+        },
+    ]
+    assert auksjonen["published_audit_opportunity_ids"] == [
+        "unified-auksjonen-1",
+        "unified-auksjonen-2",
+    ]
     assert auksjonen["excluded_records_by_reason"] == {"daily_report_limit": 1}
     assert konkurs["fetched_count"] == 1
     assert konkurs["published_audit_record_count"] == 0
