@@ -392,7 +392,9 @@ def main() -> int:
         "target_domains": list(_TARGET_DOMAINS),
         "request_budget": request_budget,
         "planned_request_count": sum(len(queries) for queries in query_plans),
-        "requests_made": client.request_count,
+        "requests_made": int(
+            getattr(client, "request_count", sum(len(queries) for queries in query_plans))
+        ),
         "query_budget_exhausted": (
             sum(len(queries) for queries in query_plans) >= request_budget
             and sum(len(_query_variants(item)) for item in selected_items)
