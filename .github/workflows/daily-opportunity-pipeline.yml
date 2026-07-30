@@ -90,7 +90,15 @@ jobs:
             --lookback-days 365 \
             --freshness py \
             --output-dir artifacts/pre-market-daily-monitor
-      - name: Publish durable monitor state
+      - name: Build human-review estate-manager outreach packets
+        run: |
+          python scripts/run_estate_manager_outreach_review.py \
+            --case-registry artifacts/pre-market-daily-monitor/pre-market-cases.json \
+            --operator-actions artifacts/pre-market-daily-monitor/operator-action-queue.json \
+            --sender-name Mahmoud \
+            --sender-business "Namsos Skredderhus" \
+            --output-dir artifacts/estate-manager-outreach-review
+      - name: Publish durable monitor and review state
         run: |
           mkdir -p data
           cp artifacts/pre-market-daily-monitor/pre-market-cases.json data/pre_market_cases.json
@@ -100,13 +108,18 @@ jobs:
           cp artifacts/pre-market-daily-monitor/live-clothing-top5.json data/pre_market_live_clothing_top5.json
           cp artifacts/pre-market-daily-monitor/pre-market-source-status.json data/pre_market_source_status.json
           cp artifacts/pre-market-daily-monitor/pre-market-daily-monitor-status.json data/pre_market_daily_monitor_status.json
-      - name: Add operator summary
-        run: cat artifacts/pre-market-daily-monitor/daily-monitor-summary.txt >> "$GITHUB_STEP_SUMMARY"
+          cp artifacts/estate-manager-outreach-review/estate-manager-outreach-review-queue.json data/pre_market_outreach_review_queue.json
+          cp artifacts/estate-manager-outreach-review/estate-manager-outreach-drafts.md data/pre_market_outreach_drafts.md
+      - name: Add operator summaries
+        run: |
+          cat artifacts/pre-market-daily-monitor/daily-monitor-summary.txt >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/estate-manager-outreach-review/operator-summary.txt >> "$GITHUB_STEP_SUMMARY"
       - name: Commit durable state only when changed
         run: |
-          FILES="data/pre_market_cases.json data/pre_market_case_changes.json data/pre_market_sale_channel_alerts.json data/pre_market_operator_action_queue.json data/pre_market_live_clothing_top5.json data/pre_market_source_status.json data/pre_market_daily_monitor_status.json"
+          FILES="data/pre_market_cases.json data/pre_market_case_changes.json data/pre_market_sale_channel_alerts.json data/pre_market_operator_action_queue.json data/pre_market_live_clothing_top5.json data/pre_market_source_status.json data/pre_market_daily_monitor_status.json data/pre_market_outreach_review_queue.json data/pre_market_outreach_drafts.md"
           if [ -z "$(git status --porcelain -- $FILES)" ]; then
-            echo "No pre-market monitor state changes"
+            echo "No pre-market monitor or outreach review state changes"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -119,6 +132,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pre-market-daily-monitor-${{ github.run_id }}
-          path: artifacts/pre-market-daily-monitor
+          path: |
+            artifacts/pre-market-daily-monitor
+            artifacts/estate-manager-outreach-review
           retention-days: 30
           if-no-files-found: warn
