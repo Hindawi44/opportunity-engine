@@ -51,19 +51,23 @@ _KNOWN_SALE_CHANNEL_DOMAINS = frozenset(
     }
 )
 _SALE_SIGNAL = re.compile(
-    r"\b(auksjon|auksjoner|selges|salg|bud|budrunde|vareparti|restlager|"
-    r"varelager|lagerbeholdning|opphørssalg|avviklingssalg|tømmesalg|"
-    r"parti\s+med\s+klær|kleslager)\b",
+    r"\b(auksjon|auksjoner|selges|salg|bud|budrunde|opphørssalg|"
+    r"avviklingssalg|tømmesalg|tvangssalg)\b",
+    re.I,
+)
+_INVENTORY_SIGNAL = re.compile(
+    r"\b(vareparti|restlager|varelager|lagerbeholdning|kleslager|"
+    r"samlet\s+lager|parti\s+med\s+klær|flere\s+plagg|"
+    r"\d{2,}\s*(?:stk|plagg|varer|jakker|bukser|kjoler|par))\b",
     re.I,
 )
 _LIQUIDATION_SIGNAL = re.compile(
     r"\b(bostyrer|bobestyrer|boet|konkursbo|avvikling|avviklingsselskap|"
-    r"på\s+vegne\s+av|oppdrag\s+for|realiseres|realisation|liquidator|"
-    r"tvangssalg)\b",
+    r"på\s+vegne\s+av|oppdrag\s+for|realiseres|realisation|liquidator)\b",
     re.I,
 )
-_LEGAL_SUFFIX_PATTERN = re.compile(
-    r"\b(?:AS|ASA|KONKURSBO|TVANGSAVVIKLINGSBO|BOET|KONKURS)\b",
+_ESTATE_SUFFIX_PATTERN = re.compile(
+    r"\b(?:KONKURSBO|TVANGSAVVIKLINGSBO|BOET|KONKURS)\b",
     re.I,
 )
 
@@ -77,10 +81,11 @@ def _digits(value: object) -> str:
 
 
 def normalize_entity_name(value: object) -> str:
+    """Normalize identity while preserving legal suffixes such as AS and ASA."""
     text = unicodedata.normalize("NFKD", _compact(value)).encode(
         "ascii", "ignore"
     ).decode("ascii")
-    text = _LEGAL_SUFFIX_PATTERN.sub(" ", text)
+    text = _ESTATE_SUFFIX_PATTERN.sub(" ", text)
     text = re.sub(r"[^A-Za-z0-9]+", " ", text).upper()
     return " ".join(text.split())
 
@@ -130,7 +135,7 @@ def _identity_match(
     }
     names.discard("")
     if any(name in normalized for name in names):
-        return True, "EXACT_NORMALIZED_COMPANY_NAME"
+        return True, "EXACT_LEGAL_COMPANY_NAME"
     return False, "NONE"
 
 
@@ -144,6 +149,7 @@ class SaleChannelCandidate:
     hostname: str
     identity_match_method: str
     sale_signal: bool
+    inventory_signal: bool
     liquidation_signal: bool
     known_sale_channel_domain: bool
     manual_only_restricted_source: bool
@@ -159,6 +165,7 @@ class SaleChannelCandidate:
             "hostname": self.hostname,
             "identity_match_method": self.identity_match_method,
             "sale_signal": self.sale_signal,
+            "inventory_signal": self.inventory_signal,
             "liquidation_signal": self.liquidation_signal,
             "known_sale_channel_domain": self.known_sale_channel_domain,
             "manual_only_restricted_source": self.manual_only_restricted_source,
@@ -260,11 +267,12 @@ def classify_search_hit(
 
     signal_corpus = _compact(f"{hit.title} {hit.description}")
     sale_signal = bool(_SALE_SIGNAL.search(signal_corpus))
+    inventory_signal = bool(_INVENTORY_SIGNAL.search(signal_corpus))
     liquidation_signal = bool(_LIQUIDATION_SIGNAL.search(signal_corpus))
     known_channel = hostname in _KNOWN_SALE_CHANNEL_DOMAINS
     restricted = hostname in _RESTRICTED_MANUAL_DOMAINS
 
-    if sale_signal or known_channel or restricted:
+    if inventory_signal and (sale_signal or known_channel or restricted):
         state = "SALE_LISTING_CANDIDATE_REQUIRES_PAGE_VERIFICATION"
     elif liquidation_signal:
         state = "LIQUIDATION_CHANNEL_CANDIDATE_REQUIRES_PAGE_VERIFICATION"
@@ -280,6 +288,7 @@ def classify_search_hit(
         hostname=hostname,
         identity_match_method=method,
         sale_signal=sale_signal,
+        inventory_signal=inventory_signal,
         liquidation_signal=liquidation_signal,
         known_sale_channel_domain=known_channel,
         manual_only_restricted_source=restricted,
