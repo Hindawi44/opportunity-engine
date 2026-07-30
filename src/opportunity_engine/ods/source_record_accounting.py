@@ -88,10 +88,10 @@ def build_source_record_accounting(
 ) -> dict[str, object]:
     """Build exact fetched/published/excluded accounting by source.
 
-    Published records are the primary source documents backing rows that reached the
-    daily dashboard. Unsupported records, extractor duplicates, cross-source merged
-    duplicates, and records removed by the daily report limit are persisted with
-    their original source document identifiers.
+    Published records retain both the raw source-document id and the normalized
+    opportunity id used by downstream audit channels. This mapping lets the final
+    verifier distinguish a daily Auksjonen record from an unrelated Auksjonen hit
+    discovered through another channel.
     """
     documents = tuple(source_documents)
     extracted_items = tuple(extracted)
@@ -116,10 +116,11 @@ def build_source_record_accounting(
             if key != primary:
                 secondary_merged_keys.add(key)
 
+    published_items = [
+        item for item in merged_items if item.opportunity_id in published_ids
+    ]
     published_primary_keys = {
-        (item.source_name, item.source_document_id)
-        for item in merged_items
-        if item.opportunity_id in published_ids
+        (item.source_name, item.source_document_id) for item in published_items
     }
 
     exclusions_by_source: dict[str, list[dict[str, str]]] = {}
@@ -182,15 +183,31 @@ def build_source_record_accounting(
             document.document_id
         )
 
-    published_by_source: dict[str, list[str]] = {}
-    for source_name, record_id in sorted(published_primary_keys):
-        published_by_source.setdefault(source_name, []).append(record_id)
+    published_records_by_source: dict[str, list[dict[str, str]]] = {}
+    for item in sorted(
+        published_items,
+        key=lambda value: (
+            value.source_name,
+            value.source_document_id,
+            value.opportunity_id,
+        ),
+    ):
+        published_records_by_source.setdefault(item.source_name, []).append(
+            {
+                "record_id": item.source_document_id,
+                "opportunity_id": item.opportunity_id,
+            }
+        )
 
     sources: dict[str, dict[str, object]] = {}
     valid = True
     for source_name in sorted(fetched_by_source):
         fetched_ids = fetched_by_source[source_name]
-        published_record_ids = published_by_source.get(source_name, [])
+        published_records = published_records_by_source.get(source_name, [])
+        published_record_ids = [item["record_id"] for item in published_records]
+        published_opportunity_ids_for_source = [
+            item["opportunity_id"] for item in published_records
+        ]
         exclusions = exclusions_by_source.get(source_name, [])
         reason_counts = Counter(item["reason"] for item in exclusions)
         accounted_total = len(published_record_ids) + len(exclusions)
@@ -201,6 +218,8 @@ def build_source_record_accounting(
             "fetched_record_ids": fetched_ids,
             "published_audit_record_count": len(published_record_ids),
             "published_audit_record_ids": published_record_ids,
+            "published_audit_opportunity_ids": published_opportunity_ids_for_source,
+            "published_audit_records": published_records,
             "excluded_record_count": len(exclusions),
             "excluded_records_by_reason": dict(sorted(reason_counts.items())),
             "excluded_records": exclusions,
@@ -209,7 +228,7 @@ def build_source_record_accounting(
         }
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "valid": valid,
         "sources": sources,
     }
