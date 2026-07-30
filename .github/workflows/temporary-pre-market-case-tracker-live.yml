@@ -38,23 +38,29 @@ jobs:
           python scripts/run_pre_market_sale_channel_search.py --estate-orgnr 937884796 --freshness py --results-per-query 10 --output-dir artifacts/sale-channel/mark-and-brandy
           python scripts/run_pre_market_sale_channel_search.py --estate-orgnr 938108897 --freshness py --results-per-query 10 --output-dir artifacts/sale-channel/cheermania
 
-      - name: Build persistent case registry
+      - name: Build registry and repeat identical observation
         run: |
           set -euo pipefail
-          python scripts/run_pre_market_case_tracker.py \
-            --sale-channel-report artifacts/sale-channel/menswear/sale-channel-search.json \
-            --sale-channel-report artifacts/sale-channel/keepfit/sale-channel-search.json \
-            --sale-channel-report artifacts/sale-channel/birkhans/sale-channel-search.json \
-            --sale-channel-report artifacts/sale-channel/mark-and-brandy/sale-channel-search.json \
-            --sale-channel-report artifacts/sale-channel/cheermania/sale-channel-search.json \
-            --output-dir artifacts/pre-market-case-tracker
-          cat artifacts/pre-market-case-tracker/operator-summary.txt
+          REPORT_ARGS="--sale-channel-report artifacts/sale-channel/menswear/sale-channel-search.json --sale-channel-report artifacts/sale-channel/keepfit/sale-channel-search.json --sale-channel-report artifacts/sale-channel/birkhans/sale-channel-search.json --sale-channel-report artifacts/sale-channel/mark-and-brandy/sale-channel-search.json --sale-channel-report artifacts/sale-channel/cheermania/sale-channel-search.json"
+          python scripts/run_pre_market_case_tracker.py ${REPORT_ARGS} --output-dir artifacts/tracker-first
+          python scripts/run_pre_market_case_tracker.py ${REPORT_ARGS} --previous-registry artifacts/tracker-first/pre-market-cases.json --output-dir artifacts/tracker-second
+          cat artifacts/tracker-first/operator-summary.txt
+          cat artifacts/tracker-second/operator-summary.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          changes = json.loads(Path('artifacts/tracker-second/pre-market-case-changes.json').read_text())
+          alerts = json.loads(Path('artifacts/tracker-second/sale-channel-alerts.json').read_text())
+          assert changes == [], changes
+          assert alerts == [], alerts
+          PY
 
       - name: Upload validation artifacts
         uses: actions/upload-artifact@v4
         with:
           name: pre-market-case-tracker-live-validation
           path: |
-            artifacts/pre-market-case-tracker
+            artifacts/tracker-first
+            artifacts/tracker-second
             artifacts/sale-channel
           if-no-files-found: error
