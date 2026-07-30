@@ -1,0 +1,76 @@
+name: Temporary Market Price Budget Live Validation
+
+on:
+  push:
+    branches:
+      - fix/market-price-query-budget
+
+permissions:
+  contents: read
+
+jobs:
+  live-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/market-price-query-budget
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run bounded market-price discovery
+        run: |
+          mkdir -p artifacts/market-price-budget-validation
+          python scripts/collect_market_price_candidates.py \
+            --queue data/opportunity_review_queue.json \
+            --output artifacts/market-price-budget-validation/market_price_candidates.json \
+            --limit 5 \
+            --results-per-query 10
+      - name: Verify budget and error invariants
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("artifacts/market-price-budget-validation/market_price_candidates.json")
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          budget = int(payload["request_budget"])
+          planned = int(payload["planned_request_count"])
+          made = int(payload["requests_made"])
+          errors = payload.get("errors", {})
+          opportunities = int(payload["opportunity_count"])
+
+          assert budget == 8, payload
+          assert 0 < opportunities <= 5, payload
+          assert 0 < planned <= budget, payload
+          assert 0 <= made <= budget, payload
+          assert errors == {}, payload
+
+          summary = {
+              "opportunity_count": opportunities,
+              "request_budget": budget,
+              "planned_request_count": planned,
+              "requests_made": made,
+              "error_count": len(errors),
+              "candidate_count": payload.get("candidate_count"),
+              "rejected_candidate_count": payload.get("rejected_candidate_count"),
+              "query_budget_exhausted": payload.get("query_budget_exhausted"),
+          }
+          Path("artifacts/market-price-budget-validation/summary.json").write_text(
+              json.dumps(summary, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(summary, sort_keys=True))
+          PY
+      - name: Upload live validation audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-price-budget-live-validation-${{ github.run_id }}
+          path: artifacts/market-price-budget-validation
+          retention-days: 30
+          if-no-files-found: error
