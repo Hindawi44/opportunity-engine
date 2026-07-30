@@ -70,7 +70,7 @@ def main() -> int:
             return audit_exit
         exclusion_accounting_exit = run([
             sys.executable,
-            "scripts/verify_cross_source_exclusion_accounting.py",
+            "scripts/verify_cross_source_record_accounting.py",
             "--audit", "data/cross_source_deduplication_audit.json",
             "--source-funnel", "data/source_funnel.json",
             "--daily", "data/todays_opportunities.json",

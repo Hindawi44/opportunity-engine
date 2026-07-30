@@ -3,6 +3,8 @@
 
 Bankruptcy records are leads for follow-up, not sale listings. They never compete
 with priced auction listings and never receive invented prices, profit or ROI.
+The bankruptcy channel reuses the exact daily source snapshot and never refetches
+the source during the same pipeline run.
 """
 
 from __future__ import annotations
@@ -13,7 +15,8 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from opportunity_engine.ods.konkurs_app import KonkursAppPublicApiClient
+from opportunity_engine.ods.live_data import SourceDocument
+from opportunity_engine.ods.source_record_accounting import deserialize_source_document
 
 
 LEAD_TERMS = {
@@ -66,6 +69,21 @@ def _lead_score(title: str, description: str, metadata: dict[str, object]) -> tu
     return min(score, 100), reasons
 
 
+def _load_snapshot_documents(path: Path) -> tuple[SourceDocument, ...]:
+    if not path.is_file():
+        raise SystemExit(f"Missing daily snapshot: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    records = payload.get("bankruptcy_discovery_records", [])
+    if not isinstance(records, list):
+        raise SystemExit("bankruptcy_discovery_records must be a list")
+    documents: list[SourceDocument] = []
+    for item in records:
+        if not isinstance(item, dict):
+            continue
+        documents.append(deserialize_source_document(item))
+    return tuple(documents)
+
+
 def _serialize_lead(document) -> dict[str, object]:
     metadata = dict(document.metadata)
     description = str(metadata.get("description") or document.text or "").strip()
@@ -103,9 +121,9 @@ def build_payload(actionable_payload: dict[str, object], documents, limit: int =
     top_leads = leads[: max(1, limit)]
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "method": "sale listings and bankruptcy discovery leads are ranked in separate channels; no financial values are invented",
+        "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
         "actionable_opportunities": {
             "candidate_count": actionable_payload.get("candidate_count", len(actionable)),
             "top_count": len(actionable),
@@ -122,19 +140,23 @@ def build_payload(actionable_payload: dict[str, object], documents, limit: int =
             "bankruptcy_leads_fetched": len(leads),
             "bankruptcy_leads_selected": len(top_leads),
         },
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase": False,
     }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--actionable", default="data/top5_opportunities.json")
+    parser.add_argument("--snapshot", default="data/todays_opportunities.json")
     parser.add_argument("--output", default="data/opportunity_channels.json")
     parser.add_argument("--limit", type=int, default=5)
     args = parser.parse_args()
 
     actionable_path = Path(args.actionable)
     actionable_payload = json.loads(actionable_path.read_text(encoding="utf-8")) if actionable_path.exists() else {}
-    documents = KonkursAppPublicApiClient(page_size=25).fetch()
+    documents = _load_snapshot_documents(Path(args.snapshot))
     payload = build_payload(actionable_payload, documents, limit=args.limit)
 
     output = Path(args.output)

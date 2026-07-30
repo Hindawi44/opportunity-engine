@@ -17,8 +17,14 @@ from opportunity_engine.ods.finn import FinnApiClient
 from opportunity_engine.ods.konkurs_app import KonkursAppFeedClient, KonkursAppPublicApiClient
 from opportunity_engine.ods.konkurskupp import KonkurskuppFeedClient
 from opportunity_engine.ods.market_pricing import MarketComparable
+from opportunity_engine.ods.multi_source import UnifiedMultiSourceEngine
 from opportunity_engine.ods.real_cost import RealCostInputs
 from opportunity_engine.ods.snapshot_alerts import SnapshotAlertProcessor
+from opportunity_engine.ods.source_record_accounting import (
+    build_source_record_accounting,
+    serialize_bankruptcy_discovery_records,
+)
+from opportunity_engine.ods.unified_opportunity import UnifiedOpportunityExtractor
 
 DEFAULT_AUKSJONEN_DISCOVERY_PATHS = (
     "/auksjoner/torget/vareparti-og-konkursbo",
@@ -57,6 +63,22 @@ class TargetedFinnClient:
         if keyword and keyword.strip():
             return self.client.search(keyword=keyword, rows=rows)
         return self.client.search_targeted_business_listings(rows_per_query=self.rows_per_query)
+
+
+class RecordingClient:
+    """Record the exact documents returned by one source without changing behavior."""
+
+    def __init__(self, client) -> None:
+        self.client = client
+        self.documents = ()
+
+    def search(self, *args, **kwargs):
+        self.documents = tuple(self.client.search(*args, **kwargs))
+        return self.documents
+
+    def fetch(self, *args, **kwargs):
+        self.documents = tuple(self.client.fetch(*args, **kwargs))
+        return self.documents
 
 
 def _load_verified_inputs(path: str | None):
@@ -119,6 +141,47 @@ def _konkurs_app_client_from_environment() -> KonkursAppFeedClient | KonkursAppP
     return KonkursAppPublicApiClient(page_size=page_size)
 
 
+def _record(client, recorders: list[RecordingClient]):
+    if client is None:
+        return None
+    recorder = RecordingClient(client)
+    recorders.append(recorder)
+    return recorder
+
+
+def _persist_source_accounting(
+    output_path: str,
+    source_documents,
+) -> dict[str, object]:
+    path = Path(output_path)
+    snapshot = json.loads(path.read_text(encoding="utf-8"))
+    extractor = UnifiedOpportunityExtractor()
+    extracted = extractor.extract(source_documents)
+    merged = UnifiedMultiSourceEngine().merge(extracted).opportunities
+    rows = snapshot.get("rows", [])
+    published_ids = [
+        str(row.get("opportunity_id") or "").strip()
+        for row in rows
+        if isinstance(row, dict) and row.get("opportunity_id")
+    ] if isinstance(rows, list) else []
+
+    snapshot["schema_version"] = max(int(snapshot.get("schema_version", 0) or 0), 12)
+    snapshot["source_record_accounting"] = build_source_record_accounting(
+        source_documents,
+        extracted,
+        merged,
+        published_ids,
+    )
+    snapshot["bankruptcy_discovery_records"] = (
+        serialize_bankruptcy_discovery_records(source_documents)
+    )
+    path.write_text(
+        json.dumps(snapshot, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return snapshot
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate today's opportunity dashboard snapshot")
     parser.add_argument("--keyword", default=None, help="Optional source search keyword")
@@ -135,12 +198,13 @@ def main() -> int:
     args = parser.parse_args()
 
     comparables, costs = _load_verified_inputs(args.verified_inputs)
+    recorders: list[RecordingClient] = []
     result = AutomatedDailyPipeline(
-        client=TargetedAuksjonenClient(),
-        finn_client=_finn_client_from_environment(),
-        konkurskupp_client=_konkurskupp_client_from_environment(),
-        bjaroy_client=_bjaroy_client_from_environment(),
-        konkurs_app_client=_konkurs_app_client_from_environment(),
+        client=_record(TargetedAuksjonenClient(), recorders),
+        finn_client=_record(_finn_client_from_environment(), recorders),
+        konkurskupp_client=_record(_konkurskupp_client_from_environment(), recorders),
+        bjaroy_client=_record(_bjaroy_client_from_environment(), recorders),
+        konkurs_app_client=_record(_konkurs_app_client_from_environment(), recorders),
     ).run(
         DailyPipelineConfig(
             keyword=args.keyword,
@@ -151,8 +215,13 @@ def main() -> int:
         comparables_by_id=comparables,
         costs_by_id=costs,
     )
+    source_documents = tuple(
+        document
+        for recorder in recorders
+        for document in recorder.documents
+    )
+    snapshot = _persist_source_accounting(args.output, source_documents)
     alerts = SnapshotAlertProcessor().process(args.output, args.alerts_output)
-    snapshot = json.loads(Path(args.output).read_text(encoding="utf-8"))
     investment_sync = InvestmentFileSynchronizer(args.investment_files_dir).sync_payload(snapshot)
     response = {
         **result.__dict__,
@@ -162,6 +231,9 @@ def main() -> int:
         "investment_files_created": investment_sync.created_count,
         "investment_files_updated": investment_sync.updated_count,
         "investment_files_unchanged": investment_sync.unchanged_count,
+        "source_record_accounting_valid": bool(
+            snapshot.get("source_record_accounting", {}).get("valid")
+        ),
     }
     print(json.dumps(response, ensure_ascii=False, sort_keys=True))
     return 0
