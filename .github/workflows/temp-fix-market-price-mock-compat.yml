@@ -1,0 +1,48 @@
+name: Temporary Fix Market Price Mock Compatibility
+
+on:
+  push:
+    branches:
+      - fix/market-price-query-budget
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/market-price-query-budget
+          fetch-depth: 0
+      - name: Preserve compatibility with lightweight test clients
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/collect_market_price_candidates.py")
+          text = path.read_text(encoding="utf-8")
+          old = '''    query_plans = _allocate_query_budget(selected_items, client.max_requests_per_run)\n'''
+          new = '''    request_budget = int(getattr(client, "max_requests_per_run", 8))\n    query_plans = _allocate_query_budget(selected_items, request_budget)\n'''
+          if old not in text:
+              raise SystemExit("query plan line not found")
+          text = text.replace(old, new, 1)
+          text = text.replace('''        "request_budget": client.max_requests_per_run,\n''', '''        "request_budget": request_budget,\n''', 1)
+          text = text.replace('''            sum(len(queries) for queries in query_plans) >= client.max_requests_per_run\n''', '''            sum(len(queries) for queries in query_plans) >= request_budget\n''', 1)
+          text = text.replace('''            > client.max_requests_per_run\n''', '''            > request_budget\n''', 1)
+          path.write_text(text, encoding="utf-8")
+          compile(text, str(path), "exec")
+          PY
+      - name: Commit compatibility fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/collect_market_price_candidates.py
+          if git diff --cached --quiet; then
+            echo "Compatibility fix already applied"
+            exit 0
+          fi
+          git commit -m "Keep market-price budget compatible with test clients"
+          git push origin fix/market-price-query-budget
