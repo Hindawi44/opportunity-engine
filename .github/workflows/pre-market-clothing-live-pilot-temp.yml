@@ -1,0 +1,40 @@
+name: Temporary Pre-Market Clothing Live Pilot
+
+on:
+  push:
+    branches:
+      - feat/pre-market-clothing-leads-pilot
+
+permissions:
+  contents: read
+
+jobs:
+  live-pilot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out pilot branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run bounded live pre-market pilot
+        env:
+          PYTHONPATH: src
+        run: |
+          python scripts/run_pre_market_clothing_leads.py \
+            --lookback-days 365 \
+            --page-size 50 \
+            --review-limit 5 \
+            --output-dir artifacts/pre-market-clothing-leads
+          cat artifacts/pre-market-clothing-leads/operator-summary.txt
+
+      - name: Upload bounded pilot artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-market-clothing-live-pilot
+          path: artifacts/pre-market-clothing-leads
+          if-no-files-found: error
