@@ -1,14 +1,13 @@
 """Targeted public-web search for sale listings and liquidation channels.
 
 The search starts from one manually selected, already-enriched bankruptcy estate.
-It uses exact company identities to find public candidate pages that may disclose
-an inventory sale, auction, liquidator, or sale agent. Search snippets are only
-candidate evidence: they never confirm a sale, inventory availability, or a
-liquidation-channel relationship.
+It uses exact company identities to find candidate pages that may disclose an
+inventory sale, auction, liquidator, or sale agent. Search snippets are candidate
+evidence only; they never confirm a sale or liquidation mandate.
 
-FINN results are retained for manual review only and are never opened by this
-module. No login, contact, bid, purchase, reservation, payment, or automatic
-investment decision is performed.
+FINN results are retained for manual review only and are never opened here. No
+login, contact, bid, purchase, reservation, payment, or automatic investment
+decision is performed.
 """
 from __future__ import annotations
 
@@ -53,8 +52,8 @@ _KNOWN_SALE_CHANNEL_DOMAINS = frozenset(
 )
 _SALE_SIGNAL = re.compile(
     r"\b(auksjon|auksjoner|selges|salg|bud|budrunde|vareparti|restlager|"
-    r"varelager|lagerbeholdning|konkursbo|opphørssalg|avviklingssalg|"
-    r"tømmesalg|parti\s+med\s+klær|kleslager)\b",
+    r"varelager|lagerbeholdning|opphørssalg|avviklingssalg|tømmesalg|"
+    r"parti\s+med\s+klær|kleslager)\b",
     re.I,
 )
 _LIQUIDATION_SIGNAL = re.compile(
@@ -93,13 +92,14 @@ def _quoted(value: str) -> str:
 def build_sale_channel_queries(
     enrichment: EstateManagerEnrichment,
 ) -> tuple[str, ...]:
-    """Build a bounded exact-identity query pack for one reviewed estate."""
+    """Build five exact-identity queries for one reviewed estate."""
     debtor = _quoted(enrichment.debtor_name)
     estate = _quoted(enrichment.estate_name)
     debtor_orgnr = _quoted(enrichment.debtor_orgnr)
     estate_orgnr = _quoted(enrichment.estate_orgnr)
     return (
-        f"{debtor} (konkursbo OR varelager OR vareparti OR restlager OR auksjon OR selges)",
+        f"{debtor} (konkursbo OR varelager OR vareparti OR restlager OR "
+        "auksjon OR selges)",
         f"{estate} (salg OR auksjon OR vareparti OR varelager)",
         f"{debtor_orgnr} OR {estate_orgnr}",
         f'{debtor} (bostyrer OR boet OR avvikling OR "på vegne av")',
@@ -123,13 +123,13 @@ def _identity_match(
     if enrichment.estate_orgnr in digits or enrichment.debtor_orgnr in digits:
         return True, "EXACT_ORGANISATION_NUMBER"
 
-    normalized_corpus = normalize_entity_name(corpus)
+    normalized = normalize_entity_name(corpus)
     names = {
         normalize_entity_name(enrichment.debtor_name),
         normalize_entity_name(enrichment.estate_name),
     }
     names.discard("")
-    if any(name and name in normalized_corpus for name in names):
+    if any(name in normalized for name in names):
         return True, "EXACT_NORMALIZED_COMPANY_NAME"
     return False, "NONE"
 
@@ -196,18 +196,18 @@ class SaleChannelSearchResult:
     @property
     def sale_listing_candidates(self) -> tuple[SaleChannelCandidate, ...]:
         return tuple(
-            candidate
-            for candidate in self.candidates
-            if candidate.candidate_state
+            item
+            for item in self.candidates
+            if item.candidate_state
             == "SALE_LISTING_CANDIDATE_REQUIRES_PAGE_VERIFICATION"
         )
 
     @property
     def liquidation_channel_candidates(self) -> tuple[SaleChannelCandidate, ...]:
         return tuple(
-            candidate
-            for candidate in self.candidates
-            if candidate.candidate_state
+            item
+            for item in self.candidates
+            if item.candidate_state
             == "LIQUIDATION_CHANNEL_CANDIDATE_REQUIRES_PAGE_VERIFICATION"
         )
 
@@ -229,7 +229,7 @@ class SaleChannelSearchResult:
                 self.liquidation_channel_candidates
             ),
             "scan_complete": self.scan_complete,
-            "candidates": [candidate.to_dict() for candidate in self.candidates],
+            "candidates": [item.to_dict() for item in self.candidates],
             "errors": list(self.errors),
             "search_snippets_confirm_sale": False,
             "public_sale_found": False,
@@ -252,13 +252,15 @@ def classify_search_hit(
     hostname = _hostname(hit.url)
     if hostname is None:
         return None
-    corpus = _compact(f"{hit.title} {hit.description} {hit.url}")
-    identity_matched, method = _identity_match(corpus, enrichment)
-    if not identity_matched:
+
+    identity_corpus = _compact(f"{hit.title} {hit.description} {hit.url}")
+    matched, method = _identity_match(identity_corpus, enrichment)
+    if not matched:
         return None
 
-    sale_signal = bool(_SALE_SIGNAL.search(corpus))
-    liquidation_signal = bool(_LIQUIDATION_SIGNAL.search(corpus))
+    signal_corpus = _compact(f"{hit.title} {hit.description}")
+    sale_signal = bool(_SALE_SIGNAL.search(signal_corpus))
+    liquidation_signal = bool(_LIQUIDATION_SIGNAL.search(signal_corpus))
     known_channel = hostname in _KNOWN_SALE_CHANNEL_DOMAINS
     restricted = hostname in _RESTRICTED_MANUAL_DOMAINS
 
@@ -295,12 +297,13 @@ def run_sale_channel_search(
         raise ValueError(
             f"results_per_query must be between 1 and {MAX_RESULTS_PER_QUERY}"
         )
+
     queries = build_sale_channel_queries(enrichment)
     if len(queries) > MAX_QUERY_COUNT:
-        raise RuntimeError("query pack exceeds the approved bounded request budget")
+        raise RuntimeError("query pack exceeds the approved request budget")
 
     errors: list[dict[str, str]] = []
-    candidates_by_url: dict[str, SaleChannelCandidate] = {}
+    by_url: dict[str, SaleChannelCandidate] = {}
     requests_made = 0
     raw_hits = 0
 
@@ -320,28 +323,30 @@ def run_sale_channel_search(
                 )
                 if candidate is None:
                     continue
-                existing = candidates_by_url.get(candidate.url)
+                existing = by_url.get(candidate.url)
                 if existing is None or (
                     existing.candidate_state == "IDENTITY_REFERENCE_ONLY"
                     and candidate.candidate_state != "IDENTITY_REFERENCE_ONLY"
                 ):
-                    candidates_by_url[candidate.url] = candidate
+                    by_url[candidate.url] = candidate
         except Exception as exc:
             errors.append({"query": query, "error": str(exc)})
 
-    state_rank = {
+    rank = {
         "SALE_LISTING_CANDIDATE_REQUIRES_PAGE_VERIFICATION": 0,
         "LIQUIDATION_CHANNEL_CANDIDATE_REQUIRES_PAGE_VERIFICATION": 1,
         "IDENTITY_REFERENCE_ONLY": 2,
     }
     candidates = tuple(
         sorted(
-            candidates_by_url.values(),
-            key=lambda candidate: (
-                state_rank[candidate.candidate_state],
-                0 if candidate.identity_match_method == "EXACT_ORGANISATION_NUMBER" else 1,
-                candidate.hostname,
-                candidate.url,
+            by_url.values(),
+            key=lambda item: (
+                rank[item.candidate_state],
+                0
+                if item.identity_match_method == "EXACT_ORGANISATION_NUMBER"
+                else 1,
+                item.hostname,
+                item.url,
             ),
         )
     )
@@ -374,7 +379,7 @@ def write_sale_channel_artifacts(
     )
     sale_path.write_text(
         json.dumps(
-            [candidate.to_dict() for candidate in result.sale_listing_candidates],
+            [item.to_dict() for item in result.sale_listing_candidates],
             ensure_ascii=False,
             indent=2,
         )
@@ -383,10 +388,7 @@ def write_sale_channel_artifacts(
     )
     liquidator_path.write_text(
         json.dumps(
-            [
-                candidate.to_dict()
-                for candidate in result.liquidation_channel_candidates
-            ],
+            [item.to_dict() for item in result.liquidation_channel_candidates],
             ensure_ascii=False,
             indent=2,
         )
@@ -415,16 +417,16 @@ def write_sale_channel_artifacts(
         "Automatic page open/contact/bid/purchase/payment: false",
         "",
     ]
-    review_candidates = (
+    review = (
         *result.sale_listing_candidates,
         *result.liquidation_channel_candidates,
     )
-    if review_candidates:
+    if review:
         lines.append("Highest-priority candidates requiring page verification:")
-        for candidate in review_candidates[:10]:
+        for item in review[:10]:
             lines.append(
-                f"- {candidate.candidate_state} | {candidate.title} | "
-                f"{candidate.hostname} | {candidate.url}"
+                f"- {item.candidate_state} | {item.title} | "
+                f"{item.hostname} | {item.url}"
             )
     else:
         lines.append("No sale-listing or liquidation-channel candidate was found.")
