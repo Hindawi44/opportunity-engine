@@ -1,0 +1,12 @@
+{
+  "automated_pipeline_status": "FAILED",
+  "failed_stage": "complete_sources_decisions_actions_learning",
+  "pipeline_run_status": "SUCCESS",
+  "pipeline_step_outcome": "failure",
+  "schema_version": 1,
+  "verification_step_outcome": "skipped",
+  "verified_source_record_accounting": {},
+  "verified_source_record_accounting_valid": null,
+  "workflow_run_id": "30560443759",
+  "workflow_sha": "a8d3e638d6bad599fb648cfb6ba74beb5f32f5aa"
+}
