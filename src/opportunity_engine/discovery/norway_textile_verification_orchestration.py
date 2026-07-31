@@ -12,6 +12,9 @@ from opportunity_engine.discovery.norway_textile_page_verification import (
     evaluate_norway_textile_page_verification,
 )
 
+_AUKSJONEN_CLOTHING_CATEGORY_PROVIDER = "Auksjonen Current Category"
+_AUKSJONEN_CLOTHING_CATEGORY = "CLOTHING_INVENTORY"
+
 
 def _query_category_map() -> dict[str, str]:
     return {
@@ -24,6 +27,16 @@ def _candidate_category(
     candidate: Mapping[str, Any],
     categories_by_query: Mapping[str, str],
 ) -> tuple[str | None, str | None]:
+    providers = candidate.get("source_providers")
+    if (
+        isinstance(providers, list)
+        and _AUKSJONEN_CLOTHING_CATEGORY_PROVIDER in providers
+    ):
+        # These candidates come from the one approved Klær/Arbeidsklær category.
+        # Their provenance is more specific than the machinery-oriented query used
+        # to trigger bounded Auksjonen collection.
+        return _AUKSJONEN_CLOTHING_CATEGORY, None
+
     query_ids = candidate.get("found_by_queries")
     if not isinstance(query_ids, list):
         return None, "candidate has no traceable query IDs"
