@@ -39,14 +39,18 @@ def main() -> int:
     )
     temporary.replace(output)
 
-    readiness = snapshot["matching_readiness"]
+    stages = snapshot["readiness_stages"]
+    qualification = stages["personal_qualification"]
     print(
         json.dumps(
             {
                 "output": str(output),
                 "profile_id": snapshot["profile_id"],
-                "matching_status": readiness["status"],
-                "missing_required_constraints": readiness[
+                "discovery_status": stages["discovery"]["status"],
+                "cost_estimation_status": stages["cost_estimation"]["status"],
+                "personal_qualification_status": qualification["status"],
+                "matching_status": qualification["status"],
+                "missing_required_constraints": qualification[
                     "missing_required_constraints"
                 ],
             },
