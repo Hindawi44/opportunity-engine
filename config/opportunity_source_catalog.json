@@ -16,7 +16,7 @@
       "access_mode": "public_category_pages",
       "status": "active",
       "priority": 1,
-      "targets": ["bankruptcy_lots", "surplus_goods", "shop_fittings", "office_furniture", "warehouse_stock"]
+      "targets": ["bankruptcy_lots", "surplus_goods", "shop_fittings", "clothing_shop_fixtures", "office_furniture", "warehouse_stock"]
     },
     {
       "id": "finn_no",
@@ -27,7 +27,7 @@
       "status": "configuration_required",
       "priority": 1,
       "required_configuration": ["FINN_API_KEY", "FINN_ORG_ID"],
-      "targets": ["shop_fittings", "business_inventory", "textiles", "sewing_equipment", "office_furniture"]
+      "targets": ["shop_fittings", "clothing_shop_fixtures", "business_inventory", "textiles", "sewing_equipment", "office_furniture"]
     },
     {
       "id": "konkurskupp",
@@ -38,7 +38,7 @@
       "status": "configuration_required",
       "priority": 1,
       "required_configuration": ["KONKURSKUPP_FEED_URL"],
-      "targets": ["bankruptcy_lots", "company_inventory", "shop_fittings"]
+      "targets": ["bankruptcy_lots", "company_inventory", "shop_fittings", "clothing_shop_fixtures"]
     },
     {
       "id": "konkurs_app",

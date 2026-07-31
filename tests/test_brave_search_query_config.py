@@ -31,3 +31,5 @@ def test_clothing_inventory_queries_are_prioritized() -> None:
     assert any("tekstil" in query for query in queries)
     assert any("opphørssalg" in query for query in queries)
     assert any("varelager konkursbo" in query for query in queries)
+    assert any("butikkinnredning klesbutikk" in query for query in queries)
+    assert any("klesstativ" in query and "utstillingsdukker" in query for query in queries)

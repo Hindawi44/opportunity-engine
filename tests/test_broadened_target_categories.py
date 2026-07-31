@@ -53,6 +53,23 @@ def test_accepts_textile_and_sewing_categories(tmp_path: Path) -> None:
     assert {item["opportunity_id"] for item in payload["queue"]} == {"textile", "sewing"}
 
 
+def test_accepts_clothing_shop_fixture_terms(tmp_path: Path) -> None:
+    payload = _run(
+        tmp_path,
+        [
+            {"opportunity_id": "rack", "title": "Klesoppheng fra butikk", "asking_price_nok": 700},
+            {
+                "opportunity_id": "display",
+                "title": "Utstillingsdukker og klesstativ",
+                "asking_price_nok": 1200,
+            },
+        ],
+    )
+
+    assert payload["selected_count"] == 2
+    assert {item["opportunity_id"] for item in payload["queue"]} == {"rack", "display"}
+
+
 def test_still_excludes_vehicles_and_unrelated_goods(tmp_path: Path) -> None:
     payload = _run(
         tmp_path,

@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs, urlparse
+
 from opportunity_engine.ods import FinnApiClient, FinnConnector, ODSRequest, parse_finn_atom_feed
 
 
@@ -11,6 +13,31 @@ ATOM = b'''<?xml version="1.0" encoding="UTF-8"?>
     <link rel="self" href="https://api.finn.no/iad/ad/bap/123456789" />
   </entry>
 </feed>'''
+
+EMPTY_ATOM = b'''<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"></feed>'''
+
+FIXTURE_ATOM = '''<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <id>urn:finn:ad:222333444</id>
+    <title>Butikkinnredning for klær og sko</title>
+    <summary>&lt;p&gt;Klesstativ, prøverom og utstillingsdukker selges.&lt;/p&gt;</summary>
+    <updated>2026-07-31T07:00:00Z</updated>
+    <link rel="self" href="https://www.finn.no/bap/forsale/ad.html?finnkode=222333444" />
+  </entry>
+</feed>'''.encode("utf-8")
+
+CONSUMER_CLOTHING_ATOM = '''<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <id>urn:finn:ad:555666777</id>
+    <title>Dameklær og sko</title>
+    <summary>&lt;p&gt;Private klær selges samlet.&lt;/p&gt;</summary>
+    <updated>2026-07-31T07:05:00Z</updated>
+    <link rel="self" href="https://www.finn.no/bap/forsale/ad.html?finnkode=555666777" />
+  </entry>
+</feed>'''.encode("utf-8")
 
 
 def test_parse_finn_atom_feed_normalizes_advert():
@@ -62,6 +89,27 @@ def test_connector_uses_request_subject():
     connector = FinnConnector(client=Client(), rows=10)
     assert connector.fetch(ODSRequest(subject="butikkinnredning", country="Norway")) == ()
     assert keywords == [("butikkinnredning", 10)]
+
+
+def test_targeted_business_search_prioritizes_clothing_shop_fixtures():
+    calls = []
+
+    def transport(url: str, timeout: float, headers: dict[str, str]) -> bytes:
+        keyword = parse_qs(urlparse(url).query).get("q", [""])[0]
+        calls.append(keyword)
+        if keyword == "butikkinnredning klesbutikk":
+            return FIXTURE_ATOM
+        if keyword == "tekstil":
+            return CONSUMER_CLOTHING_ATOM
+        return EMPTY_ATOM
+
+    client = FinnApiClient(api_key="secret", org_id="partner-42", transport=transport)
+    documents = client.search_targeted_business_listings(rows_per_query=10)
+
+    assert "butikkinnredning klesbutikk" in calls
+    assert "klesstativ butikk" in calls
+    assert [document.document_id for document in documents] == ["finn-222333444"]
+    assert documents[0].metadata["discovery_query"] == "butikkinnredning klesbutikk"
 
 
 def test_client_rejects_missing_authorization_and_invalid_limits():

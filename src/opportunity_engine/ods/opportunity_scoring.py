@@ -99,6 +99,7 @@ class OpportunityScoringEngine:
         text = f"{opportunity.title} {opportunity.description}".casefold()
         easy = (
             "kontorstol", "kontormøbel", "butikkinnredning", "hylle", "verktøy",
+            "klesstativ", "klesoppheng", "utstillingsdukke", "mannekeng",
             "symaskin", "møbel", "lampe", "skjerm", "bord", "stol",
         )
         difficult = (

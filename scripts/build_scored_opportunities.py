@@ -65,6 +65,7 @@ def _marketability(item: dict[str, object]) -> tuple[float, list[str]]:
     text = _text(item)
     easy = (
         "kontorstol", "kontormøbel", "butikkinnredning", "hylle", "verktøy",
+        "klesstativ", "klesoppheng", "utstillingsdukke", "mannekeng",
         "symaskin", "møbel", "lampe", "skjerm", "bord", "stol", "varelager",
     )
     difficult = (

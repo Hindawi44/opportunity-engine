@@ -48,6 +48,22 @@ def test_build_discovery_leads_excludes_irrelevant_vehicle_result():
     assert build_discovery_leads(results) == ()
 
 
+def test_build_discovery_leads_classifies_clothing_shop_fixtures():
+    leads = build_discovery_leads((
+        WebSearchResult(
+            title="Klesoppheng og utstillingsdukker selges",
+            url="https://www.finn.no/recommerce/forsale/item/470000001",
+            snippet="Butikkinnredning fra klesbutikk i Trondheim.",
+            city="Trondheim",
+            price_nok=5000,
+        ),
+    ))
+
+    assert len(leads) == 1
+    assert "clothing_shop_fixtures" in leads[0].categories
+    assert leads[0].priority_score >= 30
+
+
 def test_missing_values_remain_none():
     lead = build_discovery_leads((
         WebSearchResult(
