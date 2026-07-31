@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run bounded source-targeted Clothing Inventory retrieval validation."""
+"""Run bounded source-targeted Norway textile retrieval validation."""
 from __future__ import annotations
 
 import argparse
@@ -17,11 +17,13 @@ from opportunity_engine.discovery.clothing_inventory_search import (
 from opportunity_engine.discovery.early_opportunity_gate import (
     apply_early_opportunity_gate,
 )
+from opportunity_engine.discovery.norway_textile_source_targeted_queries import (
+    NORWAY_TEXTILE_SOURCE_TARGETED_FRESHNESS,
+    NORWAY_TEXTILE_SOURCE_TARGETED_QUERY_BUDGET,
+    select_norway_textile_source_targeted_queries,
+)
 from opportunity_engine.discovery.source_targeted_queries import (
-    SOURCE_TARGETED_FRESHNESS,
-    SOURCE_TARGETED_QUERY_BUDGET,
     SOURCE_TARGETED_REFERENCE_QUERIES,
-    select_source_targeted_queries,
 )
 from opportunity_engine.discovery.source_targeted_retrieval import (
     SourceTargetedSearchProvider,
@@ -36,9 +38,10 @@ def _write_validation_summary(payload: dict, path: Path) -> None:
     required_recovered = payload["required_reference_recovered"]
     advisory_recovered = payload["advisory_references_recovered"]
     lines = [
-        "SOURCE-TARGETED CLOTHING RETRIEVAL",
-        "==================================",
+        "SOURCE-TARGETED NORWAY TEXTILE RETRIEVAL",
+        "========================================",
         f"Status: {payload['validation_status']}",
+        f"Domain: {payload['domain']}",
         f"Freshness: {payload['freshness']}",
         f"Discovery queries: {payload['discovery_queries_submitted']}",
         f"Reference queries: {payload['reference_queries_submitted']}",
@@ -108,13 +111,13 @@ def main() -> int:
     parser.add_argument(
         "--query-budget",
         type=int,
-        default=SOURCE_TARGETED_QUERY_BUDGET,
-        help="Number of source-diverse discovery queries to execute (1-16)",
+        default=NORWAY_TEXTILE_SOURCE_TARGETED_QUERY_BUDGET,
+        help="Number of source-diverse Norway textile queries to execute (1-16)",
     )
     parser.add_argument(
         "--freshness",
         choices=("none", "pd", "pw", "pm", "py"),
-        default=SOURCE_TARGETED_FRESHNESS,
+        default=NORWAY_TEXTILE_SOURCE_TARGETED_FRESHNESS,
         help=(
             "Brave page-age filter. Default 'none' avoids hiding still-active "
             "sales whose pages were indexed more than 31 days ago."
@@ -134,7 +137,9 @@ def main() -> int:
     if not api_key:
         raise SystemExit("BRAVE_SEARCH_API_KEY is required")
 
-    discovery_queries = select_source_targeted_queries(args.query_budget)
+    discovery_queries = select_norway_textile_source_targeted_queries(
+        args.query_budget
+    )
     reference_queries = (
         ()
         if args.skip_reference_checks
@@ -197,6 +202,9 @@ def main() -> int:
 
     report = result["search_run_report"]
     report.update({
+        "domain": "TEXTILE_AND_SEWING",
+        "market_code": "NO",
+        "taxonomy_aware_queries": True,
         "source_targeting_policy_applied": True,
         "source_targeting_query_budget": args.query_budget,
         "source_targeting_request_budget": request_budget,
@@ -219,8 +227,9 @@ def main() -> int:
     artifact_paths = write_discovery_artifacts(result, output_dir)
 
     validation_payload = {
-        "schema_version": "source-targeted-clothing-retrieval-1.2",
-        "domain": "CLOTHING_INVENTORY",
+        "schema_version": "source-targeted-norway-textile-retrieval-1.0",
+        "domain": "TEXTILE_AND_SEWING",
+        "market_code": "NO",
         "executed_at": datetime.now(timezone.utc).isoformat(),
         "validation_status": validation_status,
         "discovery_queries_submitted": len(discovery_queries),
