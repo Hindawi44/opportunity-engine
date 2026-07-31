@@ -1,8 +1,10 @@
 """Apply Norway textile page-verification policy to discovery payloads."""
 from __future__ import annotations
 
+import re
 from copy import deepcopy
 from typing import Any, Mapping
+from urllib.parse import urlparse
 
 from opportunity_engine.discovery.clothing_inventory_search import PageVerification
 from opportunity_engine.discovery.norway_textile_keywords import (
@@ -14,6 +16,8 @@ from opportunity_engine.discovery.norway_textile_page_verification import (
 
 _AUKSJONEN_CLOTHING_CATEGORY_PROVIDER = "Auksjonen Current Category"
 _AUKSJONEN_CLOTHING_CATEGORY = "CLOTHING_INVENTORY"
+_AUKSJONEN_HOSTS = frozenset({"auksjonen.no", "ny.auksjonen.no"})
+_AUKSJONEN_TRAILING_ITEM_ID = re.compile(r"/(\d+)/?$")
 
 
 def _query_category_map() -> dict[str, str]:
@@ -32,9 +36,6 @@ def _candidate_category(
         isinstance(providers, list)
         and _AUKSJONEN_CLOTHING_CATEGORY_PROVIDER in providers
     ):
-        # These candidates come from the one approved Klær/Arbeidsklær category.
-        # Their provenance is more specific than the machinery-oriented query used
-        # to trigger bounded Auksjonen collection.
         return _AUKSJONEN_CLOTHING_CATEGORY, None
 
     query_ids = candidate.get("found_by_queries")
@@ -50,6 +51,53 @@ def _candidate_category(
     if len(categories) > 1:
         return None, "candidate maps to multiple textile categories"
     return next(iter(categories)), None
+
+
+def _auksjonen_trailing_identity(candidate: Mapping[str, Any]) -> str | None:
+    providers = candidate.get("source_providers")
+    if not (
+        isinstance(providers, list)
+        and _AUKSJONEN_CLOTHING_CATEGORY_PROVIDER in providers
+    ):
+        return None
+    source_urls = candidate.get("source_urls")
+    if not isinstance(source_urls, list):
+        return None
+    identities: set[str] = set()
+    for url in source_urls:
+        if not isinstance(url, str):
+            continue
+        parsed = urlparse(url)
+        if parsed.scheme != "https" or parsed.hostname not in _AUKSJONEN_HOSTS:
+            continue
+        match = _AUKSJONEN_TRAILING_ITEM_ID.search(parsed.path)
+        if match:
+            identities.add(f"url-id:{match.group(1)}")
+    if len(identities) != 1:
+        return None
+    return next(iter(identities))
+
+
+def _apply_auksjonen_identity(candidate: dict[str, Any]) -> None:
+    identity = _auksjonen_trailing_identity(candidate)
+    if identity is None:
+        return
+    candidate["opportunity_identity"] = identity
+    candidate["identity_stable"] = True
+    verifications = candidate.get("verification")
+    if not isinstance(verifications, list):
+        return
+    for verification in verifications:
+        if not isinstance(verification, dict):
+            continue
+        url = verification.get("url")
+        if not isinstance(url, str):
+            continue
+        parsed = urlparse(url)
+        match = _AUKSJONEN_TRAILING_ITEM_ID.search(parsed.path)
+        if parsed.hostname in _AUKSJONEN_HOSTS and match:
+            verification["opportunity_identity"] = f"url-id:{match.group(1)}"
+            verification["identity_stable"] = True
 
 
 def _page_verification(payload: Mapping[str, Any]) -> PageVerification:
@@ -76,6 +124,7 @@ def apply_norway_textile_page_verification_policy(
     for candidate in candidates:
         if not isinstance(candidate, dict):
             continue
+        _apply_auksjonen_identity(candidate)
         category, category_error = _candidate_category(candidate, categories_by_query)
         candidate["textile_category"] = category
         decisions: list[dict[str, Any]] = []
