@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -277,6 +278,7 @@ def test_cli_writes_snapshot(tmp_path: Path) -> None:
         json.dumps(_manual_quote_ready_payload(), ensure_ascii=False),
         encoding="utf-8",
     )
+    root = Path(__file__).resolve().parents[1]
 
     result = subprocess.run(
         [
@@ -287,7 +289,8 @@ def test_cli_writes_snapshot(tmp_path: Path) -> None:
             "--output",
             str(output_path),
         ],
-        cwd=Path(__file__).resolve().parents[1],
+        cwd=root,
+        env={**os.environ, "PYTHONPATH": str(root / "src")},
         check=False,
         capture_output=True,
         text=True,
