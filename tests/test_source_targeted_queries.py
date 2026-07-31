@@ -4,6 +4,10 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     CLOTHING_INVENTORY_QUERY_MATRIX,
     DiscoveryQuery,
 )
+from opportunity_engine.discovery.norway_textile_source_targeted_queries import (
+    NORWAY_TEXTILE_SOURCE_TARGETED_QUERY_BUDGET,
+    select_norway_textile_source_targeted_queries,
+)
 from opportunity_engine.discovery.source_targeted_queries import (
     SOURCE_TARGETED_FRESHNESS,
     SOURCE_TARGETED_QUERY_BUDGET,
@@ -49,12 +53,14 @@ def test_default_budget_covers_all_approved_source_families():
     assert "site:konkurs.app" in text
 
 
-def test_structured_discovery_uses_source_targeted_default_budget():
+def test_structured_discovery_uses_norway_textile_default_budget():
     selected = build_structured_discovery_queries()
 
-    assert selected == select_source_targeted_queries()
-    assert len(selected) == SOURCE_TARGETED_QUERY_BUDGET
+    assert selected == select_norway_textile_source_targeted_queries()
+    assert len(selected) == NORWAY_TEXTILE_SOURCE_TARGETED_QUERY_BUDGET
     assert all(query.query.count("site:") == 1 for query in selected)
+    assert any(query.asset_scope == "SEWING_MACHINERY" for query in selected)
+    assert any(query.asset_scope == "FABRIC_TEXTILE_STOCK" for query in selected)
 
 
 def test_site_operators_are_host_only_and_queries_remain_short():
