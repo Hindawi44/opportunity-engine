@@ -11,6 +11,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 import re
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlparse
 
 if TYPE_CHECKING:
     from opportunity_engine.discovery.e2e_checkpoint import CheckpointOutcome
@@ -32,10 +33,43 @@ ALLOWED_WORKFLOW_STATUSES = frozenset(
 )
 
 _MARKET_CODE = re.compile(r"^[A-Z]{2}$")
+_DECISION_TO_COMMERCIAL_STATUS = {
+    "BUY_REVIEW": "QUALIFIED",
+    "WATCH": "WATCH",
+    "REJECT": "DISQUALIFIED",
+}
+_COST_FIELDS = (
+    "asking_price_nok",
+    "conservative_resale_value_nok",
+    "total_cost_nok",
+    "expected_profit_nok",
+    "roi_percent",
+    "maximum_safe_bid_nok",
+    "target_profit_buffer_nok",
+    "verified_operating_costs_nok",
+)
 
 
 class UnifiedOpportunityContractError(ValueError):
     """Raised when a V1 opportunity contract violates its stable boundary."""
+
+
+def _non_empty_strings(value: object) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        return ()
+    return tuple(str(item).strip() for item in value if str(item).strip())
+
+
+def _source_name_from_url(url: str) -> str:
+    hostname = (urlparse(url).hostname or "").casefold()
+    if hostname.startswith("www."):
+        hostname = hostname[4:]
+    return hostname
+
+
+def _allowed_or_default(value: object, allowed: frozenset[str], default: str) -> str:
+    candidate = str(value or "").strip().upper()
+    return candidate if candidate in allowed else default
 
 
 @dataclass(frozen=True, slots=True)
@@ -200,4 +234,111 @@ class UnifiedOpportunityContractV1:
             missing_information=missing_information,
             recommended_actions=dossier.seller_questions,
             automatic_purchase_decision=outcome.automatic_purchase_decision,
+        )
+
+    @classmethod
+    def from_decision_intelligence_record(
+        cls,
+        record: dict[str, Any],
+        *,
+        market: str = "NO",
+        workflow_status: str = "NEW",
+    ) -> UnifiedOpportunityContractV1:
+        """Adapt one official decision record without recomputing any decision."""
+        if not isinstance(record, dict):
+            raise UnifiedOpportunityContractError("decision record must be an object")
+
+        opportunity_id = str(record.get("opportunity_id") or "").strip()
+        source_url = str(record.get("url") or "").strip()
+        source_name_raw = record.get("source_name") or record.get("source")
+        if isinstance(source_name_raw, dict):
+            source_name_raw = source_name_raw.get("name")
+        source_name = str(source_name_raw or _source_name_from_url(source_url)).strip()
+        final_decision = str(record.get("final_decision") or "").strip()
+
+        listing_status = _allowed_or_default(
+            record.get("listing_status"), ALLOWED_LISTING_STATUSES, "UNKNOWN"
+        )
+        explicit_verification = _allowed_or_default(
+            record.get("verification_status"), ALLOWED_VERIFICATION_STATUSES, ""
+        )
+        missing_evidence = _non_empty_strings(record.get("missing_evidence"))
+        if explicit_verification:
+            verification_status = explicit_verification
+        elif record.get("decision_confidence") == "HIGH" and not missing_evidence:
+            verification_status = "VERIFIED"
+        else:
+            verification_status = "REQUIRES_VERIFICATION"
+
+        commercial_status = _DECISION_TO_COMMERCIAL_STATUS.get(
+            final_decision, "NOT_ANALYZED"
+        )
+        workflow_status = _allowed_or_default(
+            record.get("workflow_status") or workflow_status,
+            ALLOWED_WORKFLOW_STATUSES,
+            "NEW",
+        )
+
+        source = {
+            "name": source_name,
+            "url": source_url,
+            "title": record.get("title"),
+            "description": record.get("description"),
+            "city": record.get("city"),
+        }
+        identity = {
+            "source_listing_id": record.get("listing_id") or opportunity_id,
+            "canonical_url": source_url,
+            "legacy_opportunity_id": opportunity_id,
+        }
+
+        evidence_items: list[dict[str, Any]] = []
+        for reason in _non_empty_strings(record.get("reasons")):
+            evidence_items.append({"kind": "DISCOVERY_REASON", "value": reason})
+        for reason in _non_empty_strings(record.get("score_reasons")):
+            evidence_items.append({"kind": "SCORE_REASON", "value": reason})
+        for reason in _non_empty_strings(record.get("decision_reasons_ar")):
+            evidence_items.append({"kind": "DECISION_REASON_AR", "value": reason})
+
+        cost_estimate = {field_name: record.get(field_name) for field_name in _COST_FIELDS}
+        risk = {
+            "decision_confidence": record.get("decision_confidence"),
+            "decision_warnings_ar": list(_non_empty_strings(record.get("decision_warnings_ar"))),
+            "exclusion_reasons": list(_non_empty_strings(record.get("exclusion_reasons"))),
+            "opportunity_score": record.get("opportunity_score"),
+            "relevance_score": record.get("relevance_score"),
+            "score_grade": record.get("score_grade"),
+            "score_components": deepcopy(record.get("score_components") or {}),
+            "top5_eligible": record.get("top5_eligible"),
+            "analysis_eligible": record.get("analysis_eligible"),
+            "legacy_recommendation": record.get("recommendation"),
+            "official_decision_field": record.get("official_decision_field"),
+        }
+        missing_information = tuple(
+            dict.fromkeys(
+                (*missing_evidence, *_non_empty_strings(record.get("evidence_needed")))
+            )
+        )
+        recommended_actions = _non_empty_strings(record.get("next_actions_ar"))
+        automatic_purchase = bool(
+            record.get("automatic_purchase_decision")
+            or record.get("automatic_purchase")
+        )
+
+        return cls(
+            opportunity_id=opportunity_id,
+            market=market,
+            source=source,
+            identity=identity,
+            listing_status=listing_status,
+            verification_status=verification_status,
+            commercial_status=commercial_status,
+            workflow_status=workflow_status,
+            evidence=tuple(evidence_items),
+            cost_estimate=cost_estimate,
+            risk=risk,
+            final_decision=final_decision,
+            missing_information=missing_information,
+            recommended_actions=recommended_actions,
+            automatic_purchase_decision=automatic_purchase,
         )
