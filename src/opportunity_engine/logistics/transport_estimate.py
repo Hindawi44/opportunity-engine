@@ -338,13 +338,13 @@ class TransportEstimateInputV1:
 def _route_precision(estimate: TransportEstimateInputV1) -> str:
     origin = estimate.origin
     destination = estimate.destination
-    if origin["city"] is None:
-        return "INCOMPLETE"
     if origin["coordinates"] is not None and destination["coordinates"] is not None:
         return "COORDINATE_LEVEL"
     if origin["postal_code"] is not None and destination["postal_code"] is not None:
         return "POSTAL_CODE_LEVEL"
-    return "CITY_LEVEL_INPUT_ONLY"
+    if origin["city"] is not None:
+        return "CITY_LEVEL_INPUT_ONLY"
+    return "INCOMPLETE"
 
 
 def build_transport_estimate_snapshot(estimate: TransportEstimateInputV1) -> dict[str, Any]:
@@ -361,8 +361,8 @@ def build_transport_estimate_snapshot(estimate: TransportEstimateInputV1) -> dic
     known_metrics = [field for field in metric_fields if estimate.shipment[field] is not None]
     unknown_handling = [field for field, value in estimate.handling.items() if value is None]
     missing_inputs: list[str] = []
-    if estimate.origin["city"] is None:
-        missing_inputs.append("origin.city")
+    if route_precision == "INCOMPLETE":
+        missing_inputs.append("origin.city_or_postal_code_or_coordinates")
     if estimate.shipment["cargo_type"] == "UNKNOWN":
         missing_inputs.append("shipment.cargo_type")
     if not known_metrics:
@@ -390,6 +390,10 @@ def build_transport_estimate_snapshot(estimate: TransportEstimateInputV1) -> dic
         landed_cost_input_ready = False
     elif estimate.shipment["cargo_type"] == "UNKNOWN" or not known_metrics:
         status = "REQUIRES_SHIPMENT_INPUTS"
+        confidence = "LOW"
+        landed_cost_input_ready = False
+    elif estimate.transport_mode == "UNKNOWN":
+        status = "REQUIRES_TRANSPORT_MODE"
         confidence = "LOW"
         landed_cost_input_ready = False
     else:
