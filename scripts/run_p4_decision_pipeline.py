@@ -55,6 +55,17 @@ def main() -> int:
     if landed_cost_exit != 0:
         return landed_cost_exit
 
+    transport_input_exit = run([
+        sys.executable,
+        "scripts/build_operational_transport_input.py",
+        "--landed-cost", "data/operational_landed_cost_v1.json",
+        "--buyer", "config/buyers/mahmoud_namsos_v1.json",
+        "--market", "config/markets/no_v1.json",
+        "--output", "data/operational_transport_input_v1.json",
+    ], root)
+    if transport_input_exit != 0:
+        return transport_input_exit
+
     return run([
         sys.executable,
         "scripts/sync_final_decisions.py",
