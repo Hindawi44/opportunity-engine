@@ -87,7 +87,10 @@ def test_real_operational_selection_builds_unknown_transport_input() -> None:
 
 
 def test_listing_title_is_not_parsed_into_shipment_measurements() -> None:
-    landed = _landed_payload()
+    landed = deepcopy(_landed_payload())
+    landed["source_opportunity"]["title"] = (
+        "4 stk komplette lagerreoler 800kg - synthetic transport test"
+    )
     assert "800kg" in landed["source_opportunity"]["title"]
 
     export = build_operational_transport_export(landed, _buyer(), _market())
