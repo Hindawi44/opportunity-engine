@@ -2,7 +2,7 @@
   "evaluation_count": 5,
   "evaluations": [
     {
-      "asking_price_nok": 2600.0,
+      "asking_price_nok": 2800.0,
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "evidence": {
@@ -30,12 +30,12 @@
       "opportunity_id": "unified-auksjonen-614288",
       "priority": 1,
       "roi_percent": null,
-      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud 15t 30m 44s",
+      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud 7t 33m 15s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288"
     },
     {
-      "asking_price_nok": 5000.0,
+      "asking_price_nok": 5200.0,
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "evidence": {
@@ -63,7 +63,7 @@
       "opportunity_id": "unified-auksjonen-614289",
       "priority": 1,
       "roi_percent": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d 14t 48m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d 6t 51m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     },
@@ -96,12 +96,12 @@
       "opportunity_id": "unified-auksjonen-610671",
       "priority": 1,
       "roi_percent": null,
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 21t 14m 45s",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 13t 17m 16s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
     },
     {
-      "asking_price_nok": 3000.0,
+      "asking_price_nok": 4000.0,
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "evidence": {
@@ -129,12 +129,12 @@
       "opportunity_id": "unified-auksjonen-613944",
       "priority": 1,
       "roi_percent": null,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d 16t 46m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 2d 8t 49m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
     },
     {
-      "asking_price_nok": 9500.0,
+      "asking_price_nok": 9700.0,
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "evidence": {
@@ -162,14 +162,14 @@
       "opportunity_id": "unified-auksjonen-614290",
       "priority": 2,
       "roi_percent": null,
-      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud 15t 16m 44s",
+      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud 7t 19m 15s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290"
     }
   ],
   "evidence_required_count": 5,
   "evidence_source": "data/opportunity_evidence.json",
-  "generated_at": "2026-07-30T19:51:26.110386+00:00",
+  "generated_at": "2026-07-31T03:48:55.618531+00:00",
   "method": "verified-evidence-gated conservative economics; missing values remain null and block recommendations",
   "ready_for_numeric_review_count": 0,
   "schema_version": 2,

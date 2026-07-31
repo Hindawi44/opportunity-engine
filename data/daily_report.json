@@ -3,7 +3,7 @@
     "alerts": [],
     "decision_source": "data/decision_intelligence.json",
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-07-30T19:51:26.146542+00:00",
+    "last_scoring_run": "2026-07-31T03:48:55.661011+00:00",
     "official_decision_field": "final_decision",
     "schema_version": 2,
     "signatures": []
@@ -155,7 +155,7 @@
       ],
       "top_count": 5
     },
-    "generated_at": "2026-07-30T19:51:26.336236+00:00",
+    "generated_at": "2026-07-31T03:48:55.868928+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
     "schema_version": 2,
     "source_funnel": {
@@ -165,11 +165,11 @@
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-07-30T19:51:26.408345+00:00",
+  "generated_at": "2026-07-31T03:48:55.951446+00:00",
   "opportunities": {
     "actionable_count": 0,
     "candidate_count": 5,
-    "generated_at": "2026-07-30T19:51:26.179464+00:00",
+    "generated_at": "2026-07-31T03:48:55.700079+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -180,12 +180,12 @@
     "actionable_count": 0,
     "buy_review_count": 0,
     "candidate_count": 5,
-    "generated_at": "2026-07-30T19:51:26.146542+00:00",
+    "generated_at": "2026-07-31T03:48:55.661011+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
       {
-        "asking_price_nok": 2600.0,
+        "asking_price_nok": 2800.0,
         "city": "Tønsberg",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -200,7 +200,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud",
+        "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud",
         "matched_target_terms": [
           "lagerreol",
           "reol",
@@ -250,12 +250,12 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 19 bud 15t 30m 44s",
+        "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud 7t 33m 15s",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288"
       },
       {
-        "asking_price_nok": 9500.0,
+        "asking_price_nok": 9700.0,
         "city": "Tønsberg",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -270,7 +270,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud",
+        "market_search_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud",
         "matched_target_terms": [
           "arbeidsbenk",
           "skap"
@@ -319,12 +319,12 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 63 bud 15t 16m 44s",
+        "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud 7t 19m 15s",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290"
       },
       {
-        "asking_price_nok": 3000.0,
+        "asking_price_nok": 4000.0,
         "city": "Vigrestad",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -339,7 +339,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d",
+        "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 2d",
         "matched_target_terms": [
           "varelager"
         ],
@@ -385,12 +385,12 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 3 bud 2d 16t 46m",
+        "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 2d 8t 49m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
       },
       {
-        "asking_price_nok": 5000.0,
+        "asking_price_nok": 5200.0,
         "city": "Tønsberg",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -405,7 +405,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d",
+        "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d",
         "matched_target_terms": [
           "lagerreol",
           "reol"
@@ -453,7 +453,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 23 bud 3d 14t 48m",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d 6t 51m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
       },
@@ -521,7 +521,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 21t 14m 45s",
+        "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 13t 17m 16s",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
       }
@@ -531,7 +531,7 @@
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-07-30T19:51:26.377770+00:00",
+    "generated_at": "2026-07-31T03:48:55.916798+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [

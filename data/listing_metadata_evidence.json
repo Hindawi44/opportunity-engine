@@ -4,7 +4,7 @@
   "errors": {},
   "evidence": {
     "unified-auksjonen-610671": {
-      "captured_at": "2026-07-30T19:51:18.519455+00:00",
+      "captured_at": "2026-07-31T03:48:47.154132+00:00",
       "observed": {
         "city": "Mathopen",
         "ends_at": "1785517560000"
@@ -14,7 +14,7 @@
       "verified": true
     },
     "unified-auksjonen-613944": {
-      "captured_at": "2026-07-30T19:51:19.432757+00:00",
+      "captured_at": "2026-07-31T03:48:48.339963+00:00",
       "observed": {
         "city": "Vigrestad",
         "ends_at": "1785674280000"
@@ -24,7 +24,7 @@
       "verified": true
     },
     "unified-auksjonen-614288": {
-      "captured_at": "2026-07-30T19:51:17.264458+00:00",
+      "captured_at": "2026-07-31T03:48:45.537763+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1785496920000"
@@ -34,7 +34,7 @@
       "verified": true
     },
     "unified-auksjonen-614289": {
-      "captured_at": "2026-07-30T19:51:18.007016+00:00",
+      "captured_at": "2026-07-31T03:48:46.293896+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1785753600000"
@@ -44,7 +44,7 @@
       "verified": true
     },
     "unified-auksjonen-614290": {
-      "captured_at": "2026-07-30T19:51:20.122629+00:00",
+      "captured_at": "2026-07-31T03:48:48.895470+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1785496080000"
@@ -54,6 +54,6 @@
       "verified": true
     }
   },
-  "generated_at": "2026-07-30T19:51:20.122645+00:00",
+  "generated_at": "2026-07-31T03:48:48.895491+00:00",
   "schema_version": 2
 }
