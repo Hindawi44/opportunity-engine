@@ -48,14 +48,14 @@ _BASE_SPECS: tuple[NorwayTextileKeywordQuery, ...] = (
     NorwayTextileKeywordQuery(
         "sale-03", "AUCTION", "SALE_INTENT",
         OpportunityCategory.SEWING_MACHINERY.value,
-        "auksjon", "sømverksted", "industrisymaskiner",
-        "industrisymaskiner sømverksted auksjon {country}",
+        "auksjon", "tekstilbedrift", "industrisymaskiner",
+        "industrisymaskiner tekstilbedrift auksjon {country}",
     ),
     NorwayTextileKeywordQuery(
         "sale-04", "WAREHOUSE_SURPLUS", "SALE_INTENT",
         OpportunityCategory.HABERDASHERY_AND_NOTIONS.value,
-        "restlager", "systue", "sytilbehør",
-        "sytilbehør systue restlager {country}",
+        "restlager", "sybutikk", "sytilbehør",
+        "sytilbehør sybutikk restlager {country}",
     ),
     NorwayTextileKeywordQuery(
         "sale-05", "COMPANY_BANKRUPTCY", "SALE_INTENT",
@@ -127,10 +127,10 @@ _BASE_SPECS: tuple[NorwayTextileKeywordQuery, ...] = (
         "SECONDARY",
     ),
     NorwayTextileKeywordQuery(
-        "special-04", "STORE_CLOSING", "SPECIALIZED",
+        "special-04", "LARGE_LOT_SALE", "SPECIALIZED",
         OpportunityCategory.CLOTHING_STORE_FIXTURES.value,
-        "avvikling", "klesbutikk", "butikkinnredning",
-        "butikkinnredning klesbutikk avvikling {country}",
+        "selges", "klesbutikk", "butikkinnredning",
+        "butikkinnredning klesbutikk selges {country}",
         "SECONDARY",
     ),
 )
