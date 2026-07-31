@@ -19,6 +19,11 @@ CATEGORY_TERMS: dict[str, tuple[str, ...]] = {
     "liquidation": ("avvikling", "lagerutsalg", "opphørssalg", "liquidation"),
     "bankruptcy": ("konkurs", "konkursbo", "bankruptcy"),
     "shop_equipment": ("butikkinnredning", "butikk inventar", "butikkutstyr", "butikk utstyr"),
+    "clothing_shop_fixtures": (
+        "butikkinnredning klær", "butikkinnredning klesbutikk",
+        "klesbutikk innredning", "klesstativ", "klesoppheng",
+        "utstillingsdukke", "utstillingsdukker", "prøverom", "mannekeng",
+    ),
     "inventory": ("varelager", "restparti", "overskuddslager", "konkurslager", "lager"),
     "office_furniture": ("kontormøbler", "kontorstol", "skrivebord", "arkivskap"),
     "restaurant_equipment": ("restaurant inventar", "kjøledisk", "kaffemaskin", "kassesystem"),
@@ -132,6 +137,7 @@ def _priority_score(result: WebSearchResult, categories: tuple[str, ...]) -> tup
     score = 0
     reasons: list[str] = []
     category_points = {
+        "clothing_shop_fixtures": 24,
         "shop_equipment": 22,
         "inventory": 22,
         "restaurant_equipment": 18,
