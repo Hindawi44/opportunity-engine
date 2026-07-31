@@ -13,6 +13,8 @@ from typing import Callable
 from urllib.parse import urlparse, urlunparse
 
 from opportunity_engine.discovery.clothing_inventory_search import (
+    ACTIVE,
+    ITEM_LISTING,
     PageVerification,
     normalize_public_url,
     verify_public_html,
@@ -26,6 +28,29 @@ MIN_DELAY_SECONDS = 2.0
 _AUKSJONEN_ITEM_PATH = re.compile(r"^/auksjon(?:/[^/]+)+/\d+/?$", re.I)
 _APPROVED_AUKSJONEN_HOSTS = frozenset({"auksjonen.no", "ny.auksjonen.no"})
 _FALLBACK_ERRORS = frozenset({"insufficient public listing content"})
+_AUKSJONEN_CLOTHING_TERMS = (
+    "t-skjorte",
+    "t-skjorter",
+    "skjorte",
+    "skjorter",
+    "kjeledress",
+    "kjeledresser",
+    "overall",
+    "coverall",
+    "skalljakke",
+    "skalljakker",
+    "hettejakke",
+    "hettejakker",
+    "regnbukse",
+    "regnbukser",
+    "arbeidstøy",
+    "arbeidsklær",
+    "klesartikler",
+    "jakke",
+    "jakker",
+    "bukse",
+    "bukser",
+)
 
 PrimaryVerifier = Callable[[str], PageVerification]
 RenderedPageLoader = Callable[[str], tuple[str, str]]
@@ -43,6 +68,32 @@ def canonicalize_auksjonen_item_url(url: str) -> str | None:
     ):
         return None
     return urlunparse(parsed._replace(netloc="auksjonen.no"))
+
+
+def _enrich_rendered_auksjonen_item(result: PageVerification) -> PageVerification:
+    """Recover bounded auction evidence from a verified active clothing item."""
+    if (
+        result.verified is not True
+        or result.page_role != ITEM_LISTING
+        or result.identity_stable is not True
+        or result.listing_status != ACTIVE
+        or canonicalize_auksjonen_item_url(result.url) is None
+    ):
+        return result
+
+    bounded_text = " ".join(
+        part for part in (result.title, result.text, result.bounded_context) if part
+    ).casefold()
+    if not any(term in bounded_text for term in _AUKSJONEN_CLOTHING_TERMS):
+        return result
+
+    return replace(
+        result,
+        clothing_inventory_evidence=True,
+        sale_evidence=True,
+        event_scenario="AUCTION",
+        bounded_context=result.bounded_context or result.text,
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -154,6 +205,7 @@ class AuksjonenPlaywrightFallbackVerifier:
             rendered_result = enforce_source_channel_identity(
                 verify_public_html(canonical_final_url, rendered_html)
             )
+            rendered_result = _enrich_rendered_auksjonen_item(rendered_result)
             if rendered_result.verified is True:
                 self._successful_urls.append(canonical)
             else:
