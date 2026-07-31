@@ -26,19 +26,46 @@ XmlTransport = Callable[[str, float, dict[str, str]], bytes]
 _ATOM = "{http://www.w3.org/2005/Atom}"
 
 TARGET_FINN_TERMS = (
+    "butikkinnredning klesbutikk", "butikkinnredning klær",
+    "butikkutstyr klesbutikk", "klesstativ butikk", "klesoppheng butikk",
+    "utstillingsdukker klær", "prøverom butikk", "butikkdisk klesbutikk",
     "butikkinnredning", "butikkutstyr", "klesstativ", "hylle", "vitrineskap",
     "butikkdisk", "kassadisk", "mannekeng", "varelager", "restparti",
     "konkurslager", "overskuddslager", "kontormøbler", "kontorstol",
     "skrivebord", "arkivskap", "lagerreol", "pallereol", "lagerutstyr",
-    "kjøledisk", "fryser", "kaffemaskin", "kassesystem", "industrisymaskin",
-    "symaskin", "overlock", "tekstil", "stoffparti",
+    "kjøledisk", "fryser", "kaffemaskin", "kassesystem", "klesoppheng",
+    "utstillingsdukke", "utstillingsdukker", "industrisymaskin", "symaskin",
+    "overlock", "tekstil", "stoffparti",
 )
 
-EXCLUDED_FINN_TERMS = (
+_ALWAYS_EXCLUDED_FINN_TERMS = (
     "personbil", "varebil", "lastebil", "motorsykkel", "båt", "bolig",
     "leilighet", "tomt", "iphone", "samsung galaxy", "mobiltelefon",
-    "barneklær", "dameklær", "herreklær", "sko", "småelektrisk",
+    "småelektrisk",
 )
+
+_CONSUMER_CLOTHING_EXCLUDE_TERMS = ("barneklær", "dameklær", "herreklær", "sko")
+
+EXCLUDED_FINN_TERMS = _ALWAYS_EXCLUDED_FINN_TERMS + _CONSUMER_CLOTHING_EXCLUDE_TERMS
+
+_FIXTURE_CONTEXT_TERMS = (
+    "butikkinnredning", "butikkutstyr", "butikk inventar", "butikk utstyr",
+    "klesstativ", "klesoppheng", "utstillingsdukke", "utstillingsdukker",
+    "mannekeng", "prøverom", "butikkdisk", "kassadisk", "vitrineskap",
+    "displaystativ", "klesbutikk",
+)
+
+
+def _has_fixture_context(searchable: str) -> bool:
+    return any(term in searchable for term in _FIXTURE_CONTEXT_TERMS)
+
+
+def _is_excluded_business_listing(searchable: str) -> bool:
+    if any(term in searchable for term in _ALWAYS_EXCLUDED_FINN_TERMS):
+        return True
+    if any(term in searchable for term in _CONSUMER_CLOTHING_EXCLUDE_TERMS):
+        return not _has_fixture_context(searchable)
+    return False
 
 
 def _default_xml_transport(url: str, timeout: float, headers: dict[str, str]) -> bytes:
@@ -104,7 +131,7 @@ class FinnApiClient:
         for keyword in TARGET_FINN_TERMS:
             for document in self.search(keyword=keyword, rows=rows_per_query):
                 searchable = f"{document.title} {document.text}".casefold()
-                if any(term in searchable for term in EXCLUDED_FINN_TERMS):
+                if _is_excluded_business_listing(searchable):
                     continue
                 if document.document_id in seen:
                     continue
