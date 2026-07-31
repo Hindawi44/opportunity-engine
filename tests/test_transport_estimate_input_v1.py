@@ -105,7 +105,7 @@ def test_unknown_shipment_is_not_converted_to_zero() -> None:
     ]
 
 
-def test_missing_origin_city_blocks_route_readiness() -> None:
+def test_missing_origin_location_blocks_route_readiness() -> None:
     payload = _payload()
     payload["origin"]["city"] = None
     snapshot = build_transport_estimate_snapshot(
@@ -115,7 +115,20 @@ def test_missing_origin_city_blocks_route_readiness() -> None:
     assert snapshot["transport_status"] == "REQUIRES_ROUTE_INPUTS"
     assert snapshot["confidence"] == "NONE"
     assert snapshot["route_precision"] == "INCOMPLETE"
-    assert "origin.city" in snapshot["missing_inputs"]
+    assert "origin.city_or_postal_code_or_coordinates" in snapshot["missing_inputs"]
+
+
+def test_known_shipment_requires_transport_mode() -> None:
+    payload = _manual_quote_ready_payload()
+    payload["transport_mode"] = "UNKNOWN"
+    snapshot = build_transport_estimate_snapshot(
+        TransportEstimateInputV1.from_dict(payload)
+    )
+
+    assert snapshot["transport_status"] == "REQUIRES_TRANSPORT_MODE"
+    assert snapshot["confidence"] == "LOW"
+    assert "transport_mode" in snapshot["missing_inputs"]
+    assert snapshot["landed_cost_input_readiness"]["ready"] is False
 
 
 def test_known_shipment_becomes_ready_for_manual_quote() -> None:
