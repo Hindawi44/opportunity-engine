@@ -6,14 +6,14 @@ import re
 from typing import Any
 
 from opportunity_engine.discovery.models import DiscoveryCandidate, DiscoveryResult
+from opportunity_engine.discovery.norway_textile_scope import (
+    classify_norway_textile_opportunity,
+)
 from opportunity_engine.discovery.opportunity_maps import (
     CLOTHING_INVENTORY_MAP,
     SCENARIO_RECORD_TYPES,
 )
-from opportunity_engine.discovery.textile_taxonomy import (
-    TaxonomyDecision,
-    classify_textile_opportunity,
-)
+from opportunity_engine.discovery.textile_taxonomy import TaxonomyDecision
 
 _SINGLE_ITEM_TERMS = (
     "jakke", "kjole", "bukse", "skjorte", "genser", "frakk", "dress",
@@ -114,7 +114,7 @@ def classify_candidate(candidate: DiscoveryCandidate) -> DiscoveryResult:
         )
 
     text = _normalized(candidate)
-    taxonomy = classify_textile_opportunity(candidate.title, candidate.text)
+    taxonomy = classify_norway_textile_opportunity(candidate.title, candidate.text)
     scenario, scenario_evidence = _scenario(text, taxonomy)
     has_sale_signal = any(term in text for term in _SALE_TERMS) or candidate.price_nok is not None
 
