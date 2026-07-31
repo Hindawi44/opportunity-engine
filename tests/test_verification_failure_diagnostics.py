@@ -10,6 +10,7 @@ def test_collect_verification_failure_details_reports_only_failed_hard_gate_cand
                 "title": "Vareparti med arbeidstøy",
                 "source_urls": ["https://auksjonen.no/auksjon/arbeidstoy/185420"],
                 "opportunity_identity": "url-id:185420",
+                "textile_category": "CLOTHING_INVENTORY",
                 "post_verification_top5_block_reason": "verification_failed",
                 "verification": [
                     {
@@ -42,6 +43,7 @@ def test_collect_verification_failure_details_reports_only_failed_hard_gate_cand
             "page_role": "UNRESOLVED_SOURCE",
             "listing_status": "UNKNOWN",
             "opportunity_identity": "url-id:185420",
+            "textile_category": "CLOTHING_INVENTORY",
         }
     ]
 

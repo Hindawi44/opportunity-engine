@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run source-targeted structured Clothing Inventory Discovery manually."""
+"""Run source-targeted Norway textile discovery with bounded page verification."""
 from __future__ import annotations
 
 import argparse
@@ -26,13 +26,16 @@ from opportunity_engine.discovery.clothing_inventory_search import (
 from opportunity_engine.discovery.early_opportunity_gate import (
     apply_early_opportunity_gate,
 )
+from opportunity_engine.discovery.norway_textile_source_targeted_queries import (
+    NORWAY_TEXTILE_SOURCE_TARGETED_FRESHNESS,
+    NORWAY_TEXTILE_SOURCE_TARGETED_QUERY_BUDGET,
+    select_norway_textile_source_targeted_queries,
+)
+from opportunity_engine.discovery.norway_textile_verification_orchestration import (
+    apply_norway_textile_page_verification_policy,
+)
 from opportunity_engine.discovery.source_channel_guard import (
     enforce_source_channel_identity,
-)
-from opportunity_engine.discovery.source_targeted_queries import (
-    SOURCE_TARGETED_FRESHNESS,
-    SOURCE_TARGETED_QUERY_BUDGET,
-    select_source_targeted_queries,
 )
 from opportunity_engine.discovery.source_targeted_retrieval import (
     SourceTargetedSearchProvider,
@@ -44,9 +47,11 @@ def _guarded_public_verifier(url: str):
     return enforce_source_channel_identity(verify_public_page(url))
 
 
-def build_structured_discovery_queries(query_budget: int = SOURCE_TARGETED_QUERY_BUDGET):
-    """Return the approved source-diverse query set used by live discovery."""
-    return select_source_targeted_queries(query_budget)
+def build_structured_discovery_queries(
+    query_budget: int = NORWAY_TEXTILE_SOURCE_TARGETED_QUERY_BUDGET,
+):
+    """Return the approved Norway textile query set used by live discovery."""
+    return select_norway_textile_source_targeted_queries(query_budget)
 
 
 def collect_verification_failure_details(result: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -59,7 +64,10 @@ def collect_verification_failure_details(result: Mapping[str, Any]) -> list[dict
     for candidate in candidates:
         if not isinstance(candidate, Mapping):
             continue
-        if candidate.get("post_verification_top5_block_reason") != "verification_failed":
+        if candidate.get("post_verification_top5_block_reason") not in {
+            "verification_failed",
+            "norway_textile_page_verification_failed",
+        }:
             continue
         verifications = candidate.get("verification")
         if not isinstance(verifications, list):
@@ -76,6 +84,7 @@ def collect_verification_failure_details(result: Mapping[str, Any]) -> list[dict
                 "page_role": verification.get("page_role"),
                 "listing_status": verification.get("listing_status"),
                 "opportunity_identity": candidate.get("opportunity_identity"),
+                "textile_category": candidate.get("textile_category"),
             })
     return details
 
@@ -124,20 +133,20 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output-dir",
-        default="artifacts/clothing-inventory-discovery",
+        default="artifacts/norway-textile-discovery",
         help="Artifact directory",
     )
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument(
         "--query-budget",
         type=int,
-        default=SOURCE_TARGETED_QUERY_BUDGET,
-        help="Number of source-diverse discovery queries to execute (1-16)",
+        default=NORWAY_TEXTILE_SOURCE_TARGETED_QUERY_BUDGET,
+        help="Number of source-diverse Norway textile queries to execute (1-16)",
     )
     parser.add_argument(
         "--freshness",
         choices=("none", "pd", "pw", "pm", "py"),
-        default=SOURCE_TARGETED_FRESHNESS,
+        default=NORWAY_TEXTILE_SOURCE_TARGETED_FRESHNESS,
         help="Brave page-age filter; 'none' avoids hiding still-active indexed sales",
     )
     parser.add_argument(
@@ -260,6 +269,7 @@ def main() -> int:
 
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
+    result = apply_norway_textile_page_verification_policy(result)
     report = result["search_run_report"]
     diagnostics = source_provider.diagnostics()
     verification_failures = collect_verification_failure_details(result)
@@ -268,6 +278,9 @@ def main() -> int:
         if playwright_verifier is not None
         else _disabled_playwright_diagnostics()
     )
+    report["domain"] = "TEXTILE_AND_SEWING"
+    report["market_code"] = "NO"
+    report["taxonomy_aware_queries"] = True
     report["source_targeting_policy_applied"] = True
     report["source_targeting_query_budget"] = args.query_budget
     report["source_targeting_request_budget"] = len(discovery_queries)
@@ -285,6 +298,7 @@ def main() -> int:
 
     paths = write_discovery_artifacts(result, Path(args.output_dir))
     print(f"Status: {report['status']}")
+    print(f"Domain: {report['domain']}")
     print(f"Queries: {report['queries_submitted']}")
     print(f"Brave requests: {diagnostics['requests_made']}/{diagnostics['request_budget']}")
     print(f"Raw hits: {diagnostics['raw_hits']}")
@@ -297,6 +311,10 @@ def main() -> int:
     print(f"Playwright attempts: {playwright_diagnostics['attempted']}")
     print(f"Playwright successes: {playwright_diagnostics['succeeded']}")
     print(f"Verification failures detailed: {len(verification_failures)}")
+    print(
+        "Textile verification accepted: "
+        f"{report['norway_textile_page_verification_accepted']}"
+    )
     print(f"Top opportunities: {report['top5_count']}")
     for name, path in paths.items():
         print(f"{name}: {path}")
