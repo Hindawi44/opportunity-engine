@@ -1,0 +1,107 @@
+[
+  {
+    "case_id": "small-clothing-store",
+    "title": "Klesbutikk avvikling - hele varelageret selges",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "SMALL_CLOTHING_STORE_LIQUIDATION",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "clothing-chain-closure",
+    "title": "Kleskjede avvikles og filial stenger - restlager klær",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "CLOTHING_CHAIN_OR_BRANCH_CLOSURE",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "brand-inventory",
+    "title": "Merkevarer klær - komplett varelager til salgs",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "BRAND_INVENTORY_LIQUIDATION",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "clothing-inventory",
+    "title": "Stort vareparti klær og arbeidstøy",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "CLOTHING_INVENTORY",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "shoes-bags-accessories",
+    "title": "Komplett varelager sko, vesker og belter selges",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "SHOES_BAGS_ACCESSORIES_INVENTORY",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "fabric-stock",
+    "title": "Restlager stoffruller og metervare selges",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "FABRIC_TEXTILE_STOCK",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "tailor-workshop",
+    "title": "Skredderverksted legges ned - utstyr og lager",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "TAILOR_WORKSHOP_LIQUIDATION",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "sewing-atelier",
+    "title": "Nedlagt systue med overlock og symaskiner selges samlet",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "SEWING_ATELIER_LIQUIDATION",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "sewing-factory",
+    "title": "Konfeksjonsfabrikk konkurs - produksjonsutstyr og varelager",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "SEWING_FACTORY_LIQUIDATION",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "sewing-machinery",
+    "title": "Industrisymaskiner og skjærebord til salgs",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "SEWING_MACHINERY",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "sewing-notions",
+    "title": "Varelager sytråd, glidelåser, knapper og kantbånd",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "HABERDASHERY_AND_NOTIONS",
+    "expected_primary_tier": "PRIMARY"
+  },
+  {
+    "case_id": "clothing-store-fixtures",
+    "title": "Klesstativer og butikkinnredning fra klesbutikk til salgs",
+    "expected_status": "IN_SCOPE",
+    "expected_primary_category": "CLOTHING_STORE_FIXTURES",
+    "expected_primary_tier": "SECONDARY"
+  },
+  {
+    "case_id": "kitchen-inventory",
+    "title": "Stort varelager for kjøkken- og møbelproduksjon",
+    "expected_status": "OUT_OF_SCOPE",
+    "expected_primary_category": null,
+    "expected_primary_tier": null
+  },
+  {
+    "case_id": "generic-warehouse-racks",
+    "title": "4 stk lagerreoler 1200kg på auksjon",
+    "expected_status": "OUT_OF_SCOPE",
+    "expected_primary_category": null,
+    "expected_primary_tier": null
+  },
+  {
+    "case_id": "ordinary-retail-sale",
+    "title": "Ny kolleksjon klær med 50 prosent rabatt",
+    "expected_status": "OUT_OF_SCOPE",
+    "expected_primary_category": null,
+    "expected_primary_tier": null
+  }
+]
