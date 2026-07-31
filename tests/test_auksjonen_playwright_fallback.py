@@ -7,6 +7,7 @@ from opportunity_engine.discovery.auksjonen_playwright_fallback import (
 )
 from opportunity_engine.discovery.clothing_inventory_search import (
     ACTIVE,
+    CATEGORY_INDEX,
     ITEM_LISTING,
     UNRESOLVED_SOURCE,
     PageVerification,
@@ -106,6 +107,90 @@ def test_rendered_fallback_reuses_existing_html_verifier(monkeypatch):
     assert diagnostics["succeeded"] == 1
     assert diagnostics["failed"] == 0
     assert diagnostics["used"] is True
+
+
+def test_rendered_active_clothing_item_recovers_bounded_auction_evidence(monkeypatch):
+    rendered = PageVerification(
+        url=AUKSJONEN_ITEM,
+        title="8 stk Blåkläder T-skjorter i størrelse XL",
+        text="Antall: 8 stk T-skjorter. Modell 3325. Egnet til arbeid.",
+        listing_status=ACTIVE,
+        page_role=ITEM_LISTING,
+        opportunity_identity="url-id:450595",
+        identity_stable=True,
+        clothing_inventory_evidence=False,
+        sale_evidence=False,
+        verified=True,
+    )
+    monkeypatch.setattr(
+        "opportunity_engine.discovery.auksjonen_playwright_fallback.verify_public_html",
+        lambda url, html: rendered,
+    )
+    verifier = AuksjonenPlaywrightFallbackVerifier(
+        lambda url: _unresolved(url),
+        rendered_page_loader=lambda url: (url, "<html/>"),
+    )
+
+    result = verifier(AUKSJONEN_ITEM)
+
+    assert result.clothing_inventory_evidence is True
+    assert result.sale_evidence is True
+    assert result.event_scenario == "AUCTION"
+    assert result.bounded_context == rendered.text
+
+
+def test_rendered_non_clothing_item_is_not_enriched(monkeypatch):
+    rendered = PageVerification(
+        url=AUKSJONEN_ITEM,
+        title="Parti med håndverktøy",
+        text="Antall: 8 stk skiftenøkler.",
+        listing_status=ACTIVE,
+        page_role=ITEM_LISTING,
+        opportunity_identity="url-id:450595",
+        identity_stable=True,
+        verified=True,
+    )
+    monkeypatch.setattr(
+        "opportunity_engine.discovery.auksjonen_playwright_fallback.verify_public_html",
+        lambda url, html: rendered,
+    )
+    verifier = AuksjonenPlaywrightFallbackVerifier(
+        lambda url: _unresolved(url),
+        rendered_page_loader=lambda url: (url, "<html/>"),
+    )
+
+    result = verifier(AUKSJONEN_ITEM)
+
+    assert result.clothing_inventory_evidence is False
+    assert result.sale_evidence is False
+    assert result.event_scenario == "UNVERIFIED_EVENT"
+
+
+def test_rendered_category_page_remains_rejected(monkeypatch):
+    rendered = PageVerification(
+        url=AUKSJONEN_ITEM,
+        title="Arbeidshansker - 570 par - stort parti",
+        text="Samtykke Detaljer. Denne nettsiden bruker informasjonskapsler.",
+        listing_status=ACTIVE,
+        page_role=CATEGORY_INDEX,
+        opportunity_identity="url-id:450595",
+        identity_stable=True,
+        verified=True,
+    )
+    monkeypatch.setattr(
+        "opportunity_engine.discovery.auksjonen_playwright_fallback.verify_public_html",
+        lambda url, html: rendered,
+    )
+    verifier = AuksjonenPlaywrightFallbackVerifier(
+        lambda url: _unresolved(url),
+        rendered_page_loader=lambda url: (url, "<html/>"),
+    )
+
+    result = verifier(AUKSJONEN_ITEM)
+
+    assert result.page_role == CATEGORY_INDEX
+    assert result.clothing_inventory_evidence is False
+    assert result.sale_evidence is False
 
 
 def test_fallback_does_not_run_for_other_hosts():
