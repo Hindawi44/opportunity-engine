@@ -1,19 +1,30 @@
-"""Build deterministic Norwegian search queries from opportunity scenarios."""
+"""Build deterministic Norwegian textile and sewing discovery queries."""
 from __future__ import annotations
 
-from opportunity_engine.discovery.opportunity_maps import CLOTHING_INVENTORY_MAP
+from opportunity_engine.discovery.norway_textile_keywords import (
+    DOMAIN,
+    build_norway_textile_keyword_queries,
+)
 
 
 def build_clothing_inventory_queries(*, country: str = "Norge") -> list[dict[str, str]]:
-    """Return deduplicated queries with traceable scenario metadata."""
-    output: list[dict[str, str]] = []
-    seen: set[str] = set()
-    for scenario, phrases in CLOTHING_INVENTORY_MAP.items():
-        for phrase in phrases:
-            query = f"{phrase} {country}".strip()
-            normalized = " ".join(query.lower().split())
-            if normalized in seen:
-                continue
-            seen.add(normalized)
-            output.append({"domain": "CLOTHING_INVENTORY", "scenario": scenario, "query": query})
-    return output
+    """Return the bounded V1 pack with traceable signal components.
+
+    The legacy function name is preserved for callers, while the returned domain
+    now describes the expanded textile and sewing ecosystem.
+    """
+    return [
+        {
+            "domain": DOMAIN,
+            "query_id": spec.query_id,
+            "scenario": spec.scenario,
+            "intent": spec.intent,
+            "category": spec.category,
+            "event_term": spec.event_term,
+            "sector_term": spec.sector_term,
+            "asset_term": spec.asset_term,
+            "rotation_group": spec.rotation_group,
+            "query": spec.query,
+        }
+        for spec in build_norway_textile_keyword_queries(country=country)
+    ]
