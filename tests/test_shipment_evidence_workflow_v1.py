@@ -86,7 +86,11 @@ def test_real_operational_transport_builds_blocking_evidence_queue() -> None:
 
 
 def test_title_measurement_does_not_resolve_structured_evidence_task() -> None:
-    transport = _transport()
+    landed = deepcopy(_landed())
+    landed["source_opportunity"]["title"] = (
+        "4 stk komplette lagerreoler 800kg - synthetic shipment evidence test"
+    )
+    transport = _transport(landed)
     assert "800kg" in transport["source_opportunity"]["title"]
 
     queue = build_shipment_evidence_queue(transport)
