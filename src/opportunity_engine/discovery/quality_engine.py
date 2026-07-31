@@ -21,17 +21,12 @@ _TRUSTED_DOMAIN_HINTS = (
     "auksjon", "auction", "konkurs", "finn.no", "boauksjon",
     "nettauksjon", "restlager", "avvikling",
 )
-_CLOTHING_TERMS = (
-    "klær", "klesbutikk", "brudekjole", "brudekjoler", "brudesalong",
-    "tekstil", "varelager", "vareparti", "butikkinnredning", "syutstyr",
-)
 
 
 def assess_quality(result: DiscoveryResult) -> QualityAssessment:
     """Score one classified result from 0 to 100 without inventing evidence."""
     candidate = result.candidate
-    text = " ".join(f"{candidate.title} {candidate.text}".lower().split())
-    host = urlparse(candidate.url).netloc.lower()
+    host = urlparse(candidate.url).netloc.casefold()
     reasons: list[str] = []
     score = 0
 
@@ -42,9 +37,9 @@ def assess_quality(result: DiscoveryResult) -> QualityAssessment:
         score += 15
         reasons.append("commercial lead requires contact")
 
-    if any(term in text for term in _CLOTHING_TERMS):
+    if result.category:
         score += 20
-        reasons.append("clothing or textile inventory relevance")
+        reasons.append(f"textile-sector category: {result.category}")
 
     if len(candidate.text.strip()) >= 40:
         score += 15
