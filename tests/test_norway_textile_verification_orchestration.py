@@ -8,10 +8,16 @@ from opportunity_engine.discovery.norway_textile_verification_orchestration impo
 )
 
 
-def _candidate(*, query_id: str = "sale-03", status: str = ACTIVE) -> dict:
+def _candidate(
+    *,
+    query_id: str = "sale-03",
+    status: str = ACTIVE,
+    providers: list[str] | None = None,
+) -> dict:
     return {
         "title": "Industrisymaskiner fra systue selges",
         "found_by_queries": [query_id],
+        "source_providers": providers or ["Stub Search"],
         "top5_eligible": True,
         "discovery_score": 88,
         "source_urls": ["https://example.invalid/listing/12345"],
@@ -53,6 +59,28 @@ def test_accepts_active_verified_taxonomy_candidate_into_top5() -> None:
     assert output["search_run_report"][
         "norway_textile_page_verification_policy_applied"
     ] is True
+
+
+def test_auksjonen_clothing_category_provenance_overrides_machinery_query() -> None:
+    candidate = _candidate(providers=["Auksjonen Current Category"])
+    candidate["title"] = "Parti med 24 klesartikler"
+    candidate["verification"][0]["title"] = "Parti med 24 klesartikler"
+
+    output = apply_norway_textile_page_verification_policy(_result(candidate))
+
+    evaluated = output["all_discovered_candidates"][0]
+    assert evaluated["textile_category"] == "CLOTHING_INVENTORY"
+    assert evaluated["textile_page_verification_accepted"] is True
+    assert len(output["top5_opportunities"]) == 1
+
+
+def test_similar_provider_name_does_not_bypass_query_taxonomy() -> None:
+    output = apply_norway_textile_page_verification_policy(
+        _result(_candidate(providers=["Auksjonen Current Category Mirror"]))
+    )
+
+    evaluated = output["all_discovered_candidates"][0]
+    assert evaluated["textile_category"] == "SEWING_MACHINERY"
 
 
 def test_ended_page_is_removed_from_top5_fail_closed() -> None:
