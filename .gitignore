@@ -51,3 +51,8 @@ htmlcov/
 # Data files
 data/*.csv
 reports/*.csv
+
+# Local SQLite databases
+data/*.db
+data/*.sqlite
+data/*.sqlite3
