@@ -13,6 +13,11 @@ from opportunity_engine.discovery.e2e_checkpoint import (
 from opportunity_engine.discovery.models import DiscoveryCandidate, DiscoveryResult
 from opportunity_engine.discovery.opportunity_maps import CLOTHING_INVENTORY_MAP
 from opportunity_engine.discovery.query_builder import build_clothing_inventory_queries
+from opportunity_engine.discovery.unified_opportunity_contract import (
+    SCHEMA_VERSION as UNIFIED_OPPORTUNITY_CONTRACT_SCHEMA_VERSION,
+    UnifiedOpportunityContractError,
+    UnifiedOpportunityContractV1,
+)
 
 __all__ = [
     "CLOTHING_INVENTORY_MAP",
@@ -21,6 +26,9 @@ __all__ = [
     "DiscoveryResult",
     "EligibilityDecision",
     "OpportunityDossier",
+    "UNIFIED_OPPORTUNITY_CONTRACT_SCHEMA_VERSION",
+    "UnifiedOpportunityContractError",
+    "UnifiedOpportunityContractV1",
     "build_clothing_inventory_queries",
     "build_opportunity_dossier",
     "classify_candidate",
