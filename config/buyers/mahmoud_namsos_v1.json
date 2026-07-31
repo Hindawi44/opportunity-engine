@@ -1,0 +1,48 @@
+{
+  "schema_version": "buyer-profile-v1",
+  "profile_id": "MAHMOUD_NAMSOS_V1",
+  "buyer_type": "BUSINESS",
+  "display_name": "Namsos Skredderhus",
+  "home_market_profile_id": "NO_DOMESTIC_V1",
+  "location": {
+    "country_code": "NO",
+    "city": "Namsos",
+    "postal_code": null,
+    "coordinates": null
+  },
+  "settlement_currency": "NOK",
+  "interests": {
+    "categories": [
+      "clothing_inventory",
+      "textiles"
+    ],
+    "markets": [
+      "NO"
+    ]
+  },
+  "commercial_constraints": {
+    "budget_nok": null,
+    "maximum_purchase_price_nok": null,
+    "maximum_shipping_nok": null,
+    "minimum_expected_margin_ratio": null,
+    "maximum_total_exposure_nok": null,
+    "maximum_sell_through_months": null
+  },
+  "operational_capacity": {
+    "storage_available": null,
+    "pickup_capability": null,
+    "pallet_handling_capability": null
+  },
+  "risk_policy": {
+    "risk_tolerance": null,
+    "requires_verified_seller": true,
+    "requires_verified_active_listing": true,
+    "requires_complete_landed_cost": true,
+    "unknown_constraints_block_qualification": true
+  },
+  "safety": {
+    "automatic_purchase_allowed": false,
+    "automatic_bid_allowed": false,
+    "automatic_contact_allowed": false
+  }
+}
