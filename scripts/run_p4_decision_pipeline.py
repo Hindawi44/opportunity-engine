@@ -45,6 +45,16 @@ def main() -> int:
     if unified_export_exit != 0:
         return unified_export_exit
 
+    landed_cost_exit = run([
+        sys.executable,
+        "scripts/build_operational_landed_cost.py",
+        "--decisions", "data/decision_intelligence.json",
+        "--buyer", "config/buyers/mahmoud_namsos_v1.json",
+        "--output", "data/operational_landed_cost_v1.json",
+    ], root)
+    if landed_cost_exit != 0:
+        return landed_cost_exit
+
     return run([
         sys.executable,
         "scripts/sync_final_decisions.py",
