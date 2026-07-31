@@ -63,12 +63,15 @@ class ShipmentEvidenceTaskModel(Base):
         ForeignKey("opportunities.opportunity_id", ondelete="CASCADE"),
         nullable=False,
     )
-    field_key: Mapped[str] = mapped_column(String(255), nullable=False)
+    task_type: Mapped[str] = mapped_column(String(128), nullable=False)
+    requested_fields_json: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
     priority: Mapped[str] = mapped_column(String(32), nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     source_channel: Mapped[str] = mapped_column(String(64), nullable=False)
     question_nb: Mapped[str] = mapped_column(Text, nullable=False)
     question_ar: Mapped[str] = mapped_column(Text, nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    current_value_json: Mapped[Any | None] = mapped_column(JSON, nullable=True)
     blocks_manual_quote: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     blocks_qualification: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     evidence_refs_json: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
