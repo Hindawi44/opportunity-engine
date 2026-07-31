@@ -27,8 +27,8 @@ Each location contains:
 - `postal_code`
 - `coordinates`
 
-The destination city is required. The origin city may remain `null`, but route
-readiness then becomes `REQUIRES_ROUTE_INPUTS`.
+The destination city is required. The origin must contain at least a city,
+postal code, or coordinates before route readiness is available.
 
 Route precision is reported as:
 
@@ -61,7 +61,7 @@ Supported cargo types are:
 - `MIXED`
 
 At least one shipment metric plus a known cargo type is required before the
-record becomes `READY_FOR_MANUAL_QUOTE`.
+record can proceed to transport-mode selection.
 
 ### Handling
 
@@ -74,6 +74,7 @@ Handling requirements are nullable booleans:
 - dismantling required
 
 A missing handling value remains visible in `unknown_handling_requirements`.
+It does not silently become `false`.
 
 ### Transport mode
 
@@ -84,6 +85,9 @@ Supported modes are:
 - `CARRIER`
 - `COURIER`
 - `FREIGHT`
+
+A known route and shipment remain `REQUIRES_TRANSPORT_MODE` until one of these
+methods is selected. Only then can the record become `READY_FOR_MANUAL_QUOTE`.
 
 ### Quote
 
@@ -105,6 +109,7 @@ delivery.
 
 - `REQUIRES_ROUTE_INPUTS`
 - `REQUIRES_SHIPMENT_INPUTS`
+- `REQUIRES_TRANSPORT_MODE`
 - `READY_FOR_MANUAL_QUOTE`
 - `ESTIMATE_AVAILABLE`
 - `CONFIRMED_QUOTE`
@@ -116,7 +121,7 @@ is estimated, confirmed, or documented as not applicable.
 ## Confidence
 
 - `NONE`: route origin is incomplete
-- `LOW`: route exists but shipment or quote evidence is incomplete
+- `LOW`: route exists but shipment, mode, or quote evidence is incomplete
 - `MEDIUM`: a documented estimate range exists
 - `HIGH`: an exact confirmed quote or documented not-applicable case exists
 
