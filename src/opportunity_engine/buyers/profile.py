@@ -20,11 +20,15 @@ _ALLOWED_RISK_TOLERANCES = frozenset({"LOW", "MEDIUM", "HIGH"})
 _COUNTRY_CODE = re.compile(r"^[A-Z]{2}$")
 _CURRENCY_CODE = re.compile(r"^[A-Z]{3}$")
 
-_REQUIRED_CONSTRAINTS_FOR_MATCHING = (
+_REQUIRED_CONSTRAINTS_FOR_QUALIFICATION = (
     "commercial_constraints.budget_nok",
     "commercial_constraints.maximum_shipping_nok",
     "commercial_constraints.minimum_expected_margin_ratio",
     "risk_policy.risk_tolerance",
+)
+_OPTIONAL_COST_PRECISION_FIELDS = (
+    "location.postal_code",
+    "location.coordinates",
 )
 
 
@@ -270,11 +274,23 @@ class BuyerProfileV1:
             "safety": deepcopy(self.safety),
         }
 
-    def missing_matching_constraints(self) -> tuple[str, ...]:
+    def missing_personal_qualification_constraints(self) -> tuple[str, ...]:
         payload = self.to_dict()
         return tuple(
             path
-            for path in _REQUIRED_CONSTRAINTS_FOR_MATCHING
+            for path in _REQUIRED_CONSTRAINTS_FOR_QUALIFICATION
+            if _path_value(payload, path) is None
+        )
+
+    def missing_matching_constraints(self) -> tuple[str, ...]:
+        """Backward-compatible alias for qualification constraints."""
+        return self.missing_personal_qualification_constraints()
+
+    def missing_cost_precision_fields(self) -> tuple[str, ...]:
+        payload = self.to_dict()
+        return tuple(
+            path
+            for path in _OPTIONAL_COST_PRECISION_FIELDS
             if _path_value(payload, path) is None
         )
 
@@ -283,7 +299,7 @@ def build_buyer_profile_snapshot(
     buyer: BuyerProfileV1,
     market_profile: object,
 ) -> dict[str, Any]:
-    """Resolve buyer identity against a loaded MarketProfileV1-like object."""
+    """Resolve buyer identity and expose independent readiness stages."""
     market_profile_id = getattr(market_profile, "profile_id", None)
     market_code = getattr(market_profile, "market_code", None)
     currency_code = getattr(market_profile, "currency_code", None)
@@ -296,16 +312,51 @@ def build_buyer_profile_snapshot(
     if market_code not in buyer.interests["markets"]:
         raise BuyerProfileError("buyer interests must include the home market")
 
-    missing = buyer.missing_matching_constraints()
-    ready = not missing
+    missing_qualification = buyer.missing_personal_qualification_constraints()
+    missing_cost_precision = buyer.missing_cost_precision_fields()
+    qualification_ready = not missing_qualification
+
+    readiness_stages = {
+        "discovery": {
+            "ready": True,
+            "status": "DISCOVERY_READY",
+            "basis": [
+                "interests.categories",
+                "interests.markets",
+            ],
+        },
+        "cost_estimation": {
+            "ready": True,
+            "status": "COST_ESTIMATION_READY",
+            "mode": "CITY_LEVEL_INPUT_ONLY",
+            "basis": [
+                "location.country_code",
+                "location.city",
+                "settlement_currency",
+            ],
+            "missing_precision_fields": list(missing_cost_precision),
+        },
+        "personal_qualification": {
+            "ready": qualification_ready,
+            "status": (
+                "QUALIFICATION_READY"
+                if qualification_ready
+                else "PERSONAL_QUALIFICATION_PENDING"
+            ),
+            "missing_required_constraints": list(missing_qualification),
+        },
+    }
+
     return {
         **buyer.to_dict(),
+        "readiness_stages": readiness_stages,
         "matching_readiness": {
-            "ready": ready,
-            "status": "READY" if ready else "BLOCKED_MISSING_CONSTRAINTS",
-            "missing_required_constraints": list(missing),
+            "ready": qualification_ready,
+            "status": readiness_stages["personal_qualification"]["status"],
+            "missing_required_constraints": list(missing_qualification),
         },
         "scope": {
+            "city_level_cost_estimation_input_ready": True,
             "landed_cost_calculation_enabled": False,
             "opportunity_ranking_enabled": False,
             "decision_changes_enabled": False,
