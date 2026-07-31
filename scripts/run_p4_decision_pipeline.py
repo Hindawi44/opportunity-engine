@@ -66,6 +66,15 @@ def main() -> int:
     if transport_input_exit != 0:
         return transport_input_exit
 
+    shipment_evidence_exit = run([
+        sys.executable,
+        "scripts/build_shipment_evidence_queue.py",
+        "--transport-input", "data/operational_transport_input_v1.json",
+        "--output", "data/shipment_evidence_queue_v1.json",
+    ], root)
+    if shipment_evidence_exit != 0:
+        return shipment_evidence_exit
+
     return run([
         sys.executable,
         "scripts/sync_final_decisions.py",
