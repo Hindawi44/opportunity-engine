@@ -15,11 +15,18 @@ from .models import (
     SourceRunModel,
     StatusHistoryModel,
 )
+from .operational_adapter import (
+    PIPELINE_NAME as OPERATIONAL_PERSISTENCE_PIPELINE_NAME,
+    OperationalPersistenceError,
+    persist_operational_snapshots,
+)
 from .repository import OpportunityRepository, PersistenceError
 
 __all__ = [
     "Base",
     "DEFAULT_DATABASE_URL",
+    "OPERATIONAL_PERSISTENCE_PIPELINE_NAME",
+    "OperationalPersistenceError",
     "OpportunityModel",
     "OpportunityRepository",
     "PersistenceError",
@@ -29,6 +36,7 @@ __all__ = [
     "build_alembic_config",
     "create_database_engine",
     "create_session_factory",
+    "persist_operational_snapshots",
     "session_scope",
     "upgrade_database",
 ]
