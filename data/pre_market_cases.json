@@ -1,6 +1,6 @@
 {
   "schema_version": "pre-market-case-registry-1.0",
-  "updated_at": "2026-07-30T17:11:59.653825+00:00",
+  "updated_at": "2026-07-31T08:19:53.424550+00:00",
   "case_count": 10,
   "cases": [
     {
@@ -15,7 +15,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:38.801737+00:00",
+      "last_checked_at": "2026-07-31T08:19:36.886558+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -28,7 +28,8 @@
         "daily-monitor:937884796:2026-07-30T14:09:57.478889+00:00",
         "daily-monitor:937884796:2026-07-30T14:11:45.882409+00:00",
         "daily-monitor:937884796:2026-07-30T14:55:55.727150+00:00",
-        "daily-monitor:937884796:2026-07-30T17:11:38.801737+00:00"
+        "daily-monitor:937884796:2026-07-30T17:11:38.801737+00:00",
+        "daily-monitor:937884796:2026-07-31T08:19:36.886558+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -51,7 +52,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:52.794668+00:00",
+      "last_checked_at": "2026-07-31T08:19:47.612217+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -64,7 +65,8 @@
         "daily-monitor:937982879:2026-07-30T14:10:08.913401+00:00",
         "daily-monitor:937982879:2026-07-30T14:11:50.747983+00:00",
         "daily-monitor:937982879:2026-07-30T14:56:06.234961+00:00",
-        "daily-monitor:937982879:2026-07-30T17:11:52.794668+00:00"
+        "daily-monitor:937982879:2026-07-30T17:11:52.794668+00:00",
+        "daily-monitor:937982879:2026-07-31T08:19:47.612217+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -87,7 +89,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:27.750814+00:00",
+      "last_checked_at": "2026-07-31T08:19:28.099129+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -100,7 +102,8 @@
         "daily-monitor:938018014:2026-07-30T14:09:48.744270+00:00",
         "daily-monitor:938018014:2026-07-30T14:11:42.708689+00:00",
         "daily-monitor:938018014:2026-07-30T14:55:46.086595+00:00",
-        "daily-monitor:938018014:2026-07-30T17:11:27.750814+00:00"
+        "daily-monitor:938018014:2026-07-30T17:11:27.750814+00:00",
+        "daily-monitor:938018014:2026-07-31T08:19:28.099129+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -123,7 +126,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:31.513586+00:00",
+      "last_checked_at": "2026-07-31T08:19:31.177836+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -136,7 +139,8 @@
         "daily-monitor:938022038:2026-07-30T14:09:51.658648+00:00",
         "daily-monitor:938022038:2026-07-30T14:11:43.662158+00:00",
         "daily-monitor:938022038:2026-07-30T14:55:49.973479+00:00",
-        "daily-monitor:938022038:2026-07-30T17:11:31.513586+00:00"
+        "daily-monitor:938022038:2026-07-30T17:11:31.513586+00:00",
+        "daily-monitor:938022038:2026-07-31T08:19:31.177836+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -159,7 +163,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:45.769763+00:00",
+      "last_checked_at": "2026-07-31T08:19:42.245437+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -172,7 +176,8 @@
         "daily-monitor:938053456:2026-07-30T14:10:03.166341+00:00",
         "daily-monitor:938053456:2026-07-30T14:11:48.865360+00:00",
         "daily-monitor:938053456:2026-07-30T14:56:01.026415+00:00",
-        "daily-monitor:938053456:2026-07-30T17:11:45.769763+00:00"
+        "daily-monitor:938053456:2026-07-30T17:11:45.769763+00:00",
+        "daily-monitor:938053456:2026-07-31T08:19:42.245437+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -195,7 +200,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:59.653749+00:00",
+      "last_checked_at": "2026-07-31T08:19:53.424478+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -208,7 +213,8 @@
         "daily-monitor:938065187:2026-07-30T14:10:14.349304+00:00",
         "daily-monitor:938065187:2026-07-30T14:11:52.637645+00:00",
         "daily-monitor:938065187:2026-07-30T14:56:12.183553+00:00",
-        "daily-monitor:938065187:2026-07-30T17:11:59.653749+00:00"
+        "daily-monitor:938065187:2026-07-30T17:11:59.653749+00:00",
+        "daily-monitor:938065187:2026-07-31T08:19:53.424478+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -231,7 +237,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:42.299906+00:00",
+      "last_checked_at": "2026-07-31T08:19:39.564727+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -244,7 +250,8 @@
         "daily-monitor:938108897:2026-07-30T14:10:00.469468+00:00",
         "daily-monitor:938108897:2026-07-30T14:11:47.626148+00:00",
         "daily-monitor:938108897:2026-07-30T14:55:58.492915+00:00",
-        "daily-monitor:938108897:2026-07-30T17:11:42.299906+00:00"
+        "daily-monitor:938108897:2026-07-30T17:11:42.299906+00:00",
+        "daily-monitor:938108897:2026-07-31T08:19:39.564727+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -267,7 +274,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:35.186771+00:00",
+      "last_checked_at": "2026-07-31T08:19:34.027635+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -280,7 +287,8 @@
         "daily-monitor:938119295:2026-07-30T14:09:54.655282+00:00",
         "daily-monitor:938119295:2026-07-30T14:11:44.833684+00:00",
         "daily-monitor:938119295:2026-07-30T14:55:52.785427+00:00",
-        "daily-monitor:938119295:2026-07-30T17:11:35.186771+00:00"
+        "daily-monitor:938119295:2026-07-30T17:11:35.186771+00:00",
+        "daily-monitor:938119295:2026-07-31T08:19:34.027635+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -303,7 +311,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:49.453150+00:00",
+      "last_checked_at": "2026-07-31T08:19:45.007061+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -316,7 +324,8 @@
         "daily-monitor:938143617:2026-07-30T14:10:06.129551+00:00",
         "daily-monitor:938143617:2026-07-30T14:11:49.883732+00:00",
         "daily-monitor:938143617:2026-07-30T14:56:03.718913+00:00",
-        "daily-monitor:938143617:2026-07-30T17:11:49.453150+00:00"
+        "daily-monitor:938143617:2026-07-30T17:11:49.453150+00:00",
+        "daily-monitor:938143617:2026-07-31T08:19:45.007061+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
@@ -339,7 +348,7 @@
       "estate_manager_identified": true,
       "state": "NO_PUBLIC_SALE_CHANNEL_FOUND",
       "first_seen_at": "2026-07-30T13:40:27.839879+00:00",
-      "last_checked_at": "2026-07-30T17:11:56.281732+00:00",
+      "last_checked_at": "2026-07-31T08:19:50.403694+00:00",
       "last_changed_at": "2026-07-30T13:40:27.839879+00:00",
       "scan_complete": true,
       "sale_listing_candidate_urls": [],
@@ -352,7 +361,8 @@
         "daily-monitor:938143978:2026-07-30T14:10:11.714227+00:00",
         "daily-monitor:938143978:2026-07-30T14:11:51.752475+00:00",
         "daily-monitor:938143978:2026-07-30T14:56:09.047457+00:00",
-        "daily-monitor:938143978:2026-07-30T17:11:56.281732+00:00"
+        "daily-monitor:938143978:2026-07-30T17:11:56.281732+00:00",
+        "daily-monitor:938143978:2026-07-31T08:19:50.403694+00:00"
       ],
       "top5_eligible": false,
       "analysis_eligible": false,
