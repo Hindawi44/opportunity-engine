@@ -74,6 +74,37 @@ def test_auksjonen_clothing_category_provenance_overrides_machinery_query() -> N
     assert len(output["top5_opportunities"]) == 1
 
 
+def test_auksjonen_identity_uses_trailing_item_id_not_slug_model_number() -> None:
+    candidate = _candidate(providers=["Auksjonen Current Category"])
+    url = (
+        "https://auksjonen.no/auksjon/overskuddsvarer/"
+        "7_stk_Gesto_skalljakker_herre_4XL__Art_719_02_5899/577659"
+    )
+    candidate["source_urls"] = [url]
+    candidate["opportunity_identity"] = "url-id:719"
+    candidate["verification"][0]["url"] = url
+    candidate["verification"][0]["opportunity_identity"] = "url-id:719"
+
+    output = apply_norway_textile_page_verification_policy(_result(candidate))
+
+    evaluated = output["all_discovered_candidates"][0]
+    assert evaluated["opportunity_identity"] == "url-id:577659"
+    assert evaluated["identity_stable"] is True
+    assert evaluated["verification"][0]["opportunity_identity"] == "url-id:577659"
+
+
+def test_auksjonen_identity_override_requires_exact_provider() -> None:
+    candidate = _candidate(providers=["Auksjonen Current Category Mirror"])
+    candidate["source_urls"] = [
+        "https://auksjonen.no/auksjon/overskuddsvarer/model_719/577659"
+    ]
+    candidate["opportunity_identity"] = "url-id:719"
+
+    output = apply_norway_textile_page_verification_policy(_result(candidate))
+
+    assert output["all_discovered_candidates"][0]["opportunity_identity"] == "url-id:719"
+
+
 def test_similar_provider_name_does_not_bypass_query_taxonomy() -> None:
     output = apply_norway_textile_page_verification_policy(
         _result(_candidate(providers=["Auksjonen Current Category Mirror"]))
