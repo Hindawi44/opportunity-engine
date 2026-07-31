@@ -5,7 +5,9 @@ from dataclasses import dataclass
 from urllib.parse import urlparse
 
 from opportunity_engine.discovery.models import DiscoveryCandidate
-from opportunity_engine.discovery.textile_taxonomy import classify_textile_opportunity
+from opportunity_engine.discovery.norway_textile_scope import (
+    classify_norway_textile_opportunity,
+)
 
 
 @dataclass(frozen=True)
@@ -54,7 +56,7 @@ def evaluate_candidate(candidate: DiscoveryCandidate) -> FilterDecision:
     if any(term in text or term in host for term in _INFORMATION_TERMS):
         return FilterDecision(False, "informational or dictionary page", -10)
 
-    taxonomy = classify_textile_opportunity(candidate.title, candidate.text)
+    taxonomy = classify_norway_textile_opportunity(candidate.title, candidate.text)
     event_hits = sum(term in text for term in _COMMERCIAL_EVENT_TERMS)
     commercial_hits = sum(term in text for term in _COMMERCIAL_TERMS)
     trusted_hits = sum(term in host for term in _TRUSTED_DOMAIN_HINTS)
