@@ -1,6 +1,7 @@
 """Database engine, session, and migration helpers."""
 from __future__ import annotations
 
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
@@ -45,6 +46,7 @@ def create_session_factory(engine: Engine) -> sessionmaker[Session]:
     return sessionmaker(bind=engine, class_=Session, expire_on_commit=False, future=True)
 
 
+@contextmanager
 def session_scope(factory: sessionmaker[Session]) -> Iterator[Session]:
     """Yield one session and commit or roll back atomically."""
     session = factory()
