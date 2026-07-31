@@ -1,13 +1,13 @@
 {
   "candidate_count": 3,
   "errors": {},
-  "generated_at": "2026-07-31T03:48:55.484436+00:00",
+  "generated_at": "2026-07-31T09:16:20.772378+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
   "opportunities": [
     {
-      "asking_price_nok": 2800.0,
+      "asking_price_nok": 3000.0,
       "available_query_count": 8,
       "candidate_count": 1,
       "candidate_market_value_nok": null,
@@ -17,10 +17,10 @@
       "candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-120x60x200cm-svart-800kg",
-          "captured_at": "2026-07-31T03:48:49.901610+00:00",
+          "captured_at": "2026-07-31T09:16:17.121339+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
           "observed_prices_nok": [
             2990.0
           ],
@@ -42,10 +42,10 @@
       "distinct_source_class_count": 1,
       "eligible_for_market_value": false,
       "market_search_queries": [
-        "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+        "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
         "\"komplette Lagerreoler 200cm 200kg hylle total 800kg Tønsberg\" selges kr"
       ],
-      "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+      "market_search_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
       "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-614288",
       "query_budget_truncated": true,
@@ -53,9 +53,9 @@
       "query_stats": [
         {
           "accepted_count": 1,
-          "query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
-          "rejected_count": 8,
-          "result_count": 9,
+          "query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
+          "rejected_count": 9,
+          "result_count": 10,
           "target_domain": null
         },
         {
@@ -66,13 +66,13 @@
           "target_domain": null
         }
       ],
-      "rejected_candidate_count": 8,
+      "rejected_candidate_count": 9,
       "rejected_candidates": [
         {
           "canonical_url": "https://ahlsell.no/category/arbeidsplass-drift-og-vedlikehold/innredning/hyller-og-reoler",
           "comparable_quantity": 4,
           "domain": "ahlsell.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -87,7 +87,7 @@
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
           "comparable_quantity": 1,
           "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35",
@@ -100,40 +100,10 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
         },
         {
-          "canonical_url": "https://ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning",
-          "comparable_quantity": null,
-          "domain": "ajprodukter.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Hyller og reoler i metall – stort utvalg og rask levering | AJ Produkter",
-          "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning"
-        },
-        {
-          "canonical_url": "https://bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller",
-          "comparable_quantity": null,
-          "domain": "bauhaus.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Lagerhylle til lav pris | BAUHAUS",
-          "url": "https://www.bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller"
-        },
-        {
           "canonical_url": "https://reolborsen.no/",
           "comparable_quantity": null,
           "domain": "reolborsen.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -145,10 +115,54 @@
           "url": "https://www.reolborsen.no/"
         },
         {
+          "canonical_url": "https://ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning",
+          "comparable_quantity": null,
+          "domain": "ajprodukter.no",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Hyller og reoler i metall – stort utvalg og rask levering | AJ Produkter",
+          "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning"
+        },
+        {
+          "canonical_url": "https://hobbybox.no/fornorth-lagerhylle-3200kg-200x60x200cm-hvit",
+          "comparable_quantity": null,
+          "domain": "hobbybox.no",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
+          "rejection_reasons": [
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Fornorth Lagerhylle 3200kg, 200x60x200cm, Hvit - kr 4 790,00 - hobbybox.no",
+          "url": "https://www.hobbybox.no/fornorth-lagerhylle-3200kg-200x60x200cm-hvit"
+        },
+        {
+          "canonical_url": "https://bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller",
+          "comparable_quantity": null,
+          "domain": "bauhaus.no",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Lagerhylle til lav pris | BAUHAUS",
+          "url": "https://www.bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller"
+        },
+        {
           "canonical_url": "https://ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller",
           "comparable_quantity": null,
           "domain": "ajprodukter.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -160,36 +174,38 @@
           "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller"
         },
         {
-          "canonical_url": "https://hobbybox.no/fornorth-lagerhylle-3200kg-200x60x200cm-hvit",
+          "canonical_url": "https://cowab.no/lager-oppbevaring/lagerhyller",
           "comparable_quantity": null,
-          "domain": "hobbybox.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+          "domain": "cowab.no",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
           "rejection_reasons": [
+            "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
           "similarity_score": 0.125,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Fornorth Lagerhylle 3200kg, 200x60x200cm, Hvit - kr 4 790,00 - hobbybox.no",
-          "url": "https://www.hobbybox.no/fornorth-lagerhylle-3200kg-200x60x200cm-hvit"
+          "title": "Finn den perfekte lagerhylle og lagerreol for både store og små lagere | Cowab.no",
+          "url": "https://www.cowab.no/lager-oppbevaring/lagerhyller"
         },
         {
-          "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
+          "canonical_url": "https://machineseeker.no/Hall-konstruksjon/ci-389",
           "comparable_quantity": null,
-          "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud brukt pris Norge",
+          "domain": "machineseeker.no",
+          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
           "rejection_reasons": [
+            "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.125,
+          "similarity_score": 0.25,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Lagerreol 200×60×200cm - Svart 1200kg",
-          "url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg/"
+          "title": "▷ Brukt lagerhaller og andre haller til salgs - Machineseeker",
+          "url": "https://www.machineseeker.no/Hall-konstruksjon/ci-389"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 21 bud 7t 33m 15s",
+      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud 2t 5m 48s",
       "verified_comparable_count": 0
     },
     {
@@ -203,7 +219,7 @@
       "candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-31T03:48:51.577222+00:00",
+          "captured_at": "2026-07-31T09:16:18.141228+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d brukt pris Norge",
@@ -240,8 +256,8 @@
         {
           "accepted_count": 1,
           "query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d brukt pris Norge",
-          "rejected_count": 8,
-          "result_count": 9,
+          "rejected_count": 9,
+          "result_count": 10,
           "target_domain": null
         },
         {
@@ -252,7 +268,7 @@
           "target_domain": null
         }
       ],
-      "rejected_candidate_count": 8,
+      "rejected_candidate_count": 9,
       "rejected_candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg",
@@ -300,21 +316,6 @@
           "url": "https://reolteknikk.no/produktkategori/brukt/"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Reoler | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
-        },
-        {
           "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
@@ -328,6 +329,21 @@
           "target_domain": null,
           "title": "Lagerreoler – Solide Reoler for Lager og Verksted - Fasadenor",
           "url": "https://fasadenor.no/product-category/lagerreoler/"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Reoler | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
         },
         {
           "canonical_url": "https://jungheinrich.no/produkter/reoler-og-lagerlosninger",
@@ -345,19 +361,19 @@
           "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
         },
         {
-          "canonical_url": "https://supersellers.no/collections/lager-tilbehor",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.78.5196",
           "comparable_quantity": null,
-          "domain": "supersellers.no",
+          "domain": "finn.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.143,
+          "similarity_score": 0.0,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Lagerinventar – Reoler, Stiger og Udstyr | SuperSellerS",
-          "url": "https://www.supersellers.no/collections/lager-tilbehor"
+          "title": "Bord og stoler | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.78.5196"
         },
         {
           "canonical_url": "https://areol.no/pallereoler",
@@ -373,10 +389,25 @@
           "target_domain": null,
           "title": "Pallereoler - Brukte og Nye - Areol Innredninger AS",
           "url": "https://areol.no/pallereoler/"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.77",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Dyr og utstyr | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?category=0.77"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d 6t 51m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d 1t 23m",
       "verified_comparable_count": 0
     },
     {
@@ -390,7 +421,7 @@
       "candidates": [
         {
           "canonical_url": "https://lindbak.no/produkter/eskoleia-elevskap-2x4-roms-b80-cm",
-          "captured_at": "2026-07-31T03:48:53.094816+00:00",
+          "captured_at": "2026-07-31T09:16:19.058084+00:00",
           "comparable_quantity": null,
           "domain": "lindbak.no",
           "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
@@ -560,23 +591,22 @@
           "url": "https://eskoleia.no/produktkategorier/garderobeskap/garderobeutstyr/"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?location=0.20061",
+          "canonical_url": "https://eskoleia.no/produkt/hoyt-kontorskap",
           "comparable_quantity": null,
-          "domain": "finn.no",
+          "domain": "eskoleia.no",
           "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.2,
+          "similarity_score": 0.4,
           "source_quantity": 10,
           "target_domain": null,
-          "title": "Oslo | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?location=0.20061"
+          "title": "Høyt kontorskap - Eskoleia",
+          "url": "https://eskoleia.no/produkt/hoyt-kontorskap/"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 13t 17m 16s",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 7t 49m 50s",
       "verified_comparable_count": 0
     },
     {
@@ -747,11 +777,11 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 2d 8t 49m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 2d 3t 21m",
       "verified_comparable_count": 0
     },
     {
-      "asking_price_nok": 9700.0,
+      "asking_price_nok": 9900.0,
       "available_query_count": 8,
       "candidate_count": 0,
       "candidate_market_value_nok": null,
@@ -763,9 +793,9 @@
       "distinct_source_class_count": 0,
       "eligible_for_market_value": false,
       "market_search_queries": [
-        "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge"
+        "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge"
       ],
-      "market_search_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
+      "market_search_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
       "market_value_status": "NO_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-614290",
       "query_budget_truncated": true,
@@ -773,7 +803,7 @@
       "query_stats": [
         {
           "accepted_count": 0,
-          "query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
+          "query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": null
@@ -782,25 +812,10 @@
       "rejected_candidate_count": 10,
       "rejected_candidates": [
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.67.8348",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Garasje | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.67.8348"
-        },
-        {
           "canonical_url": "https://clasohlson.com/no/Garasjeinnredning,-skap,-arbeidsbenk-og-verktoytavle,-6-deler/p/41-4082",
           "comparable_quantity": null,
           "domain": "clasohlson.com",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -811,24 +826,10 @@
           "url": "https://www.clasohlson.com/no/Garasjeinnredning,-skap,-arbeidsbenk-og-verktoytavle,-6-deler/p/41-4082"
         },
         {
-          "canonical_url": "https://nomax.no/collections/garasjeinnredning",
-          "comparable_quantity": null,
-          "domain": "nomax.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.6,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Garasjeinnredning – skap, benk og verktøytavle | Nomax",
-          "url": "https://nomax.no/collections/garasjeinnredning"
-        },
-        {
           "canonical_url": "https://netthandelen.no/products/verktoy-garasje/garasjeinnredning/verkstedinnredning",
           "comparable_quantity": null,
           "domain": "netthandelen.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -840,66 +841,39 @@
           "url": "https://www.netthandelen.no/products/verktoy-garasje/garasjeinnredning/verkstedinnredning"
         },
         {
-          "canonical_url": "https://prisjakt.no/s/garasjeinnredning",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.67.8348",
           "comparable_quantity": null,
-          "domain": "prisjakt.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
+          "domain": "finn.no",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
           "rejection_reasons": [
-            "missing_observed_nok_price"
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
           ],
-          "similarity_score": 0.4,
+          "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Garasjeinnredning – Finn den beste prisen",
-          "url": "https://www.prisjakt.no/s/garasjeinnredning/"
+          "title": "Garasje | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.67.8348"
         },
         {
-          "canonical_url": "https://jula.no/inspirasjon/hardhead-oppbevaringssystem",
+          "canonical_url": "https://nomax.no/collections/garasjeinnredning",
           "comparable_quantity": null,
-          "domain": "jula.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
+          "domain": "nomax.no",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
-          "similarity_score": 0.4,
+          "similarity_score": 0.6,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Garasjeinnredning – system for garasje og verksted | Jula",
-          "url": "https://www.jula.no/inspirasjon/hardhead-oppbevaringssystem/"
-        },
-        {
-          "canonical_url": "https://jula.no/catalog/bygg-og-maling/oppbevaring/innredning-garasjeverksted",
-          "comparable_quantity": null,
-          "domain": "jula.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Garasjeinnredning | Verkstedinnredning | For et proft arbeidsmiljø | Jula",
-          "url": "https://www.jula.no/catalog/bygg-og-maling/oppbevaring/innredning-garasjeverksted/"
-        },
-        {
-          "canonical_url": "https://netthandelen.no/products/verktoy-garasje/garasjeinnredning",
-          "comparable_quantity": null,
-          "domain": "netthandelen.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Garasjeinnredning | Alt til hage og utemiljø",
-          "url": "https://www.netthandelen.no/products/verktoy-garasje/garasjeinnredning"
+          "title": "Garasjeinnredning – skap, benk og verktøytavle | Nomax",
+          "url": "https://nomax.no/collections/garasjeinnredning"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?q=verkt%C3%B8yskap",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -911,29 +885,88 @@
           "url": "https://www.finn.no/recommerce/forsale/search?q=verkt%C3%B8yskap"
         },
         {
-          "canonical_url": "https://jula.no/catalog/bil-og-garasje/garasje/garasje-og-verksted",
+          "canonical_url": "https://fasadenor.no/product/lekker-komplett-garasjeinnredning",
           "comparable_quantity": null,
-          "domain": "jula.no",
-          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud brukt pris Norge",
+          "domain": "fasadenor.no",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
+          "rejection_reasons": [
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Lekker komplett garasjeinnredning. Kaiser 97",
+          "url": "https://fasadenor.no/product/lekker-komplett-garasjeinnredning/"
+        },
+        {
+          "canonical_url": "https://prisjakt.no/s/garasjeinnredning",
+          "comparable_quantity": null,
+          "domain": "prisjakt.no",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
-          "similarity_score": 0.6,
+          "similarity_score": 0.4,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Garasje og verksted | Innredning | Jula",
-          "url": "https://www.jula.no/catalog/bil-og-garasje/garasje/garasje-og-verksted/"
+          "title": "Garasjeinnredning – Finn den beste prisen",
+          "url": "https://www.prisjakt.no/s/garasjeinnredning/"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?q=garasje&sub_category=1.67.8348",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Garasje | Garasje | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?q=garasje&sub_category=1.67.8348"
+        },
+        {
+          "canonical_url": "https://obsbygg.no/verktoy-og-tilbehor/oppbevaring/2112647",
+          "comparable_quantity": null,
+          "domain": "obsbygg.no",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Probuilder arbeidsbenk med skap | Obsbygg.no",
+          "url": "https://www.obsbygg.no/verktoy-og-tilbehor/oppbevaring/2112647"
+        },
+        {
+          "canonical_url": "https://ny.auksjonen.no/",
+          "comparable_quantity": null,
+          "domain": "ny.auksjonen.no",
+          "matched_query": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Auksjonen – Norges største nettauksjon | Auksjonen.no",
+          "url": "https://ny.auksjonen.no/"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 65 bud 7t 19m 15s",
+      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud 1t 51m 48s",
       "verified_comparable_count": 0
     }
   ],
   "opportunity_count": 5,
   "planned_request_count": 8,
   "query_budget_exhausted": true,
-  "rejected_candidate_count": 44,
+  "rejected_candidate_count": 46,
   "request_budget": 8,
   "requests_made": 8,
   "required_comparables": 3,

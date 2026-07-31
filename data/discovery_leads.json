@@ -1,19 +1,174 @@
 {
   "category_counts": {
     "auction": 1,
-    "bankruptcy": 18,
+    "bankruptcy": 14,
+    "clothing_shop_fixtures": 14,
     "estate_sale": 3,
-    "inventory": 28,
-    "liquidation": 9,
+    "inventory": 23,
+    "liquidation": 8,
     "office_furniture": 1,
     "sale_listing": 10,
-    "salon_equipment": 7,
-    "shop_equipment": 10
+    "shop_equipment": 15
   },
-  "deduplicated_lead_count": 62,
-  "generated_at": "2026-07-31T03:48:41.200638+00:00",
+  "deduplicated_lead_count": 57,
+  "generated_at": "2026-07-31T09:16:06.968680+00:00",
   "input_result_count": 80,
   "items": [
+    {
+      "canonical_url": "https://avabutikkinnredning.no/",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.965555+00:00",
+      "image_count": null,
+      "lead_id": "web-7c78687e8f228b645e34",
+      "price_nok": null,
+      "priority_score": 52,
+      "published_at": "2025-09-22T20:13:33",
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22",
+        "published_at_present+6"
+      ],
+      "snippet": "Butikkinnredning, rillepanel, klesstativ, utstillingsdukker og glassmonter. Norges beste priser med rask levering",
+      "source": "Brave Search",
+      "title": "AVA Butikkinnredning, Utstillingsdukker, Rillepanel, Glassmonter",
+      "url": "https://avabutikkinnredning.no/"
+    },
+    {
+      "canonical_url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.966511+00:00",
+      "image_count": null,
+      "lead_id": "web-7368b74c0e956c42b2b7",
+      "price_nok": null,
+      "priority_score": 46,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Type innredning Slatboard ... Svart Hvit Grå Se alle! <strong>Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel</strong>....",
+      "source": "Brave Search",
+      "title": "Butikkinnredning Archives - Side 2 av 2 - Butikkartikler AS",
+      "url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2/"
+    },
+    {
+      "canonical_url": "https://www.supersellerskatalog.no/",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.965841+00:00",
+      "image_count": null,
+      "lead_id": "web-e71772deae49d9ffbeb5",
+      "price_nok": null,
+      "priority_score": 46,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
+      "source": "Brave Search",
+      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
+      "url": "https://www.supersellerskatalog.no/"
+    },
+    {
+      "canonical_url": "https://www.supersellerskatalog.no/inspirasjon",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.966569+00:00",
+      "image_count": null,
+      "lead_id": "web-72d343831b08e2486a3f",
+      "price_nok": null,
+      "priority_score": 46,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
+      "source": "Brave Search",
+      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
+      "url": "https://www.supersellerskatalog.no/inspirasjon"
+    },
+    {
+      "canonical_url": "https://www.supersellers.no/",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.965623+00:00",
+      "image_count": null,
+      "lead_id": "web-7cad0e8a59e6e6643424",
+      "price_nok": null,
+      "priority_score": 46,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "<strong>SuperSellerS tilbyr butikkinnredning som dekker hele butikken</strong>: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert ...",
+      "source": "Brave Search",
+      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
+      "url": "https://www.supersellers.no/"
+    },
+    {
+      "canonical_url": "https://www.supersellers.no/katalog",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.965713+00:00",
+      "image_count": null,
+      "lead_id": "web-bd6977fd8acb108de839",
+      "price_nok": null,
+      "priority_score": 46,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
+      "source": "Brave Search",
+      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
+      "url": "https://www.supersellers.no/katalog"
+    },
+    {
+      "canonical_url": "https://www.butikkartikler.no/butikkinnredning/utstillingsdukker_mannekenger",
+      "categories": [
+        "clothing_shop_fixtures",
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.966943+00:00",
+      "image_count": null,
+      "lead_id": "web-a9922918a03cfccae302",
+      "price_nok": null,
+      "priority_score": 46,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:inventory+22"
+      ],
+      "snippet": "Utstillingsdukker · Glassmontere · Klesstativ · Butikkdisker · Home · / / Utstillingsdukker · <strong>Vi har til enhver tid et stor lager med utstillingsdukker på lager for omgående levering</strong>.",
+      "source": "Brave Search",
+      "title": "Utstillingsdukker - Butikkartikler AS",
+      "url": "https://www.butikkartikler.no/butikkinnredning/utstillingsdukker_mannekenger/"
+    },
     {
       "canonical_url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324",
       "categories": [
@@ -21,7 +176,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197157+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964399+00:00",
       "image_count": null,
       "lead_id": "web-340bfb344e98a6d682c6",
       "price_nok": null,
@@ -45,7 +200,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199677+00:00",
+      "discovered_at": "2026-07-31T09:16:06.968217+00:00",
       "image_count": null,
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
@@ -68,7 +223,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.196997+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964270+00:00",
       "image_count": null,
       "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
@@ -91,7 +246,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198942+00:00",
+      "discovered_at": "2026-07-31T09:16:06.966046+00:00",
       "image_count": null,
       "lead_id": "web-09fdcc107a66ac1b45ab",
       "price_nok": null,
@@ -113,7 +268,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197203+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964455+00:00",
       "image_count": null,
       "lead_id": "web-ef2f88a92a8f9400d376",
       "price_nok": null,
@@ -135,7 +290,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.196899+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964148+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -157,7 +312,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197042+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964328+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -179,7 +334,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197485+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964827+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -202,7 +357,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.196510+00:00",
+      "discovered_at": "2026-07-31T09:16:06.963810+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -219,28 +374,48 @@
       "url": "https://www.nrk.no/norge/krever-at-kommunene-samler-inn-tekstilavfall--_-ingen-vet-hvor-det-skal-gjenvinnes-1.16792050"
     },
     {
-      "canonical_url": "https://norskavvikling.no/",
+      "canonical_url": "https://www.finn.no/recommerce/forsale/search",
       "categories": [
-        "bankruptcy",
-        "liquidation",
+        "clothing_shop_fixtures",
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200398+00:00",
+      "discovered_at": "2026-07-31T09:16:06.967281+00:00",
       "image_count": null,
-      "lead_id": "web-d6946302664e2cf64951",
+      "lead_id": "web-989e695b776848998740",
       "price_nok": null,
       "priority_score": 34,
       "published_at": null,
       "score_reasons": [
-        "category:bankruptcy+8",
-        "category:liquidation+16",
+        "category:clothing_shop_fixtures+24",
         "category:sale_listing+10"
       ],
-      "snippet": "Der salgsobjektet -ene stammer fra et konkursbo har selger liten eller ingen kjennskap til produktet -ene. Produktet -ene selges som de står og uten noen form for garanti. I tilfeller der salget er et parti salg, kan ikke Norsk Avvikling AS innestå for antall, kvalitet osv.",
+      "snippet": "Du finner 181 annonse(r) som inneholder ordet &quot;utstillingsdukke&quot; til salgs på <strong>FINN Torget</strong>. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
-      "title": "Norsk Avvikling",
-      "url": "https://norskavvikling.no/"
+      "title": "Utstillingsdukke | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?q=utstillingsdukke"
+    },
+    {
+      "canonical_url": "https://www.rubrikk.no/torget-brukt-til-salgs/utstillingsdukker-til-salgs.html",
+      "categories": [
+        "clothing_shop_fixtures",
+        "sale_listing"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.967338+00:00",
+      "image_count": null,
+      "lead_id": "web-9a1b9c6b529b06a2bf10",
+      "price_nok": null,
+      "priority_score": 34,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:sale_listing+10"
+      ],
+      "snippet": "Vi har 28 resultater for Utstillingsdukker til salgs til de beste prisene. Den billigste annonsen ligger ute til Kr. 100. Sjekk ut alle annonser fra hundrevis av markedsplasser på Rubrikk.no!",
+      "source": "Brave Search",
+      "title": "Utstillingsdukker til salgs - Januar 2021",
+      "url": "https://www.rubrikk.no/torget-brukt-til-salgs/utstillingsdukker-til-salgs.html"
     },
     {
       "canonical_url": "https://www.verdirealisering.no/konkursbo-b/tag/varelager",
@@ -250,7 +425,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197765+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965039+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -273,7 +448,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198495+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965500+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -289,15 +464,15 @@
       "url": "https://www.rubrikk.no/torget-brukt-til-salgs/butikkinnredning-selges.html"
     },
     {
-      "canonical_url": "https://www.finn.no/recommerce/forsale/search",
+      "canonical_url": "https://www.finn.no/bap/forsale/search.html",
       "categories": [
         "sale_listing",
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198789+00:00",
+      "discovered_at": "2026-07-31T09:16:06.966626+00:00",
       "image_count": null,
-      "lead_id": "web-989e695b776848998740",
+      "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
       "priority_score": 32,
       "published_at": null,
@@ -305,10 +480,32 @@
         "category:sale_listing+10",
         "category:shop_equipment+22"
       ],
-      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
-      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
+      "title": "Butikkinnredning | til salgs | FINN Torget",
+      "url": "https://www.finn.no/bap/forsale/search.html?product_category=2.91.3108.359"
+    },
+    {
+      "canonical_url": "https://www.finn.no/bap/webstore/ad.html",
+      "categories": [
+        "inventory",
+        "sale_listing"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.968098+00:00",
+      "image_count": null,
+      "lead_id": "web-c1e3e1a07794eb2a24ac",
+      "price_nok": null,
+      "priority_score": 32,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22",
+        "category:sale_listing+10"
+      ],
+      "snippet": "Reolen er også kjent som Electrolux og Høvik-lagerreoler. Den kan leveres åpen, eventuelt med tette rygger og endevegger. Pent brukte gavler, hyller og mellomvegger. Ta kontakt for spørsmål og tilbud. Vi skaffer også nytt, hvis ikke du finner ønsket dimensjon over. Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt. ... Ta kontakt om du ønsker mer informasjon om reolene. Utstyret selges meget prisgunstige og er enkle å montere, demontere, bygge på og bygge om.",
+      "source": "Brave Search",
+      "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
+      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
     },
     {
       "canonical_url": "https://www.machineseeker.no/Tekstilmaskiner/ci-19",
@@ -317,7 +514,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199280+00:00",
+      "discovered_at": "2026-07-31T09:16:06.967649+00:00",
       "image_count": null,
       "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
@@ -339,7 +536,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197919+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965364+00:00",
       "image_count": null,
       "lead_id": "web-08c1c3148277e6eb31ea",
       "price_nok": null,
@@ -361,7 +558,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197992+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965451+00:00",
       "image_count": null,
       "lead_id": "web-7c85d59249f9065a7874",
       "price_nok": null,
@@ -383,7 +580,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197524+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964874+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -405,7 +602,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197823+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965250+00:00",
       "image_count": null,
       "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
@@ -427,7 +624,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197336+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964760+00:00",
       "image_count": null,
       "lead_id": "web-05170ee30473a1493dd3",
       "price_nok": null,
@@ -444,33 +641,12 @@
       "url": "https://www.tb.no/opphorssalg-etter-konkurs-viktig-beskjed-til-kunder/s/5-76-2517965"
     },
     {
-      "canonical_url": "https://avabutikkinnredning.no/",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198536+00:00",
-      "image_count": null,
-      "lead_id": "web-7c78687e8f228b645e34",
-      "price_nok": null,
-      "priority_score": 28,
-      "published_at": "2025-09-22T20:13:33",
-      "score_reasons": [
-        "category:shop_equipment+22",
-        "published_at_present+6"
-      ],
-      "snippet": "Butikkinnredning, rillepanel, klesstativ, utstillingsdukker og glassmonter. Norges beste priser med rask levering",
-      "source": "Brave Search",
-      "title": "AVA Butikkinnredning, Utstillingsdukker, Rillepanel, Glassmonter",
-      "url": "https://avabutikkinnredning.no/"
-    },
-    {
       "canonical_url": "https://bdn.no/",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198990+00:00",
+      "discovered_at": "2026-07-31T09:16:06.966107+00:00",
       "image_count": null,
       "lead_id": "web-f5e25a1bdcd9e106de57",
       "price_nok": null,
@@ -491,7 +667,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198736+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965787+00:00",
       "image_count": null,
       "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
@@ -507,12 +683,54 @@
       "url": "https://www.hestra.no/"
     },
     {
+      "canonical_url": "https://www.finn.no/recommerce/forsale/item/408828487",
+      "categories": [
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.966700+00:00",
+      "image_count": null,
+      "lead_id": "web-330d2f86de3299dc9513",
+      "price_nok": null,
+      "priority_score": 28,
+      "published_at": "2025-05-26T00:00:00",
+      "score_reasons": [
+        "category:shop_equipment+22",
+        "published_at_present+6"
+      ],
+      "snippet": "Komplett butikkinnredning bestående av: <strong>Fleksible kleshyller til voksenklær</strong>. Mål: 248 x 213 x 40 cm, (sokkel 50cm) (38 seksjoner a, 3 hyller). Fleksible kleshyller til barn. Mål: 248 x 213 x 40 ( 40 seksjoner a, 4 hyller) 5 stk IKEA Billy ...",
+      "source": "Brave Search",
+      "title": "Butikkinnredning -komplett ( alt du trenger for å starte klesbutikk) | FINN-torget",
+      "url": "https://www.finn.no/recommerce/forsale/item/408828487"
+    },
+    {
+      "canonical_url": "https://unisystemer.no/prosjekter/butikkinnredning-line-of-oslo",
+      "categories": [
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.966202+00:00",
+      "image_count": null,
+      "lead_id": "web-a51fe9a70f780a57d999",
+      "price_nok": null,
+      "priority_score": 28,
+      "published_at": "2023-05-25T07:44:07",
+      "score_reasons": [
+        "category:shop_equipment+22",
+        "published_at_present+6"
+      ],
+      "snippet": "Klesbutikken «Line of Oslo» på Skøyen ønsket en innredning som var røff og elegant. Da falt valget selvfølgelig på <strong>Kee Klamp</strong>. ... Røff og industriell look. <strong>Kee Klamp</strong> benyttes ofte til butikkinnredning i mange bransjer.",
+      "source": "Brave Search",
+      "title": "Butikkinnredning: Line of Oslo - Unisystemer",
+      "url": "https://unisystemer.no/prosjekter/butikkinnredning-line-of-oslo/"
+    },
+    {
       "canonical_url": "https://lagersystemer.no/",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200010+00:00",
+      "discovered_at": "2026-07-31T09:16:06.968482+00:00",
       "image_count": null,
       "lead_id": "web-5f5c8a287e0bc6f1c921",
       "price_nok": null,
@@ -522,74 +740,152 @@
         "category:inventory+22",
         "published_at_present+6"
       ],
-      "snippet": "Kampanje Pallereol Lagerhylle Grenreol langgods Delelager reol Dekkreol og vogn Arkivreol Kampanje Kampanje Kampanje Wishlist Quick View Compare Categories: Kampanje, Lagerhylle, Pakkeløsninger, UniversalreolSuper 123 - Pakke 3A kr 9,199 (Eks. MVA) Legg i handlekurv Lengde 3065 mm x Dybde ...",
+      "snippet": "Kampanje Pallereol Lagerhylle Grenreol langgods Delelager reol Dekkreol og vogn Arkivreol Kampanje Kampanje Kampanje Wishlist Quick View Compare Categories: Kampanje, Lagerhylle, Pakkeløsninger, UniversalreolSuper 123 - Pakke 3A kr 9,199 (Eks. MVA) Legg i handlekurv Lengde 3065 mm x Dybde 800 mm x Høyde 1972 mm / Max.",
       "source": "Brave Search",
       "title": "Hjem - Lagersystemer AS",
       "url": "https://lagersystemer.no/"
     },
     {
-      "canonical_url": "https://reolteknikk.no/",
+      "canonical_url": "https://areol.no/pallereoler",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199862+00:00",
+      "discovered_at": "2026-07-31T09:16:06.968356+00:00",
       "image_count": null,
-      "lead_id": "web-63600f85f4126e808e67",
+      "lead_id": "web-251a9330532149c53475",
       "price_nok": null,
       "priority_score": 28,
-      "published_at": "2025-12-29T07:03:58",
+      "published_at": "2024-04-24T13:12:56",
       "score_reasons": [
         "category:inventory+22",
         "published_at_present+6"
       ],
-      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
+      "snippet": "<strong>Areol har over flere tiår levert lagerinnredninger og pallereoler til fornøyde kunder rundt om i Norge</strong>. Våre pallereoler er kvalitetsprodukter fra kjente produsenter, dette gir deg som kunde trygghet da du får ekstremt slitesterke produkter ...",
       "source": "Brave Search",
-      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
-      "url": "https://reolteknikk.no/"
+      "title": "Pallereoler - Brukte og Nye - Areol Innredninger AS",
+      "url": "https://areol.no/pallereoler/"
     },
     {
-      "canonical_url": "https://www.finn.no/bap/forsale/search.html",
+      "canonical_url": "https://heggland-heiltre.no/selected-klesbutikk-i-bergen",
       "categories": [
-        "bankruptcy",
-        "sale_listing"
+        "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197629+00:00",
+      "discovered_at": "2026-07-31T09:16:06.966452+00:00",
       "image_count": null,
-      "lead_id": "web-318117add644f04c71b7",
+      "lead_id": "web-f7fe2d09f32e4cbfda29",
       "price_nok": null,
-      "priority_score": 24,
-      "published_at": "2023-07-10T00:00:00",
+      "priority_score": 28,
+      "published_at": "2024-05-16T13:05:10",
       "score_reasons": [
-        "category:bankruptcy+8",
-        "category:sale_listing+10",
+        "category:shop_equipment+22",
         "published_at_present+6"
       ],
-      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "snippet": "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ...",
       "source": "Brave Search",
-      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
-      "url": "https://www.finn.no/bap/forsale/search.html?product_category=2.91.3108.363"
+      "title": "Selected – Klesbutikk i Bergen - Heggland Heiltre AS",
+      "url": "https://heggland-heiltre.no/selected-klesbutikk-i-bergen/"
     },
     {
-      "canonical_url": "https://billige-arbeidsklaer.no/arbeidsklaer",
+      "canonical_url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-75.html",
       "categories": [
-        "inventory"
+        "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198046+00:00",
+      "discovered_at": "2026-07-31T09:16:06.967222+00:00",
       "image_count": null,
-      "lead_id": "web-0658ba89b4c5fc6f74ea",
+      "lead_id": "web-15defc847337cd18eca8",
       "price_nok": null,
-      "priority_score": 22,
+      "priority_score": 24,
       "published_at": null,
       "score_reasons": [
-        "category:inventory+22"
+        "category:clothing_shop_fixtures+24"
       ],
-      "snippet": "Ser du etter arbeidsklær er du havnet på rett sted her hos <strong>Billig-arbeidsklær.no</strong>, hvor vi har et kjempestort utvalg online. Vi har alt fra billige restpartier til de siste nye trends og tendenser.",
+      "snippet": "Utstillingsdukker · Glassmonter · Klesstativ · Veggskinner · Butikkdisker · Displayutstyr · Dette er vår bestselger! Utstillingsdukker med flotte linjer og et elegant uttrykk med et moderne og minimalistisk hode gjør at disse utstillingsdukker egner seg til de fleste bransjer.",
       "source": "Brave Search",
-      "title": "Arbeidsklær | Norges største utvalg | Billige restpartier!",
-      "url": "https://billige-arbeidsklaer.no/arbeidsklaer"
+      "title": "Hvite og sorte - Utstillingsdukker",
+      "url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-75.html"
+    },
+    {
+      "canonical_url": "https://finckenhagen.no/stikkord/klesstativ",
+      "categories": [
+        "clothing_shop_fixtures"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.966822+00:00",
+      "image_count": null,
+      "lead_id": "web-5d1caedc0f687ca45737",
+      "price_nok": null,
+      "priority_score": 24,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24"
+      ],
+      "snippet": "Vi har et bredt utvalg av klesstativ til butikker og privatpersoner. Du finner blant annet reisestativ, stativ med rette armer og undertøystativ.",
+      "source": "Brave Search",
+      "title": "Klesstativ | Se vårt store utvalg | Kjøp i nettbutikken",
+      "url": "https://finckenhagen.no/stikkord/klesstativ/"
+    },
+    {
+      "canonical_url": "https://www.butikkartikler.no/product-tag/utstillingsdukke",
+      "categories": [
+        "clothing_shop_fixtures"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.966769+00:00",
+      "image_count": null,
+      "lead_id": "web-da69efc40719142bd2b6",
+      "price_nok": null,
+      "priority_score": 24,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24"
+      ],
+      "snippet": "Utstillingsdukker · Glassmontere · Klesstativ · Butikkdisker · Home · / / Utstillingsdukke · Viser 1–12 av 28 resultater · Tilbud! kr 2.950,00 Opprinnelig pris var: kr 2.950,00. kr 2.360,00Nåværende pris er: kr 2.360,00. + mva Legg i handlekurv · Tilbud! kr 2.950,00 Opprinnelig ...",
+      "source": "Brave Search",
+      "title": "Utstillingsdukke - Butikkartikler AS",
+      "url": "https://www.butikkartikler.no/product-tag/utstillingsdukke/"
+    },
+    {
+      "canonical_url": "https://www.elkjop.no/product/tjenester-og-tilbehor/diverse-tilbehor/utstillingsdukke-mann/609127",
+      "categories": [
+        "clothing_shop_fixtures"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.967061+00:00",
+      "image_count": null,
+      "lead_id": "web-d8adeb8c515443238a4b",
+      "price_nok": null,
+      "priority_score": 24,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24"
+      ],
+      "snippet": "Naturtro proporsjoner er en naturlig holdning og fine ansiktstrekk kjennetegner utstillingsdukken fra tectake. Med sitt dreibare og vippbare hode og de bevegelige armene kan man alltid sette figuren på en ny måte. Dukkens eklsusive og moderne design harmonerer med forskjellige moter og tilbehør. Glassplaten med festere av aluminium sørger for at den står stabilt og gjør det mulig at dukken kan ha sko på. Om det er til vindusutstilling, som dekorasjon til en fest eller som et annerledes klesstativ, passer denne utstillingsdukken perfekt.",
+      "source": "Brave Search",
+      "title": "Utstillingsdukke - mann - Elkjøp | Elkjøp",
+      "url": "https://www.elkjop.no/product/tjenester-og-tilbehor/diverse-tilbehor/utstillingsdukke-mann/609127"
+    },
+    {
+      "canonical_url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker",
+      "categories": [
+        "clothing_shop_fixtures"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T09:16:06.967157+00:00",
+      "image_count": null,
+      "lead_id": "web-b9100172d742fc440381",
+      "price_nok": null,
+      "priority_score": 24,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24"
+      ],
+      "snippet": "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·",
+      "source": "Brave Search",
+      "title": "Utstillingsdukker - Boltreplassen",
+      "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
     },
     {
       "canonical_url": "https://www.1881.no/butikkinnredning-og-utstyr",
@@ -597,7 +893,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198894+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965963+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -612,52 +908,12 @@
       "url": "https://www.1881.no/butikkinnredning-og-utstyr/"
     },
     {
-      "canonical_url": "https://www.supersellerskatalog.no/",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198835+00:00",
-      "image_count": null,
-      "lead_id": "web-e71772deae49d9ffbeb5",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:shop_equipment+22"
-      ],
-      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
-      "source": "Brave Search",
-      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
-      "url": "https://www.supersellerskatalog.no/"
-    },
-    {
-      "canonical_url": "https://www.supersellers.no/",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197274+00:00",
-      "image_count": null,
-      "lead_id": "web-7cad0e8a59e6e6643424",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:shop_equipment+22"
-      ],
-      "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS&#x27; butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
-      "source": "Brave Search",
-      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
-      "url": "https://www.supersellers.no/"
-    },
-    {
       "canonical_url": "https://www.sono.no/lager-industri/lager.html",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199634+00:00",
+      "discovered_at": "2026-07-31T09:16:06.968166+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -672,32 +928,12 @@
       "url": "https://www.sono.no/lager-industri/lager.html"
     },
     {
-      "canonical_url": "https://www.supersellers.no/katalog",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198673+00:00",
-      "image_count": null,
-      "lead_id": "web-bd6977fd8acb108de839",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:shop_equipment+22"
-      ],
-      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
-      "source": "Brave Search",
-      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
-      "url": "https://www.supersellers.no/katalog"
-    },
-    {
       "canonical_url": "https://www.witre.no/no/wno/lagerhyller-pallestativer",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199579+00:00",
+      "discovered_at": "2026-07-31T09:16:06.967967+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -717,7 +953,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199811+00:00",
+      "discovered_at": "2026-07-31T09:16:06.968556+00:00",
       "image_count": null,
       "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
@@ -737,7 +973,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199531+00:00",
+      "discovered_at": "2026-07-31T09:16:06.967912+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -757,7 +993,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199908+00:00",
+      "discovered_at": "2026-07-31T09:16:06.968413+00:00",
       "image_count": null,
       "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
@@ -772,33 +1008,12 @@
       "url": "https://www.supersellers.no/collections/lagerreoler"
     },
     {
-      "canonical_url": "https://luminx.no/",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200301+00:00",
-      "image_count": null,
-      "lead_id": "web-7570d71d9b328c0f5b6d",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": "2026-04-08T10:46:26",
-      "score_reasons": [
-        "category:salon_equipment+16",
-        "published_at_present+6"
-      ],
-      "snippet": "Oppdag profesjonelt frisørutstyr, skjønnhetsutstyr og salongverktøy hos Luminx. Perfekt for frisører, stylister, barbershops og skjønnhetsklinikker.",
-      "source": "Brave Search",
-      "title": "Profesjonelt Frisørutstyr & Skjønnhetsutstyr | Luminx",
-      "url": "https://luminx.no/"
-    },
-    {
       "canonical_url": "https://www.kom24.no/annonse-facebook-forbrukerradet/reklamerer-med-falske-opphorssalg-forbudt/754219",
       "categories": [
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197413+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964543+00:00",
       "image_count": null,
       "lead_id": "web-81550ca51413d1e1ac66",
       "price_nok": null,
@@ -814,133 +1029,13 @@
       "url": "https://www.kom24.no/annonse-facebook-forbrukerradet/reklamerer-med-falske-opphorssalg-forbudt/754219"
     },
     {
-      "canonical_url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199953+00:00",
-      "image_count": null,
-      "lead_id": "web-0623254318f1aaf8f835",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
-      "source": "Brave Search",
-      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
-      "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
-    },
-    {
-      "canonical_url": "https://naob.no/ordbok/restparti",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198309+00:00",
-      "image_count": null,
-      "lead_id": "web-921037454eb852a23c0d",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "restparti · substantiv · MODERAT BOKMÅLet · genus · nøytrum · ubestemt artikkel · et · FULL BOKMÅLSNORM · BETYDNING OG BRUK · <strong>resterende, ikke solgt parti av varer</strong> · | jf. rest · SITAT · [de skulde få avhendet] hele restpartiet af deres poteter ·",
-      "source": "Brave Search",
-      "title": "restparti - Det Norske Akademis ordbok",
-      "url": "https://naob.no/ordbok/restparti"
-    },
-    {
-      "canonical_url": "https://www.esska-no.com/shop/Tilbud/Restparti-sikkerhet/Restparti-arbeidshansker--24370",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198251+00:00",
-      "image_count": null,
-      "lead_id": "web-b1965bf33313f5b36f22",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "Restparti oppvarming · vvakuumteknologi · Restparti slanger + klemmer · Restparti renseteknologi · Restparti sugeteknikk · Restparti slipemidler · Restparti smøring · Restparti sikkerhet · Restparti yrkesklær · Restparti varselklær · Restparti kuldebeskyttende klær ·",
-      "source": "Brave Search",
-      "title": "Restparti arbeidshansker Restparti sikkerhet",
-      "url": "https://www.esska-no.com/shop/Tilbud/Restparti-sikkerhet/Restparti-arbeidshansker--24370"
-    },
-    {
-      "canonical_url": "https://www.finn.no/recommerce/forsale/item/453940131",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198455+00:00",
-      "image_count": null,
-      "lead_id": "web-dfc1cdb6d21849294976",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "Hardvoksolje. <strong>Fargerike Christensen</strong> er en butikk som leverer gulv fra etablerte leverandører i god kvalitet. Vi selger parkett, laminat og andre typer gulv billig pga store innkjøp, og det kommer kundene til gode.",
-      "source": "Brave Search",
-      "title": "Restparti Parkett Prestige Ask Seashell 1 stav | FINN-torget",
-      "url": "https://www.finn.no/recommerce/forsale/item/453940131"
-    },
-    {
-      "canonical_url": "https://www.finn.no/bap/webstore/ad.html",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198390+00:00",
-      "image_count": null,
-      "lead_id": "web-c1e3e1a07794eb2a24ac",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "Bla kan du bestille takstein, undertak, ... knotteplast, parkett og mye mer i vår butikk. <strong>Via www.eliteprodukter.no kan du bestille byggevarer til Norges garantert beste priser</strong>. Registrer din bedrift i dag og ta del i landets beste ...",
-      "source": "Brave Search",
-      "title": "Solgt! Dumpingpris på parkett! Restparti ! | FINN-torget",
-      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=104269917"
-    },
-    {
-      "canonical_url": "https://www.europages.no/no/products/stk",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198133+00:00",
-      "image_count": null,
-      "lead_id": "web-067ceeb7a126feb9836a",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "Zollstok, måleteknikk, lengdemåling, ... restparti (nyvare) Tilstand: ny Tilgjengelig mengde: 4.500 stk. Minimum bestillin... ... Håndlaget tilpasset solsikke snøkule Nummer: GRS1009 Materiale: Harpiks Type: Snøkule... ... Denne glasskubben er et høykvalitets papirvekt. Det er en original gave til bedrifter som kan gis ...",
-      "source": "Brave Search",
-      "title": "stk produkter | europages",
-      "url": "https://www.europages.no/no/products/stk"
-    },
-    {
       "canonical_url": "https://konkurs-bo.no/",
       "categories": [
         "bankruptcy",
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197878+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965315+00:00",
       "image_count": null,
       "lead_id": "web-69939d672dc42fe60d24",
       "price_nok": null,
@@ -962,7 +1057,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197097+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964689+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -977,132 +1072,12 @@
       "url": "https://www.bull.no/artikler/immaterialrett-og-markedsfringsrett/falske-opphrssalg"
     },
     {
-      "canonical_url": "https://www.expondo.no/frisoerutstyr",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200145+00:00",
-      "image_count": null,
-      "lead_id": "web-109ce00732f8f63fe37d",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Utmerket service ✓ Rask bestilling ✓ Topp merker ✓ Utforsk vårt store utvalg av frisørutstyr og finn riktig utstyr for din bedrift.",
-      "source": "Brave Search",
-      "title": "Frisørutstyr - kjøp frisørutstyr gunstig hos expondo.no",
-      "url": "https://www.expondo.no/frisoerutstyr/"
-    },
-    {
-      "canonical_url": "https://www.gulesider.no/fris%C3%B8rutstyr/bedrifter",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200189+00:00",
-      "image_count": null,
-      "lead_id": "web-c357ac15a9bf75a0ba5e",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Frisørutstyr - arbeidsstol, bandasjesaks, applikator, blomdahl, bor, føner, argiletz, aurora, bio+, camillen60, ainoa, carbid - Finn firmaer, adresser, telefonnumre.",
-      "source": "Brave Search",
-      "title": "Frisørutstyr | bedrifter | gulesider.no | side 1",
-      "url": "https://www.gulesider.no/fris%C3%B8rutstyr/bedrifter"
-    },
-    {
-      "canonical_url": "https://www.wellnessnorge.no/frisor/frisorutstyr-stoler-haartorkere-traller",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200074+00:00",
-      "image_count": null,
-      "lead_id": "web-a55e3a6ff81e23b22f21",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Under denne kategorien vil du i hovedsak finne utstyr og produkter tilpasset hudpleie og spa. Vi har mye å tilby fra forbruksvarer til inventar og elektrisk utstyr. Vi kan garantere at du vil kunne finne nesten alt du måtte trenge i din daglige drift eller om skal pusse opp eller går med ...",
-      "source": "Brave Search",
-      "title": "Frisørutstyr, stoler, hårtørkere, traller - Wellness Norge",
-      "url": "https://www.wellnessnorge.no/frisor/frisorutstyr-stoler-haartorkere-traller"
-    },
-    {
-      "canonical_url": "https://www.hairstore.no/produkter/utstyr",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200555+00:00",
-      "image_count": null,
-      "lead_id": "web-b1f8c07c3db873b5a31a",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Hairstore har en stort utvalg av frisørutstyr til små og store frisørsalonger.",
-      "source": "Brave Search",
-      "title": "Hairstore er en av landets ledende leverandører av rekvisita og utstyr til frisørbransjen.",
-      "url": "https://www.hairstore.no/produkter/utstyr"
-    },
-    {
-      "canonical_url": "https://salonambience.no/",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200346+00:00",
-      "image_count": null,
-      "lead_id": "web-dcc37d09e23b72b09f7d",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Frisørinnredning og frisørutstyr fra Salon Ambience. Vi kan hjelpe deg med design av din frisørsalong! Negl/Fotpleie/Hudpleie/Spa (Medical &amp; Beauty) Frisørutstyr / (Salon Ambien ...",
-      "source": "Brave Search",
-      "title": "Norhair AS - Frisørinnredning og hårpleieprodukter",
-      "url": "https://salonambience.no/"
-    },
-    {
-      "canonical_url": "https://www.osfrisorartikler.no/",
-      "categories": [
-        "salon_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.200254+00:00",
-      "image_count": null,
-      "lead_id": "web-6075e05144b5e4b48b80",
-      "price_nok": null,
-      "priority_score": 16,
-      "published_at": null,
-      "score_reasons": [
-        "category:salon_equipment+16"
-      ],
-      "snippet": "Hos OS Frisørartikler finner du et bredt utvalg av profesjonelle frisørartikler, hårprodukter og salongutstyr i høy kvalitet. Bestill enkelt på nett.",
-      "source": "Brave Search",
-      "title": "OS Frisørartikler - Profesjonelle frisørartikler & frisørutstyr",
-      "url": "https://www.osfrisorartikler.no/"
-    },
-    {
       "canonical_url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095",
       "categories": [
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.196658+00:00",
+      "discovered_at": "2026-07-31T09:16:06.963882+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1118,55 +1093,13 @@
       "url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095"
     },
     {
-      "canonical_url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861",
-      "categories": [
-        "bankruptcy"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.196724+00:00",
-      "image_count": null,
-      "lead_id": "web-d2192f749651b034d4eb",
-      "price_nok": null,
-      "priority_score": 14,
-      "published_at": "2022-09-05T10:02:35",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "published_at_present+6"
-      ],
-      "snippet": "<strong>I august økte antallet konkurser med 42,9 prosent, sammenlignet med samme måned i fjor</strong>. Antallet ansatte som har mistet jobben som følge av konkurser har økt med hele 51,5 prosent.",
-      "source": "Brave Search",
-      "title": "(+) Sterk økning i antall konkurser",
-      "url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861"
-    },
-    {
-      "canonical_url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617",
-      "categories": [
-        "bankruptcy"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.196828+00:00",
-      "image_count": null,
-      "lead_id": "web-ccf7065118a5bf95db40",
-      "price_nok": null,
-      "priority_score": 14,
-      "published_at": "2003-10-28T10:11:00",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "published_at_present+6"
-      ],
-      "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
-      "source": "Brave Search",
-      "title": "Devold Tekstil frifunne",
-      "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
-    },
-    {
       "canonical_url": "https://empus.no/konkursbo",
       "categories": [
         "bankruptcy",
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197692+00:00",
+      "discovered_at": "2026-07-31T09:16:06.965183+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1182,32 +1115,12 @@
       "url": "https://empus.no/konkursbo"
     },
     {
-      "canonical_url": "https://bedriftsborsen.no/bedrift-til-salgs",
-      "categories": [
-        "sale_listing"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T03:48:41.198196+00:00",
-      "image_count": null,
-      "lead_id": "web-a1a542fe748539aeeead",
-      "price_nok": null,
-      "priority_score": 10,
-      "published_at": null,
-      "score_reasons": [
-        "category:sale_listing+10"
-      ],
-      "snippet": "Velutrustet lokalbutikk med apotek, netthandel og selvscannings-kasser i Norges ... Kr. 1.950.000 · Bedrift med solid økonomi, moderne utstyrspark og kapasitet for vekst.",
-      "source": "Brave Search",
-      "title": "Bedrift til salgs : Bedriftsbørsen",
-      "url": "https://bedriftsborsen.no/bedrift-til-salgs/"
-    },
-    {
       "canonical_url": "https://www.machineseeker.no/mss/industrielle+symaskin",
       "categories": [
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199338+00:00",
+      "discovered_at": "2026-07-31T09:16:06.967738+00:00",
       "image_count": null,
       "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
@@ -1227,7 +1140,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199171+00:00",
+      "discovered_at": "2026-07-31T09:16:06.967531+00:00",
       "image_count": null,
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
@@ -1247,7 +1160,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.199045+00:00",
+      "discovered_at": "2026-07-31T09:16:06.967398+00:00",
       "image_count": null,
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "price_nok": null,
@@ -1267,7 +1180,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.197577+00:00",
+      "discovered_at": "2026-07-31T09:16:06.964936+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1287,7 +1200,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.196280+00:00",
+      "discovered_at": "2026-07-31T09:16:06.963568+00:00",
       "image_count": null,
       "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,
@@ -1307,7 +1220,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T03:48:41.196779+00:00",
+      "discovered_at": "2026-07-31T09:16:06.963980+00:00",
       "image_count": null,
       "lead_id": "web-ff05dbb792cccc1b5cc5",
       "price_nok": null,
@@ -1325,6 +1238,6 @@
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 62
+    "Brave Search": 57
   }
 }
