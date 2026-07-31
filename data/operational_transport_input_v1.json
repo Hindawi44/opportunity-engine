@@ -1,0 +1,160 @@
+{
+  "buyer_profile_id": "MAHMOUD_NAMSOS_V1",
+  "market_profile_id": "NO_DOMESTIC_V1",
+  "origin_country_basis": "MARKET_PROFILE",
+  "schema_version": "operational-transport-input-export-v1",
+  "selection_reason": "Reused the operational landed-cost selection and copied only structured logistics inputs.",
+  "selection_status": "SELECTED",
+  "source_opportunity": {
+    "final_decision": "WATCH",
+    "opportunity_id": "unified-auksjonen-613944",
+    "opportunity_score": 30.61,
+    "source_city": "Vigrestad",
+    "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
+    "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+  },
+  "source_schema_version": "operational-landed-cost-export-v1",
+  "transport_input": {
+    "assumptions": [
+      "Origin country is taken from the Norway market profile when the selected source does not provide a structured country code.",
+      "No shipment measurements are parsed from listing title or prose.",
+      "No map, route, distance, carrier, or external-price lookup was performed."
+    ],
+    "destination": {
+      "city": "Namsos",
+      "coordinates": null,
+      "country_code": "NO",
+      "postal_code": null
+    },
+    "estimate_id": "transport-unified-auksjonen-613944-to-mahmoud_namsos_v1",
+    "evidence_refs": [
+      "data/operational_landed_cost_v1.json#unified-auksjonen-613944",
+      "config/buyers/mahmoud_namsos_v1.json#MAHMOUD_NAMSOS_V1",
+      "config/markets/no_v1.json#NO_DOMESTIC_V1"
+    ],
+    "handling": {
+      "dismantling_required": null,
+      "forklift_required": null,
+      "loading_required": null,
+      "tail_lift_required": null,
+      "unloading_required": null
+    },
+    "opportunity_id": "unified-auksjonen-613944",
+    "origin": {
+      "city": "Vigrestad",
+      "coordinates": null,
+      "country_code": "NO",
+      "postal_code": null
+    },
+    "quote": {
+      "currency_code": "NOK",
+      "expected_nok": null,
+      "high_nok": null,
+      "low_nok": null,
+      "notes": [],
+      "source_ref": null,
+      "status": "UNKNOWN"
+    },
+    "schema_version": "transport-estimate-input-v1",
+    "shipment": {
+      "cargo_type": "UNKNOWN",
+      "item_count": null,
+      "longest_length_m": null,
+      "package_count": null,
+      "pallet_count": null,
+      "volume_m3": null,
+      "weight_kg": null
+    },
+    "transport_mode": "UNKNOWN"
+  },
+  "transport_snapshot": {
+    "assumptions": [
+      "Origin country is taken from the Norway market profile when the selected source does not provide a structured country code.",
+      "No shipment measurements are parsed from listing title or prose.",
+      "No map, route, distance, carrier, or external-price lookup was performed."
+    ],
+    "confidence": "LOW",
+    "destination": {
+      "city": "Namsos",
+      "coordinates": null,
+      "country_code": "NO",
+      "postal_code": null
+    },
+    "estimate_id": "transport-unified-auksjonen-613944-to-mahmoud_namsos_v1",
+    "evidence_refs": [
+      "data/operational_landed_cost_v1.json#unified-auksjonen-613944",
+      "config/buyers/mahmoud_namsos_v1.json#MAHMOUD_NAMSOS_V1",
+      "config/markets/no_v1.json#NO_DOMESTIC_V1"
+    ],
+    "handling": {
+      "dismantling_required": null,
+      "forklift_required": null,
+      "loading_required": null,
+      "tail_lift_required": null,
+      "unloading_required": null
+    },
+    "known_shipment_metrics": [],
+    "landed_cost_input_readiness": {
+      "ready": false,
+      "status": "TRANSPORT_COMPONENT_PENDING"
+    },
+    "missing_inputs": [
+      "shipment.cargo_type",
+      "shipment.one_of_weight_volume_pallet_package_item_or_length",
+      "transport_mode",
+      "handling.loading_required",
+      "handling.unloading_required",
+      "handling.forklift_required",
+      "handling.tail_lift_required",
+      "handling.dismantling_required"
+    ],
+    "opportunity_id": "unified-auksjonen-613944",
+    "origin": {
+      "city": "Vigrestad",
+      "coordinates": null,
+      "country_code": "NO",
+      "postal_code": null
+    },
+    "quote": {
+      "currency_code": "NOK",
+      "expected_nok": null,
+      "high_nok": null,
+      "low_nok": null,
+      "notes": [],
+      "source_ref": null,
+      "status": "UNKNOWN"
+    },
+    "route_precision": "CITY_LEVEL_INPUT_ONLY",
+    "schema_version": "transport-estimate-input-v1",
+    "scope": {
+      "automatic_distance_calculation_enabled": false,
+      "automatic_purchase_allowed": false,
+      "carrier_quote_lookup_enabled": false,
+      "changes_alerts": false,
+      "changes_final_decision": false,
+      "changes_ranking": false,
+      "changes_top5": false,
+      "external_price_lookup_enabled": false,
+      "map_or_route_lookup_enabled": false
+    },
+    "shipment": {
+      "cargo_type": "UNKNOWN",
+      "item_count": null,
+      "longest_length_m": null,
+      "package_count": null,
+      "pallet_count": null,
+      "volume_m3": null,
+      "weight_kg": null
+    },
+    "transport_cost_range": null,
+    "transport_mode": "UNKNOWN",
+    "transport_status": "REQUIRES_SHIPMENT_INPUTS",
+    "unknown_handling_requirements": [
+      "loading_required",
+      "unloading_required",
+      "forklift_required",
+      "tail_lift_required",
+      "dismantling_required"
+    ]
+  }
+}

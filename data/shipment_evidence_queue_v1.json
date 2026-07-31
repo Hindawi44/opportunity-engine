@@ -1,0 +1,184 @@
+{
+  "blocking_task_count": 8,
+  "manual_quote_readiness": {
+    "ready": false,
+    "transport_status": "REQUIRES_SHIPMENT_INPUTS"
+  },
+  "next_action": "COLLECT_SHIPMENT_EVIDENCE",
+  "schema_version": "shipment-evidence-queue-v1",
+  "scope": {
+    "automatic_carrier_contact_allowed": false,
+    "automatic_purchase_allowed": false,
+    "automatic_quote_request_allowed": false,
+    "automatic_seller_contact_allowed": false,
+    "changes_alerts": false,
+    "changes_final_decision": false,
+    "changes_ranking": false,
+    "changes_top5": false,
+    "listing_prose_extraction_enabled": false,
+    "persistent_task_state_enabled": false
+  },
+  "selection_status": "SELECTED",
+  "source_opportunity": {
+    "final_decision": "WATCH",
+    "opportunity_id": "unified-auksjonen-613944",
+    "opportunity_score": 30.61,
+    "source_city": "Vigrestad",
+    "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
+    "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+  },
+  "source_schema_version": "operational-transport-input-export-v1",
+  "task_count": 8,
+  "tasks": [
+    {
+      "blocks_manual_quote": true,
+      "blocks_qualification": true,
+      "current_value": null,
+      "evidence_refs": [],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": "HIGH",
+      "question_ar": "كيف تم تجهيز البضاعة: مفردة، داخل صناديق، أم على طبالي؟",
+      "question_nb": "Hvordan er varene pakket – løst, i esker eller på pall?",
+      "reason": "The carrier needs the packing form to choose suitable equipment.",
+      "requested_fields": [
+        "shipment.cargo_type"
+      ],
+      "source_channel": "LISTING_OR_SELLER",
+      "status": "OPEN",
+      "task_id": "shipment-evidence-unified-auksjonen-613944-cargo-type-shipment-cargo-type",
+      "task_type": "CARGO_TYPE"
+    },
+    {
+      "blocks_manual_quote": true,
+      "blocks_qualification": true,
+      "current_value": null,
+      "evidence_refs": [],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": "CRITICAL",
+      "question_ar": "هل يمكن تزويدنا بالوزن الإجمالي، والأبعاد بعد التغليف أو الحجم، وعدد الطبالي أو الطرود أو القطع؟",
+      "question_nb": "Kan dere oppgi totalvekt, pakkede mål eller volum, og antall paller, kolli eller deler?",
+      "reason": "At least one structured size or mass basis is required for a quote.",
+      "requested_fields": [
+        "shipment.weight_kg",
+        "shipment.volume_m3",
+        "shipment.pallet_count",
+        "shipment.package_count",
+        "shipment.item_count",
+        "shipment.longest_length_m"
+      ],
+      "source_channel": "LISTING_OR_SELLER",
+      "status": "OPEN",
+      "task_id": "shipment-evidence-unified-auksjonen-613944-shipment-measurements-shipment-one-of-weight-volume-pallet-package-item-or-length",
+      "task_type": "SHIPMENT_MEASUREMENTS"
+    },
+    {
+      "blocks_manual_quote": true,
+      "blocks_qualification": true,
+      "current_value": null,
+      "evidence_refs": [],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": "HIGH",
+      "question_ar": "هل سيكون الاستلام ذاتيًا، بسيارة توصيل، أم بواسطة شركة نقل وشحن؟",
+      "question_nb": "Skal varene hentes selv, med budbil eller av transportør/fraktfirma?",
+      "reason": "A transport method must be selected before requesting a comparable quote.",
+      "requested_fields": [
+        "transport_mode"
+      ],
+      "source_channel": "OPERATOR",
+      "status": "OPEN",
+      "task_id": "shipment-evidence-unified-auksjonen-613944-transport-mode-transport-mode",
+      "task_type": "TRANSPORT_MODE"
+    },
+    {
+      "blocks_manual_quote": true,
+      "blocks_qualification": true,
+      "current_value": null,
+      "evidence_refs": [],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": "HIGH",
+      "question_ar": "هل سيقوم البائع بتحميل البضاعة أم يجب على شركة النقل تحميلها؟",
+      "question_nb": "Laster selger varene, eller må transportøren stå for lasting?",
+      "reason": "Loading responsibility can materially change the quote.",
+      "requested_fields": [
+        "handling.loading_required"
+      ],
+      "source_channel": "LISTING_OR_SELLER",
+      "status": "OPEN",
+      "task_id": "shipment-evidence-unified-auksjonen-613944-loading-requirement-handling-loading-required",
+      "task_type": "LOADING_REQUIREMENT"
+    },
+    {
+      "blocks_manual_quote": true,
+      "blocks_qualification": true,
+      "current_value": null,
+      "evidence_refs": [],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": "HIGH",
+      "question_ar": "هل نحتاج إلى مساعدة أو معدات عند تفريغ البضاعة في نامسوس؟",
+      "question_nb": "Kreves det hjelp eller utstyr ved lossing i Namsos?",
+      "reason": "Unloading responsibility must be known for an operational quote.",
+      "requested_fields": [
+        "handling.unloading_required"
+      ],
+      "source_channel": "BUYER_OR_CARRIER",
+      "status": "OPEN",
+      "task_id": "shipment-evidence-unified-auksjonen-613944-unloading-requirement-handling-unloading-required",
+      "task_type": "UNLOADING_REQUIREMENT"
+    },
+    {
+      "blocks_manual_quote": true,
+      "blocks_qualification": true,
+      "current_value": null,
+      "evidence_refs": [],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": "HIGH",
+      "question_ar": "هل توجد رافعة شوكية عند الاستلام أم يجب على شركة النقل إحضار معدات الرفع؟",
+      "question_nb": "Er truck tilgjengelig ved henting, eller må transportøren ha med løfteutstyr?",
+      "reason": "Forklift availability affects vehicle and handling requirements.",
+      "requested_fields": [
+        "handling.forklift_required"
+      ],
+      "source_channel": "LISTING_OR_SELLER",
+      "status": "OPEN",
+      "task_id": "shipment-evidence-unified-auksjonen-613944-forklift-requirement-handling-forklift-required",
+      "task_type": "FORKLIFT_REQUIREMENT"
+    },
+    {
+      "blocks_manual_quote": true,
+      "blocks_qualification": true,
+      "current_value": null,
+      "evidence_refs": [],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": "HIGH",
+      "question_ar": "هل يلزم مصعد خلفي للشاحنة عند الاستلام أو التسليم؟",
+      "question_nb": "Er bakløfter nødvendig ved henting eller levering?",
+      "reason": "Tail-lift requirements affect carrier and vehicle selection.",
+      "requested_fields": [
+        "handling.tail_lift_required"
+      ],
+      "source_channel": "BUYER_OR_CARRIER",
+      "status": "OPEN",
+      "task_id": "shipment-evidence-unified-auksjonen-613944-tail-lift-requirement-handling-tail-lift-required",
+      "task_type": "TAIL_LIFT_REQUIREMENT"
+    },
+    {
+      "blocks_manual_quote": true,
+      "blocks_qualification": true,
+      "current_value": null,
+      "evidence_refs": [],
+      "opportunity_id": "unified-auksjonen-613944",
+      "priority": "HIGH",
+      "question_ar": "هل البضاعة مفككة وجاهزة للنقل أم يجب تفكيكها أولًا؟",
+      "question_nb": "Er varene demontert og klare for transport, eller må de demonteres først?",
+      "reason": "Dismantling changes handling time, dimensions, and total cost.",
+      "requested_fields": [
+        "handling.dismantling_required"
+      ],
+      "source_channel": "LISTING_OR_SELLER",
+      "status": "OPEN",
+      "task_id": "shipment-evidence-unified-auksjonen-613944-dismantling-requirement-handling-dismantling-required",
+      "task_type": "DISMANTLING_REQUIREMENT"
+    }
+  ],
+  "workflow_status": "EVIDENCE_REQUIRED_FOR_QUOTE"
+}

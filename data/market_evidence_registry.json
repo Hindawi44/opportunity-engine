@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-31T09:16:20.823618+00:00",
-  "opportunity_count": 5,
+  "generated_at": "2026-07-31T14:47:51.425262+00:00",
+  "opportunity_count": 3,
   "policy": {
     "automatic_verification": false,
     "minimum_comparables": 3,
@@ -12,57 +12,11 @@
       "accepted_comparable_count": 1,
       "accepted_comparables": [
         {
-          "canonical_url": "https://fasadenor.no/product/lagerreol-120x60x200cm-svart-800kg",
-          "captured_at": "2026-07-31T09:16:17.121339+00:00",
-          "comparable_quantity": null,
-          "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud brukt pris Norge",
-          "observed_prices_nok": [
-            2990.0
-          ],
-          "price_nok": 2990.0,
-          "quantity_status": "UNKNOWN",
-          "query_target_domain": null,
-          "similarity_score": 0.375,
-          "snippet": "<strong>2,990kr Inkludert Mva</strong> · Lagerreol 120×60×200cm – Svart 800kg – Robust lagerreol med sorte hyller og tverrstenger samt svart ramme. 4 justerbare hyller med total lastekapasitet på 800 kg. Pulverlakkert stål for ekstra slitestyrke",
-          "source": "Brave Search",
-          "source_class": "independent_web",
-          "source_quantity": 4,
-          "title": "Lagerreol 120×60×200cm - Svart 800kg",
-          "url": "https://fasadenor.no/product/lagerreol-120x60x200cm-svart-800kg/",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
-        }
-      ],
-      "asking_price_nok": 3000.0,
-      "candidate_comparable_count": 1,
-      "candidate_market_value_nok": null,
-      "evidence_status": "INSUFFICIENT_EVIDENCE",
-      "independent_domain_count": 1,
-      "independent_domains": [
-        "fasadenor.no"
-      ],
-      "market_value_verified": false,
-      "opportunity_id": "unified-auksjonen-614288",
-      "outlier_count": 0,
-      "outliers": [],
-      "review_reasons": [
-        "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains",
-        "quantity_not_confirmed_for_all_comparables"
-      ],
-      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud 2t 5m 48s",
-      "verified_market_value_nok": null
-    },
-    {
-      "accepted_comparable_count": 1,
-      "accepted_comparables": [
-        {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-31T09:16:18.141228+00:00",
+          "captured_at": "2026-07-31T14:47:46.849824+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d brukt pris Norge",
           "observed_prices_nok": [
             4990.0
           ],
@@ -97,7 +51,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d 1t 23m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 19t 52m",
       "verified_market_value_nok": null
     },
     {
@@ -105,7 +59,7 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://lindbak.no/produkter/eskoleia-elevskap-2x4-roms-b80-cm",
-          "captured_at": "2026-07-31T09:16:19.058084+00:00",
+          "captured_at": "2026-07-31T14:47:48.718490+00:00",
           "comparable_quantity": null,
           "domain": "lindbak.no",
           "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
@@ -144,7 +98,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 7t 49m 50s",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 2t 18m 19s",
       "verified_market_value_nok": null
     },
     {
@@ -164,27 +118,7 @@
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 2d 3t 21m",
-      "verified_market_value_nok": null
-    },
-    {
-      "accepted_comparable_count": 0,
-      "accepted_comparables": [],
-      "asking_price_nok": 9900.0,
-      "candidate_comparable_count": 0,
-      "candidate_market_value_nok": null,
-      "evidence_status": "INSUFFICIENT_EVIDENCE",
-      "independent_domain_count": 0,
-      "independent_domains": [],
-      "market_value_verified": false,
-      "opportunity_id": "unified-auksjonen-614290",
-      "outlier_count": 0,
-      "outliers": [],
-      "review_reasons": [
-        "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains"
-      ],
-      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud 1t 51m 48s",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
       "verified_market_value_nok": null
     }
   ],

@@ -38,7 +38,7 @@
       ],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 7t 49m 50s",
+      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 2t 18m 19s",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
       "vat_nok": null,
@@ -71,54 +71,9 @@
       "pending_market_comparables": [],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 2d 3t 21m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
-      "vat_nok": null,
-      "vat_status": null,
-      "verified": false
-    },
-    "unified-auksjonen-614288": {
-      "auction_fee_nok": null,
-      "candidate_market_value_nok": null,
-      "dismantling_cost_nok": null,
-      "market_comparables": [],
-      "market_evidence_review_reasons": [
-        "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains",
-        "quantity_not_confirmed_for_all_comparables"
-      ],
-      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
-      "missing_evidence": [
-        "three_verified_market_comparables",
-        "pending_market_comparables_require_review",
-        "auction_fee_nok",
-        "vat_status",
-        "vat_nok",
-        "transport_cost_nok",
-        "dismantling_cost_nok",
-        "storage_cost_nok",
-        "repair_cost_nok",
-        "other_costs_nok"
-      ],
-      "opportunity_id": "unified-auksjonen-614288",
-      "other_costs_nok": null,
-      "pending_market_comparables": [
-        {
-          "price_nok": 2990.0,
-          "quantity_status": "UNKNOWN",
-          "similarity_score": 0.375,
-          "source": "Brave Search",
-          "url": "https://fasadenor.no/product/lagerreol-120x60x200cm-svart-800kg/",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
-        }
-      ],
-      "repair_cost_nok": null,
-      "storage_cost_nok": null,
-      "title": "4 stk komplette Lagerreoler 120×60×200cm – 200kg pr. hylle – total 800kg Tønsberg 23 bud 2t 5m 48s",
-      "transport_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_12060200cm__200kg_pr_hylle__total_800kg/614288",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
@@ -161,52 +116,19 @@
       ],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 3d 1t 23m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 19t 52m",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
-    },
-    "unified-auksjonen-614290": {
-      "auction_fee_nok": null,
-      "candidate_market_value_nok": null,
-      "dismantling_cost_nok": null,
-      "market_comparables": [],
-      "market_evidence_review_reasons": [
-        "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains"
-      ],
-      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
-      "missing_evidence": [
-        "three_verified_market_comparables",
-        "auction_fee_nok",
-        "vat_status",
-        "vat_nok",
-        "transport_cost_nok",
-        "dismantling_cost_nok",
-        "storage_cost_nok",
-        "repair_cost_nok",
-        "other_costs_nok"
-      ],
-      "opportunity_id": "unified-auksjonen-614290",
-      "other_costs_nok": null,
-      "pending_market_comparables": [],
-      "repair_cost_nok": null,
-      "storage_cost_nok": null,
-      "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud 1t 51m 48s",
-      "transport_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290",
-      "vat_nok": null,
-      "vat_status": null,
-      "verified": false
     }
   },
-  "evidence_count": 5,
-  "generated_at": "2026-07-31T09:16:20.860656+00:00",
+  "evidence_count": 3,
+  "generated_at": "2026-07-31T14:47:51.463969+00:00",
   "market_evidence_source": "data/market_evidence_registry.json",
   "method": "verified evidence only; discovered market evidence is bridged as pending review; unknown values remain null",
-  "pending_comparable_count": 3,
+  "pending_comparable_count": 2,
   "schema_version": 2,
   "verified_count": 0
 }
