@@ -35,6 +35,16 @@ def main() -> int:
     if decision_exit != 0:
         return decision_exit
 
+    unified_export_exit = run([
+        sys.executable,
+        "scripts/build_unified_opportunity_contracts.py",
+        "--decisions", "data/decision_intelligence.json",
+        "--output", "data/unified_opportunities_v1.json",
+        "--market", "NO",
+    ], root)
+    if unified_export_exit != 0:
+        return unified_export_exit
+
     return run([
         sys.executable,
         "scripts/sync_final_decisions.py",
