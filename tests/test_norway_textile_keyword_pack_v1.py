@@ -125,8 +125,8 @@ def test_generic_fixtures_require_explicit_clothing_context() -> None:
     )
     clothing = classify_candidate(
         _candidate(
-            "Butikkinnredning fra klesbutikk avvikling",
-            "Klesstativer, mannekenger og displaybord selges.",
+            "Butikkinnredning fra klesbutikk selges",
+            "Klesstativer, mannekenger og displaybord til salgs.",
         )
     )
 
@@ -138,7 +138,7 @@ def test_generic_fixtures_require_explicit_clothing_context() -> None:
 def test_canonical_output_preserves_category_and_blocks_automatic_purchase() -> None:
     result = classify_candidate(
         _candidate(
-            "Sytilbehør fra systue restlager selges",
+            "Sytilbehør og kortvarer fra restlager selges",
             "Glidelåser, knapper og sytråd til salgs.",
         )
     )
