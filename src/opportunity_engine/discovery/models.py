@@ -26,6 +26,8 @@ class DiscoveryResult:
     status: str
     reason: str
     evidence: tuple[str, ...] = field(default_factory=tuple)
+    category: str | None = None
+    taxonomy_reason: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
