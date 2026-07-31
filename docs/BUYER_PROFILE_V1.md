@@ -41,16 +41,43 @@ Unknown values deliberately remain `null`:
 
 No value is inferred from unrelated project data.
 
-## Matching readiness
+## Independent readiness stages
 
-Buyer Profile V1 is not yet a matching or scoring engine. Its snapshot reports
-whether the minimum buyer constraints needed by a later matching engine are
-known.
+Buyer Profile V1 does not treat missing commercial limits as a global block.
+The snapshot reports three independent readiness stages.
+
+### Discovery
+
+```text
+DISCOVERY_READY
+```
+
+The confirmed categories and markets are enough to continue collecting,
+classifying, and displaying relevant opportunities.
+
+### Cost-estimation input
+
+```text
+COST_ESTIMATION_READY
+```
+
+The confirmed country, city (`Namsos`), and settlement currency are enough for a
+future city-level estimate. The mode is explicitly:
+
+```text
+CITY_LEVEL_INPUT_ONLY
+```
+
+Missing postal code or coordinates reduce precision but do not stop discovery.
+This status does not mean a landed-cost engine is enabled or that a transport
+quote has been calculated.
+
+### Personal qualification
 
 The initial profile returns:
 
 ```text
-BLOCKED_MISSING_CONSTRAINTS
+PERSONAL_QUALIFICATION_PENDING
 ```
 
 until these fields are supplied explicitly:
@@ -62,9 +89,21 @@ commercial_constraints.minimum_expected_margin_ratio
 risk_policy.risk_tolerance
 ```
 
-This does not block discovery. It blocks only buyer-specific qualification and
-prevents a general market opportunity from being presented as suitable for this
-buyer without sufficient evidence.
+When all four are present, the status becomes:
+
+```text
+QUALIFICATION_READY
+```
+
+Missing values prevent only the final buyer-specific claim that an opportunity
+fits Mahmoud's budget and risk policy. They do not reject the opportunity and do
+not stop discovery or city-level cost-estimation inputs.
+
+## Compatibility
+
+The snapshot keeps `matching_readiness` as a compatibility view of the personal
+qualification stage. Its pending status is
+`PERSONAL_QUALIFICATION_PENDING`, not a global blocked state.
 
 ## Safety boundary
 
