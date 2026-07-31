@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, replace
 from typing import Callable
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     PageVerification,
@@ -24,10 +24,25 @@ from opportunity_engine.discovery.source_channel_guard import (
 MAX_RENDERED_PAGES = 3
 MIN_DELAY_SECONDS = 2.0
 _AUKSJONEN_ITEM_PATH = re.compile(r"^/auksjon(?:/[^/]+)+/\d+/?$", re.I)
+_APPROVED_AUKSJONEN_HOSTS = frozenset({"auksjonen.no", "ny.auksjonen.no"})
 _FALLBACK_ERRORS = frozenset({"insufficient public listing content"})
 
 PrimaryVerifier = Callable[[str], PageVerification]
 RenderedPageLoader = Callable[[str], tuple[str, str]]
+
+
+def canonicalize_auksjonen_item_url(url: str) -> str | None:
+    """Return a canonical approved item URL for either public frontend host."""
+    canonical = normalize_public_url(url)
+    if not canonical:
+        return None
+    parsed = urlparse(canonical)
+    if (
+        parsed.hostname not in _APPROVED_AUKSJONEN_HOSTS
+        or _AUKSJONEN_ITEM_PATH.fullmatch(parsed.path or "") is None
+    ):
+        return None
+    return urlunparse(parsed._replace(netloc="auksjonen.no"))
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,15 +68,8 @@ class AuksjonenPlaywrightFallbackConfig:
 
 
 def is_specific_auksjonen_item_url(url: str) -> bool:
-    """Return True only for a stable public Auksjonen item URL."""
-    canonical = normalize_public_url(url)
-    if not canonical:
-        return False
-    parsed = urlparse(canonical)
-    return (
-        parsed.hostname == "auksjonen.no"
-        and _AUKSJONEN_ITEM_PATH.fullmatch(parsed.path or "") is not None
-    )
+    """Return True only for a stable public item URL on an approved host."""
+    return canonicalize_auksjonen_item_url(url) is not None
 
 
 class AuksjonenPlaywrightFallbackVerifier:
@@ -134,16 +142,17 @@ class AuksjonenPlaywrightFallbackVerifier:
             self._budget_exhausted += 1
             return primary_result
 
-        canonical = normalize_public_url(url) or url
+        canonical = canonicalize_auksjonen_item_url(url) or url
         self._attempted_urls.append(canonical)
         try:
             final_url, rendered_html = self._load_rendered_page(canonical)
-            if not is_specific_auksjonen_item_url(final_url):
+            canonical_final_url = canonicalize_auksjonen_item_url(final_url)
+            if canonical_final_url is None:
                 raise RuntimeError(
                     "rendered page redirected outside one specific Auksjonen item"
                 )
             rendered_result = enforce_source_channel_identity(
-                verify_public_html(final_url, rendered_html)
+                verify_public_html(canonical_final_url, rendered_html)
             )
             if rendered_result.verified is True:
                 self._successful_urls.append(canonical)
