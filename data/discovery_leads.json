@@ -7,11 +7,11 @@
     "inventory": 24,
     "liquidation": 7,
     "office_furniture": 1,
-    "sale_listing": 9,
+    "sale_listing": 8,
     "shop_equipment": 15
   },
   "deduplicated_lead_count": 58,
-  "generated_at": "2026-07-31T14:47:38.848795+00:00",
+  "generated_at": "2026-07-31T19:52:19.549513+00:00",
   "input_result_count": 80,
   "items": [
     {
@@ -21,7 +21,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845935+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546324+00:00",
       "image_count": null,
       "lead_id": "web-7c78687e8f228b645e34",
       "price_nok": null,
@@ -44,7 +44,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846842+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547298+00:00",
       "image_count": null,
       "lead_id": "web-7368b74c0e956c42b2b7",
       "price_nok": null,
@@ -66,7 +66,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846263+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546705+00:00",
       "image_count": null,
       "lead_id": "web-e71772deae49d9ffbeb5",
       "price_nok": null,
@@ -88,7 +88,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846888+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547351+00:00",
       "image_count": null,
       "lead_id": "web-72d343831b08e2486a3f",
       "price_nok": null,
@@ -110,7 +110,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845996+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546392+00:00",
       "image_count": null,
       "lead_id": "web-7cad0e8a59e6e6643424",
       "price_nok": null,
@@ -132,7 +132,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846093+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546480+00:00",
       "image_count": null,
       "lead_id": "web-bd6977fd8acb108de839",
       "price_nok": null,
@@ -154,7 +154,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847336+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547845+00:00",
       "image_count": null,
       "lead_id": "web-a9922918a03cfccae302",
       "price_nok": null,
@@ -176,7 +176,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845033+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545225+00:00",
       "image_count": null,
       "lead_id": "web-340bfb344e98a6d682c6",
       "price_nok": null,
@@ -200,7 +200,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848293+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548997+00:00",
       "image_count": null,
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
@@ -223,7 +223,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844785+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545096+00:00",
       "image_count": null,
       "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
@@ -246,7 +246,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846381+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546843+00:00",
       "image_count": null,
       "lead_id": "web-09fdcc107a66ac1b45ab",
       "price_nok": null,
@@ -268,7 +268,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844969+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545280+00:00",
       "image_count": null,
       "lead_id": "web-ef2f88a92a8f9400d376",
       "price_nok": null,
@@ -290,7 +290,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844675+00:00",
+      "discovered_at": "2026-07-31T19:52:19.544972+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -312,7 +312,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844835+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545153+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -334,7 +334,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845310+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545610+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -357,7 +357,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844310+00:00",
+      "discovered_at": "2026-07-31T19:52:19.544556+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -380,7 +380,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847523+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548114+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -396,28 +396,6 @@
       "url": "https://www.finn.no/recommerce/forsale/search?q=utstillingsdukke"
     },
     {
-      "canonical_url": "https://www.rubrikk.no/torget-brukt-til-salgs/utstillingsdukker-til-salgs.html",
-      "categories": [
-        "clothing_shop_fixtures",
-        "sale_listing"
-      ],
-      "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847575+00:00",
-      "image_count": null,
-      "lead_id": "web-9a1b9c6b529b06a2bf10",
-      "price_nok": null,
-      "priority_score": 34,
-      "published_at": null,
-      "score_reasons": [
-        "category:clothing_shop_fixtures+24",
-        "category:sale_listing+10"
-      ],
-      "snippet": "Vi har 28 resultater for Utstillingsdukker til salgs til de beste prisene. Den billigste annonsen ligger ute til Kr. 100. Sjekk ut alle annonser fra hundrevis av markedsplasser på Rubrikk.no!",
-      "source": "Brave Search",
-      "title": "Utstillingsdukker til salgs - Januar 2021",
-      "url": "https://www.rubrikk.no/torget-brukt-til-salgs/utstillingsdukker-til-salgs.html"
-    },
-    {
       "canonical_url": "https://www.verdirealisering.no/konkursbo-b/tag/varelager",
       "categories": [
         "bankruptcy",
@@ -425,7 +403,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845483+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545824+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -448,7 +426,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845891+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546271+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -470,7 +448,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846937+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547406+00:00",
       "image_count": null,
       "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
@@ -492,7 +470,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847875+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548533+00:00",
       "image_count": null,
       "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
@@ -514,7 +492,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845850+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546226+00:00",
       "image_count": null,
       "lead_id": "web-08c1c3148277e6eb31ea",
       "price_nok": null,
@@ -536,7 +514,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845747+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546110+00:00",
       "image_count": null,
       "lead_id": "web-7c85d59249f9065a7874",
       "price_nok": null,
@@ -558,7 +536,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845351+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545656+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -580,7 +558,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845670+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546031+00:00",
       "image_count": null,
       "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
@@ -601,7 +579,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846430+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546900+00:00",
       "image_count": null,
       "lead_id": "web-f5e25a1bdcd9e106de57",
       "price_nok": null,
@@ -622,7 +600,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846162+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546553+00:00",
       "image_count": null,
       "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
@@ -643,7 +621,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847000+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547478+00:00",
       "image_count": null,
       "lead_id": "web-330d2f86de3299dc9513",
       "price_nok": null,
@@ -664,7 +642,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846514+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546991+00:00",
       "image_count": null,
       "lead_id": "web-a51fe9a70f780a57d999",
       "price_nok": null,
@@ -685,7 +663,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848645+00:00",
+      "discovered_at": "2026-07-31T19:52:19.549384+00:00",
       "image_count": null,
       "lead_id": "web-5f5c8a287e0bc6f1c921",
       "price_nok": null,
@@ -706,7 +684,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848581+00:00",
+      "discovered_at": "2026-07-31T19:52:19.549318+00:00",
       "image_count": null,
       "lead_id": "web-63600f85f4126e808e67",
       "price_nok": null,
@@ -727,7 +705,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846789+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547239+00:00",
       "image_count": null,
       "lead_id": "web-f7fe2d09f32e4cbfda29",
       "price_nok": null,
@@ -743,24 +721,24 @@
       "url": "https://heggland-heiltre.no/selected-klesbutikk-i-bergen/"
     },
     {
-      "canonical_url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-76.html",
+      "canonical_url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-75.html",
       "categories": [
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847416+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548007+00:00",
       "image_count": null,
-      "lead_id": "web-c352a6e054ce74574ea7",
+      "lead_id": "web-15defc847337cd18eca8",
       "price_nok": null,
       "priority_score": 24,
       "published_at": null,
       "score_reasons": [
         "category:clothing_shop_fixtures+24"
       ],
-      "snippet": "Utstillingsdukker, torsoer og byster av alle typer i høy kvalitet til rimelige priser. Kjøp direkte fra importør! <strong>Sjekk våre nettsider eller ta kontakt på telefon 69 35 33 33.</strong>",
+      "snippet": "Utstillingsdukker · Glassmonter · Klesstativ · Veggskinner · Butikkdisker · Displayutstyr · Dette er vår bestselger! Utstillingsdukker med flotte linjer og et elegant uttrykk med et moderne og minimalistisk hode gjør at disse utstillingsdukker egner seg til de fleste bransjer.",
       "source": "Brave Search",
       "title": "Hvite og sorte - Utstillingsdukker",
-      "url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-76.html"
+      "url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-75.html"
     },
     {
       "canonical_url": "https://finckenhagen.no/stikkord/klesstativ",
@@ -768,7 +746,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847283+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547787+00:00",
       "image_count": null,
       "lead_id": "web-5d1caedc0f687ca45737",
       "price_nok": null,
@@ -788,7 +766,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847083+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547547+00:00",
       "image_count": null,
       "lead_id": "web-da69efc40719142bd2b6",
       "price_nok": null,
@@ -808,7 +786,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847235+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547729+00:00",
       "image_count": null,
       "lead_id": "web-d8adeb8c515443238a4b",
       "price_nok": null,
@@ -828,7 +806,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847471+00:00",
+      "discovered_at": "2026-07-31T19:52:19.547932+00:00",
       "image_count": null,
       "lead_id": "web-b9100172d742fc440381",
       "price_nok": null,
@@ -843,12 +821,32 @@
       "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
     },
     {
+      "canonical_url": "https://www.fyndpris.no/3803-Utstillingsdukker",
+      "categories": [
+        "clothing_shop_fixtures"
+      ],
+      "city": null,
+      "discovered_at": "2026-07-31T19:52:19.548206+00:00",
+      "image_count": null,
+      "lead_id": "web-c5e69552ac139233640f",
+      "price_nok": null,
+      "priority_score": 24,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24"
+      ],
+      "snippet": "Denne mannlige <strong>utstillingsdukken, som kommer med en glassbase, er perfekt for mote-, tekstil- eller plaggutstillinger, til å stille ut klær, parykker, smykker eller sko</strong>.",
+      "source": "Brave Search",
+      "title": "Utstillingsdukker til god pris på Fyndpris",
+      "url": "https://www.fyndpris.no/3803-Utstillingsdukker"
+    },
+    {
       "canonical_url": "https://www.1881.no/butikkinnredning-og-utstyr",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.846329+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546782+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -868,7 +866,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848358+00:00",
+      "discovered_at": "2026-07-31T19:52:19.549068+00:00",
       "image_count": null,
       "lead_id": "web-c1e3e1a07794eb2a24ac",
       "price_nok": null,
@@ -888,7 +886,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848250+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548949+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -908,7 +906,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848195+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548888+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -928,7 +926,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848428+00:00",
+      "discovered_at": "2026-07-31T19:52:19.549144+00:00",
       "image_count": null,
       "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
@@ -948,7 +946,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848143+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548832+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -968,7 +966,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848478+00:00",
+      "discovered_at": "2026-07-31T19:52:19.549205+00:00",
       "image_count": null,
       "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
@@ -988,7 +986,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844918+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545507+00:00",
       "image_count": null,
       "lead_id": "web-81550ca51413d1e1ac66",
       "price_nok": null,
@@ -1009,7 +1007,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.848528+00:00",
+      "discovered_at": "2026-07-31T19:52:19.549259+00:00",
       "image_count": null,
       "lead_id": "web-0623254318f1aaf8f835",
       "price_nok": null,
@@ -1030,7 +1028,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845807+00:00",
+      "discovered_at": "2026-07-31T19:52:19.546176+00:00",
       "image_count": null,
       "lead_id": "web-69939d672dc42fe60d24",
       "price_nok": null,
@@ -1052,7 +1050,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845135+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545344+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -1072,7 +1070,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844447+00:00",
+      "discovered_at": "2026-07-31T19:52:19.544730+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1093,7 +1091,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844516+00:00",
+      "discovered_at": "2026-07-31T19:52:19.544862+00:00",
       "image_count": null,
       "lead_id": "web-d2192f749651b034d4eb",
       "price_nok": null,
@@ -1114,7 +1112,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844607+00:00",
+      "discovered_at": "2026-07-31T19:52:19.544796+00:00",
       "image_count": null,
       "lead_id": "web-ccf7065118a5bf95db40",
       "price_nok": null,
@@ -1136,7 +1134,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845611+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545963+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1157,7 +1155,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847960+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548601+00:00",
       "image_count": null,
       "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
@@ -1177,7 +1175,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847757+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548410+00:00",
       "image_count": null,
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
@@ -1197,7 +1195,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.847629+00:00",
+      "discovered_at": "2026-07-31T19:52:19.548273+00:00",
       "image_count": null,
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "price_nok": null,
@@ -1217,7 +1215,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.845407+00:00",
+      "discovered_at": "2026-07-31T19:52:19.545739+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1237,7 +1235,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-07-31T14:47:38.844117+00:00",
+      "discovered_at": "2026-07-31T19:52:19.544365+00:00",
       "image_count": null,
       "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,

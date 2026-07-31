@@ -1,6 +1,6 @@
 {
   "actionable_opportunities": {
-    "candidate_count": 3,
+    "candidate_count": 2,
     "items": [],
     "top_count": 0
   },
@@ -66,6 +66,32 @@
       },
       {
         "asking_price_nok": null,
+        "bankruptcy_date": "2026-07-31T00:00:00",
+        "channel": "bankruptcy_lead",
+        "city": "BERGEN",
+        "description": "Miljøvennlig belysning. LED import og salg av belysning. Agentur.",
+        "expected_profit_nok": null,
+        "industry_code": "46.180",
+        "industry_description": "Agenturhandel med spesialisert vareutvalg ellers",
+        "lead_id": "konkurs-app-938194351",
+        "lead_score": 23,
+        "organization_number": "938194351",
+        "roi_percent": null,
+        "score_reasons": [
+          "target:handel+8",
+          "location_present+5",
+          "organization_number_present+5",
+          "trustee_present+5"
+        ],
+        "source": "Konkurs.app",
+        "status": "FOLLOW_UP_LEAD",
+        "title": "ECOTEKNOLOGI AS",
+        "trustee": "Adv. Bjørn Åge Hamre",
+        "url": "https://konkurs.app/konkursbo/938194351",
+        "warning": "Discovery lead only; assets and sale availability are not confirmed."
+      },
+      {
+        "asking_price_nok": null,
         "bankruptcy_date": "2026-07-30T00:00:00",
         "channel": "bankruptcy_lead",
         "city": "OSLO",
@@ -115,41 +141,15 @@
         "trustee": "Adv. Stephen George Fulford",
         "url": "https://konkurs.app/konkursbo/938187185",
         "warning": "Discovery lead only; assets and sale availability are not confirmed."
-      },
-      {
-        "asking_price_nok": null,
-        "bankruptcy_date": "2026-07-29T00:00:00",
-        "channel": "bankruptcy_lead",
-        "city": "DRAMMEN",
-        "description": "Drive bar- og restaurantdrift samt handel naturlig tilhørende med dette.",
-        "expected_profit_nok": null,
-        "industry_code": "56.300",
-        "industry_description": "Drift av barer",
-        "lead_id": "konkurs-app-938180423",
-        "lead_score": 23,
-        "organization_number": "938180423",
-        "roi_percent": null,
-        "score_reasons": [
-          "target:handel+8",
-          "location_present+5",
-          "organization_number_present+5",
-          "trustee_present+5"
-        ],
-        "source": "Konkurs.app",
-        "status": "FOLLOW_UP_LEAD",
-        "title": "MOAI AS",
-        "trustee": "Adv. Stephen George Fulford",
-        "url": "https://konkurs.app/konkursbo/938180423",
-        "warning": "Discovery lead only; assets and sale availability are not confirmed."
       }
     ],
     "top_count": 5
   },
-  "generated_at": "2026-07-31T14:47:51.734896+00:00",
+  "generated_at": "2026-07-31T19:52:31.927302+00:00",
   "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
   "schema_version": 2,
   "source_funnel": {
-    "actionable_candidates": 3,
+    "actionable_candidates": 2,
     "actionable_selected": 0,
     "bankruptcy_leads_fetched": 25,
     "bankruptcy_leads_selected": 5

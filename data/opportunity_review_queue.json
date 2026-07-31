@@ -5,14 +5,14 @@
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-07-31T14:47:43.214692+00:00",
+  "generated_at": "2026-07-31T19:52:25.231710+00:00",
   "input_count": 25,
   "listing_metadata_enrichment": {
-    "enriched_count": 3,
+    "enriched_count": 2,
     "error_count": 0,
     "method": "directly observed public listing metadata only; no estimates"
   },
-  "low_relevance_omitted_count": 20,
+  "low_relevance_omitted_count": 21,
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [
     {
@@ -42,38 +42,8 @@
       ],
       "relevance_score": 29,
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 19t 52m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 14t 47m",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
-    },
-    {
-      "asking_price_nok": 1000.0,
-      "city": "Mathopen",
-      "ends_at": "1785517560000",
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "market_search_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud",
-      "matched_target_terms": [
-        "skap",
-        "garderobeskap"
-      ],
-      "opportunity_id": "unified-auksjonen-610671",
-      "priority": 1,
-      "reasons": [
-        "target:skap+7",
-        "target:garderobeskap+12",
-        "asking_price_present+5"
-      ],
-      "relevance_score": 24,
-      "status": "review_first",
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 2t 18m 19s",
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
     },
     {
       "asking_price_nok": 4000.0,
@@ -100,12 +70,12 @@
       ],
       "relevance_score": 23,
       "status": "review_first",
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 16t 45m",
       "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
     }
   ],
-  "review_first_count": 3,
+  "review_first_count": 2,
   "schema_version": 6,
-  "selected_count": 3,
+  "selected_count": 2,
   "source_snapshot": "data/todays_opportunities.json"
 }

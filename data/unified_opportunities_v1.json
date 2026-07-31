@@ -114,7 +114,7 @@
         "city": "Vigrestad",
         "description": null,
         "name": "auksjonen.no",
-        "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
+        "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 16t 45m",
         "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
       },
       "verification_status": "REQUIRES_VERIFICATION",
@@ -237,143 +237,20 @@
         "city": "Tønsberg",
         "description": null,
         "name": "auksjonen.no",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 19t 52m",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 14t 47m",
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
-      },
-      "verification_status": "REQUIRES_VERIFICATION",
-      "workflow_status": "NEW"
-    },
-    {
-      "automatic_purchase_decision": false,
-      "commercial_status": "WATCH",
-      "cost_estimate": {
-        "asking_price_nok": 1000.0,
-        "conservative_resale_value_nok": null,
-        "expected_profit_nok": null,
-        "maximum_safe_bid_nok": null,
-        "roi_percent": null,
-        "target_profit_buffer_nok": null,
-        "total_cost_nok": null,
-        "verified_operating_costs_nok": null
-      },
-      "evidence": [
-        {
-          "kind": "DISCOVERY_REASON",
-          "value": "target:skap+7"
-        },
-        {
-          "kind": "DISCOVERY_REASON",
-          "value": "target:garderobeskap+12"
-        },
-        {
-          "kind": "DISCOVERY_REASON",
-          "value": "asking_price_present+5"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "verified_economics:0/35"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "evidence_completeness:0.0/15"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "verified_comparables:0.0/10"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "marketability:9.0/15"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "logistics:7.0/10"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "relevance:1.7/7"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "listing_fields:7.0/8"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "evidence_gate:EVIDENCE_REQUIRED"
-        },
-        {
-          "kind": "DECISION_REASON_AR",
-          "value": "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
-        }
-      ],
-      "final_decision": "WATCH",
-      "identity": {
-        "canonical_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671",
-        "legacy_opportunity_id": "unified-auksjonen-610671",
-        "source_listing_id": "unified-auksjonen-610671"
-      },
-      "listing_status": "UNKNOWN",
-      "market": "NO",
-      "missing_information": [
-        "auction_fee_nok",
-        "dismantling_cost_nok",
-        "other_costs_nok",
-        "repair_cost_nok",
-        "storage_cost_nok",
-        "three_verified_market_comparables",
-        "transport_cost_nok",
-        "vat_nok",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "opportunity_id": "unified-auksjonen-610671",
-      "recommended_actions": [
-        "استكمال ثلاث مقارنات سوقية موثقة.",
-        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
-      ],
-      "risk": {
-        "analysis_eligible": null,
-        "decision_confidence": "LOW",
-        "decision_warnings_ar": [
-          "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
-        ],
-        "exclusion_reasons": [],
-        "legacy_recommendation": "WATCH",
-        "official_decision_field": "final_decision",
-        "opportunity_score": 24.68,
-        "relevance_score": 24,
-        "score_components": {
-          "evidence": 0.0,
-          "listing_quality": 8.68,
-          "logistics": 7.0,
-          "marketability": 9.0,
-          "verified_economics": 0.0
-        },
-        "score_grade": "E",
-        "top5_eligible": null
-      },
-      "schema_version": "unified-opportunity-contract-v1",
-      "source": {
-        "city": "Mathopen",
-        "description": null,
-        "name": "auksjonen.no",
-        "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 2t 18m 19s",
-        "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
       },
       "verification_status": "REQUIRES_VERIFICATION",
       "workflow_status": "NEW"
     }
   ],
   "decision_counts": {
-    "WATCH": 3
+    "WATCH": 2
   },
   "market": "NO",
-  "opportunity_count": 3,
+  "opportunity_count": 2,
   "schema_version": "unified-opportunity-contract-export-v1",
-  "source_generated_at": "2026-07-31T14:47:52.110067+00:00",
+  "source_generated_at": "2026-07-31T19:52:32.311613+00:00",
   "source_official_decision_field": "final_decision",
   "source_schema_version": 2
 }

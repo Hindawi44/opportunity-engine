@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-31T14:47:51.425262+00:00",
-  "opportunity_count": 3,
+  "generated_at": "2026-07-31T19:52:31.606525+00:00",
+  "opportunity_count": 2,
   "policy": {
     "automatic_verification": false,
     "minimum_comparables": 3,
@@ -13,7 +13,7 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-31T14:47:46.849824+00:00",
+          "captured_at": "2026-07-31T19:52:28.162554+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d brukt pris Norge",
@@ -51,46 +51,45 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 19t 52m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 14t 47m",
       "verified_market_value_nok": null
     },
     {
       "accepted_comparable_count": 1,
       "accepted_comparables": [
         {
-          "canonical_url": "https://lindbak.no/produkter/eskoleia-elevskap-2x4-roms-b80-cm",
-          "captured_at": "2026-07-31T14:47:48.718490+00:00",
+          "canonical_url": "https://finn.no/recommerce/forsale/item/379955413",
+          "captured_at": "2026-07-31T19:52:31.549660+00:00",
           "comparable_quantity": null,
-          "domain": "lindbak.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
           "observed_prices_nok": [
-            250.0,
-            2150.0
+            700000.0
           ],
-          "price_nok": 250.0,
+          "price_nok": 700000.0,
           "quantity_status": "UNKNOWN",
-          "query_target_domain": null,
-          "similarity_score": 0.4,
-          "snippet": "På ordre med nye varer beregnes frakt på 10 % av totalsummen. Minimumsgrense på frakt er 250 kr. <strong>Når du handler brukte varer beregnes det alltid frakt på 30 % av ordreverdi, minimum 2150 kr</strong>.",
+          "query_target_domain": "finn.no",
+          "similarity_score": 0.375,
+          "snippet": "<strong>Et stort varelager med varer for utsalgspris for over 700.000kr selges</strong>. Varene selges for annen satsning for firmaet. Varer som posehåndtak, isbitformer, solbriller, smarte løsninger til kjøkken og hjem, ballonger ++++ er en del produktene ...",
           "source": "Brave Search",
-          "source_class": "independent_web",
-          "source_quantity": 10,
-          "title": "Eskoleia elevskap 2x4 rom B80 cm | Lindbak",
-          "url": "https://www.lindbak.no/produkter/eskoleia-elevskap-2x4-roms-b80-cm",
+          "source_class": "marketplace",
+          "source_quantity": null,
+          "title": "Varelager til nettbutikk selges | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/379955413",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
         }
       ],
-      "asking_price_nok": 1000.0,
+      "asking_price_nok": 4000.0,
       "candidate_comparable_count": 1,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
       "independent_domain_count": 1,
       "independent_domains": [
-        "lindbak.no"
+        "finn.no"
       ],
       "market_value_verified": false,
-      "opportunity_id": "unified-auksjonen-610671",
+      "opportunity_id": "unified-auksjonen-613944",
       "outlier_count": 0,
       "outliers": [],
       "review_reasons": [
@@ -98,27 +97,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 2t 18m 19s",
-      "verified_market_value_nok": null
-    },
-    {
-      "accepted_comparable_count": 0,
-      "accepted_comparables": [],
-      "asking_price_nok": 4000.0,
-      "candidate_comparable_count": 0,
-      "candidate_market_value_nok": null,
-      "evidence_status": "INSUFFICIENT_EVIDENCE",
-      "independent_domain_count": 0,
-      "independent_domains": [],
-      "market_value_verified": false,
-      "opportunity_id": "unified-auksjonen-613944",
-      "outlier_count": 0,
-      "outliers": [],
-      "review_reasons": [
-        "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains"
-      ],
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 16t 45m",
       "verified_market_value_nok": null
     }
   ],

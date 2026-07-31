@@ -1,14 +1,14 @@
 {
   "failed_source_count": 0,
   "failed_stage": null,
-  "generated_at": "2026-07-31T14:47:52.034899+00:00",
+  "generated_at": "2026-07-31T19:52:32.236660+00:00",
   "overall_health": "HEALTHY",
   "pipeline_status": "SUCCESS",
-  "registry_record_count": 204,
+  "registry_record_count": 205,
   "registry_status_counts": {
     "DISCOVERED": 58,
-    "NOT_SEEN_THIS_RUN": 143,
-    "REJECTED": 3
+    "NOT_SEEN_THIS_RUN": 145,
+    "REJECTED": 2
   },
   "schema_version": 2,
   "source_count": 6,
@@ -19,7 +19,7 @@
       "configured": true,
       "error": null,
       "health": "HEALTHY",
-      "item_count": 41,
+      "item_count": 40,
       "required_configuration": [],
       "source": "Auksjonen.no",
       "status": "collecting"
@@ -91,154 +91,154 @@
   "stages": [
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:31.890948+00:00",
+      "finished_at": "2026-07-31T19:52:13.677795+00:00",
       "health": "HEALTHY",
       "name": "source_coverage",
-      "started_at": "2026-07-31T14:47:31.863181+00:00",
+      "started_at": "2026-07-31T19:52:13.650187+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:32.662801+00:00",
+      "finished_at": "2026-07-31T19:52:14.530960+00:00",
       "health": "HEALTHY",
       "name": "public_auction_events",
-      "started_at": "2026-07-31T14:47:31.890965+00:00",
+      "started_at": "2026-07-31T19:52:13.677814+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:38.720868+00:00",
+      "finished_at": "2026-07-31T19:52:19.417096+00:00",
       "health": "HEALTHY",
       "name": "brave_search",
-      "started_at": "2026-07-31T14:47:32.662821+00:00",
+      "started_at": "2026-07-31T19:52:14.530983+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:38.864214+00:00",
+      "finished_at": "2026-07-31T19:52:19.566848+00:00",
       "health": "HEALTHY",
       "name": "web_discovery",
-      "started_at": "2026-07-31T14:47:38.720894+00:00",
+      "started_at": "2026-07-31T19:52:19.417122+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:43.122207+00:00",
+      "finished_at": "2026-07-31T19:52:25.140562+00:00",
       "health": "HEALTHY",
       "name": "daily_opportunities",
-      "started_at": "2026-07-31T14:47:38.864234+00:00",
+      "started_at": "2026-07-31T19:52:19.566872+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:43.181564+00:00",
+      "finished_at": "2026-07-31T19:52:25.199483+00:00",
       "health": "HEALTHY",
       "name": "auksjonen_diagnostics",
-      "started_at": "2026-07-31T14:47:43.122230+00:00",
+      "started_at": "2026-07-31T19:52:25.140584+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:43.219667+00:00",
+      "finished_at": "2026-07-31T19:52:25.236809+00:00",
       "health": "HEALTHY",
       "name": "review_queue",
-      "started_at": "2026-07-31T14:47:43.181583+00:00",
+      "started_at": "2026-07-31T19:52:25.199504+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:45.907867+00:00",
+      "finished_at": "2026-07-31T19:52:27.396273+00:00",
       "health": "HEALTHY",
       "name": "listing_metadata",
-      "started_at": "2026-07-31T14:47:43.219685+00:00",
+      "started_at": "2026-07-31T19:52:25.236829+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:45.941784+00:00",
+      "finished_at": "2026-07-31T19:52:27.430255+00:00",
       "health": "HEALTHY",
       "name": "market_evidence_queue",
-      "started_at": "2026-07-31T14:47:45.907885+00:00",
+      "started_at": "2026-07-31T19:52:27.396292+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.388487+00:00",
+      "finished_at": "2026-07-31T19:52:31.567643+00:00",
       "health": "HEALTHY",
       "name": "market_price_candidates",
-      "started_at": "2026-07-31T14:47:45.941798+00:00",
+      "started_at": "2026-07-31T19:52:27.430273+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.431131+00:00",
+      "finished_at": "2026-07-31T19:52:31.613320+00:00",
       "health": "HEALTHY",
       "name": "market_evidence_registry",
-      "started_at": "2026-07-31T14:47:51.388506+00:00",
+      "started_at": "2026-07-31T19:52:31.567666+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.469241+00:00",
+      "finished_at": "2026-07-31T19:52:31.653271+00:00",
       "health": "HEALTHY",
       "name": "opportunity_evidence",
-      "started_at": "2026-07-31T14:47:51.431147+00:00",
+      "started_at": "2026-07-31T19:52:31.613340+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.503119+00:00",
+      "finished_at": "2026-07-31T19:52:31.688903+00:00",
       "health": "HEALTHY",
       "name": "economic_evaluation",
-      "started_at": "2026-07-31T14:47:51.469258+00:00",
+      "started_at": "2026-07-31T19:52:31.653288+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.543268+00:00",
+      "finished_at": "2026-07-31T19:52:31.730437+00:00",
       "health": "HEALTHY",
       "name": "unified_scoring",
-      "started_at": "2026-07-31T14:47:51.503134+00:00",
+      "started_at": "2026-07-31T19:52:31.688921+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.577333+00:00",
+      "finished_at": "2026-07-31T19:52:31.764825+00:00",
       "health": "HEALTHY",
       "name": "top5_report",
-      "started_at": "2026-07-31T14:47:51.543282+00:00",
+      "started_at": "2026-07-31T19:52:31.730458+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.613693+00:00",
+      "finished_at": "2026-07-31T19:52:31.801214+00:00",
       "health": "HEALTHY",
       "name": "scoring_alerts",
-      "started_at": "2026-07-31T14:47:51.577346+00:00",
+      "started_at": "2026-07-31T19:52:31.764843+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.748122+00:00",
+      "finished_at": "2026-07-31T19:52:31.942669+00:00",
       "health": "HEALTHY",
       "name": "opportunity_channels",
-      "started_at": "2026-07-31T14:47:51.613711+00:00",
+      "started_at": "2026-07-31T19:52:31.801234+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.785076+00:00",
+      "finished_at": "2026-07-31T19:52:31.980545+00:00",
       "health": "HEALTHY",
       "name": "source_funnel",
-      "started_at": "2026-07-31T14:47:51.748139+00:00",
+      "started_at": "2026-07-31T19:52:31.942692+00:00",
       "status": "SUCCESS"
     },
     {
       "exit_code": 0,
-      "finished_at": "2026-07-31T14:47:51.813339+00:00",
+      "finished_at": "2026-07-31T19:52:32.008840+00:00",
       "health": "HEALTHY",
       "name": "source_expansion",
-      "started_at": "2026-07-31T14:47:51.785091+00:00",
+      "started_at": "2026-07-31T19:52:31.980566+00:00",
       "status": "SUCCESS"
     }
   ]

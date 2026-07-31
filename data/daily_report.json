@@ -3,14 +3,14 @@
     "alerts": [],
     "decision_source": "data/decision_intelligence.json",
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-07-31T14:47:51.537106+00:00",
+    "last_scoring_run": "2026-07-31T19:52:31.723271+00:00",
     "official_decision_field": "final_decision",
     "schema_version": 2,
     "signatures": []
   },
   "channels": {
     "actionable_opportunities": {
-      "candidate_count": 3,
+      "candidate_count": 2,
       "items": [],
       "top_count": 0
     },
@@ -76,6 +76,32 @@
         },
         {
           "asking_price_nok": null,
+          "bankruptcy_date": "2026-07-31T00:00:00",
+          "channel": "bankruptcy_lead",
+          "city": "BERGEN",
+          "description": "Miljøvennlig belysning. LED import og salg av belysning. Agentur.",
+          "expected_profit_nok": null,
+          "industry_code": "46.180",
+          "industry_description": "Agenturhandel med spesialisert vareutvalg ellers",
+          "lead_id": "konkurs-app-938194351",
+          "lead_score": 23,
+          "organization_number": "938194351",
+          "roi_percent": null,
+          "score_reasons": [
+            "target:handel+8",
+            "location_present+5",
+            "organization_number_present+5",
+            "trustee_present+5"
+          ],
+          "source": "Konkurs.app",
+          "status": "FOLLOW_UP_LEAD",
+          "title": "ECOTEKNOLOGI AS",
+          "trustee": "Adv. Bjørn Åge Hamre",
+          "url": "https://konkurs.app/konkursbo/938194351",
+          "warning": "Discovery lead only; assets and sale availability are not confirmed."
+        },
+        {
+          "asking_price_nok": null,
           "bankruptcy_date": "2026-07-30T00:00:00",
           "channel": "bankruptcy_lead",
           "city": "OSLO",
@@ -125,51 +151,25 @@
           "trustee": "Adv. Stephen George Fulford",
           "url": "https://konkurs.app/konkursbo/938187185",
           "warning": "Discovery lead only; assets and sale availability are not confirmed."
-        },
-        {
-          "asking_price_nok": null,
-          "bankruptcy_date": "2026-07-29T00:00:00",
-          "channel": "bankruptcy_lead",
-          "city": "DRAMMEN",
-          "description": "Drive bar- og restaurantdrift samt handel naturlig tilhørende med dette.",
-          "expected_profit_nok": null,
-          "industry_code": "56.300",
-          "industry_description": "Drift av barer",
-          "lead_id": "konkurs-app-938180423",
-          "lead_score": 23,
-          "organization_number": "938180423",
-          "roi_percent": null,
-          "score_reasons": [
-            "target:handel+8",
-            "location_present+5",
-            "organization_number_present+5",
-            "trustee_present+5"
-          ],
-          "source": "Konkurs.app",
-          "status": "FOLLOW_UP_LEAD",
-          "title": "MOAI AS",
-          "trustee": "Adv. Stephen George Fulford",
-          "url": "https://konkurs.app/konkursbo/938180423",
-          "warning": "Discovery lead only; assets and sale availability are not confirmed."
         }
       ],
       "top_count": 5
     },
-    "generated_at": "2026-07-31T14:47:51.734896+00:00",
+    "generated_at": "2026-07-31T19:52:31.927302+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
     "schema_version": 2,
     "source_funnel": {
-      "actionable_candidates": 3,
+      "actionable_candidates": 2,
       "actionable_selected": 0,
       "bankruptcy_leads_fetched": 25,
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-07-31T14:47:51.813352+00:00",
+  "generated_at": "2026-07-31T19:52:32.008857+00:00",
   "opportunities": {
     "actionable_count": 0,
-    "candidate_count": 3,
-    "generated_at": "2026-07-31T14:47:51.572754+00:00",
+    "candidate_count": 2,
+    "generated_at": "2026-07-31T19:52:31.759811+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -179,8 +179,8 @@
   "scoring": {
     "actionable_count": 0,
     "buy_review_count": 0,
-    "candidate_count": 3,
-    "generated_at": "2026-07-31T14:47:51.537106+00:00",
+    "candidate_count": 2,
+    "generated_at": "2026-07-31T19:52:31.723271+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
@@ -246,7 +246,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
+        "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 16t 45m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
       },
@@ -314,85 +314,17 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 19t 52m",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 14t 47m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
-      },
-      {
-        "asking_price_nok": 1000.0,
-        "city": "Mathopen",
-        "conservative_resale_value_nok": null,
-        "decision": "EVIDENCE_REQUIRED",
-        "ends_at": "1785517560000",
-        "evidence_needed": [
-          "three_verified_market_comparables",
-          "auction_fee",
-          "vat_status",
-          "transport_cost",
-          "dismantling_cost",
-          "condition_and_missing_parts"
-        ],
-        "exclusion_reasons": [],
-        "expected_profit_nok": null,
-        "market_search_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud",
-        "matched_target_terms": [
-          "skap",
-          "garderobeskap"
-        ],
-        "maximum_safe_bid_nok": null,
-        "missing_evidence": [
-          "auction_fee_nok",
-          "dismantling_cost_nok",
-          "other_costs_nok",
-          "repair_cost_nok",
-          "storage_cost_nok",
-          "three_verified_market_comparables",
-          "transport_cost_nok",
-          "vat_nok"
-        ],
-        "opportunity_id": "unified-auksjonen-610671",
-        "opportunity_score": 24.68,
-        "priority": 1,
-        "reasons": [
-          "target:skap+7",
-          "target:garderobeskap+12",
-          "asking_price_present+5"
-        ],
-        "recommendation": "REJECT",
-        "recommendation_ar": "رفض",
-        "relevance_score": 24,
-        "requires_human_approval": false,
-        "roi_percent": null,
-        "score_components": {
-          "evidence": 0.0,
-          "listing_quality": 8.68,
-          "logistics": 7.0,
-          "marketability": 9.0,
-          "verified_economics": 0.0
-        },
-        "score_grade": "E",
-        "score_reasons": [
-          "verified_economics:0/35",
-          "evidence_completeness:0.0/15",
-          "verified_comparables:0.0/10",
-          "marketability:9.0/15",
-          "logistics:7.0/10",
-          "relevance:1.7/7",
-          "listing_fields:7.0/8",
-          "evidence_gate:EVIDENCE_REQUIRED"
-        ],
-        "status": "review_first",
-        "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 2t 18m 19s",
-        "total_cost_nok": null,
-        "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
       }
     ],
-    "reject_count": 3,
+    "reject_count": 2,
     "schema_version": 1
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-07-31T14:47:51.780054+00:00",
+    "generated_at": "2026-07-31T19:52:31.975020+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [
@@ -403,7 +335,7 @@
         "bankruptcy_leads_selected": 0,
         "configured": true,
         "error": null,
-        "fetched": 41,
+        "fetched": 40,
         "note": null,
         "public_auction_event_leads_selected": 0,
         "required_configuration": [],
@@ -492,7 +424,7 @@
       "awaiting_configuration_count": 3,
       "collecting_count": 3,
       "error_count": 0,
-      "fetched_total": 68,
+      "fetched_total": 67,
       "source_count": 6
     }
   },

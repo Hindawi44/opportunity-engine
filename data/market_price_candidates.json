@@ -1,7 +1,7 @@
 {
   "candidate_count": 2,
   "errors": {},
-  "generated_at": "2026-07-31T14:47:51.372407+00:00",
+  "generated_at": "2026-07-31T19:52:31.550906+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
@@ -17,7 +17,7 @@
       "candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-07-31T14:47:46.849824+00:00",
+          "captured_at": "2026-07-31T19:52:28.162554+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d brukt pris Norge",
@@ -44,19 +44,20 @@
       "market_search_queries": [
         "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d brukt pris Norge",
         "\"komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg\" selges kr",
-        "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK"
+        "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+        "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr"
       ],
       "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d brukt pris Norge",
       "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-614289",
       "query_budget_truncated": true,
-      "query_count": 3,
+      "query_count": 4,
       "query_stats": [
         {
           "accepted_count": 1,
           "query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d brukt pris Norge",
-          "rejected_count": 8,
-          "result_count": 9,
+          "rejected_count": 9,
+          "result_count": 10,
           "target_domain": null
         },
         {
@@ -72,9 +73,16 @@
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": null
+        },
+        {
+          "accepted_count": 0,
+          "query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejected_count": 10,
+          "result_count": 10,
+          "target_domain": "finn.no"
         }
       ],
-      "rejected_candidate_count": 18,
+      "rejected_candidate_count": 29,
       "rejected_candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg",
@@ -166,9 +174,9 @@
           "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.78.5196"
         },
         {
-          "canonical_url": "https://bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller",
+          "canonical_url": "https://areol.no/pallereoler",
           "comparable_quantity": null,
-          "domain": "bauhaus.no",
+          "domain": "areol.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
@@ -177,8 +185,8 @@
           "similarity_score": 0.0,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Lagerhylle til lav pris | BAUHAUS",
-          "url": "https://www.bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller"
+          "title": "Pallereoler - Brukte og Nye - Areol Innredninger AS",
+          "url": "https://areol.no/pallereoler/"
         },
         {
           "canonical_url": "https://tonsberglager.no/",
@@ -194,6 +202,21 @@
           "target_domain": null,
           "title": "Lagerbod & minilager i Tønsberg fra 898,-/mnd",
           "url": "https://www.tonsberglager.no/"
+        },
+        {
+          "canonical_url": "https://bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller",
+          "comparable_quantity": null,
+          "domain": "bauhaus.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Lagerhylle til lav pris | BAUHAUS",
+          "url": "https://www.bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller"
         },
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
@@ -300,6 +323,36 @@
           "url": "https://lagerbod.no/tonsberg/"
         },
         {
+          "canonical_url": "https://loppetur.no/finn-bruktbutikk/3111-tonsberg",
+          "comparable_quantity": null,
+          "domain": "loppetur.no",
+          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.111,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Bruktbutikker i postnummer 3111, Tønsberg - Loppetur",
+          "url": "https://www.loppetur.no/finn-bruktbutikk/3111-tonsberg"
+        },
+        {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.111,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
+        },
+        {
           "canonical_url": "https://loppetur.no/finn-bruktbutikk/3105-tonsberg",
           "comparable_quantity": null,
           "domain": "loppetur.no",
@@ -318,66 +371,185 @@
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.111,
+          "similarity_score": 0.143,
           "source_quantity": 4,
-          "target_domain": null,
+          "target_domain": "finn.no",
           "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
         },
         {
-          "canonical_url": "https://loppetur.no/finn-bruktbutikk/3111-tonsberg",
+          "canonical_url": "https://finn.no/bap/forsale/ad.html?finnkode=266393631",
           "comparable_quantity": null,
-          "domain": "loppetur.no",
-          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.111,
+          "similarity_score": 0.0,
           "source_quantity": 4,
-          "target_domain": null,
-          "title": "Bruktbutikker i postnummer 3111, Tønsberg - Loppetur",
-          "url": "https://www.loppetur.no/finn-bruktbutikk/3111-tonsberg"
+          "target_domain": "finn.no",
+          "title": "Lager hyller reoler | FINN torget",
+          "url": "https://www.finn.no/bap/forsale/ad.html?finnkode=266393631"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/271228732",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "GARASJEBOD-LAGERBOD TIL LEIE I TØNSBERG | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/271228732"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Reoler | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
+        },
+        {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=63166252",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Lagerreol - småvarereol - galvanisert | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=63166252"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/314379428",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Minilager i Tønsberg | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/314379428"
+        },
+        {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=130138784",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Div. reoler / reol / lagerreol / småvarereol / universalreol / stålreol / arkiv | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
+        },
+        {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=180403983",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Brukte Reoler Pallereoler og Lagerutstyr Kjøp & Salg | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=180403983"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/130002363",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Mobile reoler / kompaktarkiv / rullearkiv / lagerreoler / arkivreoler / reoler | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/130002363"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/83193645",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Listverksreol | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/83193645"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 19t 52m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 14t 47m",
       "verified_comparable_count": 0
     },
     {
-      "asking_price_nok": 1000.0,
+      "asking_price_nok": 4000.0,
       "available_query_count": 8,
       "candidate_count": 1,
       "candidate_market_value_nok": null,
-      "candidate_price_max_nok": 250.0,
-      "candidate_price_median_nok": 250.0,
-      "candidate_price_min_nok": 250.0,
+      "candidate_price_max_nok": 700000.0,
+      "candidate_price_median_nok": 700000.0,
+      "candidate_price_min_nok": 700000.0,
       "candidates": [
         {
-          "canonical_url": "https://lindbak.no/produkter/eskoleia-elevskap-2x4-roms-b80-cm",
-          "captured_at": "2026-07-31T14:47:48.718490+00:00",
+          "canonical_url": "https://finn.no/recommerce/forsale/item/379955413",
+          "captured_at": "2026-07-31T19:52:31.549660+00:00",
           "comparable_quantity": null,
-          "domain": "lindbak.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
           "observed_prices_nok": [
-            250.0,
-            2150.0
+            700000.0
           ],
-          "price_nok": 250.0,
+          "price_nok": 700000.0,
           "quantity_status": "UNKNOWN",
-          "query_target_domain": null,
-          "similarity_score": 0.4,
-          "snippet": "På ordre med nye varer beregnes frakt på 10 % av totalsummen. Minimumsgrense på frakt er 250 kr. <strong>Når du handler brukte varer beregnes det alltid frakt på 30 % av ordreverdi, minimum 2150 kr</strong>.",
+          "query_target_domain": "finn.no",
+          "similarity_score": 0.375,
+          "snippet": "<strong>Et stort varelager med varer for utsalgspris for over 700.000kr selges</strong>. Varene selges for annen satsning for firmaet. Varer som posehåndtak, isbitformer, solbriller, smarte løsninger til kjøkken og hjem, ballonger ++++ er en del produktene ...",
           "source": "Brave Search",
-          "source_class": "independent_web",
-          "source_quantity": 10,
-          "title": "Eskoleia elevskap 2x4 rom B80 cm | Lindbak",
-          "url": "https://www.lindbak.no/produkter/eskoleia-elevskap-2x4-roms-b80-cm",
+          "source_class": "marketplace",
+          "source_quantity": null,
+          "title": "Varelager til nettbutikk selges | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/379955413",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
         }
@@ -386,346 +558,16 @@
       "distinct_source_class_count": 1,
       "eligible_for_market_value": false,
       "market_search_queries": [
-        "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-        "\"nye Eskoleia Garderobeskap dører Mathopen\" selges kr",
-        "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK"
-      ],
-      "market_search_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-      "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
-      "opportunity_id": "unified-auksjonen-610671",
-      "query_budget_truncated": true,
-      "query_count": 3,
-      "query_stats": [
-        {
-          "accepted_count": 1,
-          "query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejected_count": 9,
-          "result_count": 10,
-          "target_domain": null
-        },
-        {
-          "accepted_count": 0,
-          "query": "\"nye Eskoleia Garderobeskap dører Mathopen\" selges kr",
-          "rejected_count": 0,
-          "result_count": 0,
-          "target_domain": null
-        },
-        {
-          "accepted_count": 0,
-          "query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejected_count": 10,
-          "result_count": 10,
-          "target_domain": null
-        }
-      ],
-      "rejected_candidate_count": 19,
-      "rejected_candidates": [
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?q=brukt&sub_category=1.78.5198",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Brukt | Garderobe og skap | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.78.5198&q=brukt"
-        },
-        {
-          "canonical_url": "https://crifo-centura.no/katalog/skap-oppbevaring/garderobeskap/eskoleia-boksskap-2",
-          "comparable_quantity": null,
-          "domain": "crifo-centura.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Eskoleia boksskap. - Crifo Centura",
-          "url": "https://crifo-centura.no/katalog/skap-oppbevaring/garderobeskap/eskoleia-boksskap-2/"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.78.5198",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobe og skap | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.78.5198"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produktkategorier/garderobeskap",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobe i stål - Eskoleia",
-          "url": "https://eskoleia.no/produktkategorier/garderobeskap/"
-        },
-        {
-          "canonical_url": "https://vente-unique.no/c/garderobeskap-med-2-dorer",
-          "comparable_quantity": null,
-          "domain": "vente-unique.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobeskap med 2 dører",
-          "url": "https://www.vente-unique.no/c/garderobeskap-med-2-dorer"
-        },
-        {
-          "canonical_url": "https://lindbak.no/produkter/kontormobler-og-interior/oppbevaring/skap/eskoleia/z-skap/ESK_101711+101722",
-          "comparable_quantity": null,
-          "domain": "lindbak.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Eskoleia Z-skap | Lindbak",
-          "url": "https://www.lindbak.no/produkter/kontormobler-og-interior/oppbevaring/skap/eskoleia/z-skap/ESK_101711+101722"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produktkategorier/beredskapssenter/garderobeskap-beredskapssenter",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobeskap i stål - Eskoleia",
-          "url": "https://eskoleia.no/produktkategorier/beredskapssenter/garderobeskap-beredskapssenter/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produktkategorier/garderobeskap/garderobeutstyr",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobeutstyr i stål – Eskoleia",
-          "url": "https://eskoleia.no/produktkategorier/garderobeskap/garderobeutstyr/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/moderne-garderobeskap-til-skole-med-lange-tradisjoner",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.4,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "SKOLE MED LANGE TRADISJONER FÅR MODERNE GARDEROBESKAP - Eskoleia",
-          "url": "https://eskoleia.no/moderne-garderobeskap-til-skole-med-lange-tradisjoner/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produktkategorier/garderobeskap",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobe i stål - Eskoleia",
-          "url": "https://eskoleia.no/produktkategorier/garderobeskap/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produktkategorier/beredskapssenter/garderobeskap-beredskapssenter",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.286,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobeskap i stål - Eskoleia",
-          "url": "https://eskoleia.no/produktkategorier/beredskapssenter/garderobeskap-beredskapssenter/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produkt/garderobeskap-301",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.286,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobeskap 301, standard dør - Eskoleia",
-          "url": "https://eskoleia.no/produkt/garderobeskap-301/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produktkategorier/garderobeskap/garderobeutstyr",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobeutstyr i stål – Eskoleia",
-          "url": "https://eskoleia.no/produktkategorier/garderobeskap/garderobeutstyr/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produkt/garderobeskap-401",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.286,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Garderobeskap 401, standard dør - Eskoleia",
-          "url": "https://eskoleia.no/produkt/garderobeskap-401/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produkt/elevskap-3140",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.286,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Elevskap 3140 - Eskoleia",
-          "url": "https://eskoleia.no/produkt/elevskap-3140/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produkt/hoyt-kontorskap",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.429,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Høyt kontorskap - Eskoleia",
-          "url": "https://eskoleia.no/produkt/hoyt-kontorskap/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/produkt/elevskap-4130",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.286,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Elevskap 4130 - Eskoleia",
-          "url": "https://eskoleia.no/produkt/elevskap-4130/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "Eskoleia – Norskproduserte stålmøbler og bærekraftige oppbevaringsløsninger",
-          "url": "https://eskoleia.no/"
-        },
-        {
-          "canonical_url": "https://eskoleia.no/shop",
-          "comparable_quantity": null,
-          "domain": "eskoleia.no",
-          "matched_query": "nye Eskoleia Garderobeskap dører Mathopen bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.286,
-          "source_quantity": 10,
-          "target_domain": null,
-          "title": "– Eskoleia",
-          "url": "https://eskoleia.no/shop/"
-        }
-      ],
-      "required_verified_comparables": 3,
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 2t 18m 19s",
-      "verified_comparable_count": 0
-    },
-    {
-      "asking_price_nok": 4000.0,
-      "available_query_count": 8,
-      "candidate_count": 0,
-      "candidate_market_value_nok": null,
-      "candidate_price_max_nok": null,
-      "candidate_price_median_nok": null,
-      "candidate_price_min_nok": null,
-      "candidates": [],
-      "distinct_domain_count": 0,
-      "distinct_source_class_count": 0,
-      "eligible_for_market_value": false,
-      "market_search_queries": [
         "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d brukt pris Norge",
-        "\"Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer\" selges kr"
+        "\"Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer\" selges kr",
+        "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+        "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr"
       ],
       "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d brukt pris Norge",
-      "market_value_status": "NO_PRICE_CANDIDATES",
+      "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-613944",
       "query_budget_truncated": true,
-      "query_count": 2,
+      "query_count": 4,
       "query_stats": [
         {
           "accepted_count": 0,
@@ -740,9 +582,23 @@
           "rejected_count": 0,
           "result_count": 0,
           "target_domain": null
+        },
+        {
+          "accepted_count": 0,
+          "query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejected_count": 9,
+          "result_count": 9,
+          "target_domain": null
+        },
+        {
+          "accepted_count": 1,
+          "query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejected_count": 9,
+          "result_count": 10,
+          "target_domain": "finn.no"
         }
       ],
-      "rejected_candidate_count": 10,
+      "rejected_candidate_count": 28,
       "rejected_candidates": [
         {
           "canonical_url": "https://beslagteknikk.no/",
@@ -758,6 +614,21 @@
           "target_domain": null,
           "title": "Beslagteknikk AS - Stolt leverandør til Møbelindustri & Trevare - Beslagteknikk AS",
           "url": "https://www.beslagteknikk.no/"
+        },
+        {
+          "canonical_url": "https://beslagteknikk.no/vare-leverandorer",
+          "comparable_quantity": null,
+          "domain": "beslagteknikk.no",
+          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.105,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Våre Leverandører - Beslagteknikk.no - Beslagteknikk AS",
+          "url": "https://www.beslagteknikk.no/vare-leverandorer"
         },
         {
           "canonical_url": "https://interiorogbeslag.no/",
@@ -835,6 +706,21 @@
           "url": "https://ny.auksjonen.no/auksjoner/torget/byggevarer-og-oppussing"
         },
         {
+          "canonical_url": "https://blum.com/no/en",
+          "comparable_quantity": null,
+          "domain": "blum.com",
+          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.053,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Furniture fittings by Blum for modern living environments | Blum",
+          "url": "https://www.blum.com/no/en/"
+        },
+        {
           "canonical_url": "https://hth.no/nettbutikk/tilbehoer/hengsler-og-beslag",
           "comparable_quantity": null,
           "domain": "hth.no",
@@ -865,10 +751,99 @@
           "url": "https://mekk.no/byggevarer?p=6"
         },
         {
-          "canonical_url": "https://megaflis.no/hus-og-hage/jernvare/byggbeslag.html",
+          "canonical_url": "https://blum.com/no/en",
           "comparable_quantity": null,
-          "domain": "megaflis.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d brukt pris Norge",
+          "domain": "blum.com",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.1,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Furniture fittings by Blum for modern living environments | Blum",
+          "url": "https://www.blum.com/no/en/"
+        },
+        {
+          "canonical_url": "https://kjokkenfronter.no/tag/blum",
+          "comparable_quantity": null,
+          "domain": "kjokkenfronter.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Blum – Kjøkkenfronter til alle typer kjøkken",
+          "url": "https://www.kjokkenfronter.no/tag/blum/"
+        },
+        {
+          "canonical_url": "https://machineseeker.no/mss/kj%C3%B8kken",
+          "comparable_quantity": null,
+          "domain": "machineseeker.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "▷ Brukt Kjøkken til salgs - Machineseeker",
+          "url": "https://www.machineseeker.no/mss/kj%C3%B8kken"
+        },
+        {
+          "canonical_url": "https://beslagteknikk.no/hengsler-skinner-skuffer/hengsler",
+          "comparable_quantity": null,
+          "domain": "beslagteknikk.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Hengsler fra Blum - Beslagteknikk.no - Beslagteknikk AS",
+          "url": "https://www.beslagteknikk.no/hengsler-skinner-skuffer/hengsler"
+        },
+        {
+          "canonical_url": "https://gulesider.no/m%C3%B8belfabrikker+norge/bedrifter",
+          "comparable_quantity": null,
+          "domain": "gulesider.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.1,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Møbelfabrikker Norge | bedrifter | gulesider.no | side 1",
+          "url": "https://www.gulesider.no/m%C3%B8belfabrikker+norge/bedrifter"
+        },
+        {
+          "canonical_url": "https://kjokkenfronter.no/produktstikkord/blum",
+          "comparable_quantity": null,
+          "domain": "kjokkenfronter.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejection_reasons": [
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.1,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Blum – Kjokkenfronter.no",
+          "url": "https://www.kjokkenfronter.no/produktstikkord/blum/"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.78",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -876,34 +851,183 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Byggbeslag | Megaflis.no",
-          "url": "https://megaflis.no/hus-og-hage/jernvare/byggbeslag.html"
+          "title": "Møbler og interiør | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?category=0.78"
         },
         {
-          "canonical_url": "https://blum.com/no/en",
+          "canonical_url": "https://beslagteknikk.no/",
           "comparable_quantity": null,
-          "domain": "blum.com",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d brukt pris Norge",
+          "domain": "beslagteknikk.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.053,
+          "similarity_score": 0.1,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Furniture fittings by Blum for modern living environments | Blum",
-          "url": "https://www.blum.com/no/en/"
+          "title": "Beslagteknikk AS - Stolt leverandør til Møbelindustri & Trevare - Beslagteknikk AS",
+          "url": "https://www.beslagteknikk.no/"
+        },
+        {
+          "canonical_url": "https://snl.no/m%C3%B8belindustri",
+          "comparable_quantity": null,
+          "domain": "snl.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.1,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "møbelindustri – Store norske leksikon",
+          "url": "https://snl.no/m%C3%B8belindustri"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/425731738",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Tallerkenholdere kjøkken fra Blum | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/425731738"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/458625838",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Metallknagger fra 60-tallet | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/458625838"
+        },
+        {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=395143813",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "STORT LAGERSALG PÅ HVITEVARER ALT FRA 1 999 KR! - MEDFØLGER GARANTI OG FRAKT | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=395143813"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/407641180",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Hengsler overskap kjøkken -Blum Aventos Hingtop 18mm | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/407641180"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/314028912",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Universalmal for skuffefronter | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/314028912"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.67.3900",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Kjøkkeninnredning | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.67.3900"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.78",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Møbler og interiør | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?category=0.78"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?q=kj%C3%B8kken",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Kjøkken | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?q=kj%C3%B8kken"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?q=kj%C3%B8kken%C3%B8y",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Kjøkkenøy | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?q=kj%C3%B8kken%C3%B8y"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 21t 50m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 16t 45m",
       "verified_comparable_count": 0
     }
   ],
-  "opportunity_count": 3,
+  "opportunity_count": 2,
   "planned_request_count": 8,
   "query_budget_exhausted": true,
-  "rejected_candidate_count": 47,
+  "rejected_candidate_count": 57,
   "request_budget": 8,
   "requests_made": 8,
   "required_comparables": 3,
