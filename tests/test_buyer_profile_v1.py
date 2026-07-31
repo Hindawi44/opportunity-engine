@@ -41,15 +41,38 @@ def test_mahmoud_namsos_profile_matches_norway_market() -> None:
     assert snapshot["interests"]["markets"] == ["NO"]
 
 
-def test_unknown_constraints_block_matching_without_inventing_values() -> None:
+def test_unknown_constraints_only_delay_personal_qualification() -> None:
     buyer = BuyerProfileV1.from_path(BUYER_PATH)
     market = MarketProfileV1.from_path(MARKET_PATH)
 
     snapshot = build_buyer_profile_snapshot(buyer, market)
+    stages = snapshot["readiness_stages"]
 
-    assert snapshot["matching_readiness"] == {
+    assert stages["discovery"] == {
+        "ready": True,
+        "status": "DISCOVERY_READY",
+        "basis": [
+            "interests.categories",
+            "interests.markets",
+        ],
+    }
+    assert stages["cost_estimation"] == {
+        "ready": True,
+        "status": "COST_ESTIMATION_READY",
+        "mode": "CITY_LEVEL_INPUT_ONLY",
+        "basis": [
+            "location.country_code",
+            "location.city",
+            "settlement_currency",
+        ],
+        "missing_precision_fields": [
+            "location.postal_code",
+            "location.coordinates",
+        ],
+    }
+    assert stages["personal_qualification"] == {
         "ready": False,
-        "status": "BLOCKED_MISSING_CONSTRAINTS",
+        "status": "PERSONAL_QUALIFICATION_PENDING",
         "missing_required_constraints": [
             "commercial_constraints.budget_nok",
             "commercial_constraints.maximum_shipping_nok",
@@ -57,12 +80,48 @@ def test_unknown_constraints_block_matching_without_inventing_values() -> None:
             "risk_policy.risk_tolerance",
         ],
     }
+    assert snapshot["matching_readiness"] == {
+        "ready": False,
+        "status": "PERSONAL_QUALIFICATION_PENDING",
+        "missing_required_constraints": [
+            "commercial_constraints.budget_nok",
+            "commercial_constraints.maximum_shipping_nok",
+            "commercial_constraints.minimum_expected_margin_ratio",
+            "risk_policy.risk_tolerance",
+        ],
+    }
+
     assert snapshot["commercial_constraints"]["budget_nok"] is None
     assert snapshot["commercial_constraints"]["maximum_shipping_nok"] is None
     assert snapshot["commercial_constraints"]["minimum_expected_margin_ratio"] is None
     assert snapshot["risk_policy"]["risk_tolerance"] is None
     assert snapshot["location"]["postal_code"] is None
     assert snapshot["location"]["coordinates"] is None
+
+
+def test_completed_constraints_make_personal_qualification_ready() -> None:
+    payload = _buyer_payload()
+    payload["commercial_constraints"]["budget_nok"] = 100_000
+    payload["commercial_constraints"]["maximum_shipping_nok"] = 20_000
+    payload["commercial_constraints"]["minimum_expected_margin_ratio"] = 0.3
+    payload["risk_policy"]["risk_tolerance"] = "MEDIUM"
+
+    buyer = BuyerProfileV1.from_dict(payload)
+    market = MarketProfileV1.from_path(MARKET_PATH)
+    snapshot = build_buyer_profile_snapshot(buyer, market)
+
+    assert snapshot["readiness_stages"]["discovery"]["status"] == "DISCOVERY_READY"
+    assert snapshot["readiness_stages"]["cost_estimation"]["status"] == "COST_ESTIMATION_READY"
+    assert snapshot["readiness_stages"]["personal_qualification"] == {
+        "ready": True,
+        "status": "QUALIFICATION_READY",
+        "missing_required_constraints": [],
+    }
+    assert snapshot["matching_readiness"] == {
+        "ready": True,
+        "status": "QUALIFICATION_READY",
+        "missing_required_constraints": [],
+    }
 
 
 def test_buyer_profile_keeps_automatic_actions_disabled() -> None:
@@ -77,6 +136,7 @@ def test_buyer_profile_keeps_automatic_actions_disabled() -> None:
         "automatic_contact_allowed": False,
     }
     assert snapshot["scope"] == {
+        "city_level_cost_estimation_input_ready": True,
         "landed_cost_calculation_enabled": False,
         "opportunity_ranking_enabled": False,
         "decision_changes_enabled": False,
@@ -144,6 +204,11 @@ def test_buyer_profile_cli_writes_auditable_snapshot(
     printed = json.loads(capsys.readouterr().out)
 
     assert payload["profile_id"] == "MAHMOUD_NAMSOS_V1"
-    assert payload["matching_readiness"]["ready"] is False
-    assert printed["matching_status"] == "BLOCKED_MISSING_CONSTRAINTS"
+    assert payload["readiness_stages"]["discovery"]["status"] == "DISCOVERY_READY"
+    assert payload["readiness_stages"]["cost_estimation"]["status"] == "COST_ESTIMATION_READY"
+    assert payload["readiness_stages"]["personal_qualification"]["ready"] is False
+    assert printed["discovery_status"] == "DISCOVERY_READY"
+    assert printed["cost_estimation_status"] == "COST_ESTIMATION_READY"
+    assert printed["personal_qualification_status"] == "PERSONAL_QUALIFICATION_PENDING"
+    assert printed["matching_status"] == "PERSONAL_QUALIFICATION_PENDING"
     assert printed["output"] == str(output)
