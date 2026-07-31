@@ -16,6 +16,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run P4.1 decision consistency pipeline")
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--database-url",
+        default="sqlite:///data/opportunity_engine.db",
+        help="SQLAlchemy URL used for durable operational persistence",
+    )
     args = parser.parse_args()
     root = args.root.resolve()
 
@@ -74,6 +79,16 @@ def main() -> int:
     ], root)
     if shipment_evidence_exit != 0:
         return shipment_evidence_exit
+
+    persistence_exit = run([
+        sys.executable,
+        "scripts/persist_operational_state.py",
+        "--decisions", "data/decision_intelligence.json",
+        "--shipment-evidence", "data/shipment_evidence_queue_v1.json",
+        "--database-url", args.database_url,
+    ], root)
+    if persistence_exit != 0:
+        return persistence_exit
 
     return run([
         sys.executable,
