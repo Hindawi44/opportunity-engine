@@ -1,0 +1,65 @@
+{
+  "schema_version": "market-profile-v1",
+  "profile_id": "NO_DOMESTIC_V1",
+  "market_code": "NO",
+  "market_name": "Norway",
+  "currency_code": "NOK",
+  "language_codes": [
+    "nb",
+    "nn"
+  ],
+  "fallback_language_codes": [
+    "en"
+  ],
+  "transaction_scope": "DOMESTIC",
+  "source_registry": {
+    "plan_path": "config/source_expansion_plan.json",
+    "runtime_status_path": "data/source_gap_matrix.json",
+    "market_name": "Norway",
+    "signal_channels": [
+      "bankruptcy_lead",
+      "public_auction_event_lead"
+    ],
+    "qualification_requires_verified_sale_listing": true
+  },
+  "tax_policy": {
+    "profile_id": "NO_DOMESTIC_TAX_REFERENCE_V1",
+    "mode": "REFERENCE_ONLY",
+    "calculation_enabled": false,
+    "requires_documented_vat_status": true
+  },
+  "customs_policy": {
+    "profile_id": "NO_DOMESTIC_CUSTOMS_REFERENCE_V1",
+    "mode": "DOMESTIC_ONLY",
+    "calculation_enabled": false,
+    "cross_border_import_supported": false
+  },
+  "logistics_policy": {
+    "profile_id": "NO_DOMESTIC_LOGISTICS_ESTIMATE_V1",
+    "mode": "REQUIRES_ORIGIN_AND_DESTINATION",
+    "calculation_enabled": false,
+    "requires_listing_location": true,
+    "requires_buyer_destination": true
+  },
+  "risk_policy": {
+    "default_level": "LOW",
+    "allowed_levels": [
+      "LOW",
+      "MEDIUM",
+      "HIGH"
+    ],
+    "source_failure_is_not_zero_opportunities": true,
+    "unknown_costs_block_qualification": true
+  },
+  "qualification_policy": {
+    "listing_status_required": "ACTIVE",
+    "verification_status_required": "VERIFIED",
+    "minimum_evidence": [
+      "verified_sale_page",
+      "documented_price_or_bid_basis",
+      "documented_vat_status",
+      "documented_logistics_basis"
+    ],
+    "automatic_purchase_allowed": false
+  }
+}
