@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Callable, Mapping, Sequence
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 from opportunity_engine.discovery.auksjonen_playwright_fallback import (
     is_specific_auksjonen_item_url,
@@ -30,6 +30,7 @@ DEFAULT_AUKSJONEN_CLOTHING_CATEGORY_URL = (
 )
 MAX_CURRENT_LISTINGS = 10
 MIN_DELAY_SECONDS = 2.0
+_APPROVED_AUKSJONEN_HOSTS = frozenset({"auksjonen.no", "ny.auksjonen.no"})
 
 CategoryPageLoader = Callable[[str], tuple[str, Sequence[Mapping[str, Any]]]]
 
@@ -38,14 +39,25 @@ def _compact(value: object) -> str:
     return " ".join(str(value or "").split())
 
 
+def _canonicalize_auksjonen_host(url: str) -> str | None:
+    """Map the approved new Auksjonen frontend host to the canonical host."""
+    canonical = normalize_public_url(url)
+    if not canonical:
+        return None
+    parsed = urlparse(canonical)
+    if parsed.hostname not in _APPROVED_AUKSJONEN_HOSTS:
+        return canonical
+    return urlunparse(parsed._replace(netloc="auksjonen.no"))
+
+
 def is_approved_auksjonen_clothing_category_url(url: str) -> bool:
-    """Allow only the one public Auksjonen clothing/workwear category page."""
+    """Allow only the approved public clothing/workwear category route."""
     canonical = normalize_public_url(url)
     if not canonical:
         return False
     parsed = urlparse(canonical)
     return (
-        parsed.hostname == "auksjonen.no"
+        parsed.hostname in _APPROVED_AUKSJONEN_HOSTS
         and parsed.path.rstrip("/").casefold() == "/auksjoner/overskudd_klaer"
         and not parsed.query
         and not parsed.fragment
@@ -119,12 +131,10 @@ def normalize_category_cards(
     for row in rows:
         title = _compact(row.get("title"))
         context = _compact(row.get("description"))
-        canonical = normalize_public_url(str(row.get("url") or ""))
+        canonical = _canonicalize_auksjonen_host(str(row.get("url") or ""))
         if not title or not canonical or not is_specific_auksjonen_item_url(canonical):
             continue
 
-        # The approved page itself is explicitly the Klær/Arbeidsklær category.
-        # Add that source context without inventing any item-specific attributes.
         description = _compact(
             f"Klær/Arbeidsklær. Auksjon. {context or title}"
         )[:4000]
@@ -263,8 +273,6 @@ class AuksjonenCurrentCategoryAugmentedProvider:
             return base_hits
 
         merged: dict[str, SearchHit] = {}
-        # Direct source links are current-source candidates, so evaluate them before
-        # stale search-index results while preserving the same total result budget.
         for hit in (*self._current_hits, *base_hits):
             canonical = normalize_public_url(hit.url)
             if not canonical:
