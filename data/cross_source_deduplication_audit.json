@@ -15,10 +15,10 @@
     "auksjonen-615317",
     "auksjonen-601317",
     "auksjonen-601307",
-    "auksjonen-601321",
     "auksjonen-587496",
     "auksjonen-615316",
     "auksjonen-615315",
+    "auksjonen-431851",
     "auksjonen-600900",
     "konkurs-app-938194424",
     "konkurs-app-838192882",
@@ -45,8 +45,8 @@
     "daily_report_limit": 15,
     "unsupported_source_type_for_sale_pipeline": 20
   },
-  "generated_at": "2026-08-01T08:34:00.521650+00:00",
-  "ignored_non_official_record_count": 57,
+  "generated_at": "2026-08-01T13:54:27.636285+00:00",
+  "ignored_non_official_record_count": 56,
   "input_record_count": 33,
   "match_counts": {
     "EXACT_URL": 0,
@@ -111,6 +111,7 @@
       "audited_fetched_record_count": 25,
       "audited_fetched_record_ids": [
         "auksjonen-599803",
+        "auksjonen-601321",
         "auksjonen-604258",
         "auksjonen-605821",
         "auksjonen-608109",
@@ -123,7 +124,6 @@
         "auksjonen-614674",
         "auksjonen-614682",
         "auksjonen-614687",
-        "auksjonen-614746",
         "auksjonen-614788",
         "auksjonen-615418",
         "auksjonen-615419",
@@ -151,10 +151,10 @@
         "auksjonen-615317",
         "auksjonen-601317",
         "auksjonen-601307",
-        "auksjonen-601321",
         "auksjonen-587496",
         "auksjonen-615316",
         "auksjonen-615315",
+        "auksjonen-431851",
         "auksjonen-600900"
       ],
       "excluded_records_by_reason": {
@@ -256,6 +256,7 @@
       "audited_fetched_record_count": 25,
       "audited_fetched_record_ids": [
         "auksjonen-599803",
+        "auksjonen-601321",
         "auksjonen-604258",
         "auksjonen-605821",
         "auksjonen-608109",
@@ -268,7 +269,6 @@
         "auksjonen-614674",
         "auksjonen-614682",
         "auksjonen-614687",
-        "auksjonen-614746",
         "auksjonen-614788",
         "auksjonen-615418",
         "auksjonen-615419",
@@ -296,10 +296,10 @@
         "auksjonen-615317",
         "auksjonen-601317",
         "auksjonen-601307",
-        "auksjonen-601321",
         "auksjonen-587496",
         "auksjonen-615316",
         "auksjonen-615315",
+        "auksjonen-431851",
         "auksjonen-600900"
       ],
       "excluded_records_by_reason": {

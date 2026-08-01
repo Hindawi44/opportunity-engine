@@ -1,7 +1,7 @@
 {
   "cross_source_alias_count": 0,
-  "generated_at": "2026-08-01T08:34:00.615574+00:00",
-  "record_count": 206,
+  "generated_at": "2026-08-01T13:54:27.728334+00:00",
+  "record_count": 208,
   "records": [
     {
       "asking_price_nok": 6800.0,
@@ -279,14 +279,14 @@
         "bankruptcy",
         "estate_sale"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664438+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488654+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-0268831f86ac1b504e78",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 12,
       "registry_id": "url-0268831f86ac1b504e78",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:estate_sale+4"
@@ -365,14 +365,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667594+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491756+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-0623254318f1aaf8f835",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-0623254318f1aaf8f835",
-      "runs_seen": 7,
+      "runs_seen": 8,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -447,14 +447,14 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664711+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488776+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-08c1c3148277e6eb31ea",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "registry_id": "url-08c1c3148277e6eb31ea",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22"
@@ -507,14 +507,14 @@
         "office_furniture",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665276+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489567+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-09fdcc107a66ac1b45ab",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "registry_id": "url-09fdcc107a66ac1b45ab",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:office_furniture+16",
         "category:shop_equipment+22"
@@ -590,14 +590,14 @@
         "inventory",
         "sale_listing"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666943+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491112+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-10c7baeebdb991abc31f",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 32,
       "registry_id": "url-10c7baeebdb991abc31f",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:inventory+22",
         "category:sale_listing+10"
@@ -647,14 +647,14 @@
       "categories": [
         "clothing_shop_fixtures"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666508+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490687+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-15defc847337cd18eca8",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 24,
       "registry_id": "url-15defc847337cd18eca8",
-      "runs_seen": 4,
+      "runs_seen": 5,
       "score_reasons": [
         "category:clothing_shop_fixtures+24"
       ],
@@ -674,14 +674,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667540+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491699+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-1609c742e786f62fa2e6",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-1609c742e786f62fa2e6",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -701,15 +701,15 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665034+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489260+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-1782b771d92903c88329",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2024-08-21T08:17:24",
       "registry_id": "url-1782b771d92903c88329",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:shop_equipment+22",
         "published_at_present+6"
@@ -730,14 +730,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667262+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491452+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-1ced43e391ceb5d18407",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-1ced43e391ceb5d18407",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -949,15 +949,15 @@
         "sale_listing",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665863+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489927+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-318117add644f04c71b7",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 32,
       "published_at": "2023-07-10T00:00:00",
       "registry_id": "url-318117add644f04c71b7",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:sale_listing+10",
         "category:shop_equipment+22"
@@ -982,7 +982,7 @@
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
       "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
       "lead_id": "web-330d2f86de3299dc9513",
-      "lifecycle_status": "DISCOVERED",
+      "lifecycle_status": "NOT_SEEN_THIS_RUN",
       "priority_score": 28,
       "published_at": "2025-05-26T00:00:00",
       "registry_id": "url-330d2f86de3299dc9513",
@@ -1008,15 +1008,15 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663755+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487934+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-340bfb344e98a6d682c6",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 44,
       "published_at": "2020-05-01T15:30:26",
       "registry_id": "url-340bfb344e98a6d682c6",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:inventory+22",
         "category:liquidation+16",
@@ -1038,14 +1038,14 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665218+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489510+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-34cee4bf8bfb11e74c6b",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:shop_equipment+22"
       ],
@@ -1190,6 +1190,33 @@
       "url": "https://www.expondo.no/frisoerutstyr-ddabagfa/"
     },
     {
+      "canonical_url": "https://avabutikkinnredning.no/produktkategori/butikkinnredning",
+      "categories": [
+        "shop_equipment"
+      ],
+      "discovered_at": "2026-08-01T13:54:15.490051+00:00",
+      "first_seen_at": "2026-08-01T13:54:27.728334+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
+      "lead_id": "web-3acde5d4a176692a975c",
+      "lifecycle_status": "DISCOVERED",
+      "priority_score": 22,
+      "registry_id": "url-3acde5d4a176692a975c",
+      "runs_seen": 1,
+      "score_reasons": [
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Vi kan også skreddersy butikkinnredning som går under navnet butikkhyller, dette er hyllesystem man ofte ser bl.a. i dagligvarebutikker. Uansett om du driver klesbutikk, sportsbutikk, hobbybutikk, blomsterforretning eller annen detaljhandel, har vi innredningen som lar deg vise frem varene ...",
+      "source": "Brave Search",
+      "source_names": [
+        "Brave Search"
+      ],
+      "source_record_ids": [
+        "web-3acde5d4a176692a975c"
+      ],
+      "title": "Butikkinnredning - AVAbutikkinnredning",
+      "url": "https://avabutikkinnredning.no/produktkategori/butikkinnredning/"
+    },
+    {
       "canonical_url": "https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/oppbevaringshyller",
       "categories": [
         "inventory"
@@ -1282,15 +1309,15 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663566+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487745+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-504182e141c47ae32298",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 44,
       "published_at": "2023-10-03T11:12:14",
       "registry_id": "url-504182e141c47ae32298",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:inventory+22",
         "category:liquidation+16",
@@ -1343,14 +1370,14 @@
       "categories": [
         "sale_listing"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666625+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490801+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 10,
       "registry_id": "url-5cc051d2ee52f67fd96b",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:sale_listing+10"
       ],
@@ -1370,14 +1397,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667479+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491574+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-5cfdee104ddf209ca63f",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-5cfdee104ddf209ca63f",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -1397,14 +1424,14 @@
       "categories": [
         "clothing_shop_fixtures"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666063+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490537+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-5d1caedc0f687ca45737",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 24,
       "registry_id": "url-5d1caedc0f687ca45737",
-      "runs_seen": 5,
+      "runs_seen": 6,
       "score_reasons": [
         "category:clothing_shop_fixtures+24"
       ],
@@ -1420,19 +1447,50 @@
       "url": "https://finckenhagen.no/stikkord/klesstativ/"
     },
     {
+      "canonical_url": "https://avabutikkinnredning.no/om-oss",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "discovered_at": "2026-08-01T13:54:15.489390+00:00",
+      "first_seen_at": "2026-08-01T13:54:27.728334+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
+      "lead_id": "web-5e74475b63c3939a78fe",
+      "lifecycle_status": "DISCOVERED",
+      "priority_score": 52,
+      "published_at": "2025-11-12T11:53:03",
+      "registry_id": "url-5e74475b63c3939a78fe",
+      "runs_seen": 1,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22",
+        "published_at_present+6"
+      ],
+      "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
+      "source": "Brave Search",
+      "source_names": [
+        "Brave Search"
+      ],
+      "source_record_ids": [
+        "web-5e74475b63c3939a78fe"
+      ],
+      "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
+      "url": "https://avabutikkinnredning.no/om-oss/"
+    },
+    {
       "canonical_url": "https://lagersystemer.no/",
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-07-31T19:52:19.549384+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491880+00:00",
       "first_seen_at": "2026-07-31T03:48:56.135148+00:00",
-      "last_seen_at": "2026-07-31T19:52:32.186464+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-5f5c8a287e0bc6f1c921",
-      "lifecycle_status": "NOT_SEEN_THIS_RUN",
+      "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2026-01-09T12:25:19",
       "registry_id": "url-5f5c8a287e0bc6f1c921",
-      "runs_seen": 4,
+      "runs_seen": 5,
       "score_reasons": [
         "category:inventory+22",
         "published_at_present+6"
@@ -1583,14 +1641,14 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663431+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487626+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-61d06a7585e140c934b7",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "registry_id": "url-61d06a7585e140c934b7",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:inventory+22",
         "category:liquidation+16"
@@ -1640,15 +1698,15 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667653+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491815+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-63600f85f4126e808e67",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2025-12-29T07:03:58",
       "registry_id": "url-63600f85f4126e808e67",
-      "runs_seen": 10,
+      "runs_seen": 11,
       "score_reasons": [
         "category:inventory+22",
         "published_at_present+6"
@@ -1670,15 +1728,15 @@
         "bankruptcy",
         "estate_sale"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664662+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488923+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-69939d672dc42fe60d24",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 18,
       "published_at": "2026-01-29T14:08:41",
       "registry_id": "url-69939d672dc42fe60d24",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:estate_sale+4",
@@ -1700,15 +1758,15 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663159+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487379+00:00",
       "first_seen_at": "2026-07-23T06:49:59.709779+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-6f80d243272ec5979920",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 14,
       "published_at": "2022-10-24T17:00:33",
       "registry_id": "url-6f80d243272ec5979920",
-      "runs_seen": 10,
+      "runs_seen": 11,
       "score_reasons": [
         "category:bankruptcy+8",
         "published_at_present+6"
@@ -1757,14 +1815,14 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664122+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488366+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-7095af232aa83fda9586",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "registry_id": "url-7095af232aa83fda9586",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22"
@@ -1786,14 +1844,14 @@
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665810+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489766+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-72d343831b08e2486a3f",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 46,
       "registry_id": "url-72d343831b08e2486a3f",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:clothing_shop_fixtures+24",
         "category:shop_equipment+22"
@@ -1815,14 +1873,14 @@
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665756+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489986+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-7368b74c0e956c42b2b7",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 46,
       "registry_id": "url-7368b74c0e956c42b2b7",
-      "runs_seen": 5,
+      "runs_seen": 6,
       "score_reasons": [
         "category:clothing_shop_fixtures+24",
         "category:shop_equipment+22"
@@ -1844,15 +1902,15 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664076+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488318+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-739247ba7577dd9e153e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 36,
       "published_at": "2025-12-29T13:49:00",
       "registry_id": "url-739247ba7577dd9e153e",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22",
@@ -2037,15 +2095,15 @@
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664808+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489018+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-7c78687e8f228b645e34",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 52,
       "published_at": "2025-09-22T20:13:33",
       "registry_id": "url-7c78687e8f228b645e34",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:clothing_shop_fixtures+24",
         "category:shop_equipment+22",
@@ -2068,14 +2126,14 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664597+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488859+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-7c85d59249f9065a7874",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "registry_id": "url-7c85d59249f9065a7874",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22"
@@ -2097,14 +2155,14 @@
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664873+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489327+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-7cad0e8a59e6e6643424",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 46,
       "registry_id": "url-7cad0e8a59e6e6643424",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:clothing_shop_fixtures+24",
         "category:shop_equipment+22"
@@ -2154,15 +2212,15 @@
       "categories": [
         "liquidation"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663974+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488195+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-81550ca51413d1e1ac66",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "published_at": "2024-09-23T13:11:43",
       "registry_id": "url-81550ca51413d1e1ac66",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:liquidation+16",
         "published_at_present+6"
@@ -2184,15 +2242,15 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663013+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487229+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 36,
       "published_at": "2024-05-28T11:14:39",
       "registry_id": "url-83de9ca3a65e8b6a6b20",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22",
@@ -2243,14 +2301,14 @@
         "estate_sale",
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664262+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488512+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-895651357b4952b5a7ee",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 34,
       "registry_id": "url-895651357b4952b5a7ee",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:estate_sale+4",
@@ -2272,14 +2330,14 @@
       "categories": [
         "sale_listing"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667009+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491197+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-8e13c53b2da84a607b83",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 10,
       "registry_id": "url-8e13c53b2da84a607b83",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:sale_listing+10"
       ],
@@ -2299,14 +2357,14 @@
       "categories": [
         "liquidation"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663685+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487864+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-91761ae2e8ab330867f3",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 16,
       "registry_id": "url-91761ae2e8ab330867f3",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:liquidation+16"
       ],
@@ -2354,14 +2412,14 @@
         "clothing_shop_fixtures",
         "sale_listing"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666442+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490743+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-989e695b776848998740",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 34,
       "registry_id": "url-989e695b776848998740",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:clothing_shop_fixtures+24",
         "category:sale_listing+10"
@@ -2416,7 +2474,7 @@
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
       "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
       "lead_id": "web-9a1b9c6b529b06a2bf10",
-      "lifecycle_status": "DISCOVERED",
+      "lifecycle_status": "NOT_SEEN_THIS_RUN",
       "priority_score": 34,
       "registry_id": "url-9a1b9c6b529b06a2bf10",
       "runs_seen": 4,
@@ -2598,15 +2656,15 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665449+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489657+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-a51fe9a70f780a57d999",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2023-05-25T07:44:07",
       "registry_id": "url-a51fe9a70f780a57d999",
-      "runs_seen": 5,
+      "runs_seen": 6,
       "score_reasons": [
         "category:shop_equipment+22",
         "published_at_present+6"
@@ -2628,14 +2686,14 @@
         "sale_listing",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664756+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488969+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 32,
       "registry_id": "url-a556ee3a676d9da9ccd7",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:sale_listing+10",
         "category:shop_equipment+22"
@@ -2684,14 +2742,14 @@
         "bankruptcy",
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664514+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488721+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-a6413d135a87bc18522a",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 30,
       "registry_id": "url-a6413d135a87bc18522a",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:bankruptcy+8",
         "category:inventory+22"
@@ -2740,14 +2798,14 @@
         "clothing_shop_fixtures",
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666272+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490484+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-a9922918a03cfccae302",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 46,
       "registry_id": "url-a9922918a03cfccae302",
-      "runs_seen": 5,
+      "runs_seen": 6,
       "score_reasons": [
         "category:clothing_shop_fixtures+24",
         "category:inventory+22"
@@ -2801,7 +2859,7 @@
       "first_seen_at": "2026-08-01T03:49:11.127582+00:00",
       "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
       "lead_id": "web-add7d4049039ffe37bd3",
-      "lifecycle_status": "DISCOVERED",
+      "lifecycle_status": "NOT_SEEN_THIS_RUN",
       "priority_score": 22,
       "registry_id": "url-add7d4049039ffe37bd3",
       "runs_seen": 2,
@@ -2824,14 +2882,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667203+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491393+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-af4d49012ba98b9e814e",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-af4d49012ba98b9e814e",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -2994,14 +3052,14 @@
       "categories": [
         "clothing_shop_fixtures"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666381+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490596+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-b9100172d742fc440381",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 24,
       "registry_id": "url-b9100172d742fc440381",
-      "runs_seen": 5,
+      "runs_seen": 6,
       "score_reasons": [
         "category:clothing_shop_fixtures+24"
       ],
@@ -3050,14 +3108,14 @@
         "inventory",
         "sale_listing"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667310+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491500+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 44,
       "registry_id": "url-bbaee8d1437e0f872a7d",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:auction+12",
         "category:inventory+22",
@@ -3080,14 +3138,14 @@
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664962+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489105+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-bd6977fd8acb108de839",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 46,
       "registry_id": "url-bd6977fd8acb108de839",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:clothing_shop_fixtures+24",
         "category:shop_equipment+22"
@@ -3109,14 +3167,14 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663622+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487800+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-bfd07690aa50b7514dff",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "registry_id": "url-bfd07690aa50b7514dff",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:inventory+22",
         "category:liquidation+16"
@@ -3137,14 +3195,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667402+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491644+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-c1e3e1a07794eb2a24ac",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-c1e3e1a07794eb2a24ac",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -3278,15 +3336,15 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663222+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487443+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-ccf7065118a5bf95db40",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 14,
       "published_at": "2003-10-28T10:11:00",
       "registry_id": "url-ccf7065118a5bf95db40",
-      "runs_seen": 7,
+      "runs_seen": 8,
       "score_reasons": [
         "category:bankruptcy+8",
         "published_at_present+6"
@@ -3363,14 +3421,14 @@
       "categories": [
         "inventory"
       ],
-      "discovered_at": "2026-08-01T08:33:48.667149+00:00",
+      "discovered_at": "2026-08-01T13:54:15.491337+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-cecaedbad94f2c556672",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 22,
       "registry_id": "url-cecaedbad94f2c556672",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:inventory+22"
       ],
@@ -3417,14 +3475,14 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-08-01T08:33:48.662819+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487018+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-d09fa9d52c55f40584df",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 8,
       "registry_id": "url-d09fa9d52c55f40584df",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:bankruptcy+8"
       ],
@@ -3444,15 +3502,15 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663289+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487515+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-d2192f749651b034d4eb",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 14,
       "published_at": "2022-09-05T10:02:35",
       "registry_id": "url-d2192f749651b034d4eb",
-      "runs_seen": 10,
+      "runs_seen": 11,
       "score_reasons": [
         "category:bankruptcy+8",
         "published_at_present+6"
@@ -3543,7 +3601,7 @@
       "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290"
     },
     {
-      "asking_price_nok": 5300.0,
+      "asking_price_nok": 5400.0,
       "canonical_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "city": "Tønsberg",
       "decision": "EVIDENCE_REQUIRED",
@@ -3558,9 +3616,9 @@
       ],
       "exclusion_reasons": [],
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lifecycle_status": "REJECTED",
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 26 bud 2d",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d",
       "matched_target_terms": [
         "lagerreol",
         "reol"
@@ -3588,7 +3646,7 @@
       "registry_id": "url-d6279c713b4bd0f2d757",
       "relevance_score": 29,
       "requires_human_approval": false,
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_components": {
         "evidence": 0.0,
         "listing_quality": 9.03,
@@ -3612,7 +3670,7 @@
         "unified-auksjonen-614289"
       ],
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 26 bud 2d 2t 6m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d 20t 45m",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     },
     {
@@ -3651,14 +3709,14 @@
       "categories": [
         "clothing_shop_fixtures"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666215+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490429+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-d8adeb8c515443238a4b",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 24,
       "registry_id": "url-d8adeb8c515443238a4b",
-      "runs_seen": 5,
+      "runs_seen": 6,
       "score_reasons": [
         "category:clothing_shop_fixtures+24"
       ],
@@ -3705,14 +3763,14 @@
       "categories": [
         "clothing_shop_fixtures"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666009+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490225+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-da69efc40719142bd2b6",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 24,
       "registry_id": "url-da69efc40719142bd2b6",
-      "runs_seen": 5,
+      "runs_seen": 6,
       "score_reasons": [
         "category:clothing_shop_fixtures+24"
       ],
@@ -3743,9 +3801,9 @@
       ],
       "exclusion_reasons": [],
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lifecycle_status": "REJECTED",
-      "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d",
+      "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud",
       "matched_target_terms": [
         "varelager"
       ],
@@ -3771,7 +3829,7 @@
       "registry_id": "url-dc40d868d5cb2a771a53",
       "relevance_score": 23,
       "requires_human_approval": false,
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_components": {
         "evidence": 0.0,
         "listing_quality": 8.61,
@@ -3795,7 +3853,7 @@
         "unified-auksjonen-613944"
       ],
       "status": "review_first",
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 4t 4m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 22t 43m 43s",
       "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
     },
     {
@@ -3914,14 +3972,14 @@
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665151+00:00",
+      "discovered_at": "2026-08-01T13:54:15.489444+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-e71772deae49d9ffbeb5",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 46,
       "registry_id": "url-e71772deae49d9ffbeb5",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:clothing_shop_fixtures+24",
         "category:shop_equipment+22"
@@ -3942,14 +4000,14 @@
       "categories": [
         "sale_listing"
       ],
-      "discovered_at": "2026-08-01T08:33:48.666762+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490933+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 10,
       "registry_id": "url-eb8ce2849d7d7dbac981",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:sale_listing+10"
       ],
@@ -4028,14 +4086,14 @@
         "inventory",
         "liquidation"
       ],
-      "discovered_at": "2026-08-01T08:33:48.663812+00:00",
+      "discovered_at": "2026-08-01T13:54:15.487990+00:00",
       "first_seen_at": "2026-07-30T17:09:12.136262+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-ef2f88a92a8f9400d376",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 38,
       "registry_id": "url-ef2f88a92a8f9400d376",
-      "runs_seen": 8,
+      "runs_seen": 9,
       "score_reasons": [
         "category:inventory+22",
         "category:liquidation+16"
@@ -4083,14 +4141,14 @@
       "categories": [
         "bankruptcy"
       ],
-      "discovered_at": "2026-08-01T08:33:48.664182+00:00",
+      "discovered_at": "2026-08-01T13:54:15.488429+00:00",
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-f47652f646757f4a5e07",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 8,
       "registry_id": "url-f47652f646757f4a5e07",
-      "runs_seen": 11,
+      "runs_seen": 12,
       "score_reasons": [
         "category:bankruptcy+8"
       ],
@@ -4114,7 +4172,7 @@
       "first_seen_at": "2026-07-23T06:12:10.158510+00:00",
       "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
       "lead_id": "web-f5e25a1bdcd9e106de57",
-      "lifecycle_status": "DISCOVERED",
+      "lifecycle_status": "NOT_SEEN_THIS_RUN",
       "priority_score": 28,
       "published_at": "2023-01-06T00:00:00",
       "registry_id": "url-f5e25a1bdcd9e106de57",
@@ -4139,15 +4197,15 @@
       "categories": [
         "shop_equipment"
       ],
-      "discovered_at": "2026-08-01T08:33:48.665694+00:00",
+      "discovered_at": "2026-08-01T13:54:15.490132+00:00",
       "first_seen_at": "2026-07-31T09:16:21.383790+00:00",
-      "last_seen_at": "2026-08-01T08:34:00.615574+00:00",
+      "last_seen_at": "2026-08-01T13:54:27.728334+00:00",
       "lead_id": "web-f7fe2d09f32e4cbfda29",
       "lifecycle_status": "DISCOVERED",
       "priority_score": 28,
       "published_at": "2024-05-16T13:05:10",
       "registry_id": "url-f7fe2d09f32e4cbfda29",
-      "runs_seen": 5,
+      "runs_seen": 6,
       "score_reasons": [
         "category:shop_equipment+22",
         "published_at_present+6"
@@ -5960,8 +6018,8 @@
   ],
   "schema_version": 3,
   "status_counts": {
-    "DISCOVERED": 58,
-    "NOT_SEEN_THIS_RUN": 146,
+    "DISCOVERED": 57,
+    "NOT_SEEN_THIS_RUN": 149,
     "REJECTED": 2
   }
 }
