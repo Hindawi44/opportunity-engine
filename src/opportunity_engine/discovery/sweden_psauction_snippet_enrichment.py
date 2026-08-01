@@ -2,7 +2,9 @@
 
 The enrichment extracts only facts explicitly visible in Brave snippets. It never
 uses reference values as current sale prices and never changes an unresolved
-listing into an active or Top-5 eligible opportunity.
+listing into an active or Top-5 eligible opportunity. Source-wide PS Auction
+boilerplate is excluded from event classification so generic references to
+bankruptcy auctions cannot turn every retained item into a bankruptcy lead.
 """
 from __future__ import annotations
 
@@ -39,6 +41,50 @@ _PURCHASE_VALUE_RE = re.compile(
     re.I,
 )
 
+_GENERIC_SEGMENT_TERMS = (
+    "auktionsexperter med fokus på konkurser",
+    "nätauktioner varje dag",
+    "fynd & förnuft",
+    "hållbar konsumtion",
+    "om auktionen avslutas utan att reservationspriset uppnåtts",
+    "buden är bindande och serviceavgiften debiteras på alla objekt",
+    "klimatavtrycket för ett motsvarande nyproducerat objekt",
+)
+_BANKRUPTCY_PHRASES = (
+    "tillhör ett konkursbo",
+    "objektet tillhör ett konkursbo",
+    "tvångsförsäljning då objektet tillhör ett konkursbo",
+    "säljes i uppdrag av konkursförvaltare",
+    "säljs i uppdrag av konkursförvaltare",
+    "på uppdrag av konkursförvaltare",
+)
+_EVENT_SCORES = {
+    "COMPANY_BANKRUPTCY": 25,
+    "STORE_CLOSING": 23,
+    "INVENTORY_LIQUIDATION": 22,
+    "WAREHOUSE_SURPLUS": 18,
+    "LARGE_LOT_SALE": 16,
+}
+_UNSCOPED_SOURCE_SIGNALS = {
+    "konkursbo",
+    "konkurs",
+    "auksjon",
+    "nettauksjon",
+    "opphørssalg",
+    "selges",
+    "restlager",
+    "overskuddslager",
+    "vareparti",
+    "klesparti",
+}
+_EVENT_SIGNALS = {
+    "COMPANY_BANKRUPTCY": ("konkursbo", "konkurs"),
+    "STORE_CLOSING": ("butikk stenger",),
+    "INVENTORY_LIQUIDATION": ("lageravvikling",),
+    "WAREHOUSE_SURPLUS": ("restlager",),
+    "LARGE_LOT_SALE": ("vareparti",),
+}
+
 
 @dataclass(frozen=True, slots=True)
 class PSAuctionSnippetFacts:
@@ -64,6 +110,17 @@ class PSAuctionSnippetFacts:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class _CandidateEnrichment:
+    changed: bool = False
+    quantity_extracted: bool = False
+    reference_value_extracted: bool = False
+    duplicate_count_corrected: bool = False
+    scenario_corrected: bool = False
+    inventory_type_corrected: bool = False
+    source_signals_cleaned: bool = False
+
+
 def _clean(value: str) -> str:
     value = html.unescape(value or "")
     value = _TAG_RE.sub(" ", value)
@@ -80,6 +137,35 @@ def _canonical_url(value: str) -> str:
     return urlunsplit((parts.scheme.casefold(), parts.netloc.casefold(), path, "", ""))
 
 
+def _item_title(value: str) -> str:
+    title = _clean(value)
+    for marker in (
+        " - auktioner online",
+        " | ps auction",
+    ):
+        if marker in title:
+            title = title.split(marker, 1)[0]
+    return title
+
+
+def _source_scoped_text(samples: Iterable[Mapping[str, Any]]) -> str:
+    """Keep item title and item-specific snippet segments, not site boilerplate."""
+    values: list[str] = []
+    for sample in samples:
+        title = _item_title(str(sample.get("title") or ""))
+        if title:
+            values.append(title)
+        description = html.unescape(str(sample.get("description") or ""))
+        for raw_segment in description.split("|"):
+            segment = _clean(raw_segment)
+            if not segment:
+                continue
+            if any(term in segment for term in _GENERIC_SEGMENT_TERMS):
+                continue
+            values.append(segment)
+    return " ".join(dict.fromkeys(values))
+
+
 def _inventory_type(text: str) -> str | None:
     if "secondhand" in text and "damkläder" in text:
         return "sorted_second_hand_womens_clothing"
@@ -91,15 +177,36 @@ def _inventory_type(text: str) -> str | None:
         return "training_clothing_and_accessories"
     if "sportbutik" in text or "sportkläder" in text:
         return "sportswear"
+    if "jeans" in text and ("skor" in text or "arbetsskor" in text):
+        return "mixed_clothing_and_footwear"
     if "arbetskläder" in text or "arbetsskor" in text:
         return "workwear_and_work_shoes"
-    if "jeans" in text and "skor" in text:
-        return "mixed_clothing_and_footwear"
     if any(term in text for term in ("kläder", "plagg", "textil")):
         return "mixed_clothing_inventory"
     if "skor" in text:
         return "footwear_inventory"
     return None
+
+
+def _source_scenario(text: str) -> str:
+    if any(phrase in text for phrase in _BANKRUPTCY_PHRASES):
+        return "COMPANY_BANKRUPTCY"
+    if any(
+        phrase in text
+        for phrase in ("butik stänger", "butiken stänger", "läggs ned")
+    ):
+        return "STORE_CLOSING"
+    if any(
+        phrase in text
+        for phrase in ("lager rensas", "lageravveckling", "likvidation")
+    ):
+        return "INVENTORY_LIQUIDATION"
+    if any(
+        phrase in text
+        for phrase in ("restparti", "restlager", "överskottslager")
+    ):
+        return "WAREHOUSE_SURPLUS"
+    return "LARGE_LOT_SALE"
 
 
 def extract_psauction_snippet_facts(value: str) -> PSAuctionSnippetFacts:
@@ -198,27 +305,38 @@ def _fact_text(facts: PSAuctionSnippetFacts) -> list[str]:
     return values
 
 
+def _replace_event_reason(values: Iterable[str], scenario: str) -> list[str]:
+    replacement = f"source-scoped commercial event detected: {scenario}"
+    result = [
+        value
+        for value in values
+        if not value.startswith("commercial event detected:")
+        and not value.startswith("source-scoped commercial event detected:")
+    ]
+    return [replacement, *result]
+
+
 def _enrich_candidate(
     candidate: dict[str, Any],
     samples_by_url: Mapping[str, list[Mapping[str, Any]]],
-) -> tuple[bool, bool, bool, bool]:
+) -> _CandidateEnrichment:
     matched_samples: list[Mapping[str, Any]] = []
     for url in candidate.get("source_urls") or ():
         matched_samples.extend(samples_by_url.get(_canonical_url(str(url)), ()))
     if not matched_samples:
-        return False, False, False, False
+        return _CandidateEnrichment()
 
-    combined = " ".join(
-        str(value)
-        for sample in matched_samples
-        for value in (sample.get("title"), sample.get("description"))
-        if value
-    )
-    facts = extract_psauction_snippet_facts(combined)
+    scoped_text = _source_scoped_text(matched_samples)
+    facts = extract_psauction_snippet_facts(scoped_text)
+    scenario = _source_scenario(scoped_text)
     if not facts.has_any_fact:
-        return False, False, False, False
+        return _CandidateEnrichment()
 
-    if facts.inventory_type and not candidate.get("inventory_type"):
+    old_inventory_type = candidate.get("inventory_type")
+    inventory_type_corrected = bool(
+        facts.inventory_type and facts.inventory_type != old_inventory_type
+    )
+    if facts.inventory_type:
         candidate["inventory_type"] = facts.inventory_type
     if facts.quantity is not None and candidate.get("quantity") is None:
         candidate["quantity"] = facts.quantity
@@ -240,13 +358,39 @@ def _enrich_candidate(
         missing = [item for item in missing if item != "quantity"]
     candidate["missing_information"] = missing
 
-    confirmed = list(candidate.get("confirmed_information") or ())
+    confirmed = [
+        item
+        for item in (candidate.get("confirmed_information") or ())
+        if not str(item).startswith("source-scoped commercial event:")
+    ]
     for item in _fact_text(facts):
         if item not in confirmed:
             confirmed.append(item)
+    confirmed.append(f"source-scoped commercial event: {scenario}")
     candidate["confirmed_information"] = confirmed
 
+    old_scenario = str(candidate.get("scenario") or "")
+    scenario_corrected = old_scenario != scenario
+    candidate["scenario"] = scenario
+    candidate["why_opportunity"] = _replace_event_reason(
+        [str(item) for item in candidate.get("why_opportunity") or ()],
+        scenario,
+    )
+
+    old_signals = [str(item) for item in candidate.get("evidence_signals") or ()]
+    cleaned_signals = [
+        item for item in old_signals if item not in _UNSCOPED_SOURCE_SIGNALS
+    ]
+    for signal in _EVENT_SIGNALS[scenario]:
+        if signal not in cleaned_signals:
+            cleaned_signals.append(signal)
+    if "säljes" in scoped_text and "selges" not in cleaned_signals:
+        cleaned_signals.append("selges")
+    source_signals_cleaned = cleaned_signals != old_signals
+    candidate["evidence_signals"] = cleaned_signals
+
     breakdown = dict(candidate.get("score_breakdown") or {})
+    breakdown["commercial_event_strength"] = _EVENT_SCORES[scenario]
     if facts.inventory_type:
         breakdown["clothing_inventory_clarity"] = max(
             20, int(breakdown.get("clothing_inventory_clarity", 0))
@@ -257,6 +401,11 @@ def _enrich_candidate(
         )
     candidate["score_breakdown"] = breakdown
     candidate["discovery_score"] = min(100, sum(int(value) for value in breakdown.values()))
+    candidate["discovery_band"] = (
+        "HIGH" if candidate["discovery_score"] >= 80
+        else "REVIEW" if candidate["discovery_score"] >= 55
+        else "LOW"
+    )
 
     duplicate_observations = max(0, len(matched_samples) - len({
         _canonical_url(str(sample.get("canonical_url") or sample.get("url") or ""))
@@ -269,11 +418,14 @@ def _enrich_candidate(
     )
     candidate["duplicate_count"] = corrected_duplicate_count
 
-    return (
-        True,
-        facts.has_quantity,
-        facts.reference_value_sek is not None,
-        corrected_duplicate_count > old_duplicate_count,
+    return _CandidateEnrichment(
+        changed=True,
+        quantity_extracted=facts.has_quantity,
+        reference_value_extracted=facts.reference_value_sek is not None,
+        duplicate_count_corrected=corrected_duplicate_count > old_duplicate_count,
+        scenario_corrected=scenario_corrected,
+        inventory_type_corrected=inventory_type_corrected,
+        source_signals_cleaned=source_signals_cleaned,
     )
 
 
@@ -290,29 +442,44 @@ def enrich_psauction_discovery_result(
             continue
         samples_by_url.setdefault(_canonical_url(url), []).append(sample)
 
-    candidates_enriched = 0
-    quantities_extracted = 0
-    reference_values_extracted = 0
-    duplicate_counts_corrected = 0
+    counters = {
+        "candidates_enriched": 0,
+        "quantities_extracted": 0,
+        "reference_values_extracted": 0,
+        "duplicate_counts_corrected": 0,
+        "scenarios_corrected": 0,
+        "inventory_types_corrected": 0,
+        "source_event_signals_cleaned": 0,
+    }
     for key in ("all_discovered_candidates", "discovery_top5"):
         for candidate in enriched.get(key) or ():
-            changed, quantity, reference, duplicate = _enrich_candidate(
-                candidate, samples_by_url
+            outcome = _enrich_candidate(candidate, samples_by_url)
+            if key != "all_discovered_candidates":
+                continue
+            counters["candidates_enriched"] += int(outcome.changed)
+            counters["quantities_extracted"] += int(outcome.quantity_extracted)
+            counters["reference_values_extracted"] += int(
+                outcome.reference_value_extracted
             )
-            candidates_enriched += int(changed and key == "all_discovered_candidates")
-            quantities_extracted += int(quantity and key == "all_discovered_candidates")
-            reference_values_extracted += int(reference and key == "all_discovered_candidates")
-            duplicate_counts_corrected += int(duplicate and key == "all_discovered_candidates")
+            counters["duplicate_counts_corrected"] += int(
+                outcome.duplicate_count_corrected
+            )
+            counters["scenarios_corrected"] += int(outcome.scenario_corrected)
+            counters["inventory_types_corrected"] += int(
+                outcome.inventory_type_corrected
+            )
+            counters["source_event_signals_cleaned"] += int(
+                outcome.source_signals_cleaned
+            )
 
     report = enriched.get("search_run_report")
     if isinstance(report, dict):
         report["source_snippet_enrichment"] = {
             "source": "PS_AUCTION",
             "accepted_samples_used": sum(len(values) for values in samples_by_url.values()),
-            "candidates_enriched": candidates_enriched,
-            "quantities_extracted": quantities_extracted,
-            "reference_values_extracted": reference_values_extracted,
-            "duplicate_counts_corrected": duplicate_counts_corrected,
+            **counters,
+            "event_classification_scope": "item_title_and_item_specific_snippet_only",
+            "source_boilerplate_used_for_event_classification": False,
             "listing_status_changed": False,
             "top5_eligibility_changed": False,
             "reference_values_used_as_sale_prices": False,
