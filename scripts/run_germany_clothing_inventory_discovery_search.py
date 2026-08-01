@@ -8,6 +8,15 @@ import os
 from pathlib import Path
 import sys
 
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+for path in (ROOT, SRC):
+    text = str(path)
+    if text not in sys.path:
+        sys.path.insert(0, text)
+
+
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.clothing_inventory_search import (
     apply_post_verification_top5_hard_gate,
@@ -24,9 +33,6 @@ from opportunity_engine.discovery.unified_opportunity_report import (
     write_unified_opportunity_report,
 )
 from opportunity_engine.markets.germany import load_germany_market_profile
-
-
-ROOT = Path(__file__).resolve().parents[1]
 
 
 def _write_fallback_persistence_error(
