@@ -56,6 +56,10 @@ _AUKSJONEN_CLOTHING_TERMS = (
     "bukse",
     "bukser",
 )
+_EXPLICIT_QUANTITY_PATTERNS = (
+    re.compile(r"\bantall\s*[:\-]?\s*(\d{1,7})\s*(?:stk\.?|stykk(?:er)?)\b", re.I),
+    re.compile(r"^\s*(\d{1,7})\s*(?:stk\.?|stykk(?:er)?)\b", re.I),
+)
 
 PrimaryVerifier = Callable[[str], PageVerification]
 RenderedPageLoader = Callable[[str], tuple[str, str]]
@@ -75,6 +79,21 @@ def canonicalize_auksjonen_item_url(url: str) -> str | None:
     return urlunparse(parsed._replace(netloc="auksjonen.no"))
 
 
+def _extract_explicit_quantity(*parts: str | None) -> int | None:
+    """Return only a clearly stated item count; never guess a missing quantity."""
+    for part in parts:
+        if not part:
+            continue
+        for pattern in _EXPLICIT_QUANTITY_PATTERNS:
+            match = pattern.search(part)
+            if not match:
+                continue
+            quantity = int(match.group(1))
+            if quantity > 0:
+                return quantity
+    return None
+
+
 def _enrich_rendered_auksjonen_item(result: PageVerification) -> PageVerification:
     """Recover bounded auction evidence from a verified active clothing item."""
     if (
@@ -92,8 +111,17 @@ def _enrich_rendered_auksjonen_item(result: PageVerification) -> PageVerificatio
     if not any(term in bounded_text for term in _AUKSJONEN_CLOTHING_TERMS):
         return result
 
+    quantity = result.quantity
+    if quantity is None:
+        quantity = _extract_explicit_quantity(
+            result.text,
+            result.bounded_context,
+            result.title,
+        )
+
     return replace(
         result,
+        quantity=quantity,
         clothing_inventory_evidence=True,
         sale_evidence=True,
         event_scenario="AUCTION",
