@@ -25,6 +25,7 @@ class EvaluationStatus(StrEnum):
     NOT_EVALUATED = "NOT_EVALUATED"
     REQUIRES_VERIFICATION = "REQUIRES_VERIFICATION"
     QUALIFIED = "QUALIFIED"
+    HISTORICAL_ONLY = "HISTORICAL_ONLY"
     REJECTED = "REJECTED"
 
 
@@ -34,6 +35,7 @@ class WorkflowStatus(StrEnum):
     REQUIRES_VERIFICATION = "REQUIRES_VERIFICATION"
     ACTIVE_OPPORTUNITY = "ACTIVE_OPPORTUNITY"
     QUALIFIED_OPPORTUNITY = "QUALIFIED_OPPORTUNITY"
+    HISTORICAL_MARKET_EVIDENCE = "HISTORICAL_MARKET_EVIDENCE"
     CLOSED = "CLOSED"
     REJECTED = "REJECTED"
 
@@ -117,11 +119,12 @@ class OpportunityRecord(BaseModel):
 
     @model_validator(mode="after")
     def enforce_lifecycle_consistency(self) -> "OpportunityRecord":
-        if self.listing_status in {
+        inactive_statuses = {
             ListingStatus.ENDED,
             ListingStatus.SOLD,
             ListingStatus.UNAVAILABLE,
-        } and self.analysis_eligible:
+        }
+        if self.listing_status in inactive_statuses and self.analysis_eligible:
             raise ValueError("inactive listings cannot be analysis eligible")
         if self.evaluation_status == EvaluationStatus.QUALIFIED and not self.verified:
             raise ValueError("qualified opportunities must be verified")
@@ -130,5 +133,25 @@ class OpportunityRecord(BaseModel):
         ):
             raise ValueError(
                 "qualified workflow status requires verified QUALIFIED evaluation"
+            )
+        if self.workflow_status == WorkflowStatus.HISTORICAL_MARKET_EVIDENCE:
+            if self.listing_status not in inactive_statuses:
+                raise ValueError(
+                    "historical market evidence requires an inactive listing status"
+                )
+            if self.evaluation_status != EvaluationStatus.HISTORICAL_ONLY:
+                raise ValueError(
+                    "historical market evidence requires HISTORICAL_ONLY evaluation"
+                )
+            if self.analysis_eligible or self.top5_eligible:
+                raise ValueError(
+                    "historical market evidence cannot enter current opportunity analysis"
+                )
+        if (
+            self.evaluation_status == EvaluationStatus.HISTORICAL_ONLY
+            and self.workflow_status != WorkflowStatus.HISTORICAL_MARKET_EVIDENCE
+        ):
+            raise ValueError(
+                "HISTORICAL_ONLY evaluation requires historical market evidence workflow"
             )
         return self
