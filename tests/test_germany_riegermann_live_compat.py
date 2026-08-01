@@ -7,6 +7,9 @@ CATALOG_URL = (
     "https://riegermann.de/de/objekte/au-908/"
     "versteigerung_cabrini_gmbh"
 )
+INFORMATION_URL = (
+    "https://riegermann.de/de/2019_versteigerung_cabrini_gmbh/a/908"
+)
 
 
 def test_compat_extracts_absolute_and_relative_item_links_once():
@@ -82,3 +85,22 @@ def test_compat_promotes_only_explicit_bulk_slug_without_inventing_price():
     assert lot.source_start_or_minimum_price_eur is None
     assert lot.source_displayed_bid_eur is None
     assert lot.final_sale_price_trusted is False
+
+
+def test_compat_does_not_extract_lots_from_information_page():
+    source = """
+    <!doctype html>
+    <html>
+      <head><title>Versteigerung Cabrini GmbH</title></head>
+      <body>
+        <h1>Versteigerung Cabrini GmbH</h1>
+        <p>Aktuell</p>
+        <p>Ort: DE-55450 Langenlonsheim</p>
+      </body>
+    </html>
+    """
+
+    event = parse_riegermann_catalog_html_compat(INFORMATION_URL, source)
+
+    assert event.auction_id == "908"
+    assert event.child_lots == ()
