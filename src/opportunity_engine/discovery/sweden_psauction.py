@@ -182,11 +182,10 @@ _BULK_QUANTITY_PATTERN = re.compile(
 _ENDED_OR_SOLD_TERMS = (
     "auktionen är avslutad",
     "auktionen avslutad",
-    "· avslutad ·",
-    "· såld ·",
-    "avyttring · såld",
-    "konkurs · såld",
-    "avveckling · såld",
+    "avslutad",
+    "såld",
+    "utgången",
+    "avbruten",
 )
 _ENDED_REASON = "specific PS Auction item is ended or sold"
 
