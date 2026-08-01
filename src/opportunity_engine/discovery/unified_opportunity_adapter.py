@@ -26,7 +26,10 @@ def _listing_status(value: object) -> ListingStatus:
         return ListingStatus.UNKNOWN
 
 
-def _lifecycle(candidate: Mapping[str, Any], verified: bool) -> tuple[EvaluationStatus, WorkflowStatus]:
+def _lifecycle(
+    candidate: Mapping[str, Any],
+    verified: bool,
+) -> tuple[EvaluationStatus, WorkflowStatus]:
     state = str(candidate.get("opportunity_state") or candidate.get("state") or "")
     status = _listing_status(candidate.get("listing_status"))
 
@@ -100,7 +103,11 @@ def _market_signals(candidate: Mapping[str, Any]) -> list[MarketSignal]:
 
 def _missing_information(candidate: Mapping[str, Any]) -> list[MissingInformation]:
     fields = candidate.get("missing_information") or []
-    return [MissingInformation(field_name=str(field)) for field in fields if str(field).strip()]
+    return [
+        MissingInformation(field_name=str(field))
+        for field in fields
+        if str(field).strip()
+    ]
 
 
 def opportunity_record_from_discovery_candidate(
@@ -108,6 +115,7 @@ def opportunity_record_from_discovery_candidate(
     *,
     discovered_at: datetime,
     market_code: str = "NO",
+    currency: str = "NOK",
     domain: str = "TEXTILE_AND_SEWING",
 ) -> OpportunityRecord:
     """Build one validated record without estimating missing public facts."""
@@ -130,6 +138,7 @@ def opportunity_record_from_discovery_candidate(
         company_name=candidate.get("company_name"),
         location=candidate.get("location"),
         inventory_type=candidate.get("inventory_type"),
+        currency=currency,
         price=candidate.get("price_nok"),
         bid_price=candidate.get("bid_price_nok"),
         quantity=candidate.get("quantity"),
