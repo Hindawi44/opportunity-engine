@@ -21,7 +21,7 @@ _CONTAINER_RE = re.compile(
     re.I,
 )
 _ITEM_RE = re.compile(
-    rf"\b(?P<prefix>ca|cirka|över|uppskattat(?:vis)?(?:\s+till)?\s+ca)?\s*"
+    rf"\b(?P<prefix>ca|cirka|över|uppskattningsvis|uppskattat(?:\s+till)?\s+ca)?\s*"
     rf"{_NUMBER}\s*(?P<plus>\+)?\s*(?P<unit>plagg|artiklar|st|par)\b",
     re.I,
 )
