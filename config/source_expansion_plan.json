@@ -33,6 +33,14 @@
         {"source": "Campen Auktioner", "priority": 14, "audit_status": "PLANNED"},
         {"source": "Danish liquidation auctions", "priority": 15, "audit_status": "PLANNED"}
       ]
+    },
+    {
+      "market": "Germany",
+      "sources": [
+        {"source": "Riegermann", "priority": 16, "audit_status": "PLANNED", "channel": "public_auction_event_lead"},
+        {"source": "VENTA Industrieversteigerungen", "priority": 17, "audit_status": "PLANNED", "channel": "public_auction_event_lead"},
+        {"source": "Deutsche Pfandverwertung", "priority": 18, "audit_status": "PLANNED", "channel": "public_auction_event_lead"}
+      ]
     }
   ],
   "rules": [
