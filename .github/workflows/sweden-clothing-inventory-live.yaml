@@ -55,7 +55,7 @@ permissions:
 
 concurrency:
   group: sweden-clothing-inventory-live-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   live-pilot:
