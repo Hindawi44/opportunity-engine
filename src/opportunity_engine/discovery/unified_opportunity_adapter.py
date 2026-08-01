@@ -93,6 +93,15 @@ def _evidence(candidate: Mapping[str, Any]) -> list[Evidence]:
                     "page_role": item.get("page_role"),
                     "listing_status": item.get("listing_status"),
                     "event_scenario": item.get("event_scenario"),
+                    "verification_content_match": item.get(
+                        "verification_content_match"
+                    ),
+                    "historical_data_fields_trusted": item.get(
+                        "historical_data_fields_trusted"
+                    ),
+                    "exclude_from_historical_price_analysis": item.get(
+                        "exclude_from_historical_price_analysis"
+                    ),
                 },
             )
         )
@@ -119,6 +128,73 @@ def _missing_information(candidate: Mapping[str, Any]) -> list[MissingInformatio
         for field in fields
         if str(field).strip()
     ]
+
+
+def _trusted_historical_bid_price(
+    candidate: Mapping[str, Any],
+    *,
+    currency: str,
+) -> float | None:
+    """Return only a source-native bid explicitly trusted for historical analysis."""
+    direct_nok = candidate.get("bid_price_nok")
+    if direct_nok is not None:
+        return float(direct_nok)
+
+    if candidate.get("bid_price_trusted") is not True:
+        return None
+    if candidate.get("exclude_from_historical_price_analysis") is True:
+        return None
+
+    source_currency = str(candidate.get("bid_price_currency") or "").upper()
+    canonical_currency = str(currency).upper()
+    if source_currency != canonical_currency:
+        return None
+
+    source_field = {
+        "SEK": "bid_price_sek",
+    }.get(source_currency)
+    if source_field is None:
+        return None
+
+    value = candidate.get(source_field)
+    return float(value) if value is not None else None
+
+
+def _metadata(candidate: Mapping[str, Any]) -> dict[str, Any]:
+    """Preserve source trust and occurrence identity without estimating values."""
+    return {
+        "discovery_score": candidate.get("discovery_score"),
+        "discovery_band": candidate.get("discovery_band"),
+        "page_role": candidate.get("page_role"),
+        "reason": candidate.get("reason"),
+        "opportunity_state": candidate.get("opportunity_state")
+        or candidate.get("state"),
+        "historical_market_evidence_eligible": candidate.get(
+            "historical_market_evidence_eligible"
+        )
+        is True,
+        "verification_content_match": candidate.get("verification_content_match"),
+        "historical_data_fields_trusted": candidate.get(
+            "historical_data_fields_trusted"
+        ),
+        "exclude_from_historical_price_analysis": candidate.get(
+            "exclude_from_historical_price_analysis"
+        ),
+        "historical_price_analysis_exclusion_reason": candidate.get(
+            "historical_price_analysis_exclusion_reason"
+        ),
+        "bid_price_trusted": candidate.get("bid_price_trusted"),
+        "reference_value_trusted": candidate.get("reference_value_trusted"),
+        "bid_price_sek": candidate.get("bid_price_sek"),
+        "bid_price_currency": candidate.get("bid_price_currency"),
+        "reference_value_sek": candidate.get("reference_value_sek"),
+        "reference_value_kind": candidate.get("reference_value_kind"),
+        "reference_value_is_current_sale_price": candidate.get(
+            "reference_value_is_current_sale_price"
+        ),
+        "source_object_id": candidate.get("source_object_id"),
+        "auction_occurrence_id": candidate.get("auction_occurrence_id"),
+    }
 
 
 def opportunity_record_from_discovery_candidate(
@@ -151,7 +227,7 @@ def opportunity_record_from_discovery_candidate(
         inventory_type=candidate.get("inventory_type"),
         currency=currency,
         price=candidate.get("price_nok"),
-        bid_price=candidate.get("bid_price_nok"),
+        bid_price=_trusted_historical_bid_price(candidate, currency=currency),
         quantity=candidate.get("quantity"),
         published_at=candidate.get("published_at"),
         discovered_at=discovered_at,
@@ -162,13 +238,5 @@ def opportunity_record_from_discovery_candidate(
         market_signals=_market_signals(candidate),
         evidence=_evidence(candidate),
         missing_information=_missing_information(candidate),
-        metadata={
-            "discovery_score": candidate.get("discovery_score"),
-            "discovery_band": candidate.get("discovery_band"),
-            "page_role": candidate.get("page_role"),
-            "reason": candidate.get("reason"),
-            "historical_market_evidence_eligible": candidate.get(
-                "historical_market_evidence_eligible"
-            ) is True,
-        },
+        metadata=_metadata(candidate),
     )
