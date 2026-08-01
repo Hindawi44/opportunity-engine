@@ -179,6 +179,16 @@ _BULK_QUANTITY_PATTERN = re.compile(
     r"(?:st|par|plagg|artiklar|pall|kartonger?|krt)\b",
     re.I,
 )
+_ENDED_OR_SOLD_TERMS = (
+    "auktionen är avslutad",
+    "auktionen avslutad",
+    "· avslutad ·",
+    "· såld ·",
+    "avyttring · såld",
+    "konkurs · såld",
+    "avveckling · såld",
+)
+_ENDED_REASON = "specific PS Auction item is ended or sold"
 
 
 @dataclass(frozen=True, slots=True)
@@ -232,7 +242,7 @@ def _has_bulk_scope(text: str) -> bool:
 
 
 def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
-    """Accept only a specific public PS Auction bulk clothing item page."""
+    """Accept only a specific, not-known-ended PS Auction bulk clothing page."""
     canonical = normalize_public_url(hit.url)
     if not canonical:
         return PSAuctionGateDecision(False, "", None, "invalid public HTTPS URL")
@@ -265,6 +275,13 @@ def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
             canonical,
             path_match.group("item_id"),
             "specific clothing item lacks bulk inventory evidence",
+        )
+    if any(term in combined for term in _ENDED_OR_SOLD_TERMS):
+        return PSAuctionGateDecision(
+            False,
+            canonical,
+            path_match.group("item_id"),
+            _ENDED_REASON,
         )
 
     return PSAuctionGateDecision(
@@ -306,6 +323,7 @@ class PSAuctionTargetedSearchProvider:
         self._rejection_reasons: Counter[str] = Counter()
         self._accepted_item_ids: list[str] = []
         self._accepted_urls: list[str] = []
+        self._historical_item_ids: list[str] = []
         self._accepted_samples: list[dict[str, Any]] = []
         self._rejected_samples: list[dict[str, Any]] = []
         self._query_diagnostics: list[dict[str, Any]] = []
@@ -337,6 +355,12 @@ class PSAuctionTargetedSearchProvider:
                 rejected += 1
                 self._rejected_hits += 1
                 self._rejection_reasons[decision.reason] += 1
+                if (
+                    decision.reason == _ENDED_REASON
+                    and decision.item_id
+                    and decision.item_id not in self._historical_item_ids
+                ):
+                    self._historical_item_ids.append(decision.item_id)
                 if len(self._rejected_samples) < 20:
                     self._rejected_samples.append(sample)
                 continue
@@ -378,6 +402,8 @@ class PSAuctionTargetedSearchProvider:
             "rejected_hits": self._rejected_hits,
             "accepted_item_ids": list(self._accepted_item_ids),
             "accepted_urls": list(self._accepted_urls),
+            "historical_item_count": len(self._historical_item_ids),
+            "historical_item_ids": list(self._historical_item_ids),
             "accepted_samples": list(self._accepted_samples),
             "rejection_reasons": dict(sorted(self._rejection_reasons.items())),
             "rejected_samples": list(self._rejected_samples),
