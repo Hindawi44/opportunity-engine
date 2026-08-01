@@ -58,6 +58,7 @@ def build_unified_opportunity_report(
     *,
     generated_at: datetime | None = None,
     market_code: str = "NO",
+    currency: str = "NOK",
     domain: str = "TEXTILE_AND_SEWING",
 ) -> dict[str, Any]:
     """Convert discovery candidates independently into canonical records.
@@ -83,6 +84,7 @@ def build_unified_opportunity_report(
                 candidate,
                 discovered_at=timestamp,
                 market_code=market_code,
+                currency=currency,
                 domain=domain,
             )
         except (TypeError, ValueError, ValidationError) as exc:
@@ -93,6 +95,8 @@ def build_unified_opportunity_report(
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at": timestamp_text,
+        "market_code": market_code.upper(),
+        "currency": currency.upper(),
         "record_count": len(records),
         "records": records,
         "conversion_error_count": len(conversion_errors),
@@ -110,12 +114,21 @@ def write_unified_opportunity_report(
     output_dir: str | Path,
     *,
     generated_at: datetime | None = None,
+    market_code: str = "NO",
+    currency: str = "NOK",
+    domain: str = "TEXTILE_AND_SEWING",
 ) -> Path:
     """Write the canonical report beside the existing discovery artifacts."""
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     path = destination / "unified-opportunity-report.json"
-    report = build_unified_opportunity_report(result, generated_at=generated_at)
+    report = build_unified_opportunity_report(
+        result,
+        generated_at=generated_at,
+        market_code=market_code,
+        currency=currency,
+        domain=domain,
+    )
     path.write_text(
         serialize_unified_opportunity_report(report) + "\n",
         encoding="utf-8",
