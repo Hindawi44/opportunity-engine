@@ -200,7 +200,7 @@ def test_verifier_extracts_active_surplus_quantity_and_source_identity(monkeypat
     assert result.identity_stable is True
     assert result.listing_status == ACTIVE
     assert result.event_scenario == "WAREHOUSE_SURPLUS"
-    assert result.inventory_type == "mixed_clothing_inventory"
+    assert result.inventory_type == "workwear_inventory"
     assert result.quantity == 53
     assert result.location == "Växjö"
     assert result.clothing_inventory_evidence is True
