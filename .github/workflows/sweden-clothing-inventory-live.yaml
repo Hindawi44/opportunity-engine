@@ -6,9 +6,10 @@ on:
       source:
         description: Swedish discovery source mode
         required: true
-        default: klaravik
+        default: blinto
         type: choice
         options:
+          - blinto
           - klaravik
           - psauction
           - open-web
@@ -36,6 +37,7 @@ on:
       - ".github/workflows/sweden-clothing-inventory-live.yaml"
       - "scripts/run_market_clothing_inventory_discovery.py"
       - "scripts/run_sweden_clothing_inventory_discovery_search.py"
+      - "src/opportunity_engine/discovery/sweden_blinto.py"
       - "src/opportunity_engine/discovery/sweden_clothing_inventory.py"
       - "src/opportunity_engine/discovery/sweden_klaravik.py"
       - "src/opportunity_engine/discovery/sweden_psauction.py"
@@ -45,9 +47,11 @@ on:
       - "src/opportunity_engine/discovery/unified_opportunity_report.py"
       - "src/opportunity_engine/markets/sweden.py"
       - "config/markets/se_v1.json"
+      - "docs/BLINTO_PUBLIC_ACCESS_AUDIT_v1.md"
       - "docs/KLARAVIK_PUBLIC_ACCESS_AUDIT_v1.md"
       - "docs/PSAUCTION_PUBLIC_ACCESS_AUDIT_v1.md"
       - "docs/WORKFLOW_INVENTORY_REPORT_v1.1.md"
+      - "tests/test_sweden_blinto_source.py"
       - "tests/test_sweden_clothing_discovery_v1.py"
       - "tests/test_sweden_klaravik_source.py"
       - "tests/test_sweden_psauction_source.py"
@@ -68,7 +72,7 @@ jobs:
     env:
       BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
       OUTPUT_DIR: artifacts/sweden-clothing-discovery-live
-      EXPECTED_SOURCE: ${{ github.event.inputs.source || 'klaravik' }}
+      EXPECTED_SOURCE: ${{ github.event.inputs.source || 'blinto' }}
 
     steps:
       - name: Check out repository
@@ -147,6 +151,7 @@ jobs:
           expected_target = {
               "psauction": "psauction.se",
               "klaravik": "klaravik.se",
+              "blinto": "blinto.se",
           }.get(expected_source)
 
           if report.get("market_code") != "SE":
@@ -191,6 +196,8 @@ jobs:
               "source_accepted_keys: "
               f"{diagnostics.get('accepted_item_ids') or diagnostics.get('accepted_listing_keys')}"
           )
+          print(f"source_accepted_object_ids: {diagnostics.get('accepted_object_ids')}")
+          print(f"source_accepted_occurrence_ids: {diagnostics.get('accepted_occurrence_ids')}")
           print("source_accepted_samples:")
           for sample in diagnostics.get("accepted_samples") or []:
               print(json.dumps(sample, ensure_ascii=False, sort_keys=True))
@@ -206,6 +213,14 @@ jobs:
           for sample in diagnostics.get("rejected_samples") or []:
               print(json.dumps(sample, ensure_ascii=False, sort_keys=True))
 
+          enrichment = report.get("source_page_enrichment") or {}
+          print(
+              "source_page_enrichment: "
+              + json.dumps(enrichment, ensure_ascii=False, sort_keys=True)
+          )
+          if expected_source == "blinto" and enrichment.get("nok_price_fields_written") is not False:
+              raise SystemExit("Blinto source must never write SEK values into NOK fields")
+
           browser = report.get("source_page_verifier_diagnostics") or {}
           print(
               "source_browser_verifier: "
@@ -218,6 +233,8 @@ jobs:
           unified = json.loads(unified_path.read_text(encoding="utf-8"))
           print(f"unified_record_count: {unified.get('record_count')}")
           print(f"unified_conversion_error_count: {unified.get('conversion_error_count')}")
+          if unified.get("conversion_error_count") != 0:
+              raise SystemExit("Unified conversion errors must remain zero")
           PY
 
       - name: Upload Sweden live artifacts
