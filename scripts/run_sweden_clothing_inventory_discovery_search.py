@@ -8,6 +8,9 @@ import os
 from pathlib import Path
 import sys
 
+from opportunity_engine.discovery.blinto_historical_price_trust import (
+    apply_blinto_historical_price_trust_gate,
+)
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.clothing_inventory_search import (
     apply_post_verification_top5_hard_gate,
@@ -252,6 +255,7 @@ def main() -> int:
         )
     if blinto_provider is not None:
         result = enrich_blinto_discovery_result(result)
+        result = apply_blinto_historical_price_trust_gate(result)
 
     source_target = {
         "psauction": "psauction.se",
