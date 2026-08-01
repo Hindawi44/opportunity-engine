@@ -71,6 +71,12 @@ _SWEDISH_TO_NORWEGIAN_ALIASES: tuple[tuple[str, str], ...] = (
     ("lager rensas", "lager ryddes"),
     ("samlad försäljning", "samlet salg"),
     ("partiförsäljning", "partisalg"),
+    ("auktionen är avslutad", "auksjonen er avsluttet"),
+    ("auktionen avslutad", "auksjonen er avsluttet"),
+    ("avslutad", "avsluttet"),
+    ("utgången", "utløpt"),
+    ("såld", "solgt"),
+    ("avbruten", "auksjonen er avsluttet"),
     ("ledigt jobb", "ledig stilling"),
     ("karriär", "karriere"),
     ("webbutik", "nettbutikk"),
@@ -80,26 +86,36 @@ _SWEDISH_TO_NORWEGIAN_ALIASES: tuple[tuple[str, str], ...] = (
 
 _SWEDISH_CLOTHING_TERMS = (
     "kläder", "klädbutik", "klädparti", "arbetskläder", "sportkläder",
-    "beklädnad", "skor", "textil", "mode", "plagg",
+    "beklädnad", "skor", "tofflor", "bälten", "accessoarer", "textil",
+    "mode", "plagg",
 )
 _SWEDISH_INVENTORY_TERMS = (
     "varulager", "varulagret", "hela lagret", "hela varulagret", "lagerparti",
-    "restlager", "överskottslager", "partiförsäljning",
+    "restlager", "restparti", "överskottslager", "partiförsäljning",
+    "parti med kläder", "parti kläder", "alla kläder", "samtliga kläder",
+    "sortiment med arbetskläder", "pall", "kartong", "kartonger",
 )
 _SWEDISH_SALE_TERMS = (
     "säljes", "till salu", "auktion", "nätauktion", "budgivning",
-    "utförsäljning", "samlad försäljning",
+    "utförsäljning", "samlad försäljning", "auktionen avslutas",
+    "nuvarande bud", "lägg ett bud", "serviceavgift",
 )
-_SWEDISH_ENDED_TERMS = ("avslutad", "utgången", "såld", "auktionen är avslutad")
-_SWEDISH_ACTIVE_TERMS = ("aktiv", "pågående", "till salu", "säljes", "budgivning")
+_SWEDISH_ENDED_TERMS = (
+    "auktionen är avslutad", "auktionen avslutad", "avslutad", "utgången",
+    "såld", "avbruten",
+)
+_SWEDISH_ACTIVE_TERMS = (
+    "auktionen avslutas", "nuvarande bud", "lägg ett bud", "budgivning",
+    "aktiv", "pågående", "till salu", "säljes",
+)
 _SWEDISH_SCENARIOS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("COMPANY_BANKRUPTCY", ("konkursbo", "konkurs")),
     ("BRANCH_CLOSURE", ("filial stänger", "filial läggs ned")),
     ("STORE_CLOSING", ("butik stänger", "klädbutik läggs ned", "utförsäljning", "avveckling")),
     ("INVENTORY_LIQUIDATION", ("lager rensas", "likvidation")),
-    ("AUCTION", ("auktion", "nätauktion", "budgivning")),
-    ("WAREHOUSE_SURPLUS", ("restlager", "överskottslager")),
-    ("LARGE_LOT_SALE", ("lagerparti", "klädparti", "partiförsäljning", "samlad försäljning")),
+    ("AUCTION", ("auktion", "nätauktion", "budgivning", "auktionen avslutas")),
+    ("WAREHOUSE_SURPLUS", ("restlager", "restparti", "överskottslager")),
+    ("LARGE_LOT_SALE", ("lagerparti", "klädparti", "partiförsäljning", "samlad försäljning", "parti med kläder")),
 )
 
 
@@ -161,9 +177,10 @@ def _swedish_scenario(text: str) -> str | None:
     return None
 
 
-def verify_sweden_public_page(url: str) -> PageVerification:
-    """Conservatively enrich an already verified specific Swedish item page."""
-    verification = verify_public_page(url)
+def enrich_sweden_page_verification(
+    verification: PageVerification,
+) -> PageVerification:
+    """Apply Swedish vocabulary to a verified, specific public item page."""
     text = _normalized(
         " ".join(
             value
@@ -208,3 +225,8 @@ def verify_sweden_public_page(url: str) -> PageVerification:
         ),
         event_scenario=scenario or verification.event_scenario,
     )
+
+
+def verify_sweden_public_page(url: str) -> PageVerification:
+    """Conservatively enrich an already verified specific Swedish item page."""
+    return enrich_sweden_page_verification(verify_public_page(url))

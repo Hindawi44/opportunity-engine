@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Sweden Clothing Inventory open-web discovery pilot."""
+"""Run the Sweden Clothing Inventory discovery pilot."""
 from __future__ import annotations
 
 import argparse
@@ -19,6 +19,16 @@ from opportunity_engine.discovery.sweden_clothing_inventory import (
     SwedenLocalizedSearchProvider,
     build_sweden_clothing_inventory_queries,
     verify_sweden_public_page,
+)
+from opportunity_engine.discovery.sweden_psauction import (
+    build_psauction_clothing_queries,
+)
+from opportunity_engine.discovery.sweden_psauction_playwright import (
+    PSAuctionPlaywrightConfig,
+    PSAuctionPlaywrightFallbackVerifier,
+)
+from opportunity_engine.discovery.sweden_psauction_prefetch import (
+    PSAuctionPrefetchedSearchProvider,
 )
 from opportunity_engine.discovery.unified_opportunity_report import (
     write_unified_opportunity_report,
@@ -65,10 +75,16 @@ def main() -> int:
     )
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument(
+        "--source",
+        choices=("open-web", "psauction"),
+        default="open-web",
+        help="Use the broad Swedish query pack or the bounded PS Auction source pack",
+    )
+    parser.add_argument(
         "--query-budget",
         type=int,
-        default=16,
-        help="Number of Swedish Clothing Inventory queries to execute (1-16)",
+        default=None,
+        help="Number of source-specific queries (default: open-web=16, psauction=8)",
     )
     parser.add_argument(
         "--freshness",
@@ -82,6 +98,22 @@ def main() -> int:
         help="Read the public HTTPS pages of the highest-ranked candidates",
     )
     parser.add_argument("--verification-limit", type=int, default=20)
+    parser.add_argument(
+        "--psauction-browser-fallback",
+        action="store_true",
+        help="Render at most three exact PS Auction item pages after HTTP 403",
+    )
+    parser.add_argument(
+        "--psauction-browser-pages",
+        type=int,
+        default=3,
+        help="Maximum rendered PS Auction item pages (1-3)",
+    )
+    parser.add_argument(
+        "--psauction-browser-delay-seconds",
+        type=float,
+        default=2.5,
+    )
     parser.add_argument(
         "--persist-unified",
         action="store_true",
@@ -101,6 +133,10 @@ def main() -> int:
         raise SystemExit("--results-per-query must be between 1 and 20")
     if not 1 <= args.verification_limit <= 100:
         raise SystemExit("--verification-limit must be between 1 and 100")
+    if args.psauction_browser_fallback and args.source != "psauction":
+        raise SystemExit("--psauction-browser-fallback requires --source psauction")
+    if args.psauction_browser_fallback and not args.verify_pages:
+        raise SystemExit("--psauction-browser-fallback requires --verify-pages")
     if args.persist_unified and not str(args.database_url).strip():
         raise SystemExit("--database-url must not be empty with --persist-unified")
 
@@ -109,7 +145,6 @@ def main() -> int:
         raise SystemExit("BRAVE_SEARCH_API_KEY is required")
 
     profile = load_sweden_market_profile(ROOT)
-    queries = build_sweden_clothing_inventory_queries(args.query_budget)
     brave = BraveSearchProvider(
         api_key,
         country=profile.market_code,
@@ -117,16 +152,50 @@ def main() -> int:
         extra_snippets=True,
         operators=True,
     )
-    provider = SwedenLocalizedSearchProvider(brave)
-    verifier = verify_sweden_public_page if args.verify_pages else None
 
-    raw_result = run_clothing_inventory_discovery(
-        provider,
-        queries=queries,
-        results_per_query=args.results_per_query,
-        verifier=verifier,
-        verification_limit=args.verification_limit,
-    )
+    query_budget = args.query_budget
+    if query_budget is None:
+        query_budget = 8 if args.source == "psauction" else 16
+
+    psauction_provider: PSAuctionPrefetchedSearchProvider | None = None
+    if args.source == "psauction":
+        queries = build_psauction_clothing_queries(query_budget)
+        psauction_provider = PSAuctionPrefetchedSearchProvider(
+            brave,
+            queries=queries,
+            request_budget=len(queries),
+        )
+        provider = SwedenLocalizedSearchProvider(psauction_provider)
+        query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V1"
+    else:
+        queries = build_sweden_clothing_inventory_queries(query_budget)
+        provider = SwedenLocalizedSearchProvider(brave)
+        query_pack = "SWEDEN_CLOTHING_INVENTORY_V1"
+
+    verifier = verify_sweden_public_page if args.verify_pages else None
+    browser_verifier: PSAuctionPlaywrightFallbackVerifier | None = None
+    if args.psauction_browser_fallback:
+        browser_verifier = PSAuctionPlaywrightFallbackVerifier(
+            verify_sweden_public_page,
+            config=PSAuctionPlaywrightConfig(
+                max_pages=args.psauction_browser_pages,
+                delay_seconds=args.psauction_browser_delay_seconds,
+            ),
+        )
+        verifier = browser_verifier
+
+    try:
+        raw_result = run_clothing_inventory_discovery(
+            provider,
+            queries=queries,
+            results_per_query=args.results_per_query,
+            verifier=verifier,
+            verification_limit=args.verification_limit,
+        )
+    finally:
+        if browser_verifier is not None:
+            browser_verifier.close()
+
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
     report = result["search_run_report"]
@@ -137,12 +206,20 @@ def main() -> int:
     report["language_codes"] = list(profile.language_codes)
     report["transaction_scope"] = profile.transaction_scope
     report["market_profile_id"] = profile.profile_id
-    report["query_pack"] = "SWEDEN_CLOTHING_INVENTORY_V1"
+    report["source_mode"] = args.source.upper().replace("-", "_")
+    report["source_target"] = "psauction.se" if psauction_provider else None
+    report["query_pack"] = query_pack
     report["query_budget"] = len(queries)
     report["brave_country"] = profile.market_code
     report["brave_freshness"] = args.freshness
     report["brave_extra_snippets"] = True
     report["brave_operators"] = True
+    report["source_diagnostics"] = (
+        psauction_provider.diagnostics() if psauction_provider else None
+    )
+    report["source_page_verifier_diagnostics"] = (
+        browser_verifier.diagnostics() if browser_verifier else None
+    )
     report["currency_conversion_performed"] = False
     report["tax_calculation_performed"] = False
     report["customs_calculation_performed"] = False
@@ -187,6 +264,7 @@ def main() -> int:
     print(f"Status: {report['status']}")
     print(f"Market: {profile.market_code} / {profile.market_name}")
     print(f"Currency: {profile.currency_code}")
+    print(f"Source: {report['source_mode']}")
     print(f"Queries: {report['queries_submitted']}")
     print(f"Top opportunities: {report['top5_count']}")
     for name, path in paths.items():

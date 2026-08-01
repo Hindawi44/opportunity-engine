@@ -3,10 +3,18 @@ name: Sweden Clothing Inventory Live Pilot
 on:
   workflow_dispatch:
     inputs:
+      source:
+        description: Swedish discovery source mode
+        required: true
+        default: psauction
+        type: choice
+        options:
+          - psauction
+          - open-web
       query_budget:
         description: Number of Swedish discovery queries to run
         required: false
-        default: "16"
+        default: "8"
       results_per_query:
         description: Brave results requested per query
         required: false
@@ -14,27 +22,32 @@ on:
       freshness:
         description: Brave freshness window
         required: false
-        default: "pm"
+        default: "none"
         type: choice
         options:
+          - none
           - pd
           - pw
           - pm
           - py
-          - none
   pull_request:
     paths:
       - ".github/workflows/sweden-clothing-inventory-live.yaml"
       - "scripts/run_market_clothing_inventory_discovery.py"
       - "scripts/run_sweden_clothing_inventory_discovery_search.py"
       - "src/opportunity_engine/discovery/sweden_clothing_inventory.py"
+      - "src/opportunity_engine/discovery/sweden_psauction.py"
+      - "src/opportunity_engine/discovery/sweden_psauction_playwright.py"
       - "src/opportunity_engine/discovery/brave_search.py"
       - "src/opportunity_engine/discovery/unified_opportunity_adapter.py"
       - "src/opportunity_engine/discovery/unified_opportunity_report.py"
       - "src/opportunity_engine/markets/sweden.py"
       - "config/markets/se_v1.json"
+      - "docs/PSAUCTION_PUBLIC_ACCESS_AUDIT_v1.md"
       - "docs/WORKFLOW_INVENTORY_REPORT_v1.1.md"
       - "tests/test_sweden_clothing_discovery_v1.py"
+      - "tests/test_sweden_psauction_source.py"
+      - "tests/test_sweden_psauction_playwright.py"
       - "tests/test_workflow_inventory_report.py"
 
 permissions:
@@ -42,15 +55,16 @@ permissions:
 
 concurrency:
   group: sweden-clothing-inventory-live-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   live-pilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
       OUTPUT_DIR: artifacts/sweden-clothing-discovery-live
+      EXPECTED_SOURCE: ${{ github.event.inputs.source || 'psauction' }}
 
     steps:
       - name: Check out repository
@@ -61,8 +75,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install dependencies and Chromium
+        run: |
+          pip install -r requirements.txt -r requirements-playwright.txt
+          python -m playwright install --with-deps chromium
 
       - name: Confirm Brave secret exists
         run: |
@@ -74,24 +90,36 @@ jobs:
       - name: Run Sweden live discovery pilot
         shell: bash
         run: |
-          QUERY_BUDGET="${{ github.event.inputs.query_budget || '16' }}"
+          QUERY_BUDGET="${{ github.event.inputs.query_budget || '8' }}"
           RESULTS_PER_QUERY="${{ github.event.inputs.results_per_query || '10' }}"
-          FRESHNESS="${{ github.event.inputs.freshness || 'pm' }}"
+          FRESHNESS="${{ github.event.inputs.freshness || 'none' }}"
+
+          browser_args=()
+          if [ "$EXPECTED_SOURCE" = "psauction" ]; then
+            browser_args+=(
+              --psauction-browser-fallback
+              --psauction-browser-pages 3
+              --psauction-browser-delay-seconds 2.5
+            )
+          fi
 
           python scripts/run_market_clothing_inventory_discovery.py \
             --market SE \
+            --source "$EXPECTED_SOURCE" \
             --output-dir "$OUTPUT_DIR" \
             --query-budget "$QUERY_BUDGET" \
             --results-per-query "$RESULTS_PER_QUERY" \
             --freshness "$FRESHNESS" \
             --verify-pages \
-            --verification-limit 20
+            --verification-limit 20 \
+            "${browser_args[@]}"
 
       - name: Validate and summarize Sweden artifacts
         shell: bash
         run: |
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
 
           root = Path("artifacts/sweden-clothing-discovery-live")
@@ -108,15 +136,29 @@ jobs:
               raise SystemExit("Search-run report artifact was not found")
 
           report = json.loads(report_path.read_text(encoding="utf-8"))
+          expected_source = os.environ["EXPECTED_SOURCE"]
+          expected_mode = expected_source.upper().replace("-", "_")
+          expected_target = "psauction.se" if expected_source == "psauction" else None
+
           if report.get("market_code") != "SE":
               raise SystemExit(f"Expected market_code=SE, got {report.get('market_code')!r}")
           if report.get("currency") != "SEK":
               raise SystemExit(f"Expected currency=SEK, got {report.get('currency')!r}")
+          if report.get("source_mode") != expected_mode:
+              raise SystemExit(
+                  f"Expected source_mode={expected_mode}, got {report.get('source_mode')!r}"
+              )
+          if report.get("source_target") != expected_target:
+              raise SystemExit(
+                  f"Expected source_target={expected_target!r}, got {report.get('source_target')!r}"
+              )
 
           keys = (
               "status",
               "market_code",
               "currency",
+              "source_mode",
+              "source_target",
               "queries_submitted",
               "hits_received",
               "unique_public_urls",
@@ -125,11 +167,38 @@ jobs:
               "rejected_results",
               "strong_leads_requiring_verification",
               "confirmed_sales",
+              "ended_or_historical",
               "top5_count",
           )
           print("Sweden live summary:")
           for key in keys:
               print(f"{key}: {report.get(key)}")
+
+          diagnostics = report.get("source_diagnostics") or {}
+          print(f"source_raw_hits: {diagnostics.get('raw_hits')}")
+          print(f"source_accepted_hits: {diagnostics.get('accepted_hits')}")
+          print(f"source_rejected_hits: {diagnostics.get('rejected_hits')}")
+          print(f"source_accepted_item_ids: {diagnostics.get('accepted_item_ids')}")
+          print("source_accepted_samples:")
+          for sample in diagnostics.get("accepted_samples") or []:
+              print(json.dumps(sample, ensure_ascii=False, sort_keys=True))
+          print(
+              "source_rejection_reasons: "
+              + json.dumps(
+                  diagnostics.get("rejection_reasons") or {},
+                  ensure_ascii=False,
+                  sort_keys=True,
+              )
+          )
+          print("source_rejected_samples:")
+          for sample in diagnostics.get("rejected_samples") or []:
+              print(json.dumps(sample, ensure_ascii=False, sort_keys=True))
+
+          browser = report.get("source_page_verifier_diagnostics") or {}
+          print(
+              "source_browser_verifier: "
+              + json.dumps(browser, ensure_ascii=False, sort_keys=True)
+          )
 
           unified_path = root / "unified-opportunity-report.json"
           if not unified_path.exists():
