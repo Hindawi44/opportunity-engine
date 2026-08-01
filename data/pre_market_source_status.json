@@ -1,6 +1,6 @@
 {
   "schema_version": "pre-market-source-status-1.0",
-  "captured_at": "2026-07-31T14:48:38.319672+00:00",
+  "captured_at": "2026-08-01T07:50:39.115845+00:00",
   "lead_source": {
     "name": "Konkurs.app clothing bankruptcy API",
     "source_status": "COMPLETE",
@@ -26,8 +26,8 @@
       "automatic_payment": false
     },
     {
-      "estate_orgnr": "938022038",
-      "debtor_name": "KEEPFIT AS",
+      "estate_orgnr": "938119295",
+      "debtor_name": "BIRKHANS AS",
       "source_status": "COMPLETE",
       "scan_complete": true,
       "requests_made": 5,
@@ -42,8 +42,8 @@
       "automatic_payment": false
     },
     {
-      "estate_orgnr": "938119295",
-      "debtor_name": "BIRKHANS AS",
+      "estate_orgnr": "938022038",
+      "debtor_name": "KEEPFIT AS",
       "source_status": "COMPLETE",
       "scan_complete": true,
       "requests_made": 5,
