@@ -1,0 +1,112 @@
+{
+  "schema_version": "source-contract-v1",
+  "source_id": "DE_RIEGERMANN_V1",
+  "source_name": "Riegermann",
+  "market_code": "DE",
+  "currency_code": "EUR",
+  "language_code": "de",
+  "runtime_status": "PLANNED",
+  "audit_decision": "GO_FOR_BOUNDED_EVENT_ADAPTER",
+  "audit_date": "2026-08-01",
+  "audit_document": "docs/RIEGERMANN_PUBLIC_ACCESS_AUDIT_v1.md",
+  "access": {
+    "accepted_hosts": [
+      "riegermann.de",
+      "www.riegermann.de"
+    ],
+    "public_read_without_login": true,
+    "login_required_for_bidding": true,
+    "hidden_api_access_allowed": false,
+    "captcha_solving_allowed": false,
+    "proxy_or_tls_bypass_allowed": false
+  },
+  "url_contract": {
+    "auction_index_paths": [
+      "/de/Auktionen/alle",
+      "/de/Auktionen/Auktionen"
+    ],
+    "auction_information_path_regex": "^/de/[^/]+/a/(?P<auction_id>[0-9]+)$",
+    "auction_catalog_path_regex": "^/de/objekte/au-(?P<auction_id>[0-9]+)/[^/?]+$",
+    "item_detail_path_regex": "^/de/l/(?P<object_id>[0-9]+)/[^/?]+$"
+  },
+  "identity_contract": {
+    "auction_identity": "riegermann-auction:<auction_id>",
+    "item_identity": "riegermann-object:<object_id>",
+    "lot_number_is_globally_unique": false,
+    "object_id_is_required_for_item_deduplication": true,
+    "single_garment_lots_are_child_evidence": true
+  },
+  "aggregation_contract": {
+    "mode": "AUCTION_EVENT_WITH_CHILD_LOTS",
+    "promote_auction_event": true,
+    "promote_single_garment_lot": false,
+    "promote_explicit_bulk_lot": true,
+    "single_garment_top5_eligible": false,
+    "bulk_lot_requires_quantity_or_posten_wording": true
+  },
+  "public_auction_fields": [
+    "auction_id",
+    "auction_title",
+    "auction_status",
+    "auction_type",
+    "location",
+    "bidding_start_at",
+    "award_start_at",
+    "award_end_at",
+    "pickup_window",
+    "description",
+    "buyer_premium_percent",
+    "vat_percent"
+  ],
+  "public_item_fields": [
+    "object_id",
+    "lot_number",
+    "title",
+    "description",
+    "category",
+    "minimum_or_start_price_eur",
+    "displayed_bid_eur",
+    "bid_count",
+    "end_at"
+  ],
+  "lifecycle_mapping": {
+    "Vorschau": "UPCOMING",
+    "Aktuell": "ACTIVE",
+    "Jetzt bieten": "ACTIVE",
+    "online": "ACTIVE",
+    "Nachverkauf": "REQUIRES_VERIFICATION",
+    "Abgeschlossen": "ENDED",
+    "Auktion beendet": "ENDED"
+  },
+  "price_contract": {
+    "source_currency": "EUR",
+    "startpreis_is_current_sale_price": false,
+    "mindestpreis_is_current_sale_price": false,
+    "active_displayed_bid_requires_bid_count": true,
+    "final_price_requires_explicit_sold_marker": true,
+    "normalized_price_enabled": false,
+    "fx_conversion_enabled": false,
+    "vat_calculation_enabled": false,
+    "premium_calculation_enabled": false
+  },
+  "known_current_evidence": {
+    "auction_title": "Versteigerung Cabrini GmbH",
+    "auction_id": "908",
+    "auction_status": "ACTIVE",
+    "auction_location": "DE-55450 Langenlonsheim",
+    "clothing_scope": "mode_and_leather_clothing_inventory",
+    "buyer_premium_percent": 20,
+    "vat_percent": 19,
+    "sample_item_object_id": "73457",
+    "sample_item_lot_number": "410",
+    "sample_item_title": "Damen Lederjacke Größe 36"
+  },
+  "safety_contract": {
+    "seller_contact_allowed": false,
+    "bidding_allowed": false,
+    "purchase_allowed": false,
+    "payment_allowed": false,
+    "profitability_calculation_allowed": false,
+    "cross_border_cost_calculation_allowed": false
+  }
+}
