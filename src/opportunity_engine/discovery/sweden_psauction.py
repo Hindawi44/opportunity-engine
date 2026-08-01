@@ -116,7 +116,9 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
 
 _CLOTHING_TERMS = (
     "kläder",
-    "kläd",
+    "klädbutik",
+    "klädparti",
+    "klädesplagg",
     "jeans",
     "byxor",
     "kjolar",
@@ -250,6 +252,7 @@ class PSAuctionTargetedSearchProvider:
         self._rejection_reasons: Counter[str] = Counter()
         self._accepted_item_ids: list[str] = []
         self._accepted_urls: list[str] = []
+        self._rejected_samples: list[dict[str, Any]] = []
         self._query_diagnostics: list[dict[str, Any]] = []
 
     def search(self, query: str, *, count: int = 10) -> Sequence[SearchHit]:
@@ -270,6 +273,18 @@ class PSAuctionTargetedSearchProvider:
                 rejected += 1
                 self._rejected_hits += 1
                 self._rejection_reasons[decision.reason] += 1
+                if len(self._rejected_samples) < 20:
+                    self._rejected_samples.append(
+                        {
+                            "query_id": discovery_query.query_id,
+                            "title": hit.title,
+                            "url": hit.url,
+                            "canonical_url": decision.canonical_url,
+                            "item_id": decision.item_id,
+                            "reason": decision.reason,
+                            "description": hit.description[:500],
+                        }
+                    )
                 continue
             accepted.append(
                 SearchHit(
@@ -308,5 +323,6 @@ class PSAuctionTargetedSearchProvider:
             "accepted_item_ids": list(self._accepted_item_ids),
             "accepted_urls": list(self._accepted_urls),
             "rejection_reasons": dict(sorted(self._rejection_reasons.items())),
+            "rejected_samples": list(self._rejected_samples),
             "query_diagnostics": list(self._query_diagnostics),
         }
