@@ -4,7 +4,9 @@ from opportunity_engine.discovery.early_opportunity_gate import (
     ACTIVE,
     ARTICLE_OR_INFO,
     CONFIRMED_SALE,
+    ENDED,
     EVENT_LEAD,
+    HISTORICAL_MARKET_EVIDENCE,
     ITEM_LISTING,
     REJECTED_NOISE,
     SOURCE_CHANNEL,
@@ -156,6 +158,58 @@ def test_confirmed_active_listing_is_the_only_analysis_eligible_type():
     assert by_title["AXL Sport og Fritid Kolvereid AS konkurs"]["analysis_eligible"] is False
     assert corrected["search_run_report"]["analysis_eligible_count"] == 1
     assert corrected["search_run_report"]["opportunity_quality_status"] == "PASS"
+
+
+def test_verified_ended_listing_moves_to_historical_market_evidence_path():
+    ended = candidate(
+        title="Parti arbetsbyxor - Fristads",
+        scenario="LARGE_LOT_SALE",
+        opportunity_state=STRONG_LEAD_REQUIRES_VERIFICATION,
+        reason="specific listing is ended and retained as historical evidence only",
+        page_role=ITEM_LISTING,
+        opportunity_identity="blinto-auction:138679:41370",
+        identity_stable=True,
+        top5_eligible=False,
+        listing_status=ENDED,
+        source_urls=["https://blinto.se/auction/Fristads-mm-138679-41370"],
+        source_providers=["Brave Search"],
+        evidence_signals=["auksjon", "klær", "vareparti"],
+        confirmed_information=[
+            "traceable public sources: 1",
+            f"discovery state: {STRONG_LEAD_REQUIRES_VERIFICATION}",
+            "page role: ITEM_LISTING",
+            "public quantity: 96",
+        ],
+        missing_information=["price"],
+        next_verification_step=(
+            "Verify publicly that this specific listing remains active and offered for sale."
+        ),
+        verification=[{
+            "url": "https://blinto.se/auction/Fristads-mm-138679-41370",
+            "title": "Blinto - Parti arbetsbyxor - Fristads mm.",
+            "text": "Parti med arbetskläder. Totalt 96 par. Auktionen är avslutad.",
+            "bounded_context": "Parti med arbetskläder. Totalt 96 par.",
+            "page_role": ITEM_LISTING,
+            "listing_status": ENDED,
+            "identity_stable": True,
+            "opportunity_identity": "blinto-auction:138679:41370",
+            "verified": True,
+        }],
+    )
+
+    corrected = apply_early_opportunity_gate(base_report(ended))
+    historical = corrected["all_discovered_candidates"][0]
+
+    assert historical["opportunity_state"] == HISTORICAL_MARKET_EVIDENCE
+    assert historical["listing_status"] == ENDED
+    assert historical["top5_eligible"] is False
+    assert historical["analysis_eligible"] is False
+    assert historical["historical_market_evidence_eligible"] is True
+    assert historical["next_verification_step"] is None
+    assert historical["next_action"] == "Retain as historical market evidence only."
+    assert corrected["discovery_top5"] == []
+    assert corrected["search_run_report"]["strong_leads_requiring_verification"] == 0
+    assert corrected["search_run_report"]["historical_market_evidence"] == 1
 
 
 def test_generic_editorial_article_is_not_promoted_without_entity_anchor():

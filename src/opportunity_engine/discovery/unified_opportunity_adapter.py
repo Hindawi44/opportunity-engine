@@ -16,6 +16,7 @@ from opportunity_engine.unified_models import (
 
 _CONFIRMED_SALE = "CONFIRMED_SALE"
 _STRONG_LEAD = "STRONG_LEAD_REQUIRES_VERIFICATION"
+_HISTORICAL_MARKET_EVIDENCE = "HISTORICAL_MARKET_EVIDENCE"
 _REJECTED = "REJECTED_NOISE"
 
 
@@ -32,10 +33,20 @@ def _lifecycle(
 ) -> tuple[EvaluationStatus, WorkflowStatus]:
     state = str(candidate.get("opportunity_state") or candidate.get("state") or "")
     status = _listing_status(candidate.get("listing_status"))
+    inactive_statuses = {
+        ListingStatus.ENDED,
+        ListingStatus.SOLD,
+        ListingStatus.UNAVAILABLE,
+    }
 
     if state == _REJECTED:
         return EvaluationStatus.REJECTED, WorkflowStatus.REJECTED
-    if status in {ListingStatus.ENDED, ListingStatus.SOLD, ListingStatus.UNAVAILABLE}:
+    if state == _HISTORICAL_MARKET_EVIDENCE and status in inactive_statuses:
+        return (
+            EvaluationStatus.HISTORICAL_ONLY,
+            WorkflowStatus.HISTORICAL_MARKET_EVIDENCE,
+        )
+    if status in inactive_statuses:
         return EvaluationStatus.REQUIRES_VERIFICATION, WorkflowStatus.CLOSED
     if state == _CONFIRMED_SALE and verified and status == ListingStatus.ACTIVE:
         return EvaluationStatus.QUALIFIED, WorkflowStatus.QUALIFIED_OPPORTUNITY
@@ -156,5 +167,8 @@ def opportunity_record_from_discovery_candidate(
             "discovery_band": candidate.get("discovery_band"),
             "page_role": candidate.get("page_role"),
             "reason": candidate.get("reason"),
+            "historical_market_evidence_eligible": candidate.get(
+                "historical_market_evidence_eligible"
+            ) is True,
         },
     )
