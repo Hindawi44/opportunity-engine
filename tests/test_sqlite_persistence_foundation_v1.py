@@ -35,6 +35,8 @@ EXPECTED_TABLES = {
     "shipment_evidence_tasks",
     "source_runs",
     "status_history",
+    "unified_opportunities",
+    "unified_opportunity_evidence",
 }
 
 
@@ -275,7 +277,7 @@ def test_init_database_cli_applies_head_migration(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stderr
     output = json.loads(result.stdout)
-    assert output["revision"] == "0001_persistence_foundation_v1"
+    assert output["revision"] == "0002_unified_opportunity_v1"
     assert set(output["tables"]) == EXPECTED_TABLES
     assert output["changes_final_decision"] is False
     assert output["changes_ranking"] is False
