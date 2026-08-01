@@ -71,12 +71,13 @@ _NOISE_TERMS = (
     "galgar", "tvättmaskin", "torkskåp",
 )
 _QUANTITY_RE = re.compile(
-    r"\b(?:ca\s*)?(?P<count>\d{2,7})\s*(?:st|stycken|plagg|artiklar|enheter|delar|par)\b",
+    r"\b(?:ca\s*)?(?P<count>\d{2,7})\s*"
+    r"(?:st|stycken|plagg|artiklar|enheter|delar|överdelar|byxor|par)\b",
     re.I,
 )
 _TOTAL_RE = re.compile(
     r"\b(?:totalt|sammanlagt)\s*:?\s*(?P<count>\d{1,7})\s*"
-    r"(?:st|stycken|plagg|artiklar|enheter|delar|par)?\b",
+    r"(?:st|stycken|plagg|artiklar|enheter|delar|överdelar|byxor|par)?\b",
     re.I,
 )
 _ANTAL_RE = re.compile(r"\bantal\s*:?\s*(?P<count>\d{1,7})\s*(?:st|par)?\b", re.I)
