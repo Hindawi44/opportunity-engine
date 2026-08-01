@@ -10,6 +10,10 @@ from opportunity_engine.discovery.unified_opportunity_report import (
 
 _GENERATED_AT = datetime(2026, 8, 1, tzinfo=timezone.utc)
 _SOURCE_URL = "https://auksjonen.no/auksjon/overskuddsvarer/test/557914"
+_PROVISIONAL_ID = (
+    "provisional-url-sha256:"
+    "b931a283a5488cb770b60b3fa6c9859f4c09f53eb91710362e24d45a78113f44"
+)
 
 
 def _candidate(**overrides):
@@ -115,15 +119,51 @@ def test_rejected_candidate_becomes_rejected_record():
     assert report["records"][0]["workflow_status"] == "REJECTED"
 
 
-def test_missing_identity_is_a_structured_conversion_error():
+def test_missing_identity_uses_provisional_url_hash_and_cannot_qualify():
     report = _build(_candidate(opportunity_identity=None))
 
-    assert report["record_count"] == 0
-    assert report["conversion_error_count"] == 1
-    assert report["conversion_errors"][0]["title"] == _candidate()["title"]
-    assert report["conversion_errors"][0]["source_url"] == _SOURCE_URL
-    assert report["conversion_errors"][0]["opportunity_identity"] is None
-    assert "ValidationError" in report["conversion_errors"][0]["reason"]
+    assert report["record_count"] == 1
+    assert report["conversion_error_count"] == 0
+    record = report["records"][0]
+    assert record["opportunity_id"] == _PROVISIONAL_ID
+    assert record["identity_stable"] is False
+    assert record["evaluation_status"] == "REQUIRES_VERIFICATION"
+    assert record["workflow_status"] == "REQUIRES_VERIFICATION"
+    assert record["analysis_eligible"] is False
+    assert record["top5_eligible"] is False
+
+
+def test_rejected_missing_identity_stays_rejected_without_conversion_error():
+    report = _build(
+        _candidate(
+            opportunity_identity=None,
+            identity_stable=False,
+            opportunity_state="REJECTED_NOISE",
+            listing_status="UNKNOWN",
+            top5_eligible=False,
+            analysis_eligible=False,
+            verification=[],
+        )
+    )
+
+    assert report["record_count"] == 1
+    assert report["conversion_error_count"] == 0
+    record = report["records"][0]
+    assert record["opportunity_id"] == _PROVISIONAL_ID
+    assert record["evaluation_status"] == "REJECTED"
+    assert record["workflow_status"] == "REJECTED"
+
+
+def test_provisional_identity_ignores_tracking_parameters():
+    plain = _build(_candidate(opportunity_identity=None))
+    tracked = _build(
+        _candidate(
+            opportunity_identity=None,
+            source_urls=[f"{_SOURCE_URL}?utm_source=regression-test"],
+        )
+    )
+
+    assert plain["records"][0]["opportunity_id"] == tracked["records"][0]["opportunity_id"]
 
 
 def test_missing_source_url_is_a_structured_conversion_error():
@@ -136,7 +176,7 @@ def test_missing_source_url_is_a_structured_conversion_error():
 
 
 def test_invalid_candidate_does_not_prevent_valid_records():
-    report = _build(_candidate(opportunity_identity=None), _candidate())
+    report = _build(_candidate(source_urls=[]), _candidate())
 
     assert report["record_count"] == 1
     assert report["conversion_error_count"] == 1
@@ -168,7 +208,7 @@ def test_serialization_is_deterministic_for_fixed_input_and_timestamp():
 def test_building_unified_report_does_not_mutate_existing_discovery_output():
     discovery_result = {
         "search_run_report": {"status": "SUCCESS", "top5_count": 1},
-        "all_discovered_candidates": [_candidate()],
+        "all_discovered_candidates": [_candidate(opportunity_identity=None)],
         "discovery_top5": [_candidate()],
     }
     original = deepcopy(discovery_result)
@@ -187,5 +227,5 @@ def test_writer_creates_separate_canonical_json_artifact(tmp_path):
 
     assert path.name == "unified-opportunity-report.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.0"
+    assert payload["schema_version"] == "1.1"
     assert payload["record_count"] == 1
