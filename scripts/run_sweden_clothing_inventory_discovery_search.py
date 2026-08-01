@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Sweden Clothing Inventory open-web discovery pilot."""
+"""Run the Sweden Clothing Inventory discovery pilot."""
 from __future__ import annotations
 
 import argparse
@@ -19,6 +19,10 @@ from opportunity_engine.discovery.sweden_clothing_inventory import (
     SwedenLocalizedSearchProvider,
     build_sweden_clothing_inventory_queries,
     verify_sweden_public_page,
+)
+from opportunity_engine.discovery.sweden_psauction import (
+    PSAuctionTargetedSearchProvider,
+    build_psauction_clothing_queries,
 )
 from opportunity_engine.discovery.unified_opportunity_report import (
     write_unified_opportunity_report,
@@ -65,10 +69,16 @@ def main() -> int:
     )
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument(
+        "--source",
+        choices=("open-web", "psauction"),
+        default="open-web",
+        help="Use the broad Swedish query pack or the bounded PS Auction source pack",
+    )
+    parser.add_argument(
         "--query-budget",
         type=int,
-        default=16,
-        help="Number of Swedish Clothing Inventory queries to execute (1-16)",
+        default=8,
+        help="Number of source-specific queries to execute",
     )
     parser.add_argument(
         "--freshness",
@@ -109,7 +119,6 @@ def main() -> int:
         raise SystemExit("BRAVE_SEARCH_API_KEY is required")
 
     profile = load_sweden_market_profile(ROOT)
-    queries = build_sweden_clothing_inventory_queries(args.query_budget)
     brave = BraveSearchProvider(
         api_key,
         country=profile.market_code,
@@ -117,9 +126,23 @@ def main() -> int:
         extra_snippets=True,
         operators=True,
     )
-    provider = SwedenLocalizedSearchProvider(brave)
-    verifier = verify_sweden_public_page if args.verify_pages else None
 
+    psauction_provider: PSAuctionTargetedSearchProvider | None = None
+    if args.source == "psauction":
+        queries = build_psauction_clothing_queries(args.query_budget)
+        psauction_provider = PSAuctionTargetedSearchProvider(
+            brave,
+            queries=queries,
+            request_budget=len(queries),
+        )
+        provider = SwedenLocalizedSearchProvider(psauction_provider)
+        query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V1"
+    else:
+        queries = build_sweden_clothing_inventory_queries(args.query_budget)
+        provider = SwedenLocalizedSearchProvider(brave)
+        query_pack = "SWEDEN_CLOTHING_INVENTORY_V1"
+
+    verifier = verify_sweden_public_page if args.verify_pages else None
     raw_result = run_clothing_inventory_discovery(
         provider,
         queries=queries,
@@ -137,12 +160,17 @@ def main() -> int:
     report["language_codes"] = list(profile.language_codes)
     report["transaction_scope"] = profile.transaction_scope
     report["market_profile_id"] = profile.profile_id
-    report["query_pack"] = "SWEDEN_CLOTHING_INVENTORY_V1"
+    report["source_mode"] = args.source.upper().replace("-", "_")
+    report["source_target"] = "psauction.se" if psauction_provider else None
+    report["query_pack"] = query_pack
     report["query_budget"] = len(queries)
     report["brave_country"] = profile.market_code
     report["brave_freshness"] = args.freshness
     report["brave_extra_snippets"] = True
     report["brave_operators"] = True
+    report["source_diagnostics"] = (
+        psauction_provider.diagnostics() if psauction_provider else None
+    )
     report["currency_conversion_performed"] = False
     report["tax_calculation_performed"] = False
     report["customs_calculation_performed"] = False
@@ -187,6 +215,7 @@ def main() -> int:
     print(f"Status: {report['status']}")
     print(f"Market: {profile.market_code} / {profile.market_name}")
     print(f"Currency: {profile.currency_code}")
+    print(f"Source: {report['source_mode']}")
     print(f"Queries: {report['queries_submitted']}")
     print(f"Top opportunities: {report['top5_count']}")
     for name, path in paths.items():
