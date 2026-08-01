@@ -129,7 +129,7 @@
     },
     {
       "access_mode": null,
-      "channel": null,
+      "channel": "public_auction_event_lead",
       "error": null,
       "fetched": 0,
       "market": "Sweden",
@@ -140,7 +140,7 @@
     },
     {
       "access_mode": null,
-      "channel": null,
+      "channel": "public_auction_event_lead",
       "error": null,
       "fetched": 0,
       "market": "Sweden",
@@ -151,7 +151,7 @@
     },
     {
       "access_mode": null,
-      "channel": null,
+      "channel": "public_auction_event_lead",
       "error": null,
       "fetched": 0,
       "market": "Sweden",

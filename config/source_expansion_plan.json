@@ -22,9 +22,9 @@
     {
       "market": "Sweden",
       "sources": [
-        {"source": "PS Auction", "priority": 11, "audit_status": "PLANNED"},
-        {"source": "Klaravik", "priority": 12, "audit_status": "PLANNED"},
-        {"source": "Blinto", "priority": 13, "audit_status": "PLANNED"}
+        {"source": "PS Auction", "priority": 11, "audit_status": "PLANNED", "channel": "public_auction_event_lead"},
+        {"source": "Klaravik", "priority": 12, "audit_status": "PLANNED", "channel": "public_auction_event_lead"},
+        {"source": "Blinto", "priority": 13, "audit_status": "PLANNED", "channel": "public_auction_event_lead"}
       ]
     },
     {

@@ -17,6 +17,7 @@ BRAVE_WEB_SEARCH_ENDPOINT = "https://api.search.brave.com/res/v1/web/search"
 Transport = Callable[[Request, float], bytes]
 _FRESHNESS_PRESETS = frozenset({"pd", "pw", "pm", "py"})
 _CUSTOM_FRESHNESS = re.compile(r"^(\d{4}-\d{2}-\d{2})to(\d{4}-\d{2}-\d{2})$")
+_COUNTRY_CODE = re.compile(r"^[A-Z]{2}$")
 
 
 def _default_transport(request: Request, timeout: float) -> bytes:
@@ -53,6 +54,13 @@ def _validated_freshness(value: str | None) -> str | None:
     end = date.fromisoformat(match.group(2))
     if start > end:
         raise ValueError("freshness start date must not be after end date")
+    return cleaned
+
+
+def _validated_country(value: str) -> str:
+    cleaned = value.strip().upper()
+    if _COUNTRY_CODE.fullmatch(cleaned) is None:
+        raise ValueError("country must be a two-letter code")
     return cleaned
 
 
@@ -94,6 +102,7 @@ class BraveSearchProvider:
         freshness: str | None = None,
         extra_snippets: bool = False,
         operators: bool = True,
+        country: str = "NO",
     ) -> None:
         token = api_key.strip()
         if not token:
@@ -112,6 +121,7 @@ class BraveSearchProvider:
         self._freshness = _validated_freshness(freshness)
         self._extra_snippets = bool(extra_snippets)
         self._operators = bool(operators)
+        self._country = _validated_country(country)
 
     def search(self, query: str, *, count: int = 10) -> list[SearchHit]:
         clean_query = " ".join(query.split())
@@ -120,14 +130,13 @@ class BraveSearchProvider:
         if not 1 <= count <= 20:
             raise ValueError("count must be between 1 and 20")
 
-        # Norwegian intent already exists in the Norwegian query terms. Brave's
-        # language parameters are strict enums and rejected the previous `no`
-        # value with HTTP 422. Keep geographic targeting and let Brave infer
-        # language from the query text.
+        # Market intent exists in the selected market query terms. Brave's
+        # language parameters are strict enums, so geographic targeting remains
+        # explicit while language is inferred from each query.
         params: dict[str, str | int] = {
             "q": clean_query,
             "count": count,
-            "country": "NO",
+            "country": self._country,
             "safesearch": "moderate",
             "result_filter": "web",
             "operators": "true" if self._operators else "false",
@@ -155,7 +164,11 @@ class BraveSearchProvider:
                 if exc.code == 429 and attempt < self._max_retries:
                     retry_after = exc.headers.get("Retry-After") if exc.headers else None
                     try:
-                        wait_seconds = float(retry_after) if retry_after else self._retry_base_seconds * (2**attempt)
+                        wait_seconds = (
+                            float(retry_after)
+                            if retry_after
+                            else self._retry_base_seconds * (2**attempt)
+                        )
                     except (TypeError, ValueError):
                         wait_seconds = self._retry_base_seconds * (2**attempt)
                     time.sleep(max(0.0, wait_seconds))
@@ -195,5 +208,12 @@ def _parse_hits(payload: Any) -> list[SearchHit]:
         if not title or not url.startswith("https://") or url in seen_urls:
             continue
         seen_urls.add(url)
-        hits.append(SearchHit(title=title, url=url, description=description, provider="Brave Search"))
+        hits.append(
+            SearchHit(
+                title=title,
+                url=url,
+                description=description,
+                provider="Brave Search",
+            )
+        )
     return hits
