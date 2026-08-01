@@ -12,6 +12,7 @@ from opportunity_engine.discovery.sweden_psauction import (
     PSAUCTION_CLOTHING_QUERY_MATRIX,
     PSAuctionTargetedSearchProvider,
     build_psauction_clothing_queries,
+    canonicalize_psauction_item_url,
     psauction_gate_decision,
 )
 
@@ -60,6 +61,16 @@ def test_query_budget_fails_closed_outside_pack_bounds():
             raise AssertionError("invalid query budget must fail")
 
 
+def test_exact_item_url_canonicalization_is_bounded():
+    canonical = canonicalize_psauction_item_url(_hit().url)
+
+    assert canonical == (_hit().url, "1319712")
+    assert canonicalize_psauction_item_url("https://psauction.se/auctions") is None
+    assert canonicalize_psauction_item_url(
+        "https://example.com/item/view/1319712/test"
+    ) is None
+
+
 def test_gate_accepts_one_specific_psauction_clothing_lot():
     decision = psauction_gate_decision(_hit())
 
@@ -68,6 +79,45 @@ def test_gate_accepts_one_specific_psauction_clothing_lot():
     assert decision.canonical_url.endswith(
         "/item/view/1319712/parti-med-klader-och-accessoarer-ca-600-artiklar"
     )
+
+
+def test_gate_accepts_bulk_accessories_with_explicit_quantity():
+    decision = psauction_gate_decision(
+        _hit(
+            title="Ca 100 st Läderbälten, Strl 90-105",
+            url="https://psauction.se/item/view/1560018/ca-100-st-laderbalten-strl-90-105",
+            description="Auktionen avslutas. Nuvarande bud 800 SEK.",
+        )
+    )
+
+    assert decision.accepted is True
+    assert decision.item_id == "1560018"
+
+
+def test_gate_rejects_single_clothing_item_without_bulk_evidence():
+    decision = psauction_gate_decision(
+        _hit(
+            title="Golfskor G/Fore Mens Gallivan2r, Strl 44",
+            url="https://psauction.se/item/view/1517289/golfskor-strl-44",
+            description="Auktionen avslutas. Nuvarande bud 200 SEK.",
+        )
+    )
+
+    assert decision.accepted is False
+    assert decision.reason == "specific clothing item lacks bulk inventory evidence"
+
+
+def test_gate_rejects_shop_fittings_without_clothing_inventory():
+    decision = psauction_gate_decision(
+        _hit(
+            title="Butiksinredning – Hyllor, bord, speglar och klädställ",
+            url="https://psauction.se/item/view/1319713/butiksinredning-hyllor-bord",
+            description="Inredning från klädbutik säljs på auktion.",
+        )
+    )
+
+    assert decision.accepted is False
+    assert "lacks clothing evidence" in decision.reason
 
 
 def test_gate_rejects_auction_index_and_wrong_host():
@@ -124,6 +174,7 @@ def test_targeted_provider_filters_hits_and_reports_diagnostics():
     assert diagnostics["accepted_hits"] == 1
     assert diagnostics["rejected_hits"] == 2
     assert diagnostics["accepted_item_ids"] == ["1319712"]
+    assert diagnostics["accepted_samples"][0]["item_id"] == "1319712"
     assert len(diagnostics["rejected_samples"]) == 2
     assert diagnostics["rejected_samples"][0]["query_id"] == query.query_id
     assert diagnostics["rejected_samples"][0]["url"] == "https://psauction.se/auctions"
