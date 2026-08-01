@@ -96,6 +96,12 @@ class UnifiedOpportunityRepository:
         except ValidationError as exc:
             raise PersistenceError(f"invalid canonical opportunity record: {exc}") from exc
 
+        raw_evidence = raw_record.get("evidence", [])
+        if not isinstance(raw_evidence, list):
+            raise PersistenceError("canonical evidence must be a list")
+        if len(raw_evidence) != len(canonical.evidence):
+            raise PersistenceError("canonical evidence validation changed item count")
+
         observed_at = _utc(seen_at or canonical.discovered_at, "seen_at")
         opportunity_id = canonical.opportunity_id
         model = self.session.scalar(
@@ -155,7 +161,8 @@ class UnifiedOpportunityRepository:
         model.updated_at = utc_now()
         self.session.flush()
 
-        for evidence in raw_record.get("evidence", []):
+        for position, validated in enumerate(canonical.evidence):
+            evidence = raw_evidence[position]
             if not isinstance(evidence, Mapping):
                 raise PersistenceError("canonical evidence items must be objects")
             evidence_payload = deepcopy(dict(evidence))
@@ -168,11 +175,6 @@ class UnifiedOpportunityRepository:
             )
             if existing is not None:
                 continue
-            validated = next(
-                item
-                for item in canonical.evidence
-                if _evidence_key(item.model_dump(mode="json")) == key
-            )
             self.session.add(
                 UnifiedOpportunityEvidenceModel(
                     opportunity_id=opportunity_id,
