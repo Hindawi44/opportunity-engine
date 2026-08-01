@@ -6,9 +6,10 @@ on:
       source:
         description: Swedish discovery source mode
         required: true
-        default: psauction
+        default: klaravik
         type: choice
         options:
+          - klaravik
           - psauction
           - open-web
       query_budget:
@@ -36,6 +37,7 @@ on:
       - "scripts/run_market_clothing_inventory_discovery.py"
       - "scripts/run_sweden_clothing_inventory_discovery_search.py"
       - "src/opportunity_engine/discovery/sweden_clothing_inventory.py"
+      - "src/opportunity_engine/discovery/sweden_klaravik.py"
       - "src/opportunity_engine/discovery/sweden_psauction.py"
       - "src/opportunity_engine/discovery/sweden_psauction_playwright.py"
       - "src/opportunity_engine/discovery/brave_search.py"
@@ -43,9 +45,11 @@ on:
       - "src/opportunity_engine/discovery/unified_opportunity_report.py"
       - "src/opportunity_engine/markets/sweden.py"
       - "config/markets/se_v1.json"
+      - "docs/KLARAVIK_PUBLIC_ACCESS_AUDIT_v1.md"
       - "docs/PSAUCTION_PUBLIC_ACCESS_AUDIT_v1.md"
       - "docs/WORKFLOW_INVENTORY_REPORT_v1.1.md"
       - "tests/test_sweden_clothing_discovery_v1.py"
+      - "tests/test_sweden_klaravik_source.py"
       - "tests/test_sweden_psauction_source.py"
       - "tests/test_sweden_psauction_playwright.py"
       - "tests/test_workflow_inventory_report.py"
@@ -64,7 +68,7 @@ jobs:
     env:
       BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
       OUTPUT_DIR: artifacts/sweden-clothing-discovery-live
-      EXPECTED_SOURCE: ${{ github.event.inputs.source || 'psauction' }}
+      EXPECTED_SOURCE: ${{ github.event.inputs.source || 'klaravik' }}
 
     steps:
       - name: Check out repository
@@ -75,10 +79,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies and Chromium
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt -r requirements-playwright.txt
-          python -m playwright install --with-deps chromium
+          if [ "$EXPECTED_SOURCE" = "psauction" ]; then
+            python -m playwright install --with-deps chromium
+          fi
 
       - name: Confirm Brave secret exists
         run: |
@@ -138,7 +144,10 @@ jobs:
           report = json.loads(report_path.read_text(encoding="utf-8"))
           expected_source = os.environ["EXPECTED_SOURCE"]
           expected_mode = expected_source.upper().replace("-", "_")
-          expected_target = "psauction.se" if expected_source == "psauction" else None
+          expected_target = {
+              "psauction": "psauction.se",
+              "klaravik": "klaravik.se",
+          }.get(expected_source)
 
           if report.get("market_code") != "SE":
               raise SystemExit(f"Expected market_code=SE, got {report.get('market_code')!r}")
@@ -178,7 +187,10 @@ jobs:
           print(f"source_raw_hits: {diagnostics.get('raw_hits')}")
           print(f"source_accepted_hits: {diagnostics.get('accepted_hits')}")
           print(f"source_rejected_hits: {diagnostics.get('rejected_hits')}")
-          print(f"source_accepted_item_ids: {diagnostics.get('accepted_item_ids')}")
+          print(
+              "source_accepted_keys: "
+              f"{diagnostics.get('accepted_item_ids') or diagnostics.get('accepted_listing_keys')}"
+          )
           print("source_accepted_samples:")
           for sample in diagnostics.get("accepted_samples") or []:
               print(json.dumps(sample, ensure_ascii=False, sort_keys=True))

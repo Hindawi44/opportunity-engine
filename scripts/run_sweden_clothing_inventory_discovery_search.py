@@ -20,6 +20,11 @@ from opportunity_engine.discovery.sweden_clothing_inventory import (
     build_sweden_clothing_inventory_queries,
     verify_sweden_public_page,
 )
+from opportunity_engine.discovery.sweden_klaravik import (
+    KlaravikPrefetchedSearchProvider,
+    build_klaravik_clothing_queries,
+    verify_klaravik_public_page,
+)
 from opportunity_engine.discovery.sweden_psauction import (
     build_psauction_clothing_queries,
 )
@@ -79,15 +84,21 @@ def main() -> int:
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument(
         "--source",
-        choices=("open-web", "psauction"),
+        choices=("open-web", "psauction", "klaravik"),
         default="open-web",
-        help="Use the broad Swedish query pack or the bounded PS Auction source pack",
+        help=(
+            "Use the broad Swedish query pack or one bounded source pack "
+            "(PS Auction or Klaravik)"
+        ),
     )
     parser.add_argument(
         "--query-budget",
         type=int,
         default=None,
-        help="Number of source-specific queries (default: open-web=16, psauction=8)",
+        help=(
+            "Number of source-specific queries "
+            "(default: open-web=16, psauction=8, klaravik=8)"
+        ),
     )
     parser.add_argument(
         "--freshness",
@@ -158,9 +169,10 @@ def main() -> int:
 
     query_budget = args.query_budget
     if query_budget is None:
-        query_budget = 8 if args.source == "psauction" else 16
+        query_budget = 16 if args.source == "open-web" else 8
 
     psauction_provider: PSAuctionPrefetchedSearchProvider | None = None
+    klaravik_provider: KlaravikPrefetchedSearchProvider | None = None
     if args.source == "psauction":
         queries = build_psauction_clothing_queries(query_budget)
         psauction_provider = PSAuctionPrefetchedSearchProvider(
@@ -170,12 +182,27 @@ def main() -> int:
         )
         provider = SwedenLocalizedSearchProvider(psauction_provider)
         query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V1"
+    elif args.source == "klaravik":
+        queries = build_klaravik_clothing_queries(query_budget)
+        klaravik_provider = KlaravikPrefetchedSearchProvider(
+            brave,
+            queries=queries,
+            request_budget=len(queries),
+        )
+        provider = SwedenLocalizedSearchProvider(klaravik_provider)
+        query_pack = "SWEDEN_KLARAVIK_CLOTHING_INVENTORY_V1"
     else:
         queries = build_sweden_clothing_inventory_queries(query_budget)
         provider = SwedenLocalizedSearchProvider(brave)
         query_pack = "SWEDEN_CLOTHING_INVENTORY_V1"
 
-    verifier = verify_sweden_public_page if args.verify_pages else None
+    verifier = None
+    if args.verify_pages:
+        verifier = (
+            verify_klaravik_public_page
+            if args.source == "klaravik"
+            else verify_sweden_public_page
+        )
     browser_verifier: PSAuctionPlaywrightFallbackVerifier | None = None
     if args.psauction_browser_fallback:
         browser_verifier = PSAuctionPlaywrightFallbackVerifier(
@@ -201,12 +228,18 @@ def main() -> int:
 
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
-    source_diagnostics = psauction_provider.diagnostics() if psauction_provider else None
-    if source_diagnostics is not None:
+    targeted_provider = psauction_provider or klaravik_provider
+    source_diagnostics = targeted_provider.diagnostics() if targeted_provider else None
+    if psauction_provider is not None and source_diagnostics is not None:
         result = enrich_psauction_discovery_result(
             result,
             source_diagnostics.get("accepted_samples") or (),
         )
+
+    source_target = {
+        "psauction": "psauction.se",
+        "klaravik": "klaravik.se",
+    }.get(args.source)
 
     report = result["search_run_report"]
     report["domain"] = "CLOTHING_INVENTORY"
@@ -217,7 +250,7 @@ def main() -> int:
     report["transaction_scope"] = profile.transaction_scope
     report["market_profile_id"] = profile.profile_id
     report["source_mode"] = args.source.upper().replace("-", "_")
-    report["source_target"] = "psauction.se" if psauction_provider else None
+    report["source_target"] = source_target
     report["query_pack"] = query_pack
     report["query_budget"] = len(queries)
     report["brave_country"] = profile.market_code
