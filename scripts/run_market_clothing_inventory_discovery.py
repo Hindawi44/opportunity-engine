@@ -28,6 +28,10 @@ def select_market_runner(market: str) -> Callable[[], int]:
         from scripts.run_sweden_clothing_inventory_discovery_search import main
 
         return main
+    if normalized == "DE":
+        from scripts.run_germany_clothing_inventory_discovery_search import main
+
+        return main
     raise ValueError(f"unsupported market code: {market}")
 
 
@@ -78,7 +82,7 @@ def _write_post_persistence_report(
 
 def main() -> int:
     selector = argparse.ArgumentParser(add_help=False)
-    selector.add_argument("--market", choices=("NO", "SE"), default="NO")
+    selector.add_argument("--market", choices=("NO", "SE", "DE"), default="NO")
     selected, remaining = selector.parse_known_args()
     runner = select_market_runner(selected.market)
     persistence = _persistence_output_args(remaining)

@@ -8,7 +8,7 @@
   ],
   "generated_at": "2026-08-01T19:33:28.482096+00:00",
   "schema_version": 1,
-  "source_count": 15,
+  "source_count": 18,
   "sources": [
     {
       "access_mode": "public_direct_category_pages",
@@ -181,6 +181,39 @@
       "required_configuration": [],
       "source": "Danish liquidation auctions",
       "status": "PLANNED"
+    },
+    {
+      "access_mode": null,
+      "channel": "public_auction_event_lead",
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 16,
+      "required_configuration": [],
+      "source": "Riegermann",
+      "status": "PLANNED"
+    },
+    {
+      "access_mode": null,
+      "channel": "public_auction_event_lead",
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 17,
+      "required_configuration": [],
+      "source": "VENTA Industrieversteigerungen",
+      "status": "PLANNED"
+    },
+    {
+      "access_mode": null,
+      "channel": "public_auction_event_lead",
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 18,
+      "required_configuration": [],
+      "source": "Deutsche Pfandverwertung",
+      "status": "PLANNED"
     }
   ],
   "status_counts": {
@@ -188,6 +221,6 @@
     "BLOCKED_AUTH": 3,
     "CODE_READY": 0,
     "DEPRECATED": 0,
-    "PLANNED": 9
+    "PLANNED": 12
   }
 }

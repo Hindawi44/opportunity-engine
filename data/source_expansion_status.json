@@ -155,13 +155,43 @@
       "priority": 15,
       "source": "Danish liquidation auctions",
       "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 16,
+      "source": "Riegermann",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 17,
+      "source": "VENTA Industrieversteigerungen",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 18,
+      "source": "Deutsche Pfandverwertung",
+      "status": "planned"
     }
   ],
   "summary": {
     "blocked_source_count": 3,
     "complete_source_count": 3,
-    "planned_source_count": 9,
-    "remaining_source_count": 12,
-    "required_source_count": 15
+    "planned_source_count": 12,
+    "remaining_source_count": 15,
+    "required_source_count": 18
   }
 }
