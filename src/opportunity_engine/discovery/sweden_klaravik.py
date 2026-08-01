@@ -414,9 +414,14 @@ def verify_klaravik_public_page(
     if parsed is None:
         return PageVerification(url=url, error="not an exact public Klaravik product URL")
     canonical, _ = parsed
+    request_url = canonical.replace(
+        "https://klaravik.se/",
+        "https://www.klaravik.se/",
+        1,
+    )
     try:
         response = requests.get(
-            canonical,
+            request_url,
             timeout=timeout,
             allow_redirects=True,
             headers={"User-Agent": "OpportunityEngine-Discovery/2.1"},
