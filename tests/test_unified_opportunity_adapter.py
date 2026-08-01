@@ -106,7 +106,36 @@ def test_unverified_strong_lead_stays_requires_verification():
     assert record.workflow_status == WorkflowStatus.REQUIRES_VERIFICATION
 
 
-def test_ended_listing_maps_to_closed_and_cannot_remain_analysis_eligible():
+def test_historical_market_evidence_maps_to_dedicated_non_current_workflow():
+    candidate = _candidate(
+        listing_status="ENDED",
+        opportunity_state="HISTORICAL_MARKET_EVIDENCE",
+        reason="verified ended listing retained in the Historical Market Evidence path only",
+        historical_market_evidence_eligible=True,
+        analysis_eligible=False,
+        top5_eligible=False,
+        verification=[{
+            "url": "https://auksjonen.no/auksjon/overskuddsvarer/test/557914",
+            "title": "8 stk Blåkläder T-skjorter",
+            "text": "Antall: 8 stk T-skjorter. Auksjonen er avsluttet.",
+            "bounded_context": "Antall: 8 stk T-skjorter.",
+            "listing_status": "ENDED",
+            "page_role": "ITEM_LISTING",
+            "event_scenario": "AUCTION",
+            "verified": True,
+        }],
+    )
+    record = _convert(candidate)
+
+    assert record.listing_status == ListingStatus.ENDED
+    assert record.evaluation_status == EvaluationStatus.HISTORICAL_ONLY
+    assert record.workflow_status == WorkflowStatus.HISTORICAL_MARKET_EVIDENCE
+    assert record.analysis_eligible is False
+    assert record.top5_eligible is False
+    assert record.metadata["historical_market_evidence_eligible"] is True
+
+
+def test_unrouted_ended_listing_falls_back_to_closed_workflow():
     candidate = _candidate(
         listing_status="ENDED",
         opportunity_state="STRONG_LEAD_REQUIRES_VERIFICATION",
@@ -116,6 +145,7 @@ def test_ended_listing_maps_to_closed_and_cannot_remain_analysis_eligible():
     record = _convert(candidate)
 
     assert record.listing_status == ListingStatus.ENDED
+    assert record.evaluation_status == EvaluationStatus.REQUIRES_VERIFICATION
     assert record.workflow_status == WorkflowStatus.CLOSED
     assert record.analysis_eligible is False
 
