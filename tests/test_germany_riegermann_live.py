@@ -121,7 +121,7 @@ def test_extract_item_urls_is_exact_unique_and_bounded():
 
     assert urls == (
         "https://riegermann.de/de/l/73457/damen-lederjacke-groesse-36",
-        "https://riegermann.de/de/l/73458/damen-ledermantel-groesse-40",
+        "https://riegermann.de/de/l/73458/herren-lederjacke-groesse-52",
         "https://riegermann.de/de/l/73490/posten-lederjacken-24-stueck",
     )
 
