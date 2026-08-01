@@ -1,0 +1,63 @@
+{
+  "schema_version": "market-profile-v1",
+  "profile_id": "DE_CROSS_BORDER_V1",
+  "market_code": "DE",
+  "market_name": "Germany",
+  "currency_code": "EUR",
+  "language_codes": [
+    "de"
+  ],
+  "fallback_language_codes": [
+    "en"
+  ],
+  "transaction_scope": "CROSS_BORDER",
+  "source_registry": {
+    "plan_path": "config/source_expansion_plan.json",
+    "runtime_status_path": "data/source_gap_matrix.json",
+    "market_name": "Germany",
+    "signal_channels": [
+      "public_auction_event_lead"
+    ],
+    "qualification_requires_verified_sale_listing": true
+  },
+  "tax_policy": {
+    "profile_id": "DE_TO_NO_TAX_REFERENCE_V1",
+    "mode": "REFERENCE_ONLY",
+    "calculation_enabled": false,
+    "requires_documented_vat_status": true
+  },
+  "customs_policy": {
+    "profile_id": "DE_TO_NO_CUSTOMS_REFERENCE_V1",
+    "mode": "CROSS_BORDER_REFERENCE_ONLY",
+    "calculation_enabled": false,
+    "cross_border_import_supported": true
+  },
+  "logistics_policy": {
+    "profile_id": "DE_TO_NO_LOGISTICS_REFERENCE_V1",
+    "mode": "REQUIRES_ORIGIN_AND_DESTINATION",
+    "calculation_enabled": false,
+    "requires_listing_location": true,
+    "requires_buyer_destination": true
+  },
+  "risk_policy": {
+    "default_level": "MEDIUM",
+    "allowed_levels": [
+      "LOW",
+      "MEDIUM",
+      "HIGH"
+    ],
+    "source_failure_is_not_zero_opportunities": true,
+    "unknown_costs_block_qualification": true
+  },
+  "qualification_policy": {
+    "listing_status_required": "ACTIVE",
+    "verification_status_required": "VERIFIED",
+    "minimum_evidence": [
+      "verified_sale_page",
+      "documented_price_or_bid_basis",
+      "documented_vat_status",
+      "documented_cross_border_logistics_basis"
+    ],
+    "automatic_purchase_allowed": false
+  }
+}
