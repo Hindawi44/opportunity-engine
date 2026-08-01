@@ -4,7 +4,16 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Callable
+from pathlib import Path
 import sys
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+for path in (ROOT, SRC):
+    text = str(path)
+    if text not in sys.path:
+        sys.path.insert(0, text)
 
 
 def select_market_runner(market: str) -> Callable[[], int]:
