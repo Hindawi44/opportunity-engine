@@ -23,6 +23,8 @@ from .repository import PersistenceError
 
 
 UNIFIED_WORKFLOW_ENTITY_TYPE = "UNIFIED_OPPORTUNITY_WORKFLOW"
+HISTORICAL_MARKET_EVIDENCE_WORKFLOW = "HISTORICAL_MARKET_EVIDENCE"
+HISTORICAL_MANUAL_REVIEW_STATE = "HISTORICAL_EVIDENCE_REQUIRES_MANUAL_REVIEW"
 
 
 def _utc(value: datetime, field_name: str) -> datetime:
@@ -48,6 +50,14 @@ def _evidence_key(payload: Mapping[str, Any]) -> str:
         separators=(",", ":"),
     ).encode("utf-8")
     return sha256(encoded).hexdigest()
+
+
+def _record_metadata(model: UnifiedOpportunityModel) -> Mapping[str, Any]:
+    record = model.record_json
+    if not isinstance(record, Mapping):
+        return {}
+    metadata = record.get("metadata")
+    return metadata if isinstance(metadata, Mapping) else {}
 
 
 class UnifiedOpportunityRepository:
@@ -237,3 +247,69 @@ class UnifiedOpportunityRepository:
                 .order_by(StatusHistoryModel.id)
             )
         )
+
+    def list_trusted_historical_market_evidence(
+        self,
+    ) -> list[UnifiedOpportunityModel]:
+        """Return ended historical records whose discovery evidence is trusted."""
+        candidates = list(
+            self.session.scalars(
+                select(UnifiedOpportunityModel)
+                .where(
+                    UnifiedOpportunityModel.workflow_status
+                    == HISTORICAL_MARKET_EVIDENCE_WORKFLOW
+                )
+                .order_by(UnifiedOpportunityModel.id)
+            )
+        )
+        return [
+            model
+            for model in candidates
+            if (
+                _record_metadata(model).get(
+                    "historical_market_evidence_eligible"
+                )
+                is True
+                and _record_metadata(model).get("historical_data_fields_trusted")
+                is True
+                and _record_metadata(model).get(
+                    "exclude_from_historical_price_analysis"
+                )
+                is False
+            )
+        ]
+
+    def list_trusted_historical_price_records(
+        self,
+    ) -> list[UnifiedOpportunityModel]:
+        """Return only historical records with a trusted canonical bid value."""
+        return [
+            model
+            for model in self.list_trusted_historical_market_evidence()
+            if (
+                model.bid_price is not None
+                and _record_metadata(model).get("bid_price_trusted") is True
+            )
+        ]
+
+    def list_historical_evidence_manual_review(
+        self,
+    ) -> list[UnifiedOpportunityModel]:
+        """Return archived item identities blocked from historical analysis."""
+        candidates = list(
+            self.session.scalars(
+                select(UnifiedOpportunityModel).order_by(UnifiedOpportunityModel.id)
+            )
+        )
+        return [
+            model
+            for model in candidates
+            if (
+                _record_metadata(model).get("opportunity_state")
+                == HISTORICAL_MANUAL_REVIEW_STATE
+                and _record_metadata(model).get(
+                    "exclude_from_historical_price_analysis"
+                )
+                is True
+            )
+        ]
