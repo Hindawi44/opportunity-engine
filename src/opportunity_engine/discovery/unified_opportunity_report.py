@@ -1,6 +1,7 @@
 """Build a canonical opportunity report from completed discovery candidates."""
 from __future__ import annotations
 
+from hashlib import sha256
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -8,11 +9,12 @@ from typing import Any, Mapping, Sequence
 
 from pydantic import ValidationError
 
+from opportunity_engine.discovery.clothing_inventory_search import normalize_public_url
 from opportunity_engine.discovery.unified_opportunity_adapter import (
     opportunity_record_from_discovery_candidate,
 )
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 
 
 def _utc_timestamp(value: datetime) -> str:
@@ -33,6 +35,40 @@ def _first_source_url(candidate: Mapping[str, Any]) -> str | None:
     if not isinstance(urls, Sequence) or isinstance(urls, (str, bytes)) or not urls:
         return None
     return _optional_text(urls[0])
+
+
+def _candidate_with_report_identity(candidate: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Add a deterministic, explicitly provisional ID without mutating input.
+
+    Discovery identity remains authoritative. This fallback exists only so that
+    rejected or incomplete candidates can be represented in the canonical
+    report. It never makes a candidate identity-stable, analysis-eligible, or
+    Top-5 eligible. A confirmed candidate without stable identity is downgraded
+    to verification-required rather than qualified.
+    """
+    if _optional_text(candidate.get("opportunity_identity")) is not None:
+        return candidate
+
+    source_url = _first_source_url(candidate)
+    canonical_url = normalize_public_url(source_url or "")
+    if not canonical_url:
+        return candidate
+
+    provisional = dict(candidate)
+    digest = sha256(canonical_url.encode("utf-8")).hexdigest()
+    provisional["opportunity_identity"] = f"provisional-url-sha256:{digest}"
+    provisional["identity_stable"] = False
+    provisional["analysis_eligible"] = False
+    provisional["top5_eligible"] = False
+
+    state = str(candidate.get("opportunity_state") or candidate.get("state") or "")
+    if state == "CONFIRMED_SALE":
+        provisional["opportunity_state"] = "STRONG_LEAD_REQUIRES_VERIFICATION"
+        reason = _optional_text(candidate.get("reason"))
+        suffix = "stable listing identity is required before qualification"
+        provisional["reason"] = f"{reason}; {suffix}" if reason else suffix
+
+    return provisional
 
 
 def _conversion_error(candidate: object, exc: Exception) -> dict[str, str | None]:
@@ -63,9 +99,11 @@ def build_unified_opportunity_report(
 ) -> dict[str, Any]:
     """Convert discovery candidates independently into canonical records.
 
-    The input discovery result is read only. Invalid candidates are represented
-    as structured conversion errors and never prevent valid records from being
-    emitted.
+    The input discovery result is read only. Missing discovery identities use a
+    deterministic provisional URL hash so rejected and incomplete candidates
+    remain auditable without becoming qualified opportunities. Candidates that
+    still violate the canonical contract are represented as structured
+    conversion errors and never prevent valid records from being emitted.
     """
     candidates = result.get("all_discovered_candidates")
     if not isinstance(candidates, list):
@@ -80,8 +118,9 @@ def build_unified_opportunity_report(
         try:
             if not isinstance(candidate, Mapping):
                 raise TypeError("discovery candidate must be an object")
+            candidate_for_conversion = _candidate_with_report_identity(candidate)
             record = opportunity_record_from_discovery_candidate(
-                candidate,
+                candidate_for_conversion,
                 discovered_at=timestamp,
                 market_code=market_code,
                 currency=currency,
