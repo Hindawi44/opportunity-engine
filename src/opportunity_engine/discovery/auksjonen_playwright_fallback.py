@@ -28,6 +28,11 @@ MIN_DELAY_SECONDS = 2.0
 _AUKSJONEN_ITEM_PATH = re.compile(r"^/auksjon(?:/[^/]+)+/\d+/?$", re.I)
 _APPROVED_AUKSJONEN_HOSTS = frozenset({"auksjonen.no", "ny.auksjonen.no"})
 _FALLBACK_ERRORS = frozenset({"insufficient public listing content"})
+_COOKIE_ACCEPT_LABELS = (
+    "Tillat alle",
+    "Godta alle",
+    "Accept all",
+)
 _AUKSJONEN_CLOTHING_TERMS = (
     "t-skjorte",
     "t-skjorter",
@@ -177,12 +182,34 @@ class AuksjonenPlaywrightFallbackVerifier:
             self.config.navigation_timeout_seconds * 1000
         )
 
+    def _dismiss_cookie_consent(self) -> bool:
+        """Dismiss only a visible standard consent button, when present."""
+        if self._page is None:
+            return False
+        for label in _COOKIE_ACCEPT_LABELS:
+            button = self._page.get_by_role(
+                "button",
+                name=re.compile(rf"^\s*{re.escape(label)}\s*$", re.I),
+            )
+            try:
+                if button.count() < 1 or not button.first.is_visible():
+                    continue
+                button.first.click(timeout=3000)
+                self._page.wait_for_timeout(500)
+                return True
+            except Exception:
+                continue
+        return False
+
     def _load_rendered_page(self, url: str) -> tuple[str, str]:
         if self._injected_loader is not None:
             return self._injected_loader(url)
         self._ensure_browser()
         self._page.goto(url, wait_until="domcontentloaded")
         self._page.wait_for_timeout(self.config.delay_seconds * 1000)
+        if self._dismiss_cookie_consent():
+            self._page.wait_for_load_state("domcontentloaded")
+            self._page.wait_for_timeout(self.config.delay_seconds * 1000)
         return self._page.url, self._page.content()
 
     def __call__(self, url: str) -> PageVerification:
