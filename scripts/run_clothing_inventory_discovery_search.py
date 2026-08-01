@@ -40,6 +40,9 @@ from opportunity_engine.discovery.source_channel_guard import (
 from opportunity_engine.discovery.source_targeted_retrieval import (
     SourceTargetedSearchProvider,
 )
+from opportunity_engine.discovery.unified_opportunity_report import (
+    write_unified_opportunity_report,
+)
 
 
 def _guarded_public_verifier(url: str):
@@ -296,7 +299,12 @@ def main() -> int:
         playwright_diagnostics["used"] or current_category_diagnostics["used"]
     )
 
-    paths = write_discovery_artifacts(result, Path(args.output_dir))
+    output_dir = Path(args.output_dir)
+    paths = write_discovery_artifacts(result, output_dir)
+    paths["unified_opportunity_report"] = write_unified_opportunity_report(
+        result,
+        output_dir,
+    )
     print(f"Status: {report['status']}")
     print(f"Domain: {report['domain']}")
     print(f"Queries: {report['queries_submitted']}")
