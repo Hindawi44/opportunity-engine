@@ -22,14 +22,14 @@ on:
       freshness:
         description: Brave freshness window
         required: false
-        default: "pm"
+        default: "none"
         type: choice
         options:
+          - none
           - pd
           - pw
           - pm
           - py
-          - none
   pull_request:
     paths:
       - ".github/workflows/sweden-clothing-inventory-live.yaml"
@@ -88,7 +88,7 @@ jobs:
         run: |
           QUERY_BUDGET="${{ github.event.inputs.query_budget || '8' }}"
           RESULTS_PER_QUERY="${{ github.event.inputs.results_per_query || '10' }}"
-          FRESHNESS="${{ github.event.inputs.freshness || 'pm' }}"
+          FRESHNESS="${{ github.event.inputs.freshness || 'none' }}"
 
           python scripts/run_market_clothing_inventory_discovery.py \
             --market SE \
@@ -164,6 +164,17 @@ jobs:
           print(f"source_accepted_hits: {diagnostics.get('accepted_hits')}")
           print(f"source_rejected_hits: {diagnostics.get('rejected_hits')}")
           print(f"source_accepted_item_ids: {diagnostics.get('accepted_item_ids')}")
+          print(
+              "source_rejection_reasons: "
+              + json.dumps(
+                  diagnostics.get("rejection_reasons") or {},
+                  ensure_ascii=False,
+                  sort_keys=True,
+              )
+          )
+          print("source_rejected_samples:")
+          for sample in diagnostics.get("rejected_samples") or []:
+              print(json.dumps(sample, ensure_ascii=False, sort_keys=True))
 
           unified_path = root / "unified-opportunity-report.json"
           if not unified_path.exists():
