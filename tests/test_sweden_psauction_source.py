@@ -124,6 +124,14 @@ def test_targeted_provider_filters_hits_and_reports_diagnostics():
     assert diagnostics["accepted_hits"] == 1
     assert diagnostics["rejected_hits"] == 2
     assert diagnostics["accepted_item_ids"] == ["1319712"]
+    assert len(diagnostics["rejected_samples"]) == 2
+    assert diagnostics["rejected_samples"][0]["query_id"] == query.query_id
+    assert diagnostics["rejected_samples"][0]["url"] == "https://psauction.se/auctions"
+    assert diagnostics["rejected_samples"][0]["reason"] == (
+        "PS Auction URL is not one specific item page"
+    )
+    assert diagnostics["rejected_samples"][1]["item_id"] == "999999"
+    assert "lacks clothing evidence" in diagnostics["rejected_samples"][1]["reason"]
 
 
 def test_psauction_hit_remains_unverified_until_public_page_check():
