@@ -1,9 +1,8 @@
-"""Bounded public Klaravik source targeting for Swedish Clothing Inventory.
+"""Bounded public Klaravik targeting for Swedish clothing inventory.
 
 Only exact public product-auction pages are accepted. The adapter never logs in,
-bids, contacts a seller, purchases, or bypasses access controls. Klaravik's
-generic bankruptcy wording is excluded from item event classification; only the
-item title and item-specific overview are used for the commercial scenario.
+bids, contacts a seller, purchases, or bypasses access controls. Item-specific
+text is isolated so site-wide bankruptcy wording cannot contaminate scenarios.
 """
 from __future__ import annotations
 
@@ -50,14 +49,17 @@ KLARAVIK_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
 
 _CLOTHING_TERMS = (
     "kläder", "klädparti", "damkläder", "herrkläder", "barnkläder",
-    "arbetskläder", "träningskläder", "sportkläder", "skor", "stövlar",
-    "accessoarer", "plagg", "textil", "jacka", "byxor", "tröja",
-    "skjorta", "klänning", "kjol",
+    "arbetskläder", "träningskläder", "sportkläder", "arbetsskor", "skor",
+    "stövlar", "accessoarer", "plagg", "textil", "jacka", "byxor",
+    "tröja", "skjorta", "klänning", "kjol",
 )
 _BULK_TERMS = (
     "parti", "stort parti", "större parti", "lager", "varulager",
     "restlager", "restparti", "sortiment", "pall", "pallar", "kartong",
     "kartonger", "många plagg",
+)
+_NON_INVENTORY_EQUIPMENT_TERMS = (
+    "butikslarm", "klädlarm", "larmtagg", "larmtaggar", "avlarmningsenhet",
 )
 _QUANTITY_RE = re.compile(
     r"\b(?:ca\s*)?(?P<count>\d{2,7})\s*(?:st|plagg|artiklar|par)\b",
@@ -77,9 +79,11 @@ _BANKRUPTCY_TERMS = (
 _SURPLUS_TERMS = ("restparti", "restlager", "överskottslager")
 _LARGE_LOT_TERMS = (
     "stort parti", "större parti", "parti med", "parti kläder",
-    "klädparti", "varulager",
+    "klädparti", "varulager", "helt varulager",
 )
 _ENDED_REASON = "specific Klaravik product auction is ended or sold"
+_EQUIPMENT_REASON = "clothing-related equipment is not clothing inventory"
+_SOURCE_POLICY_ALIASES = "klær vareparti auksjon"
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,6 +97,7 @@ class KlaravikGateDecision:
 def build_klaravik_clothing_queries(
     query_budget: int = 8,
 ) -> tuple[DiscoveryQuery, ...]:
+    """Return a bounded prefix of the source query matrix."""
     if not 1 <= query_budget <= len(KLARAVIK_CLOTHING_QUERY_MATRIX):
         raise ValueError(
             "query_budget must be between 1 and "
@@ -111,6 +116,7 @@ def _compact(value: str) -> str:
 
 
 def canonicalize_klaravik_product_url(url: str) -> tuple[str, str] | None:
+    """Return normalized URL and slug for one exact product-auction page."""
     canonical = normalize_public_url(url)
     if not canonical:
         return None
@@ -129,7 +135,12 @@ def _has_bulk_scope(text: str) -> bool:
     )
 
 
+def _is_non_inventory_equipment(text: str) -> bool:
+    return any(term in text for term in _NON_INVENTORY_EQUIPMENT_TERMS)
+
+
 def klaravik_gate_decision(hit: SearchHit) -> KlaravikGateDecision:
+    """Accept exact bulk-apparel pages and reject equipment and known history."""
     canonical = normalize_public_url(hit.url)
     if not canonical:
         return KlaravikGateDecision(False, "", None, "invalid public HTTPS URL")
@@ -138,33 +149,43 @@ def klaravik_gate_decision(hit: SearchHit) -> KlaravikGateDecision:
     parsed = canonicalize_klaravik_product_url(hit.url)
     if parsed is None:
         return KlaravikGateDecision(
-            False, canonical, None,
+            False,
+            canonical,
+            None,
             "Klaravik URL is not one specific product-auction page",
         )
 
     canonical, slug = parsed
     title = _compact(hit.title)
     combined = _compact(f"{hit.title} {hit.description}")
+    if _is_non_inventory_equipment(combined):
+        return KlaravikGateDecision(False, canonical, slug, _EQUIPMENT_REASON)
     if not any(term in title for term in _CLOTHING_TERMS):
         return KlaravikGateDecision(
-            False, canonical, slug,
+            False,
+            canonical,
+            slug,
             "specific Klaravik title lacks clothing evidence",
         )
     if not _has_bulk_scope(combined):
         return KlaravikGateDecision(
-            False, canonical, slug,
+            False,
+            canonical,
+            slug,
             "specific clothing auction lacks bulk inventory evidence",
         )
     if any(term in combined for term in _ENDED_TERMS):
         return KlaravikGateDecision(False, canonical, slug, _ENDED_REASON)
     return KlaravikGateDecision(
-        True, canonical, slug,
+        True,
+        canonical,
+        slug,
         "specific Klaravik bulk clothing-inventory product auction",
     )
 
 
 class KlaravikPrefetchedSearchProvider:
-    """Run the bounded query pack once and globally suppress historical URLs."""
+    """Prefetch a bounded pack and globally suppress known historical slugs."""
 
     name = "Klaravik Sweden globally filtered source targeting"
 
@@ -183,6 +204,7 @@ class KlaravikPrefetchedSearchProvider:
         query_map = {query.query: query for query in query_list}
         if len(query_map) != len(query_list):
             raise ValueError("query text must be unique")
+
         self._provider = provider
         self._query_list = query_list
         self._queries = query_map
@@ -265,11 +287,16 @@ class KlaravikPrefetchedSearchProvider:
                     if len(self._rejected_samples) < 30:
                         self._rejected_samples.append(sample)
                     continue
+
+                description = (
+                    f"{hit.description} | source policy aliases: "
+                    f"{_SOURCE_POLICY_ALIASES}"
+                ).strip(" |")
                 accepted.append(
                     SearchHit(
                         title=hit.title,
                         url=decision.canonical_url,
-                        description=hit.description,
+                        description=description,
                         provider=hit.provider or self.name,
                     )
                 )
@@ -280,6 +307,7 @@ class KlaravikPrefetchedSearchProvider:
                     self._accepted_keys.append(decision.listing_key)
                 if decision.canonical_url not in self._accepted_urls:
                     self._accepted_urls.append(decision.canonical_url)
+
             self._hits_by_query[query.query] = tuple(accepted)
             self._query_diagnostics.append(
                 {
@@ -321,13 +349,16 @@ class KlaravikPrefetchedSearchProvider:
 def _strip_html(decoded: str) -> str:
     fragment = re.sub(
         r"<(script|style|noscript)[^>]*>.*?</\1>",
-        " ", decoded, flags=re.I | re.S,
+        " ",
+        decoded,
+        flags=re.I | re.S,
     )
     fragment = re.sub(r"<[^>]+>", " ", fragment)
     return " ".join(html.unescape(fragment).split())
 
 
 def _source_overview(visible: str) -> str:
+    """Select the most item-specific Klaravik overview section."""
     normalized = visible.casefold()
     starts = [match.end() for match in re.finditer(r"\böversikt\b", normalized)]
     candidates: list[str] = []
@@ -339,8 +370,8 @@ def _source_overview(visible: str) -> str:
                 "kända anmärkningar", "skick",
             )
         ]
-        valid = [end for end in ends if end > start]
-        end = min(valid) if valid else min(len(visible), start + 6000)
+        valid_ends = [end for end in ends if end > start]
+        end = min(valid_ends) if valid_ends else min(len(visible), start + 6000)
         segment = visible[start:end].strip()
         if segment:
             candidates.append(segment)
@@ -368,6 +399,8 @@ def _scenario_from_item_context(text: str) -> str:
 
 def _inventory_type(text: str) -> str | None:
     normalized = _compact(text)
+    if _is_non_inventory_equipment(normalized):
+        return None
     if "arbetskläder" in normalized:
         return "workwear_inventory"
     if "träningskläder" in normalized or "sportkläder" in normalized:
@@ -410,6 +443,7 @@ def verify_klaravik_public_page(
     *,
     timeout: float = 15.0,
 ) -> PageVerification:
+    """Verify one exact page through the certificate-valid www host."""
     parsed = canonicalize_klaravik_product_url(url)
     if parsed is None:
         return PageVerification(url=url, error="not an exact public Klaravik product URL")
@@ -454,9 +488,12 @@ def verify_klaravik_public_page(
     )
     ended = any(term in normalized_visible for term in _ENDED_TERMS)
     active = not ended and any(term in normalized_visible for term in _ACTIVE_TERMS)
-    listing_status = ENDED if ended else ACTIVE if active else UNKNOWN
-    clothing = any(term in normalized_item for term in _CLOTHING_TERMS)
-    bulk = _has_bulk_scope(normalized_item)
+    equipment = _is_non_inventory_equipment(normalized_item)
+    clothing = (
+        not equipment
+        and any(term in normalized_item for term in _CLOTHING_TERMS)
+    )
+    bulk = not equipment and _has_bulk_scope(normalized_item)
 
     return replace(
         base,
@@ -466,8 +503,8 @@ def verify_klaravik_public_page(
         inventory_type=_inventory_type(item_context),
         price_nok=None,
         bid_price_nok=None,
-        quantity=_quantity(item_context),
-        listing_status=listing_status,
+        quantity=_quantity(item_context) if not equipment else None,
+        listing_status=ENDED if ended else ACTIVE if active else UNKNOWN,
         page_role=ITEM_LISTING,
         opportunity_identity=identity,
         identity_stable=True,
