@@ -33,7 +33,9 @@ on:
       - "src/opportunity_engine/discovery/unified_opportunity_report.py"
       - "src/opportunity_engine/markets/sweden.py"
       - "config/markets/se_v1.json"
+      - "docs/WORKFLOW_INVENTORY_REPORT_v1.1.md"
       - "tests/test_sweden_clothing_discovery_v1.py"
+      - "tests/test_workflow_inventory_report.py"
 
 permissions:
   contents: read
