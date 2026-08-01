@@ -37,7 +37,15 @@
     {
       "market": "Germany",
       "sources": [
-        {"source": "Riegermann", "priority": 16, "audit_status": "PLANNED", "channel": "public_auction_event_lead"},
+        {
+          "source": "Riegermann",
+          "priority": 16,
+          "audit_status": "PLANNED",
+          "channel": "public_auction_event_lead",
+          "public_access_audit": "GO_FOR_BOUNDED_EVENT_ADAPTER",
+          "audit_document": "docs/RIEGERMANN_PUBLIC_ACCESS_AUDIT_v1.md",
+          "source_contract": "config/sources/de_riegermann_v1.json"
+        },
         {"source": "VENTA Industrieversteigerungen", "priority": 17, "audit_status": "PLANNED", "channel": "public_auction_event_lead"},
         {"source": "Deutsche Pfandverwertung", "priority": 18, "audit_status": "PLANNED", "channel": "public_auction_event_lead"}
       ]
