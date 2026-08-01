@@ -1,7 +1,7 @@
 {
   "completion_rule": "A source is complete when it is ACTIVE with verified records, CODE_READY with documented activation requirements, BLOCKED_AUTH with explicit authorized-access requirements, or deliberately classified as PLANNED or DEPRECATED.",
   "economic_ranking_unlocked": false,
-  "generated_at": "2026-08-01T13:54:27.555770+00:00",
+  "generated_at": "2026-08-01T19:30:00+00:00",
   "phase": "source_coverage_audit_and_gap_closure",
   "phase_complete": false,
   "schema_version": 1,
@@ -155,13 +155,43 @@
       "priority": 15,
       "source": "Danish liquidation auctions",
       "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 16,
+      "source": "Riegermann",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 17,
+      "source": "VENTA Industrieversteigerungen",
+      "status": "planned"
+    },
+    {
+      "blocked_by_authorized_access": false,
+      "complete": false,
+      "error": null,
+      "fetched": 0,
+      "market": "Germany",
+      "priority": 18,
+      "source": "Deutsche Pfandverwertung",
+      "status": "planned"
     }
   ],
   "summary": {
     "blocked_source_count": 3,
     "complete_source_count": 3,
-    "planned_source_count": 9,
-    "remaining_source_count": 12,
-    "required_source_count": 15
+    "planned_source_count": 12,
+    "remaining_source_count": 15,
+    "required_source_count": 18
   }
 }
