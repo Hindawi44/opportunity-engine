@@ -21,12 +21,14 @@ from opportunity_engine.discovery.sweden_clothing_inventory import (
     verify_sweden_public_page,
 )
 from opportunity_engine.discovery.sweden_psauction import (
-    PSAuctionTargetedSearchProvider,
     build_psauction_clothing_queries,
 )
 from opportunity_engine.discovery.sweden_psauction_playwright import (
     PSAuctionPlaywrightConfig,
     PSAuctionPlaywrightFallbackVerifier,
+)
+from opportunity_engine.discovery.sweden_psauction_prefetch import (
+    PSAuctionPrefetchedSearchProvider,
 )
 from opportunity_engine.discovery.unified_opportunity_report import (
     write_unified_opportunity_report,
@@ -155,10 +157,10 @@ def main() -> int:
     if query_budget is None:
         query_budget = 8 if args.source == "psauction" else 16
 
-    psauction_provider: PSAuctionTargetedSearchProvider | None = None
+    psauction_provider: PSAuctionPrefetchedSearchProvider | None = None
     if args.source == "psauction":
         queries = build_psauction_clothing_queries(query_budget)
-        psauction_provider = PSAuctionTargetedSearchProvider(
+        psauction_provider = PSAuctionPrefetchedSearchProvider(
             brave,
             queries=queries,
             request_budget=len(queries),
