@@ -8,7 +8,7 @@ from .repository import PersistenceError
 from .unified_repository import UnifiedOpportunityRepository
 
 
-UNIFIED_REPORT_SCHEMA_VERSION = "1.0"
+SUPPORTED_UNIFIED_REPORT_SCHEMA_VERSIONS = frozenset({"1.0", "1.1"})
 
 
 class UnifiedReportPersistenceError(PersistenceError):
@@ -63,9 +63,10 @@ def persist_unified_opportunity_report(
         )
 
     schema_version = report.get("schema_version")
-    if schema_version != UNIFIED_REPORT_SCHEMA_VERSION:
+    if schema_version not in SUPPORTED_UNIFIED_REPORT_SCHEMA_VERSIONS:
+        supported = ", ".join(sorted(SUPPORTED_UNIFIED_REPORT_SCHEMA_VERSIONS))
         raise UnifiedReportPersistenceError(
-            f"schema_version must be {UNIFIED_REPORT_SCHEMA_VERSION}"
+            f"schema_version must be one of: {supported}"
         )
 
     generated_at = _generated_at(report.get("generated_at"))
