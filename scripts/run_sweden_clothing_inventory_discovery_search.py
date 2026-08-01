@@ -30,6 +30,9 @@ from opportunity_engine.discovery.sweden_psauction_playwright import (
 from opportunity_engine.discovery.sweden_psauction_prefetch import (
     PSAuctionPrefetchedSearchProvider,
 )
+from opportunity_engine.discovery.sweden_psauction_snippet_enrichment import (
+    enrich_psauction_discovery_result,
+)
 from opportunity_engine.discovery.unified_opportunity_report import (
     write_unified_opportunity_report,
 )
@@ -198,6 +201,13 @@ def main() -> int:
 
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
+    source_diagnostics = psauction_provider.diagnostics() if psauction_provider else None
+    if source_diagnostics is not None:
+        result = enrich_psauction_discovery_result(
+            result,
+            source_diagnostics.get("accepted_samples") or (),
+        )
+
     report = result["search_run_report"]
     report["domain"] = "CLOTHING_INVENTORY"
     report["market_code"] = profile.market_code
@@ -214,9 +224,7 @@ def main() -> int:
     report["brave_freshness"] = args.freshness
     report["brave_extra_snippets"] = True
     report["brave_operators"] = True
-    report["source_diagnostics"] = (
-        psauction_provider.diagnostics() if psauction_provider else None
-    )
+    report["source_diagnostics"] = source_diagnostics
     report["source_page_verifier_diagnostics"] = (
         browser_verifier.diagnostics() if browser_verifier else None
     )
