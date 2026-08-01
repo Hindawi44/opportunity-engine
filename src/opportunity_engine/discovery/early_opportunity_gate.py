@@ -6,7 +6,9 @@ Analysis eligibility:
 
 * a specific active sale listing may be eligible for Analysis;
 * a traceable bankruptcy, closure, or liquidation event may enter Discovery Top 5;
-* an early event lead never becomes Analysis eligible until a sale is confirmed.
+* an early event lead never becomes Analysis eligible until a sale is confirmed;
+* a verified ended item listing leaves the current-opportunity path and is retained
+  only as Historical Market Evidence.
 """
 from __future__ import annotations
 
@@ -17,6 +19,7 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 CONFIRMED_SALE = "CONFIRMED_SALE"
 STRONG_LEAD_REQUIRES_VERIFICATION = "STRONG_LEAD_REQUIRES_VERIFICATION"
+HISTORICAL_MARKET_EVIDENCE = "HISTORICAL_MARKET_EVIDENCE"
 REJECTED_NOISE = "REJECTED_NOISE"
 
 ACTIVE = "ACTIVE"
@@ -133,6 +136,60 @@ def _has_excluded_verified_role(candidate: Mapping[str, Any]) -> bool:
             if item.get("page_role") in _EXCLUDED_VERIFIED_ROLES:
                 return True
     return False
+
+
+def _verified_historical_item_listing(candidate: Mapping[str, Any]) -> bool:
+    if candidate.get("listing_status") != ENDED:
+        return False
+    if candidate.get("page_role") != ITEM_LISTING:
+        return False
+    if candidate.get("identity_stable") is not True:
+        return False
+    if not candidate.get("source_urls"):
+        return False
+    return any(
+        isinstance(item, Mapping)
+        and item.get("verified") is True
+        and item.get("page_role") == ITEM_LISTING
+        and item.get("listing_status") == ENDED
+        for item in candidate.get("verification") or []
+    )
+
+
+def _route_historical_market_evidence(candidate: dict[str, Any]) -> None:
+    candidate["opportunity_state"] = HISTORICAL_MARKET_EVIDENCE
+    candidate["reason"] = (
+        "verified ended listing retained in the Historical Market Evidence path only"
+    )
+    candidate["top5_eligible"] = False
+    candidate["analysis_eligible"] = False
+    candidate["historical_market_evidence_eligible"] = True
+    candidate["next_verification_step"] = None
+    candidate["next_action"] = "Retain as historical market evidence only."
+
+    existing_why = [
+        str(item)
+        for item in candidate.get("why_opportunity") or []
+        if "pending further verification" not in str(item).lower()
+        and "active sale confirmed" not in str(item).lower()
+    ]
+    candidate["why_opportunity"] = list(dict.fromkeys([
+        *existing_why,
+        "verified ended clothing-inventory listing retained as historical market evidence",
+    ]))
+
+    confirmed = [
+        str(item)
+        for item in candidate.get("confirmed_information") or []
+        if not str(item).startswith("discovery state:")
+    ]
+    confirmed.insert(1, f"discovery state: {HISTORICAL_MARKET_EVIDENCE}")
+    candidate["confirmed_information"] = confirmed
+    candidate["missing_information"] = [
+        item
+        for item in candidate.get("missing_information") or []
+        if item != "active/ended status"
+    ]
 
 
 def _traceable_event(candidate: Mapping[str, Any]) -> tuple[str, str] | None:
@@ -275,11 +332,15 @@ def apply_early_opportunity_gate(result: Mapping[str, Any]) -> dict[str, Any]:
     for candidate in candidates:
         if not isinstance(candidate, dict):
             raise ValueError("all_discovered_candidates must contain objects")
+        if _verified_historical_item_listing(candidate):
+            _route_historical_market_evidence(candidate)
+            continue
         traceable = _traceable_event(candidate)
         if traceable is not None:
             _restore_event_lead(candidate, *traceable)
         else:
             candidate["analysis_eligible"] = _analysis_eligible(candidate)
+            candidate["historical_market_evidence_eligible"] = False
 
     eligible = [
         candidate for candidate in candidates
@@ -309,6 +370,10 @@ def apply_early_opportunity_gate(result: Mapping[str, Any]) -> dict[str, Any]:
         and candidate.get("listing_status") != ENDED
         for candidate in candidates
     )
+    historical_market_evidence = sum(
+        candidate.get("opportunity_state") == HISTORICAL_MARKET_EVIDENCE
+        for candidate in candidates
+    )
     confirmed_top = sum(
         candidate.get("opportunity_state") == CONFIRMED_SALE
         for candidate in corrected["discovery_top5"]
@@ -322,11 +387,16 @@ def apply_early_opportunity_gate(result: Mapping[str, Any]) -> dict[str, Any]:
     report.update({
         "schema_version": "clothing-inventory-discovery-search-1.2",
         "recovery_gate_applied": True,
+        "historical_market_evidence_gate_applied": True,
         "rejected_results": sum(
             candidate.get("opportunity_state") == REJECTED_NOISE for candidate in candidates
         ),
         "confirmed_sales": confirmed_sales,
         "strong_leads_requiring_verification": strong_leads,
+        "historical_market_evidence": historical_market_evidence,
+        "ended_or_historical": sum(
+            candidate.get("listing_status") == ENDED for candidate in candidates
+        ),
         "early_event_leads": sum(candidate.get("page_role") == EVENT_LEAD for candidate in candidates),
         "early_event_leads_in_top5": sum(
             candidate.get("page_role") == EVENT_LEAD for candidate in corrected["discovery_top5"]
