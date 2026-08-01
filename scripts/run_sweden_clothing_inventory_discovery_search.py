@@ -77,8 +77,8 @@ def main() -> int:
     parser.add_argument(
         "--query-budget",
         type=int,
-        default=8,
-        help="Number of source-specific queries to execute",
+        default=None,
+        help="Number of source-specific queries (default: open-web=16, psauction=8)",
     )
     parser.add_argument(
         "--freshness",
@@ -127,9 +127,13 @@ def main() -> int:
         operators=True,
     )
 
+    query_budget = args.query_budget
+    if query_budget is None:
+        query_budget = 8 if args.source == "psauction" else 16
+
     psauction_provider: PSAuctionTargetedSearchProvider | None = None
     if args.source == "psauction":
-        queries = build_psauction_clothing_queries(args.query_budget)
+        queries = build_psauction_clothing_queries(query_budget)
         psauction_provider = PSAuctionTargetedSearchProvider(
             brave,
             queries=queries,
@@ -138,7 +142,7 @@ def main() -> int:
         provider = SwedenLocalizedSearchProvider(psauction_provider)
         query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V1"
     else:
-        queries = build_sweden_clothing_inventory_queries(args.query_budget)
+        queries = build_sweden_clothing_inventory_queries(query_budget)
         provider = SwedenLocalizedSearchProvider(brave)
         query_pack = "SWEDEN_CLOTHING_INVENTORY_V1"
 
