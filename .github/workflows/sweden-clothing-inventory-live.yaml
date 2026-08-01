@@ -3,10 +3,18 @@ name: Sweden Clothing Inventory Live Pilot
 on:
   workflow_dispatch:
     inputs:
+      source:
+        description: Swedish discovery source mode
+        required: true
+        default: psauction
+        type: choice
+        options:
+          - psauction
+          - open-web
       query_budget:
         description: Number of Swedish discovery queries to run
         required: false
-        default: "16"
+        default: "8"
       results_per_query:
         description: Brave results requested per query
         required: false
@@ -28,13 +36,16 @@ on:
       - "scripts/run_market_clothing_inventory_discovery.py"
       - "scripts/run_sweden_clothing_inventory_discovery_search.py"
       - "src/opportunity_engine/discovery/sweden_clothing_inventory.py"
+      - "src/opportunity_engine/discovery/sweden_psauction.py"
       - "src/opportunity_engine/discovery/brave_search.py"
       - "src/opportunity_engine/discovery/unified_opportunity_adapter.py"
       - "src/opportunity_engine/discovery/unified_opportunity_report.py"
       - "src/opportunity_engine/markets/sweden.py"
       - "config/markets/se_v1.json"
+      - "docs/PSAUCTION_PUBLIC_ACCESS_AUDIT_v1.md"
       - "docs/WORKFLOW_INVENTORY_REPORT_v1.1.md"
       - "tests/test_sweden_clothing_discovery_v1.py"
+      - "tests/test_sweden_psauction_source.py"
       - "tests/test_workflow_inventory_report.py"
 
 permissions:
@@ -74,12 +85,14 @@ jobs:
       - name: Run Sweden live discovery pilot
         shell: bash
         run: |
-          QUERY_BUDGET="${{ github.event.inputs.query_budget || '16' }}"
+          SOURCE="${{ github.event.inputs.source || 'psauction' }}"
+          QUERY_BUDGET="${{ github.event.inputs.query_budget || '8' }}"
           RESULTS_PER_QUERY="${{ github.event.inputs.results_per_query || '10' }}"
           FRESHNESS="${{ github.event.inputs.freshness || 'pm' }}"
 
           python scripts/run_market_clothing_inventory_discovery.py \
             --market SE \
+            --source "$SOURCE" \
             --output-dir "$OUTPUT_DIR" \
             --query-budget "$QUERY_BUDGET" \
             --results-per-query "$RESULTS_PER_QUERY" \
@@ -112,11 +125,17 @@ jobs:
               raise SystemExit(f"Expected market_code=SE, got {report.get('market_code')!r}")
           if report.get("currency") != "SEK":
               raise SystemExit(f"Expected currency=SEK, got {report.get('currency')!r}")
+          if report.get("source_mode") != "PSAUCTION":
+              raise SystemExit(f"Expected source_mode=PSAUCTION, got {report.get('source_mode')!r}")
+          if report.get("source_target") != "psauction.se":
+              raise SystemExit(f"Expected source_target=psauction.se, got {report.get('source_target')!r}")
 
           keys = (
               "status",
               "market_code",
               "currency",
+              "source_mode",
+              "source_target",
               "queries_submitted",
               "hits_received",
               "unique_public_urls",
@@ -130,6 +149,12 @@ jobs:
           print("Sweden live summary:")
           for key in keys:
               print(f"{key}: {report.get(key)}")
+
+          diagnostics = report.get("source_diagnostics") or {}
+          print(f"source_raw_hits: {diagnostics.get('raw_hits')}")
+          print(f"source_accepted_hits: {diagnostics.get('accepted_hits')}")
+          print(f"source_rejected_hits: {diagnostics.get('rejected_hits')}")
+          print(f"source_accepted_item_ids: {diagnostics.get('accepted_item_ids')}")
 
           unified_path = root / "unified-opportunity-report.json"
           if not unified_path.exists():
