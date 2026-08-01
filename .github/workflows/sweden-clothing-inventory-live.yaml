@@ -1,0 +1,146 @@
+name: Sweden Clothing Inventory Live Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      query_budget:
+        description: Number of Swedish discovery queries to run
+        required: false
+        default: "16"
+      results_per_query:
+        description: Brave results requested per query
+        required: false
+        default: "10"
+      freshness:
+        description: Brave freshness window
+        required: false
+        default: "pm"
+        type: choice
+        options:
+          - pd
+          - pw
+          - pm
+          - py
+          - none
+  pull_request:
+    paths:
+      - ".github/workflows/sweden-clothing-inventory-live.yaml"
+      - "scripts/run_market_clothing_inventory_discovery.py"
+      - "scripts/run_sweden_clothing_inventory_discovery_search.py"
+      - "src/opportunity_engine/discovery/sweden_clothing_inventory.py"
+      - "src/opportunity_engine/discovery/brave_search.py"
+      - "src/opportunity_engine/discovery/unified_opportunity_adapter.py"
+      - "src/opportunity_engine/discovery/unified_opportunity_report.py"
+      - "src/opportunity_engine/markets/sweden.py"
+      - "config/markets/se_v1.json"
+      - "tests/test_sweden_clothing_discovery_v1.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sweden-clothing-inventory-live-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  live-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/sweden-clothing-discovery-live
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Confirm Brave secret exists
+        run: |
+          if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
+            echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
+            exit 1
+          fi
+
+      - name: Run Sweden live discovery pilot
+        shell: bash
+        run: |
+          QUERY_BUDGET="${{ github.event.inputs.query_budget || '16' }}"
+          RESULTS_PER_QUERY="${{ github.event.inputs.results_per_query || '10' }}"
+          FRESHNESS="${{ github.event.inputs.freshness || 'pm' }}"
+
+          python scripts/run_market_clothing_inventory_discovery.py \
+            --market SE \
+            --output-dir "$OUTPUT_DIR" \
+            --query-budget "$QUERY_BUDGET" \
+            --results-per-query "$RESULTS_PER_QUERY" \
+            --freshness "$FRESHNESS" \
+            --verify-pages \
+            --verification-limit 20
+
+      - name: Validate and summarize Sweden artifacts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/sweden-clothing-discovery-live")
+          files = sorted(root.glob("*.json"))
+          if not files:
+              raise SystemExit("No Sweden JSON artifacts were produced")
+
+          print("Produced artifacts:")
+          for path in files:
+              print(f"- {path.name}")
+
+          report_path = root / "search-run-report.json"
+          if not report_path.exists():
+              raise SystemExit("Search-run report artifact was not found")
+
+          report = json.loads(report_path.read_text(encoding="utf-8"))
+          if report.get("market_code") != "SE":
+              raise SystemExit(f"Expected market_code=SE, got {report.get('market_code')!r}")
+          if report.get("currency") != "SEK":
+              raise SystemExit(f"Expected currency=SEK, got {report.get('currency')!r}")
+
+          keys = (
+              "status",
+              "market_code",
+              "currency",
+              "queries_submitted",
+              "hits_received",
+              "unique_public_urls",
+              "merged_candidates",
+              "duplicates_merged",
+              "rejected_results",
+              "strong_leads_requiring_verification",
+              "confirmed_sales",
+              "top5_count",
+          )
+          print("Sweden live summary:")
+          for key in keys:
+              print(f"{key}: {report.get(key)}")
+
+          unified_path = root / "unified-opportunity-report.json"
+          if not unified_path.exists():
+              raise SystemExit("Unified opportunity report was not produced")
+          unified = json.loads(unified_path.read_text(encoding="utf-8"))
+          print(f"unified_record_count: {unified.get('record_count')}")
+          print(f"unified_conversion_error_count: {unified.get('conversion_error_count')}")
+          PY
+
+      - name: Upload Sweden live artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweden-clothing-inventory-live
+          path: artifacts/sweden-clothing-discovery-live
+          if-no-files-found: error
