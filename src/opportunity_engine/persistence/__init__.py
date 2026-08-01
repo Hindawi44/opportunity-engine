@@ -8,6 +8,14 @@ from .database import (
     session_scope,
     upgrade_database,
 )
+from .live_unified_persistence import (
+    ERROR_FILENAME as UNIFIED_PERSISTENCE_ERROR_FILENAME,
+    PIPELINE_NAME as UNIFIED_PERSISTENCE_PIPELINE_NAME,
+    SUMMARY_FILENAME as UNIFIED_PERSISTENCE_SUMMARY_FILENAME,
+    UnifiedPersistenceExecutionError,
+    persist_unified_report_file,
+    persist_unified_report_with_artifacts,
+)
 from .models import (
     Base,
     OpportunityModel,
@@ -44,17 +52,23 @@ __all__ = [
     "ShipmentEvidenceTaskModel",
     "SourceRunModel",
     "StatusHistoryModel",
+    "UNIFIED_PERSISTENCE_ERROR_FILENAME",
+    "UNIFIED_PERSISTENCE_PIPELINE_NAME",
+    "UNIFIED_PERSISTENCE_SUMMARY_FILENAME",
     "UNIFIED_REPORT_SCHEMA_VERSION",
     "UNIFIED_WORKFLOW_ENTITY_TYPE",
     "UnifiedOpportunityEvidenceModel",
     "UnifiedOpportunityModel",
     "UnifiedOpportunityRepository",
+    "UnifiedPersistenceExecutionError",
     "UnifiedReportPersistenceError",
     "build_alembic_config",
     "create_database_engine",
     "create_session_factory",
     "persist_operational_snapshots",
     "persist_unified_opportunity_report",
+    "persist_unified_report_file",
+    "persist_unified_report_with_artifacts",
     "session_scope",
     "upgrade_database",
 ]
