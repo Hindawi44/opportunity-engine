@@ -68,10 +68,11 @@ _BULK_TERMS = (
 _NOISE_TERMS = (
     "klädskåp", "kldskp", "klädställ", "klädvagn", "vagn för kläder",
     "butikslarm", "klädlarm", "larmtagg", "larmtaggar", "avlarmning",
-    "galgar", "tvättmaskin", "torkskåp",
+    "galgar", "tvättmaskin", "torkskåp", "tryckpress", "textilpress",
+    "värmepress", "transfer press", "press för kläder",
 )
 _QUANTITY_RE = re.compile(
-    r"\b(?:ca\s*)?(?P<count>\d{2,7})\s*"
+    r"\b(?:ca\s*)?(?P<count>\d{1,7})\s*"
     r"(?:st|stycken|plagg|artiklar|enheter|delar|överdelar|byxor|par)\b",
     re.I,
 )
@@ -94,7 +95,10 @@ _BANKRUPTCY_TERMS = (
 )
 _SURPLUS_TERMS = ("överskott", "restlager", "restparti", "varulager & överskott")
 _LIQUIDATION_TERMS = ("utförsäljning", "avveckling", "hela lagret säljs")
-_LARGE_LOT_TERMS = ("parti med", "stort parti", "större parti", "varulager")
+_LARGE_LOT_TERMS = (
+    "parti med", "stort parti", "större parti", "varulager",
+    "parti arbetsbyxor", "parti kläder/skor", "utrustningsparti",
+)
 _ENDED_REASON = "specific Blinto auction occurrence is ended or sold"
 _NOISE_REASON = "clothing-related equipment is not clothing inventory"
 _SOURCE_POLICY_ALIASES = "klær vareparti auksjon"
@@ -446,7 +450,12 @@ def _inventory_type(text: str) -> str | None:
         return None
     if "varselkläder" in normalized:
         return "high_visibility_workwear"
-    if any(term in normalized for term in ("arbetskläder", "yrkeskläder", "skyddskläder")):
+    if "mc-kläder" in normalized or "mc kläder" in normalized or "skinnbyxor" in normalized:
+        return "motorcycle_clothing_and_accessories"
+    if any(
+        term in normalized
+        for term in ("arbetskläder", "yrkeskläder", "skyddskläder", "arbetsbyxor")
+    ):
         if any(term in normalized for term in ("arbetsskor", "skyddsskor", "skor")):
             return "workwear_and_work_shoes"
         return "workwear_inventory"
@@ -491,9 +500,13 @@ def _quantity(item_context: str) -> int | None:
     total = _TOTAL_RE.search(item_context)
     if total:
         return int(total.group("count"))
-    direct = _QUANTITY_RE.search(item_context)
-    if direct:
-        return int(direct.group("count"))
+    direct_counts = [
+        int(match.group("count")) for match in _QUANTITY_RE.finditer(item_context)
+    ]
+    if len(direct_counts) >= 2:
+        return sum(direct_counts)
+    if direct_counts:
+        return direct_counts[0]
     counts = [int(match.group("count")) for match in _ANTAL_RE.finditer(item_context)]
     if len(counts) >= 2:
         return sum(counts)
@@ -635,6 +648,10 @@ def enrich_blinto_discovery_result(result: Mapping[str, Any]) -> dict[str, Any]:
                 continue
             candidate["source_object_id"] = identity.object_id
             candidate["auction_occurrence_id"] = identity.occurrence_id
+            candidate["duplicate_count"] = max(
+                int(candidate.get("duplicate_count") or 0),
+                max(0, len(candidate.get("found_by_queries") or ()) - 1),
+            )
             verification = next(iter(candidate.get("verification") or ()), {})
             context = str(verification.get("bounded_context") or verification.get("text") or "")
             bid = _parse_sek(context, ("source bid value", "vinnande bud", "högsta bud"))
