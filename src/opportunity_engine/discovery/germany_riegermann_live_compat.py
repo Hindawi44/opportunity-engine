@@ -115,8 +115,12 @@ def parse_riegermann_catalog_html_compat(
     url: str,
     source_html: str,
 ) -> RiegermannAuctionEvent:
-    """Parse fixture-style cards and conservatively retain any missing links."""
+    """Parse fixture-style cards and conservatively retain missing catalog links."""
     event = fixture_parser.parse_riegermann_catalog_html(url, source_html)
+    page_identity = canonicalize_riegermann_url(url)
+    if page_identity is None or page_identity.kind != "AUCTION_CATALOG":
+        return event
+
     item_urls = extract_riegermann_item_urls_compat(url, source_html)
     known = {lot.object_id for lot in event.child_lots}
     fallback = [
