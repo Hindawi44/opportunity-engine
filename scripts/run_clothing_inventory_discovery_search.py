@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
+import sys
 from typing import Any, Mapping
 
 from opportunity_engine.discovery.auksjonen_current_category import (
@@ -132,12 +134,61 @@ def _disabled_current_category_diagnostics() -> dict[str, object]:
     }
 
 
+def _write_fallback_persistence_error(
+    output_dir: Path,
+    report_path: Path,
+    exc: Exception,
+) -> Path:
+    """Write an error artifact when persistence cannot initialize its own helper."""
+    path = output_dir / "unified-persistence-error.json"
+    path.write_text(
+        json.dumps(
+            {
+                "status": "FAILED",
+                "pipeline_name": "UNIFIED_DISCOVERY_PERSISTENCE_V1",
+                "report_path": str(report_path),
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+                "json_reports_remain_official": True,
+                "report_deleted": False,
+            },
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output-dir",
         default="artifacts/norway-textile-discovery",
         help="Artifact directory",
+    )
+    parser.add_argument(
+        "--persist-unified",
+        action="store_true",
+        help=(
+            "After writing all JSON artifacts, copy unified-opportunity-report.json "
+            "into SQLite through the canonical repository"
+        ),
+    )
+    parser.add_argument(
+        "--database-url",
+        default=os.environ.get(
+            "OPPORTUNITY_DATABASE_URL",
+            "sqlite:///data/opportunity_engine.db",
+        ),
+        help="Database URL used only with --persist-unified",
+    )
+    parser.add_argument(
+        "--alembic-config",
+        default="alembic.ini",
+        help="Alembic configuration used only with --persist-unified",
     )
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument(
@@ -200,6 +251,8 @@ def main() -> int:
         raise SystemExit("--playwright-fallback requires --verify-pages")
     if args.auksjonen_current_category and not args.verify_pages:
         raise SystemExit("--auksjonen-current-category requires --verify-pages")
+    if args.persist_unified and not str(args.database_url).strip():
+        raise SystemExit("--database-url must not be empty with --persist-unified")
 
     api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
     if not api_key:
@@ -301,10 +354,37 @@ def main() -> int:
 
     output_dir = Path(args.output_dir)
     paths = write_discovery_artifacts(result, output_dir)
-    paths["unified_opportunity_report"] = write_unified_opportunity_report(
+    unified_report_path = write_unified_opportunity_report(
         result,
         output_dir,
     )
+    paths["unified_opportunity_report"] = unified_report_path
+
+    persistence_failure: Exception | None = None
+    if args.persist_unified:
+        try:
+            from opportunity_engine.persistence.live_unified_persistence import (
+                persist_unified_report_with_artifacts,
+            )
+
+            _, persistence_summary_path = persist_unified_report_with_artifacts(
+                unified_report_path,
+                output_dir,
+                database_url=args.database_url,
+                config_path=args.alembic_config,
+            )
+            paths["unified_persistence_summary"] = persistence_summary_path
+        except Exception as exc:
+            persistence_failure = exc
+            error_path = getattr(exc, "artifact_path", None)
+            if not isinstance(error_path, Path):
+                error_path = _write_fallback_persistence_error(
+                    output_dir,
+                    unified_report_path,
+                    exc,
+                )
+            paths["unified_persistence_error"] = error_path
+
     print(f"Status: {report['status']}")
     print(f"Domain: {report['domain']}")
     print(f"Queries: {report['queries_submitted']}")
@@ -326,6 +406,10 @@ def main() -> int:
     print(f"Top opportunities: {report['top5_count']}")
     for name, path in paths.items():
         print(f"{name}: {path}")
+
+    if persistence_failure is not None:
+        print(f"Unified persistence failed: {persistence_failure}", file=sys.stderr)
+        return 2
     return 0
 
 
