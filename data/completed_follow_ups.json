@@ -1,33 +1,6 @@
 {
-  "completed_count": 1,
-  "generated_at": "2026-07-31T19:52:33.277242+00:00",
-  "items": [
-    {
-      "blocking_reason_ar": "عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة",
-      "city": "Mathopen",
-      "completed_at": "2026-07-31T19:52:33.277242+00:00",
-      "completion_is_automatic": false,
-      "completion_reason_ar": "أغلقت الفرصة أو خرجت من قائمة الإجراءات النشطة.",
-      "due_at": "2026-08-01T14:47:52.979841+00:00",
-      "expected_profit_nok": null,
-      "final_decision": "WATCH",
-      "first_scheduled_at": "2026-07-30T17:09:12.327845+00:00",
-      "follow_up_status": "COMPLETED",
-      "last_evaluated_at": "2026-07-31T14:47:53.025064+00:00",
-      "maximum_safe_bid_nok": null,
-      "next_action": "VERIFY_MARKET_PRICE",
-      "opportunity_id": "unified-auksjonen-610671",
-      "overdue_hours": 0.0,
-      "owner": "SYSTEM",
-      "priority": "HIGH",
-      "requires_human_approval": false,
-      "review_count": 0,
-      "roi_percent": null,
-      "status": "COMPLETED",
-      "title": "10 stk nye Eskoleia Garderobeskap med 2 dører Mathopen 2 bud 2t 18m 19s",
-      "updated_at": "2026-07-31T14:47:52.979841+00:00",
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/10_stk_nye_Eskoleia_Garderobeskap_med_2_d%C3%B8rer/610671"
-    }
-  ],
+  "completed_count": 0,
+  "generated_at": "2026-08-01T03:49:12.171900+00:00",
+  "items": [],
   "schema_version": 1
 }

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-31T19:52:27.424837+00:00",
+  "generated_at": "2026-08-01T03:49:04.982195+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
   "search_required_count": 2,
@@ -15,33 +15,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 5200.0,
+      "asking_price_nok": 5300.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+25+bud+2d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+26+bud+2d",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+25+bud+2d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+26+bud+2d",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+25+bud+2d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=4+stk+komplette+Lagerreoler+200%C3%9760%C3%97200cm+%E2%80%93+Svart%2Bgul+1200kg+T%C3%B8nsberg+26+bud+2d+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 26 bud 2d",
       "opportunity_id": "unified-auksjonen-614289",
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 25 bud 2d 14t 47m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 26 bud 2d 6t 50m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -79,7 +79,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 16t 45m",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 1d 8t 49m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]
