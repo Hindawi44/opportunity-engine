@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-01T13:54:27.173354+00:00",
+  "generated_at": "2026-08-01T19:33:27.794503+00:00",
   "opportunity_count": 2,
   "policy": {
     "automatic_verification": false,
@@ -13,7 +13,7 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-08-01T13:54:23.522230+00:00",
+          "captured_at": "2026-08-01T19:33:24.213648+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
@@ -51,7 +51,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d 20t 45m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d 15t 6m",
       "verified_market_value_nok": null
     },
     {
@@ -59,7 +59,7 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://finn.no/recommerce/forsale/item/379955413",
-          "captured_at": "2026-08-01T13:54:27.118566+00:00",
+          "captured_at": "2026-08-01T19:33:27.739066+00:00",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
@@ -80,7 +80,7 @@
           "verified": false
         }
       ],
-      "asking_price_nok": 4000.0,
+      "asking_price_nok": 5000.0,
       "candidate_comparable_count": 1,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
@@ -97,7 +97,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 4 bud 22t 43m 43s",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 17t 4m 42s",
       "verified_market_value_nok": null
     }
   ],
