@@ -8,7 +8,8 @@ Analysis eligibility:
 * a traceable bankruptcy, closure, or liquidation event may enter Discovery Top 5;
 * an early event lead never becomes Analysis eligible until a sale is confirmed;
 * a verified ended item listing leaves the current-opportunity path and is retained
-  only as Historical Market Evidence.
+  only as Historical Market Evidence when bounded item content proves the matching
+  bulk clothing inventory.
 """
 from __future__ import annotations
 
@@ -20,6 +21,9 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 CONFIRMED_SALE = "CONFIRMED_SALE"
 STRONG_LEAD_REQUIRES_VERIFICATION = "STRONG_LEAD_REQUIRES_VERIFICATION"
 HISTORICAL_MARKET_EVIDENCE = "HISTORICAL_MARKET_EVIDENCE"
+HISTORICAL_EVIDENCE_REQUIRES_MANUAL_REVIEW = (
+    "HISTORICAL_EVIDENCE_REQUIRES_MANUAL_REVIEW"
+)
 REJECTED_NOISE = "REJECTED_NOISE"
 
 ACTIVE = "ACTIVE"
@@ -77,6 +81,22 @@ _EXCLUDED_VERIFIED_ROLES = {CATEGORY_INDEX, SOURCE_CHANNEL, ORDINARY_STORE}
 _GENERIC_ROLES = {
     CATEGORY_INDEX, SOURCE_CHANNEL, ORDINARY_STORE, ARTICLE_OR_INFO, UNRESOLVED_SOURCE,
 }
+_HISTORICAL_APPAREL_TERMS = (
+    "kläder", "klädesplagg", "arbetskläder", "yrkeskläder", "skyddskläder",
+    "varselkläder", "arbetsbyxor", "byxor", "jackor", "skinnbyxor",
+    "regnoverall", "goretexjacka", "arbetsskor", "skyddsskor", "stövlar",
+    "skor", "plagg", "workwear", "clothing", "trousers", "pants", "jackets",
+    "boots", "shoes", "klær", "arbeidstøy", "bukser", "jakker",
+)
+_HISTORICAL_BULK_TERMS = (
+    "parti", "restparti", "varulager", "vareparti", "totalt", "sammanlagt",
+    "stycken", "plagg", "par", "pall", "pallar", "kartong", "kartonger",
+    "lot", "pairs", "pieces", "units",
+)
+_HISTORICAL_QUANTITY_PATTERN = re.compile(
+    r"\b\d{1,7}\s*(?:st|stycken|plagg|artiklar|enheter|delar|byxor|par|pairs|pieces|units)\b",
+    re.I,
+)
 
 
 def _normalized_text(*values: object) -> str:
@@ -130,6 +150,39 @@ def _verification_context(candidate: Mapping[str, Any]) -> str:
     return _normalized_text(*parts)
 
 
+def _bounded_verification_context(item: Mapping[str, Any]) -> str:
+    """Use only bounded page evidence; never use title or search-snippet evidence."""
+    return _normalized_text(item.get("bounded_context") or item.get("text"))
+
+
+def _verification_content_matches_historical_inventory(
+    item: Mapping[str, Any],
+) -> bool:
+    explicit = item.get("verification_content_match")
+    if isinstance(explicit, bool):
+        return explicit
+    context = _bounded_verification_context(item)
+    if not context:
+        return False
+    apparel = any(term in context for term in _HISTORICAL_APPAREL_TERMS)
+    bulk = any(term in context for term in _HISTORICAL_BULK_TERMS)
+    quantified = _HISTORICAL_QUANTITY_PATTERN.search(context) is not None
+    return apparel and (bulk or quantified)
+
+
+def _verified_ended_item_verifications(
+    candidate: Mapping[str, Any],
+) -> list[Mapping[str, Any]]:
+    return [
+        item
+        for item in candidate.get("verification") or []
+        if isinstance(item, Mapping)
+        and item.get("verified") is True
+        and item.get("page_role") == ITEM_LISTING
+        and item.get("listing_status") == ENDED
+    ]
+
+
 def _has_excluded_verified_role(candidate: Mapping[str, Any]) -> bool:
     for item in candidate.get("verification") or []:
         if isinstance(item, Mapping) and item.get("verified") is True:
@@ -138,25 +191,53 @@ def _has_excluded_verified_role(candidate: Mapping[str, Any]) -> bool:
     return False
 
 
-def _verified_historical_item_listing(candidate: Mapping[str, Any]) -> bool:
-    if candidate.get("listing_status") != ENDED:
-        return False
-    if candidate.get("page_role") != ITEM_LISTING:
-        return False
-    if candidate.get("identity_stable") is not True:
-        return False
-    if not candidate.get("source_urls"):
-        return False
-    return any(
-        isinstance(item, Mapping)
-        and item.get("verified") is True
-        and item.get("page_role") == ITEM_LISTING
-        and item.get("listing_status") == ENDED
-        for item in candidate.get("verification") or []
+def _historical_identity_gate(candidate: Mapping[str, Any]) -> bool:
+    return bool(
+        candidate.get("listing_status") == ENDED
+        and candidate.get("page_role") == ITEM_LISTING
+        and candidate.get("identity_stable") is True
+        and candidate.get("source_urls")
     )
 
 
+def _verified_historical_item_listing(candidate: Mapping[str, Any]) -> bool:
+    if not _historical_identity_gate(candidate):
+        return False
+    return any(
+        _verification_content_matches_historical_inventory(item)
+        for item in _verified_ended_item_verifications(candidate)
+    )
+
+
+def _historical_item_requires_manual_review(candidate: Mapping[str, Any]) -> bool:
+    if not _historical_identity_gate(candidate):
+        return False
+    verifications = _verified_ended_item_verifications(candidate)
+    return bool(verifications) and not any(
+        _verification_content_matches_historical_inventory(item)
+        for item in verifications
+    )
+
+
+def _annotate_verification_content_match(candidate: dict[str, Any]) -> bool:
+    matched = False
+    for item in candidate.get("verification") or []:
+        if not isinstance(item, dict):
+            continue
+        if (
+            item.get("verified") is True
+            and item.get("page_role") == ITEM_LISTING
+            and item.get("listing_status") == ENDED
+        ):
+            item_match = _verification_content_matches_historical_inventory(item)
+            item["verification_content_match"] = item_match
+            matched = matched or item_match
+    candidate["verification_content_match"] = matched
+    return matched
+
+
 def _route_historical_market_evidence(candidate: dict[str, Any]) -> None:
+    _annotate_verification_content_match(candidate)
     candidate["opportunity_state"] = HISTORICAL_MARKET_EVIDENCE
     candidate["reason"] = (
         "verified ended listing retained in the Historical Market Evidence path only"
@@ -164,6 +245,7 @@ def _route_historical_market_evidence(candidate: dict[str, Any]) -> None:
     candidate["top5_eligible"] = False
     candidate["analysis_eligible"] = False
     candidate["historical_market_evidence_eligible"] = True
+    candidate["historical_data_fields_trusted"] = True
     candidate["next_verification_step"] = None
     candidate["next_action"] = "Retain as historical market evidence only."
 
@@ -190,6 +272,50 @@ def _route_historical_market_evidence(candidate: dict[str, Any]) -> None:
         for item in candidate.get("missing_information") or []
         if item != "active/ended status"
     ]
+
+
+def _route_historical_evidence_manual_review(candidate: dict[str, Any]) -> None:
+    _annotate_verification_content_match(candidate)
+    candidate["opportunity_state"] = HISTORICAL_EVIDENCE_REQUIRES_MANUAL_REVIEW
+    candidate["reason"] = (
+        "verified ended item page does not contain matching bounded bulk clothing-inventory evidence"
+    )
+    candidate["top5_eligible"] = False
+    candidate["analysis_eligible"] = False
+    candidate["historical_market_evidence_eligible"] = False
+    candidate["historical_data_fields_trusted"] = False
+    candidate["next_verification_step"] = None
+    candidate["next_action"] = (
+        "Review archived item evidence manually before historical market intake."
+    )
+    candidate["inventory_type"] = None
+    candidate["quantity"] = None
+    candidate["price_nok"] = None
+    candidate["bid_price_nok"] = None
+
+    candidate["why_opportunity"] = [
+        item
+        for item in candidate.get("why_opportunity") or []
+        if "historical market evidence" not in str(item).lower()
+        and "pending further verification" not in str(item).lower()
+    ]
+    candidate["why_opportunity"].append(
+        "ended item identity verified, but bounded page content does not prove the advertised clothing lot"
+    )
+    confirmed = [
+        str(item)
+        for item in candidate.get("confirmed_information") or []
+        if not str(item).startswith("discovery state:")
+    ]
+    confirmed.insert(
+        1,
+        f"discovery state: {HISTORICAL_EVIDENCE_REQUIRES_MANUAL_REVIEW}",
+    )
+    candidate["confirmed_information"] = confirmed
+    missing = list(candidate.get("missing_information") or [])
+    if "matching bounded item description" not in missing:
+        missing.append("matching bounded item description")
+    candidate["missing_information"] = missing
 
 
 def _traceable_event(candidate: Mapping[str, Any]) -> tuple[str, str] | None:
@@ -335,12 +461,16 @@ def apply_early_opportunity_gate(result: Mapping[str, Any]) -> dict[str, Any]:
         if _verified_historical_item_listing(candidate):
             _route_historical_market_evidence(candidate)
             continue
+        if _historical_item_requires_manual_review(candidate):
+            _route_historical_evidence_manual_review(candidate)
+            continue
         traceable = _traceable_event(candidate)
         if traceable is not None:
             _restore_event_lead(candidate, *traceable)
         else:
             candidate["analysis_eligible"] = _analysis_eligible(candidate)
             candidate["historical_market_evidence_eligible"] = False
+            candidate.setdefault("historical_data_fields_trusted", False)
 
     eligible = [
         candidate for candidate in candidates
@@ -374,6 +504,11 @@ def apply_early_opportunity_gate(result: Mapping[str, Any]) -> dict[str, Any]:
         candidate.get("opportunity_state") == HISTORICAL_MARKET_EVIDENCE
         for candidate in candidates
     )
+    historical_manual_review = sum(
+        candidate.get("opportunity_state")
+        == HISTORICAL_EVIDENCE_REQUIRES_MANUAL_REVIEW
+        for candidate in candidates
+    )
     confirmed_top = sum(
         candidate.get("opportunity_state") == CONFIRMED_SALE
         for candidate in corrected["discovery_top5"]
@@ -388,12 +523,14 @@ def apply_early_opportunity_gate(result: Mapping[str, Any]) -> dict[str, Any]:
         "schema_version": "clothing-inventory-discovery-search-1.2",
         "recovery_gate_applied": True,
         "historical_market_evidence_gate_applied": True,
+        "historical_content_match_gate_applied": True,
         "rejected_results": sum(
             candidate.get("opportunity_state") == REJECTED_NOISE for candidate in candidates
         ),
         "confirmed_sales": confirmed_sales,
         "strong_leads_requiring_verification": strong_leads,
         "historical_market_evidence": historical_market_evidence,
+        "historical_evidence_manual_review": historical_manual_review,
         "ended_or_historical": sum(
             candidate.get("listing_status") == ENDED for candidate in candidates
         ),
