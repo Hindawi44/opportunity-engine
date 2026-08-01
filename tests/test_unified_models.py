@@ -85,6 +85,41 @@ def test_ended_listing_cannot_be_analysis_eligible():
         )
 
 
+def test_historical_market_evidence_is_valid_only_for_inactive_non_current_records():
+    record = _record(
+        listing_status=ListingStatus.ENDED,
+        evaluation_status=EvaluationStatus.HISTORICAL_ONLY,
+        workflow_status=WorkflowStatus.HISTORICAL_MARKET_EVIDENCE,
+        analysis_eligible=False,
+        top5_eligible=False,
+    )
+
+    assert record.evaluation_status == EvaluationStatus.HISTORICAL_ONLY
+    assert record.workflow_status == WorkflowStatus.HISTORICAL_MARKET_EVIDENCE
+
+
+def test_historical_market_evidence_rejects_active_listing():
+    with pytest.raises(ValidationError, match="inactive listing status"):
+        _record(
+            listing_status=ListingStatus.ACTIVE,
+            evaluation_status=EvaluationStatus.HISTORICAL_ONLY,
+            workflow_status=WorkflowStatus.HISTORICAL_MARKET_EVIDENCE,
+            analysis_eligible=False,
+            top5_eligible=False,
+        )
+
+
+def test_historical_market_evidence_cannot_enter_top5():
+    with pytest.raises(ValidationError, match="cannot enter current opportunity analysis"):
+        _record(
+            listing_status=ListingStatus.ENDED,
+            evaluation_status=EvaluationStatus.HISTORICAL_ONLY,
+            workflow_status=WorkflowStatus.HISTORICAL_MARKET_EVIDENCE,
+            analysis_eligible=False,
+            top5_eligible=True,
+        )
+
+
 def test_qualified_evaluation_requires_verification():
     with pytest.raises(ValidationError, match="must be verified"):
         _record(verified=False)
