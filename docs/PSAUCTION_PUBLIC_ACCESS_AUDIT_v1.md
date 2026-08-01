@@ -26,11 +26,16 @@ Top-5 eligibility is allowed.
    `site:psauction.se/item/view` queries.
 2. Accept only the exact item path shape:
    `/item/view/<numeric-id>/<slug>`.
-3. Require clothing evidence plus lot, inventory, auction, sale, store, or
-   bankruptcy evidence in the public search result.
-4. Pass accepted URLs through the existing Swedish public-page verifier.
-5. Preserve ended, unavailable, rejected, and unverified pages without
-   manufacturing active opportunities.
+3. Require clothing evidence in the item title and explicit bulk-inventory
+   evidence such as a lot, warehouse stock, assortment, pallet/carton count, or
+   an item count of at least ten.
+4. Pass accepted URLs through the existing Swedish lightweight public-page
+   verifier.
+5. When the exact public page returns HTTP 403 or insufficient content, render
+   at most three accepted item pages in one shared headless Chromium session.
+6. Parse the rendered public HTML through the same bounded verification model.
+7. Preserve ended, unavailable, rejected, access-blocked, and unresolved pages
+   without manufacturing active opportunities.
 
 ## Rejected surfaces
 
@@ -40,16 +45,27 @@ The source gate rejects:
 - `/auctions` and category/index pages;
 - editorial, contact, or generic pages;
 - other domains;
-- PS Auction item pages without clothing evidence;
-- clothing pages without lot, inventory, sale, auction, store, or bankruptcy
-  evidence.
+- PS Auction item titles without clothing evidence;
+- shop fittings and fixtures without clothing inventory;
+- individual clothing, shoe, or accessory items without bulk evidence.
+
+## Browser fallback boundary
+
+Chromium is used only after the primary verifier fails closed for one exact,
+pre-approved PS Auction item URL. The fallback:
+
+- is limited to three pages per manually initiated run;
+- waits at least two seconds between rendered page reads;
+- uses no login, account, cookie injection, proxy, CAPTCHA solver, or hidden API;
+- does not continue when the rendered response remains blocked;
+- records attempted URLs, success/failure, and errors in the run report.
 
 ## Safety boundary
 
 The pilot performs no login, account creation, bidding, purchase, contact,
-payment, browser automation, hidden API use, VAT calculation, customs
+payment, access-control bypass, hidden API use, VAT calculation, customs
 calculation, transport estimate, currency conversion, ROI estimate, or automatic
 decision.
 
 `PS Auction` remains a **pilot source** until one live GitHub Actions run proves
-that the public source gate and page verifier produce traceable artifacts.
+that the bulk source gate and bounded page verifier produce traceable artifacts.
