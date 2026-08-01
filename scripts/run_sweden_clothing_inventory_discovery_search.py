@@ -15,6 +15,12 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     write_discovery_artifacts,
 )
 from opportunity_engine.discovery.early_opportunity_gate import apply_early_opportunity_gate
+from opportunity_engine.discovery.sweden_blinto import (
+    BlintoPrefetchedSearchProvider,
+    build_blinto_clothing_queries,
+    enrich_blinto_discovery_result,
+    verify_blinto_public_page,
+)
 from opportunity_engine.discovery.sweden_clothing_inventory import (
     SwedenLocalizedSearchProvider,
     build_sweden_clothing_inventory_queries,
@@ -84,11 +90,11 @@ def main() -> int:
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument(
         "--source",
-        choices=("open-web", "psauction", "klaravik"),
+        choices=("open-web", "psauction", "klaravik", "blinto"),
         default="open-web",
         help=(
             "Use the broad Swedish query pack or one bounded source pack "
-            "(PS Auction or Klaravik)"
+            "(PS Auction, Klaravik or Blinto)"
         ),
     )
     parser.add_argument(
@@ -97,7 +103,7 @@ def main() -> int:
         default=None,
         help=(
             "Number of source-specific queries "
-            "(default: open-web=16, psauction=8, klaravik=8)"
+            "(default: open-web=16, psauction=8, klaravik=8, blinto=8)"
         ),
     )
     parser.add_argument(
@@ -173,6 +179,7 @@ def main() -> int:
 
     psauction_provider: PSAuctionPrefetchedSearchProvider | None = None
     klaravik_provider: KlaravikPrefetchedSearchProvider | None = None
+    blinto_provider: BlintoPrefetchedSearchProvider | None = None
     if args.source == "psauction":
         queries = build_psauction_clothing_queries(query_budget)
         psauction_provider = PSAuctionPrefetchedSearchProvider(
@@ -191,6 +198,15 @@ def main() -> int:
         )
         provider = SwedenLocalizedSearchProvider(klaravik_provider)
         query_pack = "SWEDEN_KLARAVIK_CLOTHING_INVENTORY_V1"
+    elif args.source == "blinto":
+        queries = build_blinto_clothing_queries(query_budget)
+        blinto_provider = BlintoPrefetchedSearchProvider(
+            brave,
+            queries=queries,
+            request_budget=len(queries),
+        )
+        provider = SwedenLocalizedSearchProvider(blinto_provider)
+        query_pack = "SWEDEN_BLINTO_CLOTHING_INVENTORY_V1"
     else:
         queries = build_sweden_clothing_inventory_queries(query_budget)
         provider = SwedenLocalizedSearchProvider(brave)
@@ -198,11 +214,10 @@ def main() -> int:
 
     verifier = None
     if args.verify_pages:
-        verifier = (
-            verify_klaravik_public_page
-            if args.source == "klaravik"
-            else verify_sweden_public_page
-        )
+        verifier = {
+            "klaravik": verify_klaravik_public_page,
+            "blinto": verify_blinto_public_page,
+        }.get(args.source, verify_sweden_public_page)
     browser_verifier: PSAuctionPlaywrightFallbackVerifier | None = None
     if args.psauction_browser_fallback:
         browser_verifier = PSAuctionPlaywrightFallbackVerifier(
@@ -228,17 +243,20 @@ def main() -> int:
 
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
-    targeted_provider = psauction_provider or klaravik_provider
+    targeted_provider = psauction_provider or klaravik_provider or blinto_provider
     source_diagnostics = targeted_provider.diagnostics() if targeted_provider else None
     if psauction_provider is not None and source_diagnostics is not None:
         result = enrich_psauction_discovery_result(
             result,
             source_diagnostics.get("accepted_samples") or (),
         )
+    if blinto_provider is not None:
+        result = enrich_blinto_discovery_result(result)
 
     source_target = {
         "psauction": "psauction.se",
         "klaravik": "klaravik.se",
+        "blinto": "blinto.se",
     }.get(args.source)
 
     report = result["search_run_report"]
