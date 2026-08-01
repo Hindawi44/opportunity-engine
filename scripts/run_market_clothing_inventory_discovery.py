@@ -9,8 +9,11 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+SRC = ROOT / "src"
+for path in (ROOT, SRC):
+    text = str(path)
+    if text not in sys.path:
+        sys.path.insert(0, text)
 
 
 def select_market_runner(market: str) -> Callable[[], int]:
