@@ -32,6 +32,11 @@ on:
           - pw
           - pm
           - py
+      persist_unified:
+        description: Persist unified records to SQLite and upload the database
+        required: false
+        default: true
+        type: boolean
   pull_request:
     paths:
       - ".github/workflows/sweden-clothing-inventory-live.yaml"
@@ -73,6 +78,7 @@ jobs:
       BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
       OUTPUT_DIR: artifacts/sweden-clothing-discovery-live
       EXPECTED_SOURCE: ${{ github.event.inputs.source || 'blinto' }}
+      EXPECTED_PERSIST_UNIFIED: ${{ github.event_name != 'workflow_dispatch' || inputs.persist_unified }}
 
     steps:
       - name: Check out repository
@@ -113,6 +119,14 @@ jobs:
             )
           fi
 
+          persistence_args=()
+          if [ "${EXPECTED_PERSIST_UNIFIED,,}" = "true" ]; then
+            persistence_args+=(
+              --persist-unified
+              --database-url "sqlite:///$OUTPUT_DIR/opportunity_engine.db"
+            )
+          fi
+
           python scripts/run_market_clothing_inventory_discovery.py \
             --market SE \
             --source "$EXPECTED_SOURCE" \
@@ -122,6 +136,7 @@ jobs:
             --freshness "$FRESHNESS" \
             --verify-pages \
             --verification-limit 20 \
+            "${persistence_args[@]}" \
             "${browser_args[@]}"
 
       - name: Validate and summarize Sweden artifacts
@@ -131,6 +146,7 @@ jobs:
           import json
           import os
           from pathlib import Path
+          import sqlite3
 
           root = Path("artifacts/sweden-clothing-discovery-live")
           files = sorted(root.glob("*.json"))
@@ -147,6 +163,9 @@ jobs:
 
           report = json.loads(report_path.read_text(encoding="utf-8"))
           expected_source = os.environ["EXPECTED_SOURCE"]
+          expected_persist = (
+              os.environ.get("EXPECTED_PERSIST_UNIFIED", "false").lower() == "true"
+          )
           expected_mode = expected_source.upper().replace("-", "_")
           expected_target = {
               "psauction": "psauction.se",
@@ -235,6 +254,72 @@ jobs:
           print(f"unified_conversion_error_count: {unified.get('conversion_error_count')}")
           if unified.get("conversion_error_count") != 0:
               raise SystemExit("Unified conversion errors must remain zero")
+
+          persistence_summary_path = root / "unified-persistence-summary.json"
+          database_path = root / "opportunity_engine.db"
+          if not expected_persist:
+              if persistence_summary_path.exists() or database_path.exists():
+                  raise SystemExit("SQLite persistence artifacts were produced while disabled")
+              print("sqlite_persistence: disabled")
+          else:
+              if not persistence_summary_path.exists():
+                  raise SystemExit("Unified persistence summary was not produced")
+              if not database_path.exists():
+                  raise SystemExit("SQLite database artifact was not produced")
+
+              persistence = json.loads(
+                  persistence_summary_path.read_text(encoding="utf-8")
+              )
+              if persistence.get("status") != "SUCCESS":
+                  raise SystemExit(
+                      f"Expected persistence status SUCCESS, got {persistence.get('status')!r}"
+                  )
+              if persistence.get("persisted_record_count") != unified.get("record_count"):
+                  raise SystemExit(
+                      "Persisted record count does not match unified report record count"
+                  )
+
+              with sqlite3.connect(database_path) as connection:
+                  rows = connection.execute(
+                      "SELECT opportunity_id, workflow_status, bid_price, record_json "
+                      "FROM unified_opportunities ORDER BY opportunity_id"
+                  ).fetchall()
+
+              if len(rows) != unified.get("record_count"):
+                  raise SystemExit("SQLite row count does not match unified report")
+
+              trusted_historical = 0
+              manual_review = 0
+              for opportunity_id, workflow_status, bid_price, raw_record in rows:
+                  record = json.loads(raw_record)
+                  metadata = record.get("metadata") or {}
+                  excluded = metadata.get(
+                      "exclude_from_historical_price_analysis"
+                  ) is True
+                  if excluded and bid_price is not None:
+                      raise SystemExit(
+                          f"Excluded historical price leaked into bid_price: {opportunity_id}"
+                      )
+                  if workflow_status == "HISTORICAL_MARKET_EVIDENCE":
+                      trusted_historical += 1
+                      if metadata.get("historical_data_fields_trusted") is not True:
+                          raise SystemExit(
+                              f"Historical workflow record is not trusted: {opportunity_id}"
+                          )
+                      if excluded:
+                          raise SystemExit(
+                              f"Trusted historical record is marked excluded: {opportunity_id}"
+                          )
+                  if (
+                      metadata.get("verification_content_match") is False
+                      and excluded
+                  ):
+                      manual_review += 1
+
+              print(f"sqlite_record_count: {len(rows)}")
+              print(f"sqlite_trusted_historical_count: {trusted_historical}")
+              print(f"sqlite_manual_review_count: {manual_review}")
+              print(f"sqlite_database: {database_path}")
           PY
 
       - name: Upload Sweden live artifacts
