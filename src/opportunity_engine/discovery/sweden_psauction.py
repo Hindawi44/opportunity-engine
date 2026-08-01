@@ -24,48 +24,70 @@ PSAUCTION_ITEM_PATH = re.compile(r"^/item/view/(?P<item_id>\d+)/[^/?#]+/?$", re.
 PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
     DiscoveryQuery(
         "se-ps-01",
+        "AUCTION",
+        "SALE_INTENT",
+        "CLOTHING_INVENTORY",
+        'site:psauction.se/item/view "Auktionen avslutas" kläder parti',
+    ),
+    DiscoveryQuery(
+        "se-ps-02",
+        "AUCTION",
+        "SALE_INTENT",
+        "CLOTHING_INVENTORY",
+        'site:psauction.se/item/view "Auktionen avslutas" arbetskläder sortiment',
+    ),
+    DiscoveryQuery(
+        "se-ps-03",
+        "AUCTION",
+        "SALE_INTENT",
+        "CLOTHING_INVENTORY",
+        'site:psauction.se/item/view "Auktionen avslutas" skor parti',
+    ),
+    DiscoveryQuery(
+        "se-ps-04",
+        "AUCTION",
+        "SALE_INTENT",
+        "CLOTHING_INVENTORY",
+        'site:psauction.se/item/view "Auktionen avslutas" bälten',
+    ),
+    DiscoveryQuery(
+        "se-ps-05",
         "COMPANY_BANKRUPTCY",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
         'site:psauction.se/item/view konkursbo kläder parti -fordon -maskin',
     ),
     DiscoveryQuery(
-        "se-ps-02",
+        "se-ps-06",
         "LARGE_LOT_SALE",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
         'site:psauction.se/item/view "parti med kläder" -fordon',
     ),
     DiscoveryQuery(
-        "se-ps-03",
+        "se-ps-07",
         "INVENTORY_LIQUIDATION",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
         'site:psauction.se/item/view "samtliga kläder" butik',
     ),
     DiscoveryQuery(
-        "se-ps-04",
-        "STORE_CLOSING",
-        "SALE_INTENT",
-        "CLOTHING_INVENTORY",
-        'site:psauction.se/item/view klädbutik konkurs lager',
-    ),
-    DiscoveryQuery(
-        "se-ps-05",
+        "se-ps-08",
         "WAREHOUSE_SURPLUS",
         "SALE_INTENT",
         "CLOTHING_INVENTORY",
         'site:psauction.se/item/view restlager kläder',
     ),
     DiscoveryQuery(
-        "se-ps-06",
+        "se-ps-09",
         "LARGE_LOT_SALE",
-        "SALE_INTENT",
+        "SPECIALIZED",
         "CLOTHING_INVENTORY",
         'site:psauction.se/item/view lagerparti kläder accessoarer',
+        "SECONDARY",
     ),
     DiscoveryQuery(
-        "se-ps-07",
+        "se-ps-10",
         "COMPANY_BANKRUPTCY",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
@@ -73,7 +95,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "SECONDARY",
     ),
     DiscoveryQuery(
-        "se-ps-08",
+        "se-ps-11",
         "WAREHOUSE_SURPLUS",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
@@ -81,7 +103,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "SECONDARY",
     ),
     DiscoveryQuery(
-        "se-ps-09",
+        "se-ps-12",
         "LARGE_LOT_SALE",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
@@ -89,7 +111,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "SECONDARY",
     ),
     DiscoveryQuery(
-        "se-ps-10",
+        "se-ps-13",
         "LARGE_LOT_SALE",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
@@ -97,7 +119,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "SECONDARY",
     ),
     DiscoveryQuery(
-        "se-ps-11",
+        "se-ps-14",
         "INVENTORY_LIQUIDATION",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
@@ -105,7 +127,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "SECONDARY",
     ),
     DiscoveryQuery(
-        "se-ps-12",
+        "se-ps-15",
         "LARGE_LOT_SALE",
         "SPECIALIZED",
         "CLOTHING_INVENTORY",
@@ -114,7 +136,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
     ),
 )
 
-_CLOTHING_TERMS = (
+_CLOTHING_TITLE_TERMS = (
     "kläder",
     "klädbutik",
     "klädparti",
@@ -129,23 +151,33 @@ _CLOTHING_TERMS = (
     "arbetskläder",
     "arbetsskor",
     "skor",
+    "tofflor",
+    "bälten",
     "accessoarer",
     "textil",
     "plagg",
 )
-_INVENTORY_OR_SALE_TERMS = (
+_BULK_TERMS = (
     "parti",
     "lager",
     "varulager",
-    "butik",
-    "konkurs",
-    "konkursbo",
-    "auktion",
-    "bud",
-    "försäljning",
-    "samtliga",
     "restlager",
-    "utförsäljning",
+    "restparti",
+    "lagerparti",
+    "sortiment",
+    "alla kläder",
+    "samtliga kläder",
+    "hela lagret",
+    "hela varulagret",
+    "pall",
+    "kartong",
+    "kartonger",
+    " krt ",
+)
+_BULK_QUANTITY_PATTERN = re.compile(
+    r"\b(?:ca\s*)?(\d{2,7})(?:\+)?\s*"
+    r"(?:st|par|plagg|artiklar|pall|kartonger?|krt)\b",
+    re.I,
 )
 
 
@@ -174,12 +206,33 @@ def _normalized_host(host: str | None) -> str:
     return value[4:] if value.startswith("www.") else value
 
 
-def _compact_text(hit: SearchHit) -> str:
-    return " ".join(f"{hit.title} {hit.description}".casefold().split())
+def canonicalize_psauction_item_url(url: str) -> tuple[str, str] | None:
+    """Return canonical URL and item ID only for one specific PS Auction item."""
+    canonical = normalize_public_url(url)
+    if not canonical:
+        return None
+    parsed = urlparse(canonical)
+    if _normalized_host(parsed.hostname) != PSAUCTION_HOST:
+        return None
+    match = PSAUCTION_ITEM_PATH.fullmatch(parsed.path or "/")
+    if match is None:
+        return None
+    return canonical, match.group("item_id")
+
+
+def _compact(value: str) -> str:
+    return " ".join(value.casefold().split())
+
+
+def _has_bulk_scope(text: str) -> bool:
+    padded = f" {text} "
+    if any(term in padded for term in _BULK_TERMS):
+        return True
+    return any(int(match.group(1)) >= 10 for match in _BULK_QUANTITY_PATTERN.finditer(text))
 
 
 def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
-    """Accept only a specific public PS Auction item page with clothing evidence."""
+    """Accept only a specific public PS Auction bulk clothing item page."""
     canonical = normalize_public_url(hit.url)
     if not canonical:
         return PSAuctionGateDecision(False, "", None, "invalid public HTTPS URL")
@@ -197,27 +250,28 @@ def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
             "PS Auction URL is not one specific item page",
         )
 
-    text = _compact_text(hit)
-    if not any(term in text for term in _CLOTHING_TERMS):
+    title = _compact(hit.title)
+    combined = _compact(f"{hit.title} {hit.description}")
+    if not any(term in title for term in _CLOTHING_TITLE_TERMS):
         return PSAuctionGateDecision(
             False,
             canonical,
             path_match.group("item_id"),
-            "specific PS Auction item lacks clothing evidence",
+            "specific PS Auction title lacks clothing evidence",
         )
-    if not any(term in text for term in _INVENTORY_OR_SALE_TERMS):
+    if not _has_bulk_scope(combined):
         return PSAuctionGateDecision(
             False,
             canonical,
             path_match.group("item_id"),
-            "specific clothing item lacks lot, inventory, sale, or bankruptcy evidence",
+            "specific clothing item lacks bulk inventory evidence",
         )
 
     return PSAuctionGateDecision(
         True,
         canonical,
         path_match.group("item_id"),
-        "specific PS Auction clothing-inventory item page",
+        "specific PS Auction bulk clothing-inventory item page",
     )
 
 
@@ -252,6 +306,7 @@ class PSAuctionTargetedSearchProvider:
         self._rejection_reasons: Counter[str] = Counter()
         self._accepted_item_ids: list[str] = []
         self._accepted_urls: list[str] = []
+        self._accepted_samples: list[dict[str, Any]] = []
         self._rejected_samples: list[dict[str, Any]] = []
         self._query_diagnostics: list[dict[str, Any]] = []
 
@@ -269,22 +324,21 @@ class PSAuctionTargetedSearchProvider:
         rejected = 0
         for hit in raw_hits:
             decision = psauction_gate_decision(hit)
+            sample = {
+                "query_id": discovery_query.query_id,
+                "title": hit.title,
+                "url": hit.url,
+                "canonical_url": decision.canonical_url,
+                "item_id": decision.item_id,
+                "reason": decision.reason,
+                "description": hit.description[:500],
+            }
             if not decision.accepted:
                 rejected += 1
                 self._rejected_hits += 1
                 self._rejection_reasons[decision.reason] += 1
                 if len(self._rejected_samples) < 20:
-                    self._rejected_samples.append(
-                        {
-                            "query_id": discovery_query.query_id,
-                            "title": hit.title,
-                            "url": hit.url,
-                            "canonical_url": decision.canonical_url,
-                            "item_id": decision.item_id,
-                            "reason": decision.reason,
-                            "description": hit.description[:500],
-                        }
-                    )
+                    self._rejected_samples.append(sample)
                 continue
             accepted.append(
                 SearchHit(
@@ -295,6 +349,8 @@ class PSAuctionTargetedSearchProvider:
                 )
             )
             self._accepted_hits += 1
+            if len(self._accepted_samples) < 20:
+                self._accepted_samples.append(sample)
             if decision.item_id and decision.item_id not in self._accepted_item_ids:
                 self._accepted_item_ids.append(decision.item_id)
             if decision.canonical_url not in self._accepted_urls:
@@ -322,6 +378,7 @@ class PSAuctionTargetedSearchProvider:
             "rejected_hits": self._rejected_hits,
             "accepted_item_ids": list(self._accepted_item_ids),
             "accepted_urls": list(self._accepted_urls),
+            "accepted_samples": list(self._accepted_samples),
             "rejection_reasons": dict(sorted(self._rejection_reasons.items())),
             "rejected_samples": list(self._rejected_samples),
             "query_diagnostics": list(self._query_diagnostics),
