@@ -463,11 +463,20 @@ def _inventory_type(text: str) -> str | None:
 
 def _location(visible: str, object_id: str | None) -> str | None:
     map_match = re.search(
-        r"\bKarta\s+över\s+([A-ZÅÄÖ][A-Za-zÅÄÖåäö\- ]{1,40})\b",
+        r"\bKarta\s+över\s+([A-ZÅÄÖ][A-Za-zÅÄÖåäö\- ]{1,60})\b",
         visible,
     )
     if map_match:
-        return map_match.group(1).strip().title()
+        candidate = map_match.group(1).strip()
+        candidate = re.split(
+            r"\s+(?:Auktionen|The\s+auction|Högsta|Highest|Vinnande|Winning|"
+            r"Objekt|Item|Varulager|Kontakta)\b",
+            candidate,
+            maxsplit=1,
+            flags=re.I,
+        )[0].strip(" ,.-")
+        if candidate:
+            return candidate.title()
     if object_id:
         near_id = re.search(
             rf"\b([A-ZÅÄÖ][A-Za-zÅÄÖåäö\-]{{1,30}})\s+{re.escape(object_id)}\b",
