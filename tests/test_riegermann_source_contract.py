@@ -14,17 +14,19 @@ def _riegermann_plan_entry() -> dict:
     return next(row for row in germany["sources"] if row["source"] == "Riegermann")
 
 
-def test_riegermann_audit_keeps_source_planned_until_adapter_exists() -> None:
+def test_riegermann_source_is_code_ready_pilot_not_production() -> None:
     contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
     plan_entry = _riegermann_plan_entry()
 
     assert contract["source_id"] == "DE_RIEGERMANN_V1"
     assert contract["market_code"] == "DE"
     assert contract["currency_code"] == "EUR"
-    assert contract["runtime_status"] == "PLANNED"
+    assert contract["runtime_status"] == "PILOT"
     assert contract["audit_decision"] == "GO_FOR_BOUNDED_EVENT_ADAPTER"
 
-    assert plan_entry["audit_status"] == "PLANNED"
+    assert plan_entry["audit_status"] == "CODE_READY"
+    assert plan_entry["runtime_status"] == "PILOT"
+    assert plan_entry["production_ready"] is False
     assert plan_entry["public_access_audit"] == "GO_FOR_BOUNDED_EVENT_ADAPTER"
     assert plan_entry["source_contract"] == "config/sources/de_riegermann_v1.json"
     assert plan_entry["audit_document"] == "docs/RIEGERMANN_PUBLIC_ACCESS_AUDIT_v1.md"
@@ -82,6 +84,7 @@ def test_riegermann_price_and_safety_contracts_fail_closed() -> None:
 def test_riegermann_audit_documents_live_cabrini_evidence_and_acceptance_gate() -> None:
     contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
     evidence = contract["known_current_evidence"]
+    pilot = contract["pilot_validation"]
     audit = AUDIT_PATH.read_text(encoding="utf-8")
 
     assert evidence["auction_title"] == "Versteigerung Cabrini GmbH"
@@ -90,6 +93,13 @@ def test_riegermann_audit_documents_live_cabrini_evidence_and_acceptance_gate() 
     assert evidence["sample_item_lot_number"] == "410"
     assert evidence["buyer_premium_percent"] == 20
     assert evidence["vat_percent"] == 19
+
+    assert pilot["auction_identity"] == "riegermann-auction:908"
+    assert pilot["catalog_item_url_count"] == 24
+    assert pilot["parsed_child_lot_count"] == 24
+    assert pilot["single_garment_candidate_count"] == 0
+    assert pilot["top5_count"] == 0
+    assert pilot["production_ready"] is False
 
     assert "GO_FOR_BOUNDED_EVENT_ADAPTER" in audit
     assert "AUCTION_EVENT_WITH_CHILD_LOTS" in audit
