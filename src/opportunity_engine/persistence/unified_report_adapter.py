@@ -8,7 +8,8 @@ from .repository import PersistenceError
 from .unified_repository import UnifiedOpportunityRepository
 
 
-SUPPORTED_UNIFIED_REPORT_SCHEMA_VERSIONS = frozenset({"1.0", "1.1"})
+UNIFIED_REPORT_SCHEMA_VERSION = "1.1"
+SUPPORTED_UNIFIED_REPORT_SCHEMA_VERSIONS = frozenset({"1.0", UNIFIED_REPORT_SCHEMA_VERSION})
 
 
 class UnifiedReportPersistenceError(PersistenceError):
