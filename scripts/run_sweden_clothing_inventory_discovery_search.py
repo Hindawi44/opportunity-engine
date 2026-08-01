@@ -24,6 +24,10 @@ from opportunity_engine.discovery.sweden_psauction import (
     PSAuctionTargetedSearchProvider,
     build_psauction_clothing_queries,
 )
+from opportunity_engine.discovery.sweden_psauction_playwright import (
+    PSAuctionPlaywrightConfig,
+    PSAuctionPlaywrightFallbackVerifier,
+)
 from opportunity_engine.discovery.unified_opportunity_report import (
     write_unified_opportunity_report,
 )
@@ -93,6 +97,22 @@ def main() -> int:
     )
     parser.add_argument("--verification-limit", type=int, default=20)
     parser.add_argument(
+        "--psauction-browser-fallback",
+        action="store_true",
+        help="Render at most three exact PS Auction item pages after HTTP 403",
+    )
+    parser.add_argument(
+        "--psauction-browser-pages",
+        type=int,
+        default=3,
+        help="Maximum rendered PS Auction item pages (1-3)",
+    )
+    parser.add_argument(
+        "--psauction-browser-delay-seconds",
+        type=float,
+        default=2.5,
+    )
+    parser.add_argument(
         "--persist-unified",
         action="store_true",
         help="Persist the completed unified report after JSON artifacts are written",
@@ -111,6 +131,10 @@ def main() -> int:
         raise SystemExit("--results-per-query must be between 1 and 20")
     if not 1 <= args.verification_limit <= 100:
         raise SystemExit("--verification-limit must be between 1 and 100")
+    if args.psauction_browser_fallback and args.source != "psauction":
+        raise SystemExit("--psauction-browser-fallback requires --source psauction")
+    if args.psauction_browser_fallback and not args.verify_pages:
+        raise SystemExit("--psauction-browser-fallback requires --verify-pages")
     if args.persist_unified and not str(args.database_url).strip():
         raise SystemExit("--database-url must not be empty with --persist-unified")
 
@@ -147,13 +171,29 @@ def main() -> int:
         query_pack = "SWEDEN_CLOTHING_INVENTORY_V1"
 
     verifier = verify_sweden_public_page if args.verify_pages else None
-    raw_result = run_clothing_inventory_discovery(
-        provider,
-        queries=queries,
-        results_per_query=args.results_per_query,
-        verifier=verifier,
-        verification_limit=args.verification_limit,
-    )
+    browser_verifier: PSAuctionPlaywrightFallbackVerifier | None = None
+    if args.psauction_browser_fallback:
+        browser_verifier = PSAuctionPlaywrightFallbackVerifier(
+            verify_sweden_public_page,
+            config=PSAuctionPlaywrightConfig(
+                max_pages=args.psauction_browser_pages,
+                delay_seconds=args.psauction_browser_delay_seconds,
+            ),
+        )
+        verifier = browser_verifier
+
+    try:
+        raw_result = run_clothing_inventory_discovery(
+            provider,
+            queries=queries,
+            results_per_query=args.results_per_query,
+            verifier=verifier,
+            verification_limit=args.verification_limit,
+        )
+    finally:
+        if browser_verifier is not None:
+            browser_verifier.close()
+
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
     report = result["search_run_report"]
@@ -174,6 +214,9 @@ def main() -> int:
     report["brave_operators"] = True
     report["source_diagnostics"] = (
         psauction_provider.diagnostics() if psauction_provider else None
+    )
+    report["source_page_verifier_diagnostics"] = (
+        browser_verifier.diagnostics() if browser_verifier else None
     )
     report["currency_conversion_performed"] = False
     report["tax_calculation_performed"] = False
