@@ -6,6 +6,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -27,6 +28,42 @@ def _load(path: Path) -> dict:
     if not isinstance(value, dict):
         raise CheckpointIntegrityError(f"Expected a JSON object: {path}")
     return value
+
+
+def _correct_review_reason(report: dict[str, Any]) -> None:
+    """Keep the operator action reason aligned with the selected record state."""
+    action = report.get("next_human_action")
+    if not isinstance(action, dict):
+        return
+    if action.get("action") != "REVIEW_ONE_OPPORTUNITY":
+        return
+
+    identity = action.get("opportunity_identity")
+    records = report.get("deduplicated_opportunities")
+    if not isinstance(records, list):
+        return
+
+    target = next(
+        (
+            item
+            for item in records
+            if isinstance(item, dict)
+            and item.get("opportunity_identity") == identity
+        ),
+        None,
+    )
+    if target is None:
+        return
+
+    if target.get("analysis_eligible") is True:
+        action["reason"] = (
+            "An active Top 5 opportunity is ready for human analysis review."
+        )
+    else:
+        action["reason"] = (
+            "An active Top 5 candidate requires human verification and evidence "
+            "completion before analysis."
+        )
 
 
 def main() -> int:
@@ -56,6 +93,7 @@ def main() -> int:
             market_matrix,
             root=Path(args.root),
         )
+        _correct_review_reason(report)
         paths = write_checkpoint_artifacts(report, output_dir)
     except (OSError, json.JSONDecodeError, CheckpointIntegrityError) as exc:
         output_dir.mkdir(parents=True, exist_ok=True)
