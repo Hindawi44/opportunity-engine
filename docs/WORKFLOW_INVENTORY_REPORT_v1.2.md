@@ -2,8 +2,8 @@
 
 **Scope:** every `.yml` and `.yaml` file currently under `.github/workflows/`  
 **Inventory date:** 2026-08-02  
-**Workflow files represented:** 35  
-**Change note:** the manual Germany Clothing Inventory open-web pilot, the daily Riegermann active-auction workflow, and the daily VENTA active-catalog watch are represented; no existing workflow was deleted or disabled.
+**Workflow files represented:** 36  
+**Change note:** the manual Germany Clothing Inventory open-web pilot and the daily Riegermann, VENTA, and Deutsche Pfandverwertung watches are represented; no existing workflow was deleted or disabled.
 
 ## Operator surface
 
@@ -16,6 +16,8 @@ The Sweden and Germany pilots are bounded geographic-expansion workflows. They r
 The Germany open-web mode remains available. The source-specific Riegermann workflow reads the public active-auction index, selects only auctions with explicit clothing evidence, and delegates their exact catalog and information pages to the bounded Riegermann adapter. It runs daily at `05:17 UTC` and remains available through manual dispatch.
 
 The VENTA watch reads the public auction index, inspects every selected active catalog instead of trusting the company name, completes bounded public pagination, and emits a parent auction lead only when the catalog heading or lot titles provide explicit clothing evidence. It runs daily at `05:47 UTC`, remains manually dispatchable, and treats zero clothing results as valid. VENTA remains `PLANNED` until a live clothing catalog and exact bulk item-page verification are validated.
+
+The Deutsche Pfandverwertung watch reads the public catalog overview, completes bounded catalog pagination, verifies explicit bulk clothing lots on exact public item pages, and keeps source-native EUR amounts out of normalized price fields. It runs daily at `06:17 UTC`, remains manually dispatchable, and treats a zero-active-catalog result as valid. The source remains `PLANNED` until a current live clothing catalog validates the complete main-branch watch and persistence path.
 
 None of these workflows contacts sellers, bids, buys, pays, or estimates unsupported FX, VAT, customs, logistics, profit, or ROI values. A zero-result run remains a valid, reportable outcome.
 
@@ -52,16 +54,17 @@ None of these workflows contacts sellers, bids, buys, pays, or estimates unsuppo
 29. `.github/workflows/v3.5-opportunity-alert-review-queue.yml`
 30. `.github/workflows/v3.6-multi-source-ingestion.yml`
 31. `.github/workflows/v3.7-production-pilot.yml`
-32. `.github/workflows/germany-clothing-inventory-live.yaml`
-33. `.github/workflows/riegermann-active-auctions-live.yaml`
-34. `.github/workflows/sweden-clothing-inventory-live.yaml`
-35. `.github/workflows/venta-active-clothing-watch.yaml`
+32. `.github/workflows/dpv-active-clothing-watch.yaml`
+33. `.github/workflows/germany-clothing-inventory-live.yaml`
+34. `.github/workflows/riegermann-active-auctions-live.yaml`
+35. `.github/workflows/sweden-clothing-inventory-live.yaml`
+36. `.github/workflows/venta-active-clothing-watch.yaml`
 
 ## Classification summary
 
 - `PRIMARY_DISCOVERY_CANDIDATE`: the existing general discovery workflow.
 - `END_TO_END_REVIEW_CANDIDATE`: the existing V3.7 review workflow.
-- `GEOGRAPHIC_DISCOVERY_PILOT`: Sweden live pilot, Germany open-web pilot, bounded Riegermann active-auction workflow, and VENTA active-catalog watch.
+- `GEOGRAPHIC_DISCOVERY_PILOT`: Sweden live pilot, Germany open-web pilot, bounded Riegermann active-auction workflow, VENTA active-catalog watch, and Deutsche Pfandverwertung active-catalog watch.
 - All other classifications remain as documented in v1.0.
 
 ## Germany pilot controls
@@ -70,16 +73,17 @@ The Germany workflows enforce:
 
 - market identity `DE`;
 - report and persistence currency `EUR`;
-- source modes `OPEN_WEB`, `RIEGERMANN`, `RIEGERMANN_ACTIVE`, and `VENTA_ACTIVE_WATCH`;
-- exact public Riegermann and VENTA index, catalog, pagination, and item URL contracts;
+- source modes `OPEN_WEB`, `RIEGERMANN`, `RIEGERMANN_ACTIVE`, `VENTA_ACTIVE_WATCH`, and `DPV_ACTIVE_WATCH`;
+- exact public Riegermann, VENTA, and Deutsche Pfandverwertung index, catalog, pagination, and item URL contracts;
 - explicit clothing evidence before an auction event is emitted;
-- company names and zero-count category labels are not clothing evidence;
+- company names, brand rights, and zero-count category labels are not clothing inventory evidence;
 - ordinary single garments remain child evidence instead of standalone opportunities;
-- observed VENTA bulk lots remain blocked until exact item-page verification;
-- no normalized price or bid value until a bounded EUR parser is implemented;
+- VENTA bulk lots remain blocked until exact item-page verification;
+- Deutsche Pfandverwertung bulk lots are exactly verified but remain blocked from promotion while the source is `PLANNED`;
+- source-native EUR observations do not enter normalized price or NOK fields;
 - no use of `price_nok` or `bid_price_nok` for German records;
 - valid JSON, unified report, SQLite, and historical evidence artifacts even when no opportunity is found.
 
 ## Integrity statement
 
-This report represents all 35 workflow files, including both supported filename extensions. The Sweden and Germany open-web workflows remain manual. Riegermann runs daily at `05:17 UTC`; the VENTA watch runs daily at `05:47 UTC`; both remain manually dispatchable and preserve the existing evidence and safety gates. Existing eligibility gates, source-access statuses, financial formulas, and automatic-action prohibitions remain unchanged.
+This report represents all 36 workflow files, including both supported filename extensions. The Sweden and Germany open-web workflows remain manual. Riegermann runs daily at `05:17 UTC`, VENTA at `05:47 UTC`, and Deutsche Pfandverwertung at `06:17 UTC`; all three watches remain manually dispatchable and preserve the existing evidence and safety gates. Existing eligibility gates, source-access statuses, financial formulas, and automatic-action prohibitions remain unchanged.
