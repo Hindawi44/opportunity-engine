@@ -19,11 +19,11 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     apply_post_verification_top5_hard_gate,
     write_discovery_artifacts,
 )
-from opportunity_engine.discovery.germany_riegermann_live_compat import (
-    install_riegermann_live_catalog_compatibility,
+from opportunity_engine.discovery.germany_riegermann_pagination_completion import (
+    install_riegermann_catalog_completion_compatibility,
 )
 
-install_riegermann_live_catalog_compatibility()
+install_riegermann_catalog_completion_compatibility()
 
 from opportunity_engine.discovery.germany_riegermann_live import (
     DEFAULT_MAX_RESPONSE_BYTES,
