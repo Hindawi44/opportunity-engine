@@ -1,6 +1,9 @@
 name: Riegermann Active Clothing Auctions
 
 on:
+  schedule:
+    # GitHub cron uses UTC: 05:17 UTC is 07:17 CEST / 06:17 CET in Norway.
+    - cron: "17 5 * * *"
   workflow_dispatch:
     inputs:
       auction_limit:
@@ -32,6 +35,7 @@ on:
       - "src/opportunity_engine/discovery/germany_riegermann_pagination_completion.py"
       - "src/opportunity_engine/discovery/unified_opportunity_report.py"
       - "tests/test_germany_riegermann_active.py"
+      - "tests/test_riegermann_daily_workflow.py"
 
 permissions:
   contents: read
