@@ -98,7 +98,7 @@ def test_germany_profile_loads_cross_border_identity_and_source_statuses():
         for row in sources
     }
     assert status_by_source == {
-        "Riegermann": "CODE_READY",
+        "Riegermann": "ACTIVE",
         "VENTA Industrieversteigerungen": "PLANNED",
         "Deutsche Pfandverwertung": "PLANNED",
     }
