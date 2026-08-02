@@ -26,7 +26,9 @@ from opportunity_engine.discovery.germany_venta import (
 from opportunity_engine.discovery.germany_venta_active import (
     DEFAULT_ACTIVE_CATALOG_LIMIT,
     DEFAULT_CATALOG_PAGE_LIMIT,
-    run_venta_active_clothing_watch,
+)
+from opportunity_engine.discovery.germany_venta_active_guard import (
+    run_venta_active_clothing_watch_strict,
 )
 from opportunity_engine.discovery.unified_opportunity_report import (
     write_unified_opportunity_report,
@@ -107,7 +109,7 @@ def main() -> int:
         raise SystemExit("--database-url must not be empty with --persist-unified")
 
     profile = load_germany_market_profile(ROOT)
-    active = run_venta_active_clothing_watch(
+    active = run_venta_active_clothing_watch_strict(
         args.index_url,
         timeout=args.timeout,
         max_response_bytes=args.max_response_bytes,
@@ -222,6 +224,10 @@ def main() -> int:
     print(f"Catalog item URLs: {diagnostics['catalog_item_url_count']}")
     print(f"Clothing child lots: {diagnostics['clothing_child_lot_count']}")
     print(f"Observed bulk lots: {diagnostics['observed_bulk_lot_count']}")
+    print(
+        "Zero-count category false positives: "
+        f"{diagnostics.get('zero_count_category_false_positive_count', 0)}"
+    )
     print(f"Top opportunities: {report['top5_count']}")
     for name, path in paths.items():
         print(f"{name}: {path}")
