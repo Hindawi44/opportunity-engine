@@ -25,10 +25,12 @@ on:
       - "scripts/run_venta_active_discovery.py"
       - "src/opportunity_engine/discovery/germany_venta.py"
       - "src/opportunity_engine/discovery/germany_venta_active.py"
+      - "src/opportunity_engine/discovery/germany_venta_active_guard.py"
       - "src/opportunity_engine/discovery/unified_opportunity_report.py"
       - "config/source_expansion_plan.json"
       - "config/sources/de_venta_v1.json"
       - "tests/test_germany_venta_active.py"
+      - "tests/test_venta_active_guard.py"
       - "tests/test_venta_active_workflow.py"
 
 permissions:
@@ -260,6 +262,7 @@ jobs:
               "clothing_child_lot_count",
               "observed_bulk_lot_count",
               "company_name_only_false_positive_count",
+              "zero_count_category_false_positive_count",
           ):
               print(f"{key}: {live.get(key)}")
           print(f"candidate_count: {len(candidates)}")
