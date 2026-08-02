@@ -1,0 +1,225 @@
+name: Multi-Market Daily Operator Checkpoint
+
+on:
+  workflow_dispatch:
+    inputs:
+      sweden_query_budget:
+        description: Bounded Blinto search queries
+        required: false
+        default: "8"
+      riegermann_auction_limit:
+        description: Maximum active Riegermann clothing auctions
+        required: false
+        default: "5"
+      germany_catalog_limit:
+        description: Maximum active catalogs for each German watch
+        required: false
+        default: "5"
+  pull_request:
+    paths:
+      - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+      - "scripts/run_multi_market_daily_operator_checkpoint.py"
+      - "scripts/run_checkpoint_source_command.py"
+      - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
+      - "config/market_completion_matrix.json"
+      - "tests/test_multi_market_operator_checkpoint.py"
+      - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: multi-market-daily-operator-checkpoint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install focused test dependency
+        run: python -m pip install "pytest>=8.0,<9.0"
+      - name: Test the multi-market checkpoint contract
+        env:
+          PYTHONPATH: src:.
+        run: |
+          pytest tests/test_multi_market_operator_checkpoint.py -q
+          pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
+
+  manual-read-only-checkpoint:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      INPUT_ROOT: artifacts/multi-market-inputs
+      OUTPUT_DIR: artifacts/multi-market-daily-operator-checkpoint
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install existing project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run Norway Auksjonen public clothing path
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/no-auksjonen" -- \
+            python scripts/run_auksjonen_live_clothing.py \
+              --max-listings 30 \
+              --output-dir "$INPUT_ROOT/no-auksjonen"
+
+      - name: Run Sweden Blinto bounded pilot
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/se-blinto" -- \
+            python scripts/run_market_clothing_inventory_discovery.py \
+              --market SE \
+              --source blinto \
+              --output-dir "$INPUT_ROOT/se-blinto" \
+              --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
+              --results-per-query 10 \
+              --freshness none \
+              --verify-pages \
+              --verification-limit 20 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/se-blinto/opportunity_engine.db"
+
+      - name: Run active Riegermann discovery
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-riegermann" -- \
+            python scripts/run_riegermann_active_discovery.py \
+              --output-dir "$INPUT_ROOT/de-riegermann" \
+              --auction-limit "${{ github.event.inputs.riegermann_auction_limit || '5' }}" \
+              --catalog-page-limit 100 \
+              --item-verification-limit 10 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-riegermann/opportunity_engine.db"
+
+      - name: Run VENTA active clothing watch
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-venta" -- \
+            python scripts/run_venta_active_discovery.py \
+              --output-dir "$INPUT_ROOT/de-venta" \
+              --catalog-limit "${{ github.event.inputs.germany_catalog_limit || '5' }}" \
+              --catalog-page-limit 100 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-venta/opportunity_engine.db"
+
+      - name: Run Deutsche Pfandverwertung active clothing watch
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-dpv" -- \
+            python scripts/run_dpv_active_discovery.py \
+              --output-dir "$INPUT_ROOT/de-dpv" \
+              --catalog-limit "${{ github.event.inputs.germany_catalog_limit || '5' }}" \
+              --catalog-page-limit 100 \
+              --item-verification-limit 10 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-dpv/opportunity_engine.db"
+
+      - name: Write checkpoint input manifest
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          cat > "$OUTPUT_DIR/input-manifest.json" <<'JSON'
+          {
+            "schema_version": 1,
+            "sources": [
+              {
+                "market_code": "NO",
+                "source_name": "Auksjonen.no",
+                "currency": "NOK",
+                "artifact_dir": "artifacts/multi-market-inputs/no-auksjonen",
+                "report_kind": "AUKSJONEN_LIVE",
+                "report_file": "auksjonen-live-clothing-listings.json",
+                "top5_file": "live-clothing-top5.json"
+              },
+              {
+                "market_code": "SE",
+                "source_name": "Blinto",
+                "currency": "SEK",
+                "artifact_dir": "artifacts/multi-market-inputs/se-blinto"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "Riegermann",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-riegermann"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "VENTA Industrieversteigerungen",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-venta"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "Deutsche Pfandverwertung",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-dpv"
+              }
+            ]
+          }
+          JSON
+
+      - name: Build the three-market operator checkpoint
+        run: |
+          python scripts/run_multi_market_daily_operator_checkpoint.py \
+            --manifest "$OUTPUT_DIR/input-manifest.json" \
+            --market-matrix config/market_completion_matrix.json \
+            --root . \
+            --output-dir "$OUTPUT_DIR"
+
+      - name: Validate checkpoint safety and coverage
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/multi-market-daily-operator-checkpoint")
+          report = json.loads(
+              (root / "multi-market-daily-checkpoint.json").read_text(encoding="utf-8")
+          )
+          summary = (root / "multi-market-phone-summary.txt").read_text(encoding="utf-8")
+
+          if report.get("market_coverage") != ["NO", "SE", "DE"]:
+              raise SystemExit("The checkpoint did not cover NO, SE and DE")
+          if len(report.get("sources") or []) != 5:
+              raise SystemExit("The checkpoint did not include all five bounded source paths")
+          if summary.count("الإجراء البشري الوحيد:") != 1:
+              raise SystemExit("The phone report must contain exactly one human action")
+          for key in (
+              "automatic_contact",
+              "automatic_bid",
+              "automatic_purchase",
+              "automatic_payment",
+          ):
+              if report.get(key) is not False:
+                  raise SystemExit(f"Automatic action safety changed: {key}")
+          if sum((report.get("source_execution_counts") or {}).values()) != 5:
+              raise SystemExit("Source execution statuses do not reconcile")
+          print(summary)
+          PY
+
+      - name: Upload checkpoint and source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multi-market-daily-operator-checkpoint
+          path: |
+            artifacts/multi-market-daily-operator-checkpoint/
+            artifacts/multi-market-inputs/
+          if-no-files-found: error
