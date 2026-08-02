@@ -136,7 +136,15 @@
           "source": "Deutsche Pfandverwertung",
           "priority": 18,
           "audit_status": "PLANNED",
-          "channel": "public_auction_event_lead"
+          "runtime_status": "PLANNED",
+          "channel": "public_auction_event_lead",
+          "public_access_audit": "GO_FOR_BOUNDED_INDEX_AND_ITEM_ADAPTER",
+          "audit_document": "docs/DEUTSCHE_PFANDVERWERTUNG_PUBLIC_ACCESS_AUDIT_v1.md",
+          "source_contract": "config/sources/de_deutsche_pfandverwertung_v1.json",
+          "implemented_layer": "PUBLIC_INDEX_AND_ITEM_METADATA_PARSER",
+          "historical_clothing_item_identity": "dpv-object:2175",
+          "activation_blocker": "no active clothing catalog at audit; complete live catalog and persistence pipeline not yet validated",
+          "production_ready": false
         }
       ]
     }
