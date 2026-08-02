@@ -6,7 +6,7 @@
     "DEPRECATED",
     "PLANNED"
   ],
-  "generated_at": "2026-08-01T19:33:28.482096+00:00",
+  "generated_at": "2026-08-02T03:52:06.507880+00:00",
   "schema_version": 1,
   "source_count": 18,
   "sources": [
@@ -191,7 +191,7 @@
       "priority": 16,
       "required_configuration": [],
       "source": "Riegermann",
-      "status": "PLANNED"
+      "status": "CODE_READY"
     },
     {
       "access_mode": null,
@@ -219,8 +219,8 @@
   "status_counts": {
     "ACTIVE": 3,
     "BLOCKED_AUTH": 3,
-    "CODE_READY": 0,
+    "CODE_READY": 1,
     "DEPRECATED": 0,
-    "PLANNED": 12
+    "PLANNED": 11
   }
 }

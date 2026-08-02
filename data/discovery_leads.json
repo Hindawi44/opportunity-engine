@@ -1,7 +1,7 @@
 {
   "category_counts": {
     "auction": 1,
-    "bankruptcy": 16,
+    "bankruptcy": 15,
     "clothing_shop_fixtures": 14,
     "estate_sale": 3,
     "inventory": 24,
@@ -10,8 +10,8 @@
     "sale_listing": 8,
     "shop_equipment": 14
   },
-  "deduplicated_lead_count": 58,
-  "generated_at": "2026-08-01T19:33:16.785065+00:00",
+  "deduplicated_lead_count": 57,
+  "generated_at": "2026-08-02T03:51:55.599010+00:00",
   "input_result_count": 80,
   "items": [
     {
@@ -21,7 +21,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782019+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595949+00:00",
       "image_count": null,
       "lead_id": "web-7c78687e8f228b645e34",
       "price_nok": null,
@@ -44,7 +44,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782365+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596291+00:00",
       "image_count": null,
       "lead_id": "web-5e74475b63c3939a78fe",
       "price_nok": null,
@@ -67,7 +67,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783096+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597016+00:00",
       "image_count": null,
       "lead_id": "web-7368b74c0e956c42b2b7",
       "price_nok": null,
@@ -89,7 +89,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782420+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596346+00:00",
       "image_count": null,
       "lead_id": "web-e71772deae49d9ffbeb5",
       "price_nok": null,
@@ -111,7 +111,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783150+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597070+00:00",
       "image_count": null,
       "lead_id": "web-72d343831b08e2486a3f",
       "price_nok": null,
@@ -133,7 +133,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782174+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596236+00:00",
       "image_count": null,
       "lead_id": "web-7cad0e8a59e6e6643424",
       "price_nok": null,
@@ -155,7 +155,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782108+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596095+00:00",
       "image_count": null,
       "lead_id": "web-bd6977fd8acb108de839",
       "price_nok": null,
@@ -177,7 +177,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783506+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597390+00:00",
       "image_count": null,
       "lead_id": "web-a9922918a03cfccae302",
       "price_nok": null,
@@ -199,7 +199,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780942+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594905+00:00",
       "image_count": null,
       "lead_id": "web-340bfb344e98a6d682c6",
       "price_nok": null,
@@ -223,7 +223,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784547+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598470+00:00",
       "image_count": null,
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
@@ -246,7 +246,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780754+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594670+00:00",
       "image_count": null,
       "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
@@ -269,7 +269,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782509+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596468+00:00",
       "image_count": null,
       "lead_id": "web-09fdcc107a66ac1b45ab",
       "price_nok": null,
@@ -291,7 +291,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780998+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594962+00:00",
       "image_count": null,
       "lead_id": "web-ef2f88a92a8f9400d376",
       "price_nok": null,
@@ -313,7 +313,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780643+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594552+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -335,7 +335,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780808+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594725+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -357,7 +357,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781277+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595235+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -380,7 +380,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780268+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594168+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -403,7 +403,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783775+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597701+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -426,7 +426,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781505+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595427+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -449,7 +449,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781969+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595900+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -471,7 +471,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784149+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598103+00:00",
       "image_count": null,
       "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
@@ -493,7 +493,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781779+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595853+00:00",
       "image_count": null,
       "lead_id": "web-08c1c3148277e6eb31ea",
       "price_nok": null,
@@ -515,7 +515,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781858+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595798+00:00",
       "image_count": null,
       "lead_id": "web-7c85d59249f9065a7874",
       "price_nok": null,
@@ -537,7 +537,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781324+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595282+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -559,7 +559,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781727+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595637+00:00",
       "image_count": null,
       "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
@@ -580,7 +580,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782246+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596172+00:00",
       "image_count": null,
       "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
@@ -601,7 +601,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782670+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596561+00:00",
       "image_count": null,
       "lead_id": "web-a51fe9a70f780a57d999",
       "price_nok": null,
@@ -622,7 +622,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784868+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598814+00:00",
       "image_count": null,
       "lead_id": "web-63600f85f4126e808e67",
       "price_nok": null,
@@ -643,7 +643,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782979+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596899+00:00",
       "image_count": null,
       "lead_id": "web-f7fe2d09f32e4cbfda29",
       "price_nok": null,
@@ -664,7 +664,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783628+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597641+00:00",
       "image_count": null,
       "lead_id": "web-15defc847337cd18eca8",
       "price_nok": null,
@@ -684,7 +684,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783563+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597193+00:00",
       "image_count": null,
       "lead_id": "web-5d1caedc0f687ca45737",
       "price_nok": null,
@@ -704,7 +704,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783221+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597141+00:00",
       "image_count": null,
       "lead_id": "web-da69efc40719142bd2b6",
       "price_nok": null,
@@ -724,7 +724,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783380+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597334+00:00",
       "image_count": null,
       "lead_id": "web-d8adeb8c515443238a4b",
       "price_nok": null,
@@ -744,7 +744,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783689+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597571+00:00",
       "image_count": null,
       "lead_id": "web-b9100172d742fc440381",
       "price_nok": null,
@@ -765,7 +765,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781578+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595492+00:00",
       "image_count": null,
       "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
@@ -787,7 +787,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782846+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596733+00:00",
       "image_count": null,
       "lead_id": "web-3acde5d4a176692a975c",
       "price_nok": null,
@@ -807,7 +807,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.782579+00:00",
+      "discovered_at": "2026-08-02T03:51:55.596411+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -827,7 +827,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784618+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598540+00:00",
       "image_count": null,
       "lead_id": "web-c1e3e1a07794eb2a24ac",
       "price_nok": null,
@@ -847,7 +847,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784494+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598422+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -867,7 +867,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784414+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598362+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -887,7 +887,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784924+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598875+00:00",
       "image_count": null,
       "lead_id": "web-add7d4049039ffe37bd3",
       "price_nok": null,
@@ -907,7 +907,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784695+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598614+00:00",
       "image_count": null,
       "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
@@ -927,7 +927,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784355+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598308+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -947,7 +947,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784751+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598670+00:00",
       "image_count": null,
       "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
@@ -967,7 +967,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781084+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595050+00:00",
       "image_count": null,
       "lead_id": "web-81550ca51413d1e1ac66",
       "price_nok": null,
@@ -988,7 +988,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784809+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598727+00:00",
       "image_count": null,
       "lead_id": "web-0623254318f1aaf8f835",
       "price_nok": null,
@@ -1009,7 +1009,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781922+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595702+00:00",
       "image_count": null,
       "lead_id": "web-69939d672dc42fe60d24",
       "price_nok": null,
@@ -1031,7 +1031,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780872+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594822+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -1051,7 +1051,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780171+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594314+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1072,7 +1072,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780415+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594444+00:00",
       "image_count": null,
       "lead_id": "web-d2192f749651b034d4eb",
       "price_nok": null,
@@ -1093,7 +1093,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780564+00:00",
+      "discovered_at": "2026-08-02T03:51:55.594377+00:00",
       "image_count": null,
       "lead_id": "web-ccf7065118a5bf95db40",
       "price_nok": null,
@@ -1115,7 +1115,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781657+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595569+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1136,7 +1136,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.784215+00:00",
+      "discovered_at": "2026-08-02T03:51:55.598169+00:00",
       "image_count": null,
       "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
@@ -1156,7 +1156,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783967+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597919+00:00",
       "image_count": null,
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
@@ -1176,7 +1176,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.783835+00:00",
+      "discovered_at": "2026-08-02T03:51:55.597760+00:00",
       "image_count": null,
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "price_nok": null,
@@ -1196,7 +1196,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.781386+00:00",
+      "discovered_at": "2026-08-02T03:51:55.595342+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1216,7 +1216,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-01T19:33:16.779990+00:00",
+      "discovered_at": "2026-08-02T03:51:55.593981+00:00",
       "image_count": null,
       "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,
@@ -1229,31 +1229,11 @@
       "source": "Brave Search",
       "title": "Konkurs: Sønstebø Tekstil AS | Proff® Forvalt",
       "url": "https://forvalt.no/Konkurs/Firmadetaljer/924328703/634636"
-    },
-    {
-      "canonical_url": "https://www.proff.no/konkurser",
-      "categories": [
-        "bankruptcy"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-01T19:33:16.780503+00:00",
-      "image_count": null,
-      "lead_id": "web-ff05dbb792cccc1b5cc5",
-      "price_nok": null,
-      "priority_score": 8,
-      "published_at": null,
-      "score_reasons": [
-        "category:bankruptcy+8"
-      ],
-      "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
-      "source": "Brave Search",
-      "title": "Proff™ - Konkurser og tvangsaviklinger",
-      "url": "https://www.proff.no/konkurser"
     }
   ],
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 58
+    "Brave Search": 57
   }
 }
