@@ -1,5 +1,5 @@
 {
-  "event_count": 8,
+  "event_count": 9,
   "events": [
     {
       "final_decision": "WATCH",
@@ -64,8 +64,16 @@
       "previous_decision": null,
       "reason_ar": "إنشاء الإجراء الأول",
       "recorded_at": "2026-07-30T17:09:12.327845+00:00"
+    },
+    {
+      "final_decision": "WATCH",
+      "next_action": "VERIFY_MARKET_PRICE",
+      "opportunity_id": "unified-auksjonen-614953",
+      "previous_decision": null,
+      "reason_ar": "إنشاء الإجراء الأول",
+      "recorded_at": "2026-08-02T13:54:02.369702+00:00"
     }
   ],
-  "generated_at": "2026-08-02T08:37:01.816328+00:00",
+  "generated_at": "2026-08-02T13:54:02.369702+00:00",
   "schema_version": 1
 }

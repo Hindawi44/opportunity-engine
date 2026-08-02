@@ -3,18 +3,8 @@
   "error_count": 0,
   "errors": {},
   "evidence": {
-    "unified-auksjonen-613944": {
-      "captured_at": "2026-08-02T08:36:53.920019+00:00",
-      "observed": {
-        "city": "Vigrestad",
-        "ends_at": "1785674280000"
-      },
-      "source": "Auksjonen.no public listing page",
-      "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
-      "verified": true
-    },
     "unified-auksjonen-614289": {
-      "captured_at": "2026-08-02T08:36:52.423402+00:00",
+      "captured_at": "2026-08-02T13:53:54.702607+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1785753600000"
@@ -22,8 +12,18 @@
       "source": "Auksjonen.no public listing page",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "verified": true
+    },
+    "unified-auksjonen-614953": {
+      "captured_at": "2026-08-02T13:53:55.913673+00:00",
+      "observed": {
+        "city": "Tønsberg",
+        "ends_at": "1785936960000"
+      },
+      "source": "Auksjonen.no public listing page",
+      "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
+      "verified": true
     }
   },
-  "generated_at": "2026-08-02T08:36:53.920035+00:00",
+  "generated_at": "2026-08-02T13:53:55.913690+00:00",
   "schema_version": 2
 }

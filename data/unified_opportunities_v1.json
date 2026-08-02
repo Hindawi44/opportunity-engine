@@ -5,7 +5,7 @@
       "automatic_purchase_decision": false,
       "commercial_status": "WATCH",
       "cost_estimate": {
-        "asking_price_nok": 5000.0,
+        "asking_price_nok": 1600.0,
         "conservative_resale_value_nok": null,
         "expected_profit_nok": null,
         "maximum_safe_bid_nok": null,
@@ -17,7 +17,7 @@
       "evidence": [
         {
           "kind": "DISCOVERY_REASON",
-          "value": "target:varelager+18"
+          "value": "target:skrivebord+13"
         },
         {
           "kind": "DISCOVERY_REASON",
@@ -41,11 +41,11 @@
         },
         {
           "kind": "SCORE_REASON",
-          "value": "logistics:7.0/10"
+          "value": "logistics:10.0/10"
         },
         {
           "kind": "SCORE_REASON",
-          "value": "relevance:1.6/7"
+          "value": "relevance:1.3/7"
         },
         {
           "kind": "SCORE_REASON",
@@ -62,9 +62,9 @@
       ],
       "final_decision": "WATCH",
       "identity": {
-        "canonical_url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
-        "legacy_opportunity_id": "unified-auksjonen-613944",
-        "source_listing_id": "unified-auksjonen-613944"
+        "canonical_url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
+        "legacy_opportunity_id": "unified-auksjonen-614953",
+        "source_listing_id": "unified-auksjonen-614953"
       },
       "listing_status": "UNKNOWN",
       "market": "NO",
@@ -83,7 +83,7 @@
         "dismantling_cost",
         "condition_and_missing_parts"
       ],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "recommended_actions": [
         "استكمال ثلاث مقارنات سوقية موثقة.",
         "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
@@ -97,12 +97,12 @@
         "exclusion_reasons": [],
         "legacy_recommendation": "WATCH",
         "official_decision_field": "final_decision",
-        "opportunity_score": 30.61,
-        "relevance_score": 23,
+        "opportunity_score": 33.26,
+        "relevance_score": 18,
         "score_components": {
           "evidence": 0.0,
-          "listing_quality": 8.61,
-          "logistics": 7.0,
+          "listing_quality": 8.26,
+          "logistics": 10.0,
           "marketability": 15.0,
           "verified_economics": 0.0
         },
@@ -111,11 +111,11 @@
       },
       "schema_version": "unified-opportunity-contract-v1",
       "source": {
-        "city": "Vigrestad",
+        "city": "Tønsberg",
         "description": null,
         "name": "auksjonen.no",
-        "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
-        "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+        "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+        "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
       },
       "verification_status": "REQUIRES_VERIFICATION",
       "workflow_status": "NEW"
@@ -124,7 +124,7 @@
       "automatic_purchase_decision": false,
       "commercial_status": "WATCH",
       "cost_estimate": {
-        "asking_price_nok": 5500.0,
+        "asking_price_nok": 5900.0,
         "conservative_resale_value_nok": null,
         "expected_profit_nok": null,
         "maximum_safe_bid_nok": null,
@@ -237,7 +237,7 @@
         "city": "Tønsberg",
         "description": null,
         "name": "auksjonen.no",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d 2t 3m",
+        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
         "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
       },
       "verification_status": "REQUIRES_VERIFICATION",
@@ -250,7 +250,7 @@
   "market": "NO",
   "opportunity_count": 2,
   "schema_version": "unified-opportunity-contract-export-v1",
-  "source_generated_at": "2026-08-02T08:37:00.757856+00:00",
+  "source_generated_at": "2026-08-02T13:54:01.180634+00:00",
   "source_official_decision_field": "final_decision",
   "source_schema_version": 2
 }

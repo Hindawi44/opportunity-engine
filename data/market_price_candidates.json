@@ -1,13 +1,13 @@
 {
-  "candidate_count": 2,
+  "candidate_count": 3,
   "errors": {},
-  "generated_at": "2026-08-02T08:37:00.045951+00:00",
+  "generated_at": "2026-08-02T13:54:00.446857+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
   "opportunities": [
     {
-      "asking_price_nok": 5500.0,
+      "asking_price_nok": 5900.0,
       "available_query_count": 8,
       "candidate_count": 1,
       "candidate_market_value_nok": null,
@@ -17,10 +17,10 @@
       "candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-08-02T08:36:54.935665+00:00",
+          "captured_at": "2026-08-02T13:53:56.718692+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "observed_prices_nok": [
             4990.0
           ],
@@ -42,12 +42,12 @@
       "distinct_source_class_count": 1,
       "eligible_for_market_value": false,
       "market_search_queries": [
-        "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+        "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
         "\"komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg\" selges kr",
         "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
         "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr"
       ],
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
       "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-614289",
       "query_budget_truncated": true,
@@ -55,9 +55,9 @@
       "query_stats": [
         {
           "accepted_count": 1,
-          "query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
-          "rejected_count": 9,
-          "result_count": 10,
+          "query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
+          "rejected_count": 8,
+          "result_count": 9,
           "target_domain": null
         },
         {
@@ -82,13 +82,13 @@
           "target_domain": "finn.no"
         }
       ],
-      "rejected_candidate_count": 29,
+      "rejected_candidate_count": 28,
       "rejected_candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -99,25 +99,10 @@
           "url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg/"
         },
         {
-          "canonical_url": "https://reolteknikk.no/produktkategori/brukt",
-          "comparable_quantity": null,
-          "domain": "reolteknikk.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "rt brukt - Lagerinnredning - Reolteknikk AS",
-          "url": "https://reolteknikk.no/produktkategori/brukt/"
-        },
-        {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -129,10 +114,25 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
         },
         {
+          "canonical_url": "https://reolteknikk.no/produktkategori/brukt",
+          "comparable_quantity": null,
+          "domain": "reolteknikk.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "rt brukt - Lagerinnredning - Reolteknikk AS",
+          "url": "https://reolteknikk.no/produktkategori/brukt/"
+        },
+        {
           "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -147,7 +147,7 @@
           "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -159,10 +159,10 @@
           "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
         },
         {
-          "canonical_url": "https://bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller",
+          "canonical_url": "https://areol.no/pallereoler",
           "comparable_quantity": null,
-          "domain": "bauhaus.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "domain": "areol.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -170,44 +170,14 @@
           "similarity_score": 0.0,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Lagerhylle til lav pris | BAUHAUS",
-          "url": "https://www.bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller"
+          "title": "Pallereoler - Brukte og Nye - Areol Innredninger AS",
+          "url": "https://areol.no/pallereoler/"
         },
         {
-          "canonical_url": "https://ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning",
-          "comparable_quantity": null,
-          "domain": "ajprodukter.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Hyller og reoler i metall – stort utvalg og rask levering | AJ Produkter",
-          "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning"
-        },
-        {
-          "canonical_url": "https://ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller",
-          "comparable_quantity": null,
-          "domain": "ajprodukter.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Lagerhyller og lagerreoler – bestill her! | AJ Produkter",
-          "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.90",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -215,8 +185,23 @@
           "similarity_score": 0.0,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Torget – FINN.no | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search"
+          "title": "Utstyr til bil, båt og MC | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?category=0.90"
+        },
+        {
+          "canonical_url": "https://areol.no/butikk?add-to-cart=21337&product_count=32&product_orderby=price&product_view=list",
+          "comparable_quantity": null,
+          "domain": "areol.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Butikk - Areol Innredninger AS",
+          "url": "https://areol.no/butikk/?add-to-cart=21337&product_count=32&product_orderby=price&product_view=list"
         },
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
@@ -278,6 +263,21 @@
           "url": "https://fasadenor.no/product-category/lagerreoler/"
         },
         {
+          "canonical_url": "https://supersellers.no/i-butikken/butikkinnredning/tubo-reoler-wirereol/tubo-reol-hojde-200-cm.html",
+          "comparable_quantity": null,
+          "domain": "supersellers.no",
+          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Høyde 200 cm - Reoler av metall - TUBO - Butikkinnredning - Systemer - I butikken",
+          "url": "https://www.supersellers.no/i-butikken/butikkinnredning/tubo-reoler-wirereol/tubo-reol-hojde-200-cm.html"
+        },
+        {
           "canonical_url": "https://loppetur.no/finn-bruktbutikk/tonsberg-kommune",
           "comparable_quantity": null,
           "domain": "loppetur.no",
@@ -308,7 +308,7 @@
           "url": "https://lagerbod.no/tonsberg/"
         },
         {
-          "canonical_url": "https://loppetur.no/finn-bruktbutikk/3111-tonsberg",
+          "canonical_url": "https://loppetur.no/finn-bruktbutikk/3105-tonsberg",
           "comparable_quantity": null,
           "domain": "loppetur.no",
           "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
@@ -319,8 +319,8 @@
           "similarity_score": 0.111,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Bruktbutikker i postnummer 3111, Tønsberg - Loppetur",
-          "url": "https://www.loppetur.no/finn-bruktbutikk/3111-tonsberg"
+          "title": "Bruktbutikker i postnummer 3105, Tønsberg - Loppetur",
+          "url": "https://www.loppetur.no/finn-bruktbutikk/3105-tonsberg"
         },
         {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
@@ -338,7 +338,7 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
         },
         {
-          "canonical_url": "https://loppetur.no/finn-bruktbutikk/3105-tonsberg",
+          "canonical_url": "https://loppetur.no/finn-bruktbutikk/3111-tonsberg",
           "comparable_quantity": null,
           "domain": "loppetur.no",
           "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
@@ -349,23 +349,8 @@
           "similarity_score": 0.111,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Bruktbutikker i postnummer 3105, Tønsberg - Loppetur",
-          "url": "https://www.loppetur.no/finn-bruktbutikk/3105-tonsberg"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Torget – FINN.no | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search"
+          "title": "Bruktbutikker i postnummer 3111, Tønsberg - Loppetur",
+          "url": "https://www.loppetur.no/finn-bruktbutikk/3111-tonsberg"
         },
         {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
@@ -398,21 +383,6 @@
           "url": "https://www.finn.no/bap/forsale/ad.html?finnkode=266393631"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/271228732",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": 4,
-          "target_domain": "finn.no",
-          "title": "GARASJEBOD-LAGERBOD TIL LEIE I TØNSBERG | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/271228732"
-        },
-        {
           "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -426,6 +396,21 @@
           "target_domain": "finn.no",
           "title": "Reoler | til salgs | FINN Torget",
           "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/271228732",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "GARASJEBOD-LAGERBOD TIL LEIE I TØNSBERG | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/271228732"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.90",
@@ -488,6 +473,21 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
         },
         {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=180403983",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Brukte Reoler Pallereoler og Lagerutstyr Kjøp & Salg | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=180403983"
+        },
+        {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=130002363",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -501,55 +501,64 @@
           "target_domain": "finn.no",
           "title": "Mobile reoler / kompaktarkiv / rullearkiv / lagerreoler / arkivreoler / reoler | FINN-torget",
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130002363"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/83193645",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": 4,
-          "target_domain": "finn.no",
-          "title": "Listverksreol | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/83193645"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d 2t 3m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
       "verified_comparable_count": 0
     },
     {
-      "asking_price_nok": 5000.0,
+      "asking_price_nok": 1600.0,
       "available_query_count": 8,
-      "candidate_count": 1,
+      "candidate_count": 2,
       "candidate_market_value_nok": null,
-      "candidate_price_max_nok": 700000.0,
-      "candidate_price_median_nok": 700000.0,
-      "candidate_price_min_nok": 700000.0,
+      "candidate_price_max_nok": 1890.0,
+      "candidate_price_median_nok": 1845.0,
+      "candidate_price_min_nok": 1800.0,
       "candidates": [
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/379955413",
-          "captured_at": "2026-08-02T08:37:00.044778+00:00",
+          "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
+          "captured_at": "2026-08-02T13:53:59.901513+00:00",
           "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "domain": "secundo.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
           "observed_prices_nok": [
-            700000.0
+            1800.0,
+            1440.0
           ],
-          "price_nok": 700000.0,
+          "price_nok": 1800.0,
           "quantity_status": "UNKNOWN",
-          "query_target_domain": "finn.no",
-          "similarity_score": 0.375,
-          "snippet": "<strong>Et stort varelager med varer for utsalgspris for over 700.000kr selges</strong>. Varene selges for annen satsning for firmaet. Varer som posehåndtak, isbitformer, solbriller, smarte løsninger til kjøkken og hjem, ballonger ++++ er en del produktene ...",
+          "query_target_domain": null,
+          "similarity_score": 0.4,
+          "snippet": "Vanlig pris <strong>1.800 NOK inkl. mva1.440 NOK</strong> eks.",
           "source": "Brave Search",
-          "source_class": "marketplace",
-          "source_quantity": null,
-          "title": "Varelager til nettbutikk selges | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/379955413",
+          "source_class": "independent_web",
+          "source_quantity": 5,
+          "title": "Hev/senk skrivebord – Secundo",
+          "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
+        },
+        {
+          "canonical_url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-150x75-10031309422866",
+          "captured_at": "2026-08-02T13:53:59.902252+00:00",
+          "comparable_quantity": null,
+          "domain": "secundo.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "observed_prices_nok": [
+            1890.0,
+            1512.0
+          ],
+          "price_nok": 1890.0,
+          "quantity_status": "UNKNOWN",
+          "query_target_domain": null,
+          "similarity_score": 0.4,
+          "snippet": "0 NOK0 NOK Salgspris <strong>1.890 NOK</strong> inkl. mva1.512 NOK eks.",
+          "source": "Brave Search",
+          "source_class": "independent_web",
+          "source_quantity": 5,
+          "title": "Elektrisk hev/senk skrivebord 150x75 – Secundo",
+          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-150x75-10031309422866",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
         }
@@ -558,42 +567,42 @@
       "distinct_source_class_count": 1,
       "eligible_for_market_value": false,
       "market_search_queries": [
-        "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-        "\"Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer\" selges kr",
-        "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
-        "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr"
+        "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
+        "\"komplette elektriske hev senk skrivebord samlet Velg mellom\" selges kr",
+        "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+        "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr"
       ],
-      "market_search_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
+      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
       "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "query_budget_truncated": true,
       "query_count": 4,
       "query_stats": [
         {
           "accepted_count": 0,
-          "query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
+          "query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": null
         },
         {
           "accepted_count": 0,
-          "query": "\"Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer\" selges kr",
+          "query": "\"komplette elektriske hev senk skrivebord samlet Velg mellom\" selges kr",
           "rejected_count": 0,
           "result_count": 0,
           "target_domain": null
         },
         {
-          "accepted_count": 0,
-          "query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
-          "rejected_count": 9,
-          "result_count": 9,
+          "accepted_count": 2,
+          "query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "rejected_count": 8,
+          "result_count": 10,
           "target_domain": null
         },
         {
-          "accepted_count": 1,
-          "query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
-          "rejected_count": 9,
+          "accepted_count": 0,
+          "query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
+          "rejected_count": 10,
           "result_count": 10,
           "target_domain": "finn.no"
         }
@@ -601,433 +610,415 @@
       "rejected_candidate_count": 28,
       "rejected_candidates": [
         {
-          "canonical_url": "https://beslagteknikk.no/",
+          "canonical_url": "https://sogroup.no/categories/hev-senk-skrivebord",
           "comparable_quantity": null,
-          "domain": "beslagteknikk.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
+          "domain": "sogroup.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.364,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "Brukte hev senk skrivebord - Scandinavian Office Group",
+          "url": "https://www.sogroup.no/categories/hev-senk-skrivebord"
+        },
+        {
+          "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
+          "comparable_quantity": null,
+          "domain": "secundo.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.105,
-          "source_quantity": null,
+          "similarity_score": 0.273,
+          "source_quantity": 5,
           "target_domain": null,
-          "title": "Beslagteknikk AS - Stolt leverandør til Møbelindustri & Trevare - Beslagteknikk AS",
-          "url": "https://www.beslagteknikk.no/"
+          "title": "Hev/senk skrivebord – Secundo",
+          "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord"
         },
         {
-          "canonical_url": "https://beslagteknikk.no/vare-leverandorer",
-          "comparable_quantity": null,
-          "domain": "beslagteknikk.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.105,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Våre Leverandører - Beslagteknikk.no - Beslagteknikk AS",
-          "url": "https://www.beslagteknikk.no/vare-leverandorer"
-        },
-        {
-          "canonical_url": "https://interiorogbeslag.no/",
-          "comparable_quantity": null,
-          "domain": "interiorogbeslag.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.105,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Hjem - Interiør og Beslag",
-          "url": "https://www.interiorogbeslag.no/"
-        },
-        {
-          "canonical_url": "https://nettbutikk.wuerth.no/Produktkategorier/Mbelbeslag/31221504.cyid/3122.cgid/no/NO/NOK",
-          "comparable_quantity": null,
-          "domain": "nettbutikk.wuerth.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.105,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Kjøp Møbelbeslag på nett - wuerth.no - Würth Norge AS",
-          "url": "https://nettbutikk.wuerth.no/Produktkategorier/Mbelbeslag/31221504.cyid/3122.cgid/no/NO/NOK/"
-        },
-        {
-          "canonical_url": "https://beslagteknikk.no/hengsler-skinner-skuffer/hengsler",
-          "comparable_quantity": null,
-          "domain": "beslagteknikk.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.105,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Hengsler fra Blum - Beslagteknikk.no - Beslagteknikk AS",
-          "url": "https://www.beslagteknikk.no/hengsler-skinner-skuffer/hengsler"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget?ordering=avsluttes&p=5",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.053,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Kjøp og selg brukt utstyr og verktøy hos auksjonen.no",
-          "url": "https://www.auksjonen.no/auksjoner/torget?p=5&ordering=avsluttes"
-        },
-        {
-          "canonical_url": "https://blum.com/no/en",
-          "comparable_quantity": null,
-          "domain": "blum.com",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.053,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Furniture fittings by Blum for modern living environments | Blum",
-          "url": "https://www.blum.com/no/en/"
-        },
-        {
-          "canonical_url": "https://interiorogbeslag.no/skuffer/skuffeinnredninger",
-          "comparable_quantity": null,
-          "domain": "interiorogbeslag.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.105,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Skuffeinnredninger - INTERIØR OG BESLAG",
-          "url": "https://www.interiorogbeslag.no/skuffer/skuffeinnredninger"
-        },
-        {
-          "canonical_url": "https://solheim-trevare.no/produkter/innredninger",
-          "comparable_quantity": null,
-          "domain": "solheim-trevare.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.211,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Kjøkken || Solheim Trevarer AS",
-          "url": "https://solheim-trevare.no/produkter/innredninger/"
-        },
-        {
-          "canonical_url": "https://ny.auksjonen.no/auksjoner/torget/byggevarer-og-oppussing",
-          "comparable_quantity": null,
-          "domain": "ny.auksjonen.no",
-          "matched_query": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.053,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Torget / Byggevarer-og-oppussing",
-          "url": "https://ny.auksjonen.no/auksjoner/torget/byggevarer-og-oppussing"
-        },
-        {
-          "canonical_url": "https://blum.com/no/en",
-          "comparable_quantity": null,
-          "domain": "blum.com",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.1,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Furniture fittings by Blum for modern living environments | Blum",
-          "url": "https://www.blum.com/no/en/"
-        },
-        {
-          "canonical_url": "https://kjokkenfronter.no/tag/blum",
-          "comparable_quantity": null,
-          "domain": "kjokkenfronter.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Blum – Kjøkkenfronter til alle typer kjøkken",
-          "url": "https://www.kjokkenfronter.no/tag/blum/"
-        },
-        {
-          "canonical_url": "https://machineseeker.no/mss/kj%C3%B8kken",
-          "comparable_quantity": null,
-          "domain": "machineseeker.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "▷ Brukt Kjøkken til salgs - Machineseeker",
-          "url": "https://www.machineseeker.no/mss/kj%C3%B8kken"
-        },
-        {
-          "canonical_url": "https://beslagteknikk.no/hengsler-skinner-skuffer/hengsler",
-          "comparable_quantity": null,
-          "domain": "beslagteknikk.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Hengsler fra Blum - Beslagteknikk.no - Beslagteknikk AS",
-          "url": "https://www.beslagteknikk.no/hengsler-skinner-skuffer/hengsler"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.78",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
+          "similarity_score": 0.273,
+          "source_quantity": 5,
           "target_domain": null,
-          "title": "Møbler og interiør | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?category=0.78"
+          "title": "Hev senk or elektrisk | Skrivebord | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk"
         },
         {
-          "canonical_url": "https://gulesider.no/m%C3%B8belfabrikker+norge/bedrifter",
+          "canonical_url": "https://secundo.no/produkter/til-kontoret/elektriske-hev-senk-skrivebord",
           "comparable_quantity": null,
-          "domain": "gulesider.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "domain": "secundo.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.364,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "Hev og senk skrivebord til salgs - Brukte elektriske pult – Secundo",
+          "url": "https://www.secundo.no/produkter/til-kontoret/elektriske-hev-senk-skrivebord/"
+        },
+        {
+          "canonical_url": "https://kontorsenteretostfold.no/products/nytt-elektrisk-hev-senk-skrivebord-hvit",
+          "comparable_quantity": null,
+          "domain": "kontorsenteretostfold.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.545,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD HVIT – Kontorsenteret Østfold AS",
+          "url": "https://kontorsenteretostfold.no/products/nytt-elektrisk-hev-senk-skrivebord-hvit"
+        },
+        {
+          "canonical_url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black",
+          "comparable_quantity": null,
+          "domain": "kontorsenteretostfold.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.545,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD SVART – Kontorsenteret Østfold AS",
+          "url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black"
+        },
+        {
+          "canonical_url": "https://kontorsenteretostfold.no/collections/allekontormobler/products/brukt-hev-senk-skrivebord-med-bue",
+          "comparable_quantity": null,
+          "domain": "kontorsenteretostfold.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.545,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "BRUKT | HEV/SENK SKRIVEBORD MED BUE – Kontorsenteret Østfold AS",
+          "url": "https://kontorsenteretostfold.no/collections/allekontormobler/products/brukt-hev-senk-skrivebord-med-bue"
+        },
+        {
+          "canonical_url": "https://degvoldkontormobler.no/produktkategori/kontoret/skrivebord-el-hev-senk",
+          "comparable_quantity": null,
+          "domain": "degvoldkontormobler.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.1,
-          "source_quantity": null,
+          "similarity_score": 0.273,
+          "source_quantity": 5,
           "target_domain": null,
-          "title": "Møbelfabrikker Norge | bedrifter | gulesider.no | side 1",
-          "url": "https://www.gulesider.no/m%C3%B8belfabrikker+norge/bedrifter"
+          "title": "Skrivebord el. hev/senk Arkiver - Degvold Kontormøbler AS",
+          "url": "https://www.degvoldkontormobler.no/produktkategori/kontoret/skrivebord-el-hev-senk/"
         },
         {
-          "canonical_url": "https://kjokkenfronter.no/produktstikkord/blum",
+          "canonical_url": "https://kontorsenteretostfold.no/collections/bruktehevsenkskrivebord",
           "comparable_quantity": null,
-          "domain": "kjokkenfronter.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
-          "rejection_reasons": [
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.1,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Blum – Kjokkenfronter.no",
-          "url": "https://www.kjokkenfronter.no/produktstikkord/blum/"
-        },
-        {
-          "canonical_url": "https://beslagteknikk.no/",
-          "comparable_quantity": null,
-          "domain": "beslagteknikk.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "domain": "kontorsenteretostfold.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.1,
-          "source_quantity": null,
+          "similarity_score": 0.273,
+          "source_quantity": 5,
           "target_domain": null,
-          "title": "Beslagteknikk AS - Stolt leverandør til Møbelindustri & Trevare - Beslagteknikk AS",
-          "url": "https://www.beslagteknikk.no/"
+          "title": "Brukte hev/senk skrivebord - Kontorsenteret Østfold AS",
+          "url": "https://kontorsenteretostfold.no/collections/bruktehevsenkskrivebord"
         },
         {
-          "canonical_url": "https://snl.no/m%C3%B8belindustri",
+          "canonical_url": "https://kontorsenteretostfold.no/products/brukt-hev-senk-skrivebord-hvit",
           "comparable_quantity": null,
-          "domain": "snl.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "domain": "kontorsenteretostfold.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.545,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "BRUKT | HEV/SENK SKRIVEBORD HVIT – Kontorsenteret Østfold AS",
+          "url": "https://kontorsenteretostfold.no/products/brukt-hev-senk-skrivebord-hvit"
+        },
+        {
+          "canonical_url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black",
+          "comparable_quantity": null,
+          "domain": "kontorsenteretostfold.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.5,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD SVART – Kontorsenteret Østfold AS",
+          "url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black"
+        },
+        {
+          "canonical_url": "https://jysk.no/kontor/hev-og-senk-skrivebord",
+          "comparable_quantity": null,
+          "domain": "jysk.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.1,
-          "source_quantity": null,
+          "similarity_score": 0.3,
+          "source_quantity": 5,
           "target_domain": null,
-          "title": "møbelindustri – Store norske leksikon",
-          "url": "https://snl.no/m%C3%B8belindustri"
+          "title": "Hev senk pult og arbeidsbord til ditt hjemmekontor | JYSK",
+          "url": "https://jysk.no/kontor/hev-og-senk-skrivebord"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/425731738",
+          "canonical_url": "https://sogroup.no/categories/hev-senk-skrivebord",
+          "comparable_quantity": null,
+          "domain": "sogroup.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.3,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "Brukte hev senk skrivebord - Scandinavian Office Group",
+          "url": "https://www.sogroup.no/categories/hev-senk-skrivebord"
+        },
+        {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=235202687",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.4,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "388 stk elektriske hev/senk skrivebord | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=235202687"
+        },
+        {
+          "canonical_url": "https://kontorsenteretostfold.no/products/nytt-elektrisk-hev-senk-skrivebord-hvit",
+          "comparable_quantity": null,
+          "domain": "kontorsenteretostfold.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.5,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD HVIT – Kontorsenteret Østfold AS",
+          "url": "https://kontorsenteretostfold.no/products/nytt-elektrisk-hev-senk-skrivebord-hvit"
+        },
+        {
+          "canonical_url": "https://ikea.com/no/no/cat/hev-senk-skrivebord-55008",
+          "comparable_quantity": null,
+          "domain": "ikea.com",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
+          "similarity_score": 0.3,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "Hev og senk pult - For en mer ergonomisk arbeidshverdag - IKEA",
+          "url": "https://www.ikea.com/no/no/cat/hev-senk-skrivebord-55008/"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.3,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "Hev senk or elektrisk | Skrivebord | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk"
+        },
+        {
+          "canonical_url": "https://bruktekontormobler.no/produktkategori/hev-senk-skrivebord",
+          "comparable_quantity": null,
+          "domain": "bruktekontormobler.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.4,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "Hev senk skrivebord – Brukte Kontormøbler",
+          "url": "https://bruktekontormobler.no/produktkategori/hev-senk-skrivebord/"
+        },
+        {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=235202687",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.5,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "Tallerkenholdere kjøkken fra Blum | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/425731738"
+          "title": "388 stk elektriske hev/senk skrivebord | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=235202687"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/458625838",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
+          "similarity_score": 0.375,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "Metallknagger fra 60-tallet | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/458625838"
+          "title": "Hev senk or elektrisk | Skrivebord | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk"
         },
         {
-          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=395143813",
+          "canonical_url": "https://finn.no/recommerce/forsale/item/235202687",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
+          "similarity_score": 0.5,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "STORT LAGERSALG PÅ HVITEVARER ALT FRA 1 999 KR! - MEDFØLGER GARANTI OG FRAKT | FINN-torget",
-          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=395143813"
+          "title": "522 stk elektriske hev/senk skrivebord | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/235202687"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/407641180",
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=391508638",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
+          "similarity_score": 0.75,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "Hengsler overskap kjøkken -Blum Aventos Hingtop 18mm | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/407641180"
+          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD GRÅ EIK - BREDDE 120 OG 160 CM | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=391508638"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/314028912",
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=375434332",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
+          "similarity_score": 0.75,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "Universalmal for skuffefronter | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/314028912"
+          "title": "FERDIG MONTERT - BESTE UTVALG AV NYE ELEKTRISKE HEV/SENK SKRIVEBORD | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=375434332"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.78",
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=367880957",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
+          "similarity_score": 0.75,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "Møbler og interiør | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?category=0.78"
+          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD HVIT - BREDDE 120, 140, 160 & 180 CM | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=367880957"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.67.3900",
+          "canonical_url": "https://finn.no/recommerce/forsale/item/367492724",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
+          "similarity_score": 0.75,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "Kjøkkeninnredning | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.67.3900"
+          "title": "NYTT ELEKTRISK HEV/SENK SKRIVEBORD LYS EIK - BREDDE 120, 140, 160, 180 & 200 CM | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/367492724"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?q=kj%C3%B8kken",
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=367492724",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
+          "similarity_score": 0.5,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "Kjøkken | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?q=kj%C3%B8kken"
+          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD LYS EIK - BREDDE 120, 140, 160 & 180 CM | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=367492724"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/435996580",
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=451887271",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
+          "similarity_score": 0.5,
+          "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "Nytt stort kjøkken! Fri frakt | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/435996580"
+          "title": "Elektrisk hev senk skrivebord fargevalg - 140x60 cm | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=451887271"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/373216825",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.75,
+          "source_quantity": 5,
+          "target_domain": "finn.no",
+          "title": "BESTSELGENDE NYTT ELEKTRISK HEV/SENK HJØRNE-SKRIVEBORD 2 BEINS I MODERNE HVIT | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/373216825"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
       "verified_comparable_count": 0
     }
   ],
   "opportunity_count": 2,
   "planned_request_count": 8,
   "query_budget_exhausted": true,
-  "rejected_candidate_count": 57,
+  "rejected_candidate_count": 56,
   "request_budget": 8,
   "requests_made": 8,
   "required_comparables": 3,

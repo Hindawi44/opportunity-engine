@@ -1,50 +1,5 @@
 {
   "evidence": {
-    "unified-auksjonen-613944": {
-      "auction_fee_nok": null,
-      "candidate_market_value_nok": null,
-      "dismantling_cost_nok": null,
-      "market_comparables": [],
-      "market_evidence_review_reasons": [
-        "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains",
-        "quantity_not_confirmed_for_all_comparables"
-      ],
-      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
-      "missing_evidence": [
-        "three_verified_market_comparables",
-        "pending_market_comparables_require_review",
-        "auction_fee_nok",
-        "vat_status",
-        "vat_nok",
-        "transport_cost_nok",
-        "dismantling_cost_nok",
-        "storage_cost_nok",
-        "repair_cost_nok",
-        "other_costs_nok"
-      ],
-      "opportunity_id": "unified-auksjonen-613944",
-      "other_costs_nok": null,
-      "pending_market_comparables": [
-        {
-          "price_nok": 700000.0,
-          "quantity_status": "UNKNOWN",
-          "similarity_score": 0.375,
-          "source": "Brave Search",
-          "url": "https://www.finn.no/recommerce/forsale/item/379955413",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
-        }
-      ],
-      "repair_cost_nok": null,
-      "storage_cost_nok": null,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
-      "transport_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944",
-      "vat_nok": null,
-      "vat_status": null,
-      "verified": false
-    },
     "unified-auksjonen-614289": {
       "auction_fee_nok": null,
       "candidate_market_value_nok": null,
@@ -83,19 +38,73 @@
       ],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d 2t 3m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
+      "vat_nok": null,
+      "vat_status": null,
+      "verified": false
+    },
+    "unified-auksjonen-614953": {
+      "auction_fee_nok": null,
+      "candidate_market_value_nok": null,
+      "dismantling_cost_nok": null,
+      "market_comparables": [],
+      "market_evidence_review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains",
+        "quantity_not_confirmed_for_all_comparables"
+      ],
+      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
+      "missing_evidence": [
+        "three_verified_market_comparables",
+        "pending_market_comparables_require_review",
+        "auction_fee_nok",
+        "vat_status",
+        "vat_nok",
+        "transport_cost_nok",
+        "dismantling_cost_nok",
+        "storage_cost_nok",
+        "repair_cost_nok",
+        "other_costs_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-614953",
+      "other_costs_nok": null,
+      "pending_market_comparables": [
+        {
+          "price_nok": 1800.0,
+          "quantity_status": "UNKNOWN",
+          "similarity_score": 0.4,
+          "source": "Brave Search",
+          "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
+        },
+        {
+          "price_nok": 1890.0,
+          "quantity_status": "UNKNOWN",
+          "similarity_score": 0.4,
+          "source": "Brave Search",
+          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-150x75-10031309422866",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
+        }
+      ],
+      "repair_cost_nok": null,
+      "storage_cost_nok": null,
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+      "transport_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
     }
   },
   "evidence_count": 2,
-  "generated_at": "2026-08-02T08:37:00.133041+00:00",
+  "generated_at": "2026-08-02T13:54:00.537343+00:00",
   "market_evidence_source": "data/market_evidence_registry.json",
   "method": "verified evidence only; discovered market evidence is bridged as pending review; unknown values remain null",
-  "pending_comparable_count": 2,
+  "pending_comparable_count": 3,
   "schema_version": 2,
   "verified_count": 0
 }

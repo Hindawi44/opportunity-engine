@@ -6,7 +6,7 @@
     "DEPRECATED",
     "PLANNED"
   ],
-  "generated_at": "2026-08-02T13:09:00+00:00",
+  "generated_at": "2026-08-02T13:54:01.140938+00:00",
   "schema_version": 1,
   "source_count": 18,
   "sources": [
@@ -14,7 +14,7 @@
       "access_mode": "public_direct_category_pages",
       "channel": null,
       "error": null,
-      "fetched": 40,
+      "fetched": 41,
       "market": "Norway",
       "priority": 1,
       "required_configuration": [],
@@ -183,10 +183,10 @@
       "status": "PLANNED"
     },
     {
-      "access_mode": "public_active_auction_index",
+      "access_mode": null,
       "channel": "public_auction_event_lead",
       "error": null,
-      "fetched": 18,
+      "fetched": 0,
       "market": "Germany",
       "priority": 16,
       "required_configuration": [],

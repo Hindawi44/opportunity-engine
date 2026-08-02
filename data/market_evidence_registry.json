@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T08:37:00.095904+00:00",
+  "generated_at": "2026-08-02T13:54:00.498659+00:00",
   "opportunity_count": 2,
   "policy": {
     "automatic_verification": false,
@@ -13,10 +13,10 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-08-02T08:36:54.935665+00:00",
+          "captured_at": "2026-08-02T13:53:56.718692+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "observed_prices_nok": [
             4990.0
           ],
@@ -34,7 +34,7 @@
           "verified": false
         }
       ],
-      "asking_price_nok": 5500.0,
+      "asking_price_nok": 5900.0,
       "candidate_comparable_count": 1,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
@@ -51,45 +51,69 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d 2t 3m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
       "verified_market_value_nok": null
     },
     {
-      "accepted_comparable_count": 1,
+      "accepted_comparable_count": 2,
       "accepted_comparables": [
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/379955413",
-          "captured_at": "2026-08-02T08:37:00.044778+00:00",
+          "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
+          "captured_at": "2026-08-02T13:53:59.901513+00:00",
           "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "domain": "secundo.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
           "observed_prices_nok": [
-            700000.0
+            1800.0,
+            1440.0
           ],
-          "price_nok": 700000.0,
+          "price_nok": 1800.0,
           "quantity_status": "UNKNOWN",
-          "query_target_domain": "finn.no",
-          "similarity_score": 0.375,
-          "snippet": "<strong>Et stort varelager med varer for utsalgspris for over 700.000kr selges</strong>. Varene selges for annen satsning for firmaet. Varer som posehåndtak, isbitformer, solbriller, smarte løsninger til kjøkken og hjem, ballonger ++++ er en del produktene ...",
+          "query_target_domain": null,
+          "similarity_score": 0.4,
+          "snippet": "Vanlig pris <strong>1.800 NOK inkl. mva1.440 NOK</strong> eks.",
           "source": "Brave Search",
-          "source_class": "marketplace",
-          "source_quantity": null,
-          "title": "Varelager til nettbutikk selges | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/379955413",
+          "source_class": "independent_web",
+          "source_quantity": 5,
+          "title": "Hev/senk skrivebord – Secundo",
+          "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
+        },
+        {
+          "canonical_url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-150x75-10031309422866",
+          "captured_at": "2026-08-02T13:53:59.902252+00:00",
+          "comparable_quantity": null,
+          "domain": "secundo.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "observed_prices_nok": [
+            1890.0,
+            1512.0
+          ],
+          "price_nok": 1890.0,
+          "quantity_status": "UNKNOWN",
+          "query_target_domain": null,
+          "similarity_score": 0.4,
+          "snippet": "0 NOK0 NOK Salgspris <strong>1.890 NOK</strong> inkl. mva1.512 NOK eks.",
+          "source": "Brave Search",
+          "source_class": "independent_web",
+          "source_quantity": 5,
+          "title": "Elektrisk hev/senk skrivebord 150x75 – Secundo",
+          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-150x75-10031309422866",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
         }
       ],
-      "asking_price_nok": 5000.0,
-      "candidate_comparable_count": 1,
+      "asking_price_nok": 1600.0,
+      "candidate_comparable_count": 2,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
       "independent_domain_count": 1,
       "independent_domains": [
-        "finn.no"
+        "secundo.no"
       ],
       "market_value_verified": false,
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "outlier_count": 0,
       "outliers": [],
       "review_reasons": [
@@ -97,7 +121,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
       "verified_market_value_nok": null
     }
   ],

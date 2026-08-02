@@ -7,11 +7,11 @@
   "selection_status": "SELECTED",
   "source_opportunity": {
     "final_decision": "WATCH",
-    "opportunity_id": "unified-auksjonen-613944",
-    "opportunity_score": 30.61,
-    "source_city": "Vigrestad",
-    "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
-    "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+    "opportunity_id": "unified-auksjonen-614953",
+    "opportunity_score": 33.26,
+    "source_city": "Tønsberg",
+    "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+    "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
   },
   "source_schema_version": "operational-landed-cost-export-v1",
   "transport_input": {
@@ -26,9 +26,9 @@
       "country_code": "NO",
       "postal_code": null
     },
-    "estimate_id": "transport-unified-auksjonen-613944-to-mahmoud_namsos_v1",
+    "estimate_id": "transport-unified-auksjonen-614953-to-mahmoud_namsos_v1",
     "evidence_refs": [
-      "data/operational_landed_cost_v1.json#unified-auksjonen-613944",
+      "data/operational_landed_cost_v1.json#unified-auksjonen-614953",
       "config/buyers/mahmoud_namsos_v1.json#MAHMOUD_NAMSOS_V1",
       "config/markets/no_v1.json#NO_DOMESTIC_V1"
     ],
@@ -39,9 +39,9 @@
       "tail_lift_required": null,
       "unloading_required": null
     },
-    "opportunity_id": "unified-auksjonen-613944",
+    "opportunity_id": "unified-auksjonen-614953",
     "origin": {
-      "city": "Vigrestad",
+      "city": "Tønsberg",
       "coordinates": null,
       "country_code": "NO",
       "postal_code": null
@@ -80,9 +80,9 @@
       "country_code": "NO",
       "postal_code": null
     },
-    "estimate_id": "transport-unified-auksjonen-613944-to-mahmoud_namsos_v1",
+    "estimate_id": "transport-unified-auksjonen-614953-to-mahmoud_namsos_v1",
     "evidence_refs": [
-      "data/operational_landed_cost_v1.json#unified-auksjonen-613944",
+      "data/operational_landed_cost_v1.json#unified-auksjonen-614953",
       "config/buyers/mahmoud_namsos_v1.json#MAHMOUD_NAMSOS_V1",
       "config/markets/no_v1.json#NO_DOMESTIC_V1"
     ],
@@ -108,9 +108,9 @@
       "handling.tail_lift_required",
       "handling.dismantling_required"
     ],
-    "opportunity_id": "unified-auksjonen-613944",
+    "opportunity_id": "unified-auksjonen-614953",
     "origin": {
-      "city": "Vigrestad",
+      "city": "Tønsberg",
       "coordinates": null,
       "country_code": "NO",
       "postal_code": null

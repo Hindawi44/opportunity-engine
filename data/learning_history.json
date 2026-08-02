@@ -1,8 +1,8 @@
 {
   "automatic_weight_updates": false,
-  "generated_at": "2026-08-02T08:37:01.900816+00:00",
+  "generated_at": "2026-08-02T13:54:02.457920+00:00",
   "mode": "OBSERVATION_ONLY",
-  "record_count": 8,
+  "record_count": 9,
   "records": [
     {
       "category": null,
@@ -178,7 +178,7 @@
       "expected_profit_nok": null,
       "first_observed_at": "2026-07-30T17:09:12.411838+00:00",
       "follow_up_status": "PENDING",
-      "last_observed_at": "2026-08-02T08:37:01.900816+00:00",
+      "last_observed_at": "2026-08-02T13:54:02.457920+00:00",
       "latest_decision": "WATCH",
       "maximum_safe_bid_nok": null,
       "missing_evidence": [
@@ -197,7 +197,7 @@
       "outcome_verified": false,
       "review_count": 0,
       "roi_percent": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d 2t 3m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     },
     {
@@ -227,6 +227,34 @@
       "roi_percent": null,
       "title": "2026 Garasjeinnredning Komplett verktøyskap med arbeidsbenk – Ny i eske å Tønsberg 67 bud 1t 51m 48s",
       "url": "https://www.auksjonen.no/auksjon/torget/2026_Garasjeinnredning_Komplett_verkt%C3%B8yskap_med_arbeidsbenk__Ny_i_eske_%C3%A5/614290"
+    },
+    {
+      "category": null,
+      "city": "Tønsberg",
+      "expected_profit_nok": null,
+      "first_observed_at": "2026-08-02T13:54:02.457920+00:00",
+      "follow_up_status": "PENDING",
+      "last_observed_at": "2026-08-02T13:54:02.457920+00:00",
+      "latest_decision": "WATCH",
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-614953",
+      "original_decision": "WATCH",
+      "outcome_status": "OBSERVING",
+      "outcome_verified": false,
+      "review_count": 0,
+      "roi_percent": null,
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+      "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     }
   ],
   "schema_version": 1

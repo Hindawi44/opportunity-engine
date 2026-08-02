@@ -21,11 +21,11 @@
   "selection_status": "SELECTED",
   "source_opportunity": {
     "final_decision": "WATCH",
-    "opportunity_id": "unified-auksjonen-613944",
-    "opportunity_score": 30.61,
-    "source_city": "Vigrestad",
-    "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
-    "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+    "opportunity_id": "unified-auksjonen-614953",
+    "opportunity_score": 33.26,
+    "source_city": "Tønsberg",
+    "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+    "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
   },
   "source_schema_version": "operational-transport-input-export-v1",
   "task_count": 8,
@@ -35,7 +35,7 @@
       "blocks_qualification": true,
       "current_value": null,
       "evidence_refs": [],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "priority": "HIGH",
       "question_ar": "كيف تم تجهيز البضاعة: مفردة، داخل صناديق، أم على طبالي؟",
       "question_nb": "Hvordan er varene pakket – løst, i esker eller på pall?",
@@ -45,7 +45,7 @@
       ],
       "source_channel": "LISTING_OR_SELLER",
       "status": "OPEN",
-      "task_id": "shipment-evidence-unified-auksjonen-613944-cargo-type-shipment-cargo-type",
+      "task_id": "shipment-evidence-unified-auksjonen-614953-cargo-type-shipment-cargo-type",
       "task_type": "CARGO_TYPE"
     },
     {
@@ -53,7 +53,7 @@
       "blocks_qualification": true,
       "current_value": null,
       "evidence_refs": [],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "priority": "CRITICAL",
       "question_ar": "هل يمكن تزويدنا بالوزن الإجمالي، والأبعاد بعد التغليف أو الحجم، وعدد الطبالي أو الطرود أو القطع؟",
       "question_nb": "Kan dere oppgi totalvekt, pakkede mål eller volum, og antall paller, kolli eller deler?",
@@ -68,7 +68,7 @@
       ],
       "source_channel": "LISTING_OR_SELLER",
       "status": "OPEN",
-      "task_id": "shipment-evidence-unified-auksjonen-613944-shipment-measurements-shipment-one-of-weight-volume-pallet-package-item-or-length",
+      "task_id": "shipment-evidence-unified-auksjonen-614953-shipment-measurements-shipment-one-of-weight-volume-pallet-package-item-or-length",
       "task_type": "SHIPMENT_MEASUREMENTS"
     },
     {
@@ -76,7 +76,7 @@
       "blocks_qualification": true,
       "current_value": null,
       "evidence_refs": [],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "priority": "HIGH",
       "question_ar": "هل سيكون الاستلام ذاتيًا، بسيارة توصيل، أم بواسطة شركة نقل وشحن؟",
       "question_nb": "Skal varene hentes selv, med budbil eller av transportør/fraktfirma?",
@@ -86,7 +86,7 @@
       ],
       "source_channel": "OPERATOR",
       "status": "OPEN",
-      "task_id": "shipment-evidence-unified-auksjonen-613944-transport-mode-transport-mode",
+      "task_id": "shipment-evidence-unified-auksjonen-614953-transport-mode-transport-mode",
       "task_type": "TRANSPORT_MODE"
     },
     {
@@ -94,7 +94,7 @@
       "blocks_qualification": true,
       "current_value": null,
       "evidence_refs": [],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "priority": "HIGH",
       "question_ar": "هل سيقوم البائع بتحميل البضاعة أم يجب على شركة النقل تحميلها؟",
       "question_nb": "Laster selger varene, eller må transportøren stå for lasting?",
@@ -104,7 +104,7 @@
       ],
       "source_channel": "LISTING_OR_SELLER",
       "status": "OPEN",
-      "task_id": "shipment-evidence-unified-auksjonen-613944-loading-requirement-handling-loading-required",
+      "task_id": "shipment-evidence-unified-auksjonen-614953-loading-requirement-handling-loading-required",
       "task_type": "LOADING_REQUIREMENT"
     },
     {
@@ -112,7 +112,7 @@
       "blocks_qualification": true,
       "current_value": null,
       "evidence_refs": [],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "priority": "HIGH",
       "question_ar": "هل نحتاج إلى مساعدة أو معدات عند تفريغ البضاعة في نامسوس؟",
       "question_nb": "Kreves det hjelp eller utstyr ved lossing i Namsos?",
@@ -122,7 +122,7 @@
       ],
       "source_channel": "BUYER_OR_CARRIER",
       "status": "OPEN",
-      "task_id": "shipment-evidence-unified-auksjonen-613944-unloading-requirement-handling-unloading-required",
+      "task_id": "shipment-evidence-unified-auksjonen-614953-unloading-requirement-handling-unloading-required",
       "task_type": "UNLOADING_REQUIREMENT"
     },
     {
@@ -130,7 +130,7 @@
       "blocks_qualification": true,
       "current_value": null,
       "evidence_refs": [],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "priority": "HIGH",
       "question_ar": "هل توجد رافعة شوكية عند الاستلام أم يجب على شركة النقل إحضار معدات الرفع؟",
       "question_nb": "Er truck tilgjengelig ved henting, eller må transportøren ha med løfteutstyr?",
@@ -140,7 +140,7 @@
       ],
       "source_channel": "LISTING_OR_SELLER",
       "status": "OPEN",
-      "task_id": "shipment-evidence-unified-auksjonen-613944-forklift-requirement-handling-forklift-required",
+      "task_id": "shipment-evidence-unified-auksjonen-614953-forklift-requirement-handling-forklift-required",
       "task_type": "FORKLIFT_REQUIREMENT"
     },
     {
@@ -148,7 +148,7 @@
       "blocks_qualification": true,
       "current_value": null,
       "evidence_refs": [],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "priority": "HIGH",
       "question_ar": "هل يلزم مصعد خلفي للشاحنة عند الاستلام أو التسليم؟",
       "question_nb": "Er bakløfter nødvendig ved henting eller levering?",
@@ -158,7 +158,7 @@
       ],
       "source_channel": "BUYER_OR_CARRIER",
       "status": "OPEN",
-      "task_id": "shipment-evidence-unified-auksjonen-613944-tail-lift-requirement-handling-tail-lift-required",
+      "task_id": "shipment-evidence-unified-auksjonen-614953-tail-lift-requirement-handling-tail-lift-required",
       "task_type": "TAIL_LIFT_REQUIREMENT"
     },
     {
@@ -166,7 +166,7 @@
       "blocks_qualification": true,
       "current_value": null,
       "evidence_refs": [],
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "priority": "HIGH",
       "question_ar": "هل البضاعة مفككة وجاهزة للنقل أم يجب تفكيكها أولًا؟",
       "question_nb": "Er varene demontert og klare for transport, eller må de demonteres først?",
@@ -176,7 +176,7 @@
       ],
       "source_channel": "LISTING_OR_SELLER",
       "status": "OPEN",
-      "task_id": "shipment-evidence-unified-auksjonen-613944-dismantling-requirement-handling-dismantling-required",
+      "task_id": "shipment-evidence-unified-auksjonen-614953-dismantling-requirement-handling-dismantling-required",
       "task_type": "DISMANTLING_REQUIREMENT"
     }
   ],

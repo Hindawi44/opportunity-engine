@@ -1,28 +1,28 @@
 {
   "follow_up_count": 2,
-  "generated_at": "2026-08-02T08:37:01.816328+00:00",
+  "generated_at": "2026-08-02T13:54:02.369702+00:00",
   "items": [
     {
       "blocking_reason_ar": "عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة",
-      "city": "Vigrestad",
-      "due_at": "2026-08-03T08:37:01.816328+00:00",
+      "city": "Tønsberg",
+      "due_at": "2026-08-03T13:54:02.369702+00:00",
       "expected_profit_nok": null,
       "final_decision": "WATCH",
       "maximum_safe_bid_nok": null,
       "next_action": "VERIFY_MARKET_PRICE",
-      "opportunity_id": "unified-auksjonen-613944",
+      "opportunity_id": "unified-auksjonen-614953",
       "owner": "SYSTEM",
       "priority": "HIGH",
       "requires_human_approval": false,
       "roi_percent": null,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
-      "updated_at": "2026-08-02T08:37:01.816328+00:00",
-      "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+      "updated_at": "2026-08-02T13:54:02.369702+00:00",
+      "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     },
     {
       "blocking_reason_ar": "عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة",
       "city": "Tønsberg",
-      "due_at": "2026-08-03T08:37:01.816328+00:00",
+      "due_at": "2026-08-03T13:54:02.369702+00:00",
       "expected_profit_nok": null,
       "final_decision": "WATCH",
       "maximum_safe_bid_nok": null,
@@ -32,8 +32,8 @@
       "priority": "HIGH",
       "requires_human_approval": false,
       "roi_percent": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d 2t 3m",
-      "updated_at": "2026-08-02T08:37:01.816328+00:00",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
+      "updated_at": "2026-08-02T13:54:02.369702+00:00",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     }
   ],

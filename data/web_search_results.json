@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-08-02T08:36:47.114276+00:00",
+  "generated_at": "2026-08-02T13:53:49.200950+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -124,17 +124,15 @@
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [
-        "Med et abonnement på Tekstilforum får du tilgang til hele arkivet vårt · Butikkinnredning - Emballasje - Accesoirer - Yttertøy - Undertøy - Belysning - Med mer · Viktig digitalt læringsprosjekt i Holzweiler · Virkes konjunkturrapport: Bransjejus ·"
-      ],
-      "id": "d2192f749651b034d4eb8136",
-      "language": "nb",
-      "published_at": "2022-09-05T10:02:35",
-      "snippet": "<strong>I august økte antallet konkurser med 42,9 prosent, sammenlignet med samme måned i fjor</strong>. Antallet ansatte som har mistet jobben som følge av konkurser har økt med hele 51,5 prosent.",
+      "extra_snippets": [],
+      "id": "ff05dbb792cccc1b5cc5b636",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
       "source": "Brave Search",
       "source_rank": 9,
-      "title": "(+) Sterk økning i antall konkurser",
-      "url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861"
+      "title": "Proff™ - Konkurser og tvangsaviklinger",
+      "url": "https://www.proff.no/konkurser"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -249,22 +247,6 @@
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
       "extra_snippets": [
-        "Opphørssalget starter torsdag 2/7 - varer hele sommeren. Mengder av sportsutstyr skal bort! Se hvilke butikker det gjelder her: tomming.gsport.no",
-        "G SPORT og G MAX OPPHØRSSALG!",
-        "Velkommen til opphørssalg!"
-      ],
-      "id": "ef2f88a92a8f9400d376d302",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Opphørssalget starter torsdag 2/7 - varer hele sommeren. Mengder av sportsutstyr skal bort! Se hvilke butikker det gjelder her: tomming.gsport.no",
-      "source": "Brave Search",
-      "source_rank": 7,
-      "title": "G SPORT og G MAX OPPHØRSSALG! - Lagersalg.no",
-      "url": "https://www.lagersalg.no/sport-og-fritid/-g-sport-og-g-max-opph-rssalg-2"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
         "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk.",
         "Din leverandør av butikkinventar og salgsfremmende produkter, et sortiment som spenner fra kroker og kleshengere til disker og prøverom. ... Ring eller skriv gjerne, hvis du har spørsmål. Vi tilbyr support både på e-post og telefon: 69 25 38 88. Vi legger oss i selen for å gi deg gode priser. Pålitelig standard inventar og butikktilbehør til konkurransedyktige priser.",
         "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
@@ -275,7 +257,7 @@
       "published_at": null,
       "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS&#x27; butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
       "source": "Brave Search",
-      "source_rank": 8,
+      "source_rank": 7,
       "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
       "url": "https://www.supersellers.no/"
     },
@@ -290,7 +272,7 @@
       "published_at": null,
       "snippet": "Skap det perfekte uttrykket for din butikk eller bedrift med SuperSellerS innredning og inventar. Våre produkter hjelper deg med å forme kundens opplevelse og tilhørighet til din bedrift. Utforsk våre e-kataloger og kontakt oss for personlig sparring. Besøk oss i Moss.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
       "url": "https://www.supersellers.no/katalog"
     },
@@ -305,9 +287,25 @@
       "published_at": "2025-03-10T17:54:57",
       "snippet": "Brukthandelloven regulerer handel med brukte og kasserte varer i Norge og gjelder for virksomheter som driver næringsvirksomhet med slike varer.",
       "source": "Brave Search",
-      "source_rank": 10,
+      "source_rank": 9,
       "title": "Lover og regler for salg av brukte varer - Oslo Frimarked",
       "url": "https://oslofrimarked.no/lover-og-regler-for-salg-av-brukte-varer/"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "Matbutikken er Norges nest største, kun slått av Obs! på City Lade. Men de få ekstra kvadratmeterne er ikke nok til å frarøve ladebutikken førsteplass. Byggeplass: Det jobbes flere steder i første og andre etasje. Foto: Stian Hansen · Noen få skritt unna pågår et annet byggeprosjekt. Coop-kiosken og informasjonen skal fornyes. Flere butikker har forsvunnet på få måneder.",
+        "Både de og jentegjengen til venstre på bildet vil ha flere butikker for dameklær. Foto: Stian Hansen ... Publisert: 12. mars 2022 kl. 21:00 Oppdatert: 13. mars 2022 kl. 11:34 Artikkelen er mer enn fire år gammel · Det store, hvite senteret sør for Trondheim er i endring. Noen lokaler er tømt og bygges om. Oppe i tredje har Lampehuset opphørssalg.",
+        "- Det kan absolutt komme flere motebutikker, svarer viseadministrerende direktør i Coop Midt-Norge, Bjørn Vik-Mo, på spørsmål Ane og Celinas ønsker vil bli tatt til følge. Rettet: Butikknavn endret til Norli."
+      ],
+      "id": "2b6fb81f747b1ea249e904ee",
+      "language": "nb",
+      "published_at": "2022-03-13T10:34:57",
+      "snippet": "Både de og jentegjengen til venstre på bildet vil ha flere butikker for dameklær. Foto: Stian Hansen ... Publisert: 12. mars 2022 kl. 21:00 Oppdatert: 13. mars 2022 kl. 11:34 Artikkelen er mer enn fire år gammel · Det store, hvite senteret sør for Trondheim er i endring. Noen lokaler er tømt og bygges om. Oppe i tredje har Lampehuset opphørssalg.",
+      "source": "Brave Search",
+      "source_rank": 10,
+      "title": "Én butikk har opphørssalg. To andre lokaler bygges om. - adressa.no",
+      "url": "https://www.adressa.no/okonomi/i/z7yOd4/en-butikk-har-opphoerssalg-to-andre-lokaler-bygges-om"
     },
     {
       "discovery_query": "varelager konkursbo Norge",
@@ -792,6 +790,20 @@
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
       "extra_snippets": [
+        "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk."
+      ],
+      "id": "7cad0e8a59e6e66434244c4f",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "<strong>SuperSellerS tilbyr butikkinnredning som dekker hele butikken</strong>: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert ...",
+      "source": "Brave Search",
+      "source_rank": 3,
+      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
+      "url": "https://www.supersellers.no/"
+    },
+    {
+      "discovery_query": "klesstativ utstillingsdukker selges Norge",
+      "extra_snippets": [
         "Våre produkter holder høy kvalitet, og vi fører et bredt sortiment av stålhyller, rillepanel, utstillingsdukker, display og mye mer. Hvorfor velge oss? – Over 15 års bransjeerfaring – Norsk leverandør med lager i Innlandet – Bredt og fleksibelt sortiment – Raske leveranser og personlig kundeservice – Profesjonell aktør – vi selger kun til bedrifter"
       ],
       "id": "c27bfbff55509642b99887ea",
@@ -799,25 +811,9 @@
       "published_at": "2025-11-12T11:53:03",
       "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 4,
       "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
       "url": "https://avabutikkinnredning.no/om-oss/"
-    },
-    {
-      "discovery_query": "klesstativ utstillingsdukker selges Norge",
-      "extra_snippets": [
-        "Naturtro proporsjoner er en naturlig holdning og fine ansiktstrekk kjennetegner utstillingsdukken fra tectake. Med sitt dreibare og vippbare hode og de bevegelige armene kan man alltid sette figuren på en ny måte. Dukkens eklsusive og moderne design harmonerer med forskjellige moter og tilbehør. Glassplaten med festere av aluminium sørger for at den står stabilt og gjør det mulig at dukken kan ha sko på. Om det er til vindusutstilling, som dekorasjon til en fest eller som et annerledes klesstativ, passer denne utstillingsdukken perfekt.",
-        "Naturtro proporsjoner er en naturlig holdning og fine ansiktstrekk kjennetegner utstillingsdukken fra tectake. Med sitt dreibare og vippbare hode og de bevegelige armene kan man alltid sette figuren på en ny måte.Les mer om produktet ... Marketplace - Produktet selges og leveres av vår Partner.",
-        "Utstillingsdukke - mannDette produktet er ikke rangert enda."
-      ],
-      "id": "d8adeb8c515443238a4bea04",
-      "language": "en",
-      "published_at": null,
-      "snippet": "Naturtro proporsjoner er en naturlig holdning og fine ansiktstrekk kjennetegner utstillingsdukken fra tectake. Med sitt dreibare og vippbare hode og de bevegelige armene kan man alltid sette figuren på en ny måte. Dukkens eklsusive og moderne design harmonerer med forskjellige moter og tilbehør. Glassplaten med festere av aluminium sørger for at den står stabilt og gjør det mulig at dukken kan ha sko på. Om det er til vindusutstilling, som dekorasjon til en fest eller som et annerledes klesstativ, passer denne utstillingsdukken perfekt.",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Utstillingsdukke - mann - Elkjøp | Elkjøp",
-      "url": "https://www.elkjop.no/product/tjenester-og-tilbehor/diverse-tilbehor/utstillingsdukke-mann/609127"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -839,6 +835,22 @@
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
       "extra_snippets": [
+        "Naturtro proporsjoner er en naturlig holdning og fine ansiktstrekk kjennetegner utstillingsdukken fra tectake. Med sitt dreibare og vippbare hode og de bevegelige armene kan man alltid sette figuren på en ny måte. Dukkens eklsusive og moderne design harmonerer med forskjellige moter og tilbehør. Glassplaten med festere av aluminium sørger for at den står stabilt og gjør det mulig at dukken kan ha sko på. Om det er til vindusutstilling, som dekorasjon til en fest eller som et annerledes klesstativ, passer denne utstillingsdukken perfekt.",
+        "Naturtro proporsjoner er en naturlig holdning og fine ansiktstrekk kjennetegner utstillingsdukken fra tectake. Med sitt dreibare og vippbare hode og de bevegelige armene kan man alltid sette figuren på en ny måte.Les mer om produktet ... Marketplace - Produktet selges og leveres av vår Partner.",
+        "Utstillingsdukke - mannDette produktet er ikke rangert enda."
+      ],
+      "id": "d8adeb8c515443238a4bea04",
+      "language": "en",
+      "published_at": null,
+      "snippet": "Naturtro proporsjoner er en naturlig holdning og fine ansiktstrekk kjennetegner utstillingsdukken fra tectake. Med sitt dreibare og vippbare hode og de bevegelige armene kan man alltid sette figuren på en ny måte. Dukkens eklsusive og moderne design harmonerer med forskjellige moter og tilbehør. Glassplaten med festere av aluminium sørger for at den står stabilt og gjør det mulig at dukken kan ha sko på. Om det er til vindusutstilling, som dekorasjon til en fest eller som et annerledes klesstativ, passer denne utstillingsdukken perfekt.",
+      "source": "Brave Search",
+      "source_rank": 6,
+      "title": "Utstillingsdukke - mann - Elkjøp | Elkjøp",
+      "url": "https://www.elkjop.no/product/tjenester-og-tilbehor/diverse-tilbehor/utstillingsdukke-mann/609127"
+    },
+    {
+      "discovery_query": "klesstativ utstillingsdukker selges Norge",
+      "extra_snippets": [
         "I motsetning til en tørketrommel, som bruker mye strøm, er et tørkestativ en helt passiv og kostnadsfri metode som i tillegg er mye mer skånsom mot tekstilene. Ved å lufttørke klærne på et Klesstativ, unngår man den harde slitasjen og krympingen som en tørketrommel kan forårsake, noe som forlenger levetiden på favorittplaggene dine betraktelig.",
         "Selges kun i varehus."
       ],
@@ -847,23 +859,9 @@
       "published_at": null,
       "snippet": "Tørk klærne effektivt inne eller ute med et solid tørkestativ. Vi har et bredt utvalg av sammenleggbare modeller for enhver plass. Kjøp ditt tørkestativ.",
       "source": "Brave Search",
-      "source_rank": 6,
+      "source_rank": 7,
       "title": "Tørkestativ | For effektiv og skånsom tørking av klær | Jula",
       "url": "https://www.jula.no/catalog/hjem-og-husholdning/klesvask-og-stell/klespleie/torkestativer/"
-    },
-    {
-      "discovery_query": "klesstativ utstillingsdukker selges Norge",
-      "extra_snippets": [
-        "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk."
-      ],
-      "id": "7cad0e8a59e6e66434244c4f",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "<strong>SuperSellerS tilbyr butikkinnredning som dekker hele butikken</strong>: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert ...",
-      "source": "Brave Search",
-      "source_rank": 7,
-      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
-      "url": "https://www.supersellers.no/"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -1087,6 +1085,18 @@
     },
     {
       "discovery_query": "lagerreoler selges Norge",
+      "extra_snippets": [],
+      "id": "bbaee8d1437e0f872a7da398",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Kjøp og selg brukte maskiner, kjøretøy, utstyr og overskuddsvarer på Norges største nettauksjon.",
+      "source": "Brave Search",
+      "source_rank": 3,
+      "title": "Lagerreoler og lagerinventar selges samlet",
+      "url": "https://www.auksjonen.no/auksjon/torget/Lagerreoler_og_lagerinventar_selges_samlet/563904"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
         "I vårt omfattende produktsortiment finner du et stort utvalg av lagerreoler og pallereoler, smarte hyllesystemer, lagerbokser og Eurokasser, samt praktiske løsninger for pakkemateriell, merking og plastlommer. Alle produkter kan bestilles direkte fra webshoppen her på siden. Klikk i kategoriene under og la deg inspirere i vår store og spennende produktkatalog · Vi leverer til virksomheter over hele fastlands-Norge, raskt og sikkert.",
         "Fundamentet i et velfungerende lager er robuste og velprøvde reoler. Slik kan gods og varer, verktøy og utstyr oppbevares på oversiktlig, sikker og effektivt vis. Hos Sono finner du et stort utvalg av lagerhyller, lagerreoler og pallereoler i forskjellige størrelser og utforminger.",
@@ -1097,21 +1107,23 @@
       "published_at": null,
       "snippet": "I vårt omfattende produktsortiment ... kategoriene under og la deg inspirere i vår store og spennende produktkatalog · <strong>Vi leverer til virksomheter over hele fastlands-Norge, raskt og sikkert</strong>....",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 4,
       "title": "Funksjonell lagerinnredning til lager og verksted | Sono",
       "url": "https://www.sono.no/lager-industri/lager.html"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
-      "extra_snippets": [],
-      "id": "bbaee8d1437e0f872a7da398",
-      "language": "no",
+      "extra_snippets": [
+        "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!"
+      ],
+      "id": "5cfdee104ddf209ca63fadf4",
+      "language": "nb",
       "published_at": null,
-      "snippet": "Kjøp og selg brukte maskiner, kjøretøy, utstyr og overskuddsvarer på Norges største nettauksjon.",
+      "snippet": "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!",
       "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Lagerreoler og lagerinventar selges samlet",
-      "url": "https://www.auksjonen.no/auksjon/torget/Lagerreoler_og_lagerinventar_selges_samlet/563904"
+      "source_rank": 5,
+      "title": "Lagerreoler | FINN-torget",
+      "url": "https://www.finn.no/recommerce/forsale/item/412276314"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -1124,23 +1136,9 @@
       "published_at": null,
       "snippet": "<strong>NoBolt småvare- og lagerreol</strong>: Et særdeles robust, fleksibelt og stilrent reolsystem uten noen form for skruer! NoBolt lagerreol er spesielt utviklet for oppbevaring av diverse varer, gods og utstyr i ulike vektklasser, og representerer det ...",
       "source": "Brave Search",
-      "source_rank": 5,
+      "source_rank": 6,
       "title": "Div. reoler / reol / lagerreol / småvarereol / universalreol / stålreol / arkiv | FINN-torget",
       "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "extra_snippets": [
-        "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!"
-      ],
-      "id": "5cfdee104ddf209ca63fadf4",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Lagerreoler | FINN-torget",
-      "url": "https://www.finn.no/recommerce/forsale/item/412276314"
     },
     {
       "discovery_query": "lagerreoler selges Norge",

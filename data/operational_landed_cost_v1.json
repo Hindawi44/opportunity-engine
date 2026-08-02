@@ -4,7 +4,7 @@
     "assumptions": [
       "No route, carrier quote, VAT rule, customs rule, or external price lookup was performed.",
       "The selected decision record remains the owner of final_decision and opportunity_score.",
-      "The source city is copied as Vigrestad; destination precision remains buyer-profile precision."
+      "The source city is copied as Tønsberg; destination precision remains buyer-profile precision."
     ],
     "complete_cash_required_range": null,
     "complete_net_economic_cost_range": null,
@@ -12,15 +12,15 @@
       {
         "component_id": "purchase_price",
         "economic_treatment": "ECONOMIC_COST",
-        "expected_nok": 5000.0,
-        "high_nok": 5000.0,
+        "expected_nok": 1600.0,
+        "high_nok": 1600.0,
         "label": "Current asking or bid price",
-        "low_nok": 5000.0,
+        "low_nok": 1600.0,
         "notes": [
           "This is the current asking or bid amount, not a final acquisition commitment."
         ],
         "required_for_qualification": true,
-        "source_ref": "data/decision_intelligence.json#unified-auksjonen-613944:asking_price_nok",
+        "source_ref": "data/decision_intelligence.json#unified-auksjonen-614953:asking_price_nok",
         "status": "CONFIRMED"
       },
       {
@@ -45,7 +45,7 @@
         "label": "Transport to buyer destination",
         "low_nok": null,
         "notes": [
-          "Transport is unknown from Vigrestad to Namsos."
+          "Transport is unknown from Tønsberg to Namsos."
         ],
         "required_for_qualification": true,
         "source_ref": null,
@@ -131,21 +131,21 @@
       "postal_code": null
     },
     "destination_precision": "CITY_LEVEL_INPUT_ONLY",
-    "estimate_id": "landed-cost-unified-auksjonen-613944-to-mahmoud_namsos_v1",
+    "estimate_id": "landed-cost-unified-auksjonen-614953-to-mahmoud_namsos_v1",
     "estimate_status": "PARTIAL_ESTIMATE",
     "evidence_refs": [
-      "data/decision_intelligence.json#unified-auksjonen-613944:record",
-      "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+      "data/decision_intelligence.json#unified-auksjonen-614953:record",
+      "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     ],
     "known_cash_required_range": {
-      "expected_nok": 5000.0,
-      "high_nok": 5000.0,
-      "low_nok": 5000.0
+      "expected_nok": 1600.0,
+      "high_nok": 1600.0,
+      "low_nok": 1600.0
     },
     "known_net_economic_cost_range": {
-      "expected_nok": 5000.0,
-      "high_nok": 5000.0,
-      "low_nok": 5000.0
+      "expected_nok": 1600.0,
+      "high_nok": 1600.0,
+      "low_nok": 1600.0
     },
     "known_recoverable_cash_outflow_range": {
       "expected_nok": 0,
@@ -170,7 +170,7 @@
       "other_costs",
       "vat"
     ],
-    "opportunity_id": "unified-auksjonen-613944",
+    "opportunity_id": "unified-auksjonen-614953",
     "qualification_readiness": {
       "ready": false,
       "status": "REQUIRES_COST_REVIEW"
@@ -191,17 +191,17 @@
   "selection_policy": "FIRST_RANKED_RECORD_WITH_KNOWN_ASKING_PRICE",
   "selection_reason": "Selected one operational decision record and copied only explicit cost values.",
   "selection_status": "SELECTED",
-  "source_generated_at": "2026-08-02T08:37:00.757856+00:00",
+  "source_generated_at": "2026-08-02T13:54:01.180634+00:00",
   "source_official_decision_field": "final_decision",
   "source_opportunity": {
-    "asking_price_nok": 5000.0,
+    "asking_price_nok": 1600.0,
     "final_decision": "WATCH",
-    "opportunity_id": "unified-auksjonen-613944",
-    "opportunity_score": 30.61,
-    "priority": 1,
-    "source_city": "Vigrestad",
-    "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
-    "url": "https://www.auksjonen.no/auksjon/torget/Stort_varelager_for_kj%C3%B8kken-_og_m%C3%B8belproduksjon_-_Blum_Hfele_Kessebbhmer_og_Blanco_beslag_-_m%C3%B8belplater_fronter_og_topplater_-_lim_og_kantb%C3%A5nd_-_skruer_h%C3%A5ndtak_og_festemateriell/613944"
+    "opportunity_id": "unified-auksjonen-614953",
+    "opportunity_score": 33.26,
+    "priority": 2,
+    "source_city": "Tønsberg",
+    "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+    "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
   },
   "source_schema_version": 2
 }
