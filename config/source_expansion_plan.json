@@ -1,118 +1,188 @@
 {
-  "schema_version": 2,
-  "phase": "source_coverage_audit_and_gap_closure",
+  "schema_version": 3,
+  "phase": "project_state_reconciled_multi_market_checkpoint_next",
+  "market_completion_matrix_path": "config/market_completion_matrix.json",
   "economic_ranking_policy": "enabled_for_verified_records_only",
-  "completion_rule": "A source is complete when it is ACTIVE with verified records, CODE_READY with documented activation requirements, BLOCKED_AUTH with explicit authorized-access requirements, or deliberately classified as PLANNED or DEPRECATED.",
+  "completion_rule": "Market-foundation completion, source implementation, runtime activation, daily-watch coverage, and current-opportunity state are separate dimensions. A complete market foundation does not require every planned source to be ACTIVE.",
+  "status_semantics": {
+    "audit_status": "Existing source runtime classification: ACTIVE, CODE_READY, BLOCKED_AUTH, PLANNED, or DEPRECATED.",
+    "implementation_status": "Secondary implementation state: NOT_IMPLEMENTED, BOUNDED_PILOT_IMPLEMENTED, DAILY_WATCH_IMPLEMENTED, or ACTIVE_IMPLEMENTATION.",
+    "current_opportunity_status": "Whether a current qualifying active opportunity is actually verified; this is independent of source implementation and runtime activation."
+  },
   "markets": [
     {
       "market": "Norway",
+      "market_code": "NO",
+      "market_foundation_status": "COMPLETE",
+      "source_network_status": "PARTIAL",
+      "restart_market": false,
       "sources": [
         {
           "source": "Auksjonen.no",
           "priority": 1,
-          "audit_status": "ACTIVE"
+          "audit_status": "ACTIVE",
+          "implementation_status": "ACTIVE_IMPLEMENTATION"
         },
         {
           "source": "FINN.no",
           "priority": 2,
-          "audit_status": "BLOCKED_AUTH"
+          "audit_status": "BLOCKED_AUTH",
+          "implementation_status": "BOUNDED_PILOT_IMPLEMENTED",
+          "activation_blocker": "official API access or explicit written browser permission is required"
         },
         {
           "source": "Konkurs.app",
           "priority": 3,
           "audit_status": "ACTIVE",
+          "implementation_status": "ACTIVE_IMPLEMENTATION",
           "channel": "bankruptcy_lead"
         },
         {
           "source": "Konkurskupp",
           "priority": 4,
-          "audit_status": "BLOCKED_AUTH"
+          "audit_status": "BLOCKED_AUTH",
+          "implementation_status": "NOT_IMPLEMENTED",
+          "activation_blocker": "authorized feed is required"
         },
         {
           "source": "Bjarøy",
           "priority": 5,
-          "audit_status": "BLOCKED_AUTH"
+          "audit_status": "BLOCKED_AUTH",
+          "implementation_status": "NOT_IMPLEMENTED",
+          "activation_blocker": "authorized feed is required"
         },
         {
           "source": "Konkursbo",
           "priority": 6,
-          "audit_status": "PLANNED"
+          "audit_status": "PLANNED",
+          "implementation_status": "NOT_IMPLEMENTED"
         },
         {
           "source": "Politiet.no",
           "priority": 7,
           "audit_status": "ACTIVE",
+          "implementation_status": "ACTIVE_IMPLEMENTATION",
           "channel": "public_auction_event_lead"
         },
         {
           "source": "Kommuner",
           "priority": 8,
-          "audit_status": "PLANNED"
+          "audit_status": "PLANNED",
+          "implementation_status": "NOT_IMPLEMENTED"
         },
         {
           "source": "Tolletaten",
           "priority": 9,
-          "audit_status": "PLANNED"
+          "audit_status": "PLANNED",
+          "implementation_status": "NOT_IMPLEMENTED"
         },
         {
           "source": "Bank auctions",
           "priority": 10,
-          "audit_status": "PLANNED"
+          "audit_status": "PLANNED",
+          "implementation_status": "NOT_IMPLEMENTED"
         }
       ]
     },
     {
       "market": "Sweden",
+      "market_code": "SE",
+      "market_foundation_status": "COMPLETE",
+      "source_network_status": "BOUNDED_PILOTS_IMPLEMENTED",
+      "restart_market": false,
+      "latest_validated_workflow": "Sweden Clothing Inventory Live Pilot",
+      "latest_validated_source_mode": "BLINTO",
+      "latest_current_opportunity_status": "NO_CONFIRMED_ACTIVE_OPPORTUNITY",
       "sources": [
         {
           "source": "PS Auction",
           "priority": 11,
           "audit_status": "PLANNED",
-          "channel": "public_auction_event_lead"
+          "runtime_status": "PLANNED",
+          "implementation_status": "BOUNDED_PILOT_IMPLEMENTED",
+          "channel": "public_auction_event_lead",
+          "public_access_audit": "BOUNDED_PUBLIC_SOURCE_PILOT_APPROVED",
+          "audit_document": "docs/PSAUCTION_PUBLIC_ACCESS_AUDIT_v1.md",
+          "activation_blocker": "main-branch live validation of a traceable bulk clothing opportunity has not been proven",
+          "production_ready": false
         },
         {
           "source": "Klaravik",
           "priority": 12,
           "audit_status": "PLANNED",
-          "channel": "public_auction_event_lead"
+          "runtime_status": "PLANNED",
+          "implementation_status": "BOUNDED_PILOT_IMPLEMENTED",
+          "channel": "public_auction_event_lead",
+          "public_access_audit": "BOUNDED_PUBLIC_SOURCE_PILOT_APPROVED",
+          "audit_document": "docs/KLARAVIK_PUBLIC_ACCESS_AUDIT_v1.md",
+          "activation_blocker": "main-branch live validation of a traceable bulk clothing opportunity has not been proven",
+          "production_ready": false
         },
         {
           "source": "Blinto",
           "priority": 13,
           "audit_status": "PLANNED",
-          "channel": "public_auction_event_lead"
+          "runtime_status": "PLANNED",
+          "implementation_status": "BOUNDED_PILOT_IMPLEMENTED",
+          "channel": "public_auction_event_lead",
+          "public_access_audit": "BOUNDED_SECONDARY_SOURCE_APPROVED",
+          "audit_document": "docs/BLINTO_PUBLIC_ACCESS_AUDIT_v1.md",
+          "live_validation_status": "PASS_WITH_HISTORICAL_RECORDS_ONLY",
+          "live_validation_evidence": {
+            "merged_candidates": 6,
+            "ended_or_historical": 6,
+            "confirmed_sales": 0,
+            "top5_count": 0,
+            "sqlite_persisted_record_count": 6,
+            "conversion_error_count": 0
+          },
+          "activation_blocker": "no current verified active clothing opportunity was produced by the validated run",
+          "production_ready": false
         }
       ]
     },
     {
       "market": "Denmark",
+      "market_code": "DK",
+      "market_foundation_status": "PLANNED",
+      "source_network_status": "NOT_STARTED",
+      "restart_market": false,
       "sources": [
         {
           "source": "Campen Auktioner",
           "priority": 14,
-          "audit_status": "PLANNED"
+          "audit_status": "PLANNED",
+          "implementation_status": "NOT_IMPLEMENTED"
         },
         {
           "source": "Danish liquidation auctions",
           "priority": 15,
-          "audit_status": "PLANNED"
+          "audit_status": "PLANNED",
+          "implementation_status": "NOT_IMPLEMENTED"
         }
       ]
     },
     {
       "market": "Germany",
+      "market_code": "DE",
+      "market_foundation_status": "COMPLETE",
+      "source_network_status": "ONE_ACTIVE_TWO_OPERATIONAL_WATCHES",
+      "restart_market": false,
+      "latest_current_opportunity_status": "NO_CONFIRMED_ACTIVE_OPPORTUNITY",
       "sources": [
         {
           "source": "Riegermann",
           "priority": 16,
           "audit_status": "ACTIVE",
           "runtime_status": "ACTIVE",
+          "implementation_status": "ACTIVE_IMPLEMENTATION",
           "channel": "public_auction_event_lead",
           "public_access_audit": "GO_FOR_BOUNDED_EVENT_ADAPTER",
           "audit_document": "docs/RIEGERMANN_PUBLIC_ACCESS_AUDIT_v1.md",
           "source_contract": "config/sources/de_riegermann_v1.json",
           "validated_auction_identity": "riegermann-auction:908",
           "activation_workflow": "Riegermann Active Clothing Auctions",
+          "watch_schedule_utc": "05:17",
           "activation_validated_at": "2026-08-02T13:09:00Z",
           "production_ready": true
         },
@@ -121,6 +191,7 @@
           "priority": 17,
           "audit_status": "PLANNED",
           "runtime_status": "PLANNED",
+          "implementation_status": "DAILY_WATCH_IMPLEMENTED",
           "channel": "public_auction_event_lead",
           "public_access_audit": "GO_FOR_BOUNDED_INDEX_AND_CATALOG_ADAPTER",
           "audit_document": "docs/VENTA_PUBLIC_ACCESS_AUDIT_v1.md",
@@ -137,6 +208,7 @@
           "priority": 18,
           "audit_status": "PLANNED",
           "runtime_status": "PLANNED",
+          "implementation_status": "DAILY_WATCH_IMPLEMENTED",
           "channel": "public_auction_event_lead",
           "public_access_audit": "GO_FOR_BOUNDED_INDEX_AND_ITEM_ADAPTER",
           "audit_document": "docs/DEUTSCHE_PFANDVERWERTUNG_PUBLIC_ACCESS_AUDIT_v1.md",
@@ -158,6 +230,9 @@
     "Keep sale listings, bankruptcy leads and auction-event leads in separate channels.",
     "Economic evaluation and ranking may run only for records whose required evidence is verified.",
     "Source expansion must not block safe evaluation of already verified records.",
+    "Do not restart Norway, Sweden, or Germany merely because an individual source is PLANNED or BLOCKED_AUTH.",
     "No automatic purchase, bid or external financial action is permitted."
-  ]
+  ],
+  "next_task": "MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT",
+  "next_task_document": "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
 }
