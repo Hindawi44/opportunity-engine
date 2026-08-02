@@ -26,6 +26,18 @@
       "https://auction.venta24.de/index.html"
     ],
     "auction_catalog_path_regex": "^/browse/search/1/block/(?P<slug>[^/]+)_(?P<catalog_block_id>[0-9]+)(?:/search_closed/y)?[.]html$",
+    "catalog_pagination_path": "/browse.php",
+    "catalog_pagination_required_query_keys": [
+      "block",
+      "page"
+    ],
+    "catalog_pagination_allowed_query_keys": [
+      "block",
+      "order_by_sort",
+      "page",
+      "search",
+      "search_closed"
+    ],
     "item_detail_path_regex": "^/item/id/(?P<auction_number>[0-9]+)_(?P<lot_number>[0-9]+)_.+_(?P<object_id>[0-9]+)[.]html$"
   },
   "identity_contract": {
@@ -35,12 +47,14 @@
     "catalog_block_identity_is_provisional": true,
     "auction_number_required_for_stable_opportunity": true,
     "lot_number_is_globally_unique": false,
-    "object_id_is_required_for_item_deduplication": true
+    "object_id_is_required_for_item_deduplication": true,
+    "pagination_must_preserve_catalog_block_id": true
   },
   "filter_contract": {
     "company_name_is_clothing_evidence": false,
     "explicit_inventory_summary_required": true,
     "catalog_or_lot_clothing_evidence_required": true,
+    "zero_count_category_label_is_clothing_evidence": false,
     "accepted_clothing_terms": [
       "Bekleidung",
       "Kleidung",
@@ -61,6 +75,7 @@
     "promote_verified_clothing_auction_event": true,
     "promote_single_garment_lot": false,
     "promote_explicit_bulk_lot": true,
+    "bulk_lot_requires_exact_item_verification": true,
     "single_garment_top5_eligible": false
   },
   "public_index_fields": [
@@ -119,6 +134,18 @@
     "false_positive_catalog_number": "5214",
     "false_positive_catalog_total_results": 1,
     "false_positive_only_item": "Porsche 911 Targa 4 GTS, Cabriolet, Hybrid Benzin/Elektro"
+  },
+  "watch_implementation": {
+    "implemented": true,
+    "implemented_at": "2026-08-02",
+    "workflow": "VENTA Active Clothing Watch",
+    "source_mode": "VENTA_ACTIVE_WATCH",
+    "schedule_utc": "05:47",
+    "inspect_all_selected_active_catalogs": true,
+    "complete_catalog_pagination": true,
+    "sqlite_persistence_enabled": true,
+    "zero_result_runs_are_valid": true,
+    "unverified_bulk_lots_are_promoted": false
   },
   "activation_requirements": {
     "live_clothing_catalog_required": true,
