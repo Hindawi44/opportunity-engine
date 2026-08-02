@@ -33,7 +33,7 @@ The Germany open-web mode remains available. The source-specific Riegermann work
 14. `.github/workflows/v2.7.2.4.2-bootstrap-pipeline-integration.yml`
 15. `.github/workflows/v2.7.2.4.3-external-evidence-execution-audit.yml`
 16. `.github/workflows/v2.7.2.4.4-brave-transport-response-audit.yml`
-17. `.github/workflows/v2.7.2.4.5-brave-response-content_audit.yml`
+17. `.github/workflows/v2.7.2.4.5-brave-response-content-audit.yml`
 18. `.github/workflows/v2.7.2.4.7-comparable-acceptance-audit.yml`
 19. `.github/workflows/v2.7.2.5-external-financial-final-score.yml`
 20. `.github/workflows/v2.8.1-external-market-comparables.yml`
