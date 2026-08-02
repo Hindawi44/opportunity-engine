@@ -73,7 +73,7 @@ def _candidate():
     }
 
 
-def test_germany_profile_loads_cross_border_identity_and_planned_sources():
+def test_germany_profile_loads_cross_border_identity_and_source_statuses():
     profile = load_germany_market_profile(ROOT)
     snapshot = build_germany_market_profile_snapshot(ROOT)
 
@@ -93,7 +93,15 @@ def test_germany_profile_loads_cross_border_identity_and_planned_sources():
         "VENTA Industrieversteigerungen",
         "Deutsche Pfandverwertung",
     }
-    assert all(row["runtime_status"] == "PLANNED" for row in sources)
+    status_by_source = {
+        row["source"]: row["runtime_status"]
+        for row in sources
+    }
+    assert status_by_source == {
+        "Riegermann": "CODE_READY",
+        "VENTA Industrieversteigerungen": "PLANNED",
+        "Deutsche Pfandverwertung": "PLANNED",
+    }
     assert all(row["qualification_mode"] == "SIGNAL_ONLY" for row in sources)
 
 
