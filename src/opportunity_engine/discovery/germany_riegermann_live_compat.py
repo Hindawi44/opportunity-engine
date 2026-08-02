@@ -78,7 +78,7 @@ def extract_riegermann_item_urls_compat(
     catalog_url: str,
     source_html: str,
     *,
-    limit: int = 1000,
+    limit: int = 10_000,
 ) -> tuple[str, ...]:
     """Extract relative or absolute exact Riegermann item links."""
     if limit < 1:
@@ -126,7 +126,12 @@ def extract_riegermann_catalog_page_urls_compat(
     current_offset = _catalog_offset(catalog_url)
     by_offset: dict[int, str] = {}
     for match in _HREF_RE.finditer(source_html):
-        href = html.unescape(match.group("href")).strip()
+        href = re.sub(
+            r"&(?:amp|#38|#x26);",
+            "&",
+            match.group("href"),
+            flags=re.I,
+        ).strip()
         if not href:
             continue
         candidate = urljoin(catalog_url, href)
