@@ -1,7 +1,7 @@
 {
   "candidate_count": 3,
   "errors": {},
-  "generated_at": "2026-08-02T13:54:00.446857+00:00",
+  "generated_at": "2026-08-02T19:34:08.649831+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
@@ -17,7 +17,7 @@
       "candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-08-02T13:53:56.718692+00:00",
+          "captured_at": "2026-08-02T19:34:03.558259+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
@@ -189,9 +189,9 @@
           "url": "https://www.finn.no/recommerce/forsale/search?category=0.90"
         },
         {
-          "canonical_url": "https://areol.no/butikk?add-to-cart=21337&product_count=32&product_orderby=price&product_view=list",
+          "canonical_url": "https://caroffice.no/categories/brukte-innredninger-pa-lager",
           "comparable_quantity": null,
-          "domain": "areol.no",
+          "domain": "caroffice.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
@@ -200,8 +200,8 @@
           "similarity_score": 0.0,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Butikk - Areol Innredninger AS",
-          "url": "https://areol.no/butikk/?add-to-cart=21337&product_count=32&product_orderby=price&product_view=list"
+          "title": "Brukte reoler på lager - CarOffice AS",
+          "url": "https://www.caroffice.no/categories/brukte-innredninger-pa-lager"
         },
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
@@ -308,21 +308,6 @@
           "url": "https://lagerbod.no/tonsberg/"
         },
         {
-          "canonical_url": "https://loppetur.no/finn-bruktbutikk/3105-tonsberg",
-          "comparable_quantity": null,
-          "domain": "loppetur.no",
-          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.111,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Bruktbutikker i postnummer 3105, Tønsberg - Loppetur",
-          "url": "https://www.loppetur.no/finn-bruktbutikk/3105-tonsberg"
-        },
-        {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -336,6 +321,21 @@
           "target_domain": null,
           "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
+        },
+        {
+          "canonical_url": "https://loppetur.no/finn-bruktbutikk/3105-tonsberg",
+          "comparable_quantity": null,
+          "domain": "loppetur.no",
+          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.111,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Bruktbutikker i postnummer 3105, Tønsberg - Loppetur",
+          "url": "https://www.loppetur.no/finn-bruktbutikk/3105-tonsberg"
         },
         {
           "canonical_url": "https://loppetur.no/finn-bruktbutikk/3111-tonsberg",
@@ -383,21 +383,6 @@
           "url": "https://www.finn.no/bap/forsale/ad.html?finnkode=266393631"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": "finn.no",
-          "title": "Reoler | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
-        },
-        {
           "canonical_url": "https://finn.no/recommerce/forsale/item/271228732",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -411,6 +396,21 @@
           "target_domain": "finn.no",
           "title": "GARASJEBOD-LAGERBOD TIL LEIE I TØNSBERG | FINN-torget",
           "url": "https://www.finn.no/recommerce/forsale/item/271228732"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Reoler | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.90",
@@ -436,7 +436,7 @@
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.0,
+          "similarity_score": 0.143,
           "source_quantity": 4,
           "target_domain": "finn.no",
           "title": "Lagerreol - småvarereol - galvanisert | FINN-torget",
@@ -473,21 +473,6 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
         },
         {
-          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=180403983",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": 4,
-          "target_domain": "finn.no",
-          "title": "Brukte Reoler Pallereoler og Lagerutstyr Kjøp & Salg | FINN-torget",
-          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=180403983"
-        },
-        {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=130002363",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -501,10 +486,25 @@
           "target_domain": "finn.no",
           "title": "Mobile reoler / kompaktarkiv / rullearkiv / lagerreoler / arkivreoler / reoler | FINN-torget",
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130002363"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/83193645",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Listverksreol | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/83193645"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 15t 5m 59s",
       "verified_comparable_count": 0
     },
     {
@@ -512,13 +512,13 @@
       "available_query_count": 8,
       "candidate_count": 2,
       "candidate_market_value_nok": null,
-      "candidate_price_max_nok": 1890.0,
-      "candidate_price_median_nok": 1845.0,
+      "candidate_price_max_nok": 2490.0,
+      "candidate_price_median_nok": 2145.0,
       "candidate_price_min_nok": 1800.0,
       "candidates": [
         {
           "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
-          "captured_at": "2026-08-02T13:53:59.901513+00:00",
+          "captured_at": "2026-08-02T19:34:07.945464+00:00",
           "comparable_quantity": null,
           "domain": "secundo.no",
           "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
@@ -540,25 +540,25 @@
           "verified": false
         },
         {
-          "canonical_url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-150x75-10031309422866",
-          "captured_at": "2026-08-02T13:53:59.902252+00:00",
+          "canonical_url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
+          "captured_at": "2026-08-02T19:34:07.946439+00:00",
           "comparable_quantity": null,
           "domain": "secundo.no",
           "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
           "observed_prices_nok": [
-            1890.0,
-            1512.0
+            2490.0,
+            1992.0
           ],
-          "price_nok": 1890.0,
+          "price_nok": 2490.0,
           "quantity_status": "UNKNOWN",
           "query_target_domain": null,
           "similarity_score": 0.4,
-          "snippet": "0 NOK0 NOK Salgspris <strong>1.890 NOK</strong> inkl. mva1.512 NOK eks.",
+          "snippet": "Vanlig pris <strong>2.490 NOK inkl. mva1.992 NOK</strong> eks.",
           "source": "Brave Search",
           "source_class": "independent_web",
           "source_quantity": 5,
-          "title": "Elektrisk hev/senk skrivebord 150x75 – Secundo",
-          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-150x75-10031309422866",
+          "title": "Elektrisk hev/senk skrivebord med hvit bordplate og grått understell – Secundo",
+          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
         }
@@ -639,6 +639,20 @@
           "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord"
         },
         {
+          "canonical_url": "https://secundo.no/produkter/til-kontoret/elektriske-hev-senk-skrivebord",
+          "comparable_quantity": null,
+          "domain": "secundo.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.364,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "Hev og senk skrivebord til salgs - Brukte elektriske pult – Secundo",
+          "url": "https://www.secundo.no/produkter/til-kontoret/elektriske-hev-senk-skrivebord/"
+        },
+        {
           "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -652,20 +666,6 @@
           "target_domain": null,
           "title": "Hev senk or elektrisk | Skrivebord | FINN Torget",
           "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk"
-        },
-        {
-          "canonical_url": "https://secundo.no/produkter/til-kontoret/elektriske-hev-senk-skrivebord",
-          "comparable_quantity": null,
-          "domain": "secundo.no",
-          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.364,
-          "source_quantity": 5,
-          "target_domain": null,
-          "title": "Hev og senk skrivebord til salgs - Brukte elektriske pult – Secundo",
-          "url": "https://www.secundo.no/produkter/til-kontoret/elektriske-hev-senk-skrivebord/"
         },
         {
           "canonical_url": "https://kontorsenteretostfold.no/products/nytt-elektrisk-hev-senk-skrivebord-hvit",
@@ -826,21 +826,6 @@
           "url": "https://kontorsenteretostfold.no/products/nytt-elektrisk-hev-senk-skrivebord-hvit"
         },
         {
-          "canonical_url": "https://ikea.com/no/no/cat/hev-senk-skrivebord-55008",
-          "comparable_quantity": null,
-          "domain": "ikea.com",
-          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.3,
-          "source_quantity": 5,
-          "target_domain": null,
-          "title": "Hev og senk pult - For en mer ergonomisk arbeidshverdag - IKEA",
-          "url": "https://www.ikea.com/no/no/cat/hev-senk-skrivebord-55008/"
-        },
-        {
           "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -854,6 +839,21 @@
           "target_domain": null,
           "title": "Hev senk or elektrisk | Skrivebord | FINN Torget",
           "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk"
+        },
+        {
+          "canonical_url": "https://ikea.com/no/no/cat/hev-senk-skrivebord-55008",
+          "comparable_quantity": null,
+          "domain": "ikea.com",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.3,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "Hev og senk pult - For en mer ergonomisk arbeidshverdag - IKEA",
+          "url": "https://www.ikea.com/no/no/cat/hev-senk-skrivebord-55008/"
         },
         {
           "canonical_url": "https://bruktekontormobler.no/produktkategori/hev-senk-skrivebord",
@@ -996,22 +996,23 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=451887271"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/373216825",
-          "comparable_quantity": null,
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=450501421",
+          "comparable_quantity": 18,
           "domain": "finn.no",
           "matched_query": "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
           "rejection_reasons": [
-            "missing_observed_nok_price"
+            "missing_observed_nok_price",
+            "quantity_mismatch"
           ],
-          "similarity_score": 0.75,
+          "similarity_score": 0.5,
           "source_quantity": 5,
           "target_domain": "finn.no",
-          "title": "BESTSELGENDE NYTT ELEKTRISK HEV/SENK HJØRNE-SKRIVEBORD 2 BEINS I MODERNE HVIT | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/373216825"
+          "title": "18 stk Elektrisk hev/senk skrivebord understell, grå, 120-140 cm | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=450501421"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 18t 1m",
       "verified_comparable_count": 0
     }
   ],

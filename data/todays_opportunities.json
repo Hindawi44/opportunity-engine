@@ -630,7 +630,7 @@
     }
   ],
   "buy_count": 0,
-  "deduplicated_count": 41,
+  "deduplicated_count": 42,
   "discovery_by_id": {
     "unified-auksjonen-431851": {
       "discovery_score": 16.0,
@@ -917,25 +917,6 @@
         "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
       ]
     },
-    "unified-auksjonen-608109": {
-      "discovery_score": 16.0,
-      "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-608109",
-      "reasons": [
-        "درجة جودة الفرصة الأساسية 16/100."
-      ],
-      "requires_immediate_review": false,
-      "signals": [],
-      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
-      "tier": "low",
-      "tier_label": "⚪ أولوية منخفضة",
-      "warnings": [
-        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
-        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
-        "موثوقية البائع غير متحققة.",
-        "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
-      ]
-    },
     "unified-auksjonen-608112": {
       "discovery_score": 16.0,
       "is_exceptional": false,
@@ -1146,11 +1127,11 @@
       ]
     },
     "unified-auksjonen-615315": {
-      "discovery_score": 11.5,
+      "discovery_score": 16.0,
       "is_exceptional": false,
       "opportunity_id": "unified-auksjonen-615315",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 12/100."
+        "درجة جودة الفرصة الأساسية 16/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -1165,11 +1146,11 @@
       ]
     },
     "unified-auksjonen-615316": {
-      "discovery_score": 11.5,
+      "discovery_score": 16.0,
       "is_exceptional": false,
       "opportunity_id": "unified-auksjonen-615316",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 12/100."
+        "درجة جودة الفرصة الأساسية 16/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -1184,11 +1165,11 @@
       ]
     },
     "unified-auksjonen-615317": {
-      "discovery_score": 11.5,
+      "discovery_score": 16.0,
       "is_exceptional": false,
       "opportunity_id": "unified-auksjonen-615317",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 12/100."
+        "درجة جودة الفرصة الأساسية 16/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -1354,6 +1335,25 @@
         "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
       ]
     },
+    "unified-auksjonen-615592": {
+      "discovery_score": 16.0,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-615592",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 16/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة.",
+        "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
+      ]
+    },
     "unified-auksjonen-615593": {
       "discovery_score": 16.0,
       "is_exceptional": false,
@@ -1410,13 +1410,32 @@
         "موثوقية البائع غير متحققة.",
         "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
       ]
+    },
+    "unified-auksjonen-615833": {
+      "discovery_score": 16.0,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-615833",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 16/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة.",
+        "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
+      ]
     }
   },
   "duplicate_count": 0,
   "duplicate_groups_merged": 0,
-  "extracted_count": 41,
-  "fetched_count": 66,
-  "generated_at": "2026-08-02T13:53:53.493720+00:00",
+  "extracted_count": 42,
+  "fetched_count": 67,
+  "generated_at": "2026-08-02T19:34:01.085925+00:00",
   "history_path": "data/price_history.json",
   "intelligence_by_id": {
     "unified-auksjonen-431851": {
@@ -1945,41 +1964,6 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
-    "unified-auksjonen-608109": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-608109",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
     "unified-auksjonen-608112": {
       "confidence": "insufficient",
       "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
@@ -2369,7 +2353,7 @@
     },
     "unified-auksjonen-615315": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 12/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -2377,7 +2361,6 @@
         "قيمة إعادة بيع محافظة.",
         "التكلفة النهائية الكاملة.",
         "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند purchase_price_nok.",
         "تكلفة مؤكدة للبند auction_fee_nok.",
         "تكلفة مؤكدة للبند vat_status.",
         "تكلفة مؤكدة للبند transport_nok.",
@@ -2405,7 +2388,7 @@
     },
     "unified-auksjonen-615316": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 12/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -2413,7 +2396,6 @@
         "قيمة إعادة بيع محافظة.",
         "التكلفة النهائية الكاملة.",
         "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند purchase_price_nok.",
         "تكلفة مؤكدة للبند auction_fee_nok.",
         "تكلفة مؤكدة للبند vat_status.",
         "تكلفة مؤكدة للبند transport_nok.",
@@ -2441,7 +2423,7 @@
     },
     "unified-auksjonen-615317": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 12/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -2449,7 +2431,6 @@
         "قيمة إعادة بيع محافظة.",
         "التكلفة النهائية الكاملة.",
         "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند purchase_price_nok.",
         "تكلفة مؤكدة للبند auction_fee_nok.",
         "تكلفة مؤكدة للبند vat_status.",
         "تكلفة مؤكدة للبند transport_nok.",
@@ -2755,6 +2736,41 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
+    "unified-auksjonen-615592": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-615592",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
     "unified-auksjonen-615593": {
       "confidence": "insufficient",
       "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
@@ -2861,10 +2877,45 @@
         "الأصل يبدو سهل إعادة البيع نسبيًا وفق وصف الإعلان."
       ],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم نقطة قوة: الأصل يبدو سهل إعادة البيع نسبيًا وفق وصف الإعلان. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
+    "unified-auksjonen-615833": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-615833",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     }
   },
   "keyword": null,
-  "monitor_count": 41,
+  "monitor_count": 42,
   "reject_count": 0,
   "report_date": "2026-08-02",
   "rows": [
@@ -2891,9 +2942,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 1600.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 1600.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 1600.0,
       "market_comparable_count": 0,
@@ -2943,7 +2994,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 18t 1m",
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -2974,9 +3025,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 500.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 500.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 500.0,
       "market_comparable_count": 0,
@@ -3026,7 +3077,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Living Flame Peisbord 5 stk Enjoy Camp Ytre enebakk 1 bud 3d 22t 32m",
+      "title": "Living Flame Peisbord 5 stk Enjoy Camp Ytre enebakk 1 bud 3d 16t 52m",
       "url": "https://www.auksjonen.no/auksjon/torget/Living_Flame_Peisbord_5_stk_Enjoy_Camp/615674",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3057,9 +3108,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 10700.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 10700.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 10700.0,
       "market_comparable_count": 0,
@@ -3109,7 +3160,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Uten minstepris! Helt nytt i esker, lekker garasjeinnredning komplett! Tønsberg 29 bud 1d 23t 12m",
+      "title": "Uten minstepris! Helt nytt i esker, lekker garasjeinnredning komplett! Tønsberg 29 bud 1d 17t 31m",
       "url": "https://www.auksjonen.no/auksjon/torget/Uten_minstepris_Helt_nytt_i_esker_lekker_garasjeinnredning_komplett/615584",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3140,9 +3191,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 200.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 200.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 200.0,
       "market_comparable_count": 0,
@@ -3192,7 +3243,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "24 stk komplette basketball return nett! Helt nye! Vi rydder lageret å selges uten minstepris! Tønsberg 2 bud 21t 4m 9s",
+      "title": "24 stk komplette basketball return nett! Helt nye! Vi rydder lageret å selges uten minstepris! Tønsberg 2 bud 15t 24m 2s",
       "url": "https://www.auksjonen.no/auksjon/torget/24_stk_komplette_basketball_return_nett_Helt_nye_Vi_rydder_lageret_%C3%A5_selges_uten_minstepris_/614687",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3223,9 +3274,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 900.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 900.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 900.0,
       "market_comparable_count": 0,
@@ -3275,7 +3326,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "8 stk komplette basketball kurver! Nye i esker! Vi rydder lageret å selger uten minstepris Tønsberg 9 bud 2d 20t 36m",
+      "title": "8 stk komplette basketball kurver! Nye i esker! Vi rydder lageret å selger uten minstepris Tønsberg 9 bud 2d 14t 56m",
       "url": "https://www.auksjonen.no/auksjon/torget/8_stk_komplette_basketball_kurver_Nye_i_esker_Vi_rydder_lageret_%C3%A5_selger_uten_minstepris_/614682",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3306,9 +3357,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 1100.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 1100.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 1100.0,
       "market_comparable_count": 0,
@@ -3358,7 +3409,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "8 stk komplette basketball stativ 182 selges! Vi rydder lager! Uten minstepris Tønsberg 6 bud 1d 20t 36m",
+      "title": "8 stk komplette basketball stativ 182 selges! Vi rydder lager! Uten minstepris Tønsberg 6 bud 1d 14t 56m",
       "url": "https://www.auksjonen.no/auksjon/torget/8_stk_komplette_basketball_stativ_182_selges_Vi_rydder_lager_Uten_minstepris_/614674",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3389,9 +3440,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 5900.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 5900.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 5900.0,
       "market_comparable_count": 0,
@@ -3441,7 +3492,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 15t 5m 59s",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3472,9 +3523,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 20900.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 20900.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 20900.0,
       "market_comparable_count": 0,
@@ -3524,7 +3575,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "94,35 m2 HEL PALL MED 15mm høykvalitets PREMIUM LAMINATGULV SELGES Tolvsrød 203 bud 3d 23t 6m",
+      "title": "94,35 m2 HEL PALL MED 15mm høykvalitets PREMIUM LAMINATGULV SELGES Tolvsrød 203 bud 3d 17t 26m",
       "url": "https://www.auksjonen.no/auksjon/torget/9435_m2_HEL_PALL_MED_15mm_h%C3%B8ykvalitets_PREMIUM_LAMINATGULV_SELGES/613877",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3555,9 +3606,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 500.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 500.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 500.0,
       "market_comparable_count": 0,
@@ -3607,7 +3658,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Parti med kluter- 1 stor pall med 1530 stk Ytre enebakk 2 bud 2d 21t 36m",
+      "title": "Parti med kluter- 1 stor pall med 1530 stk Ytre enebakk 2 bud 2d 15t 56m",
       "url": "https://www.auksjonen.no/auksjon/torget/Parti_med_kluter-_1_stor_pall_med_1530_stk/605821",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3638,9 +3689,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 2500.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "highest_price_nok": 2500.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 2500.0,
       "market_comparable_count": 0,
@@ -3690,7 +3741,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Pall med Simpson Strong-Tie Quik Drive WSV51E Skruer - 62 Esker Uggdal 3 bud 8d 3t 18m",
+      "title": "Pall med Simpson Strong-Tie Quik Drive WSV51E Skruer - 62 Esker Uggdal 3 bud 7d 21t 38m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Pall_med_Simpson_Strong-Tie_Quik_Drive_WSV51E_Skruer_-_62_Esker/599803",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3699,7 +3750,7 @@
       ]
     },
     {
-      "asking_price_nok": 5000.0,
+      "asking_price_nok": 750.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3720,12 +3771,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 5000.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 5000.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 750.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 750.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 5000.0,
+      "lowest_price_nok": 750.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3734,7 +3785,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615594",
+      "opportunity_id": "unified-auksjonen-615833",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3773,8 +3824,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "60stk 10w Ecovista Dimbare Led Spotter WHITE! Helt nye moderne og kvalitets Led spotter! Ecovista Tolvsrød 20 bud 4d 20t 56m",
-      "url": "https://www.auksjonen.no/auksjon/torget/60stk_10w_Ecovista_Dimbare_Led_Spotter_WHITE_Helt_nye_moderne_og_kvalitets_Led_spotter_Ecovista/615594",
+      "title": "600 stk. Star Zone Solbriller Strømmen 3 bud 4d 15t 46m",
+      "url": "https://www.auksjonen.no/auksjon/torget/600_stk_Star_Zone_Solbriller/615833",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3782,7 +3833,7 @@
       ]
     },
     {
-      "asking_price_nok": 400.0,
+      "asking_price_nok": 5000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3803,12 +3854,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 400.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 400.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 5000.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 5000.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 400.0,
+      "lowest_price_nok": 5000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3817,7 +3868,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615593",
+      "opportunity_id": "unified-auksjonen-615594",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3856,8 +3907,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "60 stk LED Downlights ECOVISTA – 15W IP65 (2700–3200K) Tolvsrød 4 bud 2d 22t 46m",
-      "url": "https://www.auksjonen.no/auksjon/torget/60_stk_LED_Downlights_ECOVISTA__15W_IP65_27003200K/615593",
+      "title": "60stk 10w Ecovista Dimbare Led Spotter WHITE! Helt nye moderne og kvalitets Led spotter! Ecovista Tolvsrød 20 bud 4d 15t 16m",
+      "url": "https://www.auksjonen.no/auksjon/torget/60stk_10w_Ecovista_Dimbare_Led_Spotter_WHITE_Helt_nye_moderne_og_kvalitets_Led_spotter_Ecovista/615594",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3865,7 +3916,7 @@
       ]
     },
     {
-      "asking_price_nok": 250.0,
+      "asking_price_nok": 400.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3886,12 +3937,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 250.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 250.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 400.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 400.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 250.0,
+      "lowest_price_nok": 400.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3900,7 +3951,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615444",
+      "opportunity_id": "unified-auksjonen-615593",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3939,8 +3990,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Monaco Sengegavl 10 stk Ytre enebakk 1 bud 2d 21t 4m",
-      "url": "https://www.auksjonen.no/auksjon/torget/Monaco_Sengegavl_10_stk/615444",
+      "title": "60 stk LED Downlights ECOVISTA – 15W IP65 (2700–3200K) Tolvsrød 4 bud 2d 17t 6m",
+      "url": "https://www.auksjonen.no/auksjon/torget/60_stk_LED_Downlights_ECOVISTA__15W_IP65_27003200K/615593",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3948,7 +3999,7 @@
       ]
     },
     {
-      "asking_price_nok": 250.0,
+      "asking_price_nok": 14000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3969,12 +4020,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 250.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 250.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 14000.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 14000.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 250.0,
+      "lowest_price_nok": 14000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3983,7 +4034,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615443",
+      "opportunity_id": "unified-auksjonen-615592",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4022,8 +4073,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "10 stk Rattan Sengegavl i sort rotting 180 x 120 cm. 10 stk Ytre enebakk 1 bud 2d 21t 16m",
-      "url": "https://www.auksjonen.no/auksjon/torget/10_stk_Rattan_Sengegavl_i_sort_rotting_180_x_120_cm_10_stk/615443",
+      "title": "Helt ny garasjeinnredning! I esker! Tønsberg 14 bud 3d 15t 55m",
+      "url": "https://www.auksjonen.no/auksjon/torget/Helt_ny_garasjeinnredning_I_esker/615592",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4031,7 +4082,7 @@
       ]
     },
     {
-      "asking_price_nok": 9500.0,
+      "asking_price_nok": 250.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4052,12 +4103,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 9500.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 9500.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 250.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 250.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 9500.0,
+      "lowest_price_nok": 250.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4066,7 +4117,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615428",
+      "opportunity_id": "unified-auksjonen-615444",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4105,8 +4156,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Helt ny kvalitet Garasjeinnredning, med full garanti! Tønsberg 56 bud 2d 21t 30m",
-      "url": "https://www.auksjonen.no/auksjon/torget/Helt_ny_kvalitet__Garasjeinnredning_med_full_garanti/615428",
+      "title": "Monaco Sengegavl 10 stk Ytre enebakk 1 bud 2d 15t 24m",
+      "url": "https://www.auksjonen.no/auksjon/torget/Monaco_Sengegavl_10_stk/615444",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4114,7 +4165,7 @@
       ]
     },
     {
-      "asking_price_nok": 500.0,
+      "asking_price_nok": 250.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4135,12 +4186,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 500.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 500.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 250.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 250.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 500.0,
+      "lowest_price_nok": 250.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4149,7 +4200,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615422",
+      "opportunity_id": "unified-auksjonen-615443",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4188,8 +4239,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "60 stykk 7w Ecovista Dimbare Moderne Led Spotter. BLACK EDITION. Helt nye! Ecovista Tolvsrød 5 bud 2d 21t 0m",
-      "url": "https://www.auksjonen.no/auksjon/torget/60_stykk_7w_Ecovista_Dimbare_Moderne_Led_Spotter_BLACK_EDITION_Helt_nye_Ecovista/615422",
+      "title": "10 stk Rattan Sengegavl i sort rotting 180 x 120 cm. 10 stk Ytre enebakk 1 bud 2d 15t 36m",
+      "url": "https://www.auksjonen.no/auksjon/torget/10_stk_Rattan_Sengegavl_i_sort_rotting_180_x_120_cm_10_stk/615443",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4197,7 +4248,7 @@
       ]
     },
     {
-      "asking_price_nok": 750.0,
+      "asking_price_nok": 10000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4218,12 +4269,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 750.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 750.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 10000.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 10000.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 750.0,
+      "lowest_price_nok": 10000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4232,7 +4283,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615420",
+      "opportunity_id": "unified-auksjonen-615428",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4271,8 +4322,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2025 20 stykker Luxnor Led Lyskaster 200W! Kvalitet - Helt nye! Luxnor Tolvsrød 3 bud 2d 21t 2m",
-      "url": "https://www.auksjonen.no/auksjon/torget/2025_20_stykker_Luxnor_Led_Lyskaster_200W_Kvalitet_-_Helt_nye_Luxnor/615420",
+      "title": "Helt ny kvalitet Garasjeinnredning, med full garanti! Tønsberg 58 bud 2d 15t 49m",
+      "url": "https://www.auksjonen.no/auksjon/torget/Helt_ny_kvalitet__Garasjeinnredning_med_full_garanti/615428",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4280,7 +4331,7 @@
       ]
     },
     {
-      "asking_price_nok": 500.0,
+      "asking_price_nok": 700.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4301,12 +4352,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 500.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 500.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 700.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 700.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 500.0,
+      "lowest_price_nok": 700.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4315,7 +4366,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615419",
+      "opportunity_id": "unified-auksjonen-615422",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4354,8 +4405,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "60 stk LED dimmbare Downlights ECOVISTA – 15W IP65 (2700–3200K) Tolvsrød 5 bud 20t 39m 9s",
-      "url": "https://www.auksjonen.no/auksjon/torget/60_stk_LED_dimmbare_Downlights_ECOVISTA__15W_IP65_27003200K/615419",
+      "title": "60 stykk 7w Ecovista Dimbare Moderne Led Spotter. BLACK EDITION. Helt nye! Ecovista Tolvsrød 7 bud 2d 15t 20m",
+      "url": "https://www.auksjonen.no/auksjon/torget/60_stykk_7w_Ecovista_Dimbare_Moderne_Led_Spotter_BLACK_EDITION_Helt_nye_Ecovista/615422",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4363,7 +4414,7 @@
       ]
     },
     {
-      "asking_price_nok": 2000.0,
+      "asking_price_nok": 750.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4384,12 +4435,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 2000.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 2000.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 750.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 750.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 2000.0,
+      "lowest_price_nok": 750.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4398,7 +4449,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615418",
+      "opportunity_id": "unified-auksjonen-615420",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4437,8 +4488,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "5 Stk helt nye Dieseldrevet Parkeringsvarmer 12V! Helt NYE!! Robust og effektiv luftvarmer! 12V5KW Tolvsrød 4 bud 1d 22t 56m",
-      "url": "https://www.auksjonen.no/auksjon/torget/5_Stk_helt_nye_Dieseldrevet_Parkeringsvarmer_12V_Helt_NYE_Robust_og_effektiv_luftvarmer_12V5KW/615418",
+      "title": "2025 20 stykker Luxnor Led Lyskaster 200W! Kvalitet - Helt nye! Luxnor Tolvsrød 3 bud 2d 15t 22m",
+      "url": "https://www.auksjonen.no/auksjon/torget/2025_20_stykker_Luxnor_Led_Lyskaster_200W_Kvalitet_-_Helt_nye_Luxnor/615420",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4446,7 +4497,7 @@
       ]
     },
     {
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 600.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4467,12 +4518,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 100.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 100.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 600.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 600.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 100.0,
+      "lowest_price_nok": 600.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4481,7 +4532,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615121",
+      "opportunity_id": "unified-auksjonen-615419",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4520,8 +4571,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "HÅNDBALLER - PARTI - CA 700 STK Kristiansand s 1 bud 2d 23t 49m",
-      "url": "https://www.auksjonen.no/auksjon/torget/H%C3%85NDBALLER_-_PARTI_-_CA_700_STK_/615121",
+      "title": "60 stk LED dimmbare Downlights ECOVISTA – 15W IP65 (2700–3200K) Tolvsrød 6 bud 14t 59m 2s",
+      "url": "https://www.auksjonen.no/auksjon/torget/60_stk_LED_dimmbare_Downlights_ECOVISTA__15W_IP65_27003200K/615419",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4529,7 +4580,7 @@
       ]
     },
     {
-      "asking_price_nok": 3100.0,
+      "asking_price_nok": 2000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4550,12 +4601,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 3100.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 3100.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 2000.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 2000.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 3100.0,
+      "lowest_price_nok": 2000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4564,7 +4615,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-614788",
+      "opportunity_id": "unified-auksjonen-615418",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4603,8 +4654,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Helt nytt drivhus – emballasjen har vannskade Tønsberg 31 bud 1d 23t 34m",
-      "url": "https://www.auksjonen.no/auksjon/torget/Helt_nytt_drivhus__emballasjen_har_vannskade/614788",
+      "title": "5 Stk helt nye Dieseldrevet Parkeringsvarmer 12V! Helt NYE!! Robust og effektiv luftvarmer! 12V5KW Tolvsrød 4 bud 1d 17t 16m",
+      "url": "https://www.auksjonen.no/auksjon/torget/5_Stk_helt_nye_Dieseldrevet_Parkeringsvarmer_12V_Helt_NYE_Robust_og_effektiv_luftvarmer_12V5KW/615418",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4612,7 +4663,7 @@
       ]
     },
     {
-      "asking_price_nok": 118000.0,
+      "asking_price_nok": 500.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4633,12 +4684,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 118000.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 118000.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 500.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 500.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 118000.0,
+      "lowest_price_nok": 500.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4647,7 +4698,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-614297",
+      "opportunity_id": "unified-auksjonen-615317",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4686,8 +4737,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "70 ubrukte ruller naturgummi 3 mm, 980 m² Klæbu 06.08.2026",
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/70_ubrukte_ruller_naturgummi_3_mm_980_m/614297",
+      "title": "MicroDuct HDPE 12 mm mikrorør Orkanger 1 bud 1d 15t 27m",
+      "url": "https://www.auksjonen.no/auksjon/torget/MicroDuct_HDPE_12_mm_mikror%C3%B8r_/615317",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4695,7 +4746,7 @@
       ]
     },
     {
-      "asking_price_nok": 12000.0,
+      "asking_price_nok": 500.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4716,12 +4767,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 12000.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 12000.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 500.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 500.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 12000.0,
+      "lowest_price_nok": 500.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4730,7 +4781,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-608117",
+      "opportunity_id": "unified-auksjonen-615316",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4769,8 +4820,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "96 METER PIPELIFE 250/218 mm Pragma DV drensrør toppsl. m/muffe u/pakn. L=6m Stokke 8 bud 1d 3t 50m",
-      "url": "https://www.auksjonen.no/auksjon/torget/96_METER_PIPELIFE_250218_mm_Pragma_DV_drensr%C3%B8r_toppsl_mmuffe_upakn_L6m/608117",
+      "title": "Stort parti Hexatronic mikrorør og singelrør til fiberanlegg Hexatronic Orkanger 1 bud 1d 15t 36m",
+      "url": "https://www.auksjonen.no/auksjon/torget/Stort_parti_Hexatronic_mikror%C3%B8r_og_singelr%C3%B8r_til_fiberanlegg_Hexatronic/615316",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4778,7 +4829,7 @@
       ]
     },
     {
-      "asking_price_nok": 7000.0,
+      "asking_price_nok": 500.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4799,12 +4850,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 7000.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 7000.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 500.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 500.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 7000.0,
+      "lowest_price_nok": 500.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4813,7 +4864,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-608112",
+      "opportunity_id": "unified-auksjonen-615315",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4852,8 +4903,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Pipelife Pragma PP SN8 overvannsrør – DN160 og DN200 Stokke 2 bud 4d 2t 16m",
-      "url": "https://www.auksjonen.no/auksjon/torget/Pipelife_Pragma_PP_SN8_overvannsr%C3%B8r__DN160_og_DN200/608112",
+      "title": "Stort parti Hexatronic mikrorør – 4x7 mm og 7x7 mm Hexatronic mikrorør – 4x7 mm og 7x7 mm Orkanger 1 bud 1d 15t 41m",
+      "url": "https://www.auksjonen.no/auksjon/torget/Stort_parti_Hexatronic_mikror%C3%B8r__4x7_mm_og_7x7_mm_Hexatronic_mikror%C3%B8r__4x7_mm_og_7x7_mm/615315",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4861,7 +4912,7 @@
       ]
     },
     {
-      "asking_price_nok": 25000.0,
+      "asking_price_nok": 100.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4882,12 +4933,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 25000.0,
-      "first_seen_at": "2026-08-02T13:53:53.493720+00:00",
-      "highest_price_nok": 25000.0,
-      "last_seen_at": "2026-08-02T13:53:53.493720+00:00",
+      "first_price_nok": 100.0,
+      "first_seen_at": "2026-08-02T19:34:01.085925+00:00",
+      "highest_price_nok": 100.0,
+      "last_seen_at": "2026-08-02T19:34:01.085925+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 25000.0,
+      "lowest_price_nok": 100.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4896,7 +4947,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-608109",
+      "opportunity_id": "unified-auksjonen-615121",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -4935,8 +4986,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "1200 METER INFRAPLAST PP_HM KABELRØR Ø110 SN8 - Produsert høsten 2025 Stokke 7 bud 3t 6m 9s",
-      "url": "https://www.auksjonen.no/auksjon/torget/1200_METER_INFRAPLAST_PP_HM_KABELR%C3%98R_%C3%98110_SN8_-_Produsert_h%C3%B8sten_2025/608109",
+      "title": "HÅNDBALLER - PARTI - CA 700 STK Kristiansand s 1 bud 2d 18t 9m",
+      "url": "https://www.auksjonen.no/auksjon/torget/H%C3%85NDBALLER_-_PARTI_-_CA_700_STK_/615121",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -4951,12 +5002,22 @@
     "schema_version": 2,
     "sources": {
       "Auksjonen.no": {
-        "accounted_total": 41,
-        "excluded_record_count": 16,
+        "accounted_total": 42,
+        "excluded_record_count": 17,
         "excluded_records": [
           {
             "reason": "daily_report_limit",
             "record_id": "auksjonen-588231",
+            "stage": "daily_report"
+          },
+          {
+            "reason": "daily_report_limit",
+            "record_id": "auksjonen-614297",
+            "stage": "daily_report"
+          },
+          {
+            "reason": "daily_report_limit",
+            "record_id": "auksjonen-608117",
             "stage": "daily_report"
           },
           {
@@ -4981,12 +5042,12 @@
           },
           {
             "reason": "daily_report_limit",
-            "record_id": "auksjonen-599806",
+            "record_id": "auksjonen-614788",
             "stage": "daily_report"
           },
           {
             "reason": "daily_report_limit",
-            "record_id": "auksjonen-615317",
+            "record_id": "auksjonen-599806",
             "stage": "daily_report"
           },
           {
@@ -5006,22 +5067,17 @@
           },
           {
             "reason": "daily_report_limit",
+            "record_id": "auksjonen-608112",
+            "stage": "daily_report"
+          },
+          {
+            "reason": "daily_report_limit",
             "record_id": "auksjonen-604258",
             "stage": "daily_report"
           },
           {
             "reason": "daily_report_limit",
             "record_id": "auksjonen-587496",
-            "stage": "daily_report"
-          },
-          {
-            "reason": "daily_report_limit",
-            "record_id": "auksjonen-615316",
-            "stage": "daily_report"
-          },
-          {
-            "reason": "daily_report_limit",
-            "record_id": "auksjonen-615315",
             "stage": "daily_report"
           },
           {
@@ -5036,11 +5092,10 @@
           }
         ],
         "excluded_records_by_reason": {
-          "daily_report_limit": 16
+          "daily_report_limit": 17
         },
-        "fetched_count": 41,
+        "fetched_count": 42,
         "fetched_record_ids": [
-          "auksjonen-608109",
           "auksjonen-615419",
           "auksjonen-614687",
           "auksjonen-593145",
@@ -5070,6 +5125,7 @@
           "auksjonen-431851",
           "auksjonen-608112",
           "auksjonen-615594",
+          "auksjonen-615833",
           "auksjonen-588231",
           "auksjonen-600900",
           "auksjonen-614297",
@@ -5080,23 +5136,22 @@
           "auksjonen-587496",
           "auksjonen-615584",
           "auksjonen-615428",
-          "auksjonen-614953"
+          "auksjonen-614953",
+          "auksjonen-615592"
         ],
         "published_audit_opportunity_ids": [
           "unified-auksjonen-599803",
           "unified-auksjonen-605821",
-          "unified-auksjonen-608109",
-          "unified-auksjonen-608112",
-          "unified-auksjonen-608117",
           "unified-auksjonen-613877",
           "unified-auksjonen-614289",
-          "unified-auksjonen-614297",
           "unified-auksjonen-614674",
           "unified-auksjonen-614682",
           "unified-auksjonen-614687",
-          "unified-auksjonen-614788",
           "unified-auksjonen-614953",
           "unified-auksjonen-615121",
+          "unified-auksjonen-615315",
+          "unified-auksjonen-615316",
+          "unified-auksjonen-615317",
           "unified-auksjonen-615418",
           "unified-auksjonen-615419",
           "unified-auksjonen-615420",
@@ -5105,26 +5160,26 @@
           "unified-auksjonen-615443",
           "unified-auksjonen-615444",
           "unified-auksjonen-615584",
+          "unified-auksjonen-615592",
           "unified-auksjonen-615593",
           "unified-auksjonen-615594",
-          "unified-auksjonen-615674"
+          "unified-auksjonen-615674",
+          "unified-auksjonen-615833"
         ],
         "published_audit_record_count": 25,
         "published_audit_record_ids": [
           "auksjonen-599803",
           "auksjonen-605821",
-          "auksjonen-608109",
-          "auksjonen-608112",
-          "auksjonen-608117",
           "auksjonen-613877",
           "auksjonen-614289",
-          "auksjonen-614297",
           "auksjonen-614674",
           "auksjonen-614682",
           "auksjonen-614687",
-          "auksjonen-614788",
           "auksjonen-614953",
           "auksjonen-615121",
+          "auksjonen-615315",
+          "auksjonen-615316",
+          "auksjonen-615317",
           "auksjonen-615418",
           "auksjonen-615419",
           "auksjonen-615420",
@@ -5133,9 +5188,11 @@
           "auksjonen-615443",
           "auksjonen-615444",
           "auksjonen-615584",
+          "auksjonen-615592",
           "auksjonen-615593",
           "auksjonen-615594",
-          "auksjonen-615674"
+          "auksjonen-615674",
+          "auksjonen-615833"
         ],
         "published_audit_records": [
           {
@@ -5147,28 +5204,12 @@
             "record_id": "auksjonen-605821"
           },
           {
-            "opportunity_id": "unified-auksjonen-608109",
-            "record_id": "auksjonen-608109"
-          },
-          {
-            "opportunity_id": "unified-auksjonen-608112",
-            "record_id": "auksjonen-608112"
-          },
-          {
-            "opportunity_id": "unified-auksjonen-608117",
-            "record_id": "auksjonen-608117"
-          },
-          {
             "opportunity_id": "unified-auksjonen-613877",
             "record_id": "auksjonen-613877"
           },
           {
             "opportunity_id": "unified-auksjonen-614289",
             "record_id": "auksjonen-614289"
-          },
-          {
-            "opportunity_id": "unified-auksjonen-614297",
-            "record_id": "auksjonen-614297"
           },
           {
             "opportunity_id": "unified-auksjonen-614674",
@@ -5183,16 +5224,24 @@
             "record_id": "auksjonen-614687"
           },
           {
-            "opportunity_id": "unified-auksjonen-614788",
-            "record_id": "auksjonen-614788"
-          },
-          {
             "opportunity_id": "unified-auksjonen-614953",
             "record_id": "auksjonen-614953"
           },
           {
             "opportunity_id": "unified-auksjonen-615121",
             "record_id": "auksjonen-615121"
+          },
+          {
+            "opportunity_id": "unified-auksjonen-615315",
+            "record_id": "auksjonen-615315"
+          },
+          {
+            "opportunity_id": "unified-auksjonen-615316",
+            "record_id": "auksjonen-615316"
+          },
+          {
+            "opportunity_id": "unified-auksjonen-615317",
+            "record_id": "auksjonen-615317"
           },
           {
             "opportunity_id": "unified-auksjonen-615418",
@@ -5227,6 +5276,10 @@
             "record_id": "auksjonen-615584"
           },
           {
+            "opportunity_id": "unified-auksjonen-615592",
+            "record_id": "auksjonen-615592"
+          },
+          {
             "opportunity_id": "unified-auksjonen-615593",
             "record_id": "auksjonen-615593"
           },
@@ -5237,6 +5290,10 @@
           {
             "opportunity_id": "unified-auksjonen-615674",
             "record_id": "auksjonen-615674"
+          },
+          {
+            "opportunity_id": "unified-auksjonen-615833",
+            "record_id": "auksjonen-615833"
           }
         ],
         "valid": true
@@ -5412,12 +5469,12 @@
     "valid": true
   },
   "sources": {
-    "Auksjonen.no": 41,
+    "Auksjonen.no": 42,
     "Konkurs.app": 25
   },
   "summary_lines": [
-    "الفرص: 41 — شراء: 0، مراقبة: 41، رفض: 0.",
+    "الفرص: 42 — شراء: 0، مراقبة: 42، رفض: 0.",
     "أفضل فرصة: unified-auksjonen-614953 — 🟡 راقب — درجة 24/100 (E) — ربح غير متوفر — ROI غير متوفر."
   ],
-  "total_count": 41
+  "total_count": 42
 }

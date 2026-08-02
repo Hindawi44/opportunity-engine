@@ -1,18 +1,18 @@
 {
-  "excluded_count": 2,
+  "excluded_count": 4,
   "excluded_summary": {
-    "generic_unspecified_lot": 2
+    "generic_unspecified_lot": 4
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-08-02T13:53:53.647533+00:00",
+  "generated_at": "2026-08-02T19:34:01.231385+00:00",
   "input_count": 25,
   "listing_metadata_enrichment": {
     "enriched_count": 2,
     "error_count": 0,
     "method": "directly observed public listing metadata only; no estimates"
   },
-  "low_relevance_omitted_count": 21,
+  "low_relevance_omitted_count": 19,
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [
     {
@@ -42,7 +42,7 @@
       ],
       "relevance_score": 29,
       "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 20t 46m 7s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 15t 5m 59s",
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     },
     {
@@ -70,7 +70,7 @@
       ],
       "relevance_score": 18,
       "status": "review_if_capacity",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 23t 42m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 18t 1m",
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     }
   ],

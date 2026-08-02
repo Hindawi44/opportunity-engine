@@ -1,8 +1,8 @@
 {
-  "completion_rule": "A source is complete when it is ACTIVE with verified records, CODE_READY with documented activation requirements, BLOCKED_AUTH with explicit authorized-access requirements, or deliberately classified as PLANNED or DEPRECATED.",
+  "completion_rule": "Market-foundation completion, source implementation, runtime activation, daily-watch coverage, and current-opportunity state are separate dimensions. A complete market foundation does not require every planned source to be ACTIVE.",
   "economic_ranking_unlocked": false,
-  "generated_at": "2026-08-02T13:54:00.873039+00:00",
-  "phase": "source_coverage_audit_and_gap_closure",
+  "generated_at": "2026-08-02T19:34:09.085399+00:00",
+  "phase": "project_state_reconciled_multi_market_checkpoint_next",
   "phase_complete": false,
   "schema_version": 1,
   "sources": [
@@ -10,7 +10,7 @@
       "blocked_by_authorized_access": false,
       "complete": true,
       "error": null,
-      "fetched": 41,
+      "fetched": 42,
       "market": "Norway",
       "priority": 1,
       "source": "Auksjonen.no",
