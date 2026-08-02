@@ -72,7 +72,8 @@ PROJECT_ENGINE_OPERATIONAL
 COUNTRY_FOUNDATIONS_NO_SE_DE_COMPLETE
 SOURCE_ACTIVATION_PARTIAL_AND_EXPLICIT
 NEW_SOURCE_EXPANSION_PAUSED
-NEXT_TASK_MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT
+MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_IMPLEMENTED_IN_PR_413
+POST_MERGE_MANUAL_LIVE_VALIDATION_PENDING
 ```
 
 Norway, Sweden and Germany must not be restarted merely because an individual source is `PLANNED`, authorization-blocked, or waiting for a qualifying live case.
@@ -198,7 +199,8 @@ No Denmark implementation is authorized by the current task.
 - Deutsche Pfandverwertung daily zero-result-capable watch retained.
 - Unified JSON reporting and SQLite persistence retained.
 - Full project review checkpoint merged through PR #411.
-- Market/source completion semantics reconciled through the current configuration and documentation update.
+- Market/source completion semantics reconciled through PR #412.
+- Manual three-market checkpoint implementation is present in PR #413 with green CI.
 
 ## Accepted operator surface
 
@@ -213,32 +215,35 @@ The canonical repository-wide regression owner remains:
 .github/workflows/tests.yml
 ```
 
-Geographic and source-specific workflows remain supporting workflows, not replacements for the two principal operator workflows.
+The new `Multi-Market Daily Operator Checkpoint` is a manual read-only supporting workflow. Geographic and source-specific workflows remain supporting workflows, not replacements for the two principal operator workflows.
 
 ## Workflow state
 
-The repository currently retains 36 workflow files, including production support, acceptance checks, geographic pilots and historical diagnostics.
+The repository retains 37 workflow files, including production support, acceptance checks, geographic pilots, the manual multi-market checkpoint, and historical diagnostics.
 
 Many `TEMP` and `Temporary` workflows remain visible in GitHub Actions. This is an operator-usability defect, not a product blocker. No workflow may be deleted or disabled without preserved history, equivalent coverage evidence and a rollback path.
 
 ## Current phase
 
 **Phase:** Multi-market operator checkpoint  
-**Status:** `TASK_DEFINED_READY_FOR_IMPLEMENTATION`
+**Status:** `DRAFT_PR_CI_GREEN_POST_MERGE_LIVE_VALIDATION_PENDING`
 
 ## Current implementation checkpoint
 
 ```text
-PROJECT_STATE_RECONCILIATION_v1.0
+MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_v1.0
 ```
 
-The reconciliation establishes:
+The implementation establishes:
 
-- Norway, Sweden and Germany foundations are complete;
-- individual source runtime status remains independent;
-- a successful historical-only pilot is not a current opportunity;
-- a daily zero-result watch is an implemented capability even while its source remains `PLANNED`;
-- new source expansion remains paused.
+- one manual read-only workflow for Norway, Sweden and Germany;
+- five bounded existing source paths: Auksjonen, Blinto, Riegermann, VENTA and Deutsche Pfandverwertung;
+- explicit `SUCCESS`, `VALID_ZERO_RESULT`, `FAILURE` and `BLOCKED` source semantics;
+- active, upcoming, historical, ended and unresolved record counts;
+- deduplicated opportunity identities;
+- unified JSON and SQLite reconciliation where persistence is enabled;
+- exactly one bounded next human action;
+- no new source, country, schedule, financial assumption or automatic external action.
 
 ## Current task document
 
@@ -246,20 +251,18 @@ The reconciliation establishes:
 docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md
 ```
 
-## Next implementation contract
+## Validation status
 
-The next implementation must:
+PR #413 currently reports:
 
-1. remain limited to `CLOTHING_INVENTORY`;
-2. reuse existing Norway, Sweden and Germany outputs;
-3. produce one read-only phone summary and one structured report;
-4. distinguish source failure from a valid zero-result run;
-5. distinguish active, historical, ended, blocked and unresolved records;
-6. deduplicate opportunity identities across the consolidated result;
-7. preserve source-native currencies (`NOK`, `SEK`, `EUR`);
-8. preserve verification, dossier, eligibility and post-verification Top 5 gates;
-9. identify no more than one immediate human action;
-10. add no fourth country and no new source adapter.
+```text
+Full repository tests = 1292 passed
+Multi-Market Daily Operator Checkpoint contract tests = PASS
+Sweden Clothing Inventory Live Pilot = PASS
+Germany Clothing Inventory Live Pilot = PASS
+```
+
+The manual live aggregation job is intentionally not executed on pull-request events. It must be dispatched once from `main` after merge.
 
 ## Strict confirmation conjunction
 
@@ -296,7 +299,7 @@ ACTIVE_IMPLEMENTATION
 ## Non-negotiable rules
 
 - Do not restart Norway, Sweden or Germany.
-- Do not add Denmark or another country in the next task.
+- Do not add Denmark or another country in the current task.
 - Do not add a new opportunity domain.
 - Do not weaken public verification or eligibility gates.
 - Do not modify the Opportunity Dossier contract.
@@ -310,10 +313,24 @@ ACTIVE_IMPLEMENTATION
 
 ## Immediate next action
 
-Implement only:
+Review and merge only:
 
 ```text
-MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT
+PR #413 — Add manual three-market operator checkpoint
 ```
 
-The first version must be manual and read-only. It must consolidate existing Norway, Sweden and Germany evidence before any further source or country expansion is considered.
+After merge, manually run:
+
+```text
+Multi-Market Daily Operator Checkpoint
+branch = main
+```
+
+Inspect:
+
+```text
+multi-market-daily-checkpoint.json
+multi-market-phone-summary.txt
+```
+
+Do not begin a fourth market or another source task until the first `main` checkpoint run is validated.
