@@ -120,7 +120,14 @@
           "source": "VENTA Industrieversteigerungen",
           "priority": 17,
           "audit_status": "PLANNED",
-          "channel": "public_auction_event_lead"
+          "runtime_status": "PLANNED",
+          "channel": "public_auction_event_lead",
+          "public_access_audit": "GO_FOR_BOUNDED_INDEX_AND_CATALOG_ADAPTER",
+          "audit_document": "docs/VENTA_PUBLIC_ACCESS_AUDIT_v1.md",
+          "source_contract": "config/sources/de_venta_v1.json",
+          "implemented_layer": "PUBLIC_INDEX_AND_CATALOG_METADATA_PARSER",
+          "activation_blocker": "live explicit clothing catalog not currently available",
+          "production_ready": false
         },
         {
           "source": "Deutsche Pfandverwertung",
