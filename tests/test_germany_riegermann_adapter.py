@@ -168,14 +168,18 @@ def test_not_sold_is_not_interpreted_as_zero_or_final_price():
     assert lot.source_start_or_minimum_price_eur == 25.0
 
 
-def test_source_contract_stays_planned_until_live_wiring_exists():
+def test_source_contract_is_pilot_but_not_production_ready():
     contract = json.loads(
         (ROOT / "config" / "sources" / "de_riegermann_v1.json").read_text(
             encoding="utf-8"
         )
     )
 
-    assert contract["runtime_status"] == "PLANNED"
+    assert contract["runtime_status"] == "PILOT"
     assert contract["aggregation_contract"]["mode"] == AGGREGATION_MODE
     assert contract["aggregation_contract"]["promote_single_garment_lot"] is False
     assert contract["price_contract"]["fx_conversion_enabled"] is False
+    assert contract["pilot_validation"]["catalog_item_url_count"] == 24
+    assert contract["pilot_validation"]["single_garment_candidate_count"] == 0
+    assert contract["pilot_validation"]["top5_count"] == 0
+    assert contract["pilot_validation"]["production_ready"] is False

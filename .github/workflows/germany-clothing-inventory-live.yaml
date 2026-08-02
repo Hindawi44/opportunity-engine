@@ -1,10 +1,18 @@
-name: Germany Clothing Inventory Open-Web Pilot
+name: Germany Clothing Inventory Live Pilot
 
 on:
   workflow_dispatch:
     inputs:
+      source:
+        description: German discovery source
+        required: false
+        default: RIEGERMANN
+        type: choice
+        options:
+          - RIEGERMANN
+          - OPEN_WEB
       query_budget:
-        description: Number of German discovery queries to run
+        description: Number of German open-web discovery queries to run
         required: false
         default: "8"
       results_per_query:
@@ -14,7 +22,7 @@ on:
       freshness:
         description: Brave freshness window
         required: false
-        default: "pm"
+        default: pm
         type: choice
         options:
           - none
@@ -22,6 +30,10 @@ on:
           - pw
           - pm
           - py
+      riegermann_item_verification_limit:
+        description: Exact promoted bulk item pages to verify
+        required: false
+        default: "10"
       persist_unified:
         description: Persist unified records to SQLite and upload the database
         required: false
@@ -31,15 +43,21 @@ on:
     paths:
       - ".github/workflows/germany-clothing-inventory-live.yaml"
       - "scripts/run_germany_clothing_inventory_discovery_search.py"
+      - "scripts/run_riegermann_live_discovery.py"
       - "scripts/run_market_clothing_inventory_discovery.py"
       - "src/opportunity_engine/discovery/germany_clothing_inventory.py"
+      - "src/opportunity_engine/discovery/germany_riegermann.py"
+      - "src/opportunity_engine/discovery/germany_riegermann_live.py"
       - "src/opportunity_engine/discovery/brave_search.py"
       - "src/opportunity_engine/discovery/unified_opportunity_adapter.py"
       - "src/opportunity_engine/discovery/unified_opportunity_report.py"
       - "src/opportunity_engine/markets/germany.py"
       - "config/markets/de_v1.json"
+      - "config/sources/de_riegermann_v1.json"
       - "docs/WORKFLOW_INVENTORY_REPORT_v1.2.md"
       - "tests/test_germany_clothing_discovery_v1.py"
+      - "tests/test_germany_riegermann_adapter.py"
+      - "tests/test_germany_riegermann_live.py"
       - "tests/test_workflow_inventory_report.py"
 
 permissions:
@@ -56,6 +74,7 @@ jobs:
     env:
       BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
       OUTPUT_DIR: artifacts/germany-clothing-discovery-live
+      SOURCE: ${{ github.event.inputs.source || 'RIEGERMANN' }}
       EXPECTED_PERSIST_UNIFIED: ${{ github.event_name != 'workflow_dispatch' || inputs.persist_unified }}
 
     steps:
@@ -70,20 +89,28 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Confirm Brave secret exists
-        run: |
-          if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
-            echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
-            exit 1
-          fi
-
-      - name: Run Germany open-web discovery pilot
+      - name: Confirm source requirements
         shell: bash
         run: |
-          QUERY_BUDGET="${{ github.event.inputs.query_budget || '8' }}"
-          RESULTS_PER_QUERY="${{ github.event.inputs.results_per_query || '10' }}"
-          FRESHNESS="${{ github.event.inputs.freshness || 'pm' }}"
+          case "${SOURCE^^}" in
+            OPEN_WEB)
+              if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
+                echo "BRAVE_SEARCH_API_KEY repository secret is required for OPEN_WEB" >&2
+                exit 1
+              fi
+              ;;
+            RIEGERMANN)
+              echo "Riegermann uses exact public pages and does not require Brave"
+              ;;
+            *)
+              echo "Unsupported Germany source: $SOURCE" >&2
+              exit 1
+              ;;
+          esac
 
+      - name: Run Germany discovery pilot
+        shell: bash
+        run: |
           persistence_args=()
           if [ "${EXPECTED_PERSIST_UNIFIED,,}" = "true" ]; then
             persistence_args+=(
@@ -92,14 +119,25 @@ jobs:
             )
           fi
 
-          python scripts/run_germany_clothing_inventory_discovery_search.py \
-            --output-dir "$OUTPUT_DIR" \
-            --query-budget "$QUERY_BUDGET" \
-            --results-per-query "$RESULTS_PER_QUERY" \
-            --freshness "$FRESHNESS" \
-            --verify-pages \
-            --verification-limit 20 \
-            "${persistence_args[@]}"
+          if [ "${SOURCE^^}" = "RIEGERMANN" ]; then
+            ITEM_LIMIT="${{ github.event.inputs.riegermann_item_verification_limit || '10' }}"
+            python scripts/run_riegermann_live_discovery.py \
+              --output-dir "$OUTPUT_DIR" \
+              --item-verification-limit "$ITEM_LIMIT" \
+              "${persistence_args[@]}"
+          else
+            QUERY_BUDGET="${{ github.event.inputs.query_budget || '8' }}"
+            RESULTS_PER_QUERY="${{ github.event.inputs.results_per_query || '10' }}"
+            FRESHNESS="${{ github.event.inputs.freshness || 'pm' }}"
+            python scripts/run_germany_clothing_inventory_discovery_search.py \
+              --output-dir "$OUTPUT_DIR" \
+              --query-budget "$QUERY_BUDGET" \
+              --results-per-query "$RESULTS_PER_QUERY" \
+              --freshness "$FRESHNESS" \
+              --verify-pages \
+              --verification-limit 20 \
+              "${persistence_args[@]}"
+          fi
 
       - name: Validate and summarize Germany artifacts
         shell: bash
@@ -111,12 +149,15 @@ jobs:
           import sqlite3
 
           root = Path("artifacts/germany-clothing-discovery-live")
+          source = os.environ.get("SOURCE", "RIEGERMANN").upper()
           required = (
               "all-discovered-candidates.json",
               "discovery-top5.json",
               "search-run-report.json",
               "unified-opportunity-report.json",
           )
+          if source == "RIEGERMANN":
+              required += ("riegermann-live-diagnostics.json",)
           missing = [name for name in required if not (root / name).exists()]
           if missing:
               raise SystemExit(f"Missing Germany artifacts: {missing}")
@@ -129,48 +170,46 @@ jobs:
           report = json.loads(
               (root / "search-run-report.json").read_text(encoding="utf-8")
           )
-          expected = {
+          expected_common = {
               "market_code": "DE",
               "currency": "EUR",
-              "source_mode": "OPEN_WEB",
-              "source_target": None,
-              "query_pack": "GERMANY_CLOTHING_INVENTORY_V1",
               "currency_conversion_performed": False,
               "tax_calculation_performed": False,
               "customs_calculation_performed": False,
               "logistics_calculation_performed": False,
           }
-          for key, value in expected.items():
+          for key, value in expected_common.items():
               if report.get(key) != value:
                   raise SystemExit(
                       f"Expected {key}={value!r}, got {report.get(key)!r}"
                   )
 
-          summary_keys = (
-              "status",
-              "market_code",
-              "currency",
-              "source_mode",
-              "queries_submitted",
-              "hits_received",
-              "unique_public_urls",
-              "merged_candidates",
-              "duplicates_merged",
-              "rejected_results",
-              "strong_leads_requiring_verification",
-              "confirmed_sales",
-              "ended_or_historical",
-              "top5_count",
-          )
-          print("Germany live summary:")
-          for key in summary_keys:
-              print(f"{key}: {report.get(key)}")
+          if source == "RIEGERMANN":
+              expected_source = {
+                  "source_mode": "RIEGERMANN",
+                  "source_target": "RIEGERMANN_AUCTION_908",
+                  "query_pack": "RIEGERMANN_BOUNDED_EVENT_V1",
+              }
+          else:
+              expected_source = {
+                  "source_mode": "OPEN_WEB",
+                  "source_target": None,
+                  "query_pack": "GERMANY_CLOTHING_INVENTORY_V1",
+              }
+          for key, value in expected_source.items():
+              if report.get(key) != value:
+                  raise SystemExit(
+                      f"Expected {key}={value!r}, got {report.get(key)!r}"
+                  )
 
           candidates = json.loads(
               (root / "all-discovered-candidates.json").read_text(encoding="utf-8")
           )
-          if not isinstance(candidates, list):
-              raise SystemExit("Germany candidate artifact must contain a JSON list")
+          top5 = json.loads(
+              (root / "discovery-top5.json").read_text(encoding="utf-8")
+          )
+          if not isinstance(candidates, list) or not isinstance(top5, list):
+              raise SystemExit("Germany candidate artifacts must contain JSON lists")
 
           for candidate in candidates:
               if candidate.get("price_nok") is not None:
@@ -186,6 +225,34 @@ jobs:
                       raise SystemExit("German verification leaked into price_nok")
                   if verification.get("bid_price_nok") is not None:
                       raise SystemExit("German verification leaked into bid_price_nok")
+
+          if source == "RIEGERMANN":
+              live = report.get("riegermann_live") or {}
+              if live.get("auction_identity") != "riegermann-auction:908":
+                  raise SystemExit("Riegermann auction identity was not preserved")
+              if live.get("aggregation_mode") != "AUCTION_EVENT_WITH_CHILD_LOTS":
+                  raise SystemExit("Riegermann aggregation mode changed")
+              if int(live.get("catalog_item_url_count") or 0) < 1:
+                  raise SystemExit("Riegermann catalog exposed no exact item URLs")
+              if int(live.get("parsed_child_lot_count") or 0) < 1:
+                  raise SystemExit("Riegermann catalog produced no child lots")
+              if live.get("single_garment_candidate_count") != 0:
+                  raise SystemExit("Single garments became standalone candidates")
+              identities = {
+                  candidate.get("opportunity_identity") for candidate in candidates
+              }
+              if "riegermann-auction:908" not in identities:
+                  raise SystemExit("Riegermann parent auction candidate is missing")
+              if any(
+                  identity in {
+                      "riegermann-object:73457",
+                      "riegermann-object:73458",
+                  }
+                  for identity in identities
+              ):
+                  raise SystemExit("Ordinary Cabrini garments became candidates")
+              if top5:
+                  raise SystemExit("Riegermann pilot must remain outside Top 5")
 
           unified = json.loads(
               (root / "unified-opportunity-report.json").read_text(encoding="utf-8")
@@ -204,7 +271,7 @@ jobs:
                   raise SystemExit("Germany unified record lost DE/EUR identity")
               if record.get("price") is not None or record.get("bid_price") is not None:
                   raise SystemExit(
-                      "Germany pilot must not write unparsed EUR values into normalized price fields"
+                      "German source values entered normalized price fields"
                   )
 
           expected_persist = (
@@ -215,23 +282,7 @@ jobs:
           historical_json = root / "historical-market-evidence-report.json"
           historical_text = root / "historical-market-evidence-summary.txt"
 
-          if not expected_persist:
-              unexpected = [
-                  path.name
-                  for path in (
-                      persistence_summary,
-                      database_path,
-                      historical_json,
-                      historical_text,
-                  )
-                  if path.exists()
-              ]
-              if unexpected:
-                  raise SystemExit(
-                      f"Persistence artifacts were produced while disabled: {unexpected}"
-                  )
-              print("sqlite_persistence: disabled")
-          else:
+          if expected_persist:
               required_persistence = (
                   persistence_summary,
                   database_path,
@@ -245,7 +296,6 @@ jobs:
                   raise SystemExit(
                       f"Missing Germany persistence artifacts: {missing_persistence}"
                   )
-
               persistence = json.loads(
                   persistence_summary.read_text(encoding="utf-8")
               )
@@ -263,10 +313,10 @@ jobs:
                       "SELECT opportunity_id, price, bid_price, record_json "
                       "FROM unified_opportunities ORDER BY opportunity_id"
                   ).fetchall()
-
               if len(rows) != unified.get("record_count"):
-                  raise SystemExit("Germany SQLite row count does not match unified report")
-
+                  raise SystemExit(
+                      "Germany SQLite row count does not match unified report"
+                  )
               for opportunity_id, price, bid_price, raw_record in rows:
                   record = json.loads(raw_record)
                   if record.get("market_code") != "DE" or record.get("currency") != "EUR":
@@ -275,14 +325,37 @@ jobs:
                       )
                   if price is not None or bid_price is not None:
                       raise SystemExit(
-                          f"Unparsed German price entered normalized columns: {opportunity_id}"
+                          f"German source value entered normalized columns: {opportunity_id}"
                       )
-
               print(f"sqlite_record_count: {len(rows)}")
-              print(f"sqlite_database: {database_path}")
+          else:
+              unexpected = [
+                  path.name
+                  for path in (
+                      persistence_summary,
+                      database_path,
+                      historical_json,
+                      historical_text,
+                  )
+                  if path.exists()
+              ]
+              if unexpected:
+                  raise SystemExit(
+                      f"Persistence artifacts were produced while disabled: {unexpected}"
+                  )
 
+          print("Germany live summary:")
+          for key in (
+              "status",
+              "source_mode",
+              "source_target",
+              "merged_candidates",
+              "strong_leads_requiring_verification",
+              "ended_or_historical",
+              "top5_count",
+          ):
+              print(f"{key}: {report.get(key)}")
           print(f"candidate_count: {len(candidates)}")
-          print(f"rejected_count: {report.get('rejected_results')}")
           print("zero_results_are_valid: true")
           PY
 
@@ -290,6 +363,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: germany-clothing-inventory-live
+          name: germany-clothing-inventory-live-${{ env.SOURCE }}
           path: artifacts/germany-clothing-discovery-live
           if-no-files-found: error
