@@ -10,7 +10,7 @@ def test_workflow_inventory_report_represents_every_workflow_file() -> None:
     workflow_paths = sorted(WORKFLOW_DIR.glob("*.yml")) + sorted(WORKFLOW_DIR.glob("*.yaml"))
 
     assert workflow_paths, "No GitHub Actions workflows were found"
-    assert len(workflow_paths) == 36
+    assert len(workflow_paths) == 37
 
     missing = [path.as_posix() for path in workflow_paths if f"`{path.as_posix()}`" not in report]
     assert missing == []
@@ -19,11 +19,13 @@ def test_workflow_inventory_report_represents_every_workflow_file() -> None:
 def test_workflow_inventory_report_preserves_safe_scope() -> None:
     report = REPORT_PATH.read_text(encoding="utf-8")
 
-    assert "Workflow files represented:** 36" in report
+    assert "Workflow files represented:** 37" in report
     assert "Germany Clothing Inventory open-web pilot" in report
     assert "Riegermann active-auction workflow" in report
     assert "VENTA active-catalog watch" in report
     assert "Deutsche Pfandverwertung watch" in report
+    assert "MULTI_MARKET_OPERATOR_CHECKPOINT" in report
+    assert "manual read-only NO/SE/DE" in report
     assert "PRIMARY_DISCOVERY_CANDIDATE" in report
     assert "END_TO_END_REVIEW_CANDIDATE" in report
     assert "contacts sellers, bids, buys, pays" in report
