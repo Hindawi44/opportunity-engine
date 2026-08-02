@@ -65,6 +65,7 @@ def _catalog_html() -> str:
       <h3>Informationen zur Versteigerung</h3>
       <p>Auslauf der Versteigerung | Donnerstag 6. August 2026 um 18.00 Uhr</p>
       <p>Standort | Modehaus Nord GmbH Hauptstr. 12 44135 Dortmund</p>
+      <h3>Zur Beachtung</h3>
       <h3>Kompletter Warenbestand an Damenbekleidung und Schuhen</h3>
       <p>Auktion Nr. 6001</p>
       <p>Seite 1 von 2</p>
@@ -157,7 +158,9 @@ class _FakeSession:
 def test_index_fetch_fails_closed_on_redirect_or_non_html():
     with pytest.raises(ValueError, match="public VENTA auction index"):
         fetch_venta_auction_index(
-            session=_FakeSession(_FakeResponse("https://auction.venta24.de/login.html", _index_html()))
+            session=_FakeSession(
+                _FakeResponse("https://auction.venta24.de/login.html", _index_html())
+            )
         )
 
     with pytest.raises(RuntimeError, match="content type"):
