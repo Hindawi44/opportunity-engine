@@ -2,14 +2,20 @@
 
 **Scope:** every `.yml` and `.yaml` file currently under `.github/workflows/`  
 **Inventory date:** 2026-08-02  
-**Workflow files represented:** 36  
-**Change note:** the manual Germany Clothing Inventory open-web pilot and the daily Riegermann, VENTA, and Deutsche Pfandverwertung watches are represented; no existing workflow was deleted or disabled.
+**Workflow files represented:** 37  
+**Change note:** the manual three-market operator checkpoint, the Germany Clothing Inventory open-web pilot, and the daily Riegermann, VENTA, and Deutsche Pfandverwertung watches are represented; no existing workflow was deleted or disabled.
 
 ## Operator surface
 
 The principal general discovery workflow remains:
 
 - `1 — Discover Clothing Inventory Opportunities`
+
+The end-to-end review workflow remains:
+
+- `2 — Review One Opportunity End to End`
+
+`Multi-Market Daily Operator Checkpoint` is a manual, read-only supporting workflow. It runs bounded existing paths for Norway (`Auksjonen.no`), Sweden (`Blinto`), and Germany (`Riegermann`, `VENTA`, and `Deutsche Pfandverwertung`), then emits one structured report and one phone-readable summary. It distinguishes source failure from a valid zero result, deduplicates identities, reconciles JSON and SQLite counts where persistence is enabled, and selects no more than one human action.
 
 The Sweden and Germany pilots are bounded geographic-expansion workflows. They reuse the existing discovery, public-page verification, lifecycle classification, unified reporting, SQLite persistence, and safety contracts.
 
@@ -56,16 +62,33 @@ None of these workflows contacts sellers, bids, buys, pays, or estimates unsuppo
 31. `.github/workflows/v3.7-production-pilot.yml`
 32. `.github/workflows/dpv-active-clothing-watch.yaml`
 33. `.github/workflows/germany-clothing-inventory-live.yaml`
-34. `.github/workflows/riegermann-active-auctions-live.yaml`
-35. `.github/workflows/sweden-clothing-inventory-live.yaml`
-36. `.github/workflows/venta-active-clothing-watch.yaml`
+34. `.github/workflows/multi-market-daily-operator-checkpoint.yaml`
+35. `.github/workflows/riegermann-active-auctions-live.yaml`
+36. `.github/workflows/sweden-clothing-inventory-live.yaml`
+37. `.github/workflows/venta-active-clothing-watch.yaml`
 
 ## Classification summary
 
 - `PRIMARY_DISCOVERY_CANDIDATE`: the existing general discovery workflow.
 - `END_TO_END_REVIEW_CANDIDATE`: the existing V3.7 review workflow.
+- `MULTI_MARKET_OPERATOR_CHECKPOINT`: the manual read-only NO/SE/DE consolidation workflow.
 - `GEOGRAPHIC_DISCOVERY_PILOT`: Sweden live pilot, Germany open-web pilot, bounded Riegermann active-auction workflow, VENTA active-catalog watch, and Deutsche Pfandverwertung active-catalog watch.
 - All other classifications remain as documented in v1.0.
+
+## Multi-market checkpoint controls
+
+The checkpoint enforces:
+
+- exactly the completed market foundations `NO`, `SE`, and `DE`;
+- source-native currencies `NOK`, `SEK`, and `EUR`;
+- no undocumented foreign-currency value in `price_nok` or `bid_price_nok`;
+- source failure distinct from a valid zero-result run;
+- active, upcoming, historical, ended, and unresolved counts;
+- cross-source identity deduplication;
+- JSON and SQLite count reconciliation where persistence is enabled;
+- no more than one immediate human action;
+- manual dispatch only, with no schedule;
+- no contact, bid, purchase, reservation, payment, or other external action.
 
 ## Germany pilot controls
 
@@ -86,4 +109,4 @@ The Germany workflows enforce:
 
 ## Integrity statement
 
-This report represents all 36 workflow files, including both supported filename extensions. The Sweden and Germany open-web workflows remain manual. Riegermann runs daily at `05:17 UTC`, VENTA at `05:47 UTC`, and Deutsche Pfandverwertung at `06:17 UTC`; all three watches remain manually dispatchable and preserve the existing evidence and safety gates. Existing eligibility gates, source-access statuses, financial formulas, and automatic-action prohibitions remain unchanged.
+This report represents all 37 workflow files, including both supported filename extensions. The Sweden and Germany open-web workflows and the multi-market checkpoint remain manual. Riegermann runs daily at `05:17 UTC`, VENTA at `05:47 UTC`, and Deutsche Pfandverwertung at `06:17 UTC`; all three watches remain manually dispatchable and preserve the existing evidence and safety gates. Existing eligibility gates, source-access statuses, financial formulas, and automatic-action prohibitions remain unchanged.
