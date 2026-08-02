@@ -1,9 +1,9 @@
 # Workflow Inventory Report v1.2
 
 **Scope:** every `.yml` and `.yaml` file currently under `.github/workflows/`  
-**Inventory date:** 2026-08-01  
-**Workflow files represented:** 33  
-**Change note:** one manual Germany Clothing Inventory open-web pilot workflow was added; no existing workflow was deleted or disabled.
+**Inventory date:** 2026-08-02  
+**Workflow files represented:** 34  
+**Change note:** one manual Germany Clothing Inventory open-web pilot workflow and one bounded Riegermann active-auction workflow are represented; no existing workflow was deleted or disabled.
 
 ## Operator surface
 
@@ -13,7 +13,7 @@ The principal general discovery workflow remains:
 
 The Sweden and Germany pilots are bounded geographic-expansion workflows. They reuse the existing discovery, public-page verification, lifecycle classification, unified reporting, SQLite persistence, and safety contracts.
 
-The Germany pilot is open-web only. It does not activate a source-specific German collector and does not contact sellers, bid, buy, pay, or estimate unsupported FX, VAT, customs, logistics, profit, or ROI values. A zero-result run remains a valid, reportable outcome.
+The Germany open-web mode remains available. The source-specific Riegermann workflow reads the public active-auction index, selects only auctions with explicit clothing evidence, and delegates their exact catalog and information pages to the bounded Riegermann adapter. Neither workflow contacts sellers, bids, buys, pays, or estimates unsupported FX, VAT, customs, logistics, profit, or ROI values. A zero-result run remains a valid, reportable outcome.
 
 ## Complete file inventory
 
@@ -49,27 +49,30 @@ The Germany pilot is open-web only. It does not activate a source-specific Germa
 30. `.github/workflows/v3.6-multi-source-ingestion.yml`
 31. `.github/workflows/v3.7-production-pilot.yml`
 32. `.github/workflows/germany-clothing-inventory-live.yaml`
-33. `.github/workflows/sweden-clothing-inventory-live.yaml`
+33. `.github/workflows/riegermann-active-auctions-live.yaml`
+34. `.github/workflows/sweden-clothing-inventory-live.yaml`
 
 ## Classification summary
 
 - `PRIMARY_DISCOVERY_CANDIDATE`: the existing general discovery workflow.
 - `END_TO_END_REVIEW_CANDIDATE`: the existing V3.7 review workflow.
-- `GEOGRAPHIC_DISCOVERY_PILOT`: Sweden live pilot and Germany open-web pilot.
+- `GEOGRAPHIC_DISCOVERY_PILOT`: Sweden live pilot, Germany open-web pilot, and bounded Riegermann active-auction pilot.
 - All other classifications remain as documented in v1.0.
 
 ## Germany pilot controls
 
-The Germany workflow enforces:
+The Germany workflows enforce:
 
 - market identity `DE`;
 - report and persistence currency `EUR`;
-- source mode `OPEN_WEB`;
-- no source-specific German adapter activation;
+- source modes `OPEN_WEB`, `RIEGERMANN`, and `RIEGERMANN_ACTIVE`;
+- exact public Riegermann auction, catalog, information, and item URL contracts;
+- explicit clothing evidence before an active auction is selected;
+- ordinary single garments remain child evidence instead of standalone opportunities;
 - no normalized price or bid value until a bounded EUR parser is implemented;
 - no use of `price_nok` or `bid_price_nok` for German records;
 - valid JSON, unified report, SQLite, and historical evidence artifacts even when no opportunity is found.
 
 ## Integrity statement
 
-This report represents all 33 workflow files, including both supported filename extensions. The Sweden and Germany workflows are manual and evidence-preserving. Existing eligibility gates, source-access statuses, financial formulas, and automatic-action prohibitions remain unchanged.
+This report represents all 34 workflow files, including both supported filename extensions. The Sweden and Germany workflows are manual and evidence-preserving. Existing eligibility gates, source-access statuses, financial formulas, and automatic-action prohibitions remain unchanged.
