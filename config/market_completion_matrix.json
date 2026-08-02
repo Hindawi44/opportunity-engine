@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-02T17:21:00Z",
+  "domain": "CLOTHING_INVENTORY",
+  "governing_review": "docs/FULL_PROJECT_REVIEW_CHECKPOINT_2026-08-02.md",
+  "purpose": "Separate market-foundation completion from source implementation, runtime activation, watch coverage, and current-opportunity state.",
+  "status_dimensions": {
+    "market_foundation_status": [
+      "COMPLETE",
+      "PLANNED"
+    ],
+    "source_implementation_status": [
+      "NOT_IMPLEMENTED",
+      "BOUNDED_PILOT_IMPLEMENTED",
+      "DAILY_WATCH_IMPLEMENTED",
+      "ACTIVE_IMPLEMENTATION"
+    ],
+    "runtime_activation_status": [
+      "ACTIVE",
+      "PLANNED",
+      "BLOCKED_AUTH"
+    ],
+    "current_opportunity_status": [
+      "CONFIRMED_ACTIVE_OPPORTUNITY",
+      "NO_CONFIRMED_ACTIVE_OPPORTUNITY",
+      "NOT_EVALUATED"
+    ]
+  },
+  "markets": [
+    {
+      "market_code": "NO",
+      "market_name": "Norway",
+      "profile_id": "NO_DOMESTIC_V1",
+      "currency": "NOK",
+      "transaction_scope": "DOMESTIC",
+      "market_foundation_status": "COMPLETE",
+      "source_network_status": "PARTIAL",
+      "source_implementation_status": "ACTIVE_IMPLEMENTATION",
+      "daily_watch_status": "EXISTING_GENERAL_PIPELINES",
+      "current_opportunity_status": "NOT_EVALUATED",
+      "restart_market": false,
+      "sources": [
+        {
+          "source": "Auksjonen.no",
+          "runtime_activation_status": "ACTIVE",
+          "implementation_status": "ACTIVE_IMPLEMENTATION"
+        },
+        {
+          "source": "Konkurs.app",
+          "runtime_activation_status": "ACTIVE",
+          "implementation_status": "ACTIVE_IMPLEMENTATION",
+          "channel": "bankruptcy_lead"
+        },
+        {
+          "source": "Politiet.no",
+          "runtime_activation_status": "ACTIVE",
+          "implementation_status": "ACTIVE_IMPLEMENTATION",
+          "channel": "public_auction_event_lead"
+        },
+        {
+          "source": "FINN.no",
+          "runtime_activation_status": "BLOCKED_AUTH",
+          "implementation_status": "BOUNDED_PILOT_IMPLEMENTED"
+        },
+        {
+          "source": "Konkurskupp",
+          "runtime_activation_status": "BLOCKED_AUTH",
+          "implementation_status": "NOT_IMPLEMENTED"
+        },
+        {
+          "source": "Bjarøy",
+          "runtime_activation_status": "BLOCKED_AUTH",
+          "implementation_status": "NOT_IMPLEMENTED"
+        }
+      ]
+    },
+    {
+      "market_code": "SE",
+      "market_name": "Sweden",
+      "profile_id": "SE_CROSS_BORDER_V1",
+      "currency": "SEK",
+      "transaction_scope": "CROSS_BORDER_TO_NO",
+      "market_foundation_status": "COMPLETE",
+      "source_network_status": "BOUNDED_PILOTS_IMPLEMENTED",
+      "source_implementation_status": "BOUNDED_PILOT_IMPLEMENTED",
+      "daily_watch_status": "NOT_SCHEDULED",
+      "current_opportunity_status": "NO_CONFIRMED_ACTIVE_OPPORTUNITY",
+      "restart_market": false,
+      "latest_validated_evidence": {
+        "workflow": "Sweden Clothing Inventory Live Pilot",
+        "source_mode": "BLINTO",
+        "status": "PASS",
+        "merged_candidates": 6,
+        "ended_or_historical": 6,
+        "confirmed_sales": 0,
+        "top5_count": 0,
+        "sqlite_persisted_record_count": 6,
+        "conversion_error_count": 0
+      },
+      "sources": [
+        {
+          "source": "PS Auction",
+          "runtime_activation_status": "PLANNED",
+          "implementation_status": "BOUNDED_PILOT_IMPLEMENTED",
+          "activation_requirement": "main-branch live validation of a traceable bulk clothing opportunity"
+        },
+        {
+          "source": "Klaravik",
+          "runtime_activation_status": "PLANNED",
+          "implementation_status": "BOUNDED_PILOT_IMPLEMENTED",
+          "activation_requirement": "main-branch live validation of a traceable bulk clothing opportunity"
+        },
+        {
+          "source": "Blinto",
+          "runtime_activation_status": "PLANNED",
+          "implementation_status": "BOUNDED_PILOT_IMPLEMENTED",
+          "activation_requirement": "a current verified active clothing opportunity; historical-only success does not activate the source"
+        }
+      ]
+    },
+    {
+      "market_code": "DE",
+      "market_name": "Germany",
+      "profile_id": "DE_CROSS_BORDER_V1",
+      "currency": "EUR",
+      "transaction_scope": "CROSS_BORDER_TO_NO",
+      "market_foundation_status": "COMPLETE",
+      "source_network_status": "ONE_ACTIVE_TWO_OPERATIONAL_WATCHES",
+      "source_implementation_status": "DAILY_WATCH_IMPLEMENTED",
+      "daily_watch_status": "OPERATIONAL",
+      "current_opportunity_status": "NO_CONFIRMED_ACTIVE_OPPORTUNITY",
+      "restart_market": false,
+      "sources": [
+        {
+          "source": "Riegermann",
+          "runtime_activation_status": "ACTIVE",
+          "implementation_status": "ACTIVE_IMPLEMENTATION",
+          "daily_watch_utc": "05:17"
+        },
+        {
+          "source": "VENTA Industrieversteigerungen",
+          "runtime_activation_status": "PLANNED",
+          "implementation_status": "DAILY_WATCH_IMPLEMENTED",
+          "daily_watch_utc": "05:47",
+          "activation_requirement": "live explicit clothing catalog and exact bulk item-page verification"
+        },
+        {
+          "source": "Deutsche Pfandverwertung",
+          "runtime_activation_status": "PLANNED",
+          "implementation_status": "DAILY_WATCH_IMPLEMENTED",
+          "daily_watch_utc": "06:17",
+          "activation_requirement": "current active clothing catalog validating the complete main-branch watch and persistence path"
+        }
+      ]
+    },
+    {
+      "market_code": "DK",
+      "market_name": "Denmark",
+      "profile_id": null,
+      "currency": "DKK",
+      "transaction_scope": "CROSS_BORDER_TO_NO",
+      "market_foundation_status": "PLANNED",
+      "source_network_status": "NOT_STARTED",
+      "source_implementation_status": "NOT_IMPLEMENTED",
+      "daily_watch_status": "NOT_IMPLEMENTED",
+      "current_opportunity_status": "NOT_EVALUATED",
+      "restart_market": false
+    }
+  ],
+  "project_decision": {
+    "new_source_expansion": "PAUSED",
+    "completed_market_foundations": [
+      "NO",
+      "SE",
+      "DE"
+    ],
+    "next_task": "MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT",
+    "next_task_document": "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
+  }
+}
