@@ -4,7 +4,7 @@
   "errors": {},
   "evidence": {
     "unified-auksjonen-613944": {
-      "captured_at": "2026-08-02T03:52:01.661563+00:00",
+      "captured_at": "2026-08-02T08:36:53.920019+00:00",
       "observed": {
         "city": "Vigrestad",
         "ends_at": "1785674280000"
@@ -14,7 +14,7 @@
       "verified": true
     },
     "unified-auksjonen-614289": {
-      "captured_at": "2026-08-02T03:52:00.405715+00:00",
+      "captured_at": "2026-08-02T08:36:52.423402+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1785753600000"
@@ -24,6 +24,6 @@
       "verified": true
     }
   },
-  "generated_at": "2026-08-02T03:52:01.661582+00:00",
+  "generated_at": "2026-08-02T08:36:53.920035+00:00",
   "schema_version": 2
 }

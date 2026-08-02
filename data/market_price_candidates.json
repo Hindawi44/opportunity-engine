@@ -1,13 +1,13 @@
 {
   "candidate_count": 2,
   "errors": {},
-  "generated_at": "2026-08-02T03:52:05.819331+00:00",
+  "generated_at": "2026-08-02T08:37:00.045951+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
   "opportunities": [
     {
-      "asking_price_nok": 5400.0,
+      "asking_price_nok": 5500.0,
       "available_query_count": 8,
       "candidate_count": 1,
       "candidate_market_value_nok": null,
@@ -17,10 +17,10 @@
       "candidates": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-08-02T03:52:02.410856+00:00",
+          "captured_at": "2026-08-02T08:36:54.935665+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
           "observed_prices_nok": [
             4990.0
           ],
@@ -42,12 +42,12 @@
       "distinct_source_class_count": 1,
       "eligible_for_market_value": false,
       "market_search_queries": [
-        "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+        "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
         "\"komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg\" selges kr",
         "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
         "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr"
       ],
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
       "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-614289",
       "query_budget_truncated": true,
@@ -55,7 +55,7 @@
       "query_stats": [
         {
           "accepted_count": 1,
-          "query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+          "query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
           "rejected_count": 9,
           "result_count": 10,
           "target_domain": null
@@ -88,7 +88,7 @@
           "canonical_url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
@@ -99,25 +99,10 @@
           "url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg/"
         },
         {
-          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.143,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
-          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
-        },
-        {
           "canonical_url": "https://reolteknikk.no/produktkategori/brukt",
           "comparable_quantity": null,
           "domain": "reolteknikk.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -129,10 +114,25 @@
           "url": "https://reolteknikk.no/produktkategori/brukt/"
         },
         {
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
+        },
+        {
           "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -147,7 +147,7 @@
           "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -159,10 +159,10 @@
           "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.90",
+          "canonical_url": "https://bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller",
           "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+          "domain": "bauhaus.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -170,14 +170,44 @@
           "similarity_score": 0.0,
           "source_quantity": 4,
           "target_domain": null,
-          "title": "Utstyr til bil, båt og MC | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?category=0.90"
+          "title": "Lagerhylle til lav pris | BAUHAUS",
+          "url": "https://www.bauhaus.no/innredning-oppbevaring/oppbevaring/lagerhyller"
+        },
+        {
+          "canonical_url": "https://ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning",
+          "comparable_quantity": null,
+          "domain": "ajprodukter.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Hyller og reoler i metall – stort utvalg og rask levering | AJ Produkter",
+          "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning"
+        },
+        {
+          "canonical_url": "https://ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller",
+          "comparable_quantity": null,
+          "domain": "ajprodukter.no",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Lagerhyller og lagerreoler – bestill her! | AJ Produkter",
+          "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
+          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -187,36 +217,6 @@
           "target_domain": null,
           "title": "Torget – FINN.no | FINN Torget",
           "url": "https://www.finn.no/recommerce/forsale/search"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler&sub_category=1.67.8348",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Reoler | Garasje | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler&sub_category=1.67.8348"
-        },
-        {
-          "canonical_url": "https://areol.no/pallereoler",
-          "comparable_quantity": null,
-          "domain": "areol.no",
-          "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Pallereoler - Brukte og Nye - Areol Innredninger AS",
-          "url": "https://areol.no/pallereoler/"
         },
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
@@ -248,21 +248,6 @@
           "url": "https://fasadenor.no/product/lagerreol-150x60x200cm-svart-1200kg/"
         },
         {
-          "canonical_url": "https://supersellers.no/i-butikken/butikkinnredning/tubo-reoler-wirereol/tubo-reol-hojde-200-cm.html",
-          "comparable_quantity": null,
-          "domain": "supersellers.no",
-          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Høyde 200 cm - Reoler av metall - TUBO - Butikkinnredning - Systemer - I butikken",
-          "url": "https://www.supersellers.no/i-butikken/butikkinnredning/tubo-reoler-wirereol/tubo-reol-hojde-200-cm.html"
-        },
-        {
           "canonical_url": "https://reolteknikk.no/produktkategori/brukt",
           "comparable_quantity": null,
           "domain": "reolteknikk.no",
@@ -278,21 +263,6 @@
           "url": "https://reolteknikk.no/produktkategori/brukt/"
         },
         {
-          "canonical_url": "https://loppetur.no/finn-bruktbutikk/tonsberg-kommune",
-          "comparable_quantity": null,
-          "domain": "loppetur.no",
-          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.111,
-          "source_quantity": 4,
-          "target_domain": null,
-          "title": "Bruktbutikker i Tønsberg kommune - Loppetur",
-          "url": "https://www.loppetur.no/finn-bruktbutikk/tonsberg-kommune"
-        },
-        {
           "canonical_url": "https://fasadenor.no/product-category/lagerreoler",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
@@ -306,6 +276,21 @@
           "target_domain": null,
           "title": "Lagerreoler – Solide Reoler for Lager og Verksted - Fasadenor",
           "url": "https://fasadenor.no/product-category/lagerreoler/"
+        },
+        {
+          "canonical_url": "https://loppetur.no/finn-bruktbutikk/tonsberg-kommune",
+          "comparable_quantity": null,
+          "domain": "loppetur.no",
+          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.111,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Bruktbutikker i Tønsberg kommune - Loppetur",
+          "url": "https://www.loppetur.no/finn-bruktbutikk/tonsberg-kommune"
         },
         {
           "canonical_url": "https://lagerbod.no/tonsberg",
@@ -368,6 +353,21 @@
           "url": "https://www.loppetur.no/finn-bruktbutikk/3105-tonsberg"
         },
         {
+          "canonical_url": "https://finn.no/recommerce/forsale/search",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": null,
+          "title": "Torget – FINN.no | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search"
+        },
+        {
           "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=33375136",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -398,21 +398,6 @@
           "url": "https://www.finn.no/bap/forsale/ad.html?finnkode=266393631"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": "finn.no",
-          "title": "Reoler | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
-        },
-        {
           "canonical_url": "https://finn.no/recommerce/forsale/item/271228732",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -426,6 +411,21 @@
           "target_domain": "finn.no",
           "title": "GARASJEBOD-LAGERBOD TIL LEIE I TØNSBERG | FINN-torget",
           "url": "https://www.finn.no/recommerce/forsale/item/271228732"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?q=reoler",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Reoler | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?q=reoler"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.90",
@@ -488,22 +488,7 @@
           "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 4,
-          "target_domain": "finn.no",
-          "title": "Torget – FINN.no | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search"
-        },
-        {
-          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=180403983",
+          "canonical_url": "https://finn.no/bap/webstore/ad.html?finnkode=130002363",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
@@ -514,12 +499,27 @@
           "similarity_score": 0.143,
           "source_quantity": 4,
           "target_domain": "finn.no",
-          "title": "Brukte Reoler Pallereoler og Lagerutstyr Kjøp & Salg | FINN-torget",
-          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=180403983"
+          "title": "Mobile reoler / kompaktarkiv / rullearkiv / lagerreoler / arkivreoler / reoler | FINN-torget",
+          "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130002363"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/83193645",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no komplette Lagerreoler 200cm Svart gul 1200kg Tønsberg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.143,
+          "source_quantity": 4,
+          "target_domain": "finn.no",
+          "title": "Listverksreol | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/83193645"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 27 bud 1d 6t 48m",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 28 bud 1d 2t 3m",
       "verified_comparable_count": 0
     },
     {
@@ -533,7 +533,7 @@
       "candidates": [
         {
           "canonical_url": "https://finn.no/recommerce/forsale/item/379955413",
-          "captured_at": "2026-08-02T03:52:05.818100+00:00",
+          "captured_at": "2026-08-02T08:37:00.044778+00:00",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
@@ -796,20 +796,6 @@
           "url": "https://www.machineseeker.no/mss/kj%C3%B8kken"
         },
         {
-          "canonical_url": "https://kjokkenfronter.no/produktstikkord/blum",
-          "comparable_quantity": null,
-          "domain": "kjokkenfronter.no",
-          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
-          "rejection_reasons": [
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.1,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Blum – Kjokkenfronter.no",
-          "url": "https://www.kjokkenfronter.no/produktstikkord/blum/"
-        },
-        {
           "canonical_url": "https://beslagteknikk.no/hengsler-skinner-skuffer/hengsler",
           "comparable_quantity": null,
           "domain": "beslagteknikk.no",
@@ -853,6 +839,20 @@
           "target_domain": null,
           "title": "Møbelfabrikker Norge | bedrifter | gulesider.no | side 1",
           "url": "https://www.gulesider.no/m%C3%B8belfabrikker+norge/bedrifter"
+        },
+        {
+          "canonical_url": "https://kjokkenfronter.no/produktstikkord/blum",
+          "comparable_quantity": null,
+          "domain": "kjokkenfronter.no",
+          "matched_query": "Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer bruktmarked NOK",
+          "rejection_reasons": [
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.1,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Blum – Kjokkenfronter.no",
+          "url": "https://www.kjokkenfronter.no/produktstikkord/blum/"
         },
         {
           "canonical_url": "https://beslagteknikk.no/",
@@ -900,21 +900,6 @@
           "url": "https://www.finn.no/recommerce/forsale/item/425731738"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/item/314028912",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
-          "target_domain": "finn.no",
-          "title": "Universalmal for skuffefronter | FINN-torget",
-          "url": "https://www.finn.no/recommerce/forsale/item/314028912"
-        },
-        {
           "canonical_url": "https://finn.no/recommerce/forsale/item/458625838",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -957,6 +942,21 @@
           "target_domain": "finn.no",
           "title": "Hengsler overskap kjøkken -Blum Aventos Hingtop 18mm | FINN-torget",
           "url": "https://www.finn.no/recommerce/forsale/item/407641180"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/314028912",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Universalmal for skuffefronter | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/314028912"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.78",
@@ -1004,7 +1004,7 @@
           "url": "https://www.finn.no/recommerce/forsale/search?q=kj%C3%B8kken"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?q=kj%C3%B8kken%C3%B8y",
+          "canonical_url": "https://finn.no/recommerce/forsale/item/435996580",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "site:finn.no Stort varelager kjøkken møbelproduksjon Blum fele Kessebb hmer kr",
@@ -1012,15 +1012,15 @@
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.0,
+          "similarity_score": 0.25,
           "source_quantity": null,
           "target_domain": "finn.no",
-          "title": "Kjøkkenøy | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?q=kj%C3%B8kken%C3%B8y"
+          "title": "Nytt stort kjøkken! Fri frakt | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/435996580"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 8t 46m 3s",
+      "title": "Stort varelager for kjøkken- og møbelproduksjon - Blum, Häfele, Kessebböhmer og Blanco beslag - møbelplater, fronter og topplater - lim og kantbånd - skruer, håndtak og festemateriell Vigrestad 5 bud 4t 1m 11s",
       "verified_comparable_count": 0
     }
   ],

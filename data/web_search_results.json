@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-08-02T03:51:55.456377+00:00",
+  "generated_at": "2026-08-02T08:36:47.114276+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -87,26 +87,26 @@
     {
       "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [],
-      "id": "f7aa75f522d1fcb540d5624a",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [],
       "id": "6f80d243272ec5979920784f",
       "language": "no",
       "published_at": "2022-10-24T17:00:33",
       "snippet": "<strong>Tre personer fra Hedmarken, en kar fra Jessheim og Silkesvarten AS skulle satse på tekstiler klær og mote i et Hamar-selskap</strong>. To år senere er det konkurs.",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 6,
       "title": "(+) Konkurs to år etter at fem eiere satset på mote",
       "url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "extra_snippets": [],
+      "id": "f7aa75f522d1fcb540d5624a",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "source": "Brave Search",
+      "source_rank": 7,
+      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -265,23 +265,6 @@
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
       "extra_snippets": [
-        "Forbrukerrådet advarer mot villedende markedsføring i nettbutikker som reklamerer med opphørssalg uten å faktisk stenge. Lær mer om hvordan du kan beskytte deg mot slike praksiser.",
-        "Norry Oslo har siden minst 30. august reklamert med at de skal legge ned, med løfte om et 24-timers opphørssalg. Flere uker senere er verken salget avsluttet eller nettbutikken nedlagt, skriver NRK. ... Flere nettbutikker markedsfører seg med annonser som gir inntrykk av at de skal legge ned, men butikken fortsetter salget langt utover det oppgitte tidspunktet.",
-        "– Når en butikk reklamerer med opphørssalg, gir de et klart inntrykk av at prisene er satt ned på grunn av at virksomheten legges ned og at det er knapphet på varer.",
-        "I mange tilfeller fortsetter disse butikkene å selge varer i lang tid etter at de angivelig skulle ha stengt."
-      ],
-      "id": "81550ca51413d1e1ac66062f",
-      "language": "nb",
-      "published_at": "2024-09-23T13:11:43",
-      "snippet": "Norry Oslo har siden minst 30. august reklamert med at de skal legge ned, med løfte om et 24-timers opphørssalg. Flere uker senere er verken salget avsluttet eller nettbutikken nedlagt, skriver NRK. ... Flere nettbutikker markedsfører seg med annonser som gir inntrykk av at de skal legge ned, men butikken fortsetter salget langt utover det oppgitte tidspunktet.",
-      "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Reklamerer med falske opphørssalg: – Forbudt",
-      "url": "https://www.kom24.no/annonse-facebook-forbrukerradet/reklamerer-med-falske-opphorssalg-forbudt/754219"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
         "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk.",
         "Din leverandør av butikkinventar og salgsfremmende produkter, et sortiment som spenner fra kroker og kleshengere til disker og prøverom. ... Ring eller skriv gjerne, hvis du har spørsmål. Vi tilbyr support både på e-post og telefon: 69 25 38 88. Vi legger oss i selen for å gi deg gode priser. Pålitelig standard inventar og butikktilbehør til konkurransedyktige priser.",
         "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
@@ -292,7 +275,7 @@
       "published_at": null,
       "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS&#x27; butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
       "url": "https://www.supersellers.no/"
     },
@@ -307,9 +290,24 @@
       "published_at": null,
       "snippet": "Skap det perfekte uttrykket for din butikk eller bedrift med SuperSellerS innredning og inventar. Våre produkter hjelper deg med å forme kundens opplevelse og tilhørighet til din bedrift. Utforsk våre e-kataloger og kontakt oss for personlig sparring. Besøk oss i Moss.",
       "source": "Brave Search",
-      "source_rank": 10,
+      "source_rank": 9,
       "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
       "url": "https://www.supersellers.no/katalog"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "Det er ulovlig å selge visse varer i Norge, enten på grunn av sikkerhetshensyn, helsefare eller andre regulatoriske krav.",
+        "Brukthandelloven regulerer handel med brukte og kasserte varer i Norge og gjelder for virksomheter som driver næringsvirksomhet med slike varer."
+      ],
+      "id": "27e09f46f1870e86d727c9db",
+      "language": "nb",
+      "published_at": "2025-03-10T17:54:57",
+      "snippet": "Brukthandelloven regulerer handel med brukte og kasserte varer i Norge og gjelder for virksomheter som driver næringsvirksomhet med slike varer.",
+      "source": "Brave Search",
+      "source_rank": 10,
+      "title": "Lover og regler for salg av brukte varer - Oslo Frimarked",
+      "url": "https://oslofrimarked.no/lover-og-regler-for-salg-av-brukte-varer/"
     },
     {
       "discovery_query": "varelager konkursbo Norge",
@@ -722,21 +720,6 @@
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
-        "Butikkinnredning og -utstyr – Gamle Fredrikstad · Butikkdesign Norge AS · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · www.butikkservice.no ·",
-        "Butikkinnredning og -utstyr – Ålesund · Checkmark Norge AS · www.checkmark.no · Vis telefon Ring 38 01 85 00 · E-post · Kart · Mer · Vis alle telefonnummer · Magnus Barfots vei 7, 4633 Kristiansand S · Butikkinnredning og -utstyr – Kristiansand S ·"
-      ],
-      "id": "a61ccf2a30553b6a59f53ccb",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Butikkinnredning og -utstyr – Gamle Fredrikstad · <strong>Butikkdesign Norge AS</strong> · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · ...",
-      "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Butikkinnredning og -utstyr - 1881.no",
-      "url": "https://www.1881.no/butikkinnredning-og-utstyr/"
-    },
-    {
-      "discovery_query": "butikkinnredning klesbutikk Norge",
-      "extra_snippets": [
         "Type innredning Slatboard Stålinnredning Veggskinner Utstillingsdukker Klesstativ Butikkdisk Glassmonter Bransje Arbeidstøy Caravan/utstyrsbutikk Klær Matbutikk/kiosk Souvenirbutikk Sport Farge Svart Hvit Grå Se alle! Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel.",
         "Type innredning Slatboard Stålinnredning Veggskinner Utstillingsdukker Klesstativ Butikkdisk Glassmonter Bransje Arbeidstøy Caravan/utstyrsbutikk Klær Matbutikk/kiosk Souvenirbutikk Sport Farge Svart Hvit Grå Se alle! Klesbutikk med sporvegger/slatboard på veggene med hyller, frontheng og konfeksjonsbøyler."
       ],
@@ -745,9 +728,24 @@
       "published_at": null,
       "snippet": "Type innredning Slatboard ... Svart Hvit Grå Se alle! <strong>Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel</strong>....",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Butikkinnredning Archives - Side 2 av 2 - Butikkartikler AS",
       "url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2/"
+    },
+    {
+      "discovery_query": "butikkinnredning klesbutikk Norge",
+      "extra_snippets": [
+        "Butikkinnredning og -utstyr – Gamle Fredrikstad · Butikkdesign Norge AS · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · www.butikkservice.no ·",
+        "Butikkinnredning og -utstyr – Ålesund · Checkmark Norge AS · www.checkmark.no · Vis telefon Ring 38 01 85 00 · E-post · Kart · Mer · Vis alle telefonnummer · Magnus Barfots vei 7, 4633 Kristiansand S · Butikkinnredning og -utstyr – Kristiansand S ·"
+      ],
+      "id": "a61ccf2a30553b6a59f53ccb",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Butikkinnredning og -utstyr – Gamle Fredrikstad · <strong>Butikkdesign Norge AS</strong> · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · ...",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Butikkinnredning og -utstyr - 1881.no",
+      "url": "https://www.1881.no/butikkinnredning-og-utstyr/"
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
