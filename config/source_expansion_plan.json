@@ -141,9 +141,12 @@
           "public_access_audit": "GO_FOR_BOUNDED_INDEX_AND_ITEM_ADAPTER",
           "audit_document": "docs/DEUTSCHE_PFANDVERWERTUNG_PUBLIC_ACCESS_AUDIT_v1.md",
           "source_contract": "config/sources/de_deutsche_pfandverwertung_v1.json",
-          "implemented_layer": "PUBLIC_INDEX_AND_ITEM_METADATA_PARSER",
+          "implemented_layer": "DAILY_ACTIVE_INDEX_COMPLETE_CATALOG_AND_EXACT_BULK_ITEM_WATCH",
+          "watch_workflow": "Deutsche Pfandverwertung Active Clothing Watch",
+          "watch_schedule_utc": "06:17",
+          "zero_result_watch_supported": true,
           "historical_clothing_item_identity": "dpv-object:2175",
-          "activation_blocker": "no active clothing catalog at audit; complete live catalog and persistence pipeline not yet validated",
+          "activation_blocker": "no current active clothing catalog has validated the live main-branch watch and persistence path",
           "production_ready": false
         }
       ]
