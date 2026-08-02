@@ -3,7 +3,7 @@
 **Scope:** every `.yml` and `.yaml` file currently under `.github/workflows/`  
 **Inventory date:** 2026-08-02  
 **Workflow files represented:** 34  
-**Change note:** one manual Germany Clothing Inventory open-web pilot workflow and one bounded Riegermann active-auction workflow are represented; no existing workflow was deleted or disabled.
+**Change note:** one manual Germany Clothing Inventory open-web pilot workflow and one bounded Riegermann active-auction workflow are represented; the active Riegermann workflow now runs daily and remains manually dispatchable; no existing workflow was deleted or disabled.
 
 ## Operator surface
 
@@ -13,7 +13,7 @@ The principal general discovery workflow remains:
 
 The Sweden and Germany pilots are bounded geographic-expansion workflows. They reuse the existing discovery, public-page verification, lifecycle classification, unified reporting, SQLite persistence, and safety contracts.
 
-The Germany open-web mode remains available. The source-specific Riegermann workflow reads the public active-auction index, selects only auctions with explicit clothing evidence, and delegates their exact catalog and information pages to the bounded Riegermann adapter. Neither workflow contacts sellers, bids, buys, pays, or estimates unsupported FX, VAT, customs, logistics, profit, or ROI values. A zero-result run remains a valid, reportable outcome.
+The Germany open-web mode remains available. The source-specific Riegermann workflow reads the public active-auction index, selects only auctions with explicit clothing evidence, and delegates their exact catalog and information pages to the bounded Riegermann adapter. It runs daily at `05:17 UTC` and remains available through manual dispatch. Neither workflow contacts sellers, bids, buys, pays, or estimates unsupported FX, VAT, customs, logistics, profit, or ROI values. A zero-result run remains a valid, reportable outcome.
 
 ## Complete file inventory
 
@@ -33,7 +33,7 @@ The Germany open-web mode remains available. The source-specific Riegermann work
 14. `.github/workflows/v2.7.2.4.2-bootstrap-pipeline-integration.yml`
 15. `.github/workflows/v2.7.2.4.3-external-evidence-execution-audit.yml`
 16. `.github/workflows/v2.7.2.4.4-brave-transport-response-audit.yml`
-17. `.github/workflows/v2.7.2.4.5-brave-response-content-audit.yml`
+17. `.github/workflows/v2.7.2.4.5-brave-response-content_audit.yml`
 18. `.github/workflows/v2.7.2.4.7-comparable-acceptance-audit.yml`
 19. `.github/workflows/v2.7.2.5-external-financial-final-score.yml`
 20. `.github/workflows/v2.8.1-external-market-comparables.yml`
@@ -75,4 +75,4 @@ The Germany workflows enforce:
 
 ## Integrity statement
 
-This report represents all 34 workflow files, including both supported filename extensions. The Sweden and Germany workflows are manual and evidence-preserving. Existing eligibility gates, source-access statuses, financial formulas, and automatic-action prohibitions remain unchanged.
+This report represents all 34 workflow files, including both supported filename extensions. The Sweden and Germany open-web workflows remain manual. The active Riegermann workflow runs daily at `05:17 UTC`, remains manually dispatchable, and preserves the existing evidence and safety gates. Existing eligibility gates, source-access statuses, financial formulas, and automatic-action prohibitions remain unchanged.
