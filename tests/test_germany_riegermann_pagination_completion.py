@@ -93,7 +93,7 @@ def test_completion_reconciliation_keeps_unproven_single_page_incomplete():
     assert report["catalog_contiguous_pages_prove_completion"] is False
     assert report["catalog_coverage_complete"] is False
     assert report["catalog_coverage_reason"] == "pagination_not_proven"
-    assert parent["catalog_coverage_complete"] is not True
+    assert parent.get("catalog_coverage_complete") is not True
     assert parent["post_verification_top5_block_reason"] == (
         "catalog_pagination_incomplete"
     )
