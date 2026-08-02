@@ -63,14 +63,20 @@ _GENERIC_LABELS = {
     "online katalog",
     "mehr",
 }
+# German inventory wording commonly forms compounds (for example
+# Damenbekleidung and Damenschuhe), so the source terms intentionally match
+# inside a larger word instead of requiring a leading word boundary.
 _CLOTHING_PATTERNS = (
-    ("bekleidung", re.compile(r"\bbekleidung\w*\b", re.I)),
-    ("kleidung", re.compile(r"\bkleidung\w*\b", re.I)),
-    ("textilien", re.compile(r"\btextil(?:ien|waren|bestand)?\b", re.I)),
-    ("modewaren", re.compile(r"\bmode(?:waren|bestand|artikel)\b", re.I)),
-    ("konfektion", re.compile(r"\bkonfektion\w*\b", re.I)),
-    ("schuhe", re.compile(r"\bschuh(?:e|waren|bestand)?\b", re.I)),
-    ("lederbekleidung", re.compile(r"\bleder(?:bekleidung|jacken|hosen|maentel|mäntel)\b", re.I)),
+    ("bekleidung", re.compile(r"bekleidung\w*", re.I)),
+    ("kleidung", re.compile(r"(?<!be)kleidung\w*", re.I)),
+    ("textilien", re.compile(r"textil\w*", re.I)),
+    ("modewaren", re.compile(r"mode(?:waren|bestand|artikel)\w*", re.I)),
+    ("konfektion", re.compile(r"konfektion\w*", re.I)),
+    ("schuhe", re.compile(r"schuh\w*", re.I)),
+    (
+        "lederbekleidung",
+        re.compile(r"leder(?:bekleidung|jacken|hosen|maentel|mäntel)\w*", re.I),
+    ),
     ("boutique", re.compile(r"\bboutique\b", re.I)),
 )
 
@@ -319,16 +325,13 @@ def parse_venta_auction_index(
 
     for index, group in enumerate(ordered):
         first_start = group["positions"][0][0]
-        last_end = group["positions"][-1][1]
         previous_end = ordered[index - 1]["positions"][-1][1] if index else 0
         next_start = (
             ordered[index + 1]["positions"][0][0]
             if index + 1 < len(ordered)
             else len(source_html)
         )
-        start = previous_end
-        end = next_start
-        context = source_html[start:end]
+        context = source_html[previous_end:next_start]
         visible = _strip_html(context)
 
         labels = [
@@ -336,7 +339,11 @@ def parse_venta_auction_index(
             for label in group["labels"]
             if label.casefold() not in _GENERIC_LABELS
         ]
-        title = max(labels, key=len) if labels else f"VENTA catalog {group['identity'].catalog_block_id}"
+        title = (
+            max(labels, key=len)
+            if labels
+            else f"VENTA catalog {group['identity'].catalog_block_id}"
+        )
         evidence_text = _remove_title(visible, title)
         matched_terms = _matching_clothing_terms(evidence_text)
 
