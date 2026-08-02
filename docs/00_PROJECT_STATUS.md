@@ -1,6 +1,6 @@
 # Opportunity Engine — Project Status
 
-**Last updated:** 2026-07-28  
+**Last updated:** 2026-08-02  
 **Status:** ACTIVE  
 **Authoritative repository:** `Hindawi44/opportunity-engine`
 
@@ -11,9 +11,10 @@ Every development session must begin by reading, in this order:
 1. `docs/00_PROJECT_STATUS.md`
 2. `docs/Opportunity_Discovery_Analysis_Blueprint_v2.0.md`
 3. `docs/REPOSITORY_ARCHITECTURE_AUDIT_v2.0.md`
-4. The current-task document named below
+4. `docs/MARKET_COMPLETION_MATRIX_v1.0.md`
+5. The current-task document named below
 
-The repository is the source of truth.
+The repository is the source of truth. Market completion and source activation must be read from separate fields.
 
 ## Product principle
 
@@ -22,9 +23,7 @@ The project has two independent engines:
 - **Discovery Engine:** discovers and verifies traceable opportunities.
 - **Analysis Engine:** analyzes confirmed opportunities.
 
-Neither engine may perform the other engine's responsibility.
-
-The bridge between them is the **Opportunity Dossier**.
+Neither engine may perform the other engine's responsibility. The bridge between them is the **Opportunity Dossier**.
 
 ## Approved end-to-end path
 
@@ -64,55 +63,142 @@ Blocked domains remain:
 - Store fixtures
 - Other opportunity domains
 
-No new domain implementation is approved until the Clothing Inventory path
-repeatedly discovers specific traceable opportunities and completes the dossier
-and reporting cycle.
+No new domain, country, or source implementation is currently approved.
+
+## Current project decision
+
+```text
+PROJECT_ENGINE_OPERATIONAL
+COUNTRY_FOUNDATIONS_NO_SE_DE_COMPLETE
+SOURCE_ACTIVATION_PARTIAL_AND_EXPLICIT
+NEW_SOURCE_EXPANSION_PAUSED
+NEXT_TASK_MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT
+```
+
+Norway, Sweden and Germany must not be restarted merely because an individual source is `PLANNED`, authorization-blocked, or waiting for a qualifying live case.
+
+## Market completion semantics
+
+The project tracks five separate dimensions:
+
+```text
+MARKET_FOUNDATION_STATUS
+SOURCE_IMPLEMENTATION_STATUS
+RUNTIME_ACTIVATION_STATUS
+DAILY_WATCH_STATUS
+CURRENT_OPPORTUNITY_STATUS
+```
+
+Authoritative files:
+
+```text
+config/market_completion_matrix.json
+docs/MARKET_COMPLETION_MATRIX_v1.0.md
+config/source_expansion_plan.json
+data/source_gap_matrix.json
+```
+
+`data/source_gap_matrix.json` remains the official runtime source-status snapshot. It does not by itself describe whether a bounded pilot or daily watch has already been implemented.
+
+## Country status
+
+### Norway (`NO`)
+
+```text
+MARKET_FOUNDATION_STATUS = COMPLETE
+SOURCE_NETWORK_STATUS = PARTIAL
+RESTART_MARKET = false
+```
+
+Active public channels:
+
+- Auksjonen.no;
+- Konkurs.app as a bankruptcy-lead channel;
+- Politiet.no as a public-auction-event lead channel.
+
+Authorization dependencies:
+
+- FINN.no;
+- Konkurskupp;
+- Bjarøy.
+
+Other planned Norwegian sources are backlog entries and do not make the market foundation incomplete.
+
+### Sweden (`SE`)
+
+```text
+MARKET_FOUNDATION_STATUS = COMPLETE
+SOURCE_IMPLEMENTATION_STATUS = BOUNDED_PILOT_IMPLEMENTED
+RESTART_MARKET = false
+```
+
+Implemented paths:
+
+- Blinto;
+- Klaravik;
+- PS Auction;
+- Swedish open-web discovery.
+
+Latest validated Blinto evidence:
+
+```text
+status = PASS
+merged_candidates = 6
+ended_or_historical = 6
+confirmed_sales = 0
+top5_count = 0
+sqlite_persisted_record_count = 6
+conversion_error_count = 0
+```
+
+This proves the Swedish pipeline and SQLite path. It does not prove a current active opportunity and does not automatically change the source runtime status to `ACTIVE`.
+
+### Germany (`DE`)
+
+```text
+MARKET_FOUNDATION_STATUS = COMPLETE
+SOURCE_NETWORK_STATUS = ONE_ACTIVE_TWO_OPERATIONAL_WATCHES
+RESTART_MARKET = false
+```
+
+Current source paths:
+
+| Source | Runtime status | Implementation | Schedule |
+|---|---|---|---|
+| Riegermann | `ACTIVE` | Active discovery and complete catalog handling | `05:17 UTC` |
+| VENTA Industrieversteigerungen | `PLANNED` | Daily active-index and complete-catalog watch | `05:47 UTC` |
+| Deutsche Pfandverwertung | `PLANNED` | Daily active-index, catalog and exact bulk-item watch | `06:17 UTC` |
+
+VENTA and Deutsche Pfandverwertung are implemented watches that remain unactivated until their required live clothing evidence appears and passes verification.
+
+### Denmark (`DK`)
+
+```text
+MARKET_FOUNDATION_STATUS = PLANNED
+SOURCE_IMPLEMENTATION_STATUS = NOT_IMPLEMENTED
+```
+
+No Denmark implementation is authorized by the current task.
 
 ## Completed and retained
 
 - Blueprint v2.0 approved.
-- Repository Architecture Audit v2.0 merged.
+- Repository Architecture Audit v2.0 approved.
 - Existing Analysis Engine V2.8–V3.7 retained and frozen.
 - Clothing Inventory selected as the reference MVP domain.
-- Opportunity Dossier specification approved.
-- All ten Clothing Inventory knowledge cards approved and merged.
-- Controlled end-to-end and real-case validations completed through PR #208.
-- Operator workflow cleanup and ownership work completed through PR #285.
-- Clothing Inventory single-case execution task merged in PR #286.
-- PR #287–#301 implemented and hardened the first Clothing Inventory live path.
-- PR #302–#305 preserved and verified the AXL real-opportunity validation chain.
-- PR #307 defined source-agnostic confirmed dossier intake.
-- PR #308 implemented confirmed dossier intake with retained
-  `DOSSIER_EVIDENCE_REQUIRED / NO_DECISION` reporting.
-- PR #310 implemented the structured sixteen-query Clothing Inventory Discovery
-  search.
-- PR #311 integrated `structured_clothing_discovery` into the manual operator
-  workflow.
-- PR #313 implemented the fail-closed verification-integrity correction.
-- PR #314 added the source-channel identity guard.
-- PR #315 separated Discovery Top 5 eligibility from Analysis eligibility and
-  restored traceable early event leads.
-- PR #316 rejected mixed non-clothing inventory shells.
-- PR #317 added Norwegian Clothing Inventory lot vocabulary and preserved
-  distinct stable listing identities.
-- PR #318 added the authorization-gated FINN Playwright pilot; live use remains
-  frozen without explicit written FINN permission.
-- PR #319 added the FINN saved-search email intake adapter.
-- PR #320 recognized explicit unavailable Auksjonen listings as ended.
-- PR #321 rejected the Storegutter retail catalogue false positive.
-- PR #322 corrected Brave Norwegian request handling.
-- PR #323 added the final post-verification Top 5 hard gate.
-- The post-merge live validation for PR #323 completed successfully with:
-
-```text
-execution_status = PASS
-post_verification_top5_hard_gate_applied = true
-top5_count = 0
-analysis_eligible_count = 0
-opportunity_quality_status = NO_VALID_OPPORTUNITIES
-```
-
-An empty Top 5 is an accepted safe outcome.
+- Opportunity Dossier specification and confirmed-dossier intake retained.
+- Controlled end-to-end and real-case validation chain retained.
+- Scenario-driven Clothing Inventory discovery and strict verification gates retained.
+- Post-verification Top 5 hard gate retained.
+- Norway market profile and active public channels retained.
+- Sweden market profile and bounded Blinto, Klaravik and PS Auction pilots retained.
+- Germany market profile and open-web pilot retained.
+- Riegermann active source with daily discovery retained.
+- VENTA daily zero-result-capable watch retained.
+- Deutsche Pfandverwertung daily zero-result-capable watch retained.
+- Unified JSON reporting and SQLite persistence retained.
+- Full project review checkpoint merged through PR #411.
+- Market/source completion semantics reconciled through the current configuration and documentation update.
 
 ## Accepted operator surface
 
@@ -121,57 +207,59 @@ An empty Top 5 is an accepted safe outcome.
 2 — Review One Opportunity End to End
 ```
 
-The Discovery workflow exposes three mutually exclusive manual operations:
+The canonical repository-wide regression owner remains:
 
 ```text
-brave_discovery
-active_clothing_scan
-structured_clothing_discovery
+.github/workflows/tests.yml
 ```
 
-No schedule or automatic execution is added.
+Geographic and source-specific workflows remain supporting workflows, not replacements for the two principal operator workflows.
+
+## Workflow state
+
+The repository currently retains 36 workflow files, including production support, acceptance checks, geographic pilots and historical diagnostics.
+
+Many `TEMP` and `Temporary` workflows remain visible in GitHub Actions. This is an operator-usability defect, not a product blocker. No workflow may be deleted or disabled without preserved history, equivalent coverage evidence and a rollback path.
 
 ## Current phase
 
-**Phase:** Brave Search precision improvement  
-**Status:** `DRAFT_PR_CI_GREEN`
+**Phase:** Multi-market operator checkpoint  
+**Status:** `TASK_DEFINED_READY_FOR_IMPLEMENTATION`
 
 ## Current implementation checkpoint
 
 ```text
-BRAVE_PRECISION_DISCOVERY_v1.0
+PROJECT_STATE_RECONCILIATION_v1.0
 ```
 
-Current task document:
+The reconciliation establishes:
+
+- Norway, Sweden and Germany foundations are complete;
+- individual source runtime status remains independent;
+- a successful historical-only pilot is not a current opportunity;
+- a daily zero-result watch is an implemented capability even while its source remains `PLANNED`;
+- new source expansion remains paused.
+
+## Current task document
 
 ```text
-docs/BRAVE_PRECISION_DISCOVERY_TASK_v1.0.md
+docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md
 ```
 
-Current pull request:
+## Next implementation contract
 
-```text
-PR #324 — Improve Brave Clothing Inventory search precision
-```
-
-## Current implementation contract
-
-The implementation must:
+The next implementation must:
 
 1. remain limited to `CLOTHING_INVENTORY`;
-2. preserve all sixteen approved query IDs, scenarios, intents, asset scope, and
-   rotation groups;
-3. improve only the pre-verification Brave retrieval surface;
-4. support Brave freshness presets and valid custom date ranges;
-5. enable Brave search operators explicitly for structured discovery;
-6. enable bounded extra snippets and deduplicate them before classification;
-7. exclude predictable buyer-intent, job, ordinary-shop, generic-content, and
-   stale-listing noise where appropriate;
-8. default structured discovery to `freshness=pm`, with manual selection of
-   `pd`, `pw`, `pm`, or `py`;
-9. record the active Brave precision settings in the search-run artifact;
-10. preserve all verification, dossier, Analysis Engine, and commercial-safety
-    boundaries.
+2. reuse existing Norway, Sweden and Germany outputs;
+3. produce one read-only phone summary and one structured report;
+4. distinguish source failure from a valid zero-result run;
+5. distinguish active, historical, ended, blocked and unresolved records;
+6. deduplicate opportunity identities across the consolidated result;
+7. preserve source-native currencies (`NOK`, `SEK`, `EUR`);
+8. preserve verification, dossier, eligibility and post-verification Top 5 gates;
+9. identify no more than one immediate human action;
+10. add no fourth country and no new source adapter.
 
 ## Strict confirmation conjunction
 
@@ -186,80 +274,46 @@ AND listing_status == ACTIVE
 AND successful public verification
 ```
 
-Search snippets, including Brave extra snippets, cannot confirm a sale by
-themselves.
+Search snippets, source names, company names, category labels and historical records cannot confirm a sale by themselves.
 
-## Approved implementation scope
+## Source-state rules
 
-```text
-src/opportunity_engine/discovery/brave_search.py
-src/opportunity_engine/discovery/brave_precision.py
-scripts/run_clothing_inventory_discovery_search.py
-tests/test_discovery_v11_live_search.py
-tests/test_brave_precision.py
-tests/test_active_clothing_inventory_operator_integration.py
-.github/workflows/discovery-v1.2-live-pilot.yml
-docs/BRAVE_PRECISION_DISCOVERY_TASK_v1.0.md
-docs/00_PROJECT_STATUS.md
-```
+- `ACTIVE`: formally activated source with validated runtime evidence.
+- `CODE_READY`: implementation ready but activation configuration remains.
+- `BLOCKED_AUTH`: official authorization or feed is required.
+- `PLANNED`: runtime activation is not approved; implementation detail must be read separately.
+- `DEPRECATED`: source removed by an explicit documented decision.
 
-## Validation status
-
-PR #324 checks are green:
+Implementation detail uses:
 
 ```text
-782 passed
-Discovery V1.1 Live Search Adapter = success
-1 — Discover Clothing Inventory Opportunities = success
-Full repository test workflow = success
+NOT_IMPLEMENTED
+BOUNDED_PILOT_IMPLEMENTED
+DAILY_WATCH_IMPLEMENTED
+ACTIVE_IMPLEMENTATION
 ```
 
 ## Non-negotiable rules
 
+- Do not restart Norway, Sweden or Germany.
+- Do not add Denmark or another country in the next task.
 - Do not add a new opportunity domain.
-- Do not add a new source or browser collector in this task.
-- Do not change the canonical sixteen-query scenario structure.
-- Do not weaken page verification, the early-opportunity gate, or the
-  post-verification Top 5 hard gate.
+- Do not weaken public verification or eligibility gates.
 - Do not modify the Opportunity Dossier contract.
-- Do not modify confirmed-dossier intake.
-- Do not modify market-comparable or acquisition-cost logic.
 - Do not modify V2.8–V3.7 financial formulas.
-- Do not modify investment scoring or decision intelligence.
-- Do not invent price, quantity, company, location, or active status.
-- Do not add a schedule or automatic execution.
+- Do not invent price, quantity, company, location, VAT, customs, logistics, profit or ROI.
+- Do not treat source failure as zero opportunities.
+- Do not treat a valid zero result as failure.
 - Do not contact sellers.
-- Do not bid, reserve, purchase, or pay.
-- Do not run the Playwright pilot without explicit written permission from FINN.
-
-## Definition of current-task success
-
-The task succeeds only when:
-
-1. all focused and repository-wide checks pass;
-2. freshness validation fails closed for unsupported or invalid values;
-3. the structured operation sends the selected freshness window,
-   `extra_snippets=true`, and `operators=true`;
-4. extra snippets remain bounded and deduplicated;
-5. all sixteen query contracts remain unchanged;
-6. the final verification and Top 5 boundaries remain unchanged;
-7. a post-merge live run produces the existing four artifacts;
-8. the live report records the Brave precision configuration;
-9. the new run is compared against the baseline of 109 merged candidates and
-   108 rejected results;
-10. no opportunity proceeds to a dossier unless the strict confirmation
-    conjunction passes.
+- Do not bid, reserve, purchase or pay.
+- Do not run authorization-gated collectors without explicit permission.
 
 ## Immediate next action
 
-Review and merge PR #324 only while all checks remain green. Then manually run:
+Implement only:
 
 ```text
-operation = structured_clothing_discovery
+MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT
 ```
 
-Inspect the four artifacts and compare retrieval efficiency against the previous
-baseline. A lower result count is not automatically better; the goal is fewer
-predictable false positives while preserving any genuine specific active sale.
-An empty Top 5 remains valid and must not be replaced with an invented
-opportunity.
+The first version must be manual and read-only. It must consolidate existing Norway, Sweden and Germany evidence before any further source or country expansion is considered.
