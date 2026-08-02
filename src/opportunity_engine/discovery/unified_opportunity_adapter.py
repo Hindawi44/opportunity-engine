@@ -4,64 +4,21 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Mapping
 
+from opportunity_engine.opportunity_lifecycle import (
+    candidate_is_verified,
+    classify_opportunity_lifecycle,
+)
 from opportunity_engine.unified_models import (
-    EvaluationStatus,
     Evidence,
-    ListingStatus,
     MarketSignal,
     MissingInformation,
     OpportunityRecord,
-    WorkflowStatus,
 )
-
-_CONFIRMED_SALE = "CONFIRMED_SALE"
-_STRONG_LEAD = "STRONG_LEAD_REQUIRES_VERIFICATION"
-_HISTORICAL_MARKET_EVIDENCE = "HISTORICAL_MARKET_EVIDENCE"
-_REJECTED = "REJECTED_NOISE"
-
-
-def _listing_status(value: object) -> ListingStatus:
-    try:
-        return ListingStatus(str(value or "UNKNOWN"))
-    except ValueError:
-        return ListingStatus.UNKNOWN
-
-
-def _lifecycle(
-    candidate: Mapping[str, Any],
-    verified: bool,
-) -> tuple[EvaluationStatus, WorkflowStatus]:
-    state = str(candidate.get("opportunity_state") or candidate.get("state") or "")
-    status = _listing_status(candidate.get("listing_status"))
-    inactive_statuses = {
-        ListingStatus.ENDED,
-        ListingStatus.SOLD,
-        ListingStatus.UNAVAILABLE,
-    }
-
-    if state == _REJECTED:
-        return EvaluationStatus.REJECTED, WorkflowStatus.REJECTED
-    if state == _HISTORICAL_MARKET_EVIDENCE and status in inactive_statuses:
-        return (
-            EvaluationStatus.HISTORICAL_ONLY,
-            WorkflowStatus.HISTORICAL_MARKET_EVIDENCE,
-        )
-    if status in inactive_statuses:
-        return EvaluationStatus.REQUIRES_VERIFICATION, WorkflowStatus.CLOSED
-    if state == _CONFIRMED_SALE and verified and status == ListingStatus.ACTIVE:
-        return EvaluationStatus.QUALIFIED, WorkflowStatus.QUALIFIED_OPPORTUNITY
-    if state == _STRONG_LEAD:
-        return EvaluationStatus.REQUIRES_VERIFICATION, WorkflowStatus.REQUIRES_VERIFICATION
-    return EvaluationStatus.NOT_EVALUATED, WorkflowStatus.CANDIDATE
 
 
 def _verification_items(candidate: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     items = candidate.get("verification") or []
     return [item for item in items if isinstance(item, Mapping)]
-
-
-def _verified(candidate: Mapping[str, Any]) -> bool:
-    return any(item.get("verified") is True for item in _verification_items(candidate))
 
 
 def _source_url(candidate: Mapping[str, Any]) -> str:
@@ -206,9 +163,10 @@ def opportunity_record_from_discovery_candidate(
     domain: str = "TEXTILE_AND_SEWING",
 ) -> OpportunityRecord:
     """Build one validated record without estimating missing public facts."""
-    verified = _verified(candidate)
-    evaluation_status, workflow_status = _lifecycle(candidate, verified)
-    listing_status = _listing_status(candidate.get("listing_status"))
+    verified = candidate_is_verified(candidate)
+    lifecycle = classify_opportunity_lifecycle(candidate, verified=verified)
+    metadata = _metadata(candidate)
+    metadata["lifecycle_reason_code"] = lifecycle.reason_code.value
 
     return OpportunityRecord(
         opportunity_id=str(candidate.get("opportunity_identity") or "").strip(),
@@ -218,9 +176,9 @@ def opportunity_record_from_discovery_candidate(
         title=str(candidate.get("title") or "").strip(),
         source_provider=_source_provider(candidate),
         source_url=_source_url(candidate),
-        listing_status=listing_status,
-        evaluation_status=evaluation_status,
-        workflow_status=workflow_status,
+        listing_status=lifecycle.listing_status,
+        evaluation_status=lifecycle.evaluation_status,
+        workflow_status=lifecycle.workflow_status,
         scenario=candidate.get("scenario"),
         company_name=candidate.get("company_name"),
         location=candidate.get("location"),
@@ -232,11 +190,11 @@ def opportunity_record_from_discovery_candidate(
         published_at=candidate.get("published_at"),
         discovered_at=discovered_at,
         identity_stable=candidate.get("identity_stable") is True,
-        verified=verified,
-        analysis_eligible=candidate.get("analysis_eligible") is True,
-        top5_eligible=candidate.get("top5_eligible") is True,
+        verified=lifecycle.verified,
+        analysis_eligible=lifecycle.analysis_eligible,
+        top5_eligible=lifecycle.top5_eligible,
         market_signals=_market_signals(candidate),
         evidence=_evidence(candidate),
         missing_information=_missing_information(candidate),
-        metadata=_metadata(candidate),
+        metadata=metadata,
     )
