@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Mapping
 
+from .lifecycle_repository import LifecycleEventRepository
 from .repository import PersistenceError
 from .unified_repository import UnifiedOpportunityRepository
 
@@ -50,11 +51,11 @@ def persist_unified_opportunity_report(
     *,
     source_ref: str = "unified-opportunity-report.json",
 ) -> dict[str, Any]:
-    """Persist all canonical records from one validated report envelope.
+    """Persist canonical snapshots and append meaningful lifecycle transitions.
 
-    The adapter copies canonical values and the original record JSON. It does not
-    estimate missing values, recalculate lifecycle states, or modify discovery
-    reports.
+    Lifecycle events are created only when listing status, evaluation status,
+    workflow status, or ``metadata.lifecycle_reason_code`` changes. Replaying the
+    same snapshot is idempotent. The adapter does not recalculate lifecycle state.
     """
     if not isinstance(report, Mapping):
         raise UnifiedReportPersistenceError("unified report must be an object")
@@ -88,6 +89,9 @@ def persist_unified_opportunity_report(
 
     persisted_ids: list[str] = []
     seen_ids: set[str] = set()
+    lifecycle_events_created = 0
+    lifecycle_repository = LifecycleEventRepository(repository.session)
+
     for position, raw_record in enumerate(records):
         if not isinstance(raw_record, Mapping):
             raise UnifiedReportPersistenceError(
@@ -104,11 +108,30 @@ def persist_unified_opportunity_report(
                 f"duplicate opportunity_id in report: {normalized_id}"
             )
         seen_ids.add(normalized_id)
-        repository.upsert_record(
+
+        previous = lifecycle_repository.snapshot_from_model(
+            repository.get(normalized_id)
+        )
+        record_source_ref = f"{source_ref}#{normalized_id}"
+        saved = repository.upsert_record(
             raw_record,
             seen_at=generated_at,
-            source_ref=f"{source_ref}#{normalized_id}",
+            source_ref=record_source_ref,
         )
+        current = lifecycle_repository.snapshot_from_model(saved)
+        if current is None:
+            raise UnifiedReportPersistenceError(
+                f"persisted record has no lifecycle snapshot: {normalized_id}"
+            )
+        event = lifecycle_repository.record_if_changed(
+            opportunity_id=normalized_id,
+            previous=previous,
+            current=current,
+            changed_at=generated_at,
+            source_ref=record_source_ref,
+        )
+        if event is not None and previous != current:
+            lifecycle_events_created += 1
         persisted_ids.append(normalized_id)
 
     return {
@@ -116,6 +139,7 @@ def persist_unified_opportunity_report(
         "generated_at": generated_at.isoformat().replace("+00:00", "Z"),
         "persisted_record_count": len(persisted_ids),
         "persisted_opportunity_ids": persisted_ids,
+        "lifecycle_events_created": lifecycle_events_created,
         "conversion_error_count": len(conversion_errors),
         "zero_result": not persisted_ids,
         "scope": {
