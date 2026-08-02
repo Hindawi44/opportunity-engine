@@ -6,7 +6,7 @@
     "DEPRECATED",
     "PLANNED"
   ],
-  "generated_at": "2026-08-02T08:37:00.719804+00:00",
+  "generated_at": "2026-08-02T13:09:00+00:00",
   "schema_version": 1,
   "source_count": 18,
   "sources": [
@@ -183,15 +183,15 @@
       "status": "PLANNED"
     },
     {
-      "access_mode": null,
+      "access_mode": "public_active_auction_index",
       "channel": "public_auction_event_lead",
       "error": null,
-      "fetched": 0,
+      "fetched": 18,
       "market": "Germany",
       "priority": 16,
       "required_configuration": [],
       "source": "Riegermann",
-      "status": "CODE_READY"
+      "status": "ACTIVE"
     },
     {
       "access_mode": null,
@@ -217,9 +217,9 @@
     }
   ],
   "status_counts": {
-    "ACTIVE": 3,
+    "ACTIVE": 4,
     "BLOCKED_AUTH": 3,
-    "CODE_READY": 1,
+    "CODE_READY": 0,
     "DEPRECATED": 0,
     "PLANNED": 11
   }

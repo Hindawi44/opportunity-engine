@@ -14,19 +14,20 @@ def _riegermann_plan_entry() -> dict:
     return next(row for row in germany["sources"] if row["source"] == "Riegermann")
 
 
-def test_riegermann_source_is_code_ready_pilot_not_production() -> None:
+def test_riegermann_source_is_active_after_main_branch_validation() -> None:
     contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
     plan_entry = _riegermann_plan_entry()
 
     assert contract["source_id"] == "DE_RIEGERMANN_V1"
     assert contract["market_code"] == "DE"
     assert contract["currency_code"] == "EUR"
-    assert contract["runtime_status"] == "PILOT"
+    assert contract["runtime_status"] == "ACTIVE"
     assert contract["audit_decision"] == "GO_FOR_BOUNDED_EVENT_ADAPTER"
 
-    assert plan_entry["audit_status"] == "CODE_READY"
-    assert plan_entry["runtime_status"] == "PILOT"
-    assert plan_entry["production_ready"] is False
+    assert plan_entry["audit_status"] == "ACTIVE"
+    assert plan_entry["runtime_status"] == "ACTIVE"
+    assert plan_entry["production_ready"] is True
+    assert plan_entry["activation_workflow"] == "Riegermann Active Clothing Auctions"
     assert plan_entry["public_access_audit"] == "GO_FOR_BOUNDED_EVENT_ADAPTER"
     assert plan_entry["source_contract"] == "config/sources/de_riegermann_v1.json"
     assert plan_entry["audit_document"] == "docs/RIEGERMANN_PUBLIC_ACCESS_AUDIT_v1.md"
@@ -81,9 +82,10 @@ def test_riegermann_price_and_safety_contracts_fail_closed() -> None:
     assert all(value is False for value in safety.values())
 
 
-def test_riegermann_audit_documents_live_cabrini_evidence_and_acceptance_gate() -> None:
+def test_riegermann_activation_records_complete_live_catalog_evidence() -> None:
     contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
     evidence = contract["known_current_evidence"]
+    validation = contract["activation_validation"]
     pilot = contract["pilot_validation"]
     audit = AUDIT_PATH.read_text(encoding="utf-8")
 
@@ -94,12 +96,33 @@ def test_riegermann_audit_documents_live_cabrini_evidence_and_acceptance_gate() 
     assert evidence["buyer_premium_percent"] == 20
     assert evidence["vat_percent"] == 19
 
+    assert validation["workflow"] == "Riegermann Active Clothing Auctions"
+    assert validation["source_mode"] == "RIEGERMANN_ACTIVE"
+    assert validation["auction_entries_discovered"] == 18
+    assert validation["active_clothing_entries_discovered"] == 1
+    assert validation["selected_auction_count"] == 1
+    assert validation["successful_auction_count"] == 1
+    assert validation["validated_auction_identity"] == "riegermann-auction:908"
+    assert validation["catalog_total_results"] == 869
+    assert validation["catalog_expected_page_count"] == 37
+    assert validation["catalog_unique_numbered_page_count"] == 37
+    assert validation["catalog_coverage_complete"] is True
+    assert validation["catalog_coverage_reason"] == "complete"
+    assert validation["catalog_page_error_count"] == 0
+    assert validation["catalog_item_url_count"] == 869
+    assert validation["parsed_child_lot_count"] == 869
+    assert validation["ordinary_child_lot_count"] == 868
+    assert validation["promoted_bulk_lot_count"] == 0
+    assert validation["single_garment_candidate_count"] == 0
+    assert validation["top5_count"] == 0
+    assert validation["production_ready"] is True
+
     assert pilot["auction_identity"] == "riegermann-auction:908"
-    assert pilot["catalog_item_url_count"] == 24
-    assert pilot["parsed_child_lot_count"] == 24
+    assert pilot["catalog_item_url_count"] == 869
+    assert pilot["parsed_child_lot_count"] == 869
     assert pilot["single_garment_candidate_count"] == 0
     assert pilot["top5_count"] == 0
-    assert pilot["production_ready"] is False
+    assert pilot["production_ready"] is True
 
     assert "GO_FOR_BOUNDED_EVENT_ADAPTER" in audit
     assert "AUCTION_EVENT_WITH_CHILD_LOTS" in audit
