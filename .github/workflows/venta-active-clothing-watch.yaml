@@ -1,0 +1,276 @@
+name: VENTA Active Clothing Watch
+
+on:
+  schedule:
+    # GitHub cron uses UTC: 05:47 UTC is 07:47 CEST / 06:47 CET in Norway.
+    - cron: "47 5 * * *"
+  workflow_dispatch:
+    inputs:
+      catalog_limit:
+        description: Maximum active VENTA catalogs to crawl
+        required: false
+        default: "10"
+      catalog_page_limit:
+        description: Maximum public pages per selected catalog
+        required: false
+        default: "100"
+      persist_unified:
+        description: Persist unified records to SQLite and upload the database
+        required: false
+        default: true
+        type: boolean
+  pull_request:
+    paths:
+      - ".github/workflows/venta-active-clothing-watch.yaml"
+      - "scripts/run_venta_active_discovery.py"
+      - "src/opportunity_engine/discovery/germany_venta.py"
+      - "src/opportunity_engine/discovery/germany_venta_active.py"
+      - "src/opportunity_engine/discovery/unified_opportunity_report.py"
+      - "config/source_expansion_plan.json"
+      - "config/sources/de_venta_v1.json"
+      - "tests/test_germany_venta_active.py"
+      - "tests/test_venta_active_workflow.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: venta-active-clothing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  active-clothing-watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OUTPUT_DIR: artifacts/germany-venta-active
+      EXPECTED_PERSIST_UNIFIED: ${{ github.event_name != 'workflow_dispatch' || inputs.persist_unified }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run VENTA active clothing watch
+        shell: bash
+        run: |
+          persistence_args=()
+          if [ "${EXPECTED_PERSIST_UNIFIED,,}" = "true" ]; then
+            persistence_args+=(
+              --persist-unified
+              --database-url "sqlite:///$OUTPUT_DIR/opportunity_engine.db"
+            )
+          fi
+
+          python scripts/run_venta_active_discovery.py \
+            --output-dir "$OUTPUT_DIR" \
+            --catalog-limit "${{ github.event.inputs.catalog_limit || '10' }}" \
+            --catalog-page-limit "${{ github.event.inputs.catalog_page_limit || '100' }}" \
+            "${persistence_args[@]}"
+
+      - name: Validate VENTA watch artifacts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import sqlite3
+
+          root = Path("artifacts/germany-venta-active")
+          required = (
+              "all-discovered-candidates.json",
+              "discovery-top5.json",
+              "search-run-report.json",
+              "unified-opportunity-report.json",
+              "venta-active-diagnostics.json",
+          )
+          missing = [name for name in required if not (root / name).exists()]
+          if missing:
+              raise SystemExit(f"Missing VENTA watch artifacts: {missing}")
+
+          report = json.loads(
+              (root / "search-run-report.json").read_text(encoding="utf-8")
+          )
+          expected = {
+              "status": "PASS",
+              "market_code": "DE",
+              "currency": "EUR",
+              "source_mode": "VENTA_ACTIVE_WATCH",
+              "source_target": "VENTA_ACTIVE_AUCTIONS",
+              "query_pack": "VENTA_ACTIVE_INDEX_V1",
+              "currency_conversion_performed": False,
+              "tax_calculation_performed": False,
+              "customs_calculation_performed": False,
+              "logistics_calculation_performed": False,
+          }
+          for key, value in expected.items():
+              if report.get(key) != value:
+                  raise SystemExit(
+                      f"Expected {key}={value!r}, got {report.get(key)!r}"
+                  )
+
+          live = report.get("venta_active") or {}
+          if int(live.get("auction_entries_discovered") or 0) < 1:
+              raise SystemExit("VENTA public index exposed no auction entries")
+          if int(live.get("active_catalog_entries_discovered") or 0) < 1:
+              raise SystemExit("VENTA public index exposed no active catalogs")
+          if int(live.get("failed_catalog_count") or 0) != 0:
+              raise SystemExit(
+                  f"VENTA catalog failures: {live.get('catalog_errors')}"
+              )
+          if int(live.get("successful_catalog_count") or 0) != int(
+              live.get("selected_catalog_count") or 0
+          ):
+              raise SystemExit("Not every selected VENTA catalog completed")
+          if live.get("single_garment_candidate_count") != 0:
+              raise SystemExit("Single garments became standalone candidates")
+          if live.get("promoted_bulk_lot_count") != 0:
+              raise SystemExit("Unverified VENTA bulk lots were promoted")
+          if live.get("zero_clothing_results_are_valid") is not True:
+              raise SystemExit("Zero-result VENTA contract was lost")
+
+          for catalog_run in live.get("catalog_runs") or []:
+              if catalog_run.get("catalog_coverage_complete") is not True:
+                  raise SystemExit(
+                      "VENTA catalog coverage is incomplete: "
+                      f"{catalog_run.get('catalog_block_id')} / "
+                      f"{catalog_run.get('catalog_coverage_reason')}"
+                  )
+              if catalog_run.get("catalog_page_errors"):
+                  raise SystemExit(
+                      f"VENTA catalog has page errors: "
+                      f"{catalog_run.get('catalog_block_id')}"
+                  )
+              expected_pages = int(
+                  catalog_run.get("catalog_expected_page_count") or 0
+              )
+              fetched_pages = int(catalog_run.get("catalog_pages_fetched") or 0)
+              if expected_pages < 1 or fetched_pages != expected_pages:
+                  raise SystemExit(
+                      "VENTA contiguous page count was not completed: "
+                      f"{catalog_run.get('catalog_block_id')}"
+                  )
+
+          candidates = json.loads(
+              (root / "all-discovered-candidates.json").read_text(encoding="utf-8")
+          )
+          top5 = json.loads(
+              (root / "discovery-top5.json").read_text(encoding="utf-8")
+          )
+          if not isinstance(candidates, list) or not isinstance(top5, list):
+              raise SystemExit("VENTA artifacts must contain JSON lists")
+          if top5:
+              raise SystemExit("VENTA watch must not publish unverified Top 5 items")
+
+          for candidate in candidates:
+              if candidate.get("page_role") != "AUCTION_EVENT":
+                  raise SystemExit("VENTA watch emitted a non-parent candidate")
+              if not str(candidate.get("opportunity_identity") or "").startswith(
+                  "venta-auction:"
+              ):
+                  raise SystemExit("VENTA candidate lost stable auction identity")
+              if candidate.get("catalog_coverage_complete") is not True:
+                  raise SystemExit("VENTA candidate has incomplete catalog coverage")
+              if candidate.get("price_nok") is not None:
+                  raise SystemExit("VENTA candidate leaked into price_nok")
+              if candidate.get("bid_price_nok") is not None:
+                  raise SystemExit("VENTA candidate leaked into bid_price_nok")
+              if candidate.get("top5_eligible") is not False:
+                  raise SystemExit("VENTA parent became Top 5 eligible")
+              if candidate.get("analysis_eligible") is not False:
+                  raise SystemExit("VENTA parent became analysis eligible")
+              if int(candidate.get("promoted_bulk_lot_count") or 0) != 0:
+                  raise SystemExit("Unverified VENTA bulk lot was promoted")
+              for lot in candidate.get("child_lots") or []:
+                  if lot.get("promotion_eligible") is not False:
+                      raise SystemExit("Unverified VENTA child lot became promotable")
+
+          unified = json.loads(
+              (root / "unified-opportunity-report.json").read_text(encoding="utf-8")
+          )
+          if unified.get("market_code") != "DE" or unified.get("currency") != "EUR":
+              raise SystemExit("Unified VENTA report lost DE/EUR identity")
+          if unified.get("record_count") != len(candidates):
+              raise SystemExit("Unified VENTA record count does not match candidates")
+          if unified.get("conversion_error_count") != 0:
+              raise SystemExit("Unified VENTA conversion errors must remain zero")
+
+          expected_persist = (
+              os.environ.get("EXPECTED_PERSIST_UNIFIED", "false").lower() == "true"
+          )
+          persistence_summary = root / "unified-persistence-summary.json"
+          database_path = root / "opportunity_engine.db"
+          historical_json = root / "historical-market-evidence-report.json"
+          historical_text = root / "historical-market-evidence-summary.txt"
+          if expected_persist:
+              required_persistence = (
+                  persistence_summary,
+                  database_path,
+                  historical_json,
+                  historical_text,
+              )
+              missing_persistence = [
+                  path.name for path in required_persistence if not path.exists()
+              ]
+              if missing_persistence:
+                  raise SystemExit(
+                      f"Missing VENTA persistence artifacts: {missing_persistence}"
+                  )
+              persistence = json.loads(
+                  persistence_summary.read_text(encoding="utf-8")
+              )
+              if persistence.get("status") != "SUCCESS":
+                  raise SystemExit("VENTA persistence failed")
+              if persistence.get("persisted_record_count") != len(candidates):
+                  raise SystemExit("Persisted VENTA count does not match candidates")
+              with sqlite3.connect(database_path) as connection:
+                  rows = connection.execute(
+                      "SELECT opportunity_id, price, bid_price, record_json "
+                      "FROM unified_opportunities ORDER BY opportunity_id"
+                  ).fetchall()
+              if len(rows) != len(candidates):
+                  raise SystemExit("SQLite VENTA row count does not match candidates")
+              for opportunity_id, price, bid_price, raw_record in rows:
+                  record = json.loads(raw_record)
+                  if record.get("market_code") != "DE" or record.get("currency") != "EUR":
+                      raise SystemExit(
+                          f"SQLite VENTA record lost DE/EUR identity: {opportunity_id}"
+                      )
+                  if price is not None or bid_price is not None:
+                      raise SystemExit(
+                          f"Source value entered normalized columns: {opportunity_id}"
+                      )
+
+          print("VENTA active watch summary:")
+          for key in (
+              "auction_entries_discovered",
+              "active_catalog_entries_discovered",
+              "selected_catalog_count",
+              "successful_catalog_count",
+              "clothing_catalog_count",
+              "catalog_item_url_count",
+              "clothing_child_lot_count",
+              "observed_bulk_lot_count",
+              "company_name_only_false_positive_count",
+          ):
+              print(f"{key}: {live.get(key)}")
+          print(f"candidate_count: {len(candidates)}")
+          print(f"top5_count: {len(top5)}")
+          print("zero_clothing_results_are_valid: true")
+          PY
+
+      - name: Upload VENTA watch artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: venta-active-clothing-watch
+          path: artifacts/germany-venta-active
+          if-no-files-found: error
