@@ -1,0 +1,142 @@
+{
+  "schema_version": "source-contract-v1",
+  "source_id": "DE_VENTA_V1",
+  "source_name": "VENTA Industrieversteigerungen",
+  "market_code": "DE",
+  "currency_code": "EUR",
+  "language_code": "de",
+  "runtime_status": "PLANNED",
+  "audit_decision": "GO_FOR_BOUNDED_INDEX_AND_CATALOG_ADAPTER",
+  "audit_date": "2026-08-02",
+  "audit_document": "docs/VENTA_PUBLIC_ACCESS_AUDIT_v1.md",
+  "access": {
+    "accepted_hosts": [
+      "auction.venta24.de"
+    ],
+    "public_read_without_login": true,
+    "commercial_bidder_restriction_published": true,
+    "login_required_for_bidding": true,
+    "hidden_api_access_allowed": false,
+    "captcha_solving_allowed": false,
+    "proxy_or_tls_bypass_allowed": false
+  },
+  "url_contract": {
+    "auction_index_urls": [
+      "https://auction.venta24.de/",
+      "https://auction.venta24.de/index.html"
+    ],
+    "auction_catalog_path_regex": "^/browse/search/1/block/(?P<slug>[^/]+)_(?P<catalog_block_id>[0-9]+)(?:/search_closed/y)?[.]html$",
+    "item_detail_path_regex": "^/item/id/(?P<auction_number>[0-9]+)_(?P<lot_number>[0-9]+)_.+_(?P<object_id>[0-9]+)[.]html$"
+  },
+  "identity_contract": {
+    "index_catalog_identity": "venta-catalog-block:<catalog_block_id>",
+    "auction_identity": "venta-auction:<auction_number>",
+    "item_identity": "venta-object:<object_id>",
+    "catalog_block_identity_is_provisional": true,
+    "auction_number_required_for_stable_opportunity": true,
+    "lot_number_is_globally_unique": false,
+    "object_id_is_required_for_item_deduplication": true
+  },
+  "filter_contract": {
+    "company_name_is_clothing_evidence": false,
+    "explicit_inventory_summary_required": true,
+    "catalog_or_lot_clothing_evidence_required": true,
+    "accepted_clothing_terms": [
+      "Bekleidung",
+      "Kleidung",
+      "Textilien",
+      "Textilwaren",
+      "Modewaren",
+      "Konfektion",
+      "Schuhe",
+      "Lederbekleidung",
+      "Boutique"
+    ],
+    "ordinary_unrelated_catalogs_rejected": true,
+    "zero_clothing_results_are_valid": true
+  },
+  "aggregation_contract": {
+    "mode": "AUCTION_EVENT_WITH_CHILD_LOTS",
+    "promote_index_card_without_catalog_verification": false,
+    "promote_verified_clothing_auction_event": true,
+    "promote_single_garment_lot": false,
+    "promote_explicit_bulk_lot": true,
+    "single_garment_top5_eligible": false
+  },
+  "public_index_fields": [
+    "catalog_block_id",
+    "auction_title",
+    "summary",
+    "active_or_closed_section",
+    "catalog_url"
+  ],
+  "public_catalog_fields": [
+    "auction_number",
+    "auction_title",
+    "end_at",
+    "inspection_window",
+    "pickup_window",
+    "location",
+    "catalog_page_count",
+    "catalog_total_results",
+    "item_urls"
+  ],
+  "public_item_fields": [
+    "object_id",
+    "auction_number",
+    "lot_number",
+    "title",
+    "description",
+    "displayed_amount_eur",
+    "bid_count",
+    "end_at"
+  ],
+  "lifecycle_mapping": {
+    "Beginn": "ACTIVE",
+    "Erster Artikel endet": "ACTIVE",
+    "Auslauf der Versteigerung": "ACTIVE",
+    "Auktion beendet": "ENDED",
+    "search_closed/y": "ENDED"
+  },
+  "price_contract": {
+    "source_currency": "EUR",
+    "displayed_amount_semantics_require_item_verification": true,
+    "active_displayed_amount_is_final_price": false,
+    "final_price_requires_explicit_ended_sale_semantics": true,
+    "normalized_price_enabled": false,
+    "fx_conversion_enabled": false,
+    "vat_calculation_enabled": false,
+    "premium_calculation_enabled": false
+  },
+  "known_public_evidence": {
+    "index_url": "https://auction.venta24.de/",
+    "published_buyer_premium_percent": 18,
+    "published_vat_basis": "gesetzliche MwSt.",
+    "active_catalogs_observed_at_audit": 5,
+    "active_clothing_catalogs_observed_at_audit": 0,
+    "textile_category_count_observed_at_audit": 0,
+    "false_positive_company_title": "Insolvenz-Versteigerung der Multiply Apparel GmbH, Dortmund",
+    "false_positive_catalog_number": "5214",
+    "false_positive_catalog_total_results": 1,
+    "false_positive_only_item": "Porsche 911 Targa 4 GTS, Cabriolet, Hybrid Benzin/Elektro"
+  },
+  "activation_requirements": {
+    "live_clothing_catalog_required": true,
+    "catalog_pagination_required": true,
+    "exact_item_identity_required": true,
+    "bulk_lot_gate_required": true,
+    "single_garment_suppression_required": true,
+    "source_eur_fields_must_not_enter_nok_fields": true,
+    "live_workflow_required": true,
+    "sqlite_persistence_validation_required": true,
+    "production_ready": false
+  },
+  "safety_contract": {
+    "seller_contact_allowed": false,
+    "bidding_allowed": false,
+    "purchase_allowed": false,
+    "payment_allowed": false,
+    "profitability_calculation_allowed": false,
+    "cross_border_cost_calculation_allowed": false
+  }
+}
