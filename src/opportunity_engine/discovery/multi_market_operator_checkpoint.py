@@ -11,16 +11,24 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 
 MARKET_CURRENCIES = {"NO": "NOK", "SE": "SEK", "DE": "EUR"}
 SUCCESS_STATES = {"PASS", "SUCCESS", "OK", "COMPLETED"}
 ENDED_STATES = {"ENDED", "CLOSED", "EXPIRED", "SOLD", "UNAVAILABLE"}
-HISTORICAL_WORKFLOW_STATES = {
+HISTORICAL_LIFECYCLE_STATES = {
     "HISTORICAL_MARKET_EVIDENCE",
     "HISTORICAL_EVIDENCE",
+    "HISTORICAL_ONLY",
 }
+AUKSJONEN_ANALYSIS_BLOCKERS = (
+    "verified exact item-page evidence",
+    "verified quantity and condition",
+    "documented final payable price including auction fees and VAT",
+    "domestic pickup or delivery logistics basis",
+    "documented resale-market evidence",
+)
 STATUS_RANK = {
     "ACTIVE": 5,
     "UPCOMING": 4,
@@ -83,13 +91,17 @@ def opportunity_identity(record: Mapping[str, Any], source_name: str) -> str:
 
 def _record_status(record: Mapping[str, Any]) -> str:
     listing_status = _compact(record.get("listing_status") or record.get("status")).upper()
-    workflow_status = _compact(record.get("workflow_status")).upper()
+    lifecycle_states = {
+        _compact(record.get("workflow_status")).upper(),
+        _compact(record.get("opportunity_state")).upper(),
+        _compact(record.get("evaluation_status")).upper(),
+    }
+    if lifecycle_states & HISTORICAL_LIFECYCLE_STATES or listing_status == "HISTORICAL":
+        return "HISTORICAL"
     if listing_status == "ACTIVE":
         return "ACTIVE"
     if listing_status == "UPCOMING":
         return "UPCOMING"
-    if workflow_status in HISTORICAL_WORKFLOW_STATES or listing_status == "HISTORICAL":
-        return "HISTORICAL"
     if listing_status in ENDED_STATES:
         return "ENDED"
     return "UNRESOLVED"
@@ -113,8 +125,34 @@ def _missing_evidence(record: Mapping[str, Any]) -> list[str]:
             if text:
                 values.append(text)
         elif isinstance(raw, Sequence) and not isinstance(raw, (str, bytes)):
-            values.extend(_compact(item) for item in raw if _compact(item))
+            for item in raw:
+                if isinstance(item, Mapping):
+                    text = _first_text(
+                        item,
+                        ("field_name", "reason", "required_for"),
+                    )
+                else:
+                    text = _compact(item)
+                if text:
+                    values.append(text)
     return values
+
+
+def _analysis_missing_evidence(
+    record: Mapping[str, Any],
+    *,
+    source_name: str,
+    top5_eligible: bool,
+    analysis_eligible: bool,
+) -> list[str]:
+    values = _missing_evidence(record)
+    if (
+        source_name.casefold().startswith("auksjonen")
+        and top5_eligible
+        and not analysis_eligible
+    ):
+        values.extend(AUKSJONEN_ANALYSIS_BLOCKERS)
+    return sorted(set(values))
 
 
 def _source_files(spec: Mapping[str, Any], root: Path) -> dict[str, Path]:
@@ -179,7 +217,6 @@ def _load_source(spec: Mapping[str, Any], root: Path) -> dict[str, Any]:
     unified = _read_json(files["unified"], default=None)
     persistence = _read_json(files["persistence"], default=None)
 
-    # Auksjonen's direct public API adapter has a source-specific report shape.
     if spec.get("report_kind") == "AUKSJONEN_LIVE":
         report = report if isinstance(report, Mapping) else None
         records = _as_list((report or {}).get("listings"))
@@ -300,6 +337,10 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
             record = deepcopy(dict(raw))
             identity = opportunity_identity(record, source_name)
             status = _record_status(record)
+            raw_top5_eligible = bool(record.get("top5_eligible")) or identity in top5_ids
+            raw_analysis_eligible = bool(record.get("analysis_eligible"))
+            top5_eligible = raw_top5_eligible and status == "ACTIVE"
+            analysis_eligible = raw_analysis_eligible and status == "ACTIVE"
             normalized = {
                 "opportunity_identity": identity,
                 "title": _first_text(record, ("title", "name")),
@@ -307,10 +348,15 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
                 "currency": currency,
                 "source_names": [source_name],
                 "listing_status": status,
-                "top5_eligible": bool(record.get("top5_eligible")) or identity in top5_ids,
-                "analysis_eligible": bool(record.get("analysis_eligible")),
+                "top5_eligible": top5_eligible,
+                "analysis_eligible": analysis_eligible,
                 "discovery_score": _score(record),
-                "missing_evidence": _missing_evidence(record),
+                "missing_evidence": _analysis_missing_evidence(
+                    record,
+                    source_name=source_name,
+                    top5_eligible=top5_eligible,
+                    analysis_eligible=analysis_eligible,
+                ),
                 "source_urls": list(record.get("source_urls") or []),
                 "canonical_url": _first_text(record, ("canonical_url", "url")),
             }
