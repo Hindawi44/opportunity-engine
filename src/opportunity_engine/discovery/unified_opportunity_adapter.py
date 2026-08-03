@@ -117,6 +117,13 @@ def _trusted_historical_bid_price(
     return float(value) if value is not None else None
 
 
+def _string_list(candidate: Mapping[str, Any], key: str) -> list[str]:
+    raw = candidate.get(key) or []
+    if not isinstance(raw, list):
+        return []
+    return [str(item).strip() for item in raw if str(item).strip()]
+
+
 def _metadata(candidate: Mapping[str, Any]) -> dict[str, Any]:
     """Preserve source trust and occurrence identity without estimating values."""
     return {
@@ -151,6 +158,9 @@ def _metadata(candidate: Mapping[str, Any]) -> dict[str, Any]:
         ),
         "source_object_id": candidate.get("source_object_id"),
         "auction_occurrence_id": candidate.get("auction_occurrence_id"),
+        "price_kind": candidate.get("price_kind"),
+        "verification_blockers": _string_list(candidate, "verification_blockers"),
+        "analysis_tasks": _string_list(candidate, "analysis_tasks"),
     }
 
 

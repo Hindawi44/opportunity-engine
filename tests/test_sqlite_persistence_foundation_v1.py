@@ -31,6 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ALEMBIC_CONFIG = ROOT / "alembic.ini"
 EXPECTED_TABLES = {
     "alembic_version",
+    "human_review_outcomes",
     "lifecycle_events",
     "opportunities",
     "shipment_evidence_tasks",
@@ -278,7 +279,7 @@ def test_init_database_cli_applies_head_migration(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stderr
     output = json.loads(result.stdout)
-    assert output["revision"] == "0003_lifecycle_event_persistence_v1"
+    assert output["revision"] == "0004_human_review_outcome_v1"
     assert set(output["tables"]) == EXPECTED_TABLES
     assert output["changes_final_decision"] is False
     assert output["changes_ranking"] is False
