@@ -47,8 +47,8 @@
     "daily_report_limit": 17,
     "unsupported_source_type_for_sale_pipeline": 20
   },
-  "generated_at": "2026-08-02T19:34:09.166210+00:00",
-  "ignored_non_official_record_count": 57,
+  "generated_at": "2026-08-03T03:54:05.161772+00:00",
+  "ignored_non_official_record_count": 58,
   "input_record_count": 33,
   "match_counts": {
     "EXACT_URL": 0,

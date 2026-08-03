@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-08-02T19:33:56.719632+00:00",
+  "generated_at": "2026-08-03T03:53:53.778343+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -111,20 +111,6 @@
     {
       "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [
-        "Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta."
-      ],
-      "id": "ccf7065118a5bf95db4092be",
-      "language": "nb",
-      "published_at": "2003-10-28T10:11:00",
-      "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
-      "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Devold Tekstil frifunne",
-      "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [
         "Med et abonnement på Tekstilforum får du tilgang til hele arkivet vårt · Butikkinnredning - Emballasje - Accesoirer - Yttertøy - Undertøy - Belysning - Med mer · Viktig digitalt læringsprosjekt i Holzweiler · Virkes konjunkturrapport: Bransjejus ·"
       ],
       "id": "d2192f749651b034d4eb8136",
@@ -132,26 +118,35 @@
       "published_at": "2022-09-05T10:02:35",
       "snippet": "<strong>I august økte antallet konkurser med 42,9 prosent, sammenlignet med samme måned i fjor</strong>. Antallet ansatte som har mistet jobben som følge av konkurser har økt med hele 51,5 prosent.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "(+) Sterk økning i antall konkurser",
       "url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [
-        "I Trondheim har vi allerede i flere år tatt i mot både brukbare og ødelagte tekstiler på Heggstadmoen gjenvinningsstasjon. Felles for begge fraksjonene er at de må være tørre og rene. Alle tekstiler skal leveres ferdig sortert og i knyttede poser. Alle tekstiler skal leveres ferdig sortert og i knyttede poser.",
-        "Klær, tekstiler og sko gjenbrukes som de er, hvis de er hele og rene.",
-        "Fra 2025 sender vi tekstilene vi samler inn videre til Norwegian Re:Textiles på Krøderen, som sorterer alt. Så mye som mulig sorteres til ombruk, dernest til gjenvinning til ny tekstil.",
-        "Noen tekstiler repareres, eller redesignes."
+        "Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta."
       ],
-      "id": "80ef3c35ce3a7b287d722cd3",
+      "id": "ccf7065118a5bf95db4092be",
+      "language": "nb",
+      "published_at": "2003-10-28T10:11:00",
+      "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Devold Tekstil frifunne",
+      "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "extra_snippets": [],
+      "id": "ff05dbb792cccc1b5cc5b636",
       "language": "no",
-      "published_at": "2026-03-12T12:58:04",
-      "snippet": "I Trondheim har vi allerede i flere år tatt i mot både brukbare og ødelagte tekstiler på <strong>Heggstadmoen gjenvinningsstasjon</strong>. Felles for begge fraksjonene er at de må være tørre og rene. Alle tekstiler skal leveres ferdig sortert og i knyttede poser. Alle tekstiler skal leveres ferdig sortert ...",
+      "published_at": null,
+      "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
       "source": "Brave Search",
       "source_rank": 10,
-      "title": "Tekstiler - Trondheim Renholdsverk",
-      "url": "https://trv.no/hva-skjer-med-avfallet-ditt/tekstiler/"
+      "title": "Proff™ - Konkurser og tvangsaviklinger",
+      "url": "https://www.proff.no/konkurser"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -164,25 +159,11 @@
       "id": "61d06a7585e140c934b77c32",
       "language": "no",
       "published_at": null,
-      "snippet": "<strong>Butikken skal holde et opphørssalg før den flytter</strong>. ... Lær om bruken av &#x27;å kjøpe&#x27; i hverdagslige situasjoner som matvarer, klær, gaver, billetter og tjenester. ... Norge har et rikt språk med spesifikke termer for næringslivet, som kapital og inntekt.",
+      "snippet": "<strong>Opphørssalg er en type salgsarrangement hvor varer blir solgt for å tømme lageret før en bedrift stenger eller flytter</strong>. Dette kan være en god mulighet for kunder å kjøpe produkter til lave priser, men det kan også være en tegn på at bedriften har økonomiske problemer.",
       "source": "Brave Search",
       "source_rank": 1,
       "title": "Opphørssalg - hva er det?",
       "url": "https://www.ordlista.no/ord/opph%C3%B8rssalga"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
-        "Vi holder åpent til 31.12.2023. Hele butikken på 700 kvm, samt lager skal tømmes."
-      ],
-      "id": "ae9fc84b048fe1917a17be55",
-      "language": "nb",
-      "published_at": "2023-10-03T11:12:14",
-      "snippet": "<strong>Vi holder åpent til 31.12.2023.</strong> Hele butikken på 700 kvm, samt lager skal tømmes.",
-      "source": "Brave Search",
-      "source_rank": 2,
-      "title": "Opphørssalg - Krosby Møbler AS - Oslo",
-      "url": "https://www.krosby.no/opphorssalg/"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -192,9 +173,23 @@
       "published_at": null,
       "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 2,
       "title": "Vareparti og konkursbo | til salgs | FINN Torget",
       "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "Vi holder åpent til 31.12.2023. Hele butikken på 700 kvm, samt lager skal tømmes."
+      ],
+      "id": "ae9fc84b048fe1917a17be55",
+      "language": "nb",
+      "published_at": "2023-10-03T11:12:14",
+      "snippet": "<strong>Vi holder åpent til 31.12.2023.</strong> Hele butikken på 700 kvm, samt lager skal tømmes",
+      "source": "Brave Search",
+      "source_rank": 3,
+      "title": "Opphørssalg - Krosby Møbler AS - Oslo",
+      "url": "https://www.krosby.no/opphorssalg/"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -266,33 +261,34 @@
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
       "extra_snippets": [
-        "14 butikker og 180 ansatte er rammet av Home & Cottage-konkursen som ble kjent i går, og først omtalt av DN. – Når vi får oversikt vil vi forsøke å realisere verdiene i konkursboet, sier Madsen. Les også: Ekstreme matpriser: – Dramatisk forskjellig · – Betyr det at det vil bli opphørssalg i butikkene?",
-        "– Når vil det bli avklart om det blir et opphørssalg? – I denne type saker finner vi som regel en løsning i løpet av noen få dager. Jeg vil i alle fall tro vi har en løsning før helgen, sier bostyrer Madsen til Nettavisen. Onsdag morgen opplyser Madsen at butikkene er stengt, men at det snarlig vil bli tatt stilling til om de skal åpnes igjen.",
-        "SALG: Opphørssalg kan bli resultatet etter konkursen."
-      ],
-      "id": "c2997c577e8b8e3c49269e4e",
-      "language": "no",
-      "published_at": "2025-01-15T21:33:20",
-      "snippet": "– Når vil det bli avklart om det blir et opphørssalg? – I denne type saker finner vi som regel en løsning i løpet av noen få dager. Jeg vil i alle fall tro vi har en løsning før helgen, sier bostyrer Madsen til Nettavisen. Onsdag morgen opplyser Madsen at butikkene er stengt, men at det snarlig vil bli tatt stilling til om de skal åpnes igjen.",
-      "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Home & Cottage, Konkurs | Home & Cottage konkurs: Hva skjer med butikkene nå?",
-      "url": "https://www.nettavisen.no/okonomi/home-cottage-konkurs-hva-skjer-med-butikkene-na/s/5-95-2234939"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
         "Innredning, innredning og uttrykk er en viktig del av signalene vi sender til miljøet om hvem vi er og derfor viktige elementer i forhold til hvordan vi, våre Merker, våre butikker og bedrifter oppleves av andre. Med vårt interiør og inventar kan du skape det uttrykket du ønsker, slik at dine kunder får akkurat den opplevelsen du ønsker de skal ha og en følelse av tilhørighet til deg og din bedrift. Gå på en online oppdagelse i våre e-kataloger. Vi sparrer gjerne med deg slik at dine ideer og behov kan bli virkelighet. Ring oss på 69 25 38 88. Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom.",
         "Alt innen butikkinnredning – over 7000 artikler klare for rask levering."
       ],
       "id": "bd6977fd8acb108de8393557",
       "language": "nb",
       "published_at": null,
-      "snippet": "Innredning, innredning og uttrykk er en viktig del av signalene vi sender til miljøet om hvem vi er og derfor viktige elementer i forhold til hvordan vi, våre Merker, våre butikker og bedrifter oppleves av andre. Med vårt interiør og inventar kan du skape det uttrykket du ønsker, slik at dine kunder får akkurat den opplevelsen du ønsker de skal ha og en følelse av tilhørighet til deg og din bedrift. Gå på en online oppdagelse i våre e-kataloger. Vi sparrer gjerne med deg slik at dine ideer og behov kan bli virkelighet. Ring oss på 69 25 38 88. Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom.",
+      "snippet": "Skap det perfekte uttrykket for din butikk eller bedrift med SuperSellerS innredning og inventar. Våre produkter hjelper deg med å forme kundens opplevelse og tilhørighet til din bedrift. Utforsk våre e-kataloger og kontakt oss for personlig sparring. Besøk oss i Moss.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
       "url": "https://www.supersellers.no/katalog"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "Nettavisen har fått informasjon om at opphørssalget starter førstkommende mandag. Blant kundene som har bestilt varer er det både noen som har forhåndsbetalt hele kjøpet, mens andre bare har betalt en del av kjøpesummen. – Bestillingsvarer, altså varer som er bestilt inn på kundens forespørsel, som er forhåndsbetalt fullt ut, befinner seg i butikken og er merket med kundens navn, kan utleveres til den relevante kunden når butikkene gjenåpnes, står det i melding.",
+        "OPPHØRSSALG: Opphørssalget etter konkursen av Home & Cottage starter mandag.",
+        "Nå er det sendt ut melding til kunder om at det vil bli et opphørssalg og med beskjed om hva som skjer med bestilte varer.",
+        "– Konkursboet har solgt selskapets varebeholdning og øvrige eiendeler til en ekstern kjøper, som vil gjennomføre opphørssalg de neste ukene, går det fram av meldingen."
+      ],
+      "id": "05170ee30473a1493dd3b86e",
+      "language": "no",
+      "published_at": "2025-01-17T13:00:58",
+      "snippet": "– <strong>Konkursboet har solgt selskapets varebeholdning og øvrige eiendeler til en ekstern kjøper, som vil gjennomføre opphørssalg de neste ukene</strong>, går det fram av meldingen.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Tønsberg, Butikk | Opphørssalg etter konkurs: Viktig beskjed til kunder",
+      "url": "https://www.tb.no/opphorssalg-etter-konkurs-viktig-beskjed-til-kunder/s/5-76-2517965"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -434,6 +430,20 @@
     {
       "discovery_query": "varelager konkursbo Norge",
       "extra_snippets": [
+        "Har du et varelager som du ønsker å selge komplett? Eller vil du tipse oss om et konkursbo som kan være av interesse for oss?"
+      ],
+      "id": "08c1c3148277e6eb31eae2ce",
+      "language": "no",
+      "published_at": null,
+      "snippet": "<strong>AltPåSalg er en nettbutikk som videreselger oppkjøpte varelager, varepartier og varer fra konkursbo med minst 50-80% avslag fra ordinære butikkpriser</strong>",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "AltPåSalg",
+      "url": "https://www.altpasalg.no/"
+    },
+    {
+      "discovery_query": "varelager konkursbo Norge",
+      "extra_snippets": [
         "Eksempler på eiendeler og rettigheter er bankkonto, kontanter, kundefordringer, varelager, driftsmidler, krav på ytelser fra leverandører (som leide lokaler), patenter, lisenser og varemerker. Det er tingretten som åpner konkurs, etter krav fra selskapet selv eller kreditorer (f.eks. skattemyndighetene). Fra det tidspunkt (dato og klokkeslett) konkurs er åpnet, blir eiendeler og rettigheter \"beslaglagt\" av konkursboet, som ledes av en bostyrer.",
         "Hva innebærer en konkurs for selskapet, aksjonærene, styremedlemmer, de ansatte, kunder mv.? Les mer om dette her.",
         "Konkursboet overtar i utgangspunktet alle selskapets kontrakter. Selskapets avtaleparter forblir altså bundet av de avtalene som er inngått. Men ved konkurs vil konkursboet som regel ikke være i stand til å betale leverandører eller oppfylle avtaler overfor kunder.",
@@ -444,23 +454,9 @@
       "published_at": null,
       "snippet": "Eksempler på eiendeler og rettigheter ... varelager, driftsmidler, krav på ytelser fra leverandører (som leide lokaler), patenter, lisenser og varemerker. Det er tingretten som åpner konkurs, etter krav fra selskapet selv eller kreditorer (f.eks. skattemyndighetene). Fra det tidspunkt (dato og klokkeslett) konkurs er åpnet, blir eiendeler og rettigheter &quot;beslaglagt&quot; av konkursboet, som ledes ...",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 10,
       "title": "Hva innebærer en konkurs?",
       "url": "https://arbinn.nho.no/forretningsdrift/styrearbeid-og-okonomi/styrearbeid/artikler/hva-innebarer-en-konkurs/"
-    },
-    {
-      "discovery_query": "varelager konkursbo Norge",
-      "extra_snippets": [
-        "Har du et varelager som du ønsker å selge komplett? Eller vil du tipse oss om et konkursbo som kan være av interesse for oss?"
-      ],
-      "id": "08c1c3148277e6eb31eae2ce",
-      "language": "no",
-      "published_at": null,
-      "snippet": "<strong>AltPåSalg er en nettbutikk som videreselger oppkjøpte varelager, varepartier og varer fra konkursbo med minst 50-80% avslag fra ordinære butikkpriser</strong>",
-      "source": "Brave Search",
-      "source_rank": 10,
-      "title": "AltPåSalg",
-      "url": "https://www.altpasalg.no/"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -586,17 +582,17 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [
-        "Butikkinnredning og -utstyr – Gamle Fredrikstad · Butikkdesign Norge AS · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · www.butikkservice.no ·",
-        "Butikkinnredning og -utstyr – Ålesund · Checkmark Norge AS · www.checkmark.no · Vis telefon Ring 38 01 85 00 · E-post · Kart · Mer · Vis alle telefonnummer · Magnus Barfots vei 7, 4633 Kristiansand S · Butikkinnredning og -utstyr – Kristiansand S ·"
+        "ButikkDesign Norge AS, er ett av Norges eldste butikkinnredningsfirmaer. Selskapet ble først etablert i 1992 og har siden da vært en nær samarbeidspartner til de største dagligvareaktørene i Norden.",
+        "ButikkDesign Norge AS står klare til å transformere din butikk med vår ekspertise og erfaring som en ledende aktør innen butikkinnredning."
       ],
-      "id": "a61ccf2a30553b6a59f53ccb",
+      "id": "543c542abe1b843e290eeae6",
       "language": "no",
-      "published_at": null,
-      "snippet": "Butikkinnredning og -utstyr – Gamle Fredrikstad · <strong>Butikkdesign Norge AS</strong> · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · ...",
+      "published_at": "2023-01-06T00:00:00",
+      "snippet": "<strong>ButikkDesign Norge AS</strong> står klare til å transformere din butikk med vår ekspertise og erfaring som en ledende aktør innen butikkinnredning.",
       "source": "Brave Search",
       "source_rank": 9,
-      "title": "Butikkinnredning og -utstyr - 1881.no",
-      "url": "https://www.1881.no/butikkinnredning-og-utstyr/"
+      "title": "ButikkDesign Norge AS - Din Partner i Butikkinnredning",
+      "url": "https://bdn.no"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -693,6 +689,20 @@
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
+        "Ava Butikkinnredning har levert butikkinnredning og utstillingsmateriell til bedrifter over hele landet siden 2008."
+      ],
+      "id": "c27bfbff55509642b99887ea",
+      "language": "nb",
+      "published_at": "2025-11-12T11:53:03",
+      "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
+      "source": "Brave Search",
+      "source_rank": 6,
+      "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
+      "url": "https://avabutikkinnredning.no/om-oss/"
+    },
+    {
+      "discovery_query": "butikkinnredning klesbutikk Norge",
+      "extra_snippets": [
         "Butikkinnredning og -utstyr – Gamle Fredrikstad · Butikkdesign Norge AS · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · www.butikkservice.no ·",
         "Butikkinnredning og -utstyr – Ålesund · Checkmark Norge AS · www.checkmark.no · Vis telefon Ring 38 01 85 00 · E-post · Kart · Mer · Vis alle telefonnummer · Magnus Barfots vei 7, 4633 Kristiansand S · Butikkinnredning og -utstyr – Kristiansand S ·"
       ],
@@ -701,23 +711,9 @@
       "published_at": null,
       "snippet": "Butikkinnredning og -utstyr – Gamle Fredrikstad · <strong>Butikkdesign Norge AS</strong> · bdn.no · Vis telefon Ring 64 95 07 00 · E-post · Kart · Mer · Kleverveien 6, 1543 Vestby · Butikkinnredning og -utstyr – Vestby · Butikkservice AS · ...",
       "source": "Brave Search",
-      "source_rank": 6,
+      "source_rank": 7,
       "title": "Butikkinnredning og -utstyr - 1881.no",
       "url": "https://www.1881.no/butikkinnredning-og-utstyr/"
-    },
-    {
-      "discovery_query": "butikkinnredning klesbutikk Norge",
-      "extra_snippets": [
-        "Ava Butikkinnredning har levert butikkinnredning og utstillingsmateriell til bedrifter over hele landet siden 2008."
-      ],
-      "id": "c27bfbff55509642b99887ea",
-      "language": "nb",
-      "published_at": "2025-11-12T11:53:03",
-      "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
-      "source": "Brave Search",
-      "source_rank": 7,
-      "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
-      "url": "https://avabutikkinnredning.no/om-oss/"
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
@@ -778,16 +774,17 @@
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
       "extra_snippets": [
-        "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk."
+        "Utstillingsdukker · Stativer · Kontakt oss · Logg inn / Registrer · Søke · 0 Ønskeliste · 0 items · 0.00 kr · Meny · 0 items · 0.00 kr · Lukk · Imagine mannequins · Utstillingsdukker · Urban abstract · Urban realistisk · Sincere mannequins ·",
+        "Utstillingsdukker med egghead · Utstillingsdukker med hode · Utstillingsdukker uten hode · Ben · Torso · Utstillingsdukker Barn · Sportsdukker · Butikkinnredninger · Nyhet · Frittstående · Italiensk innredning · Veggskinner · Sporpanel/Rillepanel ·"
       ],
-      "id": "7cad0e8a59e6e66434244c4f",
+      "id": "ff74b94ab401e47e00894221",
       "language": "nb",
       "published_at": null,
-      "snippet": "<strong>SuperSellerS tilbyr butikkinnredning som dekker hele butikken</strong>: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert ...",
+      "snippet": "Vi har et bredt utvalg av klesstativ til butikker og privatpersoner. Du finner blant annet reisestativ, stativ med rette armer og undertøystativ.",
       "source": "Brave Search",
       "source_rank": 2,
-      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
-      "url": "https://www.supersellers.no/"
+      "title": "Klesstativ | Se vårt store utvalg | Kjøp i nettbutikken",
+      "url": "https://finckenhagen.no/stikkord/klesstativ/"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -839,21 +836,6 @@
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
       "extra_snippets": [
-        "Utstillingsdukker · Stativer · Kontakt oss · Logg inn / Registrer · Søke · 0 Ønskeliste · 0 items · 0.00 kr · Meny · 0 items · 0.00 kr · Lukk · Imagine mannequins · Utstillingsdukker · Urban abstract · Urban realistisk · Sincere mannequins ·",
-        "Utstillingsdukker med egghead · Utstillingsdukker med hode · Utstillingsdukker uten hode · Ben · Torso · Utstillingsdukker Barn · Sportsdukker · Butikkinnredninger · Nyhet · Frittstående · Italiensk innredning · Veggskinner · Sporpanel/Rillepanel ·"
-      ],
-      "id": "ff74b94ab401e47e00894221",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Vi har et bredt utvalg av klesstativ til butikker og privatpersoner. Du finner blant annet reisestativ, stativ med rette armer og undertøystativ.",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Klesstativ | Se vårt store utvalg | Kjøp i nettbutikken",
-      "url": "https://finckenhagen.no/stikkord/klesstativ/"
-    },
-    {
-      "discovery_query": "klesstativ utstillingsdukker selges Norge",
-      "extra_snippets": [
         "I motsetning til en tørketrommel, som bruker mye strøm, er et tørkestativ en helt passiv og kostnadsfri metode som i tillegg er mye mer skånsom mot tekstilene. Ved å lufttørke klærne på et Klesstativ, unngår man den harde slitasjen og krympingen som en tørketrommel kan forårsake, noe som forlenger levetiden på favorittplaggene dine betraktelig.",
         "Selges kun i varehus."
       ],
@@ -862,21 +844,23 @@
       "published_at": null,
       "snippet": "Tørk klærne effektivt inne eller ute med et solid tørkestativ. Vi har et bredt utvalg av sammenleggbare modeller for enhver plass. Kjøp ditt tørkestativ.",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 6,
       "title": "Tørkestativ | For effektiv og skånsom tørking av klær | Jula",
       "url": "https://www.jula.no/catalog/hjem-og-husholdning/klesvask-og-stell/klespleie/torkestativer/"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
-      "extra_snippets": [],
-      "id": "79308f470db623e6439296c3",
+      "extra_snippets": [
+        "SuperSellerS tilbyr butikkinnredning som dekker hele butikken: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert og funksjonelt. Rask levering fra lager og rådgivning fra erfarne fagfolk."
+      ],
+      "id": "7cad0e8a59e6e66434244c4f",
       "language": "nb",
       "published_at": null,
-      "snippet": "Du finner 168 annonse(r) som inneholder ordet &quot;utstillingsdukke&quot; til salgs på <strong>FINN Torget</strong>. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "snippet": "<strong>SuperSellerS tilbyr butikkinnredning som dekker hele butikken</strong>: gondoler, sporpaneler, TUBO-hyller, klesstativer, kleshengere, utstillingsdukker og gaveemballasje. Alt i god og velprøvd kvalitet, slik at du kan presentere varene dine vakkert ...",
       "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Utstillingsdukke | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?q=utstillingsdukke"
+      "source_rank": 7,
+      "title": "Butiksindretning og inventar. 1-2 dags levering. ⭐ SE mere HER – SuperSellerS",
+      "url": "https://www.supersellers.no/"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -888,9 +872,21 @@
       "published_at": null,
       "snippet": "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Utstillingsdukker - Boltreplassen",
       "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
+    },
+    {
+      "discovery_query": "klesstativ utstillingsdukker selges Norge",
+      "extra_snippets": [],
+      "id": "79308f470db623e6439296c3",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Du finner 168 annonse(r) som inneholder ordet &quot;utstillingsdukke&quot; til salgs på <strong>FINN Torget</strong>. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Utstillingsdukke | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?q=utstillingsdukke"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -957,14 +953,14 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "extra_snippets": [],
-      "id": "f413b0e27b2c75607ca7fca6",
+      "id": "ba86755c7a9657577086089e",
       "language": "nb",
       "published_at": null,
-      "snippet": "Du finner 1 224 annonse(r) i kategorien Symaskiner under Fritid, hobby og underholdning til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "snippet": "Industrisymaskin · <strong>Symaskin av merket Pfaff</strong>. Egner seg til &quot;lettere&quot; prosjekter som feks. kalesjer, presseninger, møbelskinn etc. OBS! 3 faset symaskin! Pris: 16 500,- Pussebord · Demobrukt pussebord. 2 slipebånd · 1 slipekon · 1 frontsliper · 1 børste · 1 pusserondell ·",
       "source": "Brave Search",
       "source_rank": 4,
-      "title": "Symaskiner | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.86.7734.123"
+      "title": "Maskiner Skinnlåven",
+      "url": "https://www.skinnlaaven.no/aktuelt"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -981,14 +977,14 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "extra_snippets": [],
-      "id": "ba86755c7a9657577086089e",
+      "id": "f413b0e27b2c75607ca7fca6",
       "language": "nb",
       "published_at": null,
-      "snippet": "Industrisymaskin · <strong>Symaskin av merket Pfaff</strong>. Egner seg til &quot;lettere&quot; prosjekter som feks. kalesjer, presseninger, møbelskinn etc. OBS! 3 faset symaskin! Pris: 16 500,- Pussebord · Demobrukt pussebord. 2 slipebånd · 1 slipekon · 1 frontsliper · 1 børste · 1 pusserondell ·",
+      "snippet": "Du finner 1 224 annonse(r) i kategorien Symaskiner under Fritid, hobby og underholdning til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
       "source_rank": 6,
-      "title": "Maskiner Skinnlåven",
-      "url": "https://www.skinnlaaven.no/aktuelt"
+      "title": "Symaskiner | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.86.7734.123"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -1027,6 +1023,20 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "extra_snippets": [
+        "Vi er i dag en totalleverandør av maskiner og utstyr for søm, tilskjæring pressing, brodering, lasergravering, strikking m.m. Dette strekker seg fra enkle maskiner for håndverk og småindustri opp til store komplekse automater for industrien. Vi yter også bistand i form av opplæring og teknisk service på våre produkter.Ta kontakt for nærmere informasjon, eller klikk på logo for å komme inn på vår hjemmeside. Her finner du også oversikt over alle våre brukte maskiner."
+      ],
+      "id": "a28b1ec8fa4760f37eb9c1bc",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Vi er i dag en totalleverandør av maskiner og utstyr for søm, tilskjæring pressing, brodering, lasergravering, strikking m.m. Dette strekker seg fra enkle maskiner for håndverk og småindustri opp til store komplekse automater for industrien. Vi yter også bistand i form av opplæring og teknisk service på våre produkter.Ta kontakt for nærmere informasjon, eller klikk på logo for å komme inn på vår hjemmeside. Her finner du også oversikt over alle våre brukte maskiner.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "JUKI DDL-8700H industrisymaskin | FINN-torget",
+      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=68285526"
+    },
+    {
+      "discovery_query": "industrisymaskin brukt Norge",
+      "extra_snippets": [
         "Pent brukt Pfaff industrisymaskin, Mod 487-g Rettsøm med overtransportør. Automatisk trådkutt, feste og labbløft.",
         "3 - fas Clutch motor for industri-symaskin nesten ikke brukt selges. Kontakt meg på sms 916 71 664 eller e-post. ... Typical gc0617d er non-stop industrisymaskin med forstørret skyttel og trippel matemekanisme.",
         "Kraftig Industrisymaskin, Alternerende føtter med nåltransport (Compound feed) med direkt drevet motor, led-lys, og spoleapparat intergrert i maskinen Vår mest...",
@@ -1037,23 +1047,9 @@
       "published_at": null,
       "snippet": "Pent brukt <strong>Pfaff industrisymaskin, Mod 487-g Rettsøm med overtransportør</strong>. Automatisk trådkutt, feste og labbløft.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 10,
       "title": "Industrisymaskin til salg - September 2023",
       "url": "https://www.rubrikk.no/torget-brukt-til-salgs/industrisymaskin-til-salg.html"
-    },
-    {
-      "discovery_query": "industrisymaskin brukt Norge",
-      "extra_snippets": [
-        "Brukt · kr 225,48 /stykke · 5430 St. Brukt · kr 225,48 /stykke · 5450 St. Brukt · kr 208 134,36 /lastebil · 830 St. Brukt · kr 115,63 /stykke · -5% for din første bestilling! 5 St. Ny · kr 208,13 /stykke · 4550 St. Brukt · Landing... Innholdet lastes inn..."
-      ],
-      "id": "ee0f03d25cc2b85496a9c656",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Brukt · <strong>kr 370,02 /stykke</strong> · 1500 St. Brukt · kr 23,13 /stykke · -5% for din første bestilling! uten grenser · Ny · kr 404,71 /stykke · 650 St. Ny · <strong>kr 370,02 /stykke</strong> · uten grenser · Brukt · kr 228,37 /stykke · 5500 St.",
-      "source": "Brave Search",
-      "source_rank": 10,
-      "title": "Restesalg av symaskiner - Engros industrisymaskiner fra auksjoner og restpartier | B2B Merkandi.no",
-      "url": "https://merkandi.no/engros/restesalg-av-symaskiner"
     },
     {
       "discovery_query": "lagerreoler selges Norge",

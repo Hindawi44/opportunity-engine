@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T19:34:08.702768+00:00",
+  "generated_at": "2026-08-03T03:54:04.707971+00:00",
   "opportunity_count": 2,
   "policy": {
     "automatic_verification": false,
@@ -13,7 +13,7 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg",
-          "captured_at": "2026-08-02T19:34:03.558259+00:00",
+          "captured_at": "2026-08-03T03:54:01.020580+00:00",
           "comparable_quantity": null,
           "domain": "fasadenor.no",
           "matched_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud brukt pris Norge",
@@ -51,7 +51,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 15t 5m 59s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 6t 46m 2s",
       "verified_market_value_nok": null
     },
     {
@@ -59,7 +59,7 @@
       "accepted_comparables": [
         {
           "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
-          "captured_at": "2026-08-02T19:34:07.945464+00:00",
+          "captured_at": "2026-08-03T03:54:04.101961+00:00",
           "comparable_quantity": null,
           "domain": "secundo.no",
           "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
@@ -82,7 +82,7 @@
         },
         {
           "canonical_url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
-          "captured_at": "2026-08-02T19:34:07.946439+00:00",
+          "captured_at": "2026-08-03T03:54:04.102944+00:00",
           "comparable_quantity": null,
           "domain": "secundo.no",
           "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
@@ -121,7 +121,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 18t 1m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 9t 42m",
       "verified_market_value_nok": null
     }
   ],
