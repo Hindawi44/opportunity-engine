@@ -29,6 +29,8 @@ from .live_unified_persistence import (
     persist_unified_report_file,
     persist_unified_report_with_artifacts,
 )
+from .market_signal_models import MarketSignalModel, MarketSignalObservationModel
+from .market_signal_repository import MarketSignalRepository
 from .models import (
     Base,
     OpportunityModel,
@@ -64,6 +66,9 @@ __all__ = [
     "LifecycleEventModel",
     "LifecycleEventRepository",
     "LifecycleSnapshot",
+    "MarketSignalModel",
+    "MarketSignalObservationModel",
+    "MarketSignalRepository",
     "OPERATIONAL_PERSISTENCE_PIPELINE_NAME",
     "OperationalPersistenceError",
     "OpportunityModel",
