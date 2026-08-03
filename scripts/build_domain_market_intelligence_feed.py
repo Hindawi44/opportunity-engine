@@ -11,8 +11,8 @@ from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     persist_manifest_market_signals,
 )
-from opportunity_engine.discovery.phone_readable_market_bulletin import (
-    write_phone_readable_market_bulletin_artifacts,
+from opportunity_engine.discovery.signal_role_freshness_correction import (
+    write_corrected_market_bulletin_artifacts,
 )
 
 
@@ -47,7 +47,7 @@ def main() -> int:
         encoding="utf-8",
     )
     brief = build_domain_market_intelligence_brief(checkpoint, persistence)
-    write_phone_readable_market_bulletin_artifacts(
+    write_corrected_market_bulletin_artifacts(
         brief,
         persistence,
         json_path=output_dir / "domain-market-intelligence-brief.json",
