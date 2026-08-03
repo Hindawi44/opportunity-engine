@@ -48,6 +48,10 @@ def main() -> int:
         json.dumps(official_coverage, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    print(
+        "official_early_signal_status_counts:",
+        json.dumps(official_coverage.get("status_counts") or {}, sort_keys=True),
+    )
 
     persistence = persist_manifest_market_signals(
         manifest,
