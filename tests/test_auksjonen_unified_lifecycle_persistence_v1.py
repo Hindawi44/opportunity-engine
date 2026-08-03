@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 import sqlite3
 
@@ -8,7 +9,9 @@ from opportunity_engine.discovery.auksjonen_public_api_adapter import (
     AuksjonenLiveClothingListing,
 )
 from opportunity_engine.discovery.auksjonen_unified_lifecycle import (
-    AUKSJONEN_ANALYSIS_BLOCKERS,
+    AUKSJONEN_ANALYSIS_TASKS,
+    AUKSJONEN_REQUIRED_VERIFICATION,
+    auksjonen_listing_to_discovery_candidate,
     build_auksjonen_discovery_result,
     build_auksjonen_unified_report,
     write_auksjonen_unified_artifacts,
@@ -60,7 +63,7 @@ def _collection() -> AuksjonenLiveClothingCollection:
     )
 
 
-def test_auksjonen_inventory_lots_use_unified_verification_lifecycle() -> None:
+def test_auksjonen_inventory_lots_separate_verification_from_analysis_tasks() -> None:
     collection = _collection()
     discovery = build_auksjonen_discovery_result(collection)
     candidates = discovery["all_discovered_candidates"]
@@ -70,8 +73,18 @@ def test_auksjonen_inventory_lots_use_unified_verification_lifecycle() -> None:
     assert candidates[0]["identity_stable"] is True
     assert candidates[0]["top5_eligible"] is True
     assert candidates[0]["analysis_eligible"] is False
-    assert candidates[0]["missing_information"] == list(AUKSJONEN_ANALYSIS_BLOCKERS)
+    assert candidates[0]["verification_blockers"] == list(
+        AUKSJONEN_REQUIRED_VERIFICATION
+    )
+    assert candidates[0]["missing_information"] == list(
+        AUKSJONEN_REQUIRED_VERIFICATION
+    )
+    assert candidates[0]["analysis_tasks"] == list(AUKSJONEN_ANALYSIS_TASKS)
     assert candidates[0]["location"] == "7800, Namsos"
+    assert candidates[0]["quantity"] == 10
+    assert candidates[0]["price_nok"] == 1000.0
+    assert candidates[0]["price_kind"] == "CURRENT_BID"
+    assert candidates[1]["quantity"] is None
 
     _, report = build_auksjonen_unified_report(collection)
     assert report["schema_version"] == "1.1"
@@ -84,10 +97,39 @@ def test_auksjonen_inventory_lots_use_unified_verification_lifecycle() -> None:
     assert first["verified"] is False
     assert first["analysis_eligible"] is False
     assert first["top5_eligible"] is True
+    assert first["price"] == 1000.0
+    assert first["quantity"] == 10
     assert first["metadata"]["lifecycle_reason_code"] == "MISSING_REQUIRED_VERIFICATION"
     assert [item["field_name"] for item in first["missing_information"]] == list(
-        AUKSJONEN_ANALYSIS_BLOCKERS
+        AUKSJONEN_REQUIRED_VERIFICATION
     )
+
+
+def test_auksjonen_gate_adds_only_missing_source_facts() -> None:
+    listing = replace(
+        _listing(103, "Parti med arbeidsklær"),
+        current_bid_nok=None,
+        buy_now_price_nok=None,
+        start_price_nok=None,
+        city=None,
+        zip_code=None,
+        address=None,
+    )
+
+    candidate = auksjonen_listing_to_discovery_candidate(
+        listing,
+        top5_eligible=True,
+    )
+
+    assert candidate["verification_blockers"] == [
+        "verified exact item-page evidence",
+        "current bid, buy-now price, or start price",
+        "pickup location",
+    ]
+    assert candidate["missing_information"] == candidate["verification_blockers"]
+    assert candidate["analysis_tasks"] == list(AUKSJONEN_ANALYSIS_TASKS)
+    assert candidate["price_nok"] is None
+    assert candidate["price_kind"] is None
 
 
 def test_auksjonen_sqlite_lifecycle_replay_is_idempotent(tmp_path: Path) -> None:
