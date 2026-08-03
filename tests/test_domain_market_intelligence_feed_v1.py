@@ -11,6 +11,10 @@ from opportunity_engine.discovery.domain_market_intelligence_feed import (
     market_signal_from_opportunity_record,
     persist_manifest_market_signals,
 )
+from opportunity_engine.discovery.phone_readable_market_bulletin import (
+    enrich_phone_readable_market_bulletin,
+    render_phone_readable_market_bulletin,
+)
 from opportunity_engine.persistence import (
     MarketSignalRepository,
     create_database_engine,
@@ -194,3 +198,81 @@ def test_closure_signal_is_retained_without_becoming_direct_opportunity(tmp_path
     assert brief["automatic_bid"] is False
     assert brief["automatic_purchase"] is False
     assert brief["automatic_payment"] is False
+
+
+def test_phone_bulletin_names_signals_and_selected_opportunity_in_arabic() -> None:
+    listing_signal = _signal(
+        signal_id="opportunity-signal:auction:lot:1",
+        signal_type="ITEM_LISTING",
+        value="58 workwear trousers",
+        source="Blinto",
+        source_country="SE",
+        source_url="https://example.test/auction/1",
+        title="58 workwear trousers",
+        company_name=None,
+        seller_name="Sem Workwear Seller",
+        location="Sem",
+        related_opportunity_id="auction:lot:1",
+        status="ACTIVE",
+        metadata={"quantity": 58, "inventory_type": "workwear_inventory"},
+    )
+    brief = {
+        "generated_at": "2026-08-03T16:08:38Z",
+        "counts": {
+            "new_signals_today": 2,
+            "changed_signals_since_previous_checkpoint": 0,
+            "early_signals_to_watch": 1,
+            "current_direct_opportunities": 1,
+            "unavailable_or_failed_sources": 0,
+        },
+        "early_signals_to_watch": [_signal()],
+        "current_direct_opportunities": [
+            {
+                "opportunity_identity": "auction:lot:1",
+                "title": "58 workwear trousers",
+                "market_code": "SE",
+                "source_name": None,
+                "source_url": None,
+                "workflow_status": "ACTIVE_OPPORTUNITY",
+                "listing_status": "ACTIVE",
+                "discovery_score": 72,
+                "location": None,
+                "quantity": None,
+            }
+        ],
+        "selected_human_action": {
+            "action": "REVIEW_ONE_OPPORTUNITY",
+            "reason": "A verified active opportunity is ready for human analysis review.",
+            "opportunity_identity": "auction:lot:1",
+            "signal_id": None,
+        },
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase": False,
+        "automatic_payment": False,
+    }
+    persistence = {
+        "current_signals": [_signal(), listing_signal],
+    }
+
+    enriched = enrich_phone_readable_market_bulletin(brief, persistence)
+    selected = enriched["phone_readable_summary"]["selected_opportunity"]
+    assert selected["source_name"] == "Blinto"
+    assert selected["source_url"] == "https://example.test/auction/1"
+    assert selected["location"] == "Sem"
+    assert selected["quantity"] == 58
+
+    rendered = render_phone_readable_market_bulletin(enriched)
+    assert "أهم الإشارات المبكرة اليوم:" in rendered
+    assert "[إغلاق نشاط تجاري] Example clothing shop closing" in rendered
+    assert "الجهة: Example AS" in rendered
+    assert "https://example.test/closure/1" in rendered
+    assert "أفضل فرصة مباشرة اليوم:" in rendered
+    assert "الاسم: 58 workwear trousers" in rendered
+    assert "المصدر: Blinto" in rendered
+    assert "الموقع: Sem" in rendered
+    assert "الكمية المعروفة: 58" in rendered
+    assert "الإجراء البشري الوحيد: راجع فرصة واحدة" in rendered
+    assert "السبب: توجد فرصة نشطة موثقة وجاهزة للمراجعة البشرية." in rendered
+    assert "REVIEW_ONE_OPPORTUNITY" not in rendered
+    assert "A verified active opportunity" not in rendered
