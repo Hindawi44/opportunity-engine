@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Mapping
 
+from .human_review import HumanReviewOutcomeRepository, apply_persisted_human_review
 from .lifecycle_repository import LifecycleEventRepository
 from .repository import PersistenceError
 from .unified_repository import UnifiedOpportunityRepository
@@ -53,9 +54,10 @@ def persist_unified_opportunity_report(
 ) -> dict[str, Any]:
     """Persist canonical snapshots and append meaningful lifecycle transitions.
 
-    Lifecycle events are created only when listing status, evaluation status,
-    workflow status, or ``metadata.lifecycle_reason_code`` changes. Replaying the
-    same snapshot is idempotent. The adapter does not recalculate lifecycle state.
+    The latest explicit human review is overlaid before the source snapshot is
+    stored. This prevents a later collector refresh from silently reverting a
+    manual VERIFIED, NEEDS_MORE_INFORMATION, REJECTED, or CLOSED decision.
+    True source closure still outranks the human overlay.
     """
     if not isinstance(report, Mapping):
         raise UnifiedReportPersistenceError("unified report must be an object")
@@ -91,6 +93,7 @@ def persist_unified_opportunity_report(
     seen_ids: set[str] = set()
     lifecycle_events_created = 0
     lifecycle_repository = LifecycleEventRepository(repository.session)
+    review_repository = HumanReviewOutcomeRepository(repository.session)
 
     for position, raw_record in enumerate(records):
         if not isinstance(raw_record, Mapping):
@@ -109,12 +112,14 @@ def persist_unified_opportunity_report(
             )
         seen_ids.add(normalized_id)
 
+        latest_review = review_repository.latest_for_opportunity(normalized_id)
+        effective_record = apply_persisted_human_review(raw_record, latest_review)
         previous = lifecycle_repository.snapshot_from_model(
             repository.get(normalized_id)
         )
         record_source_ref = f"{source_ref}#{normalized_id}"
         saved = repository.upsert_record(
-            raw_record,
+            effective_record,
             seen_at=generated_at,
             source_ref=record_source_ref,
         )
