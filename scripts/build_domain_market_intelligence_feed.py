@@ -7,12 +7,12 @@ import json
 from pathlib import Path
 from typing import Any
 
+from opportunity_engine.discovery.direct_official_source_adapters import (
+    collect_manifest_direct_official_signals,
+)
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     persist_manifest_market_signals,
-)
-from opportunity_engine.discovery.official_early_signal_sources import (
-    collect_manifest_official_early_signals,
 )
 from opportunity_engine.discovery.signal_role_freshness_correction import (
     write_corrected_market_bulletin_artifacts,
@@ -40,7 +40,7 @@ def main() -> int:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    official_coverage = collect_manifest_official_early_signals(
+    official_coverage = collect_manifest_direct_official_signals(
         manifest,
         root=args.root,
     )
