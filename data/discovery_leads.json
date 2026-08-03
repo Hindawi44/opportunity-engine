@@ -1,17 +1,17 @@
 {
   "category_counts": {
     "auction": 1,
-    "bankruptcy": 15,
-    "clothing_shop_fixtures": 14,
+    "bankruptcy": 14,
+    "clothing_shop_fixtures": 15,
     "estate_sale": 3,
-    "inventory": 23,
-    "liquidation": 7,
-    "sale_listing": 8,
-    "shop_equipment": 15
+    "inventory": 24,
+    "liquidation": 8,
+    "sale_listing": 9,
+    "shop_equipment": 16
   },
-  "deduplicated_lead_count": 56,
-  "generated_at": "2026-08-03T10:05:16.531567+00:00",
-  "input_result_count": 79,
+  "deduplicated_lead_count": 58,
+  "generated_at": "2026-08-03T15:15:27.172496+00:00",
+  "input_result_count": 80,
   "items": [
     {
       "canonical_url": "https://www.gulesider.no/butikkinnredning+%C3%B8stlandet/bedrifter",
@@ -21,7 +21,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529256+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170063+00:00",
       "image_count": null,
       "lead_id": "web-09fdcc107a66ac1b45ab",
       "price_nok": null,
@@ -44,7 +44,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528823+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169642+00:00",
       "image_count": null,
       "lead_id": "web-7c78687e8f228b645e34",
       "price_nok": null,
@@ -67,7 +67,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529160+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169951+00:00",
       "image_count": null,
       "lead_id": "web-5e74475b63c3939a78fe",
       "price_nok": null,
@@ -90,7 +90,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529844+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170563+00:00",
       "image_count": null,
       "lead_id": "web-7368b74c0e956c42b2b7",
       "price_nok": null,
@@ -112,7 +112,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529209+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170013+00:00",
       "image_count": null,
       "lead_id": "web-e71772deae49d9ffbeb5",
       "price_nok": null,
@@ -128,13 +128,35 @@
       "url": "https://www.supersellerskatalog.no/"
     },
     {
+      "canonical_url": "https://www.supersellerskatalog.no/inspirasjon",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T15:15:27.170311+00:00",
+      "image_count": null,
+      "lead_id": "web-72d343831b08e2486a3f",
+      "price_nok": null,
+      "priority_score": 46,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
+      "source": "Brave Search",
+      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
+      "url": "https://www.supersellerskatalog.no/inspirasjon"
+    },
+    {
       "canonical_url": "https://www.supersellers.no/",
       "categories": [
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528884+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169702+00:00",
       "image_count": null,
       "lead_id": "web-7cad0e8a59e6e6643424",
       "price_nok": null,
@@ -156,7 +178,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528988+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169786+00:00",
       "image_count": null,
       "lead_id": "web-bd6977fd8acb108de839",
       "price_nok": null,
@@ -178,7 +200,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530166+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170950+00:00",
       "image_count": null,
       "lead_id": "web-a9922918a03cfccae302",
       "price_nok": null,
@@ -200,7 +222,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527817+00:00",
+      "discovered_at": "2026-08-03T15:15:27.168832+00:00",
       "image_count": null,
       "lead_id": "web-340bfb344e98a6d682c6",
       "price_nok": null,
@@ -224,7 +246,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.531070+00:00",
+      "discovered_at": "2026-08-03T15:15:27.172033+00:00",
       "image_count": null,
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
@@ -247,7 +269,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527642+00:00",
+      "discovered_at": "2026-08-03T15:15:27.168659+00:00",
       "image_count": null,
       "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
@@ -270,7 +292,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527531+00:00",
+      "discovered_at": "2026-08-03T15:15:27.168507+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -286,13 +308,35 @@
       "url": "https://www.ordlista.no/ord/opph%C3%B8rssalga"
     },
     {
+      "canonical_url": "https://www.lagersalg.no/category/opphorssalg",
+      "categories": [
+        "inventory",
+        "liquidation"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T15:15:27.168369+00:00",
+      "image_count": null,
+      "lead_id": "web-3c91305f7ea2ad44bc3d",
+      "price_nok": null,
+      "priority_score": 38,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22",
+        "category:liquidation+16"
+      ],
+      "snippet": "Vi starter opphørssalget hos <strong>Joytag på Tåsen Senter</strong>! Klær, interiør og smykker samt noen vesker og tilbehør alt skal ut etter 8 år i butikken.",
+      "source": "Brave Search",
+      "title": "Opphørssalg - Lagersalg.no",
+      "url": "https://www.lagersalg.no/category/opphorssalg"
+    },
+    {
       "canonical_url": "https://kreativmormor.no/opphorssalg-nettbutikken-avvikles",
       "categories": [
         "inventory",
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527692+00:00",
+      "discovered_at": "2026-08-03T15:15:27.168769+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -314,7 +358,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528195+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169001+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -337,7 +381,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527164+00:00",
+      "discovered_at": "2026-08-03T15:15:27.167992+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -360,7 +404,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530409+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171161+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -383,7 +427,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528375+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169315+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -406,7 +450,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528780+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169596+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -428,7 +472,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529725+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170512+00:00",
       "image_count": null,
       "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
@@ -444,13 +488,35 @@
       "url": "https://www.finn.no/bap/forsale/search.html?product_category=2.91.3108.359"
     },
     {
+      "canonical_url": "https://www.finn.no/bap/webstore/ad.html",
+      "categories": [
+        "inventory",
+        "sale_listing"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T15:15:27.171987+00:00",
+      "image_count": null,
+      "lead_id": "web-c1e3e1a07794eb2a24ac",
+      "price_nok": null,
+      "priority_score": 32,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22",
+        "category:sale_listing+10"
+      ],
+      "snippet": "Reolen er også kjent som Electrolux og Høvik-lagerreoler. Den kan leveres åpen, eventuelt med tette rygger og endevegger. Pent brukte gavler, hyller og mellomvegger. Ta kontakt for spørsmål og tilbud. Vi skaffer også nytt, hvis ikke du finner ønsket dimensjon over. Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt. ... Ta kontakt om du ønsker mer informasjon om reolene. Utstyret selges meget prisgunstige og er enkle å montere, demontere, bygge på og bygge om.",
+      "source": "Brave Search",
+      "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
+      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
+    },
+    {
       "canonical_url": "https://www.machineseeker.no/Tekstilmaskiner/ci-19",
       "categories": [
         "inventory",
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530765+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171575+00:00",
       "image_count": null,
       "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
@@ -472,7 +538,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528740+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169555+00:00",
       "image_count": null,
       "lead_id": "web-08c1c3148277e6eb31ea",
       "price_nok": null,
@@ -494,7 +560,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528638+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169453+00:00",
       "image_count": null,
       "lead_id": "web-7c85d59249f9065a7874",
       "price_nok": null,
@@ -516,7 +582,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528237+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169048+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -538,7 +604,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528563+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169377+00:00",
       "image_count": null,
       "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
@@ -554,35 +620,12 @@
       "url": "https://www.konkurskupp.no/guide/slik-kjoper-du-fra-konkursbo"
     },
     {
-      "canonical_url": "https://www.tb.no/opphorssalg-etter-konkurs-viktig-beskjed-til-kunder/s/5-76-2517965",
-      "categories": [
-        "bankruptcy",
-        "liquidation"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528051+00:00",
-      "image_count": null,
-      "lead_id": "web-05170ee30473a1493dd3",
-      "price_nok": null,
-      "priority_score": 30,
-      "published_at": "2025-01-17T13:00:58",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "category:liquidation+16",
-        "published_at_present+6"
-      ],
-      "snippet": "– <strong>Konkursboet har solgt selskapets varebeholdning og øvrige eiendeler til en ekstern kjøper, som vil gjennomføre opphørssalg de neste ukene</strong>, går det fram av meldingen.",
-      "source": "Brave Search",
-      "title": "Tønsberg, Butikk | Opphørssalg etter konkurs: Viktig beskjed til kunder",
-      "url": "https://www.tb.no/opphorssalg-etter-konkurs-viktig-beskjed-til-kunder/s/5-76-2517965"
-    },
-    {
       "canonical_url": "https://www.hestra.no/",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529060+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169853+00:00",
       "image_count": null,
       "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
@@ -603,7 +646,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529401+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170206+00:00",
       "image_count": null,
       "lead_id": "web-a51fe9a70f780a57d999",
       "price_nok": null,
@@ -619,12 +662,33 @@
       "url": "https://unisystemer.no/prosjekter/butikkinnredning-line-of-oslo/"
     },
     {
+      "canonical_url": "https://lagersystemer.no/",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T15:15:27.172343+00:00",
+      "image_count": null,
+      "lead_id": "web-5f5c8a287e0bc6f1c921",
+      "price_nok": null,
+      "priority_score": 28,
+      "published_at": "2026-01-09T12:25:19",
+      "score_reasons": [
+        "category:inventory+22",
+        "published_at_present+6"
+      ],
+      "snippet": "Kampanje Pallereol Lagerhylle Grenreol langgods Delelager reol Dekkreol og vogn Arkivreol Kampanje Kampanje Kampanje Wishlist Quick View Compare Categories: Kampanje, Lagerhylle, Pakkeløsninger, UniversalreolSuper 123 - Pakke 3A kr 9,199 (Eks. MVA) Legg i handlekurv Lengde 3065 mm x Dybde ...",
+      "source": "Brave Search",
+      "title": "Hjem - Lagersystemer AS",
+      "url": "https://lagersystemer.no/"
+    },
+    {
       "canonical_url": "https://reolteknikk.no/",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.531312+00:00",
+      "discovered_at": "2026-08-03T15:15:27.172279+00:00",
       "image_count": null,
       "lead_id": "web-63600f85f4126e808e67",
       "price_nok": null,
@@ -645,7 +709,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529676+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170644+00:00",
       "image_count": null,
       "lead_id": "web-f7fe2d09f32e4cbfda29",
       "price_nok": null,
@@ -666,7 +730,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530273+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171222+00:00",
       "image_count": null,
       "lead_id": "web-15defc847337cd18eca8",
       "price_nok": null,
@@ -686,7 +750,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530214+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170755+00:00",
       "image_count": null,
       "lead_id": "web-5d1caedc0f687ca45737",
       "price_nok": null,
@@ -706,7 +770,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529925+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170707+00:00",
       "image_count": null,
       "lead_id": "web-da69efc40719142bd2b6",
       "price_nok": null,
@@ -726,7 +790,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530116+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170897+00:00",
       "image_count": null,
       "lead_id": "web-d8adeb8c515443238a4b",
       "price_nok": null,
@@ -746,7 +810,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530357+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171109+00:00",
       "image_count": null,
       "lead_id": "web-b9100172d742fc440381",
       "price_nok": null,
@@ -766,7 +830,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529555+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170407+00:00",
       "image_count": null,
       "lead_id": "web-3acde5d4a176692a975c",
       "price_nok": null,
@@ -786,7 +850,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529790+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170267+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -801,32 +865,12 @@
       "url": "https://www.1881.no/butikkinnredning-og-utstyr/"
     },
     {
-      "canonical_url": "https://www.finn.no/bap/webstore/ad.html",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T10:05:16.531258+00:00",
-      "image_count": null,
-      "lead_id": "web-c1e3e1a07794eb2a24ac",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "<strong>NoBolt småvare- og lagerreol</strong>: Et særdeles robust, fleksibelt og stilrent reolsystem uten noen form for skruer! NoBolt lagerreol er spesielt utviklet for oppbevaring av diverse varer, gods og utstyr i ulike vektklasser, og representerer det ...",
-      "source": "Brave Search",
-      "title": "Div. reoler / reol / lagerreol / småvarereol / universalreol / stålreol / arkiv | FINN-torget",
-      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
-    },
-    {
       "canonical_url": "https://www.sono.no/lager-industri/lager.html",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.531124+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171883+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -841,32 +885,12 @@
       "url": "https://www.sono.no/lager-industri/lager.html"
     },
     {
-      "canonical_url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T10:05:16.531420+00:00",
-      "image_count": null,
-      "lead_id": "web-ce2c77fe5e0ab90d0f7b",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "<strong>Vi har lagerhyller og praktiske og solide lagerreoler for lageret</strong>. Reolene kan bygges ut til ønsket lengde. Velg mellom flere modeller. Rask levering....",
-      "source": "Brave Search",
-      "title": "Lagerhyller og lagerreoler – bestill her! | AJ Produkter",
-      "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller"
-    },
-    {
       "canonical_url": "https://www.witre.no/no/wno/lagerhyller-pallestativer",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.531027+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171828+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -886,7 +910,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.531193+00:00",
+      "discovered_at": "2026-08-03T15:15:27.172224+00:00",
       "image_count": null,
       "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
@@ -906,7 +930,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530976+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171777+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -926,7 +950,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.531362+00:00",
+      "discovered_at": "2026-08-03T15:15:27.172155+00:00",
       "image_count": null,
       "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
@@ -946,7 +970,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.529316+00:00",
+      "discovered_at": "2026-08-03T15:15:27.170122+00:00",
       "image_count": null,
       "lead_id": "web-5abbbb7a87d219444db2",
       "price_nok": null,
@@ -961,34 +985,13 @@
       "url": "https://smartsupply.no/butikkinnredning/"
     },
     {
-      "canonical_url": "https://www.adressa.no/okonomi/i/z7yOd4/en-butikk-har-opphoerssalg-to-andre-lokaler-bygges-om",
-      "categories": [
-        "liquidation"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528134+00:00",
-      "image_count": null,
-      "lead_id": "web-2b6fb81f747b1ea249e9",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": "2022-03-13T10:34:57",
-      "score_reasons": [
-        "category:liquidation+16",
-        "published_at_present+6"
-      ],
-      "snippet": "Både de og jentegjengen til venstre på bildet vil ha flere butikker for dameklær. Foto: Stian Hansen ... Publisert: 12. mars 2022 kl. 21:00 Oppdatert: 13. mars 2022 kl. 11:34 Artikkelen er mer enn fire år gammel · Det store, hvite senteret sør for Trondheim er i endring. Noen lokaler er tømt og bygges om. Oppe i tredje har Lampehuset opphørssalg.",
-      "source": "Brave Search",
-      "title": "Én butikk har opphørssalg. To andre lokaler bygges om. - adressa.no",
-      "url": "https://www.adressa.no/okonomi/i/z7yOd4/en-butikk-har-opphoerssalg-to-andre-lokaler-bygges-om"
-    },
-    {
       "canonical_url": "https://konkurs-bo.no/",
       "categories": [
         "bankruptcy",
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528696+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169511+00:00",
       "image_count": null,
       "lead_id": "web-69939d672dc42fe60d24",
       "price_nok": null,
@@ -1010,7 +1013,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527751+00:00",
+      "discovered_at": "2026-08-03T15:15:27.168721+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -1021,8 +1024,48 @@
       ],
       "snippet": "<strong>En skobutikk ble i 2018 ilagt et overtredelsesgebyr på 100.000 kroner av Forbrukertilsynet for brudd på forbudet</strong>. Butikken hadde annonsert opphørssalg i over ett år uten å bli lagt ned.",
       "source": "Brave Search",
-      "title": "Falske opphørssalg: en villedende taktikk som kan bli dyr!",
+      "title": "Falske opphørssalg: en villedende taktikk som kan bli dyr! | Advokatfirmaet Bull AS",
       "url": "https://www.bull.no/artikler/immaterialrett-og-markedsfringsrett/falske-opphrssalg"
+    },
+    {
+      "canonical_url": "https://naob.no/ordbok/opph%C3%B8rssalg",
+      "categories": [
+        "liquidation"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T15:15:27.168439+00:00",
+      "image_count": null,
+      "lead_id": "web-0fd193c4d16fd92ffb58",
+      "price_nok": null,
+      "priority_score": 16,
+      "published_at": null,
+      "score_reasons": [
+        "category:liquidation+16"
+      ],
+      "snippet": "opphørssalg · substantiv · MODERAT ... · første ledd opphør · BETYDNING OG BRUK · <strong>salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned</strong> · SITATER · en liten butikk som ......",
+      "source": "Brave Search",
+      "title": "opphørssalg - Det Norske Akademis ordbok",
+      "url": "https://naob.no/ordbok/opph%C3%B8rssalg"
+    },
+    {
+      "canonical_url": "https://melkoghonning.no/tema/opphorssalg",
+      "categories": [
+        "liquidation"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T15:15:27.168612+00:00",
+      "image_count": null,
+      "lead_id": "web-bc68cdb969104e9e06f3",
+      "price_nok": null,
+      "priority_score": 16,
+      "published_at": null,
+      "score_reasons": [
+        "category:liquidation+16"
+      ],
+      "snippet": "Høye husleier og endrede handlemønstre får skylden. Etter 15 år er det over for <strong>klesbutikken Babel på Grünerløkka i Oslo</strong>. Butikken ble raskt en...",
+      "source": "Brave Search",
+      "title": "opphørssalg - Melk og Honning",
+      "url": "https://melkoghonning.no/tema/opphorssalg"
     },
     {
       "canonical_url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095",
@@ -1030,7 +1073,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527304+00:00",
+      "discovered_at": "2026-08-03T15:15:27.168151+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1051,7 +1094,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527425+00:00",
+      "discovered_at": "2026-08-03T15:15:27.168276+00:00",
       "image_count": null,
       "lead_id": "web-d2192f749651b034d4eb",
       "price_nok": null,
@@ -1072,7 +1115,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.527363+00:00",
+      "discovered_at": "2026-08-03T15:15:27.168211+00:00",
       "image_count": null,
       "lead_id": "web-ccf7065118a5bf95db40",
       "price_nok": null,
@@ -1094,7 +1137,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528501+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169233+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1115,7 +1158,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530825+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171636+00:00",
       "image_count": null,
       "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
@@ -1135,7 +1178,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530596+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171406+00:00",
       "image_count": null,
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
@@ -1155,7 +1198,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.530466+00:00",
+      "discovered_at": "2026-08-03T15:15:27.171278+00:00",
       "image_count": null,
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "price_nok": null,
@@ -1175,7 +1218,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.528297+00:00",
+      "discovered_at": "2026-08-03T15:15:27.169105+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1195,7 +1238,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T10:05:16.526933+00:00",
+      "discovered_at": "2026-08-03T15:15:27.167704+00:00",
       "image_count": null,
       "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,
@@ -1213,6 +1256,6 @@
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 56
+    "Brave Search": 58
   }
 }

@@ -637,6 +637,20 @@
           "score": 28.03
         }
       ]
+    },
+    {
+      "buy_review_count": 0,
+      "candidate_count": 1,
+      "generated_at": "2026-08-03T15:15:37.926547+00:00",
+      "monitor_count": 0,
+      "reject_count": 1,
+      "scores": [
+        {
+          "opportunity_id": "unified-auksjonen-614953",
+          "recommendation": "REJECT",
+          "score": 33.26
+        }
+      ]
     }
   ],
   "schema_version": 1

@@ -6,7 +6,7 @@
     "DEPRECATED",
     "PLANNED"
   ],
-  "generated_at": "2026-08-03T10:05:28.921742+00:00",
+  "generated_at": "2026-08-03T15:15:38.507345+00:00",
   "schema_version": 1,
   "source_count": 18,
   "sources": [
@@ -14,7 +14,7 @@
       "access_mode": "public_direct_category_pages",
       "channel": null,
       "error": null,
-      "fetched": 42,
+      "fetched": 52,
       "market": "Norway",
       "priority": 1,
       "required_configuration": [],

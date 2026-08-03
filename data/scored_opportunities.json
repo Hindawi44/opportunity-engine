@@ -1,13 +1,13 @@
 {
   "actionable_count": 0,
   "buy_review_count": 0,
-  "candidate_count": 2,
-  "generated_at": "2026-08-03T10:05:28.350927+00:00",
+  "candidate_count": 1,
+  "generated_at": "2026-08-03T15:15:37.926547+00:00",
   "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
   "monitor_count": 0,
   "opportunities": [
     {
-      "asking_price_nok": 1600.0,
+      "asking_price_nok": 1800.0,
       "city": "Tønsberg",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
@@ -22,7 +22,7 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
-      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d",
+      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d",
       "matched_target_terms": [
         "skrivebord"
       ],
@@ -68,79 +68,11 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 3t 30m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 22t 20m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
-    },
-    {
-      "asking_price_nok": 6100.0,
-      "city": "Tønsberg",
-      "conservative_resale_value_nok": null,
-      "decision": "EVIDENCE_REQUIRED",
-      "ends_at": "1785753600000",
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "expected_profit_nok": null,
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 34 bud 34m 40s",
-      "matched_target_terms": [
-        "lagerreol",
-        "reol"
-      ],
-      "maximum_safe_bid_nok": null,
-      "missing_evidence": [
-        "auction_fee_nok",
-        "dismantling_cost_nok",
-        "other_costs_nok",
-        "repair_cost_nok",
-        "storage_cost_nok",
-        "three_verified_market_comparables",
-        "transport_cost_nok",
-        "vat_nok"
-      ],
-      "opportunity_id": "unified-auksjonen-614289",
-      "opportunity_score": 28.03,
-      "priority": 1,
-      "reasons": [
-        "target:lagerreol+15",
-        "target:reol+9",
-        "asking_price_present+5"
-      ],
-      "recommendation": "REJECT",
-      "recommendation_ar": "رفض",
-      "relevance_score": 29,
-      "requires_human_approval": false,
-      "roi_percent": null,
-      "score_components": {
-        "evidence": 0.0,
-        "listing_quality": 9.03,
-        "logistics": 10.0,
-        "marketability": 9.0,
-        "verified_economics": 0.0
-      },
-      "score_grade": "E",
-      "score_reasons": [
-        "verified_economics:0/35",
-        "evidence_completeness:0.0/15",
-        "verified_comparables:0.0/10",
-        "marketability:9.0/15",
-        "logistics:10.0/10",
-        "relevance:2.0/7",
-        "listing_fields:7.0/8",
-        "evidence_gate:EVIDENCE_REQUIRED"
-      ],
-      "status": "review_first",
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 34 bud 34m 40s",
-      "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     }
   ],
-  "reject_count": 2,
+  "reject_count": 1,
   "schema_version": 1
 }

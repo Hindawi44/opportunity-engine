@@ -5,7 +5,7 @@
       "automatic_purchase_decision": false,
       "commercial_status": "WATCH",
       "cost_estimate": {
-        "asking_price_nok": 1600.0,
+        "asking_price_nok": 1800.0,
         "conservative_resale_value_nok": null,
         "expected_profit_nok": null,
         "maximum_safe_bid_nok": null,
@@ -114,143 +114,20 @@
         "city": "Tønsberg",
         "description": null,
         "name": "auksjonen.no",
-        "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 3t 30m",
+        "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 22t 20m",
         "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
-      },
-      "verification_status": "REQUIRES_VERIFICATION",
-      "workflow_status": "NEW"
-    },
-    {
-      "automatic_purchase_decision": false,
-      "commercial_status": "WATCH",
-      "cost_estimate": {
-        "asking_price_nok": 6100.0,
-        "conservative_resale_value_nok": null,
-        "expected_profit_nok": null,
-        "maximum_safe_bid_nok": null,
-        "roi_percent": null,
-        "target_profit_buffer_nok": null,
-        "total_cost_nok": null,
-        "verified_operating_costs_nok": null
-      },
-      "evidence": [
-        {
-          "kind": "DISCOVERY_REASON",
-          "value": "target:lagerreol+15"
-        },
-        {
-          "kind": "DISCOVERY_REASON",
-          "value": "target:reol+9"
-        },
-        {
-          "kind": "DISCOVERY_REASON",
-          "value": "asking_price_present+5"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "verified_economics:0/35"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "evidence_completeness:0.0/15"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "verified_comparables:0.0/10"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "marketability:9.0/15"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "logistics:10.0/10"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "relevance:2.0/7"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "listing_fields:7.0/8"
-        },
-        {
-          "kind": "SCORE_REASON",
-          "value": "evidence_gate:EVIDENCE_REQUIRED"
-        },
-        {
-          "kind": "DECISION_REASON_AR",
-          "value": "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
-        }
-      ],
-      "final_decision": "WATCH",
-      "identity": {
-        "canonical_url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
-        "legacy_opportunity_id": "unified-auksjonen-614289",
-        "source_listing_id": "unified-auksjonen-614289"
-      },
-      "listing_status": "UNKNOWN",
-      "market": "NO",
-      "missing_information": [
-        "auction_fee_nok",
-        "dismantling_cost_nok",
-        "other_costs_nok",
-        "repair_cost_nok",
-        "storage_cost_nok",
-        "three_verified_market_comparables",
-        "transport_cost_nok",
-        "vat_nok",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "opportunity_id": "unified-auksjonen-614289",
-      "recommended_actions": [
-        "استكمال ثلاث مقارنات سوقية موثقة.",
-        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
-      ],
-      "risk": {
-        "analysis_eligible": null,
-        "decision_confidence": "LOW",
-        "decision_warnings_ar": [
-          "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
-        ],
-        "exclusion_reasons": [],
-        "legacy_recommendation": "WATCH",
-        "official_decision_field": "final_decision",
-        "opportunity_score": 28.03,
-        "relevance_score": 29,
-        "score_components": {
-          "evidence": 0.0,
-          "listing_quality": 9.03,
-          "logistics": 10.0,
-          "marketability": 9.0,
-          "verified_economics": 0.0
-        },
-        "score_grade": "E",
-        "top5_eligible": null
-      },
-      "schema_version": "unified-opportunity-contract-v1",
-      "source": {
-        "city": "Tønsberg",
-        "description": null,
-        "name": "auksjonen.no",
-        "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 34 bud 34m 40s",
-        "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
       },
       "verification_status": "REQUIRES_VERIFICATION",
       "workflow_status": "NEW"
     }
   ],
   "decision_counts": {
-    "WATCH": 2
+    "WATCH": 1
   },
   "market": "NO",
-  "opportunity_count": 2,
+  "opportunity_count": 1,
   "schema_version": "unified-opportunity-contract-export-v1",
-  "source_generated_at": "2026-08-03T10:05:28.964730+00:00",
+  "source_generated_at": "2026-08-03T15:15:38.549485+00:00",
   "source_official_decision_field": "final_decision",
   "source_schema_version": 2
 }
