@@ -7,15 +7,15 @@ import json
 from pathlib import Path
 from typing import Any
 
-from opportunity_engine.discovery.brreg_update_id_cursor import (
-    collect_manifest_cursor_direct_official_signals,
-)
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     persist_manifest_market_signals,
 )
 from opportunity_engine.discovery.signal_role_freshness_correction import (
     write_corrected_market_bulletin_artifacts,
+)
+from opportunity_engine.discovery.sweden_valuable_datasets_status_feed import (
+    collect_manifest_official_signals_with_sweden_status,
 )
 
 
@@ -40,7 +40,7 @@ def main() -> int:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    official_coverage = collect_manifest_cursor_direct_official_signals(
+    official_coverage = collect_manifest_official_signals_with_sweden_status(
         manifest,
         root=args.root,
     )

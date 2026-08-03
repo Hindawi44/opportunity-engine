@@ -54,6 +54,7 @@ on:
       - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
       - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
       - "src/opportunity_engine/discovery/lifecycle_checkpoint_integration.py"
+      - "src/opportunity_engine/discovery/sweden_valuable_datasets_status_feed.py"
       - "src/opportunity_engine/persistence/__init__.py"
       - "src/opportunity_engine/persistence/human_review.py"
       - "src/opportunity_engine/persistence/human_review_models.py"
@@ -68,6 +69,7 @@ on:
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
       - "tests/test_lifecycle_checkpoint_integration_v1.py"
+      - "tests/test_sweden_valuable_datasets_status_feed_v1.py"
       - "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
 
 permissions:
@@ -99,6 +101,7 @@ jobs:
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
           pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
+          pytest tests/test_sweden_valuable_datasets_status_feed_v1.py -q
 
   manual-read-only-checkpoint:
     if: ${{ github.event_name == 'workflow_dispatch' }}
@@ -107,6 +110,9 @@ jobs:
     env:
       PYTHONPATH: src:.
       BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      BOLAGSVERKET_CLIENT_ID: ${{ secrets.BOLAGSVERKET_CLIENT_ID }}
+      BOLAGSVERKET_CLIENT_SECRET: ${{ secrets.BOLAGSVERKET_CLIENT_SECRET }}
+      BOLAGSVERKET_SE_ORGANISATION_NUMBERS: ${{ secrets.BOLAGSVERKET_SE_ORGANISATION_NUMBERS }}
       INPUT_ROOT: artifacts/multi-market-inputs
       OUTPUT_DIR: artifacts/multi-market-daily-operator-checkpoint
 
