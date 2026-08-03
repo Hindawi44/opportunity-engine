@@ -6,6 +6,9 @@ import argparse
 import json
 from pathlib import Path
 
+from opportunity_engine.discovery.auksjonen_checkpoint_evidence import (
+    reconcile_auksjonen_checkpoint_evidence,
+)
 from opportunity_engine.discovery.lifecycle_checkpoint_integration import (
     enrich_checkpoint_with_lifecycle,
     write_lifecycle_checkpoint_artifacts,
@@ -43,6 +46,11 @@ def main() -> int:
         manifest,
         root=args.root,
         restore_status=restore_status,
+    )
+    enriched = reconcile_auksjonen_checkpoint_evidence(
+        enriched,
+        manifest,
+        root=args.root,
     )
     write_lifecycle_checkpoint_artifacts(enriched, args.report, args.summary)
     print(json.dumps(enriched.get("lifecycle") or {}, ensure_ascii=False, sort_keys=True))
