@@ -8,6 +8,13 @@ from .database import (
     session_scope,
     upgrade_database,
 )
+from .human_review import (
+    HumanReviewOutcome,
+    HumanReviewOutcomeRepository,
+    apply_human_review_outcome,
+    apply_persisted_human_review,
+)
+from .human_review_models import HumanReviewOutcomeModel
 from .lifecycle_models import LifecycleEventModel
 from .lifecycle_repository import (
     LIFECYCLE_REASON_CODE_KEY,
@@ -50,6 +57,9 @@ from .unified_repository import (
 __all__ = [
     "Base",
     "DEFAULT_DATABASE_URL",
+    "HumanReviewOutcome",
+    "HumanReviewOutcomeModel",
+    "HumanReviewOutcomeRepository",
     "LIFECYCLE_REASON_CODE_KEY",
     "LifecycleEventModel",
     "LifecycleEventRepository",
@@ -72,6 +82,8 @@ __all__ = [
     "UnifiedOpportunityRepository",
     "UnifiedPersistenceExecutionError",
     "UnifiedReportPersistenceError",
+    "apply_human_review_outcome",
+    "apply_persisted_human_review",
     "build_alembic_config",
     "create_database_engine",
     "create_session_factory",
