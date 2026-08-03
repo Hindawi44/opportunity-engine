@@ -34,23 +34,65 @@
           "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
+        },
+        {
+          "price_nok": 2490.0,
+          "quantity_status": "UNKNOWN",
+          "similarity_score": 0.4,
+          "source": "Brave Search",
+          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
         }
       ],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 22t 20m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 17t 39m",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
+    },
+    "unified-auksjonen-616275": {
+      "auction_fee_nok": null,
+      "candidate_market_value_nok": null,
+      "dismantling_cost_nok": null,
+      "market_comparables": [],
+      "market_evidence_review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
+      "missing_evidence": [
+        "three_verified_market_comparables",
+        "auction_fee_nok",
+        "vat_status",
+        "vat_nok",
+        "transport_cost_nok",
+        "dismantling_cost_nok",
+        "storage_cost_nok",
+        "repair_cost_nok",
+        "other_costs_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616275",
+      "other_costs_nok": null,
+      "pending_market_comparables": [],
+      "repair_cost_nok": null,
+      "storage_cost_nok": null,
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d 22t 58m",
+      "transport_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275",
+      "vat_nok": null,
+      "vat_status": null,
+      "verified": false
     }
   },
-  "evidence_count": 1,
-  "generated_at": "2026-08-03T15:15:37.846707+00:00",
+  "evidence_count": 2,
+  "generated_at": "2026-08-03T19:57:01.633351+00:00",
   "market_evidence_source": "data/market_evidence_registry.json",
   "method": "verified evidence only; discovered market evidence is bridged as pending review; unknown values remain null",
-  "pending_comparable_count": 1,
+  "pending_comparable_count": 2,
   "schema_version": 2,
   "verified_count": 0
 }

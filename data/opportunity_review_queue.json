@@ -1,20 +1,48 @@
 {
-  "excluded_count": 5,
+  "excluded_count": 6,
   "excluded_summary": {
-    "generic_unspecified_lot": 5
+    "generic_unspecified_lot": 6
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-08-03T15:15:31.698034+00:00",
+  "generated_at": "2026-08-03T19:56:54.009389+00:00",
   "input_count": 25,
   "listing_metadata_enrichment": {
-    "enriched_count": 1,
+    "enriched_count": 2,
     "error_count": 0,
     "method": "directly observed public listing metadata only; no estimates"
   },
-  "low_relevance_omitted_count": 19,
+  "low_relevance_omitted_count": 17,
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [
+    {
+      "asking_price_nok": 100.0,
+      "city": "Florvåg",
+      "ends_at": "1786474500000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d",
+      "matched_target_terms": [
+        "klær"
+      ],
+      "opportunity_id": "unified-auksjonen-616275",
+      "priority": 2,
+      "reasons": [
+        "target:klær+16",
+        "asking_price_present+5"
+      ],
+      "relevance_score": 21,
+      "status": "review_if_capacity",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d 22t 58m",
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
+    },
     {
       "asking_price_nok": 1800.0,
       "city": "Tønsberg",
@@ -40,12 +68,12 @@
       ],
       "relevance_score": 18,
       "status": "review_if_capacity",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 22t 20m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 17t 39m",
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     }
   ],
   "review_first_count": 0,
   "schema_version": 6,
-  "selected_count": 1,
+  "selected_count": 2,
   "source_snapshot": "data/todays_opportunities.json"
 }

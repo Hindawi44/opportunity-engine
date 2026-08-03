@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-03T15:15:37.804118+00:00",
-  "opportunity_count": 1,
+  "generated_at": "2026-08-03T19:57:01.592266+00:00",
+  "opportunity_count": 2,
   "policy": {
     "automatic_verification": false,
     "minimum_comparables": 3,
@@ -9,11 +9,31 @@
   },
   "records": [
     {
-      "accepted_comparable_count": 1,
+      "accepted_comparable_count": 0,
+      "accepted_comparables": [],
+      "asking_price_nok": 100.0,
+      "candidate_comparable_count": 0,
+      "candidate_market_value_nok": null,
+      "evidence_status": "INSUFFICIENT_EVIDENCE",
+      "independent_domain_count": 0,
+      "independent_domains": [],
+      "market_value_verified": false,
+      "opportunity_id": "unified-auksjonen-616275",
+      "outlier_count": 0,
+      "outliers": [],
+      "review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d 22t 58m",
+      "verified_market_value_nok": null
+    },
+    {
+      "accepted_comparable_count": 2,
       "accepted_comparables": [
         {
           "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
-          "captured_at": "2026-08-03T15:15:34.802563+00:00",
+          "captured_at": "2026-08-03T19:57:00.775878+00:00",
           "comparable_quantity": null,
           "domain": "secundo.no",
           "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
@@ -33,10 +53,33 @@
           "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
+        },
+        {
+          "canonical_url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
+          "captured_at": "2026-08-03T19:57:00.776883+00:00",
+          "comparable_quantity": null,
+          "domain": "secundo.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "observed_prices_nok": [
+            2490.0,
+            1992.0
+          ],
+          "price_nok": 2490.0,
+          "quantity_status": "UNKNOWN",
+          "query_target_domain": null,
+          "similarity_score": 0.4,
+          "snippet": "Vanlig pris <strong>2.490 NOK inkl. mva1.992 NOK</strong> eks.",
+          "source": "Brave Search",
+          "source_class": "independent_web",
+          "source_quantity": 5,
+          "title": "Elektrisk hev/senk skrivebord med hvit bordplate og grått understell – Secundo",
+          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
         }
       ],
       "asking_price_nok": 1800.0,
-      "candidate_comparable_count": 1,
+      "candidate_comparable_count": 2,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
       "independent_domain_count": 1,
@@ -52,7 +95,7 @@
         "fewer_than_2_independent_domains",
         "quantity_not_confirmed_for_all_comparables"
       ],
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 22t 20m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 17t 39m",
       "verified_market_value_nok": null
     }
   ],

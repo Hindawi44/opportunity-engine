@@ -1,6 +1,6 @@
 {
   "actionable_opportunities": {
-    "candidate_count": 1,
+    "candidate_count": 2,
     "items": [],
     "top_count": 0
   },
@@ -145,11 +145,11 @@
     ],
     "top_count": 5
   },
-  "generated_at": "2026-08-03T15:15:38.138091+00:00",
+  "generated_at": "2026-08-03T19:57:01.910837+00:00",
   "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
   "schema_version": 2,
   "source_funnel": {
-    "actionable_candidates": 1,
+    "actionable_candidates": 2,
     "actionable_selected": 0,
     "bankruptcy_leads_fetched": 25,
     "bankruptcy_leads_selected": 5

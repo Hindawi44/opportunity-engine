@@ -1,6 +1,39 @@
 {
-  "evaluation_count": 1,
+  "evaluation_count": 2,
   "evaluations": [
+    {
+      "asking_price_nok": 100.0,
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "evidence": {
+        "auction_fee_nok": null,
+        "dismantling_cost_nok": null,
+        "market_comparables_nok": [],
+        "other_costs_nok": null,
+        "repair_cost_nok": null,
+        "storage_cost_nok": null,
+        "transport_cost_nok": null,
+        "vat_nok": null
+      },
+      "expected_profit_nok": null,
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616275",
+      "priority": 2,
+      "roi_percent": null,
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d 22t 58m",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
+    },
     {
       "asking_price_nok": 1800.0,
       "conservative_resale_value_nok": null,
@@ -30,14 +63,14 @@
       "opportunity_id": "unified-auksjonen-614953",
       "priority": 2,
       "roi_percent": null,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 22t 20m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 17t 39m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     }
   ],
-  "evidence_required_count": 1,
+  "evidence_required_count": 2,
   "evidence_source": "data/opportunity_evidence.json",
-  "generated_at": "2026-08-03T15:15:37.884371+00:00",
+  "generated_at": "2026-08-03T19:57:01.669496+00:00",
   "method": "verified-evidence-gated conservative economics; missing values remain null and block recommendations",
   "ready_for_numeric_review_count": 0,
   "schema_version": 2,

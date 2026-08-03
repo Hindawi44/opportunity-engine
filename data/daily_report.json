@@ -3,14 +3,14 @@
     "alerts": [],
     "decision_source": "data/decision_intelligence.json",
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-08-03T15:15:37.926547+00:00",
+    "last_scoring_run": "2026-08-03T19:57:01.709116+00:00",
     "official_decision_field": "final_decision",
     "schema_version": 2,
     "signatures": []
   },
   "channels": {
     "actionable_opportunities": {
-      "candidate_count": 1,
+      "candidate_count": 2,
       "items": [],
       "top_count": 0
     },
@@ -155,21 +155,21 @@
       ],
       "top_count": 5
     },
-    "generated_at": "2026-08-03T15:15:38.138091+00:00",
+    "generated_at": "2026-08-03T19:57:01.910837+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
     "schema_version": 2,
     "source_funnel": {
-      "actionable_candidates": 1,
+      "actionable_candidates": 2,
       "actionable_selected": 0,
       "bankruptcy_leads_fetched": 25,
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-08-03T15:15:38.224826+00:00",
+  "generated_at": "2026-08-03T19:57:01.991801+00:00",
   "opportunities": {
     "actionable_count": 0,
-    "candidate_count": 1,
-    "generated_at": "2026-08-03T15:15:37.965863+00:00",
+    "candidate_count": 2,
+    "generated_at": "2026-08-03T19:57:01.745850+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -179,8 +179,8 @@
   "scoring": {
     "actionable_count": 0,
     "buy_review_count": 0,
-    "candidate_count": 1,
-    "generated_at": "2026-08-03T15:15:37.926547+00:00",
+    "candidate_count": 2,
+    "generated_at": "2026-08-03T19:57:01.709116+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
@@ -246,17 +246,83 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 22t 20m",
+        "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 17t 39m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
+      },
+      {
+        "asking_price_nok": 100.0,
+        "city": "Florvåg",
+        "conservative_resale_value_nok": null,
+        "decision": "EVIDENCE_REQUIRED",
+        "ends_at": "1786474500000",
+        "evidence_needed": [
+          "three_verified_market_comparables",
+          "auction_fee",
+          "vat_status",
+          "transport_cost",
+          "dismantling_cost",
+          "condition_and_missing_parts"
+        ],
+        "exclusion_reasons": [],
+        "expected_profit_nok": null,
+        "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d",
+        "matched_target_terms": [
+          "klær"
+        ],
+        "maximum_safe_bid_nok": null,
+        "missing_evidence": [
+          "auction_fee_nok",
+          "dismantling_cost_nok",
+          "other_costs_nok",
+          "repair_cost_nok",
+          "storage_cost_nok",
+          "three_verified_market_comparables",
+          "transport_cost_nok",
+          "vat_nok"
+        ],
+        "opportunity_id": "unified-auksjonen-616275",
+        "opportunity_score": 24.47,
+        "priority": 2,
+        "reasons": [
+          "target:klær+16",
+          "asking_price_present+5"
+        ],
+        "recommendation": "REJECT",
+        "recommendation_ar": "رفض",
+        "relevance_score": 21,
+        "requires_human_approval": false,
+        "roi_percent": null,
+        "score_components": {
+          "evidence": 0.0,
+          "listing_quality": 8.47,
+          "logistics": 7.0,
+          "marketability": 9.0,
+          "verified_economics": 0.0
+        },
+        "score_grade": "E",
+        "score_reasons": [
+          "verified_economics:0/35",
+          "evidence_completeness:0.0/15",
+          "verified_comparables:0.0/10",
+          "marketability:9.0/15",
+          "logistics:7.0/10",
+          "relevance:1.5/7",
+          "listing_fields:7.0/8",
+          "evidence_gate:EVIDENCE_REQUIRED"
+        ],
+        "status": "review_if_capacity",
+        "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d 22t 58m",
+        "total_cost_nok": null,
+        "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
       }
     ],
-    "reject_count": 1,
+    "reject_count": 2,
     "schema_version": 1
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-08-03T15:15:38.189055+00:00",
+    "generated_at": "2026-08-03T19:57:01.958274+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [
@@ -267,7 +333,7 @@
         "bankruptcy_leads_selected": 0,
         "configured": true,
         "error": null,
-        "fetched": 52,
+        "fetched": 53,
         "note": null,
         "public_auction_event_leads_selected": 0,
         "required_configuration": [],
@@ -356,7 +422,7 @@
       "awaiting_configuration_count": 3,
       "collecting_count": 3,
       "error_count": 0,
-      "fetched_total": 79,
+      "fetched_total": 80,
       "source_count": 6
     }
   },

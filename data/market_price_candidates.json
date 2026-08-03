@@ -1,23 +1,532 @@
 {
-  "candidate_count": 1,
+  "candidate_count": 2,
   "errors": {},
-  "generated_at": "2026-08-03T15:15:37.745254+00:00",
+  "generated_at": "2026-08-03T19:57:01.537718+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
   "opportunities": [
     {
+      "asking_price_nok": 100.0,
+      "available_query_count": 8,
+      "candidate_count": 0,
+      "candidate_market_value_nok": null,
+      "candidate_price_max_nok": null,
+      "candidate_price_median_nok": null,
+      "candidate_price_min_nok": null,
+      "candidates": [],
+      "distinct_domain_count": 0,
+      "distinct_source_class_count": 0,
+      "eligible_for_market_value": false,
+      "market_search_queries": [
+        "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+        "\"Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg\" selges kr",
+        "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+        "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr"
+      ],
+      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+      "market_value_status": "NO_PRICE_CANDIDATES",
+      "opportunity_id": "unified-auksjonen-616275",
+      "query_budget_truncated": true,
+      "query_count": 4,
+      "query_stats": [
+        {
+          "accepted_count": 0,
+          "query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejected_count": 10,
+          "result_count": 10,
+          "target_domain": null
+        },
+        {
+          "accepted_count": 0,
+          "query": "\"Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg\" selges kr",
+          "rejected_count": 0,
+          "result_count": 0,
+          "target_domain": null
+        },
+        {
+          "accepted_count": 0,
+          "query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejected_count": 10,
+          "result_count": 10,
+          "target_domain": null
+        },
+        {
+          "accepted_count": 0,
+          "query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejected_count": 10,
+          "result_count": 10,
+          "target_domain": "finn.no"
+        }
+      ],
+      "rejected_candidate_count": 30,
+      "rejected_candidates": [
+        {
+          "canonical_url": "https://profileringsartikler.no/produkter/klaer",
+          "comparable_quantity": null,
+          "domain": "profileringsartikler.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Klær - Profileringsartikler AS",
+          "url": "https://www.profileringsartikler.no/produkter/klaer"
+        },
+        {
+          "canonical_url": "https://profildesign.no/category/produktkataloger",
+          "comparable_quantity": null,
+          "domain": "profildesign.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profil Design Norge AS, Profildesign, profilklær og firmaprofilering, Asker Profil",
+          "url": "https://www.profildesign.no/category/produktkataloger/"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.71.3941",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Dameklær | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.71.3941"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.71",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Klær, kosmetikk og tilbehør | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?category=0.71"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?brand=9626&sub_category=1.71.3941",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Lager 157 | Dameklær | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?brand=9626&sub_category=1.71.3941"
+        },
+        {
+          "canonical_url": "https://florworks.no/",
+          "comparable_quantity": null,
+          "domain": "florworks.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for damer – Flor",
+          "url": "https://florworks.no/"
+        },
+        {
+          "canonical_url": "https://ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar",
+          "comparable_quantity": null,
+          "domain": "ahlsell.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profil og fritidsklær | Ahlsell – Vi gjør det enklere å v...",
+          "url": "https://www.ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar"
+        },
+        {
+          "canonical_url": "https://bonprix.no/kategori/dame",
+          "comparable_quantity": null,
+          "domain": "bonprix.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Dameklær på nett - kjøp klær og sko hos bonprix.no",
+          "url": "https://www.bonprix.no/kategori/dame/"
+        },
+        {
+          "canonical_url": "https://norskprofilreklame.no/sortiment/profilklar",
+          "comparable_quantity": null,
+          "domain": "norskprofilreklame.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profilklær - Norsk Profilreklame & Gaver AS",
+          "url": "https://www.norskprofilreklame.no/sortiment/profilklar"
+        },
+        {
+          "canonical_url": "https://nextprofilering.no/categories/profilklaer",
+          "comparable_quantity": null,
+          "domain": "nextprofilering.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Trenger din bedrift profilklær med logo? - Next Profilering",
+          "url": "https://www.nextprofilering.no/categories/profilklaer"
+        },
+        {
+          "canonical_url": "https://profileringsartikler.no/produkter/klaer",
+          "comparable_quantity": null,
+          "domain": "profileringsartikler.no",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Klær - Profileringsartikler AS",
+          "url": "https://www.profileringsartikler.no/produkter/klaer"
+        },
+        {
+          "canonical_url": "https://norgesprofil.no/produkter/profilklaer/k-1",
+          "comparable_quantity": null,
+          "domain": "norgesprofil.no",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.3,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profilklær med trykk og brodering | NorgesProfil",
+          "url": "https://norgesprofil.no/produkter/profilklaer/k-1"
+        },
+        {
+          "canonical_url": "https://ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar",
+          "comparable_quantity": null,
+          "domain": "ahlsell.no",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.1,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profil og fritidsklær | Ahlsell – Vi gjør det enklere å v...",
+          "url": "https://www.ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar"
+        },
+        {
+          "canonical_url": "https://bonprix.no/kategori/dame",
+          "comparable_quantity": null,
+          "domain": "bonprix.no",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Dameklær på nett - kjøp klær og sko hos bonprix.no",
+          "url": "https://www.bonprix.no/kategori/dame/"
+        },
+        {
+          "canonical_url": "https://nextprofilering.no/categories/profilklaer",
+          "comparable_quantity": null,
+          "domain": "nextprofilering.no",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Trenger din bedrift profilklær med logo? - Next Profilering",
+          "url": "https://www.nextprofilering.no/categories/profilklaer"
+        },
+        {
+          "canonical_url": "https://norskprofilreklame.no/sortiment/profilklar",
+          "comparable_quantity": null,
+          "domain": "norskprofilreklame.no",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profilklær - Norsk Profilreklame & Gaver AS",
+          "url": "https://www.norskprofilreklame.no/sortiment/profilklar"
+        },
+        {
+          "canonical_url": "https://florworks.no/",
+          "comparable_quantity": null,
+          "domain": "florworks.no",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for damer – Flor",
+          "url": "https://florworks.no/"
+        },
+        {
+          "canonical_url": "https://profildesign.no/category/produktkataloger",
+          "comparable_quantity": null,
+          "domain": "profildesign.no",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profil Design Norge AS, Profildesign, profilklær og firmaprofilering, Asker Profil",
+          "url": "https://www.profildesign.no/category/produktkataloger/"
+        },
+        {
+          "canonical_url": "https://wenaas.com/nb-no/produkter/profilklaer",
+          "comparable_quantity": null,
+          "domain": "wenaas.com",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.1,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profilklær",
+          "url": "https://www.wenaas.com/nb-no/produkter/profilklaer"
+        },
+        {
+          "canonical_url": "https://karitraa.com/no/no/shop-etter-aktivitet/fritidsklaer?page=3",
+          "comparable_quantity": null,
+          "domain": "karitraa.com",
+          "matched_query": "Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg bruktmarked NOK",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.2,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Fritidsklær | Kari Traa",
+          "url": "https://www.karitraa.com/no/no/shop-etter-aktivitet/fritidsklaer/?page=3"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.71.3941",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Dameklær | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.71.3941"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/430334990",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "New Wave jakke M L UBRUKT | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/430334990"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/430335155",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Jakke New Wave Helt NY. Str M , L , 38 40 | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/430335155"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/item/402210566",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.375,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Kjempe parti av klær til salgs | FINN-torget",
+          "url": "https://www.finn.no/recommerce/forsale/item/402210566"
+        },
+        {
+          "canonical_url": "https://finn.no/bap/artikler/klaer-mote/dette-merket-er-mer-populaert-enn-chanel",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Norrøna er i toppen, foran Mulberry og Gianni | FINN.no",
+          "url": "https://www.finn.no/bap/artikler/klaer-mote/dette-merket-er-mer-populaert-enn-chanel"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.71",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Klær, kosmetikk og tilbehør | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?category=0.71"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.71.3950.185",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Skjorter | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.71.3950.185"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.71.3941.180&women_clothing_shirt_type=1",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Skjorte | Skjorter | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.71.3941.180&women_clothing_shirt_type=1"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?brand=9196&sub_category=1.71.3941",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "KappAhl | Dameklær | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?brand=9196&sub_category=1.71.3941"
+        },
+        {
+          "canonical_url": "https://finn.no/job/ad/429454008",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "site:finn.no Stort parti nye profilklær dameskjorter fritidsklær plagg Florvåg kr",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": "finn.no",
+          "title": "Liker du praktisk arbeid, kreativt miljø og varierte dager? Da vil vi høre fra deg! | FINN.no",
+          "url": "https://www.finn.no/job/ad/429454008"
+        }
+      ],
+      "required_verified_comparables": 3,
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d 22t 58m",
+      "verified_comparable_count": 0
+    },
+    {
       "asking_price_nok": 1800.0,
       "available_query_count": 8,
-      "candidate_count": 1,
+      "candidate_count": 2,
       "candidate_market_value_nok": null,
-      "candidate_price_max_nok": 1800.0,
-      "candidate_price_median_nok": 1800.0,
+      "candidate_price_max_nok": 2490.0,
+      "candidate_price_median_nok": 2145.0,
       "candidate_price_min_nok": 1800.0,
       "candidates": [
         {
           "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
-          "captured_at": "2026-08-03T15:15:34.802563+00:00",
+          "captured_at": "2026-08-03T19:57:00.775878+00:00",
           "comparable_quantity": null,
           "domain": "secundo.no",
           "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
@@ -37,6 +546,29 @@
           "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
+        },
+        {
+          "canonical_url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
+          "captured_at": "2026-08-03T19:57:00.776883+00:00",
+          "comparable_quantity": null,
+          "domain": "secundo.no",
+          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
+          "observed_prices_nok": [
+            2490.0,
+            1992.0
+          ],
+          "price_nok": 2490.0,
+          "quantity_status": "UNKNOWN",
+          "query_target_domain": null,
+          "similarity_score": 0.4,
+          "snippet": "Vanlig pris <strong>2.490 NOK inkl. mva1.992 NOK</strong> eks.",
+          "source": "Brave Search",
+          "source_class": "independent_web",
+          "source_quantity": 5,
+          "title": "Elektrisk hev/senk skrivebord med hvit bordplate og grått understell – Secundo",
+          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
+          "verification_status": "REVIEW_REQUIRED",
+          "verified": false
         }
       ],
       "distinct_domain_count": 1,
@@ -46,17 +578,13 @@
         "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d brukt pris Norge",
         "\"komplette elektriske hev senk skrivebord samlet Velg mellom\" selges kr",
         "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
-        "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-        "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-        "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-        "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-        "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr"
+        "site:finn.no komplette elektriske hev senk skrivebord samlet Velg mellom kr"
       ],
       "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d brukt pris Norge",
       "market_value_status": "INSUFFICIENT_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-614953",
-      "query_budget_truncated": false,
-      "query_count": 8,
+      "query_budget_truncated": true,
+      "query_count": 4,
       "query_stats": [
         {
           "accepted_count": 0,
@@ -73,9 +601,9 @@
           "target_domain": null
         },
         {
-          "accepted_count": 1,
+          "accepted_count": 2,
           "query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
-          "rejected_count": 9,
+          "rejected_count": 8,
           "result_count": 10,
           "target_domain": null
         },
@@ -85,37 +613,9 @@
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": "finn.no"
-        },
-        {
-          "accepted_count": 0,
-          "query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejected_count": 10,
-          "result_count": 10,
-          "target_domain": "auksjonen.no"
-        },
-        {
-          "accepted_count": 0,
-          "query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejected_count": 10,
-          "result_count": 10,
-          "target_domain": "retrade.eu"
-        },
-        {
-          "accepted_count": 0,
-          "query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejected_count": 10,
-          "result_count": 10,
-          "target_domain": "klaravik.no"
-        },
-        {
-          "accepted_count": 0,
-          "query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejected_count": 10,
-          "result_count": 10,
-          "target_domain": "mascus.no"
         }
       ],
-      "rejected_candidate_count": 69,
+      "rejected_candidate_count": 28,
       "rejected_candidates": [
         {
           "canonical_url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black",
@@ -349,21 +849,6 @@
           "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.78.5196.214&q=hev+senk+or+elektrisk"
         },
         {
-          "canonical_url": "https://ikea.com/no/no/cat/hev-senk-skrivebord-55008",
-          "comparable_quantity": null,
-          "domain": "ikea.com",
-          "matched_query": "komplette elektriske hev senk skrivebord samlet Velg mellom bruktmarked NOK",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.3,
-          "source_quantity": 5,
-          "target_domain": null,
-          "title": "Hev og senk pult - For en mer ergonomisk arbeidshverdag - IKEA",
-          "url": "https://www.ikea.com/no/no/cat/hev-senk-skrivebord-55008/"
-        },
-        {
           "canonical_url": "https://kontorkonsult.no/produkt/hev-senk-skrivebord-elektrisk",
           "comparable_quantity": null,
           "domain": "kontorkonsult.no",
@@ -531,620 +1016,17 @@
           "target_domain": "finn.no",
           "title": "BESTSELGENDE NYTT ELEKTRISK HEV/SENK HJØRNE-SKRIVEBORD 2 BEINS I MODERNE HVIT | FINN-torget",
           "url": "https://www.finn.no/recommerce/forsale/item/373216825"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjon/3_stk_Linak_skrivebord_180x80cm_-_Hevsenk/372558",
-          "comparable_quantity": 3,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "quantity_mismatch"
-          ],
-          "similarity_score": 0.375,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "3 stk Linak skrivebord 180x80cm - Hev/senk",
-          "url": "https://www.auksjonen.no/auksjon/3_stk_Linak_skrivebord_180x80cm_-_Hevsenk/372558"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjon/torget/2010_ROL_Ergo_Hj%C3%B8rneskrivebord_-_Hev__Senk_-_Skrivebord/444854",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.375,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "2010 ROL Ergo Hjørneskrivebord - Hev & Senk - Skrivebord",
-          "url": "https://auksjonen.no/auksjon/torget/2010_ROL_Ergo_Hj%C3%B8rneskrivebord_-_Hev__Senk_-_Skrivebord/444854"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjon/Arbeidsbord_i_metall_med_fastmontert_skrutvinge/397649",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "Arbeidsbord i metall med fastmontert skrutvinge",
-          "url": "https://www.auksjonen.no/auksjon/Arbeidsbord_i_metall_med_fastmontert_skrutvinge/397649"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjoner/alle?ordering=avsluttes&p=7",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "Kjøp og selg alt mulig på Auksjonen.no",
-          "url": "https://www.auksjonen.no/auksjoner/alle?p=7&ordering=avsluttes"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjoner/kontorustyr",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "Kontorutstyr",
-          "url": "https://www.auksjonen.no/auksjoner/kontorustyr"
-        },
-        {
-          "canonical_url": "https://ny.auksjonen.no/auksjoner/torget/%C3%B8stfold",
-          "comparable_quantity": null,
-          "domain": "ny.auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "Torget | Auksjonen.no",
-          "url": "https://ny.auksjonen.no/auksjoner/torget/%C3%B8stfold"
-        },
-        {
-          "canonical_url": "https://ny.auksjonen.no/auksjoner/elektronikk",
-          "comparable_quantity": null,
-          "domain": "ny.auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "Elektronikk og hvitevarer | Auksjonen.no",
-          "url": "https://ny.auksjonen.no/auksjoner/elektronikk"
-        },
-        {
-          "canonical_url": "https://ny.auksjonen.no/auksjon/torget/2021_8stk_OKAI_ES400B_El-sparkesykler_2021_-_Repobjekt__Prosjektparti_OKAI_ES400B/608233",
-          "comparable_quantity": 8,
-          "domain": "ny.auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35",
-            "quantity_mismatch"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "2021 8stk OKAI ES400B El-sparkesykler (2021) - Repobjekt / Prosjektparti OKAI ES400B – 500,- | Auksjonen.no",
-          "url": "https://ny.auksjonen.no/auksjon/torget/2021_8stk_OKAI_ES400B_El-sparkesykler_2021_-_Repobjekt__Prosjektparti_OKAI_ES400B/608233"
-        },
-        {
-          "canonical_url": "https://auksjonen.no/auksjoner/torget?filter=~%28valueFilters~%28~%28field~%27category2~values~%28~%2711004~%2710110508%29%29%29%29",
-          "comparable_quantity": null,
-          "domain": "auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "Kjøp og selg brukt utstyr og verktøy hos auksjonen.no",
-          "url": "https://www.auksjonen.no/auksjoner/torget?filter=%7E%28valueFilters%7E%28%7E%28field%7E%27category2%7Evalues%7E%28%7E%2711004%7E%2710110508%29%29%29%29"
-        },
-        {
-          "canonical_url": "https://info.auksjonen.no/ofte-stilte-sporsmal",
-          "comparable_quantity": null,
-          "domain": "info.auksjonen.no",
-          "matched_query": "site:auksjonen.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": 5,
-          "target_domain": "auksjonen.no",
-          "title": "Ofte stilte spørsmål — Auksjonen.no Infosenter",
-          "url": "https://info.auksjonen.no/ofte-stilte-sporsmal/"
-        },
-        {
-          "canonical_url": "https://retrade.eu/da/aitem/445658/Hev_og_senk_bord._elektrisk",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "Hev og senk bord. elektrisk til salg. P Retrade kan du kbe brugt udstyr, maskiner, kretjer og andet overskudsmateriel online. Lgg dit bud n!",
-          "url": "https://www.retrade.eu/da/aitem/445658/Hev_og_senk_bord._elektrisk"
-        },
-        {
-          "canonical_url": "https://retrade.eu/en/aitem/130964/Heve_senke_skrivebord_-_4_stk",
-          "comparable_quantity": 4,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "similarity_below_0.35",
-            "quantity_mismatch"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "Heve/senke skrivebord - 4 stk for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
-          "url": "https://www.retrade.eu/en/aitem/130964/Heve_senke_skrivebord_-_4_stk"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/aitem/122087/Trippel_garasje",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "Trippel garasje til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
-          "url": "https://www.retrade.eu/no/aitem/122087/Trippel_garasje"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/aitem/407559/Elektrisk_l%C3%B8ftebord.",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "Elektrisk løftebord. til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
-          "url": "https://www.retrade.eu/no/aitem/407559/Elektrisk_l%C3%B8ftebord."
-        },
-        {
-          "canonical_url": "https://retrade.eu/da/aitem/520285/El_hev_senk_kontorpult",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "El hev/senk kontorpult til salg. På Retrade kan du købe brugt udstyr, maskiner, køretøjer og andet overskudsmateriel online. Lægg dit bud nå!",
-          "url": "https://www.retrade.eu/da/aitem/520285/El_hev_senk_kontorpult"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/aitem/108808/Verkstedutstyr_selges_samlet_8_st",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "Verkstedutstyr selges samlet 8 st til salgs. På Retrade kan du kjøpe brukte maskiner, utstyr, kjøretøy og annet overskuddsmateriell online. Gi bud nå!",
-          "url": "https://www.retrade.eu/no/aitem/108808/Verkstedutstyr_selges_samlet_8_st"
-        },
-        {
-          "canonical_url": "https://retrade.eu/auction/37253",
-          "comparable_quantity": 6,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35",
-            "quantity_mismatch"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "6 X HYWEMA LIFTS RG 6.5 / HJULLØFTERE / 39.000 KG CAPACITY / | Retrade",
-          "url": "https://retrade.eu/auction/37253"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/auction/101808",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "GIS 2500 kg el talje / Electric hoists | Retrade",
-          "url": "https://retrade.eu/no/auction/101808"
-        },
-        {
-          "canonical_url": "https://retrade.eu/en/en/aitem/508583/Kontorpulter_og_verkt%C3%B8yskap",
-          "comparable_quantity": 3,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35",
-            "quantity_mismatch"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "Kontorpulter og verktøyskap for sale. Retrade offers used machines, vehicles, equipment and surplus material online. Place your bid now!",
-          "url": "https://www.retrade.eu/en/en/aitem/508583/Kontorpulter_og_verkt%C3%B8yskap"
-        },
-        {
-          "canonical_url": "https://retrade.eu/no/aitem/118990/Diverse_redskap_og_utstyr",
-          "comparable_quantity": null,
-          "domain": "retrade.eu",
-          "matched_query": "site:retrade.eu komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "retrade.eu",
-          "title": "Diverse redskap og utstyr til salgs. P Retrade kan du kjpe brukte maskiner, utstyr, kjrety og annet overskuddsmateriell online. Gi bud n!",
-          "url": "https://www.retrade.eu/no/aitem/118990/Diverse_redskap_og_utstyr"
-        },
-        {
-          "canonical_url": "https://klaravik.no/productprint/26031",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik",
-          "url": "https://www.klaravik.no/productprint/26031/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/skjermholder-pc-2stk",
-          "comparable_quantity": 2,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35",
-            "quantity_mismatch"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Skjermholder PC 2stk",
-          "url": "https://www.klaravik.no/auction/product/skjermholder-pc-2stk/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/kapp-gjaersag-pa-sammenleggbart-bord",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Kapp-/Gjærsag på sammenleggbart bord",
-          "url": "https://www.klaravik.no/auction/product/kapp-gjaersag-pa-sammenleggbart-bord/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/kornskrue",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Kornskrue",
-          "url": "https://www.klaravik.no/auction/product/kornskrue/"
-        },
-        {
-          "canonical_url": "https://old.klaravik.no/login",
-          "comparable_quantity": null,
-          "domain": "old.klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Velg Kundetype - Klaravik auksjoner",
-          "url": "https://old.klaravik.no/login/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/all?setlocationflag=2092+Minnesund",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner",
-          "url": "https://www.klaravik.no/auction/all/?setlocationflag=2092 Minnesund"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/el-bil-motorsykkel-4-hjul",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik | Auksjoner for maskiner, verktøy og kjøretøy",
-          "url": "https://www.klaravik.no/auction/product/el-bil-motorsykkel-4-hjul/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/smergelmaskin-med-avsug-011749",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Smergelmaskin med avsug - 011749",
-          "url": "https://www.klaravik.no/auction/product/smergelmaskin-med-avsug-011749/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/krokkomprimator",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Krokkomprimator",
-          "url": "https://www.klaravik.no/auction/product/krokkomprimator/"
-        },
-        {
-          "canonical_url": "https://klaravik.no/auction/product/delelager-bilverksted",
-          "comparable_quantity": null,
-          "domain": "klaravik.no",
-          "matched_query": "site:klaravik.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": 5,
-          "target_domain": "klaravik.no",
-          "title": "Klaravik auksjoner - Delelager bilverksted",
-          "url": "https://www.klaravik.no/auction/product/delelager-bilverksted/"
-        },
-        {
-          "canonical_url": "https://mascus.no/truck/diesel-trucker/hyster-pc-1-5/iihufkhg.html",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Hyster PC 1,5, 2024, Porsgrunn, Norge - Brukt diesel Trucker - Mascus Norway",
-          "url": "https://www.mascus.no/truck/diesel-trucker/hyster-pc-1-5/iihufkhg.html"
-        },
-        {
-          "canonical_url": "https://mascus.no/anlegg/skuffer?from_brandmodel=alo",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Brukt skuffer til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/skuffer?from_brandmodel=alo"
-        },
-        {
-          "canonical_url": "https://mascus.no/transport/kranbil?from_brandmodel=henger_-_trailer-bygg",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Kranbiler til salgs - se vårt brede utvalg - Mascus Norway",
-          "url": "https://www.mascus.no/transport/kranbil?from_brandmodel=henger_-_trailer-bygg"
-        },
-        {
-          "canonical_url": "https://mascus.no/transport/tilhengere",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Brukt tilhenger til salgs - Brukte tilhengere til salg hos Mascus",
-          "url": "https://www.mascus.no/transport/tilhengere"
-        },
-        {
-          "canonical_url": "https://mascus.no/transport/skapbiler",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Skapbiler til salgs på Mascus!",
-          "url": "https://www.mascus.no/transport/skapbiler"
-        },
-        {
-          "canonical_url": "https://mascus.no/anlegg/personloftere",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Brukt personløfter til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/personloftere"
-        },
-        {
-          "canonical_url": "https://mascus.no/anlegg/redskap-og-utstyr-anlegg?from_brandmodel=sm",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Brukt redskap og utstyr til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/anlegg/redskap-og-utstyr-anlegg?from_brandmodel=sm"
-        },
-        {
-          "canonical_url": "https://mascus.no/landbruk/skurtresker-tilbehor",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Brukt skurtresker tilbehør til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/landbruk/skurtresker-tilbehor"
-        },
-        {
-          "canonical_url": "https://mascus.no/park-og-hageanlegg/redskapsbarere?from_brandmodel=evum",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Brukt redskapsbærere til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/park-og-hageanlegg/redskapsbarere?from_brandmodel=evum"
-        },
-        {
-          "canonical_url": "https://mascus.no/skogsmaskiner/mobile-sagbruk",
-          "comparable_quantity": null,
-          "domain": "mascus.no",
-          "matched_query": "site:mascus.no komplette elektriske hev senk skrivebord samlet Velg mellom kr",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": 5,
-          "target_domain": "mascus.no",
-          "title": "Brukt mobile sagbruk til salgs - Mascus Norway",
-          "url": "https://www.mascus.no/skogsmaskiner/mobile-sagbruk"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 22t 20m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 17t 39m",
       "verified_comparable_count": 0
     }
   ],
-  "opportunity_count": 1,
+  "opportunity_count": 2,
   "planned_request_count": 8,
-  "query_budget_exhausted": false,
-  "rejected_candidate_count": 69,
+  "query_budget_exhausted": true,
+  "rejected_candidate_count": 58,
   "request_budget": 8,
   "requests_made": 8,
   "required_comparables": 3,
