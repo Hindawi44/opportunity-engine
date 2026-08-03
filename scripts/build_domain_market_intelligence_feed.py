@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from opportunity_engine.discovery.brreg_complete_update_window import (
-    collect_manifest_complete_direct_official_signals,
+from opportunity_engine.discovery.brreg_update_id_cursor import (
+    collect_manifest_cursor_direct_official_signals,
 )
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
@@ -40,7 +40,7 @@ def main() -> int:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    official_coverage = collect_manifest_complete_direct_official_signals(
+    official_coverage = collect_manifest_cursor_direct_official_signals(
         manifest,
         root=args.root,
     )
