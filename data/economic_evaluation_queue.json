@@ -2,7 +2,7 @@
   "evaluation_count": 2,
   "evaluations": [
     {
-      "asking_price_nok": 5900.0,
+      "asking_price_nok": 6100.0,
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
       "evidence": {
@@ -30,7 +30,7 @@
       "opportunity_id": "unified-auksjonen-614289",
       "priority": 1,
       "roi_percent": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 6t 46m 2s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 34 bud 34m 40s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289"
     },
@@ -63,14 +63,14 @@
       "opportunity_id": "unified-auksjonen-614953",
       "priority": 2,
       "roi_percent": null,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 9t 42m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 3t 30m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     }
   ],
   "evidence_required_count": 2,
   "evidence_source": "data/opportunity_evidence.json",
-  "generated_at": "2026-08-03T03:54:04.778370+00:00",
+  "generated_at": "2026-08-03T10:05:28.310337+00:00",
   "method": "verified-evidence-gated conservative economics; missing values remain null and block recommendations",
   "ready_for_numeric_review_count": 0,
   "schema_version": 2,

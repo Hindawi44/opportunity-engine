@@ -1,19 +1,42 @@
 {
   "category_counts": {
     "auction": 1,
-    "bankruptcy": 17,
+    "bankruptcy": 15,
     "clothing_shop_fixtures": 14,
     "estate_sale": 3,
     "inventory": 23,
     "liquidation": 7,
-    "office_furniture": 1,
     "sale_listing": 8,
     "shop_equipment": 15
   },
-  "deduplicated_lead_count": 59,
-  "generated_at": "2026-08-03T03:53:53.923402+00:00",
-  "input_result_count": 80,
+  "deduplicated_lead_count": 56,
+  "generated_at": "2026-08-03T10:05:16.531567+00:00",
+  "input_result_count": 79,
   "items": [
+    {
+      "canonical_url": "https://www.gulesider.no/butikkinnredning+%C3%B8stlandet/bedrifter",
+      "categories": [
+        "clothing_shop_fixtures",
+        "inventory",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T10:05:16.529256+00:00",
+      "image_count": null,
+      "lead_id": "web-09fdcc107a66ac1b45ab",
+      "price_nok": null,
+      "priority_score": 68,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:inventory+22",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "<strong>Vi har alt av utstillingsdukker, torso, butikkinnredning, kleshengere og stativer</strong>. Stort lager like ved Lillestrøm.",
+      "source": "Brave Search",
+      "title": "Butikkinnredning Østlandet | bedrifter | gulesider.no | side 1",
+      "url": "https://www.gulesider.no/butikkinnredning+%C3%B8stlandet/bedrifter"
+    },
     {
       "canonical_url": "https://avabutikkinnredning.no/",
       "categories": [
@@ -21,7 +44,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920272+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528823+00:00",
       "image_count": null,
       "lead_id": "web-7c78687e8f228b645e34",
       "price_nok": null,
@@ -44,7 +67,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920620+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529160+00:00",
       "image_count": null,
       "lead_id": "web-5e74475b63c3939a78fe",
       "price_nok": null,
@@ -67,7 +90,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921393+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529844+00:00",
       "image_count": null,
       "lead_id": "web-7368b74c0e956c42b2b7",
       "price_nok": null,
@@ -89,7 +112,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920677+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529209+00:00",
       "image_count": null,
       "lead_id": "web-e71772deae49d9ffbeb5",
       "price_nok": null,
@@ -105,35 +128,13 @@
       "url": "https://www.supersellerskatalog.no/"
     },
     {
-      "canonical_url": "https://www.supersellerskatalog.no/inspirasjon",
-      "categories": [
-        "clothing_shop_fixtures",
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921448+00:00",
-      "image_count": null,
-      "lead_id": "web-72d343831b08e2486a3f",
-      "price_nok": null,
-      "priority_score": 46,
-      "published_at": null,
-      "score_reasons": [
-        "category:clothing_shop_fixtures+24",
-        "category:shop_equipment+22"
-      ],
-      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
-      "source": "Brave Search",
-      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
-      "url": "https://www.supersellerskatalog.no/inspirasjon"
-    },
-    {
       "canonical_url": "https://www.supersellers.no/",
       "categories": [
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920337+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528884+00:00",
       "image_count": null,
       "lead_id": "web-7cad0e8a59e6e6643424",
       "price_nok": null,
@@ -155,7 +156,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920427+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528988+00:00",
       "image_count": null,
       "lead_id": "web-bd6977fd8acb108de839",
       "price_nok": null,
@@ -177,7 +178,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921798+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530166+00:00",
       "image_count": null,
       "lead_id": "web-a9922918a03cfccae302",
       "price_nok": null,
@@ -199,7 +200,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919206+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527817+00:00",
       "image_count": null,
       "lead_id": "web-340bfb344e98a6d682c6",
       "price_nok": null,
@@ -223,7 +224,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922896+00:00",
+      "discovered_at": "2026-08-03T10:05:16.531070+00:00",
       "image_count": null,
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
@@ -246,7 +247,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919018+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527642+00:00",
       "image_count": null,
       "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
@@ -263,35 +264,13 @@
       "url": "https://www.krosby.no/opphorssalg/"
     },
     {
-      "canonical_url": "https://www.gulesider.no/butikkinnredning+%C3%B8stlandet/bedrifter",
-      "categories": [
-        "office_furniture",
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920848+00:00",
-      "image_count": null,
-      "lead_id": "web-09fdcc107a66ac1b45ab",
-      "price_nok": null,
-      "priority_score": 38,
-      "published_at": null,
-      "score_reasons": [
-        "category:office_furniture+16",
-        "category:shop_equipment+22"
-      ],
-      "snippet": "Butikkinnredning Østlandet - brosjyreholder, butikkdesign, garderobeskap, kontorlandskap, benker, bord, garderobe, kontorstol, kontormøbler, skrivebord, brosjyrestativ, arkivskap - Finn firmaer, adresser, telefonnumre.",
-      "source": "Brave Search",
-      "title": "Butikkinnredning Østlandet | bedrifter | gulesider.no",
-      "url": "https://www.gulesider.no/butikkinnredning+%C3%B8stlandet/bedrifter"
-    },
-    {
       "canonical_url": "https://www.ordlista.no/ord/opph%C3%B8rssalga",
       "categories": [
         "inventory",
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.918905+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527531+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -313,7 +292,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919070+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527692+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -335,7 +314,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919540+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528195+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -358,7 +337,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.918458+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527164+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -381,7 +360,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922057+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530409+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -404,7 +383,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919755+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528375+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -427,7 +406,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920221+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528780+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -443,13 +422,35 @@
       "url": "https://www.rubrikk.no/torget-brukt-til-salgs/butikkinnredning-selges.html"
     },
     {
+      "canonical_url": "https://www.finn.no/bap/forsale/search.html",
+      "categories": [
+        "sale_listing",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T10:05:16.529725+00:00",
+      "image_count": null,
+      "lead_id": "web-318117add644f04c71b7",
+      "price_nok": null,
+      "priority_score": 32,
+      "published_at": null,
+      "score_reasons": [
+        "category:sale_listing+10",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "source": "Brave Search",
+      "title": "Butikkinnredning | til salgs | FINN Torget",
+      "url": "https://www.finn.no/bap/forsale/search.html?product_category=2.91.3108.359"
+    },
+    {
       "canonical_url": "https://www.machineseeker.no/Tekstilmaskiner/ci-19",
       "categories": [
         "inventory",
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922501+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530765+00:00",
       "image_count": null,
       "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
@@ -471,7 +472,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920088+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528740+00:00",
       "image_count": null,
       "lead_id": "web-08c1c3148277e6eb31ea",
       "price_nok": null,
@@ -493,7 +494,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920174+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528638+00:00",
       "image_count": null,
       "lead_id": "web-7c85d59249f9065a7874",
       "price_nok": null,
@@ -515,7 +516,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919586+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528237+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -537,7 +538,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919971+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528563+00:00",
       "image_count": null,
       "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
@@ -559,7 +560,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919389+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528051+00:00",
       "image_count": null,
       "lead_id": "web-05170ee30473a1493dd3",
       "price_nok": null,
@@ -576,33 +577,12 @@
       "url": "https://www.tb.no/opphorssalg-etter-konkurs-viktig-beskjed-til-kunder/s/5-76-2517965"
     },
     {
-      "canonical_url": "https://bdn.no/",
-      "categories": [
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920733+00:00",
-      "image_count": null,
-      "lead_id": "web-f5e25a1bdcd9e106de57",
-      "price_nok": null,
-      "priority_score": 28,
-      "published_at": "2023-01-06T00:00:00",
-      "score_reasons": [
-        "category:shop_equipment+22",
-        "published_at_present+6"
-      ],
-      "snippet": "<strong>ButikkDesign Norge AS</strong> står klare til å transformere din butikk med vår ekspertise og erfaring som en ledende aktør innen butikkinnredning.",
-      "source": "Brave Search",
-      "title": "ButikkDesign Norge AS - Din Partner i Butikkinnredning",
-      "url": "https://bdn.no"
-    },
-    {
       "canonical_url": "https://www.hestra.no/",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920506+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529060+00:00",
       "image_count": null,
       "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
@@ -623,7 +603,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920952+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529401+00:00",
       "image_count": null,
       "lead_id": "web-a51fe9a70f780a57d999",
       "price_nok": null,
@@ -644,7 +624,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.923216+00:00",
+      "discovered_at": "2026-08-03T10:05:16.531312+00:00",
       "image_count": null,
       "lead_id": "web-63600f85f4126e808e67",
       "price_nok": null,
@@ -665,7 +645,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921331+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529676+00:00",
       "image_count": null,
       "lead_id": "web-f7fe2d09f32e4cbfda29",
       "price_nok": null,
@@ -686,7 +666,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922122+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530273+00:00",
       "image_count": null,
       "lead_id": "web-15defc847337cd18eca8",
       "price_nok": null,
@@ -706,7 +686,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921570+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530214+00:00",
       "image_count": null,
       "lead_id": "web-5d1caedc0f687ca45737",
       "price_nok": null,
@@ -726,7 +706,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921517+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529925+00:00",
       "image_count": null,
       "lead_id": "web-da69efc40719142bd2b6",
       "price_nok": null,
@@ -746,7 +726,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921718+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530116+00:00",
       "image_count": null,
       "lead_id": "web-d8adeb8c515443238a4b",
       "price_nok": null,
@@ -766,7 +746,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921998+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530357+00:00",
       "image_count": null,
       "lead_id": "web-b9100172d742fc440381",
       "price_nok": null,
@@ -781,35 +761,12 @@
       "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
     },
     {
-      "canonical_url": "https://www.finn.no/bap/forsale/search.html",
-      "categories": [
-        "bankruptcy",
-        "sale_listing"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919828+00:00",
-      "image_count": null,
-      "lead_id": "web-318117add644f04c71b7",
-      "price_nok": null,
-      "priority_score": 24,
-      "published_at": "2023-07-10T00:00:00",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "category:sale_listing+10",
-        "published_at_present+6"
-      ],
-      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
-      "url": "https://www.finn.no/bap/forsale/search.html?product_category=2.91.3108.363"
-    },
-    {
       "canonical_url": "https://avabutikkinnredning.no/produktkategori/butikkinnredning",
       "categories": [
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921128+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529555+00:00",
       "image_count": null,
       "lead_id": "web-3acde5d4a176692a975c",
       "price_nok": null,
@@ -829,7 +786,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.921244+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529790+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -849,7 +806,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.923044+00:00",
+      "discovered_at": "2026-08-03T10:05:16.531258+00:00",
       "image_count": null,
       "lead_id": "web-c1e3e1a07794eb2a24ac",
       "price_nok": null,
@@ -869,7 +826,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922846+00:00",
+      "discovered_at": "2026-08-03T10:05:16.531124+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -884,12 +841,32 @@
       "url": "https://www.sono.no/lager-industri/lager.html"
     },
     {
+      "canonical_url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-03T10:05:16.531420+00:00",
+      "image_count": null,
+      "lead_id": "web-ce2c77fe5e0ab90d0f7b",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "<strong>Vi har lagerhyller og praktiske og solide lagerreoler for lageret</strong>. Reolene kan bygges ut til ønsket lengde. Velg mellom flere modeller. Rask levering....",
+      "source": "Brave Search",
+      "title": "Lagerhyller og lagerreoler – bestill her! | AJ Produkter",
+      "url": "https://www.ajprodukter.no/lager-og-verksted/oppbevaring/lagerhyller-og-innredning/lagerhyller"
+    },
+    {
       "canonical_url": "https://www.witre.no/no/wno/lagerhyller-pallestativer",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922784+00:00",
+      "discovered_at": "2026-08-03T10:05:16.531027+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -904,32 +881,12 @@
       "url": "https://www.witre.no/no/wno/lagerhyller-pallestativer"
     },
     {
-      "canonical_url": "https://www.hhl-lagerinnredning.no/lagerreoler",
-      "categories": [
-        "inventory"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T03:53:53.923271+00:00",
-      "image_count": null,
-      "lead_id": "web-add7d4049039ffe37bd3",
-      "price_nok": null,
-      "priority_score": 22,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22"
-      ],
-      "snippet": "Finn lagerreoler, lagerhyller og reoler til lager hos <strong>HHL Lagerinnredning</strong>. Fleksible og robuste lagerreoler til industri med rask levering og profesjonell rådgivning.",
-      "source": "Brave Search",
-      "title": "Lagerreoler og lagerhyller | Reoler til lager og industri",
-      "url": "https://www.hhl-lagerinnredning.no/lagerreoler"
-    },
-    {
       "canonical_url": "https://www.finn.no/recommerce/forsale/item/412276314",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922972+00:00",
+      "discovered_at": "2026-08-03T10:05:16.531193+00:00",
       "image_count": null,
       "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
@@ -949,7 +906,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922707+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530976+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -969,7 +926,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.923101+00:00",
+      "discovered_at": "2026-08-03T10:05:16.531362+00:00",
       "image_count": null,
       "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
@@ -984,24 +941,24 @@
       "url": "https://www.supersellers.no/collections/lagerreoler"
     },
     {
-      "canonical_url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger",
+      "canonical_url": "https://smartsupply.no/butikkinnredning",
       "categories": [
-        "inventory"
+        "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.923153+00:00",
+      "discovered_at": "2026-08-03T10:05:16.529316+00:00",
       "image_count": null,
-      "lead_id": "web-0623254318f1aaf8f835",
+      "lead_id": "web-5abbbb7a87d219444db2",
       "price_nok": null,
       "priority_score": 22,
       "published_at": null,
       "score_reasons": [
-        "category:inventory+22"
+        "category:shop_equipment+22"
       ],
-      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
+      "snippet": "BUTIKKINNREDNING · Pakkebokser · HYLLESYSTEM · DISPLAYSTATIVER · FRUKT OG GRØNT · KASSADISK OG UTSJEKK · BAKERI OG BAKE-OFF · <strong>Vi leverer alt fra standard til spesialtilpasset innredning og løsninger til detaljhandelen</strong>. Fra enkeltstående eksponeringsløsninger i trevirke eller hele ...",
       "source": "Brave Search",
-      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
-      "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
+      "title": "Smart Supply | BUTIKKINNREDNING",
+      "url": "https://smartsupply.no/butikkinnredning/"
     },
     {
       "canonical_url": "https://www.adressa.no/okonomi/i/z7yOd4/en-butikk-har-opphoerssalg-to-andre-lokaler-bygges-om",
@@ -1009,7 +966,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919474+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528134+00:00",
       "image_count": null,
       "lead_id": "web-2b6fb81f747b1ea249e9",
       "price_nok": null,
@@ -1031,7 +988,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.920038+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528696+00:00",
       "image_count": null,
       "lead_id": "web-69939d672dc42fe60d24",
       "price_nok": null,
@@ -1053,7 +1010,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919135+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527751+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -1073,7 +1030,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.918608+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527304+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1094,7 +1051,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.918680+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527425+00:00",
       "image_count": null,
       "lead_id": "web-d2192f749651b034d4eb",
       "price_nok": null,
@@ -1115,7 +1072,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.918756+00:00",
+      "discovered_at": "2026-08-03T10:05:16.527363+00:00",
       "image_count": null,
       "lead_id": "web-ccf7065118a5bf95db40",
       "price_nok": null,
@@ -1137,7 +1094,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919903+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528501+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1158,7 +1115,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922567+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530825+00:00",
       "image_count": null,
       "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
@@ -1178,7 +1135,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922319+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530596+00:00",
       "image_count": null,
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
@@ -1198,7 +1155,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.922182+00:00",
+      "discovered_at": "2026-08-03T10:05:16.530466+00:00",
       "image_count": null,
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "price_nok": null,
@@ -1218,7 +1175,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.919653+00:00",
+      "discovered_at": "2026-08-03T10:05:16.528297+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1238,7 +1195,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-03T03:53:53.918234+00:00",
+      "discovered_at": "2026-08-03T10:05:16.526933+00:00",
       "image_count": null,
       "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,
@@ -1251,31 +1208,11 @@
       "source": "Brave Search",
       "title": "Konkurs: Sønstebø Tekstil AS | Proff® Forvalt",
       "url": "https://forvalt.no/Konkurs/Firmadetaljer/924328703/634636"
-    },
-    {
-      "canonical_url": "https://www.proff.no/konkurser",
-      "categories": [
-        "bankruptcy"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-03T03:53:53.918826+00:00",
-      "image_count": null,
-      "lead_id": "web-ff05dbb792cccc1b5cc5",
-      "price_nok": null,
-      "priority_score": 8,
-      "published_at": null,
-      "score_reasons": [
-        "category:bankruptcy+8"
-      ],
-      "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
-      "source": "Brave Search",
-      "title": "Proff™ - Konkurser og tvangsaviklinger",
-      "url": "https://www.proff.no/konkurser"
     }
   ],
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 59
+    "Brave Search": 56
   }
 }

@@ -90,13 +90,13 @@
       ],
       "status": "review_if_capacity",
       "target_profit_buffer_nok": null,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 9t 42m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 3t 30m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
       "verified_operating_costs_nok": null
     },
     {
-      "asking_price_nok": 5900.0,
+      "asking_price_nok": 6100.0,
       "automatic_purchase": false,
       "city": "Tønsberg",
       "conservative_resale_value_nok": null,
@@ -121,7 +121,7 @@
       "expected_profit_nok": null,
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
-      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud",
+      "market_search_query": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 34 bud 34m 40s",
       "matched_target_terms": [
         "lagerreol",
         "reol"
@@ -185,13 +185,13 @@
       ],
       "status": "review_first",
       "target_profit_buffer_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 6t 46m 2s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 34 bud 34m 40s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "verified_operating_costs_nok": null
     }
   ],
-  "generated_at": "2026-08-03T03:54:05.374586+00:00",
+  "generated_at": "2026-08-03T10:05:28.964730+00:00",
   "method": "canonical final decision, verified evidence, conservative target-profit buffer, human approval required",
   "official_decision_field": "final_decision",
   "reject_count": 0,

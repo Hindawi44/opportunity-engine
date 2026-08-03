@@ -7,13 +7,11 @@
       "market_comparables": [],
       "market_evidence_review_reasons": [
         "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains",
-        "quantity_not_confirmed_for_all_comparables"
+        "fewer_than_2_independent_domains"
       ],
       "market_evidence_status": "INSUFFICIENT_EVIDENCE",
       "missing_evidence": [
         "three_verified_market_comparables",
-        "pending_market_comparables_require_review",
         "auction_fee_nok",
         "vat_status",
         "vat_nok",
@@ -25,20 +23,10 @@
       ],
       "opportunity_id": "unified-auksjonen-614289",
       "other_costs_nok": null,
-      "pending_market_comparables": [
-        {
-          "price_nok": 4990.0,
-          "quantity_status": "UNKNOWN",
-          "similarity_score": 0.429,
-          "source": "Brave Search",
-          "url": "https://fasadenor.no/product/lagerreol-200x60x200cm-svart-1200kg/",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
-        }
-      ],
+      "pending_market_comparables": [],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 32 bud 6t 46m 2s",
+      "title": "4 stk komplette Lagerreoler 200×60×200cm – Svart+gul 1200kg Tønsberg 34 bud 34m 40s",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/4_stk_komplette_Lagerreoler_20060200cm__Svartgul_1200kg/614289",
       "vat_nok": null,
@@ -79,20 +67,11 @@
           "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
           "verification_status": "REVIEW_REQUIRED",
           "verified": false
-        },
-        {
-          "price_nok": 2490.0,
-          "quantity_status": "UNKNOWN",
-          "similarity_score": 0.4,
-          "source": "Brave Search",
-          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
         }
       ],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 9t 42m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 8 bud 2d 3t 30m",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
       "vat_nok": null,
@@ -101,10 +80,10 @@
     }
   },
   "evidence_count": 2,
-  "generated_at": "2026-08-03T03:54:04.745382+00:00",
+  "generated_at": "2026-08-03T10:05:28.273091+00:00",
   "market_evidence_source": "data/market_evidence_registry.json",
   "method": "verified evidence only; discovered market evidence is bridged as pending review; unknown values remain null",
-  "pending_comparable_count": 3,
+  "pending_comparable_count": 1,
   "schema_version": 2,
   "verified_count": 0
 }
