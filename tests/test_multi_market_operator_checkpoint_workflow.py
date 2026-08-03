@@ -38,10 +38,10 @@ def test_checkpoint_workflow_preserves_one_human_action() -> None:
 
 def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
-    restore = text.index("restore_previous_checkpoint_state.py")
-    first_source = text.index("run_auksjonen_live_clothing.py")
-    build = text.index("run_multi_market_daily_operator_checkpoint.py", first_source)
-    enrich = text.index("enrich_multi_market_checkpoint_lifecycle.py", build)
+    restore = text.index("- name: Restore previous lifecycle SQLite state")
+    first_source = text.index("- name: Run Norway Auksjonen public clothing path")
+    build = text.index("- name: Build the three-market operator checkpoint")
+    enrich = text.index("- name: Enrich checkpoint with lifecycle state and transitions")
 
     assert restore < first_source < build < enrich
     assert "previous-state-restore.json" in text
@@ -49,3 +49,17 @@ def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> 
     assert "CURRENT_RUN_INITIALIZATION" in text
     assert "دورة الحياة:" in text
     assert "استمرارية SQLite:" in text
+
+
+def test_checkpoint_persists_and_validates_auksjonen_lifecycle() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    start = text.index("Run Norway Auksjonen public clothing path")
+    end = text.index("Run Sweden Blinto bounded pilot", start)
+    norway_step = text[start:end]
+
+    assert "--persist-unified" in norway_step
+    assert (
+        'sqlite:///$INPUT_ROOT/no-auksjonen/opportunity_engine.db' in norway_step
+    )
+    assert "Auksjonen unified SQLite persistence did not succeed" in text
+    assert "Auksjonen lifecycle event storage is not enabled" in text
