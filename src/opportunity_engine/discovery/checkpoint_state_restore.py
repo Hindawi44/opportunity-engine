@@ -11,8 +11,8 @@ from io import BytesIO
 import json
 from pathlib import Path
 from typing import Any, Mapping
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.parse import urlencode, urlsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 from zipfile import BadZipFile, ZipFile
 
 
@@ -28,6 +28,30 @@ DATABASE_RELATIVE_PATHS = (
 
 class PreviousCheckpointRestoreError(RuntimeError):
     """Raised when an artifact exists but its allowed SQLite payload is invalid."""
+
+
+def _origin(url: str) -> tuple[str, str, int | None]:
+    parsed = urlsplit(url)
+    port = parsed.port
+    if port is None:
+        port = 443 if parsed.scheme.lower() == "https" else 80
+    return parsed.scheme.lower(), (parsed.hostname or "").lower(), port
+
+
+class _CrossOriginAuthorizationRedirectHandler(HTTPRedirectHandler):
+    """Do not forward the GitHub bearer token to artifact blob storage.
+
+    GitHub's artifact archive endpoint returns a temporary redirect to an external
+    signed blob URL. ``urllib`` normally copies request headers across redirects,
+    including ``Authorization``. External blob storage must receive only the signed
+    URL, not the repository token.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[no-untyped-def]
+        redirected = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if redirected is not None and _origin(req.full_url) != _origin(newurl):
+            redirected.remove_header("Authorization")
+        return redirected
 
 
 def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
@@ -48,7 +72,8 @@ def _request(url: str, token: str, *, accept: str) -> bytes:
             "User-Agent": "opportunity-engine-lifecycle-checkpoint",
         },
     )
-    with urlopen(request, timeout=60) as response:  # noqa: S310 - fixed GitHub API URL
+    opener = build_opener(_CrossOriginAuthorizationRedirectHandler())
+    with opener.open(request, timeout=60) as response:  # noqa: S310 - fixed GitHub API URL
         return response.read()
 
 
