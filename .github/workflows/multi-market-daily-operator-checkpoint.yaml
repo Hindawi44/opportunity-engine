@@ -20,12 +20,15 @@ on:
       - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
       - "scripts/run_multi_market_daily_operator_checkpoint.py"
       - "scripts/run_checkpoint_source_command.py"
+      - "scripts/run_auksjonen_live_clothing.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
+      - "src/opportunity_engine/discovery/auksjonen_unified_lifecycle.py"
       - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
       - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
       - "src/opportunity_engine/discovery/lifecycle_checkpoint_integration.py"
       - "config/market_completion_matrix.json"
+      - "tests/test_auksjonen_unified_lifecycle_persistence_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
       - "tests/test_lifecycle_checkpoint_integration_v1.py"
@@ -48,11 +51,12 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install focused test dependencies
-        run: python -m pip install "pytest>=8.0,<9.0" "pydantic>=2.8,<3.0"
+        run: python -m pip install -r requirements.txt
       - name: Test the multi-market checkpoint contract
         env:
           PYTHONPATH: src:.
         run: |
+          pytest tests/test_auksjonen_unified_lifecycle_persistence_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
           pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
@@ -95,7 +99,9 @@ jobs:
             --output-dir "$INPUT_ROOT/no-auksjonen" -- \
             python scripts/run_auksjonen_live_clothing.py \
               --max-listings 30 \
-              --output-dir "$INPUT_ROOT/no-auksjonen"
+              --output-dir "$INPUT_ROOT/no-auksjonen" \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/no-auksjonen/opportunity_engine.db"
 
       - name: Run Sweden Blinto bounded pilot
         run: |
@@ -238,6 +244,12 @@ jobs:
           if sum((report.get("source_execution_counts") or {}).values()) != 5:
               raise SystemExit("Source execution statuses do not reconcile")
 
+          source_by_name = {
+              item.get("source_name"): item for item in report.get("sources") or []
+          }
+          if (source_by_name.get("Auksjonen.no") or {}).get("persistence_status") != "SUCCESS":
+              raise SystemExit("Auksjonen unified SQLite persistence did not succeed")
+
           lifecycle = report.get("lifecycle") or {}
           stage_counts = lifecycle.get("stage_counts") or {}
           if sum(stage_counts.values()) != report.get("deduplicated_record_count"):
@@ -248,6 +260,11 @@ jobs:
               "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT",
           }:
               raise SystemExit("Lifecycle comparison scope is missing")
+          lifecycle_sources = {
+              item.get("source_name"): item for item in persistence.get("sources") or []
+          }
+          if (lifecycle_sources.get("Auksjonen.no") or {}).get("status") != "SUCCESS":
+              raise SystemExit("Auksjonen lifecycle event storage is not enabled")
           if "دورة الحياة:" not in summary or "استمرارية SQLite:" not in summary:
               raise SystemExit("Phone summary does not expose lifecycle status")
           print(summary)
