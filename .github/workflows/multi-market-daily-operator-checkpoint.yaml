@@ -15,20 +15,48 @@ on:
         description: Maximum active catalogs for each German watch
         required: false
         default: "5"
+      human_review_opportunity_id:
+        description: Exact opportunity identity to review; leave empty when outcome is NONE
+        required: false
+        default: ""
+      human_review_outcome:
+        description: Optional explicit lifecycle review outcome
+        required: false
+        type: choice
+        default: NONE
+        options:
+          - NONE
+          - VERIFIED
+          - NEEDS_MORE_INFORMATION
+          - REJECTED
+          - CLOSED
+      human_review_note:
+        description: Optional reviewer note
+        required: false
+        default: ""
   pull_request:
     paths:
       - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+      - "alembic/versions/0004_human_review_outcome_v1.py"
+      - "scripts/apply_human_review_outcome.py"
+      - "scripts/reconcile_checkpoint_human_reviews.py"
       - "scripts/run_multi_market_daily_operator_checkpoint.py"
       - "scripts/run_checkpoint_source_command.py"
       - "scripts/run_auksjonen_live_clothing.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/discovery/auksjonen_unified_lifecycle.py"
+      - "src/opportunity_engine/discovery/human_review_checkpoint.py"
       - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
       - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
       - "src/opportunity_engine/discovery/lifecycle_checkpoint_integration.py"
+      - "src/opportunity_engine/persistence/human_review.py"
+      - "src/opportunity_engine/persistence/human_review_models.py"
+      - "src/opportunity_engine/persistence/unified_report_adapter.py"
       - "config/market_completion_matrix.json"
       - "tests/test_auksjonen_unified_lifecycle_persistence_v1.py"
+      - "tests/test_human_review_checkpoint_v1.py"
+      - "tests/test_human_review_outcome_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
       - "tests/test_lifecycle_checkpoint_integration_v1.py"
@@ -57,6 +85,8 @@ jobs:
           PYTHONPATH: src:.
         run: |
           pytest tests/test_auksjonen_unified_lifecycle_persistence_v1.py -q
+          pytest tests/test_human_review_outcome_v1.py -q
+          pytest tests/test_human_review_checkpoint_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
           pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
@@ -154,6 +184,29 @@ jobs:
               --persist-unified \
               --database-url "sqlite:///$INPUT_ROOT/de-dpv/opportunity_engine.db"
 
+      - name: Apply optional human review outcome
+        if: ${{ github.event.inputs.human_review_outcome != '' && github.event.inputs.human_review_outcome != 'NONE' }}
+        env:
+          REVIEW_OPPORTUNITY_ID: ${{ github.event.inputs.human_review_opportunity_id }}
+          REVIEW_OUTCOME: ${{ github.event.inputs.human_review_outcome }}
+          REVIEW_NOTE: ${{ github.event.inputs.human_review_note }}
+          REVIEWER: ${{ github.actor }}
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          if [ -z "$REVIEW_OPPORTUNITY_ID" ]; then
+            echo "human_review_opportunity_id is required when an outcome is selected" >&2
+            exit 2
+          fi
+          python scripts/apply_human_review_outcome.py \
+            --input-root "$INPUT_ROOT" \
+            --opportunity-id "$REVIEW_OPPORTUNITY_ID" \
+            --outcome "$REVIEW_OUTCOME" \
+            --reviewer "$REVIEWER" \
+            --note "$REVIEW_NOTE" \
+            --request-id "github-run:${{ github.run_id }}" \
+            --source-ref "github-actions:${{ github.run_id }}" \
+            --output "$OUTPUT_DIR/human-review-outcome.json"
+
       - name: Write checkpoint input manifest
         run: |
           mkdir -p "$OUTPUT_DIR"
@@ -215,6 +268,14 @@ jobs:
             --restore-status "$OUTPUT_DIR/previous-state-restore.json" \
             --root .
 
+      - name: Reconcile persisted human review outcomes
+        run: |
+          python scripts/reconcile_checkpoint_human_reviews.py \
+            --report "$OUTPUT_DIR/multi-market-daily-checkpoint.json" \
+            --summary "$OUTPUT_DIR/multi-market-phone-summary.txt" \
+            --manifest "$OUTPUT_DIR/input-manifest.json" \
+            --root .
+
       - name: Validate checkpoint safety, coverage and lifecycle integrity
         run: |
           python - <<'PY'
@@ -267,6 +328,17 @@ jobs:
               raise SystemExit("Auksjonen lifecycle event storage is not enabled")
           if "دورة الحياة:" not in summary or "استمرارية SQLite:" not in summary:
               raise SystemExit("Phone summary does not expose lifecycle status")
+          review = root / "human-review-outcome.json"
+          if review.exists():
+              payload = json.loads(review.read_text(encoding="utf-8"))
+              for key in (
+                  "automatic_contact",
+                  "automatic_bid",
+                  "automatic_purchase",
+                  "automatic_payment",
+              ):
+                  if payload.get(key) is not False:
+                      raise SystemExit(f"Human review changed automatic safety: {key}")
           print(summary)
           PY
 
