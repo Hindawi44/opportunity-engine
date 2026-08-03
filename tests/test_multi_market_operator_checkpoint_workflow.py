@@ -3,6 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+RECONCILE = ROOT / "scripts/reconcile_checkpoint_human_reviews.py"
 
 
 def test_checkpoint_workflow_is_manual_and_read_only() -> None:
@@ -84,3 +85,11 @@ def test_checkpoint_supports_bounded_explicit_human_review() -> None:
     assert "scripts/apply_human_review_outcome.py" in text
     assert "scripts/reconcile_checkpoint_human_reviews.py" in text
     assert "human-review-outcome.json" in text
+
+
+def test_reconciliation_builds_one_daily_analysis_artifact() -> None:
+    text = RECONCILE.read_text(encoding="utf-8")
+    assert "build_daily_analysis" in text
+    assert "one-opportunity-daily-analysis.json" in text
+    assert "one-opportunity-daily-analysis.txt" in text
+    assert "render_daily_analysis" in text

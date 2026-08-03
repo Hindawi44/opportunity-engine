@@ -15,6 +15,10 @@ from opportunity_engine.discovery.lifecycle_checkpoint_integration import (
     WORKFLOW_RANK,
     write_lifecycle_checkpoint_artifacts,
 )
+from opportunity_engine.discovery.one_opportunity_daily_analysis import (
+    build_daily_analysis,
+    render_daily_analysis,
+)
 
 
 def _load(path: str | Path) -> dict:
@@ -130,6 +134,45 @@ def _merge_current_review_transition(
                 break
 
 
+def _detail_records(manifest: Mapping[str, Any], root: Path) -> dict[str, dict[str, Any]]:
+    details: dict[str, dict[str, Any]] = {}
+    for source in manifest.get("sources") or []:
+        if not isinstance(source, Mapping):
+            continue
+        directory = root / _compact(source.get("artifact_dir"))
+        filename = _compact(source.get("unified_report_file")) or "unified-opportunity-report.json"
+        path = directory / filename
+        if not path.exists():
+            continue
+        payload = _load(path)
+        for raw in payload.get("records") or []:
+            if not isinstance(raw, Mapping):
+                continue
+            item = dict(raw)
+            for key in ("opportunity_id", "opportunity_identity", "source_url", "canonical_url", "url"):
+                identity = _compact(item.get(key))
+                if identity:
+                    details.setdefault(identity, item)
+    return details
+
+
+def _write_daily_analysis(
+    report: Mapping[str, Any], manifest: Mapping[str, Any], *, root: Path, output_dir: Path
+) -> dict[str, Any]:
+    analysis = build_daily_analysis(
+        report,
+        detail_records=_detail_records(manifest, root),
+    )
+    json_path = output_dir / "one-opportunity-daily-analysis.json"
+    text_path = output_dir / "one-opportunity-daily-analysis.txt"
+    json_path.write_text(
+        json.dumps(analysis, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    text_path.write_text(render_daily_analysis(analysis), encoding="utf-8")
+    return analysis
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--report", required=True)
@@ -142,9 +185,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    manifest = _load(args.manifest)
     reconciled = reconcile_checkpoint_human_reviews(
         _load(args.report),
-        _load(args.manifest),
+        manifest,
         root=args.root,
     )
     review_path = (
@@ -158,6 +202,12 @@ def main() -> int:
         args.report,
         args.summary,
     )
+    analysis = _write_daily_analysis(
+        reconciled,
+        manifest,
+        root=Path(args.root),
+        output_dir=Path(args.report).parent,
+    )
     print(
         json.dumps(
             {
@@ -168,6 +218,11 @@ def main() -> int:
                 "transitions": (reconciled.get("lifecycle") or {}).get(
                     "transitions"
                 ),
+                "daily_analysis": {
+                    "selection_status": analysis.get("selection_status"),
+                    "analysis_state": analysis.get("analysis_state"),
+                    "next_human_action": analysis.get("next_human_action"),
+                },
             },
             ensure_ascii=False,
             sort_keys=True,
