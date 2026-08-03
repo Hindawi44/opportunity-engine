@@ -10,7 +10,7 @@ def test_checkpoint_workflow_is_manual_and_read_only() -> None:
     assert "name: Multi-Market Daily Operator Checkpoint" in text
     assert "workflow_dispatch:" in text
     assert "schedule:" not in text
-    assert "permissions:\n  contents: read" in text
+    assert "permissions:\n  contents: read\n  actions: read" in text
     assert "automatic_purchase" in text
     assert "automatic_payment" in text
     assert "run_multi_market_daily_operator_checkpoint.py" in text
@@ -34,3 +34,18 @@ def test_checkpoint_workflow_preserves_one_human_action() -> None:
     assert 'summary.count("الإجراء البشري الوحيد:") != 1' in text
     assert "contact sellers" not in text.lower()
     assert "git push" not in text
+
+
+def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    restore = text.index("restore_previous_checkpoint_state.py")
+    first_source = text.index("run_auksjonen_live_clothing.py")
+    build = text.index("run_multi_market_daily_operator_checkpoint.py", first_source)
+    enrich = text.index("enrich_multi_market_checkpoint_lifecycle.py", build)
+
+    assert restore < first_source < build < enrich
+    assert "previous-state-restore.json" in text
+    assert "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT" in text
+    assert "CURRENT_RUN_INITIALIZATION" in text
+    assert "دورة الحياة:" in text
+    assert "استمرارية SQLite:" in text

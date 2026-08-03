@@ -20,14 +20,20 @@ on:
       - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
       - "scripts/run_multi_market_daily_operator_checkpoint.py"
       - "scripts/run_checkpoint_source_command.py"
+      - "scripts/restore_previous_checkpoint_state.py"
+      - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
+      - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
+      - "src/opportunity_engine/discovery/lifecycle_checkpoint_integration.py"
       - "config/market_completion_matrix.json"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "tests/test_lifecycle_checkpoint_integration_v1.py"
       - "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: multi-market-daily-operator-checkpoint-${{ github.ref }}
@@ -41,14 +47,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install focused test dependency
-        run: python -m pip install "pytest>=8.0,<9.0"
+      - name: Install focused test dependencies
+        run: python -m pip install "pytest>=8.0,<9.0" "pydantic>=2.8,<3.0"
       - name: Test the multi-market checkpoint contract
         env:
           PYTHONPATH: src:.
         run: |
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
+          pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
 
   manual-read-only-checkpoint:
     if: ${{ github.event_name == 'workflow_dispatch' }}
@@ -71,6 +78,16 @@ jobs:
 
       - name: Install existing project dependencies
         run: python -m pip install -r requirements.txt
+
+      - name: Restore previous lifecycle SQLite state
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          python scripts/restore_previous_checkpoint_state.py \
+            --input-root "$INPUT_ROOT" \
+            --status-path "$OUTPUT_DIR/previous-state-restore.json"
 
       - name: Run Norway Auksjonen public clothing path
         run: |
@@ -183,7 +200,16 @@ jobs:
             --root . \
             --output-dir "$OUTPUT_DIR"
 
-      - name: Validate checkpoint safety and coverage
+      - name: Enrich checkpoint with lifecycle state and transitions
+        run: |
+          python scripts/enrich_multi_market_checkpoint_lifecycle.py \
+            --report "$OUTPUT_DIR/multi-market-daily-checkpoint.json" \
+            --summary "$OUTPUT_DIR/multi-market-phone-summary.txt" \
+            --manifest "$OUTPUT_DIR/input-manifest.json" \
+            --restore-status "$OUTPUT_DIR/previous-state-restore.json" \
+            --root .
+
+      - name: Validate checkpoint safety, coverage and lifecycle integrity
         run: |
           python - <<'PY'
           import json
@@ -211,6 +237,19 @@ jobs:
                   raise SystemExit(f"Automatic action safety changed: {key}")
           if sum((report.get("source_execution_counts") or {}).values()) != 5:
               raise SystemExit("Source execution statuses do not reconcile")
+
+          lifecycle = report.get("lifecycle") or {}
+          stage_counts = lifecycle.get("stage_counts") or {}
+          if sum(stage_counts.values()) != report.get("deduplicated_record_count"):
+              raise SystemExit("Lifecycle stage counts do not reconcile")
+          persistence = lifecycle.get("persistence") or {}
+          if persistence.get("comparison_scope") not in {
+              "CURRENT_RUN_INITIALIZATION",
+              "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT",
+          }:
+              raise SystemExit("Lifecycle comparison scope is missing")
+          if "دورة الحياة:" not in summary or "استمرارية SQLite:" not in summary:
+              raise SystemExit("Phone summary does not expose lifecycle status")
           print(summary)
           PY
 
