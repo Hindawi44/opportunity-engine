@@ -1,0 +1,204 @@
+"""Restore lifecycle SQLite state from the last successful checkpoint artifact.
+
+The restore is read-only against GitHub Actions and copies only four explicitly
+allowed SQLite files. Missing prior state is a valid first-run condition. Network or
+permission failures are reported in a structured status artifact and do not invent
+cross-run continuity.
+"""
+from __future__ import annotations
+
+from io import BytesIO
+import json
+from pathlib import Path
+from typing import Any, Mapping
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+from zipfile import BadZipFile, ZipFile
+
+
+ARTIFACT_NAME = "multi-market-daily-operator-checkpoint"
+DATABASE_RELATIVE_PATHS = (
+    "se-blinto/opportunity_engine.db",
+    "de-riegermann/opportunity_engine.db",
+    "de-venta/opportunity_engine.db",
+    "de-dpv/opportunity_engine.db",
+)
+
+
+class PreviousCheckpointRestoreError(RuntimeError):
+    """Raised when an artifact exists but its allowed SQLite payload is invalid."""
+
+
+def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _request(url: str, token: str, *, accept: str) -> bytes:
+    request = Request(
+        url,
+        headers={
+            "Accept": accept,
+            "Authorization": f"Bearer {token}",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "opportunity-engine-lifecycle-checkpoint",
+        },
+    )
+    with urlopen(request, timeout=60) as response:  # noqa: S310 - fixed GitHub API URL
+        return response.read()
+
+
+def _request_json(url: str, token: str) -> dict[str, Any]:
+    payload = json.loads(
+        _request(url, token, accept="application/vnd.github+json").decode("utf-8")
+    )
+    if not isinstance(payload, dict):
+        raise PreviousCheckpointRestoreError("GitHub API response must be an object")
+    return payload
+
+
+def extract_previous_databases(
+    archive_bytes: bytes,
+    input_root: str | Path,
+) -> list[dict[str, str]]:
+    """Copy only allow-listed checkpoint databases from one artifact archive."""
+    destination_root = Path(input_root)
+    restored: list[dict[str, str]] = []
+    try:
+        archive = ZipFile(BytesIO(archive_bytes))
+    except BadZipFile as exc:
+        raise PreviousCheckpointRestoreError(
+            "Previous checkpoint artifact is not a valid ZIP archive"
+        ) from exc
+
+    with archive:
+        names = set(archive.namelist())
+        for relative in DATABASE_RELATIVE_PATHS:
+            candidates = (
+                f"artifacts/multi-market-inputs/{relative}",
+                f"multi-market-inputs/{relative}",
+                relative,
+            )
+            member = next((name for name in candidates if name in names), None)
+            if member is None:
+                continue
+            payload = archive.read(member)
+            if not payload.startswith(b"SQLite format 3\x00"):
+                raise PreviousCheckpointRestoreError(
+                    f"Restored database is not SQLite: {member}"
+                )
+            target = destination_root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(payload)
+            restored.append(
+                {
+                    "archive_member": member,
+                    "relative_path": target.as_posix(),
+                }
+            )
+    return restored
+
+
+def restore_previous_checkpoint_databases(
+    *,
+    repository: str,
+    token: str,
+    current_run_id: int,
+    input_root: str | Path,
+    status_path: str | Path,
+    workflow_file: str = "multi-market-daily-operator-checkpoint.yaml",
+    branch: str = "main",
+    api_url: str = "https://api.github.com",
+) -> dict[str, Any]:
+    """Restore the newest non-expired successful checkpoint database artifact."""
+    output = Path(status_path)
+    base = api_url.rstrip("/")
+    if not repository or "/" not in repository:
+        raise ValueError("repository must use owner/name form")
+    if not token:
+        status = {
+            "status": "UNAVAILABLE",
+            "reason": "GITHUB_TOKEN is not available",
+            "restored_databases": [],
+        }
+        _write_json(output, status)
+        return status
+
+    try:
+        query = urlencode(
+            {
+                "branch": branch,
+                "event": "workflow_dispatch",
+                "status": "success",
+                "per_page": 10,
+            }
+        )
+        runs_url = (
+            f"{base}/repos/{repository}/actions/workflows/{workflow_file}/runs?{query}"
+        )
+        runs_payload = _request_json(runs_url, token)
+        runs = runs_payload.get("workflow_runs") or []
+        if not isinstance(runs, list):
+            raise PreviousCheckpointRestoreError("workflow_runs must be a list")
+
+        for run in runs:
+            if not isinstance(run, Mapping):
+                continue
+            run_id = run.get("id")
+            if not isinstance(run_id, int) or run_id == current_run_id:
+                continue
+            artifacts_url = f"{base}/repos/{repository}/actions/runs/{run_id}/artifacts"
+            artifacts_payload = _request_json(artifacts_url, token)
+            artifacts = artifacts_payload.get("artifacts") or []
+            if not isinstance(artifacts, list):
+                continue
+            artifact = next(
+                (
+                    item
+                    for item in artifacts
+                    if isinstance(item, Mapping)
+                    and item.get("name") == ARTIFACT_NAME
+                    and item.get("expired") is not True
+                ),
+                None,
+            )
+            if not isinstance(artifact, Mapping):
+                continue
+            download_url = artifact.get("archive_download_url")
+            artifact_id = artifact.get("id")
+            if not isinstance(download_url, str) or not download_url:
+                continue
+            archive_bytes = _request(
+                download_url,
+                token,
+                accept="application/vnd.github+json",
+            )
+            restored = extract_previous_databases(archive_bytes, input_root)
+            status = {
+                "status": "RESTORED" if restored else "NO_DATABASES_IN_ARTIFACT",
+                "previous_run_id": run_id,
+                "previous_artifact_id": artifact_id,
+                "restored_databases": restored,
+            }
+            _write_json(output, status)
+            return status
+
+        status = {
+            "status": "NO_PREVIOUS_STATE",
+            "reason": "No earlier successful non-expired checkpoint artifact was found",
+            "restored_databases": [],
+        }
+        _write_json(output, status)
+        return status
+    except Exception as exc:  # keep discovery available while reporting lost continuity
+        status = {
+            "status": "UNAVAILABLE",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "restored_databases": [],
+        }
+        _write_json(output, status)
+        return status
