@@ -90,6 +90,58 @@ def _update_persistence_summary(database_path: Path, transition_created: bool) -
     _write_json(path, payload)
 
 
+def _latest_lifecycle_transition(
+    database_path: Path,
+    *,
+    opportunity_id: str,
+    source_ref: str | None,
+) -> dict[str, Any] | None:
+    """Return the exact lifecycle event created by this manual review, if any."""
+    connection = sqlite3.connect(database_path)
+    connection.row_factory = sqlite3.Row
+    try:
+        table = connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='lifecycle_events'"
+        ).fetchone()
+        if table is None:
+            return None
+        if source_ref:
+            row = connection.execute(
+                """
+                SELECT opportunity_id,
+                       from_listing_status, to_listing_status,
+                       from_evaluation_status, to_evaluation_status,
+                       from_workflow_status, to_workflow_status,
+                       from_reason_code, to_reason_code,
+                       source_ref, changed_at
+                FROM lifecycle_events
+                WHERE opportunity_id = ? AND source_ref = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (opportunity_id, source_ref),
+            ).fetchone()
+        else:
+            row = connection.execute(
+                """
+                SELECT opportunity_id,
+                       from_listing_status, to_listing_status,
+                       from_evaluation_status, to_evaluation_status,
+                       from_workflow_status, to_workflow_status,
+                       from_reason_code, to_reason_code,
+                       source_ref, changed_at
+                FROM lifecycle_events
+                WHERE opportunity_id = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (opportunity_id,),
+            ).fetchone()
+        return dict(row) if row is not None else None
+    finally:
+        connection.close()
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     location = parser.add_mutually_exclusive_group(required=True)
@@ -142,11 +194,18 @@ def main() -> int:
         engine.dispose()
 
     result["database_path"] = str(database_path) if database_path else None
+    result["source_ref"] = args.source_ref
     if database_path is not None:
-        _update_persistence_summary(
-            database_path,
-            bool(result["lifecycle_transition_created"]),
-        )
+        transition_created = bool(result["lifecycle_transition_created"])
+        _update_persistence_summary(database_path, transition_created)
+        if transition_created:
+            transition = _latest_lifecycle_transition(
+                database_path,
+                opportunity_id=args.opportunity_id,
+                source_ref=args.source_ref,
+            )
+            if transition is not None:
+                result["lifecycle_transition"] = transition
     if args.output:
         _write_json(Path(args.output), result)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
