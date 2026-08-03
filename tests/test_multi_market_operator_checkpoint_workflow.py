@@ -42,8 +42,9 @@ def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> 
     first_source = text.index("- name: Run Norway Auksjonen public clothing path")
     build = text.index("- name: Build the three-market operator checkpoint")
     enrich = text.index("- name: Enrich checkpoint with lifecycle state and transitions")
+    reconcile = text.index("- name: Reconcile persisted human review outcomes")
 
-    assert restore < first_source < build < enrich
+    assert restore < first_source < build < enrich < reconcile
     assert "previous-state-restore.json" in text
     assert "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT" in text
     assert "CURRENT_RUN_INITIALIZATION" in text
@@ -63,3 +64,23 @@ def test_checkpoint_persists_and_validates_auksjonen_lifecycle() -> None:
     )
     assert "Auksjonen unified SQLite persistence did not succeed" in text
     assert "Auksjonen lifecycle event storage is not enabled" in text
+
+
+def test_checkpoint_supports_bounded_explicit_human_review() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert "human_review_opportunity_id:" in text
+    assert "human_review_outcome:" in text
+    for outcome in (
+        "NONE",
+        "VERIFIED",
+        "NEEDS_MORE_INFORMATION",
+        "REJECTED",
+        "CLOSED",
+    ):
+        assert f"- {outcome}" in text
+    apply_step = text.index("- name: Apply optional human review outcome")
+    manifest_step = text.index("- name: Write checkpoint input manifest")
+    assert apply_step < manifest_step
+    assert "scripts/apply_human_review_outcome.py" in text
+    assert "scripts/reconcile_checkpoint_human_reviews.py" in text
+    assert "human-review-outcome.json" in text
