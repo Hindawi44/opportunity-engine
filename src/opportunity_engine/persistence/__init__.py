@@ -8,6 +8,12 @@ from .database import (
     session_scope,
     upgrade_database,
 )
+from .lifecycle_models import LifecycleEventModel
+from .lifecycle_repository import (
+    LIFECYCLE_REASON_CODE_KEY,
+    LifecycleEventRepository,
+    LifecycleSnapshot,
+)
 from .live_unified_persistence import (
     ERROR_FILENAME as UNIFIED_PERSISTENCE_ERROR_FILENAME,
     PIPELINE_NAME as UNIFIED_PERSISTENCE_PIPELINE_NAME,
@@ -44,6 +50,10 @@ from .unified_repository import (
 __all__ = [
     "Base",
     "DEFAULT_DATABASE_URL",
+    "LIFECYCLE_REASON_CODE_KEY",
+    "LifecycleEventModel",
+    "LifecycleEventRepository",
+    "LifecycleSnapshot",
     "OPERATIONAL_PERSISTENCE_PIPELINE_NAME",
     "OperationalPersistenceError",
     "OpportunityModel",
