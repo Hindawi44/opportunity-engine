@@ -9,6 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 import json
 from pathlib import Path
+import re
 from typing import Any
 
 from .auksjonen_public_api_adapter import (
@@ -20,12 +21,23 @@ from .unified_opportunity_report import (
     serialize_unified_opportunity_report,
 )
 
-AUKSJONEN_ANALYSIS_BLOCKERS = (
+# Only facts required to trust the source-native listing belong in the lifecycle
+# verification gate. Commercial calculations are deliberately deferred to the
+# one-opportunity analysis dossier and must not masquerade as source blockers.
+AUKSJONEN_REQUIRED_VERIFICATION = (
     "verified exact item-page evidence",
-    "verified quantity and condition",
-    "documented final payable price including auction fees and VAT",
-    "domestic pickup or delivery logistics basis",
-    "documented resale-market evidence",
+)
+AUKSJONEN_ANALYSIS_TASKS = (
+    "confirm quantity and condition from the exact item page",
+    "calculate final payable price including auction fees and VAT",
+    "calculate domestic pickup or delivery logistics",
+    "document resale-market evidence",
+)
+
+_QUANTITY_PATTERN = re.compile(
+    r"\b(?P<quantity>\d+)\s*(?:stk|plagg|jakker|bukser|kjoler|skjorter|"
+    r"gensere|sko|varer)\b",
+    re.I,
 )
 
 
@@ -33,6 +45,37 @@ def _location(listing: AuksjonenLiveClothingListing) -> str | None:
     parts = [listing.address, listing.zip_code, listing.city]
     values = [str(value).strip() for value in parts if str(value or "").strip()]
     return ", ".join(dict.fromkeys(values)) or None
+
+
+def _explicit_quantity(title: str) -> int | None:
+    """Return a title-native quantity only when it is explicitly stated."""
+    match = _QUANTITY_PATTERN.search(str(title or ""))
+    if match is None:
+        return None
+    quantity = int(match.group("quantity"))
+    return quantity if quantity > 0 else None
+
+
+def _current_price(listing: AuksjonenLiveClothingListing) -> tuple[float | None, str | None]:
+    """Return one source-native current price without estimating final payable cost."""
+    if listing.current_bid_nok is not None:
+        return float(listing.current_bid_nok), "CURRENT_BID"
+    if listing.buy_now_price_nok is not None:
+        return float(listing.buy_now_price_nok), "BUY_NOW"
+    if listing.start_price_nok is not None:
+        return float(listing.start_price_nok), "START_PRICE"
+    return None, None
+
+
+def _verification_blockers(listing: AuksjonenLiveClothingListing) -> list[str]:
+    """Return only missing source facts that block trusted analysis entry."""
+    blockers = list(AUKSJONEN_REQUIRED_VERIFICATION)
+    price, _ = _current_price(listing)
+    if price is None:
+        blockers.append("current bid, buy-now price, or start price")
+    if _location(listing) is None:
+        blockers.append("pickup location")
+    return blockers
 
 
 def auksjonen_listing_to_discovery_candidate(
@@ -46,13 +89,17 @@ def auksjonen_listing_to_discovery_candidate(
     if listing.listing_status != "ACTIVE":
         raise ValueError("only active Auksjonen inventory lots may be unified")
 
+    price_nok, price_kind = _current_price(listing)
+    blockers = _verification_blockers(listing)
+
     return {
         "title": listing.title,
         "scenario": "WAREHOUSE_SURPLUS",
         "opportunity_state": "STRONG_LEAD_REQUIRES_VERIFICATION",
         "reason": (
-            "active public API clothing-inventory lot; exact item page and "
-            "commercial evidence still require human verification"
+            "active public API clothing-inventory lot; exact item-page verification "
+            "is the remaining lifecycle gate, while fees, logistics, condition, and "
+            "resale evidence are downstream analysis tasks"
         ),
         "page_role": "ITEM_LISTING",
         "opportunity_identity": listing.url,
@@ -66,6 +113,12 @@ def auksjonen_listing_to_discovery_candidate(
         "textile_category": "CLOTHING_INVENTORY",
         "inventory_type": "clothing_inventory_lot",
         "location": _location(listing),
+        "quantity": _explicit_quantity(listing.title),
+        "price_nok": price_nok,
+        "price_kind": price_kind,
+        "current_bid_nok": listing.current_bid_nok,
+        "buy_now_price_nok": listing.buy_now_price_nok,
+        "start_price_nok": listing.start_price_nok,
         "source_object_id": str(listing.object_id),
         "auction_occurrence_id": (
             f"auksjonen-auction:{listing.auction_id}:object:{listing.object_id}"
@@ -87,7 +140,9 @@ def auksjonen_listing_to_discovery_candidate(
                 "verified": False,
             }
         ],
-        "missing_information": list(AUKSJONEN_ANALYSIS_BLOCKERS),
+        "verification_blockers": blockers,
+        "analysis_tasks": list(AUKSJONEN_ANALYSIS_TASKS),
+        "missing_information": blockers,
         "automatic_contact": False,
         "automatic_bid": False,
         "automatic_purchase": False,
