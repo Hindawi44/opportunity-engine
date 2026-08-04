@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T09:07:06.027688+00:00",
+  "generated_at": "2026-08-04T14:39:08.868964+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
   "search_required_count": 5,
@@ -41,7 +41,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d 9t 44m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d 4t 12m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -79,7 +79,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d 9t 37m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d 4t 5m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -117,7 +117,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d 9t 47m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d 4t 15m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -155,7 +155,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d 10t 7m",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d 4t 35m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -167,33 +167,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 1800.0,
+      "asking_price_nok": 1900.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+10+bud+1d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+11+bud",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+10+bud+1d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+11+bud",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+10+bud+1d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+11+bud+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d",
+      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 11 bud",
       "opportunity_id": "unified-auksjonen-614953",
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 4t 28m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 11 bud 22t 56m 57s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]

@@ -738,6 +738,40 @@
           "score": 24.47
         }
       ]
+    },
+    {
+      "buy_review_count": 0,
+      "candidate_count": 5,
+      "generated_at": "2026-08-04T14:39:14.512499+00:00",
+      "monitor_count": 0,
+      "reject_count": 5,
+      "scores": [
+        {
+          "opportunity_id": "unified-auksjonen-614953",
+          "recommendation": "REJECT",
+          "score": 33.26
+        },
+        {
+          "opportunity_id": "unified-auksjonen-616276",
+          "recommendation": "REJECT",
+          "score": 24.47
+        },
+        {
+          "opportunity_id": "unified-auksjonen-616267",
+          "recommendation": "REJECT",
+          "score": 24.47
+        },
+        {
+          "opportunity_id": "unified-auksjonen-616275",
+          "recommendation": "REJECT",
+          "score": 24.47
+        },
+        {
+          "opportunity_id": "unified-auksjonen-616271",
+          "recommendation": "REJECT",
+          "score": 24.47
+        }
+      ]
     }
   ],
   "schema_version": 1
