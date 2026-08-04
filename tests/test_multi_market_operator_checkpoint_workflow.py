@@ -25,10 +25,29 @@ def test_checkpoint_workflow_covers_only_completed_markets() -> None:
     assert '"market_code": "DE"' in text
     assert '"market_code": "DK"' not in text
     assert "run_auksjonen_live_clothing.py" in text
+    assert "run_finn_email_intake.py" in text
     assert "--market SE" in text
     assert "run_riegermann_active_discovery.py" in text
     assert "run_venta_active_discovery.py" in text
     assert "run_dpv_active_discovery.py" in text
+
+
+def test_checkpoint_reads_finn_gmail_after_auksjonen() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    auksjonen = text.index("- name: Run Norway Auksjonen public clothing path")
+    finn = text.index("- name: Read FINN saved-search alerts from Gmail")
+    sweden = text.index("- name: Run Sweden Blinto bounded pilot")
+
+    assert auksjonen < finn < sweden
+    assert "GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}" in text
+    assert "GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}" in text
+    assert "GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}" in text
+    assert "--gmail-api" in text
+    assert "--max-messages 20" in text
+    assert 'from:agent@finn.no subject:"Nye annonser:" newer_than:7d' in text
+    assert "--auksjonen-report" in text
+    assert '"source_name": "FINN saved-search email"' in text
+    assert "all six bounded source paths" in text
 
 
 def test_checkpoint_workflow_preserves_one_human_action() -> None:
@@ -42,11 +61,12 @@ def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> 
     text = WORKFLOW.read_text(encoding="utf-8")
     restore = text.index("- name: Restore previous lifecycle SQLite state")
     first_source = text.index("- name: Run Norway Auksjonen public clothing path")
+    finn_source = text.index("- name: Read FINN saved-search alerts from Gmail")
     build = text.index("- name: Build the three-market operator checkpoint")
     enrich = text.index("- name: Enrich checkpoint with lifecycle state and transitions")
     reconcile = text.index("- name: Reconcile persisted human review outcomes")
 
-    assert restore < first_source < build < enrich < reconcile
+    assert restore < first_source < finn_source < build < enrich < reconcile
     assert "previous-state-restore.json" in text
     assert "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT" in text
     assert "CURRENT_RUN_INITIALIZATION" in text
@@ -57,7 +77,7 @@ def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> 
 def test_checkpoint_persists_and_validates_auksjonen_lifecycle() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     start = text.index("Run Norway Auksjonen public clothing path")
-    end = text.index("Run Sweden Blinto bounded pilot", start)
+    end = text.index("Read FINN saved-search alerts from Gmail", start)
     norway_step = text[start:end]
 
     assert "--persist-unified" in norway_step
