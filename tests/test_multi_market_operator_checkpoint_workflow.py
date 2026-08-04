@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
 RECONCILE = ROOT / "scripts/reconcile_checkpoint_human_reviews.py"
+BUILD_INTELLIGENCE = ROOT / "scripts/build_domain_market_intelligence_feed.py"
 
 
 def test_checkpoint_workflow_is_manual_and_read_only() -> None:
@@ -93,3 +94,12 @@ def test_reconciliation_builds_one_daily_analysis_artifact() -> None:
     assert "one-opportunity-daily-analysis.json" in text
     assert "one-opportunity-daily-analysis.txt" in text
     assert "render_daily_analysis" in text
+
+
+def test_sweden_identity_bridge_runs_before_official_status_check() -> None:
+    text = BUILD_INTELLIGENCE.read_text(encoding="utf-8")
+    bridge = text.index("resolve_sweden_artifact_company_identities")
+    official = text.index("collect_manifest_official_signals_with_sweden_status")
+
+    assert bridge < official
+    assert "sweden-organisation-discovery-bridge.json" in text
