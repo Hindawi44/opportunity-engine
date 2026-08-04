@@ -32,7 +32,7 @@ from opportunity_engine.discovery.sweden_blinto import (
 
 SCHEMA_VERSION = "blinto-seller-identity-extraction-1.0"
 OUTPUT_FILENAME = "blinto-seller-identity-evidence.json"
-DEFAULT_PAGE_LIMIT = 20
+DEFAULT_PAGE_LIMIT = 50
 DEFAULT_FILE_LIMIT = 100
 DEFAULT_FILE_BYTES = 5_000_000
 DEFAULT_RESPONSE_BYTES = 1_500_000
@@ -448,8 +448,8 @@ def collect_blinto_seller_identity_evidence(
 ) -> dict[str, Any]:
     """Collect bounded seller identity evidence from already-known Blinto pages."""
 
-    if not 1 <= page_limit <= 25:
-        raise ValueError("page_limit must be between 1 and 25")
+    if not 1 <= page_limit <= 50:
+        raise ValueError("page_limit must be between 1 and 50")
     if timeout <= 0:
         raise ValueError("timeout must be positive")
 
