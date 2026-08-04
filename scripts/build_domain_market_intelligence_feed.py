@@ -14,6 +14,9 @@ from opportunity_engine.discovery.domain_market_intelligence_feed import (
 from opportunity_engine.discovery.signal_role_freshness_correction import (
     write_corrected_market_bulletin_artifacts,
 )
+from opportunity_engine.discovery.sweden_organisation_discovery_bridge import (
+    resolve_sweden_artifact_company_identities,
+)
 from opportunity_engine.discovery.sweden_valuable_datasets_status_feed import (
     collect_manifest_official_signals_with_sweden_status,
 )
@@ -39,6 +42,39 @@ def main() -> int:
     manifest = _load_object(Path(args.manifest), "manifest")
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    try:
+        sweden_identity_bridge = resolve_sweden_artifact_company_identities(
+            manifest,
+            root=args.root,
+            config_path=args.config_path,
+        )
+    except Exception as exc:
+        sweden_identity_bridge = {
+            "schema_version": "sweden-organisation-discovery-bridge-1.0",
+            "status": "FAILED",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "resolved_organisations": [],
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+    (output_dir / "sweden-organisation-discovery-bridge.json").write_text(
+        json.dumps(
+            sweden_identity_bridge,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    print(
+        "sweden_organisation_discovery_bridge_status:",
+        sweden_identity_bridge.get("status"),
+    )
 
     official_coverage = collect_manifest_official_signals_with_sweden_status(
         manifest,
