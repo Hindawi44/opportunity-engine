@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from opportunity_engine.discovery.blinto_seller_identity_extraction import (
+    DEFAULT_PAGE_LIMIT,
     OUTPUT_FILENAME,
     collect_blinto_seller_identity_evidence,
     extract_blinto_seller_identity,
@@ -260,6 +261,44 @@ def test_page_limit_reports_partial_truth(tmp_path: Path) -> None:
     assert report["retrieval_complete"] is False
     assert report["page_limit_reached"] is True
     assert report["selected_page_url_count"] == 1
+
+
+def test_default_page_limit_completes_31_known_pages(tmp_path: Path) -> None:
+    manifest = _manifest(tmp_path)
+    urls = [
+        f"https://blinto.se/auction/Parti-med-klader-{200000 + index}-{70000 + index}"
+        for index in range(31)
+    ]
+    _write_candidate(tmp_path, urls)
+
+    def html_get(url: str, timeout: float) -> tuple[str, str]:
+        assert timeout > 0
+        return (
+            url,
+            """
+            <html><body>
+              <p>Objektet säljs på uppdrag av privatperson eller annan ej momspliktig säljare</p>
+            </body></html>
+            """,
+        )
+
+    report = collect_blinto_seller_identity_evidence(
+        manifest,
+        root=".",
+        observed_at=NOW,
+        html_get=html_get,
+    )
+
+    assert DEFAULT_PAGE_LIMIT == 50
+    assert report["page_limit"] == 50
+    assert report["candidate_page_url_count"] == 31
+    assert report["selected_page_url_count"] == 31
+    assert report["pages_fetched"] == 31
+    assert report["page_limit_reached"] is False
+    assert report["retrieval_complete"] is True
+    assert report["status"] == "VALID_ZERO"
+    assert report["accepted_identity_count"] == 0
+    assert report["seller_classification_count"] == 31
 
 
 def test_network_failure_is_truthful_and_all_automatic_actions_remain_disabled(
