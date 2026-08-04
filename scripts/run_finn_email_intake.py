@@ -32,6 +32,7 @@ DEFAULT_MAX_MESSAGES = 20
 MAX_GMAIL_MESSAGES = 50
 DEFAULT_TIMEOUT_SECONDS = 20.0
 _AUKSJONEN_SELLER_RE = re.compile(r"\bauksjonen(?:\.no)?\s+as\b", re.IGNORECASE)
+_SAFE_ERROR_CODE_RE = re.compile(r"[^a-zA-Z0-9_.-]+")
 
 
 def _load_json(path: Path) -> list[FinnEmailMessage]:
@@ -56,8 +57,26 @@ def _load(path: Path) -> list[FinnEmailMessage]:
     return [message_from_rfc822(path.read_bytes())]
 
 
+def _safe_http_error_code(response: requests.Response) -> str:
+    """Return only a bounded provider error code, never response details."""
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = None
+    if isinstance(payload, Mapping):
+        raw_code = str(payload.get("error") or "").strip()
+        code = _SAFE_ERROR_CODE_RE.sub("_", raw_code).strip("_.-")
+        if code:
+            return code[:80]
+    return f"http_{response.status_code}"
+
+
 def _json_object(response: requests.Response, *, label: str) -> Mapping[str, Any]:
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as exc:
+        code = _safe_http_error_code(response)
+        raise RuntimeError(f"{label} rejected the request: {code}") from exc
     try:
         payload = response.json()
     except ValueError as exc:
