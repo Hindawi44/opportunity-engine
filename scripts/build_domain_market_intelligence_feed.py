@@ -7,6 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from opportunity_engine.discovery.blinto_generic_seller_guard import (
+    sanitize_blinto_seller_identity_report,
+)
 from opportunity_engine.discovery.blinto_seller_identity_extraction import (
     write_blinto_seller_identity_evidence,
 )
@@ -33,10 +36,25 @@ def _load_object(path: Path, name: str) -> dict[str, Any]:
 
 
 def _write_report(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+
+
+def _rewrite_source_artifact(
+    report: dict[str, Any],
+    *,
+    root: str | Path,
+) -> None:
+    raw_path = report.get("artifact_path")
+    if not raw_path:
+        return
+    artifact_path = Path(str(raw_path))
+    if not artifact_path.is_absolute():
+        artifact_path = Path(root) / artifact_path
+    _write_report(artifact_path, report)
 
 
 def main() -> int:
@@ -58,6 +76,10 @@ def main() -> int:
             manifest,
             root=args.root,
         )
+        blinto_seller_identity = sanitize_blinto_seller_identity_report(
+            blinto_seller_identity
+        )
+        _rewrite_source_artifact(blinto_seller_identity, root=args.root)
     except Exception as exc:
         blinto_seller_identity = {
             "schema_version": "blinto-seller-identity-extraction-1.0",
