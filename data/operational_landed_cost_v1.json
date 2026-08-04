@@ -4,7 +4,7 @@
     "assumptions": [
       "No route, carrier quote, VAT rule, customs rule, or external price lookup was performed.",
       "The selected decision record remains the owner of final_decision and opportunity_score.",
-      "The source city is copied as Tønsberg; destination precision remains buyer-profile precision."
+      "The source city is copied as Kristiansand s; destination precision remains buyer-profile precision."
     ],
     "complete_cash_required_range": null,
     "complete_net_economic_cost_range": null,
@@ -12,15 +12,15 @@
       {
         "component_id": "purchase_price",
         "economic_treatment": "ECONOMIC_COST",
-        "expected_nok": 1900.0,
-        "high_nok": 1900.0,
+        "expected_nok": 1000.0,
+        "high_nok": 1000.0,
         "label": "Current asking or bid price",
-        "low_nok": 1900.0,
+        "low_nok": 1000.0,
         "notes": [
           "This is the current asking or bid amount, not a final acquisition commitment."
         ],
         "required_for_qualification": true,
-        "source_ref": "data/decision_intelligence.json#unified-auksjonen-614953:asking_price_nok",
+        "source_ref": "data/decision_intelligence.json#unified-auksjonen-612667:asking_price_nok",
         "status": "CONFIRMED"
       },
       {
@@ -45,7 +45,7 @@
         "label": "Transport to buyer destination",
         "low_nok": null,
         "notes": [
-          "Transport is unknown from Tønsberg to Namsos."
+          "Transport is unknown from Kristiansand s to Namsos."
         ],
         "required_for_qualification": true,
         "source_ref": null,
@@ -131,21 +131,21 @@
       "postal_code": null
     },
     "destination_precision": "CITY_LEVEL_INPUT_ONLY",
-    "estimate_id": "landed-cost-unified-auksjonen-614953-to-mahmoud_namsos_v1",
+    "estimate_id": "landed-cost-unified-auksjonen-612667-to-mahmoud_namsos_v1",
     "estimate_status": "PARTIAL_ESTIMATE",
     "evidence_refs": [
-      "data/decision_intelligence.json#unified-auksjonen-614953:record",
-      "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
+      "data/decision_intelligence.json#unified-auksjonen-612667:record",
+      "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
     ],
     "known_cash_required_range": {
-      "expected_nok": 1900.0,
-      "high_nok": 1900.0,
-      "low_nok": 1900.0
+      "expected_nok": 1000.0,
+      "high_nok": 1000.0,
+      "low_nok": 1000.0
     },
     "known_net_economic_cost_range": {
-      "expected_nok": 1900.0,
-      "high_nok": 1900.0,
-      "low_nok": 1900.0
+      "expected_nok": 1000.0,
+      "high_nok": 1000.0,
+      "low_nok": 1000.0
     },
     "known_recoverable_cash_outflow_range": {
       "expected_nok": 0,
@@ -170,7 +170,7 @@
       "other_costs",
       "vat"
     ],
-    "opportunity_id": "unified-auksjonen-614953",
+    "opportunity_id": "unified-auksjonen-612667",
     "qualification_readiness": {
       "ready": false,
       "status": "REQUIRES_COST_REVIEW"
@@ -191,17 +191,17 @@
   "selection_policy": "FIRST_RANKED_RECORD_WITH_KNOWN_ASKING_PRICE",
   "selection_reason": "Selected one operational decision record and copied only explicit cost values.",
   "selection_status": "SELECTED",
-  "source_generated_at": "2026-08-04T14:39:15.079792+00:00",
+  "source_generated_at": "2026-08-04T19:56:16.550435+00:00",
   "source_official_decision_field": "final_decision",
   "source_opportunity": {
-    "asking_price_nok": 1900.0,
+    "asking_price_nok": 1000.0,
     "final_decision": "WATCH",
-    "opportunity_id": "unified-auksjonen-614953",
-    "opportunity_score": 33.26,
-    "priority": 2,
-    "source_city": "Tønsberg",
-    "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 11 bud 22t 56m 57s",
-    "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
+    "opportunity_id": "unified-auksjonen-612667",
+    "opportunity_score": 33.61,
+    "priority": 1,
+    "source_city": "Kristiansand s",
+    "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 1 bud 6d 21t 3m",
+    "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
   },
   "source_schema_version": 2
 }

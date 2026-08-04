@@ -1,13 +1,79 @@
 {
   "actionable_count": 0,
   "buy_review_count": 0,
-  "candidate_count": 5,
-  "generated_at": "2026-08-04T14:39:14.512499+00:00",
+  "candidate_count": 7,
+  "generated_at": "2026-08-04T19:56:15.957598+00:00",
   "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
   "monitor_count": 0,
   "opportunities": [
     {
-      "asking_price_nok": 1900.0,
+      "asking_price_nok": 1000.0,
+      "city": "Kristiansand s",
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "ends_at": "1786467600000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "expected_profit_nok": null,
+      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 1 bud 6d",
+      "matched_target_terms": [
+        "varelager"
+      ],
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-612667",
+      "opportunity_score": 33.61,
+      "priority": 1,
+      "reasons": [
+        "target:varelager+18",
+        "asking_price_present+5"
+      ],
+      "recommendation": "REJECT",
+      "recommendation_ar": "رفض",
+      "relevance_score": 23,
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "score_components": {
+        "evidence": 0.0,
+        "listing_quality": 8.61,
+        "logistics": 10.0,
+        "marketability": 15.0,
+        "verified_economics": 0.0
+      },
+      "score_grade": "E",
+      "score_reasons": [
+        "verified_economics:0/35",
+        "evidence_completeness:0.0/15",
+        "verified_comparables:0.0/10",
+        "marketability:15.0/15",
+        "logistics:10.0/10",
+        "relevance:1.6/7",
+        "listing_fields:7.0/8",
+        "evidence_gate:EVIDENCE_REQUIRED"
+      ],
+      "status": "review_first",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 1 bud 6d 21t 3m",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
+    },
+    {
+      "asking_price_nok": 2100.0,
       "city": "Tønsberg",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
@@ -22,7 +88,7 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
-      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 11 bud",
+      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 13 bud",
       "matched_target_terms": [
         "skrivebord"
       ],
@@ -68,7 +134,7 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 11 bud 22t 56m 57s",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 13 bud 17t 39m 55s",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     },
@@ -88,7 +154,7 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
-      "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d",
+      "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d",
       "matched_target_terms": [
         "klær"
       ],
@@ -134,7 +200,7 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d 4t 12m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d 22t 55m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276"
     },
@@ -154,7 +220,7 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
-      "market_search_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d",
+      "market_search_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d",
       "matched_target_terms": [
         "klær"
       ],
@@ -200,12 +266,78 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d 4t 5m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d 22t 48m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267"
     },
     {
-      "asking_price_nok": 200.0,
+      "asking_price_nok": 1000.0,
+      "city": "Florvåg",
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "ends_at": "1786646700000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "expected_profit_nok": null,
+      "market_search_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d",
+      "matched_target_terms": [
+        "klær"
+      ],
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616274",
+      "opportunity_score": 24.47,
+      "priority": 2,
+      "reasons": [
+        "target:klær+16",
+        "asking_price_present+5"
+      ],
+      "recommendation": "REJECT",
+      "recommendation_ar": "رفض",
+      "relevance_score": 21,
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "score_components": {
+        "evidence": 0.0,
+        "listing_quality": 8.47,
+        "logistics": 7.0,
+        "marketability": 9.0,
+        "verified_economics": 0.0
+      },
+      "score_grade": "E",
+      "score_reasons": [
+        "verified_economics:0/35",
+        "evidence_completeness:0.0/15",
+        "verified_comparables:0.0/10",
+        "marketability:9.0/15",
+        "logistics:7.0/10",
+        "relevance:1.5/7",
+        "listing_fields:7.0/8",
+        "evidence_gate:EVIDENCE_REQUIRED"
+      ],
+      "status": "review_if_capacity",
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d 22t 48m",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274"
+    },
+    {
+      "asking_price_nok": 300.0,
       "city": "Florvåg",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
@@ -220,7 +352,7 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
-      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d",
+      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d",
       "matched_target_terms": [
         "klær"
       ],
@@ -266,7 +398,7 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d 4t 15m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d 22t 58m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
     },
@@ -286,7 +418,7 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
-      "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d",
+      "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 7d",
       "matched_target_terms": [
         "klær"
       ],
@@ -332,11 +464,11 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d 4t 35m",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 7d 23t 18m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271"
     }
   ],
-  "reject_count": 5,
+  "reject_count": 7,
   "schema_version": 1
 }

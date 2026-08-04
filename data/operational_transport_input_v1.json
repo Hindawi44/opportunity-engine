@@ -7,11 +7,11 @@
   "selection_status": "SELECTED",
   "source_opportunity": {
     "final_decision": "WATCH",
-    "opportunity_id": "unified-auksjonen-614953",
-    "opportunity_score": 33.26,
-    "source_city": "Tønsberg",
-    "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 11 bud 22t 56m 57s",
-    "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
+    "opportunity_id": "unified-auksjonen-612667",
+    "opportunity_score": 33.61,
+    "source_city": "Kristiansand s",
+    "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 1 bud 6d 21t 3m",
+    "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
   },
   "source_schema_version": "operational-landed-cost-export-v1",
   "transport_input": {
@@ -26,9 +26,9 @@
       "country_code": "NO",
       "postal_code": null
     },
-    "estimate_id": "transport-unified-auksjonen-614953-to-mahmoud_namsos_v1",
+    "estimate_id": "transport-unified-auksjonen-612667-to-mahmoud_namsos_v1",
     "evidence_refs": [
-      "data/operational_landed_cost_v1.json#unified-auksjonen-614953",
+      "data/operational_landed_cost_v1.json#unified-auksjonen-612667",
       "config/buyers/mahmoud_namsos_v1.json#MAHMOUD_NAMSOS_V1",
       "config/markets/no_v1.json#NO_DOMESTIC_V1"
     ],
@@ -39,9 +39,9 @@
       "tail_lift_required": null,
       "unloading_required": null
     },
-    "opportunity_id": "unified-auksjonen-614953",
+    "opportunity_id": "unified-auksjonen-612667",
     "origin": {
-      "city": "Tønsberg",
+      "city": "Kristiansand s",
       "coordinates": null,
       "country_code": "NO",
       "postal_code": null
@@ -80,9 +80,9 @@
       "country_code": "NO",
       "postal_code": null
     },
-    "estimate_id": "transport-unified-auksjonen-614953-to-mahmoud_namsos_v1",
+    "estimate_id": "transport-unified-auksjonen-612667-to-mahmoud_namsos_v1",
     "evidence_refs": [
-      "data/operational_landed_cost_v1.json#unified-auksjonen-614953",
+      "data/operational_landed_cost_v1.json#unified-auksjonen-612667",
       "config/buyers/mahmoud_namsos_v1.json#MAHMOUD_NAMSOS_V1",
       "config/markets/no_v1.json#NO_DOMESTIC_V1"
     ],
@@ -108,9 +108,9 @@
       "handling.tail_lift_required",
       "handling.dismantling_required"
     ],
-    "opportunity_id": "unified-auksjonen-614953",
+    "opportunity_id": "unified-auksjonen-612667",
     "origin": {
-      "city": "Tønsberg",
+      "city": "Kristiansand s",
       "coordinates": null,
       "country_code": "NO",
       "postal_code": null

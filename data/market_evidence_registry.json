@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T14:39:14.403726+00:00",
+  "generated_at": "2026-08-04T19:56:15.845570+00:00",
   "opportunity_count": 5,
   "policy": {
     "automatic_verification": false,
@@ -8,6 +8,26 @@
     "outlier_ratio": 2.5
   },
   "records": [
+    {
+      "accepted_comparable_count": 0,
+      "accepted_comparables": [],
+      "asking_price_nok": 1000.0,
+      "candidate_comparable_count": 0,
+      "candidate_market_value_nok": null,
+      "evidence_status": "INSUFFICIENT_EVIDENCE",
+      "independent_domain_count": 0,
+      "independent_domains": [],
+      "market_value_verified": false,
+      "opportunity_id": "unified-auksjonen-612667",
+      "outlier_count": 0,
+      "outliers": [],
+      "review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 1 bud 6d 21t 3m",
+      "verified_market_value_nok": null
+    },
     {
       "accepted_comparable_count": 0,
       "accepted_comparables": [],
@@ -25,7 +45,7 @@
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d 4t 12m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d 22t 55m",
       "verified_market_value_nok": null
     },
     {
@@ -45,13 +65,33 @@
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d 4t 5m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d 22t 48m",
       "verified_market_value_nok": null
     },
     {
       "accepted_comparable_count": 0,
       "accepted_comparables": [],
-      "asking_price_nok": 200.0,
+      "asking_price_nok": 1000.0,
+      "candidate_comparable_count": 0,
+      "candidate_market_value_nok": null,
+      "evidence_status": "INSUFFICIENT_EVIDENCE",
+      "independent_domain_count": 0,
+      "independent_domains": [],
+      "market_value_verified": false,
+      "opportunity_id": "unified-auksjonen-616274",
+      "outlier_count": 0,
+      "outliers": [],
+      "review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d 22t 48m",
+      "verified_market_value_nok": null
+    },
+    {
+      "accepted_comparable_count": 0,
+      "accepted_comparables": [],
+      "asking_price_nok": 300.0,
       "candidate_comparable_count": 0,
       "candidate_market_value_nok": null,
       "evidence_status": "INSUFFICIENT_EVIDENCE",
@@ -65,47 +105,7 @@
         "fewer_than_3_comparables",
         "fewer_than_2_independent_domains"
       ],
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d 4t 15m",
-      "verified_market_value_nok": null
-    },
-    {
-      "accepted_comparable_count": 0,
-      "accepted_comparables": [],
-      "asking_price_nok": 1000.0,
-      "candidate_comparable_count": 0,
-      "candidate_market_value_nok": null,
-      "evidence_status": "INSUFFICIENT_EVIDENCE",
-      "independent_domain_count": 0,
-      "independent_domains": [],
-      "market_value_verified": false,
-      "opportunity_id": "unified-auksjonen-616271",
-      "outlier_count": 0,
-      "outliers": [],
-      "review_reasons": [
-        "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains"
-      ],
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d 4t 35m",
-      "verified_market_value_nok": null
-    },
-    {
-      "accepted_comparable_count": 0,
-      "accepted_comparables": [],
-      "asking_price_nok": 1900.0,
-      "candidate_comparable_count": 0,
-      "candidate_market_value_nok": null,
-      "evidence_status": "INSUFFICIENT_EVIDENCE",
-      "independent_domain_count": 0,
-      "independent_domains": [],
-      "market_value_verified": false,
-      "opportunity_id": "unified-auksjonen-614953",
-      "outlier_count": 0,
-      "outliers": [],
-      "review_reasons": [
-        "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains"
-      ],
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 11 bud 22t 56m 57s",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d 22t 58m",
       "verified_market_value_nok": null
     }
   ],
