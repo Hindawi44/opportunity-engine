@@ -103,3 +103,12 @@ def test_sweden_identity_bridge_runs_before_official_status_check() -> None:
 
     assert bridge < official
     assert "sweden-organisation-discovery-bridge.json" in text
+
+
+def test_final_market_bulletin_is_published_to_github_run_summary() -> None:
+    text = BUILD_INTELLIGENCE.read_text(encoding="utf-8")
+
+    assert "GITHUB_STEP_SUMMARY" in text
+    assert "## نشرة استخبارات سوق مخزون الملابس" in text
+    assert "domain-market-intelligence-brief.txt" in text
+    assert "_publish_github_step_summary(bulletin_text)" in text
