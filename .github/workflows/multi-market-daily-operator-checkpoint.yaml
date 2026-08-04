@@ -45,11 +45,13 @@ on:
       - "scripts/run_multi_market_daily_operator_checkpoint.py"
       - "scripts/run_checkpoint_source_command.py"
       - "scripts/run_auksjonen_live_clothing.py"
+      - "scripts/run_finn_email_intake.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/market_intelligence.py"
       - "src/opportunity_engine/discovery/auksjonen_unified_lifecycle.py"
       - "src/opportunity_engine/discovery/domain_market_intelligence_feed.py"
+      - "src/opportunity_engine/discovery/finn_email_intake.py"
       - "src/opportunity_engine/discovery/human_review_checkpoint.py"
       - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
       - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
@@ -64,12 +66,15 @@ on:
       - "config/market_completion_matrix.json"
       - "tests/test_auksjonen_unified_lifecycle_persistence_v1.py"
       - "tests/test_domain_market_intelligence_feed_v1.py"
+      - "tests/test_finn_email_intake.py"
+      - "tests/test_run_finn_email_intake_script.py"
       - "tests/test_human_review_checkpoint_v1.py"
       - "tests/test_human_review_outcome_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
       - "tests/test_lifecycle_checkpoint_integration_v1.py"
       - "tests/test_sweden_valuable_datasets_status_feed_v1.py"
+      - "docs/FINN_GMAIL_INTAKE_BRIDGE_V1.md"
       - "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
 
 permissions:
@@ -96,6 +101,8 @@ jobs:
         run: |
           pytest tests/test_auksjonen_unified_lifecycle_persistence_v1.py -q
           pytest tests/test_domain_market_intelligence_feed_v1.py -q
+          pytest tests/test_finn_email_intake.py -q
+          pytest tests/test_run_finn_email_intake_script.py -q
           pytest tests/test_human_review_outcome_v1.py -q
           pytest tests/test_human_review_checkpoint_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
@@ -113,6 +120,9 @@ jobs:
       BOLAGSVERKET_CLIENT_ID: ${{ secrets.BOLAGSVERKET_CLIENT_ID }}
       BOLAGSVERKET_CLIENT_SECRET: ${{ secrets.BOLAGSVERKET_CLIENT_SECRET }}
       BOLAGSVERKET_SE_ORGANISATION_NUMBERS: ${{ secrets.BOLAGSVERKET_SE_ORGANISATION_NUMBERS }}
+      GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+      GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+      GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
       INPUT_ROOT: artifacts/multi-market-inputs
       OUTPUT_DIR: artifacts/multi-market-daily-operator-checkpoint
 
@@ -147,6 +157,17 @@ jobs:
               --output-dir "$INPUT_ROOT/no-auksjonen" \
               --persist-unified \
               --database-url "sqlite:///$INPUT_ROOT/no-auksjonen/opportunity_engine.db"
+
+      - name: Read FINN saved-search alerts from Gmail
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/no-finn-email" -- \
+            python scripts/run_finn_email_intake.py \
+              --gmail-api \
+              --max-messages 20 \
+              --gmail-query 'from:agent@finn.no subject:"Nye annonser:" newer_than:7d' \
+              --auksjonen-report "$INPUT_ROOT/no-auksjonen/auksjonen-live-clothing-listings.json" \
+              --output-dir "$INPUT_ROOT/no-finn-email"
 
       - name: Run Sweden Blinto bounded pilot
         run: |
@@ -239,6 +260,12 @@ jobs:
                 "top5_file": "live-clothing-top5.json"
               },
               {
+                "market_code": "NO",
+                "source_name": "FINN saved-search email",
+                "currency": "NOK",
+                "artifact_dir": "artifacts/multi-market-inputs/no-finn-email"
+              },
+              {
                 "market_code": "SE",
                 "source_name": "Blinto",
                 "currency": "SEK",
@@ -319,8 +346,8 @@ jobs:
 
           if report.get("market_coverage") != ["NO", "SE", "DE"]:
               raise SystemExit("The checkpoint did not cover NO, SE and DE")
-          if len(report.get("sources") or []) != 5:
-              raise SystemExit("The checkpoint did not include all five bounded source paths")
+          if len(report.get("sources") or []) != 6:
+              raise SystemExit("The checkpoint did not include all six bounded source paths")
           if summary.count("الإجراء البشري الوحيد:") != 1:
               raise SystemExit("The phone report must contain exactly one human action")
           for key in (
@@ -331,7 +358,7 @@ jobs:
           ):
               if report.get(key) is not False:
                   raise SystemExit(f"Automatic action safety changed: {key}")
-          if sum((report.get("source_execution_counts") or {}).values()) != 5:
+          if sum((report.get("source_execution_counts") or {}).values()) != 6:
               raise SystemExit("Source execution statuses do not reconcile")
 
           source_by_name = {
@@ -339,6 +366,8 @@ jobs:
           }
           if (source_by_name.get("Auksjonen.no") or {}).get("persistence_status") != "SUCCESS":
               raise SystemExit("Auksjonen unified SQLite persistence did not succeed")
+          if "FINN saved-search email" not in source_by_name:
+              raise SystemExit("FINN saved-search email was not included in the checkpoint")
 
           lifecycle = report.get("lifecycle") or {}
           stage_counts = lifecycle.get("stage_counts") or {}
