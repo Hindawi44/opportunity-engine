@@ -7,6 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from opportunity_engine.discovery.blinto_seller_identity_extraction import (
+    write_blinto_seller_identity_evidence,
+)
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     persist_manifest_market_signals,
@@ -29,6 +32,13 @@ def _load_object(path: Path, name: str) -> dict[str, Any]:
     return payload
 
 
+def _write_report(path: Path, payload: dict[str, Any]) -> None:
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", required=True)
@@ -42,6 +52,32 @@ def main() -> int:
     manifest = _load_object(Path(args.manifest), "manifest")
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    try:
+        blinto_seller_identity = write_blinto_seller_identity_evidence(
+            manifest,
+            root=args.root,
+        )
+    except Exception as exc:
+        blinto_seller_identity = {
+            "schema_version": "blinto-seller-identity-extraction-1.0",
+            "status": "FAILED",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "seller_evidence": [],
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+    _write_report(
+        output_dir / "blinto-seller-identity-extraction.json",
+        blinto_seller_identity,
+    )
+    print(
+        "blinto_seller_identity_extraction_status:",
+        blinto_seller_identity.get("status"),
+    )
 
     try:
         sweden_identity_bridge = resolve_sweden_artifact_company_identities(
@@ -61,15 +97,9 @@ def main() -> int:
             "automatic_purchase": False,
             "automatic_payment": False,
         }
-    (output_dir / "sweden-organisation-discovery-bridge.json").write_text(
-        json.dumps(
-            sweden_identity_bridge,
-            ensure_ascii=False,
-            indent=2,
-            sort_keys=True,
-        )
-        + "\n",
-        encoding="utf-8",
+    _write_report(
+        output_dir / "sweden-organisation-discovery-bridge.json",
+        sweden_identity_bridge,
     )
     print(
         "sweden_organisation_discovery_bridge_status:",
@@ -80,9 +110,9 @@ def main() -> int:
         manifest,
         root=args.root,
     )
-    (output_dir / "official-early-signal-source-coverage.json").write_text(
-        json.dumps(official_coverage, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    _write_report(
+        output_dir / "official-early-signal-source-coverage.json",
+        official_coverage,
     )
     print(
         "official_early_signal_status_counts:",
@@ -94,9 +124,9 @@ def main() -> int:
         root=args.root,
         config_path=args.config_path,
     )
-    (output_dir / "domain-market-signal-persistence.json").write_text(
-        json.dumps(persistence, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    _write_report(
+        output_dir / "domain-market-signal-persistence.json",
+        persistence,
     )
     brief = build_domain_market_intelligence_brief(checkpoint, persistence)
     write_corrected_market_bulletin_artifacts(
