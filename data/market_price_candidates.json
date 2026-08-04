@@ -1,7 +1,7 @@
 {
   "candidate_count": 0,
   "errors": {},
-  "generated_at": "2026-08-04T03:36:31.170095+00:00",
+  "generated_at": "2026-08-04T09:07:11.639420+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
@@ -162,6 +162,20 @@
           "url": "https://www.wenaas.com/nb-no/vare-produkter/arbeidstoy"
         },
         {
+          "canonical_url": "https://wenaas.com/nb-no/vart-konsept/energi-og-industri",
+          "comparable_quantity": null,
+          "domain": "wenaas.com",
+          "matched_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.5,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for energi og industri | Wenaas Workwear AS",
+          "url": "https://www.wenaas.com/nb-no/vart-konsept/energi-og-industri"
+        },
+        {
           "canonical_url": "https://wenaas.com/nb-no/nettbutikk/group/flammehemmende-undertoey-861",
           "comparable_quantity": null,
           "domain": "wenaas.com",
@@ -175,24 +189,10 @@
           "target_domain": null,
           "title": "Flammehemmende undertøy Wenaas Workwear AS",
           "url": "https://www.wenaas.com/nb-no/nettbutikk/group/flammehemmende-undertoey-861"
-        },
-        {
-          "canonical_url": "https://wenaas.com/nb-no/vart-konsept/energi-og-industri",
-          "comparable_quantity": null,
-          "domain": "wenaas.com",
-          "matched_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.5,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Arbeidsklær for energi og industri | Wenaas Workwear AS",
-          "url": "https://www.wenaas.com/nb-no/vart-konsept/energi-og-industri"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d 15t 15m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d 9t 44m",
       "verified_comparable_count": 0
     },
     {
@@ -295,6 +295,21 @@
           "url": "https://www.finn.no/recommerce/forsale/search?location=0.22034"
         },
         {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?location=0.20002",
+          "comparable_quantity": null,
+          "domain": "finn.no",
+          "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Østfold | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?location=0.20002"
+        },
+        {
           "canonical_url": "https://finn.no/recommerce/forsale/search",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -323,21 +338,6 @@
           "target_domain": null,
           "title": "Rogaland | FINN Torget",
           "url": "https://www.finn.no/recommerce/forsale/search?location=0.20012"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?trade_type=2",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Gis bort | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?trade_type=2"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.71.3941",
@@ -386,7 +386,7 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d 15t 8m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d 9t 37m",
       "verified_comparable_count": 0
     },
     {
@@ -459,6 +459,21 @@
           "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.71.3941"
         },
         {
+          "canonical_url": "https://florworks.no/",
+          "comparable_quantity": null,
+          "domain": "florworks.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for damer – Flor",
+          "url": "https://florworks.no/"
+        },
+        {
           "canonical_url": "https://profildesign.no/category/produktkataloger",
           "comparable_quantity": null,
           "domain": "profildesign.no",
@@ -472,6 +487,21 @@
           "target_domain": null,
           "title": "Profil Design Norge AS, Profildesign, profilklær og firmaprofilering, Asker Profil",
           "url": "https://www.profildesign.no/category/produktkataloger/"
+        },
+        {
+          "canonical_url": "https://ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar",
+          "comparable_quantity": null,
+          "domain": "ahlsell.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profil og fritidsklær | Ahlsell – Vi gjør det enklere å v...",
+          "url": "https://www.ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.71",
@@ -489,36 +519,6 @@
           "url": "https://www.finn.no/recommerce/forsale/search?category=0.71"
         },
         {
-          "canonical_url": "https://florworks.no/",
-          "comparable_quantity": null,
-          "domain": "florworks.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Arbeidsklær for damer – Flor",
-          "url": "https://florworks.no/"
-        },
-        {
-          "canonical_url": "https://bonprix.no/kategori/dame",
-          "comparable_quantity": null,
-          "domain": "bonprix.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Dameklær på nett - kjøp klær og sko hos bonprix.no",
-          "url": "https://www.bonprix.no/kategori/dame/"
-        },
-        {
           "canonical_url": "https://norskprofilreklame.no/sortiment/profilklar",
           "comparable_quantity": null,
           "domain": "norskprofilreklame.no",
@@ -534,19 +534,19 @@
           "url": "https://www.norskprofilreklame.no/sortiment/profilklar"
         },
         {
-          "canonical_url": "https://ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar",
+          "canonical_url": "https://bonprix.no/kategori/dame",
           "comparable_quantity": null,
-          "domain": "ahlsell.no",
+          "domain": "bonprix.no",
           "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.125,
+          "similarity_score": 0.25,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Profil og fritidsklær | Ahlsell – Vi gjør det enklere å v...",
-          "url": "https://www.ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar"
+          "title": "Dameklær på nett - kjøp klær og sko hos bonprix.no",
+          "url": "https://www.bonprix.no/kategori/dame/"
         },
         {
           "canonical_url": "https://norgesprofil.no/produkter/profilklaer/k-1",
@@ -579,7 +579,7 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d 15t 18m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d 9t 47m",
       "verified_comparable_count": 0
     },
     {
@@ -764,7 +764,7 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d 15t 38m",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d 10t 7m",
       "verified_comparable_count": 0
     },
     {
@@ -799,6 +799,20 @@
       "rejected_candidate_count": 10,
       "rejected_candidates": [
         {
+          "canonical_url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black",
+          "comparable_quantity": null,
+          "domain": "kontorsenteretostfold.no",
+          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.545,
+          "source_quantity": 5,
+          "target_domain": null,
+          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD SVART – Kontorsenteret Østfold AS",
+          "url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black"
+        },
+        {
           "canonical_url": "https://sogroup.no/categories/hev-senk-skrivebord",
           "comparable_quantity": null,
           "domain": "sogroup.no",
@@ -825,20 +839,6 @@
           "target_domain": null,
           "title": "Hev og senk skrivebord til salgs - Brukte elektriske pult – Secundo",
           "url": "https://www.secundo.no/produkter/til-kontoret/elektriske-hev-senk-skrivebord/"
-        },
-        {
-          "canonical_url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black",
-          "comparable_quantity": null,
-          "domain": "kontorsenteretostfold.no",
-          "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.545,
-          "source_quantity": 5,
-          "target_domain": null,
-          "title": "NYTT | ELEKTRISK HEV/SENK SKRIVEBORD SVART – Kontorsenteret Østfold AS",
-          "url": "https://kontorsenteretostfold.no/products/nytt-hev-senk-skrivebord-black"
         },
         {
           "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
@@ -929,22 +929,22 @@
           "url": "https://kontorsenteretostfold.no/collections/allekontormobler/products/brukt-hev-senk-skrivebord-med-bue"
         },
         {
-          "canonical_url": "https://kontorsenteretostfold.no/products/brukt-hev-senk-skrivebord-hvit",
+          "canonical_url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord?page=10",
           "comparable_quantity": null,
-          "domain": "kontorsenteretostfold.no",
+          "domain": "secundo.no",
           "matched_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
           ],
-          "similarity_score": 0.545,
+          "similarity_score": 0.364,
           "source_quantity": 5,
           "target_domain": null,
-          "title": "BRUKT | HEV/SENK SKRIVEBORD HVIT – Kontorsenteret Østfold AS",
-          "url": "https://kontorsenteretostfold.no/products/brukt-hev-senk-skrivebord-hvit"
+          "title": "Page 10 – Hev og senk skrivebord til salgs - Brukte elektriske pult – Secundo",
+          "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord?page=10"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 9t 59m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 4t 28m",
       "verified_comparable_count": 0
     }
   ],
