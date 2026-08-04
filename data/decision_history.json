@@ -1,5 +1,5 @@
 {
-  "event_count": 10,
+  "event_count": 13,
   "events": [
     {
       "final_decision": "WATCH",
@@ -80,8 +80,32 @@
       "previous_decision": null,
       "reason_ar": "إنشاء الإجراء الأول",
       "recorded_at": "2026-08-03T19:57:03.340056+00:00"
+    },
+    {
+      "final_decision": "WATCH",
+      "next_action": "VERIFY_MARKET_PRICE",
+      "opportunity_id": "unified-auksjonen-616276",
+      "previous_decision": null,
+      "reason_ar": "إنشاء الإجراء الأول",
+      "recorded_at": "2026-08-04T03:36:33.115963+00:00"
+    },
+    {
+      "final_decision": "WATCH",
+      "next_action": "VERIFY_MARKET_PRICE",
+      "opportunity_id": "unified-auksjonen-616267",
+      "previous_decision": null,
+      "reason_ar": "إنشاء الإجراء الأول",
+      "recorded_at": "2026-08-04T03:36:33.115963+00:00"
+    },
+    {
+      "final_decision": "WATCH",
+      "next_action": "VERIFY_MARKET_PRICE",
+      "opportunity_id": "unified-auksjonen-616271",
+      "previous_decision": null,
+      "reason_ar": "إنشاء الإجراء الأول",
+      "recorded_at": "2026-08-04T03:36:33.115963+00:00"
     }
   ],
-  "generated_at": "2026-08-03T19:57:03.340056+00:00",
+  "generated_at": "2026-08-04T03:36:33.115963+00:00",
   "schema_version": 1
 }

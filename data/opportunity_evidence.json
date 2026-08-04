@@ -7,13 +7,11 @@
       "market_comparables": [],
       "market_evidence_review_reasons": [
         "fewer_than_3_comparables",
-        "fewer_than_2_independent_domains",
-        "quantity_not_confirmed_for_all_comparables"
+        "fewer_than_2_independent_domains"
       ],
       "market_evidence_status": "INSUFFICIENT_EVIDENCE",
       "missing_evidence": [
         "three_verified_market_comparables",
-        "pending_market_comparables_require_review",
         "auction_fee_nok",
         "vat_status",
         "vat_nok",
@@ -25,31 +23,78 @@
       ],
       "opportunity_id": "unified-auksjonen-614953",
       "other_costs_nok": null,
-      "pending_market_comparables": [
-        {
-          "price_nok": 1800.0,
-          "quantity_status": "UNKNOWN",
-          "similarity_score": 0.4,
-          "source": "Brave Search",
-          "url": "https://secundo.no/collections/elektriske-hev-senk-skrivebord",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
-        },
-        {
-          "price_nok": 2490.0,
-          "quantity_status": "UNKNOWN",
-          "similarity_score": 0.4,
-          "source": "Brave Search",
-          "url": "https://secundo.no/products/elektrisk-hev-senk-skrivebord-med-hvit-bordplate-og-gratt-understell",
-          "verification_status": "REVIEW_REQUIRED",
-          "verified": false
-        }
-      ],
+      "pending_market_comparables": [],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 17t 39m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 9t 59m",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
+      "vat_nok": null,
+      "vat_status": null,
+      "verified": false
+    },
+    "unified-auksjonen-616267": {
+      "auction_fee_nok": null,
+      "candidate_market_value_nok": null,
+      "dismantling_cost_nok": null,
+      "market_comparables": [],
+      "market_evidence_review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
+      "missing_evidence": [
+        "three_verified_market_comparables",
+        "auction_fee_nok",
+        "vat_status",
+        "vat_nok",
+        "transport_cost_nok",
+        "dismantling_cost_nok",
+        "storage_cost_nok",
+        "repair_cost_nok",
+        "other_costs_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616267",
+      "other_costs_nok": null,
+      "pending_market_comparables": [],
+      "repair_cost_nok": null,
+      "storage_cost_nok": null,
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d 15t 8m",
+      "transport_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267",
+      "vat_nok": null,
+      "vat_status": null,
+      "verified": false
+    },
+    "unified-auksjonen-616271": {
+      "auction_fee_nok": null,
+      "candidate_market_value_nok": null,
+      "dismantling_cost_nok": null,
+      "market_comparables": [],
+      "market_evidence_review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
+      "missing_evidence": [
+        "three_verified_market_comparables",
+        "auction_fee_nok",
+        "vat_status",
+        "vat_nok",
+        "transport_cost_nok",
+        "dismantling_cost_nok",
+        "storage_cost_nok",
+        "repair_cost_nok",
+        "other_costs_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616271",
+      "other_costs_nok": null,
+      "pending_market_comparables": [],
+      "repair_cost_nok": null,
+      "storage_cost_nok": null,
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d 15t 38m",
+      "transport_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
@@ -80,19 +125,52 @@
       "pending_market_comparables": [],
       "repair_cost_nok": null,
       "storage_cost_nok": null,
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d 22t 58m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d 15t 18m",
       "transport_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275",
       "vat_nok": null,
       "vat_status": null,
       "verified": false
+    },
+    "unified-auksjonen-616276": {
+      "auction_fee_nok": null,
+      "candidate_market_value_nok": null,
+      "dismantling_cost_nok": null,
+      "market_comparables": [],
+      "market_evidence_review_reasons": [
+        "fewer_than_3_comparables",
+        "fewer_than_2_independent_domains"
+      ],
+      "market_evidence_status": "INSUFFICIENT_EVIDENCE",
+      "missing_evidence": [
+        "three_verified_market_comparables",
+        "auction_fee_nok",
+        "vat_status",
+        "vat_nok",
+        "transport_cost_nok",
+        "dismantling_cost_nok",
+        "storage_cost_nok",
+        "repair_cost_nok",
+        "other_costs_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616276",
+      "other_costs_nok": null,
+      "pending_market_comparables": [],
+      "repair_cost_nok": null,
+      "storage_cost_nok": null,
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d 15t 15m",
+      "transport_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276",
+      "vat_nok": null,
+      "vat_status": null,
+      "verified": false
     }
   },
-  "evidence_count": 2,
-  "generated_at": "2026-08-03T19:57:01.633351+00:00",
+  "evidence_count": 5,
+  "generated_at": "2026-08-04T03:36:31.248452+00:00",
   "market_evidence_source": "data/market_evidence_registry.json",
   "method": "verified evidence only; discovered market evidence is bridged as pending review; unknown values remain null",
-  "pending_comparable_count": 2,
+  "pending_comparable_count": 0,
   "schema_version": 2,
   "verified_count": 0
 }

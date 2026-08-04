@@ -1,8 +1,8 @@
 {
   "actionable_count": 0,
   "buy_review_count": 0,
-  "candidate_count": 2,
-  "generated_at": "2026-08-03T19:57:01.709116+00:00",
+  "candidate_count": 5,
+  "generated_at": "2026-08-04T03:36:31.303187+00:00",
   "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
   "monitor_count": 0,
   "opportunities": [
@@ -68,12 +68,144 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 17t 39m",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 10 bud 1d 9t 59m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
     },
     {
       "asking_price_nok": 100.0,
+      "city": "Florvåg",
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "ends_at": "1786560720000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "expected_profit_nok": null,
+      "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d",
+      "matched_target_terms": [
+        "klær"
+      ],
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616276",
+      "opportunity_score": 24.47,
+      "priority": 2,
+      "reasons": [
+        "target:klær+16",
+        "asking_price_present+5"
+      ],
+      "recommendation": "REJECT",
+      "recommendation_ar": "رفض",
+      "relevance_score": 21,
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "score_components": {
+        "evidence": 0.0,
+        "listing_quality": 8.47,
+        "logistics": 7.0,
+        "marketability": 9.0,
+        "verified_economics": 0.0
+      },
+      "score_grade": "E",
+      "score_reasons": [
+        "verified_economics:0/35",
+        "evidence_completeness:0.0/15",
+        "verified_comparables:0.0/10",
+        "marketability:9.0/15",
+        "logistics:7.0/10",
+        "relevance:1.5/7",
+        "listing_fields:7.0/8",
+        "evidence_gate:EVIDENCE_REQUIRED"
+      ],
+      "status": "review_if_capacity",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 8d 15t 15m",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276"
+    },
+    {
+      "asking_price_nok": 500.0,
+      "city": "Florvåg",
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "ends_at": "1786473900000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "expected_profit_nok": null,
+      "market_search_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d",
+      "matched_target_terms": [
+        "klær"
+      ],
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616267",
+      "opportunity_score": 24.47,
+      "priority": 2,
+      "reasons": [
+        "target:klær+16",
+        "asking_price_present+5"
+      ],
+      "recommendation": "REJECT",
+      "recommendation_ar": "رفض",
+      "relevance_score": 21,
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "score_components": {
+        "evidence": 0.0,
+        "listing_quality": 8.47,
+        "logistics": 7.0,
+        "marketability": 9.0,
+        "verified_economics": 0.0
+      },
+      "score_grade": "E",
+      "score_reasons": [
+        "verified_economics:0/35",
+        "evidence_completeness:0.0/15",
+        "verified_comparables:0.0/10",
+        "marketability:9.0/15",
+        "logistics:7.0/10",
+        "relevance:1.5/7",
+        "listing_fields:7.0/8",
+        "evidence_gate:EVIDENCE_REQUIRED"
+      ],
+      "status": "review_if_capacity",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 7d 15t 8m",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267"
+    },
+    {
+      "asking_price_nok": 200.0,
       "city": "Florvåg",
       "conservative_resale_value_nok": null,
       "decision": "EVIDENCE_REQUIRED",
@@ -88,7 +220,7 @@
       ],
       "exclusion_reasons": [],
       "expected_profit_nok": null,
-      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d",
+      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d",
       "matched_target_terms": [
         "klær"
       ],
@@ -134,11 +266,77 @@
         "evidence_gate:EVIDENCE_REQUIRED"
       ],
       "status": "review_if_capacity",
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 1 bud 7d 22t 58m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 2 bud 7d 15t 18m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
+    },
+    {
+      "asking_price_nok": 1000.0,
+      "city": "Florvåg",
+      "conservative_resale_value_nok": null,
+      "decision": "EVIDENCE_REQUIRED",
+      "ends_at": "1786562100000",
+      "evidence_needed": [
+        "three_verified_market_comparables",
+        "auction_fee",
+        "vat_status",
+        "transport_cost",
+        "dismantling_cost",
+        "condition_and_missing_parts"
+      ],
+      "exclusion_reasons": [],
+      "expected_profit_nok": null,
+      "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d",
+      "matched_target_terms": [
+        "klær"
+      ],
+      "maximum_safe_bid_nok": null,
+      "missing_evidence": [
+        "auction_fee_nok",
+        "dismantling_cost_nok",
+        "other_costs_nok",
+        "repair_cost_nok",
+        "storage_cost_nok",
+        "three_verified_market_comparables",
+        "transport_cost_nok",
+        "vat_nok"
+      ],
+      "opportunity_id": "unified-auksjonen-616271",
+      "opportunity_score": 24.47,
+      "priority": 2,
+      "reasons": [
+        "target:klær+16",
+        "asking_price_present+5"
+      ],
+      "recommendation": "REJECT",
+      "recommendation_ar": "رفض",
+      "relevance_score": 21,
+      "requires_human_approval": false,
+      "roi_percent": null,
+      "score_components": {
+        "evidence": 0.0,
+        "listing_quality": 8.47,
+        "logistics": 7.0,
+        "marketability": 9.0,
+        "verified_economics": 0.0
+      },
+      "score_grade": "E",
+      "score_reasons": [
+        "verified_economics:0/35",
+        "evidence_completeness:0.0/15",
+        "verified_comparables:0.0/10",
+        "marketability:9.0/15",
+        "logistics:7.0/10",
+        "relevance:1.5/7",
+        "listing_fields:7.0/8",
+        "evidence_gate:EVIDENCE_REQUIRED"
+      ],
+      "status": "review_if_capacity",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 8d 15t 38m",
+      "total_cost_nok": null,
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271"
     }
   ],
-  "reject_count": 2,
+  "reject_count": 5,
   "schema_version": 1
 }
