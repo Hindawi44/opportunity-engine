@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +56,22 @@ def _rewrite_source_artifact(
     if not artifact_path.is_absolute():
         artifact_path = Path(root) / artifact_path
     _write_report(artifact_path, report)
+
+
+def _publish_github_step_summary(bulletin_text: str) -> bool:
+    """Expose the final operator bulletin in the GitHub Actions run summary."""
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not summary_path:
+        return False
+
+    path = Path(summary_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as summary:
+        summary.write("## نشرة استخبارات سوق مخزون الملابس\n\n")
+        summary.write("```text\n")
+        summary.write(bulletin_text.rstrip())
+        summary.write("\n```\n")
+    return True
 
 
 def main() -> int:
@@ -157,7 +174,11 @@ def main() -> int:
         json_path=output_dir / "domain-market-intelligence-brief.json",
         text_path=output_dir / "domain-market-intelligence-brief.txt",
     )
-    print((output_dir / "domain-market-intelligence-brief.txt").read_text(encoding="utf-8"))
+    bulletin_text = (
+        output_dir / "domain-market-intelligence-brief.txt"
+    ).read_text(encoding="utf-8")
+    _publish_github_step_summary(bulletin_text)
+    print(bulletin_text)
     return 0
 
 
