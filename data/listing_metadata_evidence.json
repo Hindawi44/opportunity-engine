@@ -4,7 +4,7 @@
   "errors": {},
   "evidence": {
     "unified-auksjonen-612667": {
-      "captured_at": "2026-08-05T03:31:46.446056+00:00",
+      "captured_at": "2026-08-05T09:04:40.212232+00:00",
       "observed": {
         "city": "Kristiansand s",
         "ends_at": "1786467600000"
@@ -14,7 +14,7 @@
       "verified": true
     },
     "unified-auksjonen-614953": {
-      "captured_at": "2026-08-05T03:31:50.483552+00:00",
+      "captured_at": "2026-08-05T09:04:44.181581+00:00",
       "observed": {
         "city": "Tønsberg",
         "ends_at": "1785936960000"
@@ -24,7 +24,7 @@
       "verified": true
     },
     "unified-auksjonen-616267": {
-      "captured_at": "2026-08-05T03:31:47.738892+00:00",
+      "captured_at": "2026-08-05T09:04:41.545505+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786473900000"
@@ -34,7 +34,7 @@
       "verified": true
     },
     "unified-auksjonen-616271": {
-      "captured_at": "2026-08-05T03:31:49.765175+00:00",
+      "captured_at": "2026-08-05T09:04:43.663119+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786562100000"
@@ -44,7 +44,7 @@
       "verified": true
     },
     "unified-auksjonen-616274": {
-      "captured_at": "2026-08-05T03:31:48.537711+00:00",
+      "captured_at": "2026-08-05T09:04:42.329045+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786646700000"
@@ -54,7 +54,7 @@
       "verified": true
     },
     "unified-auksjonen-616275": {
-      "captured_at": "2026-08-05T03:31:49.260883+00:00",
+      "captured_at": "2026-08-05T09:04:42.860714+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786474500000"
@@ -64,7 +64,7 @@
       "verified": true
     },
     "unified-auksjonen-616276": {
-      "captured_at": "2026-08-05T03:31:46.938204+00:00",
+      "captured_at": "2026-08-05T09:04:40.990523+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786560720000"
@@ -74,6 +74,6 @@
       "verified": true
     }
   },
-  "generated_at": "2026-08-05T03:31:50.483568+00:00",
+  "generated_at": "2026-08-05T09:04:44.181599+00:00",
   "schema_version": 2
 }
