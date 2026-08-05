@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,11 @@ from opportunity_engine.discovery.brave_market_signal_continuity import (
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     persist_manifest_market_signals,
+)
+from opportunity_engine.discovery.openai_hunt_case_enrichment import (
+    attach_hunt_case_intelligence,
+    run_openai_hunt_case_enrichment,
+    write_openai_hunt_case_artifacts,
 )
 from opportunity_engine.discovery.signal_role_freshness_correction import (
     write_corrected_market_bulletin_artifacts,
@@ -182,6 +188,30 @@ def main() -> int:
         persistence,
     )
     brief = build_domain_market_intelligence_brief(checkpoint, persistence)
+
+    hunt_case_enrichment = run_openai_hunt_case_enrichment(
+        brief,
+        environment=os.environ,
+    )
+    write_openai_hunt_case_artifacts(
+        hunt_case_enrichment,
+        json_path=output_dir / "openai-hunt-case-enrichment.json",
+        text_path=output_dir / "openai-hunt-case-enrichment.txt",
+    )
+    brief = attach_hunt_case_intelligence(brief, hunt_case_enrichment)
+    print(
+        "openai_hunt_case_enrichment_status:",
+        hunt_case_enrichment.get("status"),
+    )
+    print(
+        "openai_hunt_case_api_requests:",
+        hunt_case_enrichment.get("api_request_count", 0),
+    )
+    print(
+        "openai_hunt_case_estimated_cost_usd:",
+        hunt_case_enrichment.get("estimated_cost_usd", 0.0),
+    )
+
     write_corrected_market_bulletin_artifacts(
         brief,
         persistence,
@@ -189,6 +219,7 @@ def main() -> int:
         text_path=output_dir / "domain-market-intelligence-brief.txt",
     )
     print((output_dir / "domain-market-intelligence-brief.txt").read_text(encoding="utf-8"))
+    print((output_dir / "openai-hunt-case-enrichment.txt").read_text(encoding="utf-8"))
     return 0
 
 
