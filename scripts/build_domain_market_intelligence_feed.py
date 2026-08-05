@@ -13,7 +13,7 @@ from opportunity_engine.discovery.blinto_generic_seller_guard import (
 from opportunity_engine.discovery.blinto_seller_identity_extraction import (
     write_blinto_seller_identity_evidence,
 )
-from opportunity_engine.discovery.brave_market_signal_radar import (
+from opportunity_engine.discovery.brave_market_signal_continuity import (
     collect_manifest_brave_market_signals,
 )
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
