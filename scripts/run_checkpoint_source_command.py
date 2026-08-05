@@ -9,6 +9,10 @@ from pathlib import Path
 import subprocess
 import sys
 
+from opportunity_engine.discovery.source_artifact_continuity import (
+    ensure_source_artifact_continuity,
+)
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -26,12 +30,34 @@ def main() -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
     started_at = datetime.now(timezone.utc).isoformat()
     completed = subprocess.run(command, check=False)  # noqa: S603
+    artifact_continuity: dict[str, object] = {
+        "status": "SKIPPED",
+        "reason": "source command did not complete successfully",
+    }
+    effective_exit_code = completed.returncode
+    if completed.returncode == 0:
+        try:
+            artifact_continuity = ensure_source_artifact_continuity(output_dir)
+        except Exception as exc:  # source failure is checkpoint data, not a hidden crash
+            effective_exit_code = 3
+            artifact_continuity = {
+                "status": "FAILED",
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+                "automatic_contact": False,
+                "automatic_bid": False,
+                "automatic_purchase": False,
+                "automatic_payment": False,
+            }
+
     finished_at = datetime.now(timezone.utc).isoformat()
     payload = {
         "command": command,
-        "exit_code": completed.returncode,
+        "source_command_exit_code": completed.returncode,
+        "exit_code": effective_exit_code,
         "started_at": started_at,
         "finished_at": finished_at,
+        "artifact_continuity": artifact_continuity,
         "automatic_contact": False,
         "automatic_bid": False,
         "automatic_purchase": False,
@@ -42,8 +68,9 @@ def main() -> int:
         json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    print(f"source_artifact_continuity_status: {artifact_continuity.get('status')}")
     print(f"source_execution_status: {status_path}")
-    print(f"source_exit_code: {completed.returncode}")
+    print(f"source_exit_code: {effective_exit_code}")
     # A source failure is data for the checkpoint. The consolidator decides the
     # single human action and keeps failure separate from a valid zero result.
     return 0
