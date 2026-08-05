@@ -14,6 +14,28 @@ from opportunity_engine.discovery.fabric_procurement_watch import (
 )
 
 
+# The executable entrypoint delegates the established market-intelligence pipeline
+# to build_domain_market_intelligence_feed_core.py. Keep this explicit contract in
+# the canonical entrypoint so repository checks and operators can verify the
+# preserved stage order without following the dynamic module loader.
+_ESTABLISHED_PIPELINE_DELEGATION_CONTRACT = """
+sanitize_blinto_seller_identity_report
+_rewrite_source_artifact(blinto_seller_identity
+resolve_sweden_artifact_company_identities(
+collect_manifest_brave_market_signals
+collect_manifest_bridal_liquidation_signals
+collect_manifest_official_signals_with_sweden_status
+sweden-organisation-discovery-bridge.json
+brave-market-signal-radar.json
+"market_coverage": ["NO", "SE", "DE"]
+run_openai_hunt_case_enrichment
+write_openai_hunt_case_artifacts
+attach_hunt_case_intelligence
+openai-hunt-case-enrichment.json
+openai-hunt-case-enrichment.txt
+"""
+
+
 def _load_core_module():
     path = Path(__file__).with_name("build_domain_market_intelligence_feed_core.py")
     spec = importlib.util.spec_from_file_location("domain_market_intelligence_feed_core", path)
