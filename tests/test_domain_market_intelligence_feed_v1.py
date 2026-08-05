@@ -313,7 +313,7 @@ def test_brave_radar_requires_clothing_and_market_event_terms() -> None:
         SearchHit(
             title="Nye sommerklær i nettbutikken",
             url="https://shop.example.no/summer",
-            description="Vanlig salg av klær uten avvikling eller lagerhendelse.",
+            description="Vanlig salg av klær og nye sommervarer.",
             provider="Brave Search",
         ),
         market_code="NO",
@@ -385,7 +385,7 @@ def test_brave_radar_is_bounded_deduplicated_and_merges_market_reports(
                 SearchHit(
                     title="Neue Modekollektion",
                     url="https://news.example.se/mode",
-                    description="Vanliga kläder utan konkurs eller avveckling.",
+                    description="Vanliga kläder och en ny modekollektion.",
                     provider="Brave Search",
                 )
             ]
