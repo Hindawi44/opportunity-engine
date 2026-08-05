@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-08-05T09:04:44.221765+00:00",
+  "generated_at": "2026-08-05T14:32:44.012116+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
-  "search_required_count": 7,
+  "search_required_count": 6,
   "source_queue": "data/opportunity_review_queue.json",
-  "task_count": 7,
+  "task_count": 6,
   "tasks": [
     {
       "accepted_comparable_fields": [
@@ -41,7 +41,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 6d 7t 55m",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 6d 2t 27m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -53,33 +53,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 100.0,
+      "asking_price_nok": 200.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Parti+med+flammehemmende+og+offshore+arbeidskl%C3%A6r+%E2%80%93+24+plagg+Florv%C3%A5g+1+bud+7d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Parti+med+flammehemmende+og+offshore+arbeidskl%C3%A6r+%E2%80%93+24+plagg+Florv%C3%A5g+2+bud+7d",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=Parti+med+flammehemmende+og+offshore+arbeidskl%C3%A6r+%E2%80%93+24+plagg+Florv%C3%A5g+1+bud+7d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=Parti+med+flammehemmende+og+offshore+arbeidskl%C3%A6r+%E2%80%93+24+plagg+Florv%C3%A5g+2+bud+7d",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=Parti+med+flammehemmende+og+offshore+arbeidskl%C3%A6r+%E2%80%93+24+plagg+Florv%C3%A5g+1+bud+7d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=Parti+med+flammehemmende+og+offshore+arbeidskl%C3%A6r+%E2%80%93+24+plagg+Florv%C3%A5g+2+bud+7d+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d",
+      "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 7d",
       "opportunity_id": "unified-auksjonen-616276",
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d 9t 47m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 7d 4t 19m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -117,7 +117,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d 9t 40m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d 4t 12m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -129,33 +129,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 1000.0,
+      "asking_price_nok": 2000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Stort+parti+med+arbeidskl%C3%A6r+-+140+plagg+-+bukser%2C+shorts+og+jakker+Florv%C3%A5g+1+bud+8d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Stort+parti+med+arbeidskl%C3%A6r+-+140+plagg+-+bukser%2C+shorts+og+jakker+Florv%C3%A5g+2+bud+8d",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=Stort+parti+med+arbeidskl%C3%A6r+-+140+plagg+-+bukser%2C+shorts+og+jakker+Florv%C3%A5g+1+bud+8d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=Stort+parti+med+arbeidskl%C3%A6r+-+140+plagg+-+bukser%2C+shorts+og+jakker+Florv%C3%A5g+2+bud+8d",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=Stort+parti+med+arbeidskl%C3%A6r+-+140+plagg+-+bukser%2C+shorts+og+jakker+Florv%C3%A5g+1+bud+8d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=Stort+parti+med+arbeidskl%C3%A6r+-+140+plagg+-+bukser%2C+shorts+og+jakker+Florv%C3%A5g+2+bud+8d+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d",
+      "market_search_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 8d",
       "opportunity_id": "unified-auksjonen-616274",
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d 9t 40m",
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 8d 4t 12m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -167,33 +167,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 300.0,
+      "asking_price_nok": 400.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Stort+parti+nye+profilkl%C3%A6r%2C+dameskjorter+og+fritidskl%C3%A6r+%E2%80%93+117+plagg+Florv%C3%A5g+3+bud+6d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Stort+parti+nye+profilkl%C3%A6r%2C+dameskjorter+og+fritidskl%C3%A6r+%E2%80%93+117+plagg+Florv%C3%A5g+4+bud+6d",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=Stort+parti+nye+profilkl%C3%A6r%2C+dameskjorter+og+fritidskl%C3%A6r+%E2%80%93+117+plagg+Florv%C3%A5g+3+bud+6d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=Stort+parti+nye+profilkl%C3%A6r%2C+dameskjorter+og+fritidskl%C3%A6r+%E2%80%93+117+plagg+Florv%C3%A5g+4+bud+6d",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=Stort+parti+nye+profilkl%C3%A6r%2C+dameskjorter+og+fritidskl%C3%A6r+%E2%80%93+117+plagg+Florv%C3%A5g+3+bud+6d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=Stort+parti+nye+profilkl%C3%A6r%2C+dameskjorter+og+fritidskl%C3%A6r+%E2%80%93+117+plagg+Florv%C3%A5g+4+bud+6d+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d",
+      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 6d",
       "opportunity_id": "unified-auksjonen-616275",
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d 9t 50m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 6d 4t 22m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -205,71 +205,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 1000.0,
+      "asking_price_nok": 2000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Stort+parti+synlighetskl%C3%A6r%2C+bukser%2C+refleks+og+regnt%C3%B8y+%E2%80%93+272+plagg+arbeidskl%C3%A6r+Florv%C3%A5g+1+bud+7d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=Stort+parti+synlighetskl%C3%A6r%2C+bukser%2C+refleks+og+regnt%C3%B8y+%E2%80%93+272+plagg+arbeidskl%C3%A6r+Florv%C3%A5g+2+bud+7d",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=Stort+parti+synlighetskl%C3%A6r%2C+bukser%2C+refleks+og+regnt%C3%B8y+%E2%80%93+272+plagg+arbeidskl%C3%A6r+Florv%C3%A5g+1+bud+7d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=Stort+parti+synlighetskl%C3%A6r%2C+bukser%2C+refleks+og+regnt%C3%B8y+%E2%80%93+272+plagg+arbeidskl%C3%A6r+Florv%C3%A5g+2+bud+7d",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=Stort+parti+synlighetskl%C3%A6r%2C+bukser%2C+refleks+og+regnt%C3%B8y+%E2%80%93+272+plagg+arbeidskl%C3%A6r+Florv%C3%A5g+1+bud+7d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=Stort+parti+synlighetskl%C3%A6r%2C+bukser%2C+refleks+og+regnt%C3%B8y+%E2%80%93+272+plagg+arbeidskl%C3%A6r+Florv%C3%A5g+2+bud+7d+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 7d",
+      "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 7d",
       "opportunity_id": "unified-auksjonen-616271",
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 7d 10t 10m",
-      "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
-    },
-    {
-      "accepted_comparable_fields": [
-        "source",
-        "url",
-        "price_nok",
-        "condition",
-        "captured_at",
-        "verified"
-      ],
-      "asking_price_nok": 2700.0,
-      "candidate_sources": [
-        {
-          "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+19+bud",
-          "source": "FINN Torget",
-          "status": "REVIEW_REQUIRED"
-        },
-        {
-          "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+19+bud",
-          "source": "Auksjonen.no",
-          "status": "REVIEW_REQUIRED"
-        },
-        {
-          "authorized": false,
-          "search_url": "https://www.google.com/search?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+19+bud+pris+Norge",
-          "source": "Google Norway",
-          "status": "REVIEW_REQUIRED"
-        }
-      ],
-      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 19 bud",
-      "opportunity_id": "unified-auksjonen-614953",
-      "opportunity_url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
-      "required_verified_comparables": 3,
-      "status": "SEARCH_REQUIRED",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 19 bud 4t 31m 21s",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 7d 4t 42m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]

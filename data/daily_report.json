@@ -3,14 +3,14 @@
     "alerts": [],
     "decision_source": "data/decision_intelligence.json",
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-08-05T09:04:50.415776+00:00",
+    "last_scoring_run": "2026-08-05T14:32:48.949836+00:00",
     "official_decision_field": "final_decision",
     "schema_version": 2,
     "signatures": []
   },
   "channels": {
     "actionable_opportunities": {
-      "candidate_count": 7,
+      "candidate_count": 6,
       "items": [],
       "top_count": 0
     },
@@ -154,21 +154,21 @@
       ],
       "top_count": 5
     },
-    "generated_at": "2026-08-05T09:04:50.611449+00:00",
+    "generated_at": "2026-08-05T14:32:49.102506+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
     "schema_version": 2,
     "source_funnel": {
-      "actionable_candidates": 7,
+      "actionable_candidates": 6,
       "actionable_selected": 0,
       "bankruptcy_leads_fetched": 25,
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-08-05T09:04:50.689714+00:00",
+  "generated_at": "2026-08-05T14:32:49.163282+00:00",
   "opportunities": {
     "actionable_count": 0,
-    "candidate_count": 7,
-    "generated_at": "2026-08-05T09:04:50.452133+00:00",
+    "candidate_count": 6,
+    "generated_at": "2026-08-05T14:32:48.977928+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -178,8 +178,8 @@
   "scoring": {
     "actionable_count": 0,
     "buy_review_count": 0,
-    "candidate_count": 7,
-    "generated_at": "2026-08-05T09:04:50.415776+00:00",
+    "candidate_count": 6,
+    "generated_at": "2026-08-05T14:32:48.949836+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
@@ -245,78 +245,12 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 6d 7t 55m",
+        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 6d 2t 27m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
       },
       {
-        "asking_price_nok": 2700.0,
-        "city": "Tønsberg",
-        "conservative_resale_value_nok": null,
-        "decision": "EVIDENCE_REQUIRED",
-        "ends_at": "1785936960000",
-        "evidence_needed": [
-          "three_verified_market_comparables",
-          "auction_fee",
-          "vat_status",
-          "transport_cost",
-          "dismantling_cost",
-          "condition_and_missing_parts"
-        ],
-        "exclusion_reasons": [],
-        "expected_profit_nok": null,
-        "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 19 bud",
-        "matched_target_terms": [
-          "skrivebord"
-        ],
-        "maximum_safe_bid_nok": null,
-        "missing_evidence": [
-          "auction_fee_nok",
-          "dismantling_cost_nok",
-          "other_costs_nok",
-          "repair_cost_nok",
-          "storage_cost_nok",
-          "three_verified_market_comparables",
-          "transport_cost_nok",
-          "vat_nok"
-        ],
-        "opportunity_id": "unified-auksjonen-614953",
-        "opportunity_score": 33.26,
-        "priority": 2,
-        "reasons": [
-          "target:skrivebord+13",
-          "asking_price_present+5"
-        ],
-        "recommendation": "REJECT",
-        "recommendation_ar": "رفض",
-        "relevance_score": 18,
-        "requires_human_approval": false,
-        "roi_percent": null,
-        "score_components": {
-          "evidence": 0.0,
-          "listing_quality": 8.26,
-          "logistics": 10.0,
-          "marketability": 15.0,
-          "verified_economics": 0.0
-        },
-        "score_grade": "E",
-        "score_reasons": [
-          "verified_economics:0/35",
-          "evidence_completeness:0.0/15",
-          "verified_comparables:0.0/10",
-          "marketability:15.0/15",
-          "logistics:10.0/10",
-          "relevance:1.3/7",
-          "listing_fields:7.0/8",
-          "evidence_gate:EVIDENCE_REQUIRED"
-        ],
-        "status": "review_if_capacity",
-        "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 19 bud 4t 31m 21s",
-        "total_cost_nok": null,
-        "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
-      },
-      {
-        "asking_price_nok": 100.0,
+        "asking_price_nok": 200.0,
         "city": "Florvåg",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -331,7 +265,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d",
+        "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 7d",
         "matched_target_terms": [
           "klær"
         ],
@@ -377,7 +311,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d 9t 47m",
+        "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 7d 4t 19m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276"
       },
@@ -443,12 +377,12 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d 9t 40m",
+        "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d 4t 12m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267"
       },
       {
-        "asking_price_nok": 1000.0,
+        "asking_price_nok": 2000.0,
         "city": "Florvåg",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -463,7 +397,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d",
+        "market_search_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 8d",
         "matched_target_terms": [
           "klær"
         ],
@@ -509,12 +443,12 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d 9t 40m",
+        "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 8d 4t 12m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274"
       },
       {
-        "asking_price_nok": 300.0,
+        "asking_price_nok": 400.0,
         "city": "Florvåg",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -529,7 +463,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d",
+        "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 6d",
         "matched_target_terms": [
           "klær"
         ],
@@ -575,12 +509,12 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d 9t 50m",
+        "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 6d 4t 22m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
       },
       {
-        "asking_price_nok": 1000.0,
+        "asking_price_nok": 2000.0,
         "city": "Florvåg",
         "conservative_resale_value_nok": null,
         "decision": "EVIDENCE_REQUIRED",
@@ -595,7 +529,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 7d",
+        "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 7d",
         "matched_target_terms": [
           "klær"
         ],
@@ -641,17 +575,17 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 7d 10t 10m",
+        "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 7d 4t 42m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271"
       }
     ],
-    "reject_count": 7,
+    "reject_count": 6,
     "schema_version": 1
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-08-05T09:04:50.656775+00:00",
+    "generated_at": "2026-08-05T14:32:49.138019+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [

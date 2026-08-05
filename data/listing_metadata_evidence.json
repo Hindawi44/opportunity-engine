@@ -1,10 +1,10 @@
 {
-  "enriched_count": 7,
+  "enriched_count": 6,
   "error_count": 0,
   "errors": {},
   "evidence": {
     "unified-auksjonen-612667": {
-      "captured_at": "2026-08-05T09:04:40.212232+00:00",
+      "captured_at": "2026-08-05T14:32:39.957890+00:00",
       "observed": {
         "city": "Kristiansand s",
         "ends_at": "1786467600000"
@@ -13,18 +13,8 @@
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "verified": true
     },
-    "unified-auksjonen-614953": {
-      "captured_at": "2026-08-05T09:04:44.181581+00:00",
-      "observed": {
-        "city": "Tønsberg",
-        "ends_at": "1785936960000"
-      },
-      "source": "Auksjonen.no public listing page",
-      "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
-      "verified": true
-    },
     "unified-auksjonen-616267": {
-      "captured_at": "2026-08-05T09:04:41.545505+00:00",
+      "captured_at": "2026-08-05T14:32:41.562677+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786473900000"
@@ -34,7 +24,7 @@
       "verified": true
     },
     "unified-auksjonen-616271": {
-      "captured_at": "2026-08-05T09:04:43.663119+00:00",
+      "captured_at": "2026-08-05T14:32:43.980332+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786562100000"
@@ -44,7 +34,7 @@
       "verified": true
     },
     "unified-auksjonen-616274": {
-      "captured_at": "2026-08-05T09:04:42.329045+00:00",
+      "captured_at": "2026-08-05T14:32:42.219242+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786646700000"
@@ -54,7 +44,7 @@
       "verified": true
     },
     "unified-auksjonen-616275": {
-      "captured_at": "2026-08-05T09:04:42.860714+00:00",
+      "captured_at": "2026-08-05T14:32:42.845543+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786474500000"
@@ -64,7 +54,7 @@
       "verified": true
     },
     "unified-auksjonen-616276": {
-      "captured_at": "2026-08-05T09:04:40.990523+00:00",
+      "captured_at": "2026-08-05T14:32:40.884269+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786560720000"
@@ -74,6 +64,6 @@
       "verified": true
     }
   },
-  "generated_at": "2026-08-05T09:04:44.181599+00:00",
+  "generated_at": "2026-08-05T14:32:43.980349+00:00",
   "schema_version": 2
 }
