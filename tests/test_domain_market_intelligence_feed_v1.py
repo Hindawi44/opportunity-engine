@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import datetime, timezone
 from pathlib import Path
 import json
 
 from sqlalchemy import inspect
 
+from opportunity_engine.discovery.brave_market_signal_radar import (
+    MARKET_QUERIES,
+    collect_manifest_brave_market_signals,
+    market_signal_from_brave_hit,
+)
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     market_signal_from_opportunity_record,
@@ -15,6 +21,7 @@ from opportunity_engine.discovery.phone_readable_market_bulletin import (
     enrich_phone_readable_market_bulletin,
     render_phone_readable_market_bulletin,
 )
+from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.persistence import (
     MarketSignalRepository,
     create_database_engine,
@@ -276,3 +283,172 @@ def test_phone_bulletin_names_signals_and_selected_opportunity_in_arabic() -> No
     assert "السبب: توجد فرصة نشطة موثقة وجاهزة للمراجعة البشرية." in rendered
     assert "REVIEW_ONE_OPPORTUNITY" not in rendered
     assert "A verified active opportunity" not in rendered
+
+
+def test_brave_radar_requires_clothing_and_market_event_terms() -> None:
+    observed_at = datetime(2026, 8, 5, 10, 0, tzinfo=timezone.utc)
+    signal = market_signal_from_brave_hit(
+        SearchHit(
+            title="Klesbutikk legger ned med opphørssalg av klær",
+            url="https://news.example.no/story/1?utm_source=mail#details",
+            description="Butikken avvikles og hele tekstillageret skal selges.",
+            provider="Brave Search",
+        ),
+        market_code="NO",
+        query=MARKET_QUERIES["NO"][0],
+        rank=1,
+        observed_at=observed_at,
+    )
+
+    assert signal is not None
+    assert signal.signal_type.value == "BUSINESS_CLOSURE"
+    assert str(signal.source_url) == "https://news.example.no/story/1"
+    assert signal.related_opportunity_id is None
+    assert signal.status.value == "WATCH"
+    assert signal.metadata["signal_only"] is True
+    assert signal.metadata["not_an_opportunity"] is True
+    assert signal.evidence[0].verified is False
+
+    ordinary_listing = market_signal_from_brave_hit(
+        SearchHit(
+            title="Nye sommerklær i nettbutikken",
+            url="https://shop.example.no/summer",
+            description="Vanlig salg av klær uten avvikling eller lagerhendelse.",
+            provider="Brave Search",
+        ),
+        market_code="NO",
+        query=MARKET_QUERIES["NO"][0],
+        rank=2,
+        observed_at=observed_at,
+    )
+    assert ordinary_listing is None
+
+
+def test_brave_radar_is_bounded_deduplicated_and_merges_market_reports(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "sources": [
+            {
+                "market_code": "NO",
+                "source_name": "Auksjonen.no",
+                "artifact_dir": "inputs/no-auksjonen",
+            },
+            {
+                "market_code": "SE",
+                "source_name": "Blinto",
+                "artifact_dir": "inputs/se-blinto",
+            },
+            {
+                "market_code": "DE",
+                "source_name": "Riegermann",
+                "artifact_dir": "inputs/de-riegermann",
+            },
+        ]
+    }
+    no_dir = tmp_path / "inputs" / "no-auksjonen"
+    no_dir.mkdir(parents=True)
+    (no_dir / "market-signal-report.json").write_text(
+        json.dumps({"signals": [_signal()]}),
+        encoding="utf-8",
+    )
+
+    calls: list[tuple[str, str, int]] = []
+
+    class FakeProvider:
+        name = "Fake Brave"
+
+        def __init__(self, market_code: str) -> None:
+            self.market_code = market_code
+
+        def search(self, query: str, *, count: int = 10):
+            calls.append((self.market_code, query, count))
+            if self.market_code == "NO":
+                return [
+                    SearchHit(
+                        title="Opphørssalg i klesbutikk",
+                        url="https://news.example.no/closure?utm_campaign=x",
+                        description="Nedleggelse med salg av klær og tekstillager.",
+                        provider="Brave Search",
+                    )
+                ]
+            if self.market_code == "DE":
+                return [
+                    SearchHit(
+                        title="Insolvenz eines Modegeschäfts",
+                        url="https://news.example.de/insolvenz/77",
+                        description="Bekleidung und Warenbestand können später verkauft werden.",
+                        provider="Brave Search",
+                    )
+                ]
+            return [
+                SearchHit(
+                    title="Neue Modekollektion",
+                    url="https://news.example.se/mode",
+                    description="Vanliga kläder utan konkurs eller avveckling.",
+                    provider="Brave Search",
+                )
+            ]
+
+    report = collect_manifest_brave_market_signals(
+        manifest,
+        root=tmp_path,
+        observed_at=datetime(2026, 8, 5, 10, 0, tzinfo=timezone.utc),
+        environment={"BRAVE_SEARCH_API_KEY": "test-key"},
+        provider_factory=lambda market, api_key, freshness: FakeProvider(market),
+    )
+
+    assert report["market_coverage"] == ["NO", "SE", "DE"]
+    assert report["query_budget_total"] == 6
+    assert report["requests_made"] == 6
+    assert len(calls) == 6
+    assert all(count == 10 for _, _, count in calls)
+    assert report["signal_count"] == 2
+    assert report["status_counts"] == {"SUCCESS": 2, "VALID_ZERO": 1}
+
+    by_market = {item["source_country"]: item for item in report["sources"]}
+    assert by_market["NO"]["accepted_signal_count"] == 1
+    assert by_market["NO"]["duplicate_result_count"] == 1
+    assert by_market["SE"]["status"] == "VALID_ZERO"
+    assert by_market["DE"]["accepted_signal_count"] == 1
+
+    merged = json.loads(
+        (no_dir / "market-signal-report.json").read_text(encoding="utf-8")
+    )
+    signal_ids = {item["signal_id"] for item in merged["signals"]}
+    assert "closure:NO:example-shop" in signal_ids
+    assert len([value for value in signal_ids if value.startswith("brave-radar:no:")]) == 1
+    assert report["automatic_contact"] is False
+    assert report["automatic_bid"] is False
+    assert report["automatic_purchase"] is False
+    assert report["automatic_payment"] is False
+
+
+def test_brave_radar_missing_key_is_truthfully_blocked_without_requests(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "sources": [
+            {"market_code": "NO", "artifact_dir": "inputs/no"},
+            {"market_code": "SE", "artifact_dir": "inputs/se"},
+            {"market_code": "DE", "artifact_dir": "inputs/de"},
+        ]
+    }
+
+    def fail_factory(market_code: str, api_key: str, freshness: str | None):
+        raise AssertionError("provider must not be initialized without credentials")
+
+    report = collect_manifest_brave_market_signals(
+        manifest,
+        root=tmp_path,
+        environment={},
+        provider_factory=fail_factory,
+    )
+
+    assert report["requests_made"] == 0
+    assert report["signal_count"] == 0
+    assert report["status_counts"] == {"BLOCKED_CONFIGURATION": 3}
+    assert all(
+        item["block_reason"] == "BRAVE_SEARCH_API_KEY_MISSING"
+        for item in report["sources"]
+    )
