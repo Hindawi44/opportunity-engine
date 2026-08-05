@@ -123,3 +123,13 @@ def test_sweden_identity_bridge_runs_before_official_status_check() -> None:
 
     assert bridge < official
     assert "sweden-organisation-discovery-bridge.json" in text
+
+
+def test_brave_market_signal_radar_runs_before_official_status_check() -> None:
+    text = BUILD_INTELLIGENCE.read_text(encoding="utf-8")
+    radar = text.index("collect_manifest_brave_market_signals")
+    official = text.index("collect_manifest_official_signals_with_sweden_status")
+
+    assert radar < official
+    assert "brave-market-signal-radar.json" in text
+    assert '"market_coverage": ["NO", "SE", "DE"]' in text
