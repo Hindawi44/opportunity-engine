@@ -41,8 +41,23 @@ def strict_openai_schema(model: type[BaseModel]) -> dict[str, Any]:
     return schema
 
 
+def _assert_strict_object_schema(schema: Mapping[str, Any]) -> None:
+    properties = schema.get("properties")
+    required = schema.get("required")
+    if not isinstance(properties, Mapping):
+        raise RuntimeError("Strict schema object is missing properties")
+    if required != list(properties.keys()):
+        raise RuntimeError("Strict schema required fields do not match properties")
+    if schema.get("additionalProperties") is not False:
+        raise RuntimeError("Strict schema must reject additional properties")
+
+
 def install_openai_hunt_case_schema_compat() -> None:
     """Install the narrow schema normalizer on the hunt-case module."""
     from opportunity_engine.discovery import openai_hunt_case_enrichment
 
+    triage_schema = strict_openai_schema(openai_hunt_case_enrichment.TriageOutput)
+    deep_schema = strict_openai_schema(openai_hunt_case_enrichment.DeepOutput)
+    _assert_strict_object_schema(triage_schema)
+    _assert_strict_object_schema(deep_schema)
     openai_hunt_case_enrichment._schema = strict_openai_schema
