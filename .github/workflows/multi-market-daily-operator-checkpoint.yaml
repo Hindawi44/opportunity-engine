@@ -51,6 +51,7 @@ on:
       - "src/opportunity_engine/market_intelligence.py"
       - "src/opportunity_engine/discovery/auksjonen_unified_lifecycle.py"
       - "src/opportunity_engine/discovery/domain_market_intelligence_feed.py"
+      - "src/opportunity_engine/discovery/openai_hunt_case_enrichment.py"
       - "src/opportunity_engine/discovery/finn_email_intake.py"
       - "src/opportunity_engine/discovery/human_review_checkpoint.py"
       - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
@@ -66,6 +67,7 @@ on:
       - "config/market_completion_matrix.json"
       - "tests/test_auksjonen_unified_lifecycle_persistence_v1.py"
       - "tests/test_domain_market_intelligence_feed_v1.py"
+      - "tests/test_openai_hunt_case_enrichment_v1.py"
       - "tests/test_finn_email_intake.py"
       - "tests/test_run_finn_email_intake_script.py"
       - "tests/test_human_review_checkpoint_v1.py"
@@ -76,6 +78,7 @@ on:
       - "tests/test_sweden_valuable_datasets_status_feed_v1.py"
       - "docs/FINN_GMAIL_INTAKE_BRIDGE_V1.md"
       - "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
+      - "docs/OPENAI_HUNT_CASE_ENRICHMENT_V1.md"
 
 permissions:
   contents: read
@@ -101,6 +104,7 @@ jobs:
         run: |
           pytest tests/test_auksjonen_unified_lifecycle_persistence_v1.py -q
           pytest tests/test_domain_market_intelligence_feed_v1.py -q
+          pytest tests/test_openai_hunt_case_enrichment_v1.py -q
           pytest tests/test_finn_email_intake.py -q
           pytest tests/test_run_finn_email_intake_script.py -q
           pytest tests/test_human_review_outcome_v1.py -q
@@ -123,6 +127,13 @@ jobs:
       GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
       GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
       GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_HUNT_TRIAGE_MODEL: gpt-5.6-luna
+      OPENAI_HUNT_DEEP_MODEL: gpt-5.6-terra
+      OPENAI_HUNT_MAX_SIGNALS: "10"
+      OPENAI_HUNT_MAX_DEEP_CASES: "2"
+      OPENAI_HUNT_MAX_API_REQUESTS: "3"
+      OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.16"
       INPUT_ROOT: artifacts/multi-market-inputs
       OUTPUT_DIR: artifacts/multi-market-daily-operator-checkpoint
 
@@ -343,6 +354,12 @@ jobs:
           intelligence_text = (
               root / "domain-market-intelligence-brief.txt"
           ).read_text(encoding="utf-8")
+          hunt = json.loads(
+              (root / "openai-hunt-case-enrichment.json").read_text(encoding="utf-8")
+          )
+          hunt_text = (
+              root / "openai-hunt-case-enrichment.txt"
+          ).read_text(encoding="utf-8")
 
           if report.get("market_coverage") != ["NO", "SE", "DE"]:
               raise SystemExit("The checkpoint did not cover NO, SE and DE")
@@ -411,6 +428,33 @@ jobs:
               if intelligence.get(key) is not False:
                   raise SystemExit(f"Domain bulletin changed automatic safety: {key}")
 
+          if hunt.get("status") not in {
+              "SUCCESS",
+              "SKIPPED_NO_API_KEY",
+              "NO_ELIGIBLE_SIGNALS",
+              "SKIPPED_BUDGET_GUARD",
+              "FAILED",
+          }:
+              raise SystemExit("OpenAI hunt-case status is invalid")
+          if int(hunt.get("selected_signal_count") or 0) > 10:
+              raise SystemExit("OpenAI hunt-case signal limit changed")
+          if int(hunt.get("deep_case_count") or 0) > 2:
+              raise SystemExit("OpenAI hunt-case deep-analysis limit changed")
+          if int(hunt.get("api_request_count") or 0) > 3:
+              raise SystemExit("OpenAI hunt-case request limit changed")
+          if hunt.get("promotion_to_opportunity_allowed") is not False:
+              raise SystemExit("OpenAI output may not promote opportunities")
+          for key in (
+              "automatic_contact",
+              "automatic_bid",
+              "automatic_purchase",
+              "automatic_payment",
+          ):
+              if hunt.get(key) is not False:
+                  raise SystemExit(f"OpenAI hunt case changed automatic safety: {key}")
+          if "ليست إثباتًا لوجود بيع أو مخزون" not in hunt_text:
+              raise SystemExit("OpenAI hunt-case advisory warning is missing")
+
           review = root / "human-review-outcome.json"
           if review.exists():
               payload = json.loads(review.read_text(encoding="utf-8"))
@@ -424,6 +468,7 @@ jobs:
                       raise SystemExit(f"Human review changed automatic safety: {key}")
           print(summary)
           print(intelligence_text)
+          print(hunt_text)
           PY
 
       - name: Upload checkpoint and source evidence
