@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T19:56:09.866608+00:00",
+  "generated_at": "2026-08-05T03:31:50.521538+00:00",
   "method": "discovery tasks only; no scraping, verification, prices, or costs are invented",
   "schema_version": 1,
   "search_required_count": 7,
@@ -15,33 +15,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 1000.0,
+      "asking_price_nok": 3000.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+1+bud+6d",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+3+bud+6d",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+1+bud+6d",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+3+bud+6d",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+1+bud+6d+pris+Norge",
+          "search_url": "https://www.google.com/search?q=BUTIKK+AVVIKLING+-+KOMPLETT+VARELAGER+%E2%80%93+KAWAII+-+CA+4500+ARTIKLER+Kristiansand+s+3+bud+6d+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 1 bud 6d",
+      "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 6d",
       "opportunity_id": "unified-auksjonen-612667",
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 1 bud 6d 21t 3m",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 6d 13t 28m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -79,7 +79,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d 22t 55m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 1 bud 7d 15t 20m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -117,7 +117,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d 22t 48m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 6d 15t 13m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -155,7 +155,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d 22t 48m",
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 1 bud 8d 15t 13m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -193,7 +193,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d 22t 58m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 3 bud 6d 15t 23m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -231,7 +231,7 @@
       "opportunity_url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 7d 23t 18m",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 1 bud 7d 15t 43m",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     },
     {
@@ -243,33 +243,33 @@
         "captured_at",
         "verified"
       ],
-      "asking_price_nok": 2100.0,
+      "asking_price_nok": 2500.0,
       "candidate_sources": [
         {
           "authorized": false,
-          "search_url": "https://www.finn.no/bap/forsale/search.html?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+13+bud",
+          "search_url": "https://www.finn.no/bap/forsale/search.html?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+17+bud",
           "source": "FINN Torget",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": true,
-          "search_url": "https://www.auksjonen.no/auksjoner/?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+13+bud",
+          "search_url": "https://www.auksjonen.no/auksjoner/?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+17+bud",
           "source": "Auksjonen.no",
           "status": "REVIEW_REQUIRED"
         },
         {
           "authorized": false,
-          "search_url": "https://www.google.com/search?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+13+bud+pris+Norge",
+          "search_url": "https://www.google.com/search?q=5+stk+komplette+elektriske+hev%2Fsenk-skrivebord+%E2%80%93+selges+samlet%21+Velg+mellom+fler+st%C3%B8rrelser%21+T%C3%B8nsberg+17+bud+pris+Norge",
           "source": "Google Norway",
           "status": "REVIEW_REQUIRED"
         }
       ],
-      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 13 bud",
+      "market_search_query": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 17 bud",
       "opportunity_id": "unified-auksjonen-614953",
       "opportunity_url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953",
       "required_verified_comparables": 3,
       "status": "SEARCH_REQUIRED",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 13 bud 17t 39m 55s",
+      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 17 bud 10t 4m 14s",
       "verification_rule": "Accept only after a reviewer confirms material similarity, an accessible URL, and a directly observed NOK price."
     }
   ]

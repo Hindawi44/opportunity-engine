@@ -12,10 +12,10 @@
       {
         "component_id": "purchase_price",
         "economic_treatment": "ECONOMIC_COST",
-        "expected_nok": 1000.0,
-        "high_nok": 1000.0,
+        "expected_nok": 3000.0,
+        "high_nok": 3000.0,
         "label": "Current asking or bid price",
-        "low_nok": 1000.0,
+        "low_nok": 3000.0,
         "notes": [
           "This is the current asking or bid amount, not a final acquisition commitment."
         ],
@@ -138,14 +138,14 @@
       "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
     ],
     "known_cash_required_range": {
-      "expected_nok": 1000.0,
-      "high_nok": 1000.0,
-      "low_nok": 1000.0
+      "expected_nok": 3000.0,
+      "high_nok": 3000.0,
+      "low_nok": 3000.0
     },
     "known_net_economic_cost_range": {
-      "expected_nok": 1000.0,
-      "high_nok": 1000.0,
-      "low_nok": 1000.0
+      "expected_nok": 3000.0,
+      "high_nok": 3000.0,
+      "low_nok": 3000.0
     },
     "known_recoverable_cash_outflow_range": {
       "expected_nok": 0,
@@ -191,16 +191,16 @@
   "selection_policy": "FIRST_RANKED_RECORD_WITH_KNOWN_ASKING_PRICE",
   "selection_reason": "Selected one operational decision record and copied only explicit cost values.",
   "selection_status": "SELECTED",
-  "source_generated_at": "2026-08-04T19:56:16.550435+00:00",
+  "source_generated_at": "2026-08-05T03:31:57.603178+00:00",
   "source_official_decision_field": "final_decision",
   "source_opportunity": {
-    "asking_price_nok": 1000.0,
+    "asking_price_nok": 3000.0,
     "final_decision": "WATCH",
     "opportunity_id": "unified-auksjonen-612667",
     "opportunity_score": 33.61,
     "priority": 1,
     "source_city": "Kristiansand s",
-    "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 1 bud 6d 21t 3m",
+    "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 6d 13t 28m",
     "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
   },
   "source_schema_version": 2
