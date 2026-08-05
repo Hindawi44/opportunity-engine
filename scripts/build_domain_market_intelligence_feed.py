@@ -180,15 +180,21 @@ def main() -> int:
         )
     except Exception as exc:
         bridal_feed = {
-            "schema_version": "bridal-liquidation-feed-1.0",
+            "schema_version": "bridal-bilingual-market-search-1.0",
             "feed_family": "BRIDAL_LIQUIDATION_FEED_V1",
             "status": "FAILED",
             "error_type": type(exc).__name__,
             "error": str(exc),
             "market_coverage": ["NO", "SE", "DE"],
-            "query_budget_total": 3,
+            "search_languages": ["local-market-language", "en"],
+            "english_market_search_enabled": True,
+            "query_budget_total": 6,
             "requests_made": 0,
+            "local_requests_made": 0,
+            "english_requests_made": 0,
             "signal_count": 0,
+            "local_signal_count": 0,
+            "english_signal_count": 0,
             "sources": [],
             "promotion_to_opportunity_allowed": False,
             "analysis_eligible": False,
@@ -211,8 +217,16 @@ def main() -> int:
         bridal_feed.get("requests_made", 0),
     )
     print(
+        "bridal_liquidation_feed_english_requests:",
+        bridal_feed.get("english_requests_made", 0),
+    )
+    print(
         "bridal_liquidation_feed_signals:",
         bridal_feed.get("signal_count", 0),
+    )
+    print(
+        "bridal_liquidation_feed_english_signals:",
+        bridal_feed.get("english_signal_count", 0),
     )
 
     official_coverage = collect_manifest_official_signals_with_sweden_status(
@@ -241,10 +255,18 @@ def main() -> int:
     brief["bridal_liquidation_feed"] = {
         "feed_family": bridal_feed.get("feed_family"),
         "market_coverage": bridal_feed.get("market_coverage") or [],
+        "search_languages": bridal_feed.get("search_languages") or [],
+        "english_market_search_enabled": bridal_feed.get(
+            "english_market_search_enabled", False
+        ),
         "status_counts": bridal_feed.get("status_counts") or {},
         "query_budget_total": bridal_feed.get("query_budget_total", 0),
         "requests_made": bridal_feed.get("requests_made", 0),
+        "local_requests_made": bridal_feed.get("local_requests_made", 0),
+        "english_requests_made": bridal_feed.get("english_requests_made", 0),
         "signal_count": bridal_feed.get("signal_count", 0),
+        "local_signal_count": bridal_feed.get("local_signal_count", 0),
+        "english_signal_count": bridal_feed.get("english_signal_count", 0),
         "private_single_dress_listings_rejected": bridal_feed.get(
             "private_single_dress_listings_rejected", True
         ),
