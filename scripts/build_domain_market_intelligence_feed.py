@@ -9,12 +9,17 @@ import os
 from pathlib import Path
 from typing import Any, Callable
 
-from opportunity_engine.discovery.fabric_procurement_watch import collect_fabric_procurement_watch
+from opportunity_engine.discovery.fabric_procurement_watch import (
+    collect_fabric_procurement_watch,
+)
 from opportunity_engine.discovery.fashion_stock_netherlands_feed import (
     collect_fashion_stock_netherlands_feed,
 )
 from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import (
     collect_merkandi_b2b_liquidation_feed,
+)
+from opportunity_engine.discovery.stockhurt_b2b_feed import (
+    collect_stockhurt_b2b_feed,
 )
 
 # Preserve the established canonical pipeline contract for repository regression checks.
@@ -38,15 +43,20 @@ openai-hunt-case-enrichment.json
 openai-hunt-case-enrichment.txt
 brief["merkandi_b2b_liquidation_feed"]
 brief["fashion_stock_netherlands_feed"]
+brief["stockhurt_b2b_feed"]
 "B2B_LEAD_REQUIRES_VERIFICATION"
 "EARLY_B2B_SIGNAL_REQUIRES_VERIFICATION"
+"HUMAN_OPERATOR"
 "automatic_purchase": False
 """
 
 
 def _load_core_module():
     path = Path(__file__).with_name("build_domain_market_intelligence_feed_core.py")
-    spec = importlib.util.spec_from_file_location("domain_market_intelligence_feed_core", path)
+    spec = importlib.util.spec_from_file_location(
+        "domain_market_intelligence_feed_core",
+        path,
+    )
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load core bulletin builder: {path}")
     module = importlib.util.module_from_spec(spec)
@@ -93,26 +103,36 @@ def _attach_fabric(output_dir: Path, report: dict[str, Any]) -> None:
     for item in (report.get("candidates") or [])[:5]:
         if not isinstance(item, dict):
             continue
-        compact.append({
-            "candidate_id": item.get("candidate_id"),
-            "source_name": item.get("source_name"),
-            "title": item.get("title"),
-            "source_url": item.get("source_url"),
-            "price_text": item.get("price_text"),
-            "price": item.get("price"),
-            "currency": item.get("currency"),
-            "fabric_terms": item.get("fabric_terms") or [],
-            "bridal_terms": item.get("bridal_terms") or [],
-            "procurement_relevance_score": item.get("procurement_relevance_score"),
-            "recommended_operator_action": item.get("recommended_operator_action"),
-        })
+        compact.append(
+            {
+                "candidate_id": item.get("candidate_id"),
+                "source_name": item.get("source_name"),
+                "title": item.get("title"),
+                "source_url": item.get("source_url"),
+                "price_text": item.get("price_text"),
+                "price": item.get("price"),
+                "currency": item.get("currency"),
+                "fabric_terms": item.get("fabric_terms") or [],
+                "bridal_terms": item.get("bridal_terms") or [],
+                "procurement_relevance_score": item.get(
+                    "procurement_relevance_score"
+                ),
+                "recommended_operator_action": item.get(
+                    "recommended_operator_action"
+                ),
+            }
+        )
+
     loaded = _load_brief(output_dir)
     if loaded:
         path, brief = loaded
         brief["fabric_procurement_watch"] = {
             "feed_family": report.get("feed_family"),
             "purpose": report.get("purpose"),
-            "approved_official_domains": report.get("approved_official_domains") or [],
+            "approved_official_domains": report.get(
+                "approved_official_domains"
+            )
+            or [],
             "status_counts": report.get("status_counts") or {},
             "query_budget_total": report.get("query_budget_total", 0),
             "requests_made": report.get("requests_made", 0),
@@ -127,6 +147,7 @@ def _attach_fabric(output_dir: Path, report: dict[str, Any]) -> None:
             "automatic_payment": False,
         }
         _write_json(path, brief)
+
     lines = [
         "FABRIC PROCUREMENT WATCH",
         f"status_counts: {json.dumps(report.get('status_counts') or {}, sort_keys=True)}",
@@ -137,7 +158,8 @@ def _attach_fabric(output_dir: Path, report: dict[str, Any]) -> None:
         price = item.get("price_text") or "price not visible"
         lines.append(
             f"- [{item.get('source_name')}] {item.get('title')} | {price} | "
-            f"score={item.get('procurement_relevance_score')} | {item.get('source_url')}"
+            f"score={item.get('procurement_relevance_score')} | "
+            f"{item.get('source_url')}"
         )
     lines += ["advisory_only: true", "automatic_purchase: false"]
     _append_text(output_dir, lines)
@@ -147,25 +169,31 @@ def _compact_b2b_candidate(item: dict[str, Any]) -> dict[str, Any]:
     return {
         "candidate_id": item.get("candidate_id"),
         "source_name": item.get("source_name"),
+        "source_country": item.get("source_country"),
         "title": item.get("title"),
         "source_url": item.get("source_url"),
         "page_role": item.get("page_role"),
+        "listing_status": item.get("listing_status"),
         "seller_name": item.get("seller_name"),
         "quantity": item.get("quantity"),
         "quantity_unit": item.get("quantity_unit"),
         "lot_size_band": item.get("lot_size_band"),
         "minimum_order": item.get("minimum_order"),
         "minimum_order_unit": item.get("minimum_order_unit"),
+        "unit_hint": item.get("unit_hint"),
         "unit_price": item.get("unit_price"),
         "total_price": item.get("total_price"),
         "currency": item.get("currency"),
+        "grade": item.get("grade"),
         "brands": item.get("brands") or [],
         "stock_location": item.get("stock_location"),
         "missing_information": item.get("missing_information") or [],
         "opportunity_state": item.get("opportunity_state"),
         "b2b_relevance_score": item.get("b2b_relevance_score"),
         "decision_owner": "HUMAN_OPERATOR",
-        "recommended_operator_action": item.get("recommended_operator_action"),
+        "recommended_operator_action": item.get(
+            "recommended_operator_action"
+        ),
     }
 
 
@@ -178,16 +206,20 @@ def _attach_b2b(
 ) -> None:
     compact = [
         _compact_b2b_candidate(item)
-        for item in (report.get("candidates") or [])[:10]
+        for item in (report.get("candidates") or [])[:12]
         if isinstance(item, dict)
     ]
+
     loaded = _load_brief(output_dir)
     if loaded:
         path, brief = loaded
         brief[brief_key] = {
             "feed_family": report.get("feed_family"),
             "purpose": report.get("purpose"),
-            "approved_official_domains": report.get("approved_official_domains") or [],
+            "approved_official_domains": report.get(
+                "approved_official_domains"
+            )
+            or [],
             "status_counts": report.get("status_counts") or {},
             "query_budget_total": report.get("query_budget_total", 0),
             "requests_made": report.get("requests_made", 0),
@@ -220,7 +252,9 @@ def _attach_b2b(
         "quantity_size_rejection_enabled: false",
     ]
     if not compact:
-        lines.append("result: No current serious source result passed the relevance gate.")
+        lines.append(
+            "result: No current serious source result passed the relevance gate."
+        )
     for item in compact:
         price = item.get("unit_price")
         basis = "per unit"
@@ -228,15 +262,19 @@ def _attach_b2b(
             price = item.get("total_price")
             basis = "total or unspecified basis"
         price_text = (
-            f"{price} {item.get('currency')} ({basis})" if price is not None
+            f"{price} {item.get('currency')} ({basis})"
+            if price is not None
             else "price not visible"
         )
         lines.append(
             f"- {item.get('title')} | state={item.get('opportunity_state')} | "
+            f"status={item.get('listing_status')} | "
             f"quantity={item.get('quantity')} {item.get('quantity_unit')} | "
-            f"lot={item.get('lot_size_band')} | MOQ={item.get('minimum_order')} "
+            f"lot={item.get('lot_size_band')} | "
+            f"MOQ={item.get('minimum_order')} "
             f"{item.get('minimum_order_unit')} | price={price_text} | "
-            f"missing={item.get('missing_information')} | {item.get('source_url')}"
+            f"missing={item.get('missing_information')} | "
+            f"{item.get('source_url')}"
         )
     lines += [
         "human_verification_required: true",
@@ -298,7 +336,10 @@ def _run_feed(
         report = _failed_report(exc, **failure_kwargs)
     _write_json(output_dir / filename, report)
     attach(output_dir, report)
-    print(f"{log_prefix}_status_counts:", json.dumps(report.get("status_counts") or {}, sort_keys=True))
+    print(
+        f"{log_prefix}_status_counts:",
+        json.dumps(report.get("status_counts") or {}, sort_keys=True),
+    )
     print(f"{log_prefix}_requests:", report.get("requests_made", 0))
     print(f"{log_prefix}_candidates:", report.get("candidate_count", 0))
 
@@ -319,7 +360,11 @@ def main() -> int:
             "schema_version": "fabric-procurement-watch-1.0",
             "feed_family": "FABRIC_DEADSTOCK_PROCUREMENT_FEED_V1",
             "purpose": "TAILORING_SHOP_FABRIC_PROCUREMENT_INTELLIGENCE",
-            "domains": ["evaresource.com", "fabrichouse.com", "bridalfabrics.com"],
+            "domains": [
+                "evaresource.com",
+                "fabrichouse.com",
+                "bridalfabrics.com",
+            ],
             "query_budget": 3,
         },
         log_prefix="fabric_procurement_watch",
@@ -329,7 +374,8 @@ def main() -> int:
         collector=collect_merkandi_b2b_liquidation_feed,
         filename="merkandi-b2b-liquidation-feed.json",
         attach=lambda out, report: _attach_b2b(
-            out, report,
+            out,
+            report,
             brief_key="merkandi_b2b_liquidation_feed",
             heading="MERKANDI B2B LIQUIDATION FEED",
         ),
@@ -347,7 +393,8 @@ def main() -> int:
         collector=collect_fashion_stock_netherlands_feed,
         filename="fashion-stock-netherlands-feed.json",
         attach=lambda out, report: _attach_b2b(
-            out, report,
+            out,
+            report,
             brief_key="fashion_stock_netherlands_feed",
             heading="FASHION STOCK NETHERLANDS FEED",
         ),
@@ -355,10 +402,35 @@ def main() -> int:
             "schema_version": "fashion-stock-netherlands-feed-1.0",
             "feed_family": "FASHION_STOCK_NETHERLANDS_FEED_V1",
             "purpose": "OFFICIAL_SOURCE_B2B_CLOTHING_STOCK_DECISION_SUPPORT",
-            "domains": ["fashion-stock.eu", "fashionstock.eu", "fashion-stock.nl"],
+            "domains": [
+                "fashion-stock.eu",
+                "fashionstock.eu",
+                "fashion-stock.nl",
+            ],
             "query_budget": 2,
         },
         log_prefix="fashion_stock_netherlands",
+    )
+    _run_feed(
+        output_dir,
+        collector=collect_stockhurt_b2b_feed,
+        filename="stockhurt-b2b-feed.json",
+        attach=lambda out, report: _attach_b2b(
+            out,
+            report,
+            brief_key="stockhurt_b2b_feed",
+            heading="STOCK-HURT B2B FEED",
+        ),
+        failure_kwargs={
+            "schema_version": "stockhurt-b2b-feed-1.0",
+            "feed_family": "STOCK_HURT_B2B_FEED_V1",
+            "purpose": (
+                "OFFICIAL_SOURCE_WHOLESALE_STOCK_AND_AUCTION_DECISION_SUPPORT"
+            ),
+            "domains": ["stockhurt.com"],
+            "query_budget": 2,
+        },
+        log_prefix="stockhurt_b2b",
     )
     return 0
 
