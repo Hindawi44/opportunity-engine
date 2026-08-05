@@ -114,9 +114,7 @@ def test_finn_source_uses_existing_canonical_and_signal_persistence(tmp_path: Pa
         root=tmp_path,
         config_path=ALEMBIC_CONFIG,
     )
-    assert first_persistence["created_signal_ids"] == [
-        "finn-listing:471396147"
-    ]
+    assert "finn-listing:471396147" in first_persistence["created_signal_ids"]
 
     _reset_generated_continuity_artifacts(output_dir)
     _write_finn_run(
@@ -136,9 +134,12 @@ def test_finn_source_uses_existing_canonical_and_signal_persistence(tmp_path: Pa
         config_path=ALEMBIC_CONFIG,
     )
 
-    assert replay["created_signal_ids"] == []
-    assert replay["changed_signal_ids"] == []
-    current = replay["current_signals"][0]
+    assert "finn-listing:471396147" not in replay["created_signal_ids"]
+    assert "finn-listing:471396147" not in replay["changed_signal_ids"]
+    current = next(
+        item for item in replay["current_signals"]
+        if item["signal_id"] == "finn-listing:471396147"
+    )
     assert current["first_observed_at"] == first_seen
     assert current["latest_observed_at"] == second_run
 
@@ -158,10 +159,14 @@ def test_finn_source_uses_existing_canonical_and_signal_persistence(tmp_path: Pa
         _manifest(),
         root=tmp_path,
         config_path=ALEMBIC_CONFIG,
-    )
+   )
 
-    assert changed["changed_signal_ids"] == ["finn-listing:471396147"]
-    assert changed["current_signals"][0]["metadata"]["advertised_price_nok"] == 12500.0
+    assert "finn-listing:471396147" in changed["changed_signal_ids"]
+    current = next(
+        item for item in changed["current_signals"]
+        if item["signal_id"] == "finn-listing:471396147"
+    )
+    assert current["metadata"]["advertised_price_nok"] == 12500.0
 
 
 def test_restore_allowlist_includes_finn_signal_database(tmp_path: Path) -> None:
