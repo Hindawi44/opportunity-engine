@@ -27,6 +27,7 @@ collect_manifest_bridal_liquidation_signals
 collect_manifest_official_signals_with_sweden_status
 sweden-organisation-discovery-bridge.json
 brave-market-signal-radar.json
+bridal-liquidation-feed.json
 "market_coverage": ["NO", "SE", "DE"]
 run_openai_hunt_case_enrichment
 write_openai_hunt_case_artifacts
