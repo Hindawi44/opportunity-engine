@@ -17,6 +17,9 @@ from opportunity_engine.discovery.blinto_seller_identity_extraction import (
 from opportunity_engine.discovery.brave_market_signal_continuity import (
     collect_manifest_brave_market_signals,
 )
+from opportunity_engine.discovery.bridal_liquidation_feed import (
+    collect_manifest_bridal_liquidation_signals,
+)
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     persist_manifest_market_signals,
@@ -170,6 +173,48 @@ def main() -> int:
         json.dumps(brave_radar.get("status_counts") or {}, sort_keys=True),
     )
 
+    try:
+        bridal_feed = collect_manifest_bridal_liquidation_signals(
+            manifest,
+            root=args.root,
+        )
+    except Exception as exc:
+        bridal_feed = {
+            "schema_version": "bridal-liquidation-feed-1.0",
+            "feed_family": "BRIDAL_LIQUIDATION_FEED_V1",
+            "status": "FAILED",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "market_coverage": ["NO", "SE", "DE"],
+            "query_budget_total": 3,
+            "requests_made": 0,
+            "signal_count": 0,
+            "sources": [],
+            "promotion_to_opportunity_allowed": False,
+            "analysis_eligible": False,
+            "top5_eligible": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+    _write_report(
+        output_dir / "bridal-liquidation-feed.json",
+        bridal_feed,
+    )
+    print(
+        "bridal_liquidation_feed_status_counts:",
+        json.dumps(bridal_feed.get("status_counts") or {}, sort_keys=True),
+    )
+    print(
+        "bridal_liquidation_feed_requests:",
+        bridal_feed.get("requests_made", 0),
+    )
+    print(
+        "bridal_liquidation_feed_signals:",
+        bridal_feed.get("signal_count", 0),
+    )
+
     official_coverage = collect_manifest_official_signals_with_sweden_status(
         manifest,
         root=args.root,
@@ -193,6 +238,25 @@ def main() -> int:
         persistence,
     )
     brief = build_domain_market_intelligence_brief(checkpoint, persistence)
+    brief["bridal_liquidation_feed"] = {
+        "feed_family": bridal_feed.get("feed_family"),
+        "market_coverage": bridal_feed.get("market_coverage") or [],
+        "status_counts": bridal_feed.get("status_counts") or {},
+        "query_budget_total": bridal_feed.get("query_budget_total", 0),
+        "requests_made": bridal_feed.get("requests_made", 0),
+        "signal_count": bridal_feed.get("signal_count", 0),
+        "private_single_dress_listings_rejected": bridal_feed.get(
+            "private_single_dress_listings_rejected", True
+        ),
+        "source_page_verification_required": bridal_feed.get(
+            "source_page_verification_required", True
+        ),
+        "promotion_to_opportunity_allowed": False,
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase": False,
+        "automatic_payment": False,
+    }
 
     hunt_case_enrichment = run_openai_hunt_case_enrichment(
         brief,
