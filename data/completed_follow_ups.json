@@ -1,33 +1,6 @@
 {
-  "completed_count": 1,
-  "generated_at": "2026-08-05T14:32:51.414438+00:00",
-  "items": [
-    {
-      "blocking_reason_ar": "عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة",
-      "city": "Tønsberg",
-      "completed_at": "2026-08-05T14:32:51.414438+00:00",
-      "completion_is_automatic": false,
-      "completion_reason_ar": "أغلقت الفرصة أو خرجت من قائمة الإجراءات النشطة.",
-      "due_at": "2026-08-06T09:04:52.114339+00:00",
-      "expected_profit_nok": null,
-      "final_decision": "WATCH",
-      "first_scheduled_at": "2026-08-02T13:54:02.369702+00:00",
-      "follow_up_status": "COMPLETED",
-      "last_evaluated_at": "2026-08-05T09:04:52.159575+00:00",
-      "maximum_safe_bid_nok": null,
-      "next_action": "VERIFY_MARKET_PRICE",
-      "opportunity_id": "unified-auksjonen-614953",
-      "overdue_hours": 0.0,
-      "owner": "SYSTEM",
-      "priority": "HIGH",
-      "requires_human_approval": false,
-      "review_count": 0,
-      "roi_percent": null,
-      "status": "COMPLETED",
-      "title": "5 stk komplette elektriske hev/senk-skrivebord – selges samlet! Velg mellom fler størrelser! Tønsberg 19 bud 4t 31m 21s",
-      "updated_at": "2026-08-05T09:04:52.114339+00:00",
-      "url": "https://www.auksjonen.no/auksjon/torget/5_stk_komplette_elektriske_hevsenk-skrivebord__selges_samlet_Velg_mellom_fler_st%C3%B8rrelser/614953"
-    }
-  ],
+  "completed_count": 0,
+  "generated_at": "2026-08-05T19:54:01.017738+00:00",
+  "items": [],
   "schema_version": 1
 }
