@@ -82,6 +82,12 @@ class MarketSignalRepository:
             model.first_seen_at = min(_utc(model.first_seen_at, "first_seen_at"), first_seen)
             model.last_seen_at = max(_utc(model.last_seen_at, "last_seen_at"), last_seen)
 
+        merged_first_seen = _utc(model.first_seen_at, "first_seen_at")
+        merged_last_seen = _utc(model.last_seen_at, "last_seen_at")
+        payload["first_observed_at"] = merged_first_seen.isoformat()
+        payload["latest_observed_at"] = merged_last_seen.isoformat()
+        payload["observed_at"] = merged_last_seen.isoformat()
+
         changed = created or previous_hash != state_hash
         model.signal_type = canonical.signal_type.value
         model.source_provider = canonical.source

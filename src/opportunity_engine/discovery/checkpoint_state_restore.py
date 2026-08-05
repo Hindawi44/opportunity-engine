@@ -1,6 +1,6 @@
 """Restore lifecycle SQLite state from the last successful checkpoint artifact.
 
-The restore is read-only against GitHub Actions and copies only five explicitly
+The restore is read-only against GitHub Actions and copies only six explicitly
 allowed SQLite files. Missing prior state is a valid first-run condition. Network or
 permission failures are reported in a structured status artifact and do not invent
 cross-run continuity.
@@ -19,6 +19,7 @@ from zipfile import BadZipFile, ZipFile
 ARTIFACT_NAME = "multi-market-daily-operator-checkpoint"
 DATABASE_RELATIVE_PATHS = (
     "no-auksjonen/opportunity_engine.db",
+    "no-finn-email/opportunity_engine.db",
     "se-blinto/opportunity_engine.db",
     "de-riegermann/opportunity_engine.db",
     "de-venta/opportunity_engine.db",
