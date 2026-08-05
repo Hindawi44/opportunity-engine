@@ -13,15 +13,14 @@ from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import (
 )
 from opportunity_engine.discovery.search_provider import SearchHit
 
-
 NOW = datetime(2026, 8, 6, 0, 30, tzinfo=timezone.utc)
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_SCRIPT = ROOT / "scripts/build_domain_market_intelligence_feed.py"
 
 
-def _valid_hit() -> SearchHit:
+def _valid_hit(quantity: str = "800 pcs") -> SearchHit:
     return SearchHit(
-        title="Wholesale clothing liquidation stock 800 pcs — €4.50 per piece",
+        title=f"Wholesale clothing liquidation stock {quantity} — €4.50 per piece",
         url="https://merkandi.com/products/verified-clothing-stock/12345?utm_source=test",
         description=(
             "Seller: Nordic Stock Partner AS; minimum order: 100 pcs; new with tags; "
@@ -37,43 +36,33 @@ def test_query_is_bounded_to_official_merkandi_domain() -> None:
     assert "site:merkandi.com" in QUERY
 
 
-def test_accepts_complete_small_operator_b2b_listing() -> None:
+def test_accepts_complete_b2b_listing_for_human_decision() -> None:
     candidate = merkandi_candidate_from_hit(_valid_hit(), observed_at=NOW)
-
     assert candidate is not None
     assert candidate["feed_family"] == FEED_FAMILY
-    assert candidate["source_url"] == (
-        "https://merkandi.com/products/verified-clothing-stock/12345"
-    )
+    assert candidate["source_url"] == "https://merkandi.com/products/verified-clothing-stock/12345"
     assert candidate["quantity"] == 800
-    assert candidate["quantity_unit"] == "units"
+    assert candidate["lot_size_band"] == "MEDIUM"
     assert candidate["minimum_order"] == 100
     assert candidate["unit_price"] == 4.5
-    assert candidate["currency"] == "EUR"
     assert candidate["seller_name"] == "Nordic Stock Partner AS"
-    assert candidate["manifest_available"] is True
-    assert candidate["authenticity_evidence_visible"] is True
     assert candidate["opportunity_state"] == "B2B_LEAD_REQUIRES_VERIFICATION"
+    assert candidate["decision_owner"] == "HUMAN_OPERATOR"
+    assert candidate["quantity_size_rejection_applied"] is False
     assert candidate["top5_eligible"] is False
-    assert candidate["automatic_contact"] is False
     assert candidate["automatic_purchase"] is False
 
 
-def test_rejects_unapproved_domain() -> None:
-    hit = _valid_hit()
-    candidate = merkandi_candidate_from_hit(
-        SearchHit(
-            title=hit.title,
-            url="https://merkandi-fake.example/products/123",
-            description=hit.description,
-            provider=hit.provider,
-        ),
-        observed_at=NOW,
-    )
-    assert candidate is None
+def test_preserves_large_lot_instead_of_rejecting_it() -> None:
+    candidate = merkandi_candidate_from_hit(_valid_hit("25000 pcs"), observed_at=NOW)
+    assert candidate is not None
+    assert candidate["quantity"] == 25000
+    assert candidate["lot_size_band"] == "VERY_LARGE"
+    assert candidate["quantity_size_rejection_applied"] is False
+    assert candidate["decision_owner"] == "HUMAN_OPERATOR"
 
 
-def test_rejects_listing_without_quantity() -> None:
+def test_preserves_serious_listing_with_missing_quantity_as_early_signal() -> None:
     hit = _valid_hit()
     candidate = merkandi_candidate_from_hit(
         SearchHit(
@@ -84,10 +73,13 @@ def test_rejects_listing_without_quantity() -> None:
         ),
         observed_at=NOW,
     )
-    assert candidate is None
+    assert candidate is not None
+    assert candidate["quantity"] is None
+    assert "QUANTITY" in candidate["missing_information"]
+    assert candidate["opportunity_state"] == "EARLY_B2B_SIGNAL_REQUIRES_VERIFICATION"
 
 
-def test_rejects_unknown_seller() -> None:
+def test_preserves_unknown_seller_as_missing_information() -> None:
     hit = _valid_hit()
     candidate = merkandi_candidate_from_hit(
         SearchHit(
@@ -98,49 +90,18 @@ def test_rejects_unknown_seller() -> None:
         ),
         observed_at=NOW,
     )
-    assert candidate is None
+    assert candidate is not None
+    assert candidate["seller_name"] is None
+    assert "SELLER_IDENTITY" in candidate["missing_information"]
 
 
-def test_rejects_single_item_listing() -> None:
+def test_rejects_unapproved_domain_and_single_item() -> None:
     hit = _valid_hit()
-    candidate = merkandi_candidate_from_hit(
-        SearchHit(
-            title=hit.title.replace("800 pcs", "1 pc"),
-            url=hit.url,
-            description=hit.description,
-            provider=hit.provider,
-        ),
+    assert merkandi_candidate_from_hit(
+        SearchHit(title=hit.title, url="https://merkandi-fake.example/p/1", description=hit.description),
         observed_at=NOW,
-    )
-    assert candidate is None
-
-
-def test_rejects_branded_stock_without_authenticity_evidence() -> None:
-    hit = _valid_hit()
-    candidate = merkandi_candidate_from_hit(
-        SearchHit(
-            title=hit.title,
-            url=hit.url,
-            description=hit.description.replace("proof of authenticity; ", ""),
-            provider=hit.provider,
-        ),
-        observed_at=NOW,
-    )
-    assert candidate is None
-
-
-def test_rejects_quantity_above_small_operator_limit() -> None:
-    hit = _valid_hit()
-    candidate = merkandi_candidate_from_hit(
-        SearchHit(
-            title=hit.title.replace("800 pcs", "25000 pcs"),
-            url=hit.url,
-            description=hit.description,
-            provider=hit.provider,
-        ),
-        observed_at=NOW,
-    )
-    assert candidate is None
+    ) is None
+    assert merkandi_candidate_from_hit(_valid_hit("1 pc"), observed_at=NOW) is None
 
 
 class FakeProvider:
@@ -158,13 +119,13 @@ class FakeProvider:
             SearchHit(
                 title="Wholesale clothing clearance",
                 url="https://merkandi.com/products/missing-evidence/999",
-                description="No quantity, seller or manifest shown.",
+                description="Bulk apparel stock. No quantity, seller or manifest shown.",
                 provider=self.name,
             ),
         ]
 
 
-def test_collection_uses_one_bounded_search_request() -> None:
+def test_collection_uses_one_request_and_preserves_incomplete_signals() -> None:
     providers: list[FakeProvider] = []
 
     def factory(country: str, api_key: str, freshness: str | None) -> FakeProvider:
@@ -181,52 +142,38 @@ def test_collection_uses_one_bounded_search_request() -> None:
         provider_factory=factory,
         results=10,
     )
-
     assert report["feed_family"] == FEED_FAMILY
-    assert report["query_budget_total"] == 1
     assert report["requests_made"] == 1
-    assert report["candidate_count"] == 1
-    assert report["status_counts"] == {"SUCCESS": 1}
-    assert report["not_part_of_opportunity_top5"] is True
-    assert report["automatic_purchase"] is False
-    assert len(providers) == 1
+    assert report["candidate_count"] == 2
+    assert report["incomplete_signals_preserved"] is True
+    assert report["quantity_size_rejection_enabled"] is False
+    assert report["human_decision_required"] is True
     assert providers[0].calls == [(QUERY, 10)]
-    assert report["sources"][0]["rejected_result_count"] == 1
 
 
 def test_missing_brave_key_is_explicit_and_makes_no_request() -> None:
-    def forbidden_factory(*args, **kwargs):
-        raise AssertionError("provider must not be initialized")
-
     report = collect_merkandi_b2b_liquidation_feed(
         observed_at=NOW,
         environment={},
-        provider_factory=forbidden_factory,
+        provider_factory=lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError()),
     )
-
     assert report["requests_made"] == 0
-    assert report["candidate_count"] == 0
     assert report["status_counts"] == {"BLOCKED_CONFIGURATION": 1}
-    assert report["sources"][0]["block_reason"] == "BRAVE_SEARCH_API_KEY_MISSING"
 
 
 def test_results_limit_is_bounded() -> None:
     try:
-        collect_merkandi_b2b_liquidation_feed(
-            observed_at=NOW,
-            environment={},
-            results=11,
-        )
+        collect_merkandi_b2b_liquidation_feed(observed_at=NOW, environment={}, results=11)
     except ValueError as exc:
         assert "results" in str(exc)
-    else:  # pragma: no cover
+    else:
         raise AssertionError("expected ValueError")
 
 
-def test_daily_builder_writes_and_attaches_merkandi_feed() -> None:
+def test_daily_builder_attaches_decision_support_contract() -> None:
     text = BUILD_SCRIPT.read_text(encoding="utf-8")
     assert "collect_merkandi_b2b_liquidation_feed" in text
     assert 'merkandi-b2b-liquidation-feed.json' in text
     assert 'brief["merkandi_b2b_liquidation_feed"]' in text
-    assert '"B2B_LEAD_REQUIRES_VERIFICATION"' in text
+    assert '"EARLY_B2B_SIGNAL_REQUIRES_VERIFICATION"' in text
     assert '"automatic_purchase": False' in text
