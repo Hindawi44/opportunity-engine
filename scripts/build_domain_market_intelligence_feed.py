@@ -21,6 +21,11 @@ from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     persist_manifest_market_signals,
 )
+from opportunity_engine.discovery.hunt_case_targeted_followup import (
+    attach_targeted_followup_intelligence,
+    run_hunt_case_targeted_followup,
+    write_hunt_case_targeted_followup_artifacts,
+)
 from opportunity_engine.discovery.openai_hunt_case_enrichment import (
     attach_hunt_case_intelligence,
     run_openai_hunt_case_enrichment,
@@ -198,7 +203,20 @@ def main() -> int:
         json_path=output_dir / "openai-hunt-case-enrichment.json",
         text_path=output_dir / "openai-hunt-case-enrichment.txt",
     )
+
+    targeted_followup = run_hunt_case_targeted_followup(
+        hunt_case_enrichment,
+        brief,
+        environment=os.environ,
+    )
+    write_hunt_case_targeted_followup_artifacts(
+        targeted_followup,
+        json_path=output_dir / "hunt-case-targeted-followup.json",
+        text_path=output_dir / "hunt-case-targeted-followup.txt",
+    )
+
     brief = attach_hunt_case_intelligence(brief, hunt_case_enrichment)
+    brief = attach_targeted_followup_intelligence(brief, targeted_followup)
     print(
         "openai_hunt_case_enrichment_status:",
         hunt_case_enrichment.get("status"),
@@ -211,6 +229,18 @@ def main() -> int:
         "openai_hunt_case_estimated_cost_usd:",
         hunt_case_enrichment.get("estimated_cost_usd", 0.0),
     )
+    print(
+        "hunt_case_targeted_followup_status:",
+        targeted_followup.get("status"),
+    )
+    print(
+        "hunt_case_targeted_followup_requests:",
+        targeted_followup.get("search_request_count", 0),
+    )
+    print(
+        "hunt_case_targeted_evidence_candidates:",
+        targeted_followup.get("evidence_candidate_count", 0),
+    )
 
     write_corrected_market_bulletin_artifacts(
         brief,
@@ -220,6 +250,7 @@ def main() -> int:
     )
     print((output_dir / "domain-market-intelligence-brief.txt").read_text(encoding="utf-8"))
     print((output_dir / "openai-hunt-case-enrichment.txt").read_text(encoding="utf-8"))
+    print((output_dir / "hunt-case-targeted-followup.txt").read_text(encoding="utf-8"))
     return 0
 
 
