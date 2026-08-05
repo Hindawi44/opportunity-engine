@@ -17,6 +17,12 @@ This change does not rebuild the engine. It reuses the current `MarketSignalReco
 
 The maximum is three OpenAI API requests per checkpoint run.
 
+## Strict Structured Outputs compatibility
+
+Pydantic fields with defaults are optional in its generated JSON Schema. OpenAI strict Structured Outputs require every object property to be listed in `required` and require `additionalProperties: false` for each object. The checkpoint normalizes the two hunt-case schemas before sending them to the Responses API, removes Pydantic-only `default` and `title` metadata, and keeps Pydantic validation after the response returns.
+
+This correction addresses the first live run's HTTP 400 schema rejection without changing signal selection, lifecycle state, opportunity promotion, or automatic-action safety.
+
 ## Trust boundary
 
 OpenAI output is advisory and is never a source of truth. The model cannot:

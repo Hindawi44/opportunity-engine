@@ -31,6 +31,11 @@ from opportunity_engine.discovery.unified_opportunity_contract import (
     UnifiedOpportunityContractError,
     UnifiedOpportunityContractV1,
 )
+from opportunity_engine.discovery.openai_strict_schema_compat import (
+    install_openai_hunt_case_schema_compat,
+)
+
+install_openai_hunt_case_schema_compat()
 
 __all__ = [
     "CLOTHING_INVENTORY_MAP",
