@@ -13,6 +13,9 @@ from opportunity_engine.discovery.blinto_generic_seller_guard import (
 from opportunity_engine.discovery.blinto_seller_identity_extraction import (
     write_blinto_seller_identity_evidence,
 )
+from opportunity_engine.discovery.brave_market_signal_continuity import (
+    collect_manifest_brave_market_signals,
+)
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
     build_domain_market_intelligence_brief,
     persist_manifest_market_signals,
@@ -126,6 +129,34 @@ def main() -> int:
     print(
         "sweden_organisation_discovery_bridge_status:",
         sweden_identity_bridge.get("status"),
+    )
+
+    try:
+        brave_radar = collect_manifest_brave_market_signals(
+            manifest,
+            root=args.root,
+        )
+    except Exception as exc:
+        brave_radar = {
+            "schema_version": "brave-market-signal-radar-1.0",
+            "status": "FAILED",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "market_coverage": ["NO", "SE", "DE"],
+            "signal_count": 0,
+            "sources": [],
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+    _write_report(
+        output_dir / "brave-market-signal-radar.json",
+        brave_radar,
+    )
+    print(
+        "brave_market_signal_radar_status_counts:",
+        json.dumps(brave_radar.get("status_counts") or {}, sort_keys=True),
     )
 
     official_coverage = collect_manifest_official_signals_with_sweden_status(
