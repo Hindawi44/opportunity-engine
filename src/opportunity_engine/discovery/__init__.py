@@ -34,8 +34,12 @@ from opportunity_engine.discovery.unified_opportunity_contract import (
 from opportunity_engine.discovery.openai_strict_schema_compat import (
     install_openai_hunt_case_schema_compat,
 )
+from opportunity_engine.discovery.bridal_english_market_search import (
+    install_bilingual_bridal_search,
+)
 
 install_openai_hunt_case_schema_compat()
+install_bilingual_bridal_search()
 
 __all__ = [
     "CLOTHING_INVENTORY_MAP",
