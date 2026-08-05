@@ -2,90 +2,57 @@
 
 ## Purpose
 
-Add one bounded marketplace-intelligence lane for clothing stock and liquidation
-lots listed on the official Merkandi domain.
+Monitor serious clothing-stock and liquidation listings on the official Merkandi
+domain and preserve the evidence for human evaluation.
 
-This is the first source in the future `B2B_LIQUIDATION_MARKETPLACE_FEED_V1`
-family. It does not replace the existing Norway, Sweden, Germany, bridal, fabric,
-or early-signal pipelines.
+The engine does not decide whether a lot is too large, affordable, or suitable.
+It extracts what is public, marks missing information, supports later calculation,
+and leaves the commercial decision to the operator.
 
-## Approved source
+## Approved source and budget
 
-- `merkandi.com`
-
-No other marketplace is enabled in this change.
-
-## Search budget
-
-- one official-domain Brave Search request per daily run;
-- at most 10 search results requested;
-- at most 5 accepted leads;
-- one-month freshness window;
+- official domain: `merkandi.com`;
+- one Brave Search request per daily run;
+- at most 10 results requested and 8 retained signals;
 - existing `BRAVE_SEARCH_API_KEY`; no new provider or secret.
 
-## Strict acceptance gate
+## Visibility gate
 
-A result is accepted only when the public search result shows all of the following:
+A result must be on the official domain and show both clothing-inventory context
+and a wholesale, stocklot, liquidation, clearance, surplus, overstock, or similar
+B2B signal.
 
-1. exact official Merkandi domain;
-2. clothing inventory context;
-3. wholesale, stocklot, liquidation, clearance, surplus, or equivalent B2B signal;
-4. inventory quantity greater than one;
-5. quantity within the small-operator limit;
-6. minimum order or MOQ;
-7. visible price and currency;
-8. named seller, supplier, company, or wholesaler;
-9. manifest, packing list, inventory list, or stock list;
-10. authenticity evidence when named brands are present.
+Only clearly irrelevant, unofficial, generic home-page, private-sale, or single-item
+results are rejected.
 
-A listing is rejected when any required field is missing. Private sales, single-item
-listings, generic marketplace pages, unknown sellers, and oversized lots are not
-promoted.
+Missing quantity, MOQ, price, seller identity, manifest, shipping information, or
+brand-authenticity evidence does not automatically hide a serious result. It is
+listed under `missing_information` and remains:
 
-## Small-operator quantity limit
+- `B2B_LEAD_REQUIRES_VERIFICATION` when the visible commercial evidence is complete;
+- `EARLY_B2B_SIGNAL_REQUIRES_VERIFICATION` when important fields are missing.
 
-- up to 5,000 units, pieces, pairs, or sets;
-- up to 1,000 kg.
+## Lot size and decision authority
 
-These limits are a safety gate for the current one-person tailoring business, not
-a claim that every accepted quantity is affordable or commercially suitable.
+Lot size is descriptive only:
 
-## Candidate state
+- `SMALL`
+- `MEDIUM`
+- `LARGE`
+- `VERY_LARGE`
+- `UNKNOWN`
 
-Every accepted row remains:
+There is no rejection threshold based on shop size, capital, or lot size.
 
-`B2B_LEAD_REQUIRES_VERIFICATION`
+`decision_owner = HUMAN_OPERATOR`
 
-It is not a qualified opportunity until a human verifies:
+The operator inspects, calculates landed cost and resale scenarios, negotiates,
+and decides whether to proceed.
 
-- that the listing is still active;
-- the seller's legal identity and company data;
-- the complete manifest;
-- authenticity and resale rights for brands;
-- condition and defects;
-- shipping to Norway;
-- import VAT, customs, freight, and total landed cost;
-- payment and return terms.
+## Output and trust boundary
 
-## Output
+The daily run writes `merkandi-b2b-liquidation-feed.json` and attaches a compact
+section to the daily JSON and text bulletins.
 
-The daily run writes:
-
-- `merkandi-b2b-liquidation-feed.json`;
-- a compact `merkandi_b2b_liquidation_feed` section in
-  `domain-market-intelligence-brief.json`;
-- a readable section in `domain-market-intelligence-brief.txt`.
-
-A zero-result run is valid and remains visible as `VALID_ZERO`.
-
-## Trust boundary
-
-- read-only marketplace intelligence;
-- no seller contact;
-- no bidding;
-- no reservation;
-- no purchase;
-- no payment;
-- no Top 5 eligibility;
-- no financial-analysis eligibility;
-- no automatic promotion to a canonical opportunity.
+The lane remains read-only: no contact, bidding, reservation, purchase, payment,
+Top 5 promotion, financial-analysis promotion, or automatic opportunity promotion.
