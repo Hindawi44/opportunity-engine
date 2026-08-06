@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-08-06T09:05:17.033782+00:00",
+  "generated_at": "2026-08-06T14:34:30.372647+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -55,17 +55,15 @@
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [
-        "Norges ledende leverandør av tekstiltjenester · Norgesledende på tekstilservice · Se våre ledige stillinger · Aktuelle saker i Nor Tekstil · Arbeidstøy · Restauranttøy · Kokketøy · Sengetøy · Matter · Mopper og kluter · Tekstilservice · Featured · June 29, 2026 ·"
-      ],
-      "id": "e181d58b4dad60ee5ec91f4a",
-      "language": "no",
+      "extra_snippets": [],
+      "id": "f7aa75f522d1fcb540d5624a",
+      "language": "nb",
       "published_at": null,
-      "snippet": "Nor Tekstil er Norges ledende aktør innen tekstilservice og vaskeritjenester. Vi yter tjenester til helsesektor, hotell, industri-, handels- og servicebedrifter - også på arbeidstøy, sengetøy, matter og mopper.",
+      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
       "source_rank": 4,
-      "title": "Nor Tekstil",
-      "url": "https://www.nortekstil.no/"
+      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -87,40 +85,28 @@
     {
       "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [],
-      "id": "f7aa75f522d1fcb540d5624a",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [],
       "id": "6f80d243272ec5979920784f",
       "language": "no",
       "published_at": "2022-10-24T17:00:33",
       "snippet": "<strong>Tre personer fra Hedmarken, en kar fra Jessheim og Silkesvarten AS skulle satse på tekstiler klær og mote i et Hamar-selskap</strong>. To år senere er det konkurs.",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 6,
       "title": "(+) Konkurs to år etter at fem eiere satset på mote",
       "url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [
-        "Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta."
+        "Norges ledende leverandør av tekstiltjenester · Norgesledende på tekstilservice · Se våre ledige stillinger · Aktuelle saker i Nor Tekstil · Arbeidstøy · Restauranttøy · Kokketøy · Sengetøy · Matter · Mopper og kluter · Tekstilservice · Featured · June 29, 2026 ·"
       ],
-      "id": "ccf7065118a5bf95db4092be",
-      "language": "nb",
-      "published_at": "2003-10-28T10:11:00",
-      "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
+      "id": "e181d58b4dad60ee5ec91f4a",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Nor Tekstil er Norges ledende aktør innen tekstilservice og vaskeritjenester. Vi yter tjenester til helsesektor, hotell, industri-, handels- og servicebedrifter - også på arbeidstøy, sengetøy, matter og mopper.",
       "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Devold Tekstil frifunne",
-      "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
+      "source_rank": 7,
+      "title": "Nor Tekstil",
+      "url": "https://www.nortekstil.no/"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -135,7 +121,7 @@
       "published_at": "2026-03-12T12:58:04",
       "snippet": "I Trondheim har vi allerede i flere år tatt i mot både brukbare og ødelagte tekstiler på <strong>Heggstadmoen gjenvinningsstasjon</strong>. Felles for begge fraksjonene er at de må være tørre og rene. Alle tekstiler skal leveres ferdig sortert og i knyttede poser. Alle tekstiler skal leveres ferdig sortert ...",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Tekstiler - Trondheim Renholdsverk",
       "url": "https://trv.no/hva-skjer-med-avfallet-ditt/tekstiler/"
     },
@@ -147,9 +133,23 @@
       "published_at": null,
       "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
       "source": "Brave Search",
-      "source_rank": 10,
+      "source_rank": 9,
       "title": "Proff™ - Konkurser og tvangsaviklinger",
       "url": "https://www.proff.no/konkurser"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "extra_snippets": [
+        "Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta."
+      ],
+      "id": "ccf7065118a5bf95db4092be",
+      "language": "nb",
+      "published_at": "2003-10-28T10:11:00",
+      "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
+      "source": "Brave Search",
+      "source_rank": 10,
+      "title": "Devold Tekstil frifunne",
+      "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -538,18 +538,6 @@
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [],
-      "id": "875f71823b7227328ea295d7",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [
         "Ava Butikkinnredning har levert butikkinnredning og utstillingsmateriell til bedrifter over hele landet siden 2008.",
         "Hvorfor velge oss? – Over 15 års bransjeerfaring – Norsk leverandør med lager i Innlandet – Bredt og fleksibelt sortiment – Raske leveranser og personlig kundeservice – Profesjonell aktør – vi selger kun til bedrifter"
@@ -559,9 +547,21 @@
       "published_at": "2025-11-12T11:53:03",
       "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 6,
       "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
       "url": "https://avabutikkinnredning.no/om-oss/"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "extra_snippets": [],
+      "id": "875f71823b7227328ea295d7",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "source": "Brave Search",
+      "source_rank": 7,
+      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -653,6 +653,18 @@
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
+      "extra_snippets": [],
+      "id": "72d343831b08e2486a3f5b73",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
+      "source": "Brave Search",
+      "source_rank": 4,
+      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
+      "url": "https://www.supersellerskatalog.no/inspirasjon"
+    },
+    {
+      "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
         "Vi kan også skreddersy butikkinnredning som går under navnet butikkhyller, dette er hyllesystem man ofte ser bl.a. i dagligvarebutikker. Uansett om du driver klesbutikk, sportsbutikk, hobbybutikk, blomsterforretning eller annen detaljhandel, har vi innredningen som lar deg vise frem varene på en profesjonell og inspirerende måte.",
         "Butikkinnredning til markedsledende priser - se vår nettbutikk for innredninger og artikler til din virksomhet - avabutikkinnredning.no",
@@ -664,21 +676,9 @@
       "published_at": null,
       "snippet": "Vi kan også skreddersy butikkinnredning som går under navnet butikkhyller, dette er hyllesystem man ofte ser bl.a. i dagligvarebutikker. Uansett om du driver klesbutikk, sportsbutikk, hobbybutikk, blomsterforretning eller annen detaljhandel, har vi innredningen som lar deg vise frem varene ...",
       "source": "Brave Search",
-      "source_rank": 4,
+      "source_rank": 5,
       "title": "Butikkinnredning - AVAbutikkinnredning",
       "url": "https://avabutikkinnredning.no/produktkategori/butikkinnredning/"
-    },
-    {
-      "discovery_query": "butikkinnredning klesbutikk Norge",
-      "extra_snippets": [],
-      "id": "72d343831b08e2486a3f5b73",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
-      "source": "Brave Search",
-      "source_rank": 5,
-      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
-      "url": "https://www.supersellerskatalog.no/inspirasjon"
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
@@ -712,6 +712,21 @@
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
+        "Type innredning Slatboard Stålinnredning Veggskinner Utstillingsdukker Klesstativ Butikkdisk Glassmonter Bransje Arbeidstøy Caravan/utstyrsbutikk Klær Matbutikk/kiosk Souvenirbutikk Sport Farge Svart Hvit Grå Se alle! Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel.",
+        "Type innredning Slatboard Stålinnredning Veggskinner Utstillingsdukker Klesstativ Butikkdisk Glassmonter Bransje Arbeidstøy Caravan/utstyrsbutikk Klær Matbutikk/kiosk Souvenirbutikk Sport Farge Svart Hvit Grå Se alle! Klesbutikk med sporvegger/slatboard på veggene med hyller, frontheng og konfeksjonsbøyler."
+      ],
+      "id": "2a14a064078c3fba2d58505a",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Type innredning Slatboard ... Svart Hvit Grå Se alle! <strong>Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel</strong>....",
+      "source": "Brave Search",
+      "source_rank": 8,
+      "title": "Butikkinnredning Archives - Side 2 av 2 - Butikkartikler AS",
+      "url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2/"
+    },
+    {
+      "discovery_query": "butikkinnredning klesbutikk Norge",
+      "extra_snippets": [
         "De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK). Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere. Minstekravet til aksjekapital er 30 000 kroner.",
         "Finansieringen kan komme fra egne midler, lån fra banken, eller støtteordninger gjennom Innovasjon Norge. I 2026 finnes det også flere tilskuddsordninger rettet mot bærekraftig handel og sirkulærøkonomi. Undersøk hva som er tilgjengelig i din region. Noen velger å starte med en crowdfunding-kampanje, noe som også fungerer som en tidlig markedstest av konseptet ditt. Innkjøpet er selve hjertet av en klesbutikk.",
         "Å starte en klesbutikk uten en tydelig forretningsmodell er som å seile uten kart. Du trenger ikke bare en vag idé om hva du vil selge, men en gjennomtenkt plan for hvordan butikken din skal skille seg ut, hvem du selger til, og hvordan du skal tjene penger.",
@@ -722,24 +737,9 @@
       "published_at": "2026-07-31T07:43:34",
       "snippet": "<strong>De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK).</strong> Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere.",
       "source": "Brave Search",
-      "source_rank": 8,
+      "source_rank": 9,
       "title": "Starte klesbutikk i 2026: komplett guide fra idé til åpning - Shoplabs",
       "url": "https://shoplabs.no/butikkbloggen/starte-klesbutikk-i-2026-komplett-guide-fra-ide-til-apning-2/"
-    },
-    {
-      "discovery_query": "butikkinnredning klesbutikk Norge",
-      "extra_snippets": [
-        "Type innredning Slatboard Stålinnredning Veggskinner Utstillingsdukker Klesstativ Butikkdisk Glassmonter Bransje Arbeidstøy Caravan/utstyrsbutikk Klær Matbutikk/kiosk Souvenirbutikk Sport Farge Svart Hvit Grå Se alle! Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel.",
-        "Type innredning Slatboard Stålinnredning Veggskinner Utstillingsdukker Klesstativ Butikkdisk Glassmonter Bransje Arbeidstøy Caravan/utstyrsbutikk Klær Matbutikk/kiosk Souvenirbutikk Sport Farge Svart Hvit Grå Se alle! Klesbutikk med sporvegger/slatboard på veggene med hyller, frontheng og konfeksjonsbøyler."
-      ],
-      "id": "2a14a064078c3fba2d58505a",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Type innredning Slatboard ... Svart Hvit Grå Se alle! <strong>Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel</strong>....",
-      "source": "Brave Search",
-      "source_rank": 9,
-      "title": "Butikkinnredning Archives - Side 2 av 2 - Butikkartikler AS",
-      "url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2/"
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
@@ -1178,29 +1178,29 @@
         "Kjøp lagerreoler på nett via vår nettbutikk www.jungheinrich-shop.no, eller send en produktforespørsel og få grundig rådgivning.",
         "Lagerreoler er robuste reolsystemer utviklet for sikker og oversiktlig lagring av varer i flere nivåer."
       ],
-      "id": "76a8b44880e350452a2a05e2",
+      "id": "0623254318f1aaf8f835c57c",
       "language": "no",
       "published_at": null,
       "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
       "source": "Brave Search",
       "source_rank": 9,
       "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
-      "url": "https://jungheinrich.no/produkter/reol-og-lagerl%C3%B8sning"
+      "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
-        "Kampanje Pallereol Lagerhylle Grenreol langgods Delelager reol Dekkreol og vogn Arkivreol Kampanje Kampanje Kampanje Wishlist Quick View Compare Categories: Kampanje, Lagerhylle, Pakkeløsninger, UniversalreolSuper 123 - Pakke 3A kr 9,199 (Eks. MVA) Legg i handlekurv Lengde 3065 mm x Dybde 800 mm x Høyde 1972 mm / Max.",
-        "LagerSystemer AS selger ikke personopplysninger til tredjepart, og vi bytter eller videreformidler heller ikke denne informasjonen med tredjepart."
+        "Våre dyktige montører har utallige montasjejobber under beltet, og monterer både stort og smått enten det skulle være helt nord eller sør i Norge.",
+        "Vi leverer løsninger for lager og verksted"
       ],
-      "id": "5f5c8a287e0bc6f1c921ff8c",
+      "id": "63600f85f4126e808e6723ff",
       "language": "nb",
-      "published_at": "2026-01-09T12:25:19",
-      "snippet": "Kampanje Pallereol Lagerhylle Grenreol langgods Delelager reol Dekkreol og vogn Arkivreol Kampanje Kampanje Kampanje Wishlist Quick View Compare Categories: Kampanje, Lagerhylle, Pakkeløsninger, UniversalreolSuper 123 - Pakke 3A kr 9,199 (Eks. MVA) Legg i handlekurv Lengde 3065 mm x Dybde ...",
+      "published_at": "2025-12-29T07:03:58",
+      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
       "source": "Brave Search",
       "source_rank": 10,
-      "title": "Hjem - Lagersystemer AS",
-      "url": "https://lagersystemer.no/"
+      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
+      "url": "https://reolteknikk.no/"
     }
   ],
   "schema_version": 1

@@ -1,7 +1,7 @@
 {
   "completion_rule": "Market-foundation completion, source implementation, runtime activation, daily-watch coverage, and current-opportunity state are separate dimensions. A complete market foundation does not require every planned source to be ACTIVE.",
   "economic_ranking_unlocked": false,
-  "generated_at": "2026-08-06T09:05:32.339551+00:00",
+  "generated_at": "2026-08-06T14:34:45.605450+00:00",
   "phase": "project_state_reconciled_multi_market_checkpoint_next",
   "phase_complete": false,
   "schema_version": 1,
@@ -10,7 +10,7 @@
       "blocked_by_authorized_access": false,
       "complete": true,
       "error": null,
-      "fetched": 53,
+      "fetched": 51,
       "market": "Norway",
       "priority": 1,
       "source": "Auksjonen.no",
