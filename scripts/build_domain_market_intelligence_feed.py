@@ -30,6 +30,9 @@ from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import (
 from opportunity_engine.discovery.stockhurt_b2b_feed import (
     collect_stockhurt_b2b_feed,
 )
+from opportunity_engine.discovery.stockhurt_official_catalog_enrichment import (
+    collect_stockhurt_official_catalog_enrichment,
+)
 
 # Literal compatibility contract used by repository regression tests.
 _ESTABLISHED_PIPELINE_DELEGATION_CONTRACT = """
@@ -53,6 +56,7 @@ openai-hunt-case-enrichment.txt
 brief["merkandi_b2b_liquidation_feed"]
 brief["fashion_stock_netherlands_feed"]
 brief["stockhurt_b2b_feed"]
+brief["stockhurt_official_catalog_enrichment"]
 brief["jobalots_clothing_auction_feed"]
 brief["jobalots_official_page_enrichment"]
 brief["jobalots_official_catalog_discovery"]
@@ -412,6 +416,18 @@ def main() -> int:
             ["stockhurt.com"],
             2,
             "stockhurt_b2b",
+        ),
+        (
+            collect_stockhurt_official_catalog_enrichment,
+            "stockhurt-official-catalog-enrichment.json",
+            "stockhurt_official_catalog_enrichment",
+            "STOCK-HURT OFFICIAL CATALOG ENRICHMENT",
+            "stockhurt-official-catalog-enrichment-1.0",
+            "STOCKHURT_OFFICIAL_CATALOG_ENRICHMENT_V1",
+            "DIRECT_OFFICIAL_STOCKHURT_CATALOG_TO_PRODUCT_PAGE_DECISION_SUPPORT",
+            ["stockhurt.com"],
+            6,
+            "stockhurt_official_catalog_enrichment",
         ),
         (
             collect_jobalots_clothing_auction_feed,
