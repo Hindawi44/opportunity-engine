@@ -16,7 +16,7 @@ When visible in a local source artifact, the layer preserves:
 - auction end time;
 - conservative brand tokens from the product title.
 
-An explicit title quantity such as `10 stk` may be used as source-backed quantity evidence. No quantity is invented for a general lot title.
+An explicit title quantity such as `10 stk` may be used as source-backed quantity evidence. No quantity is invented for a general lot title. Every hydrated field retains the local artifact path and matched-record count in the benchmark output.
 
 ## Price discipline
 
