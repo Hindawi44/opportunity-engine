@@ -4,7 +4,7 @@
   "errors": {},
   "evidence": {
     "unified-auksjonen-612667": {
-      "captured_at": "2026-08-06T03:35:41.728636+00:00",
+      "captured_at": "2026-08-06T09:05:22.632946+00:00",
       "observed": {
         "city": "Kristiansand s",
         "ends_at": "1786467600000"
@@ -14,7 +14,7 @@
       "verified": true
     },
     "unified-auksjonen-616267": {
-      "captured_at": "2026-08-06T03:35:43.272829+00:00",
+      "captured_at": "2026-08-06T09:05:24.501818+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786473900000"
@@ -24,7 +24,7 @@
       "verified": true
     },
     "unified-auksjonen-616271": {
-      "captured_at": "2026-08-06T03:35:45.608272+00:00",
+      "captured_at": "2026-08-06T09:05:26.213997+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786562100000"
@@ -34,7 +34,7 @@
       "verified": true
     },
     "unified-auksjonen-616274": {
-      "captured_at": "2026-08-06T03:35:43.970247+00:00",
+      "captured_at": "2026-08-06T09:05:25.051809+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786646700000"
@@ -44,7 +44,7 @@
       "verified": true
     },
     "unified-auksjonen-616275": {
-      "captured_at": "2026-08-06T03:35:44.944398+00:00",
+      "captured_at": "2026-08-06T09:05:25.616010+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786474500000"
@@ -54,7 +54,7 @@
       "verified": true
     },
     "unified-auksjonen-616276": {
-      "captured_at": "2026-08-06T03:35:42.349006+00:00",
+      "captured_at": "2026-08-06T09:05:23.754963+00:00",
       "observed": {
         "city": "Florvåg",
         "ends_at": "1786560720000"
@@ -64,6 +64,6 @@
       "verified": true
     }
   },
-  "generated_at": "2026-08-06T03:35:45.608290+00:00",
+  "generated_at": "2026-08-06T09:05:26.214011+00:00",
   "schema_version": 2
 }
