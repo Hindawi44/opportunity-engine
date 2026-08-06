@@ -43,11 +43,15 @@ from opportunity_engine.discovery.stockhurt_redirect_partial_recovery import (
 from opportunity_engine.discovery.stockhurt_sale_mode_brand_cleanup import (
     install_stockhurt_sale_mode_brand_cleanup,
 )
+from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook import (
+    install_unified_market_intelligence_river_cli_hook,
+)
 
 install_openai_hunt_case_schema_compat()
 install_bilingual_bridal_search()
 install_stockhurt_redirect_partial_recovery()
 install_stockhurt_sale_mode_brand_cleanup()
+install_unified_market_intelligence_river_cli_hook()
 
 __all__ = [
     "CLOTHING_INVENTORY_MAP",
