@@ -37,9 +37,13 @@ from opportunity_engine.discovery.openai_strict_schema_compat import (
 from opportunity_engine.discovery.bridal_english_market_search import (
     install_bilingual_bridal_search,
 )
+from opportunity_engine.discovery.stockhurt_redirect_partial_recovery import (
+    install_stockhurt_redirect_partial_recovery,
+)
 
 install_openai_hunt_case_schema_compat()
 install_bilingual_bridal_search()
+install_stockhurt_redirect_partial_recovery()
 
 __all__ = [
     "CLOTHING_INVENTORY_MAP",
