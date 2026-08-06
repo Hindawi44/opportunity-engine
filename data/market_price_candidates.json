@@ -1,7 +1,7 @@
 {
   "candidate_count": 0,
   "errors": {},
-  "generated_at": "2026-08-05T19:53:58.911873+00:00",
+  "generated_at": "2026-08-06T03:35:50.454821+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
@@ -119,21 +119,6 @@
           "url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand/"
         },
         {
-          "canonical_url": "https://finnbruktbutikk.no/bruktbutikk",
-          "comparable_quantity": null,
-          "domain": "finnbruktbutikk.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 5d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Alle bruktbutikker i Norge | Finnbruktbutikk",
-          "url": "https://finnbruktbutikk.no/bruktbutikk/"
-        },
-        {
           "canonical_url": "https://ubuy.co.no/no/brand/kawaii-merch",
           "comparable_quantity": null,
           "domain": "ubuy.co.no",
@@ -177,6 +162,20 @@
           "url": "https://www.finn.no/recommerce/forsale/search?location=1.22042.20179"
         },
         {
+          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-cute-clothes-here",
+          "comparable_quantity": null,
+          "domain": "ubuy.co.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 5d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.4,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Kjøp Kawaii Cute Clothes Here produkter på nett |. Ukjøp Norway",
+          "url": "https://www.ubuy.co.no/no/brand/kawaii-cute-clothes-here"
+        },
+        {
           "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.91.3108.361&q=butikk",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -193,7 +192,7 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 5d 21t 6m",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 5d 13t 24m",
       "verified_comparable_count": 0
     },
     {
@@ -352,6 +351,20 @@
           "url": "https://www.wenaas.com/nb-no/multinorm"
         },
         {
+          "canonical_url": "https://wenaas.com/nb-no/vart-konsept/energi-og-industri",
+          "comparable_quantity": null,
+          "domain": "wenaas.com",
+          "matched_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 6d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.5,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for energi og industri | Wenaas Workwear AS",
+          "url": "https://www.wenaas.com/nb-no/vart-konsept/energi-og-industri"
+        },
+        {
           "canonical_url": "https://webshop.kyvik.no/katalog/beskyttelse-klar-sko/klar/arbeidsklar-flammehemmende",
           "comparable_quantity": null,
           "domain": "webshop.kyvik.no",
@@ -365,24 +378,10 @@
           "target_domain": null,
           "title": "Arbeidsklær Flammehemmende | Kyvik",
           "url": "https://webshop.kyvik.no/katalog/beskyttelse-klar-sko/klar/arbeidsklar-flammehemmende"
-        },
-        {
-          "canonical_url": "https://wenaas.com/nb-no/vart-konsept/energi-og-industri",
-          "comparable_quantity": null,
-          "domain": "wenaas.com",
-          "matched_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 6d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.5,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Arbeidsklær for energi og industri | Wenaas Workwear AS",
-          "url": "https://www.wenaas.com/nb-no/vart-konsept/energi-og-industri"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 6d 22t 58m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 6d 15t 16m",
       "verified_comparable_count": 0
     },
     {
@@ -455,7 +454,22 @@
           "url": "https://silverlines.no/butikk/brukt-utstyr"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search",
+          "canonical_url": "https://florworks.no/",
+          "comparable_quantity": null,
+          "domain": "florworks.no",
+          "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for damer – Flor",
+          "url": "https://florworks.no/"
+        },
+        {
+          "canonical_url": "https://finn.no/recommerce/forsale/search?trade_type=2",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d brukt pris Norge",
@@ -466,8 +480,8 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Torget – FINN.no | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search"
+          "title": "Gis bort | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?trade_type=2"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/item/458692660",
@@ -485,36 +499,6 @@
           "url": "https://www.finn.no/recommerce/forsale/item/458692660"
         },
         {
-          "canonical_url": "https://florworks.no/",
-          "comparable_quantity": null,
-          "domain": "florworks.no",
-          "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Arbeidsklær for damer – Flor",
-          "url": "https://florworks.no/"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.71.3941",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Dameklær | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.71.3941"
-        },
-        {
           "canonical_url": "https://finn.no/recommerce/forsale/search?product_category=2.71.3950.191",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -530,7 +514,7 @@
           "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.71.3950.191"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?location=0.20012",
+          "canonical_url": "https://finn.no/recommerce/forsale/search",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d brukt pris Norge",
@@ -541,8 +525,8 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Rogaland | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?location=0.20012"
+          "title": "Torget – FINN.no | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?location=0.22034",
@@ -560,7 +544,7 @@
           "url": "https://www.finn.no/recommerce/forsale/search?location=0.22034"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?location=0.22042",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.71.3941",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d brukt pris Norge",
@@ -571,12 +555,27 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Agder | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?location=0.22042"
+          "title": "Dameklær | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.71.3941"
+        },
+        {
+          "canonical_url": "https://yrkeogprofil.no/kategori/helseklar",
+          "comparable_quantity": null,
+          "domain": "yrkeogprofil.no",
+          "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.167,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Nettbutikk - A. Oksnes AS - Yrkesklær og Profil",
+          "url": "https://yrkeogprofil.no/kategori/helseklar/"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d 22t 51m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d 15t 9m",
       "verified_comparable_count": 0
     },
     {
@@ -699,21 +698,6 @@
           "url": "https://florworks.no/collections/arbeidsbukser"
         },
         {
-          "canonical_url": "https://kirppis.no/",
-          "comparable_quantity": null,
-          "domain": "kirppis.no",
-          "matched_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 7d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Kirppis® | Sirkulærmarked i Norge - selg og kjøp brukt - vi tar oss av salget",
-          "url": "https://www.kirppis.no/"
-        },
-        {
           "canonical_url": "https://felleskjopet.no/arbeidsklaer-og-verneutstyr/arbeidsklaer/bukser",
           "comparable_quantity": null,
           "domain": "felleskjopet.no",
@@ -756,14 +740,29 @@
           "target_domain": null,
           "title": "Billige arbeidsklær | Arbeidsklær med logo | Funksjonelt | Jula",
           "url": "https://www.jula.no/catalog/klar-og-verneutstyr/herreklar/arbeidsklar/"
+        },
+        {
+          "canonical_url": "https://jokerengros.no/collections/arbeidstoy",
+          "comparable_quantity": null,
+          "domain": "jokerengros.no",
+          "matched_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 7d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Kjøp Arbeidstøy: Håndtverkerbukse, Arbejdsjakke, Arbeidsbukse og mer",
+          "url": "https://jokerengros.no/collections/arbeidstoy"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 7d 22t 51m",
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 7d 15t 9m",
       "verified_comparable_count": 0
     },
     {
-      "asking_price_nok": 400.0,
+      "asking_price_nok": 600.0,
       "available_query_count": 8,
       "candidate_count": 0,
       "candidate_market_value_nok": null,
@@ -775,9 +774,9 @@
       "distinct_source_class_count": 0,
       "eligible_for_market_value": false,
       "market_search_queries": [
-        "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge"
+        "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge"
       ],
-      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+      "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
       "market_value_status": "NO_PRICE_CANDIDATES",
       "opportunity_id": "unified-auksjonen-616275",
       "query_budget_truncated": true,
@@ -785,7 +784,7 @@
       "query_stats": [
         {
           "accepted_count": 0,
-          "query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+          "query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
           "rejected_count": 10,
           "result_count": 10,
           "target_domain": null
@@ -797,7 +796,7 @@
           "canonical_url": "https://profileringsartikler.no/produkter/klaer",
           "comparable_quantity": null,
           "domain": "profileringsartikler.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -812,7 +811,7 @@
           "canonical_url": "https://profildesign.no/category/produktkataloger",
           "comparable_quantity": null,
           "domain": "profildesign.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -824,39 +823,10 @@
           "url": "https://www.profildesign.no/category/produktkataloger/"
         },
         {
-          "canonical_url": "https://nextprofilering.no/categories/profilklaer",
-          "comparable_quantity": null,
-          "domain": "nextprofilering.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Trenger din bedrift profilklær med logo? - Next Profilering",
-          "url": "https://www.nextprofilering.no/categories/profilklaer"
-        },
-        {
-          "canonical_url": "https://norgesprofil.no/produkter/profilklaer/k-1",
-          "comparable_quantity": null,
-          "domain": "norgesprofil.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.375,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Profilklær med trykk og brodering | NorgesProfil",
-          "url": "https://norgesprofil.no/produkter/profilklaer/k-1"
-        },
-        {
           "canonical_url": "https://ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar",
           "comparable_quantity": null,
           "domain": "ahlsell.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -868,10 +838,40 @@
           "url": "https://www.ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar"
         },
         {
+          "canonical_url": "https://florworks.no/",
+          "comparable_quantity": null,
+          "domain": "florworks.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for damer – Flor",
+          "url": "https://florworks.no/"
+        },
+        {
+          "canonical_url": "https://bonprix.no/kategori/dame",
+          "comparable_quantity": null,
+          "domain": "bonprix.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Dameklær på nett - kjøp klær og sko hos bonprix.no",
+          "url": "https://www.bonprix.no/kategori/dame/"
+        },
+        {
           "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.71.3941",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -883,40 +883,24 @@
           "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.71.3941"
         },
         {
-          "canonical_url": "https://florworks.no/",
+          "canonical_url": "https://norgesprofil.no/produkter/profilklaer/k-1",
           "comparable_quantity": null,
-          "domain": "florworks.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+          "domain": "norgesprofil.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.0,
+          "similarity_score": 0.375,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Arbeidsklær for damer – Flor",
-          "url": "https://florworks.no/"
-        },
-        {
-          "canonical_url": "https://norskprofilreklame.no/sortiment/profilklar",
-          "comparable_quantity": null,
-          "domain": "norskprofilreklame.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.25,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Profilklær - Norsk Profilreklame & Gaver AS",
-          "url": "https://www.norskprofilreklame.no/sortiment/profilklar"
+          "title": "Profilklær med trykk og brodering | NorgesProfil",
+          "url": "https://norgesprofil.no/produkter/profilklaer/k-1"
         },
         {
           "canonical_url": "https://xpressprofil.no/sortiment/profilklar",
           "comparable_quantity": null,
           "domain": "xpressprofil.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -928,10 +912,25 @@
           "url": "https://www.xpressprofil.no/sortiment/profilklar"
         },
         {
+          "canonical_url": "https://norskprofilreklame.no/sortiment/profilklar",
+          "comparable_quantity": null,
+          "domain": "norskprofilreklame.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.25,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profilklær - Norsk Profilreklame & Gaver AS",
+          "url": "https://www.norskprofilreklame.no/sortiment/profilklar"
+        },
+        {
           "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.71",
           "comparable_quantity": null,
           "domain": "finn.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d brukt pris Norge",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price",
             "similarity_below_0.35"
@@ -944,7 +943,7 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 4 bud 5d 23t 1m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d 15t 19m",
       "verified_comparable_count": 0
     }
   ],

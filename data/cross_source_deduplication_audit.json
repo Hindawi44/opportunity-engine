@@ -8,7 +8,6 @@
     "auksjonen-596860",
     "auksjonen-611173",
     "auksjonen-597184",
-    "auksjonen-617105",
     "auksjonen-615442",
     "auksjonen-588231",
     "auksjonen-617106",
@@ -18,7 +17,9 @@
     "auksjonen-596852",
     "auksjonen-611693",
     "auksjonen-615304",
+    "auksjonen-615725",
     "auksjonen-615592",
+    "auksjonen-615704",
     "auksjonen-599806",
     "auksjonen-615676",
     "auksjonen-589356",
@@ -32,7 +33,6 @@
     "auksjonen-611744",
     "auksjonen-611719",
     "auksjonen-611731",
-    "auksjonen-431851",
     "konkurs-app-938213593",
     "konkurs-app-938213410",
     "konkurs-app-938212988",
@@ -58,8 +58,8 @@
     "daily_report_limit": 28,
     "unsupported_source_type_for_sale_pipeline": 20
   },
-  "generated_at": "2026-08-05T19:53:59.424622+00:00",
-  "ignored_non_official_record_count": 55,
+  "generated_at": "2026-08-06T03:35:50.982171+00:00",
+  "ignored_non_official_record_count": 57,
   "input_record_count": 33,
   "match_counts": {
     "EXACT_URL": 0,
@@ -123,14 +123,13 @@
       "audit_record_count": 26,
       "audited_fetched_record_count": 25,
       "audited_fetched_record_ids": [
+        "auksjonen-431851",
         "auksjonen-596846",
         "auksjonen-596850",
         "auksjonen-599803",
         "auksjonen-612667",
         "auksjonen-613877",
         "auksjonen-615674",
-        "auksjonen-615704",
-        "auksjonen-615725",
         "auksjonen-615833",
         "auksjonen-616117",
         "auksjonen-616255",
@@ -147,7 +146,8 @@
         "auksjonen-616678",
         "auksjonen-616680",
         "auksjonen-616716",
-        "auksjonen-616912"
+        "auksjonen-616912",
+        "auksjonen-617105"
       ],
       "channel_duplicate_excluded_count": 0,
       "difference": 0,
@@ -157,7 +157,6 @@
         "auksjonen-596860",
         "auksjonen-611173",
         "auksjonen-597184",
-        "auksjonen-617105",
         "auksjonen-615442",
         "auksjonen-588231",
         "auksjonen-617106",
@@ -167,7 +166,9 @@
         "auksjonen-596852",
         "auksjonen-611693",
         "auksjonen-615304",
+        "auksjonen-615725",
         "auksjonen-615592",
+        "auksjonen-615704",
         "auksjonen-599806",
         "auksjonen-615676",
         "auksjonen-589356",
@@ -180,8 +181,7 @@
         "auksjonen-608112",
         "auksjonen-611744",
         "auksjonen-611719",
-        "auksjonen-611731",
-        "auksjonen-431851"
+        "auksjonen-611731"
       ],
       "excluded_records_by_reason": {
         "daily_report_limit": 28
@@ -281,14 +281,13 @@
       "audit_record_count": 26,
       "audited_fetched_record_count": 25,
       "audited_fetched_record_ids": [
+        "auksjonen-431851",
         "auksjonen-596846",
         "auksjonen-596850",
         "auksjonen-599803",
         "auksjonen-612667",
         "auksjonen-613877",
         "auksjonen-615674",
-        "auksjonen-615704",
-        "auksjonen-615725",
         "auksjonen-615833",
         "auksjonen-616117",
         "auksjonen-616255",
@@ -305,7 +304,8 @@
         "auksjonen-616678",
         "auksjonen-616680",
         "auksjonen-616716",
-        "auksjonen-616912"
+        "auksjonen-616912",
+        "auksjonen-617105"
       ],
       "channel_duplicate_excluded_count": 0,
       "difference": 0,
@@ -315,7 +315,6 @@
         "auksjonen-596860",
         "auksjonen-611173",
         "auksjonen-597184",
-        "auksjonen-617105",
         "auksjonen-615442",
         "auksjonen-588231",
         "auksjonen-617106",
@@ -325,7 +324,9 @@
         "auksjonen-596852",
         "auksjonen-611693",
         "auksjonen-615304",
+        "auksjonen-615725",
         "auksjonen-615592",
+        "auksjonen-615704",
         "auksjonen-599806",
         "auksjonen-615676",
         "auksjonen-589356",
@@ -338,8 +339,7 @@
         "auksjonen-608112",
         "auksjonen-611744",
         "auksjonen-611719",
-        "auksjonen-611731",
-        "auksjonen-431851"
+        "auksjonen-611731"
       ],
       "excluded_records_by_reason": {
         "daily_report_limit": 28
