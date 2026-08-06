@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import sys
 
-from opportunity_engine.discovery.market_comparables_target_hydration import (
+from opportunity_engine.discovery.market_comparables_target_hydration_policy import (
     write_hydrated_market_comparables_benchmark as write_market_comparables_benchmark,
 )
 
