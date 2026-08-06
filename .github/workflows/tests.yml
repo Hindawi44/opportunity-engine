@@ -1,6 +1,5 @@
 name: تشغيل الاختبارات
 
-# Pull requests run the complete suite, including market comparable hydration tests.
 on:
   push:
     branches: [main]
