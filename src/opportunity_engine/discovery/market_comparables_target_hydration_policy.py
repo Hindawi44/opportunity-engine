@@ -20,7 +20,12 @@ def _safe_infer_brands(title: object) -> list[str]:
     quantity, _ = implementation._infer_quantity(title)
     if not (raw_tokens & implementation._PRODUCT_TERMS) and quantity is None:
         return []
-    return _ORIGINAL_INFER_BRANDS(title)
+    return [
+        brand
+        for brand in _ORIGINAL_INFER_BRANDS(title)
+        if brand.casefold().strip(".") not in implementation._QUERY_NOISE
+        and brand.casefold().strip(".") not in implementation._GENERIC_COMPANY_TOKENS
+    ]
 
 
 def _safe_specific_product_target(item: Mapping[str, Any]) -> bool:
