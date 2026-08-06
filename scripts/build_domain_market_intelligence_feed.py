@@ -15,6 +15,9 @@ from opportunity_engine.discovery.fabric_procurement_watch import (
 from opportunity_engine.discovery.fashion_stock_netherlands_feed import (
     collect_fashion_stock_netherlands_feed,
 )
+from opportunity_engine.discovery.jobalots_clothing_auction_feed import (
+    collect_jobalots_clothing_auction_feed,
+)
 from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import (
     collect_merkandi_b2b_liquidation_feed,
 )
@@ -44,9 +47,11 @@ openai-hunt-case-enrichment.txt
 brief["merkandi_b2b_liquidation_feed"]
 brief["fashion_stock_netherlands_feed"]
 brief["stockhurt_b2b_feed"]
+brief["jobalots_clothing_auction_feed"]
 "B2B_LEAD_REQUIRES_VERIFICATION"
 "EARLY_B2B_SIGNAL_REQUIRES_VERIFICATION"
 "HUMAN_OPERATOR"
+"automatic_bid": False
 "automatic_purchase": False
 """
 
@@ -170,23 +175,34 @@ def _compact_b2b_candidate(item: dict[str, Any]) -> dict[str, Any]:
         "candidate_id": item.get("candidate_id"),
         "source_name": item.get("source_name"),
         "source_country": item.get("source_country"),
+        "source_region": item.get("source_region"),
+        "source_reference": item.get("source_reference"),
         "title": item.get("title"),
         "source_url": item.get("source_url"),
         "page_role": item.get("page_role"),
         "listing_status": item.get("listing_status"),
+        "sale_mode": item.get("sale_mode"),
+        "inventory_focus": item.get("inventory_focus"),
         "seller_name": item.get("seller_name"),
         "quantity": item.get("quantity"),
         "quantity_unit": item.get("quantity_unit"),
+        "lot_units": item.get("lot_units"),
+        "lot_unit_type": item.get("lot_unit_type"),
         "lot_size_band": item.get("lot_size_band"),
         "minimum_order": item.get("minimum_order"),
         "minimum_order_unit": item.get("minimum_order_unit"),
         "unit_hint": item.get("unit_hint"),
         "unit_price": item.get("unit_price"),
         "total_price": item.get("total_price"),
+        "current_bid": item.get("current_bid"),
         "currency": item.get("currency"),
+        "estimated_retail_value": item.get("estimated_retail_value"),
+        "estimated_retail_currency": item.get("estimated_retail_currency"),
         "grade": item.get("grade"),
         "brands": item.get("brands") or [],
         "stock_location": item.get("stock_location"),
+        "auction_end_text": item.get("auction_end_text"),
+        "manifest_available": item.get("manifest_available"),
         "missing_information": item.get("missing_information") or [],
         "opportunity_state": item.get("opportunity_state"),
         "b2b_relevance_score": item.get("b2b_relevance_score"),
@@ -256,8 +272,11 @@ def _attach_b2b(
             "result: No current serious source result passed the relevance gate."
         )
     for item in compact:
-        price = item.get("unit_price")
-        basis = "per unit"
+        price = item.get("current_bid")
+        basis = "current or starting bid"
+        if price is None:
+            price = item.get("unit_price")
+            basis = "per unit"
         if price is None:
             price = item.get("total_price")
             basis = "total or unspecified basis"
@@ -270,15 +289,19 @@ def _attach_b2b(
             f"- {item.get('title')} | state={item.get('opportunity_state')} | "
             f"status={item.get('listing_status')} | "
             f"quantity={item.get('quantity')} {item.get('quantity_unit')} | "
+            f"lot_units={item.get('lot_units')} {item.get('lot_unit_type')} | "
             f"lot={item.get('lot_size_band')} | "
             f"MOQ={item.get('minimum_order')} "
             f"{item.get('minimum_order_unit')} | price={price_text} | "
+            f"manifest={item.get('manifest_available')} | "
+            f"ends={item.get('auction_end_text')} | "
             f"missing={item.get('missing_information')} | "
             f"{item.get('source_url')}"
         )
     lines += [
         "human_verification_required: true",
         "automatic_contact: false",
+        "automatic_bid: false",
         "automatic_purchase: false",
     ]
     _append_text(output_dir, lines)
@@ -431,6 +454,25 @@ def main() -> int:
             "query_budget": 2,
         },
         log_prefix="stockhurt_b2b",
+    )
+    _run_feed(
+        output_dir,
+        collector=collect_jobalots_clothing_auction_feed,
+        filename="jobalots-clothing-auction-feed.json",
+        attach=lambda out, report: _attach_b2b(
+            out,
+            report,
+            brief_key="jobalots_clothing_auction_feed",
+            heading="JOBALOTS CLOTHING LIQUIDATION AUCTION FEED",
+        ),
+        failure_kwargs={
+            "schema_version": "jobalots-clothing-auction-feed-1.0",
+            "feed_family": "JOBALOTS_CLOTHING_LIQUIDATION_AUCTION_FEED_V1",
+            "purpose": "OFFICIAL_JOBLOT_CLOTHING_AUCTION_DECISION_SUPPORT",
+            "domains": ["jobalots.com"],
+            "query_budget": 2,
+        },
+        log_prefix="jobalots_clothing_auction",
     )
     return 0
 
