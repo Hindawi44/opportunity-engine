@@ -1,16 +1,16 @@
 {
   "category_counts": {
     "auction": 1,
-    "bankruptcy": 15,
-    "clothing_shop_fixtures": 15,
-    "estate_sale": 3,
+    "bankruptcy": 14,
+    "clothing_shop_fixtures": 14,
+    "estate_sale": 2,
     "inventory": 24,
-    "liquidation": 8,
+    "liquidation": 7,
     "sale_listing": 9,
-    "shop_equipment": 14
+    "shop_equipment": 13
   },
-  "deduplicated_lead_count": 59,
-  "generated_at": "2026-08-07T07:40:39.266739+00:00",
+  "deduplicated_lead_count": 56,
+  "generated_at": "2026-08-07T13:38:16.383128+00:00",
   "input_result_count": 80,
   "items": [
     {
@@ -21,7 +21,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264580+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380759+00:00",
       "image_count": null,
       "lead_id": "web-09fdcc107a66ac1b45ab",
       "price_nok": null,
@@ -44,7 +44,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264086+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380216+00:00",
       "image_count": null,
       "lead_id": "web-7c78687e8f228b645e34",
       "price_nok": null,
@@ -67,7 +67,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264425+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380585+00:00",
       "image_count": null,
       "lead_id": "web-5e74475b63c3939a78fe",
       "price_nok": null,
@@ -90,7 +90,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264990+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381214+00:00",
       "image_count": null,
       "lead_id": "web-7368b74c0e956c42b2b7",
       "price_nok": null,
@@ -106,35 +106,13 @@
       "url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2/"
     },
     {
-      "canonical_url": "https://www.supersellerskatalog.no/",
-      "categories": [
-        "clothing_shop_fixtures",
-        "shop_equipment"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264474+00:00",
-      "image_count": null,
-      "lead_id": "web-e71772deae49d9ffbeb5",
-      "price_nok": null,
-      "priority_score": 46,
-      "published_at": null,
-      "score_reasons": [
-        "category:clothing_shop_fixtures+24",
-        "category:shop_equipment+22"
-      ],
-      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
-      "source": "Brave Search",
-      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
-      "url": "https://www.supersellerskatalog.no/"
-    },
-    {
       "canonical_url": "https://www.supersellerskatalog.no/inspirasjon",
       "categories": [
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264813+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380639+00:00",
       "image_count": null,
       "lead_id": "web-72d343831b08e2486a3f",
       "price_nok": null,
@@ -156,7 +134,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264358+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380373+00:00",
       "image_count": null,
       "lead_id": "web-bd6977fd8acb108de839",
       "price_nok": null,
@@ -178,7 +156,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265351+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381583+00:00",
       "image_count": null,
       "lead_id": "web-a9922918a03cfccae302",
       "price_nok": null,
@@ -194,29 +172,6 @@
       "url": "https://www.butikkartikler.no/butikkinnredning/utstillingsdukker_mannekenger/"
     },
     {
-      "canonical_url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324",
-      "categories": [
-        "inventory",
-        "liquidation"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263372+00:00",
-      "image_count": null,
-      "lead_id": "web-340bfb344e98a6d682c6",
-      "price_nok": null,
-      "priority_score": 44,
-      "published_at": "2020-05-01T15:30:26",
-      "score_reasons": [
-        "category:inventory+22",
-        "category:liquidation+16",
-        "published_at_present+6"
-      ],
-      "snippet": "– <strong>Vi har kjøpt varelager, inventar, utstyr og varemerker og skal drive butikkene videre i en måned for å rydde opp og holde opphørssalg</strong>, sier Jan Egil Flo til Tekstilforum. - Hva som skjer videre er ikke avklart.",
-      "source": "Brave Search",
-      "title": "Flo kjøper Brandstad og Wagner",
-      "url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324"
-    },
-    {
       "canonical_url": "https://www.auksjonen.no/auksjon/torget/Lagerreoler_og_lagerinventar_selges_samlet/563904",
       "categories": [
         "auction",
@@ -224,7 +179,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266275+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382647+00:00",
       "image_count": null,
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
@@ -247,7 +202,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263184+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379151+00:00",
       "image_count": null,
       "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
@@ -270,7 +225,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.262976+00:00",
+      "discovered_at": "2026-08-07T13:38:16.378963+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -292,7 +247,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.262842+00:00",
+      "discovered_at": "2026-08-07T13:38:16.378819+00:00",
       "image_count": null,
       "lead_id": "web-3c91305f7ea2ad44bc3d",
       "price_nok": null,
@@ -314,7 +269,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263309+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379319+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -336,7 +291,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263460+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379520+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -359,7 +314,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.262536+00:00",
+      "discovered_at": "2026-08-07T13:38:16.378527+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -382,7 +337,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265553+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381846+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -404,7 +359,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265602+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381787+00:00",
       "image_count": null,
       "lead_id": "web-9a1b9c6b529b06a2bf10",
       "price_nok": null,
@@ -427,7 +382,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263636+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379724+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -450,7 +405,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264044+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380167+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -472,7 +427,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265937+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382261+00:00",
       "image_count": null,
       "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
@@ -488,13 +443,35 @@
       "url": "https://www.machineseeker.no/Tekstilmaskiner/ci-19"
     },
     {
+      "canonical_url": "https://www.altpasalg.no/",
+      "categories": [
+        "bankruptcy",
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-07T13:38:16.379982+00:00",
+      "image_count": null,
+      "lead_id": "web-08c1c3148277e6eb31ea",
+      "price_nok": null,
+      "priority_score": 30,
+      "published_at": null,
+      "score_reasons": [
+        "category:bankruptcy+8",
+        "category:inventory+22"
+      ],
+      "snippet": "<strong>AltPåSalg er en nettbutikk som videreselger oppkjøpte varelager, varepartier og varer fra konkursbo med minst 50-80% avslag fra ordinære butikkpriser</strong>",
+      "source": "Brave Search",
+      "title": "AltPåSalg",
+      "url": "https://www.altpasalg.no/"
+    },
+    {
       "canonical_url": "https://arbinn.nho.no/forretningsdrift/styrearbeid-og-okonomi/styrearbeid/artikler/hva-innebarer-en-konkurs",
       "categories": [
         "bankruptcy",
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263897+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380067+00:00",
       "image_count": null,
       "lead_id": "web-7c85d59249f9065a7874",
       "price_nok": null,
@@ -516,7 +493,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263500+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379574+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -538,7 +515,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263820+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379931+00:00",
       "image_count": null,
       "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
@@ -559,7 +536,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264206+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380469+00:00",
       "image_count": null,
       "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
@@ -580,7 +557,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264669+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380849+00:00",
       "image_count": null,
       "lead_id": "web-a51fe9a70f780a57d999",
       "price_nok": null,
@@ -601,7 +578,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264939+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381157+00:00",
       "image_count": null,
       "lead_id": "web-f7fe2d09f32e4cbfda29",
       "price_nok": null,
@@ -622,7 +599,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265503+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381731+00:00",
       "image_count": null,
       "lead_id": "web-15defc847337cd18eca8",
       "price_nok": null,
@@ -637,24 +614,24 @@
       "url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-75.html"
     },
     {
-      "canonical_url": "https://finckenhagen.no/stikkord/klesstativ",
+      "canonical_url": "https://www.europris.no/hjem-interior/garderobe/klesstativ",
       "categories": [
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265175+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381900+00:00",
       "image_count": null,
-      "lead_id": "web-5d1caedc0f687ca45737",
+      "lead_id": "web-9e5ce4ab7304610510ed",
       "price_nok": null,
       "priority_score": 24,
       "published_at": null,
       "score_reasons": [
         "category:clothing_shop_fixtures+24"
       ],
-      "snippet": "Vi har et bredt utvalg av klesstativ til butikker og privatpersoner. Du finner blant annet reisestativ, stativ med rette armer og undertøystativ.",
+      "snippet": "<strong>Europris har alltid gode tilbud og et godt utvalg av klesstativ</strong>. Besøk oss i butikk eller handle i nettbutikken. Se utvalget av våre klesstativ her &gt;&gt;",
       "source": "Brave Search",
-      "title": "Klesstativ | Se vårt store utvalg | Kjøp i nettbutikken",
-      "url": "https://finckenhagen.no/stikkord/klesstativ/"
+      "title": "Klesstativ - For oppheng av klær i alle rom",
+      "url": "https://www.europris.no/hjem-interior/garderobe/klesstativ"
     },
     {
       "canonical_url": "https://www.butikkartikler.no/product-tag/utstillingsdukke",
@@ -662,7 +639,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265128+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381362+00:00",
       "image_count": null,
       "lead_id": "web-da69efc40719142bd2b6",
       "price_nok": null,
@@ -682,7 +659,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265301+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381524+00:00",
       "image_count": null,
       "lead_id": "web-d8adeb8c515443238a4b",
       "price_nok": null,
@@ -702,7 +679,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265415+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381668+00:00",
       "image_count": null,
       "lead_id": "web-b9100172d742fc440381",
       "price_nok": null,
@@ -723,7 +700,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263759+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379789+00:00",
       "image_count": null,
       "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
@@ -745,7 +722,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264768+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381013+00:00",
       "image_count": null,
       "lead_id": "web-3acde5d4a176692a975c",
       "price_nok": null,
@@ -765,7 +742,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264533+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380706+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -785,7 +762,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263262+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379396+00:00",
       "image_count": null,
       "lead_id": "web-7cad0e8a59e6e6643424",
       "price_nok": null,
@@ -805,7 +782,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266338+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382716+00:00",
       "image_count": null,
       "lead_id": "web-c1e3e1a07794eb2a24ac",
       "price_nok": null,
@@ -825,7 +802,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266231+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382594+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -845,7 +822,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266179+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382536+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -865,7 +842,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266515+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382907+00:00",
       "image_count": null,
       "lead_id": "web-add7d4049039ffe37bd3",
       "price_nok": null,
@@ -885,7 +862,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266414+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382794+00:00",
       "image_count": null,
       "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
@@ -905,7 +882,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266131+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382480+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -925,7 +902,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266466+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382848+00:00",
       "image_count": null,
       "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
@@ -945,7 +922,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266561+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382959+00:00",
       "image_count": null,
       "lead_id": "web-76a8b44880e350452a2a",
       "price_nok": null,
@@ -965,7 +942,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.266601+00:00",
+      "discovered_at": "2026-08-07T13:38:16.383004+00:00",
       "image_count": null,
       "lead_id": "web-f233ebf2b059bd695449",
       "price_nok": null,
@@ -980,35 +957,12 @@
       "url": "https://www.maskinregisteret.no/product/search/5017/stalreoler_lagerreoler"
     },
     {
-      "canonical_url": "https://konkurs-bo.no/",
-      "categories": [
-        "bankruptcy",
-        "estate_sale"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-07T07:40:39.264000+00:00",
-      "image_count": null,
-      "lead_id": "web-69939d672dc42fe60d24",
-      "price_nok": null,
-      "priority_score": 18,
-      "published_at": "2026-01-29T14:08:41",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "category:estate_sale+4",
-        "published_at_present+6"
-      ],
-      "snippet": "<strong>Vi har snart 40 års erfaring med håndtering av konkursbo og dødsbo</strong>. Som oppdragsgiver får du den kompetanse og erfaring som er nødvendig for å sikre og behandle verdier i ulike typer bo.",
-      "source": "Brave Search",
-      "title": "Asbjørn Neverdal AS - Håndtering av konkursbo og dødsbo",
-      "url": "https://konkurs-bo.no/"
-    },
-    {
       "canonical_url": "https://www.bull.no/artikler/immaterialrett-og-markedsfringsrett/falske-opphrssalg",
       "categories": [
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263087+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379092+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -1028,7 +982,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.262909+00:00",
+      "discovered_at": "2026-08-07T13:38:16.378887+00:00",
       "image_count": null,
       "lead_id": "web-0fd193c4d16fd92ffb58",
       "price_nok": null,
@@ -1048,7 +1002,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263026+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379021+00:00",
       "image_count": null,
       "lead_id": "web-bc68cdb969104e9e06f3",
       "price_nok": null,
@@ -1068,7 +1022,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.262603+00:00",
+      "discovered_at": "2026-08-07T13:38:16.378600+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1084,33 +1038,12 @@
       "url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095"
     },
     {
-      "canonical_url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861",
-      "categories": [
-        "bankruptcy"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-07T07:40:39.262738+00:00",
-      "image_count": null,
-      "lead_id": "web-d2192f749651b034d4eb",
-      "price_nok": null,
-      "priority_score": 14,
-      "published_at": "2022-09-05T10:02:35",
-      "score_reasons": [
-        "category:bankruptcy+8",
-        "published_at_present+6"
-      ],
-      "snippet": "<strong>I august økte antallet konkurser med 42,9 prosent, sammenlignet med samme måned i fjor</strong>. Antallet ansatte som har mistet jobben som følge av konkurser har økt med hele 51,5 prosent.",
-      "source": "Brave Search",
-      "title": "(+) Sterk økning i antall konkurser",
-      "url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861"
-    },
-    {
       "canonical_url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617",
       "categories": [
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.262790+00:00",
+      "discovered_at": "2026-08-07T13:38:16.378729+00:00",
       "image_count": null,
       "lead_id": "web-ccf7065118a5bf95db40",
       "price_nok": null,
@@ -1132,7 +1065,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263703+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379862+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1153,7 +1086,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265998+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382325+00:00",
       "image_count": null,
       "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
@@ -1173,7 +1106,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265778+00:00",
+      "discovered_at": "2026-08-07T13:38:16.382145+00:00",
       "image_count": null,
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
@@ -1193,7 +1126,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.265655+00:00",
+      "discovered_at": "2026-08-07T13:38:16.381961+00:00",
       "image_count": null,
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "price_nok": null,
@@ -1213,7 +1146,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263557+00:00",
+      "discovered_at": "2026-08-07T13:38:16.379639+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1233,7 +1166,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.262309+00:00",
+      "discovered_at": "2026-08-07T13:38:16.378279+00:00",
       "image_count": null,
       "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,
@@ -1253,7 +1186,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-07T07:40:39.263939+00:00",
+      "discovered_at": "2026-08-07T13:38:16.380117+00:00",
       "image_count": null,
       "lead_id": "web-a8b396d321a9a13c10d3",
       "price_nok": null,
@@ -1271,6 +1204,6 @@
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 59
+    "Brave Search": 56
   }
 }

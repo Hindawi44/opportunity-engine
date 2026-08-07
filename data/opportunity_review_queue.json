@@ -1,18 +1,18 @@
 {
-  "excluded_count": 6,
+  "excluded_count": 4,
   "excluded_summary": {
-    "generic_unspecified_lot": 6
+    "generic_unspecified_lot": 4
   },
   "fallback_count": 0,
   "fallback_used": false,
-  "generated_at": "2026-08-07T07:40:42.917146+00:00",
+  "generated_at": "2026-08-07T13:38:20.034210+00:00",
   "input_count": 25,
   "listing_metadata_enrichment": {
     "enriched_count": 6,
     "error_count": 0,
     "method": "directly observed public listing metadata only; no estimates"
   },
-  "low_relevance_omitted_count": 13,
+  "low_relevance_omitted_count": 15,
   "method": "expanded practical target categories with strict vehicle, heavy-equipment and unrelated-item exclusions; no financial values are invented",
   "queue": [
     {
@@ -40,7 +40,7 @@
       ],
       "relevance_score": 23,
       "status": "review_first",
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d 9t 19m",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d 3t 21m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
     },
     {
@@ -68,7 +68,7 @@
       ],
       "relevance_score": 21,
       "status": "review_if_capacity",
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d 11t 11m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d 5t 13m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276"
     },
     {
@@ -96,7 +96,7 @@
       ],
       "relevance_score": 21,
       "status": "review_if_capacity",
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d 11t 4m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d 5t 6m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267"
     },
     {
@@ -124,7 +124,7 @@
       ],
       "relevance_score": 21,
       "status": "review_if_capacity",
-      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d 11t 4m",
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d 5t 6m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274"
     },
     {
@@ -152,7 +152,7 @@
       ],
       "relevance_score": 21,
       "status": "review_if_capacity",
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d 11t 14m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d 5t 16m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
     },
     {
@@ -180,7 +180,7 @@
       ],
       "relevance_score": 21,
       "status": "review_if_capacity",
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 5d 11t 34m",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 5d 5t 36m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271"
     }
   ],
