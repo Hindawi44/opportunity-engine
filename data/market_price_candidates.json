@@ -1,7 +1,7 @@
 {
   "candidate_count": 0,
   "errors": {},
-  "generated_at": "2026-08-07T03:18:50.061408+00:00",
+  "generated_at": "2026-08-07T07:40:53.342041+00:00",
   "max_query_variants": 8,
   "method": "Authorized Brave Search broad and source-targeted candidate discovery with strict NOK parsing, URL deduplication, similarity, quantity and target-domain checks; candidates remain unverified",
   "minimum_similarity": 0.35,
@@ -46,21 +46,6 @@
       "rejected_candidate_count": 10,
       "rejected_candidates": [
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.91",
-          "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Næringsvirksomhet | til salgs | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?category=0.91"
-        },
-        {
           "canonical_url": "https://rubrikk.no/torget-brukt-til-salgs/varelager-til-salgs.html",
           "comparable_quantity": null,
           "domain": "rubrikk.no",
@@ -91,18 +76,19 @@
           "url": "https://www.finn.no/recommerce/forsale/search?location=0.22042"
         },
         {
-          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-home",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?category=0.91",
           "comparable_quantity": null,
-          "domain": "ubuy.co.no",
+          "domain": "finn.no",
           "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d brukt pris Norge",
           "rejection_reasons": [
-            "missing_observed_nok_price"
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
           ],
-          "similarity_score": 0.4,
+          "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Kjøp Kawaii Home produkter online til de beste prisene i Norway | Ukjøp",
-          "url": "https://www.ubuy.co.no/no/brand/kawaii-home"
+          "title": "Næringsvirksomhet | til salgs | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?category=0.91"
         },
         {
           "canonical_url": "https://finnbruktbutikk.no/bruktbutikk/sted/kristiansand",
@@ -134,6 +120,20 @@
           "url": "https://www.ubuy.co.no/no/brand/kawaii-merch"
         },
         {
+          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-home",
+          "comparable_quantity": null,
+          "domain": "ubuy.co.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.4,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Kjøp Kawaii Home produkter online til de beste prisene i Norway | Ukjøp",
+          "url": "https://www.ubuy.co.no/no/brand/kawaii-home"
+        },
+        {
           "canonical_url": "https://ubuy.co.no/no/brand/super-cute-kawaii",
           "comparable_quantity": null,
           "domain": "ubuy.co.no",
@@ -163,24 +163,9 @@
           "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.361&q=butikk"
         },
         {
-          "canonical_url": "https://finn.no/butikk/hanes122",
+          "canonical_url": "https://spareskillingsmegleren.no/kjoepe-bolig/linnkjellkollen-3-kristiansand-s",
           "comparable_quantity": null,
-          "domain": "finn.no",
-          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.2,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Wasteland Brukthandel – FINN-butikkside",
-          "url": "https://www.finn.no/butikk/hanes122"
-        },
-        {
-          "canonical_url": "https://loppo.no/",
-          "comparable_quantity": null,
-          "domain": "loppo.no",
+          "domain": "spareskillingsmegleren.no",
           "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d brukt pris Norge",
           "rejection_reasons": [
             "missing_observed_nok_price"
@@ -188,12 +173,26 @@
           "similarity_score": 0.4,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Norges største Loppesupermarked",
-          "url": "https://loppo.no/"
+          "title": "Linnkjellkollen 3",
+          "url": "https://spareskillingsmegleren.no/kjoepe-bolig/linnkjellkollen-3-kristiansand-s"
+        },
+        {
+          "canonical_url": "https://ubuy.co.no/no/brand/kawaii-clothes-&-anime-stuff-for-men-&-women",
+          "comparable_quantity": null,
+          "domain": "ubuy.co.no",
+          "matched_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price"
+          ],
+          "similarity_score": 0.4,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Kjøp Kawaii Clothes & Anime Stuff For Men & Women produkter på nett |. Ukjøp Norway",
+          "url": "https://www.ubuy.co.no/no/brand/kawaii-clothes-&-anime-stuff-for-men-&-women"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d 13t 41m",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d 9t 19m",
       "verified_comparable_count": 0
     },
     {
@@ -337,18 +336,19 @@
           "url": "https://florworks.no/"
         },
         {
-          "canonical_url": "https://wenaas.com/nb-no/vart-konsept/energi-og-industri",
+          "canonical_url": "https://bygghjemme.no/hus-och-bygg/arbeidsklar-og-beskyttelse/flammehemmende-klar",
           "comparable_quantity": null,
-          "domain": "wenaas.com",
+          "domain": "bygghjemme.no",
           "matched_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d brukt pris Norge",
           "rejection_reasons": [
-            "missing_observed_nok_price"
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
           ],
-          "similarity_score": 0.5,
+          "similarity_score": 0.167,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Arbeidsklær for energi og industri | Wenaas Workwear AS",
-          "url": "https://www.wenaas.com/nb-no/vart-konsept/energi-og-industri"
+          "title": "Flammehemmende klær - Billig og stort utvalg av Beskyttelse | Bygghjemme.no",
+          "url": "https://www.bygghjemme.no/hus-och-bygg/arbeidsklar-og-beskyttelse/flammehemmende-klar/"
         },
         {
           "canonical_url": "https://ahlsell.no/category/klar-og-personlig-verneutstyr/arbeidsklar",
@@ -366,23 +366,22 @@
           "url": "https://www.ahlsell.no/category/klar-og-personlig-verneutstyr/arbeidsklar"
         },
         {
-          "canonical_url": "https://bygghjemme.no/hus-och-bygg/arbeidsklar-og-beskyttelse/flammehemmende-klar",
+          "canonical_url": "https://wenaas.com/nb-no/vart-konsept/energi-og-industri",
           "comparable_quantity": null,
-          "domain": "bygghjemme.no",
+          "domain": "wenaas.com",
           "matched_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d brukt pris Norge",
           "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
+            "missing_observed_nok_price"
           ],
-          "similarity_score": 0.167,
+          "similarity_score": 0.5,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Flammehemmende klær - Billig og stort utvalg av Beskyttelse | Bygghjemme.no",
-          "url": "https://www.bygghjemme.no/hus-och-bygg/arbeidsklar-og-beskyttelse/flammehemmende-klar/"
+          "title": "Arbeidsklær for energi og industri | Wenaas Workwear AS",
+          "url": "https://www.wenaas.com/nb-no/vart-konsept/energi-og-industri"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d 15t 33m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d 11t 11m",
       "verified_comparable_count": 0
     },
     {
@@ -455,22 +454,7 @@
           "url": "https://silverlines.no/butikk/brukt-utstyr"
         },
         {
-          "canonical_url": "https://florworks.no/",
-          "comparable_quantity": null,
-          "domain": "florworks.no",
-          "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Arbeidsklær for damer – Flor",
-          "url": "https://florworks.no/"
-        },
-        {
-          "canonical_url": "https://finn.no/recommerce/forsale/search?trade_type=2",
+          "canonical_url": "https://finn.no/recommerce/forsale/search",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d brukt pris Norge",
@@ -481,8 +465,8 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Gis bort | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search?trade_type=2"
+          "title": "Torget – FINN.no | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/item/458692660",
@@ -500,6 +484,21 @@
           "url": "https://www.finn.no/recommerce/forsale/item/458692660"
         },
         {
+          "canonical_url": "https://florworks.no/",
+          "comparable_quantity": null,
+          "domain": "florworks.no",
+          "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for damer – Flor",
+          "url": "https://florworks.no/"
+        },
+        {
           "canonical_url": "https://finn.no/recommerce/forsale/search?location=0.20012",
           "comparable_quantity": null,
           "domain": "finn.no",
@@ -515,7 +514,7 @@
           "url": "https://www.finn.no/recommerce/forsale/search?location=0.20012"
         },
         {
-          "canonical_url": "https://finn.no/recommerce/forsale/search",
+          "canonical_url": "https://finn.no/recommerce/forsale/search?trade_type=2",
           "comparable_quantity": null,
           "domain": "finn.no",
           "matched_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d brukt pris Norge",
@@ -526,8 +525,8 @@
           "similarity_score": 0.0,
           "source_quantity": null,
           "target_domain": null,
-          "title": "Torget – FINN.no | FINN Torget",
-          "url": "https://www.finn.no/recommerce/forsale/search"
+          "title": "Gis bort | FINN Torget",
+          "url": "https://www.finn.no/recommerce/forsale/search?trade_type=2"
         },
         {
           "canonical_url": "https://finn.no/recommerce/forsale/search?sub_category=1.71.3941",
@@ -576,7 +575,7 @@
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d 15t 26m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d 11t 4m",
       "verified_comparable_count": 0
     },
     {
@@ -670,6 +669,21 @@
           "url": "https://www.klimaoslo.no/bruktbutikker-i-oslo-du-bor-sjekke-ut/"
         },
         {
+          "canonical_url": "https://felleskjopet.no/arbeidsklaer-og-verneutstyr/arbeidsklaer/bukser",
+          "comparable_quantity": null,
+          "domain": "felleskjopet.no",
+          "matched_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsbukser | Felleskjøpet",
+          "url": "https://felleskjopet.no/arbeidsklaer-og-verneutstyr/arbeidsklaer/bukser"
+        },
+        {
           "canonical_url": "https://byggtorget.no/article/proff-arbeidsbukse-sommer",
           "comparable_quantity": null,
           "domain": "byggtorget.no",
@@ -683,6 +697,21 @@
           "target_domain": null,
           "title": "Proff: Velg riktig arbeidsbukse i sommer",
           "url": "https://www.byggtorget.no/article/proff-arbeidsbukse-sommer"
+        },
+        {
+          "canonical_url": "https://jokerengros.no/no/collections/arbeidstoy",
+          "comparable_quantity": null,
+          "domain": "jokerengros.no",
+          "matched_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.0,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Kjøp Arbeidstøy: Håndtverkerbukse, Arbejdsjakke, Arbeidsbukse og mer",
+          "url": "https://jokerengros.no/no/collections/arbeidstoy"
         },
         {
           "canonical_url": "https://mascotworkwear.no/no/arbeidsklaer",
@@ -715,21 +744,6 @@
           "url": "https://www.finn.no/recommerce/forsale/search?sub_category=1.71.3941"
         },
         {
-          "canonical_url": "https://tise.com/no",
-          "comparable_quantity": null,
-          "domain": "tise.com",
-          "matched_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.0,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Tise | Reuse fashion",
-          "url": "https://tise.com/no"
-        },
-        {
           "canonical_url": "https://firmagaveshop.no/sortiment/tekstiler/arbeidstoey?listfilter_sort_1=0&page=2",
           "comparable_quantity": null,
           "domain": "firmagaveshop.no",
@@ -738,29 +752,15 @@
             "missing_observed_nok_price",
             "similarity_below_0.35"
           ],
-          "similarity_score": 0.125,
+          "similarity_score": 0.25,
           "source_quantity": null,
           "target_domain": null,
           "title": "Funksjonelle arbeidsklær for proffe håndverkere med logo",
           "url": "https://www.firmagaveshop.no/sortiment/tekstiler/arbeidstoey?page=2&listfilter_sort_1=0"
-        },
-        {
-          "canonical_url": "https://billige-arbeidsklaer.no/arbeidsklaer/arbeidsbukse",
-          "comparable_quantity": null,
-          "domain": "billige-arbeidsklaer.no",
-          "matched_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price"
-          ],
-          "similarity_score": 0.375,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Arbeidsbukser | Stort utvalg - Billige-arbeidsklær.no",
-          "url": "https://billige-arbeidsklaer.no/arbeidsklaer/arbeidsbukse"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d 15t 26m",
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d 11t 4m",
       "verified_comparable_count": 0
     },
     {
@@ -855,21 +855,6 @@
           "url": "https://www.profildesign.no/category/produktkataloger/"
         },
         {
-          "canonical_url": "https://florworks.no/",
-          "comparable_quantity": null,
-          "domain": "florworks.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Arbeidsklær for damer – Flor",
-          "url": "https://florworks.no/"
-        },
-        {
           "canonical_url": "https://nextprofilering.no/categories/profilklaer",
           "comparable_quantity": null,
           "domain": "nextprofilering.no",
@@ -883,21 +868,6 @@
           "target_domain": null,
           "title": "Trenger din bedrift profilklær med logo? - Next Profilering",
           "url": "https://www.nextprofilering.no/categories/profilklaer"
-        },
-        {
-          "canonical_url": "https://ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar",
-          "comparable_quantity": null,
-          "domain": "ahlsell.no",
-          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d brukt pris Norge",
-          "rejection_reasons": [
-            "missing_observed_nok_price",
-            "similarity_below_0.35"
-          ],
-          "similarity_score": 0.125,
-          "source_quantity": null,
-          "target_domain": null,
-          "title": "Profil og fritidsklær | Ahlsell – Vi gjør det enklere å v...",
-          "url": "https://www.ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar"
         },
         {
           "canonical_url": "https://workwell.no/collections/profil-og-fritidsklaer",
@@ -930,6 +900,21 @@
           "url": "https://printmax.no/profiltoy/"
         },
         {
+          "canonical_url": "https://ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar",
+          "comparable_quantity": null,
+          "domain": "ahlsell.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Profil og fritidsklær | Ahlsell – Vi gjør det enklere å v...",
+          "url": "https://www.ahlsell.no/category/klar-og-personlig-verneutstyr/profil-og-fritidsklar"
+        },
+        {
           "canonical_url": "https://xpressprofil.no/sortiment/profilklar",
           "comparable_quantity": null,
           "domain": "xpressprofil.no",
@@ -943,10 +928,25 @@
           "target_domain": null,
           "title": "Profilklær",
           "url": "https://www.xpressprofil.no/sortiment/profilklar"
+        },
+        {
+          "canonical_url": "https://florworks.no/",
+          "comparable_quantity": null,
+          "domain": "florworks.no",
+          "matched_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d brukt pris Norge",
+          "rejection_reasons": [
+            "missing_observed_nok_price",
+            "similarity_below_0.35"
+          ],
+          "similarity_score": 0.125,
+          "source_quantity": null,
+          "target_domain": null,
+          "title": "Arbeidsklær for damer – Flor",
+          "url": "https://florworks.no/"
         }
       ],
       "required_verified_comparables": 3,
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d 15t 36m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d 11t 14m",
       "verified_comparable_count": 0
     }
   ],

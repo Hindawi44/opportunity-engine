@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-08-07T03:18:36.649804+00:00",
+  "generated_at": "2026-08-07T07:40:39.124085+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -128,6 +128,20 @@
     {
       "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [
+        "Med et abonnement på Tekstilforum får du tilgang til hele arkivet vårt · Butikkinnredning - Emballasje - Accesoirer - Yttertøy - Undertøy - Belysning - Med mer · Viktig digitalt læringsprosjekt i Holzweiler · Virkes konjunkturrapport: Bransjejus ·"
+      ],
+      "id": "d2192f749651b034d4eb8136",
+      "language": "nb",
+      "published_at": "2022-09-05T10:02:35",
+      "snippet": "<strong>I august økte antallet konkurser med 42,9 prosent, sammenlignet med samme måned i fjor</strong>. Antallet ansatte som har mistet jobben som følge av konkurser har økt med hele 51,5 prosent.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "(+) Sterk økning i antall konkurser",
+      "url": "https://www.tekstilforum.no/konkurser/sterk-okning-i-antall-konkurser/831861"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "extra_snippets": [
         "Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta."
       ],
       "id": "ccf7065118a5bf95db4092be",
@@ -135,26 +149,9 @@
       "published_at": "2003-10-28T10:11:00",
       "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 10,
       "title": "Devold Tekstil frifunne",
       "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [
-        "Visste du at både brukbare og ødelagte klær skal i ombrukscontaineren?",
-        "Per i dag har finnes det kun ett operativt anlegg for materialgjenvinning av tekstiler i Norge – Norsk Tekstilgjenvinning i Sandefjord.",
-        "Bare i Oslo blir det kastet over tre tusen tonn klær og tekstiler i restavfallet hvert år. Det er nok til å fylle nesten fem og et halvt olympiske svømmebasseng. Både brukbare òg ødelagte klær og tekstiler skal leveres i ombrukscontainerne rundt i byen.",
-        "Siste utvei: Levere plagget til en tekstilcontainer. Alle tekstiler, også ødelagte klær, kan leveres i tekstilcontainerne som står sammen med glass- og metallcontainerne. Husk å levere tørt og rent i en plastpose!"
-      ],
-      "id": "68d9c831f2dca7774a774016",
-      "language": "nb",
-      "published_at": "2026-03-17T12:17:00",
-      "snippet": "Siste utvei: <strong>Levere plagget til en tekstilcontainer</strong>. Alle tekstiler, også ødelagte klær, kan leveres i tekstilcontainerne som står sammen med glass- og metallcontainerne. Husk å levere tørt og rent i en plastpose!",
-      "source": "Brave Search",
-      "source_rank": 10,
-      "title": "Hit skal alle klærne - også de hullete sokkene dine",
-      "url": "https://www.klimaoslo.no/hvor-skal-du-levere-odelagte-klaer/"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -204,18 +201,6 @@
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [],
-      "id": "f7aa75f522d1fcb540d5624a",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
       "extra_snippets": [
         "Høye husleier og endrede handlemønstre får skylden. Etter 15 år er det over for klesbutikken Babel på Grünerløkka i Oslo. Butikken ble raskt en..."
       ],
@@ -224,23 +209,9 @@
       "published_at": null,
       "snippet": "Høye husleier og endrede handlemønstre får skylden. Etter 15 år er det over for <strong>klesbutikken Babel på Grünerløkka i Oslo</strong>. Butikken ble raskt en...",
       "source": "Brave Search",
-      "source_rank": 5,
+      "source_rank": 4,
       "title": "opphørssalg - Melk og Honning",
       "url": "https://melkoghonning.no/tema/opphorssalg"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
-        "Vi holder åpent til 31.12.2023. Hele butikken på 700 kvm, samt lager skal tømmes."
-      ],
-      "id": "ae9fc84b048fe1917a17be55",
-      "language": "nb",
-      "published_at": "2023-10-03T11:12:14",
-      "snippet": "<strong>Vi holder åpent til 31.12.2023.</strong> Hele butikken på 700 kvm, samt lager skal tømmes",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Opphørssalg - Krosby Møbler AS - Oslo",
-      "url": "https://www.krosby.no/opphorssalg/"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -255,26 +226,35 @@
       "published_at": null,
       "snippet": "<strong>En skobutikk ble i 2018 ilagt et overtredelsesgebyr på 100.000 kroner av Forbrukertilsynet for brudd på forbudet</strong>. Butikken hadde annonsert opphørssalg i over ett år uten å bli lagt ned.",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 5,
       "title": "Falske opphørssalg: en villedende taktikk som kan bli dyr! | Advokatfirmaet Bull AS",
       "url": "https://www.bull.no/artikler/immaterialrett-og-markedsfringsrett/falske-opphrssalg"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
-        "Det har vært mye moro, men innsats og resultat står ikke helt i forhold til hverandre, så «Kreativ Mormor» har bestemt seg for å avvikle stoffbutikken på nettet. Jeg skal ikke gi pandemien skylda for at jeg gir meg, men det er klart at de to siste årene ble noe tyngre enn jeg hadde sett for meg. Alle stoffene på lageret er på opphørssalg – og her gjelder «først til mølla»-prinsippet.",
-        "Opphørssalg – nettbutikken avvikles!",
-        "Velkommen til opphørssalg!",
-        "Siste sjanse – opphørssalget avsluttes 10.november 30."
-      ],
-      "id": "5fb5b5876606f722a2a9c650",
+      "extra_snippets": [],
+      "id": "f7aa75f522d1fcb540d5624a",
       "language": "nb",
       "published_at": null,
-      "snippet": "Kreativ Mormor legger ned stoffbutikken på nettet - opphørssalg på hele lagerbeholdningen",
+      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Opphørssalg – nettbutikken avvikles!",
-      "url": "https://kreativmormor.no/opphorssalg-nettbutikken-avvikles/"
+      "source_rank": 6,
+      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "Vi holder åpent til 31.12.2023. Hele butikken på 700 kvm, samt lager skal tømmes."
+      ],
+      "id": "ae9fc84b048fe1917a17be55",
+      "language": "nb",
+      "published_at": "2023-10-03T11:12:14",
+      "snippet": "<strong>Vi holder åpent til 31.12.2023.</strong> Hele butikken på 700 kvm, samt lager skal tømmes",
+      "source": "Brave Search",
+      "source_rank": 7,
+      "title": "Opphørssalg - Krosby Møbler AS - Oslo",
+      "url": "https://www.krosby.no/opphorssalg/"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -289,9 +269,26 @@
       "published_at": null,
       "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS&#x27; butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Butikkinnredning og inventar. 5–7 dagers levering. ⭐ SE mer HER – SuperSellerS",
       "url": "https://www.supersellers.no/"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "Det har vært mye moro, men innsats og resultat står ikke helt i forhold til hverandre, så «Kreativ Mormor» har bestemt seg for å avvikle stoffbutikken på nettet. Jeg skal ikke gi pandemien skylda for at jeg gir meg, men det er klart at de to siste årene ble noe tyngre enn jeg hadde sett for meg. Alle stoffene på lageret er på opphørssalg – og her gjelder «først til mølla»-prinsippet.",
+        "Opphørssalg – nettbutikken avvikles!",
+        "Velkommen til opphørssalg!",
+        "Siste sjanse – opphørssalget avsluttes 10.november 30."
+      ],
+      "id": "5fb5b5876606f722a2a9c650",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Kreativ Mormor legger ned stoffbutikken på nettet - opphørssalg på hele lagerbeholdningen",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Opphørssalg – nettbutikken avvikles!",
+      "url": "https://kreativmormor.no/opphorssalg-nettbutikken-avvikles/"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -495,17 +492,16 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [
-        "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
-        "Alt innen butikkinnredning – over 7000 artikler klare for rask levering."
+        "Butikkinnredning (716) Lagerutstyr (538) Sikkerhet og overvåkning (309) Vareparti og konkursbo (594) Annet butikkutstyr (447)Gå til resultat · Fiks ferdig (88)Gå til resultat · Ingen resultater ·"
       ],
-      "id": "bd6977fd8acb108de8393557",
+      "id": "4d96f214044f8d44d022d4d3",
       "language": "nb",
       "published_at": null,
-      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
+      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
       "source_rank": 3,
-      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
-      "url": "https://www.supersellers.no/katalog"
+      "title": "Butikkinnredning | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -543,15 +539,18 @@
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [],
-      "id": "875f71823b7227328ea295d7",
+      "extra_snippets": [
+        "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
+        "Alt innen butikkinnredning – over 7000 artikler klare for rask levering."
+      ],
+      "id": "bd6977fd8acb108de8393557",
       "language": "nb",
       "published_at": null,
-      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
       "source": "Brave Search",
       "source_rank": 6,
-      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
+      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
+      "url": "https://www.supersellers.no/katalog"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -703,23 +702,6 @@
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
-        "De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK). Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere. Minstekravet til aksjekapital er 30 000 kroner.",
-        "Finansieringen kan komme fra egne midler, lån fra banken, eller støtteordninger gjennom Innovasjon Norge. I 2026 finnes det også flere tilskuddsordninger rettet mot bærekraftig handel og sirkulærøkonomi. Undersøk hva som er tilgjengelig i din region. Noen velger å starte med en crowdfunding-kampanje, noe som også fungerer som en tidlig markedstest av konseptet ditt. Innkjøpet er selve hjertet av en klesbutikk.",
-        "Å starte en klesbutikk uten en tydelig forretningsmodell er som å seile uten kart. Du trenger ikke bare en vag idé om hva du vil selge, men en gjennomtenkt plan for hvordan butikken din skal skille seg ut, hvem du selger til, og hvordan du skal tjene penger.",
-        "Bærekraft er ikke lenger et tillegg eller en markedsføringsstrategi. Det er en forventning. Norske forbrukere i 2026 forventer at klesbutikker kan dokumentere hvor plaggene kommer fra, hvilke materialer som brukes, og hvordan arbeiderne i produksjonskjeden behandles."
-      ],
-      "id": "4359f2fe36f47784d72dc461",
-      "language": "nb",
-      "published_at": "2026-07-31T07:43:34",
-      "snippet": "<strong>De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK).</strong> Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere.",
-      "source": "Brave Search",
-      "source_rank": 7,
-      "title": "Starte klesbutikk i 2026: komplett guide fra idé til åpning - Shoplabs",
-      "url": "https://shoplabs.no/butikkbloggen/starte-klesbutikk-i-2026-komplett-guide-fra-ide-til-apning-2/"
-    },
-    {
-      "discovery_query": "butikkinnredning klesbutikk Norge",
-      "extra_snippets": [
         "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ·"
       ],
       "id": "67f88cde81cc5ba7b27dc6ea",
@@ -727,7 +709,7 @@
       "published_at": "2024-05-16T13:05:10",
       "snippet": "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ...",
       "source": "Brave Search",
-      "source_rank": 8,
+      "source_rank": 7,
       "title": "Selected – Klesbutikk i Bergen - Heggland Heiltre AS",
       "url": "https://heggland-heiltre.no/selected-klesbutikk-i-bergen/"
     },
@@ -742,23 +724,40 @@
       "published_at": null,
       "snippet": "Type innredning Slatboard ... Svart Hvit Grå Se alle! <strong>Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel</strong>....",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Butikkinnredning Archives - Side 2 av 2 - Butikkartikler AS",
       "url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2/"
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
-        "Butikkinnredning (716) Lagerutstyr (538) Sikkerhet og overvåkning (309) Vareparti og konkursbo (594) Annet butikkutstyr (447)Gå til resultat · Fiks ferdig (88)Gå til resultat · Ingen resultater ·"
+        "De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK). Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere. Minstekravet til aksjekapital er 30 000 kroner.",
+        "Finansieringen kan komme fra egne midler, lån fra banken, eller støtteordninger gjennom Innovasjon Norge. I 2026 finnes det også flere tilskuddsordninger rettet mot bærekraftig handel og sirkulærøkonomi. Undersøk hva som er tilgjengelig i din region. Noen velger å starte med en crowdfunding-kampanje, noe som også fungerer som en tidlig markedstest av konseptet ditt. Innkjøpet er selve hjertet av en klesbutikk.",
+        "Å starte en klesbutikk uten en tydelig forretningsmodell er som å seile uten kart. Du trenger ikke bare en vag idé om hva du vil selge, men en gjennomtenkt plan for hvordan butikken din skal skille seg ut, hvem du selger til, og hvordan du skal tjene penger.",
+        "Bærekraft er ikke lenger et tillegg eller en markedsføringsstrategi. Det er en forventning. Norske forbrukere i 2026 forventer at klesbutikker kan dokumentere hvor plaggene kommer fra, hvilke materialer som brukes, og hvordan arbeiderne i produksjonskjeden behandles."
       ],
-      "id": "2f5eb1f1cc67c45b4eca8b0d",
+      "id": "4359f2fe36f47784d72dc461",
       "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "published_at": "2026-07-31T07:43:34",
+      "snippet": "<strong>De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK).</strong> Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Starte klesbutikk i 2026: komplett guide fra idé til åpning - Shoplabs",
+      "url": "https://shoplabs.no/butikkbloggen/starte-klesbutikk-i-2026-komplett-guide-fra-ide-til-apning-2/"
+    },
+    {
+      "discovery_query": "butikkinnredning klesbutikk Norge",
+      "extra_snippets": [
+        "Ava Butikkinnredning har levert butikkinnredning og utstillingsmateriell til bedrifter over hele landet siden 2008."
+      ],
+      "id": "c27bfbff55509642b99887ea",
+      "language": "nb",
+      "published_at": "2025-11-12T11:53:03",
+      "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
       "source": "Brave Search",
       "source_rank": 10,
-      "title": "Butikkinnredning | til salgs | FINN Torget",
-      "url": "https://www.finn.no/bap/forsale/search.html?product_category=2.91.3108.359"
+      "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
+      "url": "https://avabutikkinnredning.no/om-oss/"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -840,6 +839,20 @@
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
       "extra_snippets": [
+        "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·"
+      ],
+      "id": "83c0878f4fce92ca326f92de",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·",
+      "source": "Brave Search",
+      "source_rank": 6,
+      "title": "Utstillingsdukker - Boltreplassen",
+      "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
+    },
+    {
+      "discovery_query": "klesstativ utstillingsdukker selges Norge",
+      "extra_snippets": [
         "I motsetning til en tørketrommel, som bruker mye strøm, er et tørkestativ en helt passiv og kostnadsfri metode som i tillegg er mye mer skånsom mot tekstilene. Ved å lufttørke klærne på et Klesstativ, unngår man den harde slitasjen og krympingen som en tørketrommel kan forårsake, noe som forlenger levetiden på favorittplaggene dine betraktelig.",
         "Selges kun i varehus."
       ],
@@ -848,23 +861,9 @@
       "published_at": null,
       "snippet": "Tørk klærne effektivt inne eller ute med et solid tørkestativ. Vi har et bredt utvalg av sammenleggbare modeller for enhver plass. Kjøp ditt tørkestativ.",
       "source": "Brave Search",
-      "source_rank": 6,
+      "source_rank": 7,
       "title": "Tørkestativ | For effektiv og skånsom tørking av klær | Jula",
       "url": "https://www.jula.no/catalog/hjem-og-husholdning/klesvask-og-stell/klespleie/torkestativer/"
-    },
-    {
-      "discovery_query": "klesstativ utstillingsdukker selges Norge",
-      "extra_snippets": [
-        "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·"
-      ],
-      "id": "83c0878f4fce92ca326f92de",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·",
-      "source": "Brave Search",
-      "source_rank": 7,
-      "title": "Utstillingsdukker - Boltreplassen",
-      "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
