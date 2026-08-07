@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-08-06T14:34:30.372647+00:00",
+  "generated_at": "2026-08-07T00:15:10.418020+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -127,18 +127,6 @@
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [],
-      "id": "ff05dbb792cccc1b5cc5b636",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Oversikt over bedrifter som er meldt konkurs eller blitt tvangsaviklet. Du kan se lister for hele landet, eller for bestemte områder og bransjer.",
-      "source": "Brave Search",
-      "source_rank": 9,
-      "title": "Proff™ - Konkurser og tvangsaviklinger",
-      "url": "https://www.proff.no/konkurser"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [
         "Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta."
       ],
@@ -147,9 +135,26 @@
       "published_at": "2003-10-28T10:11:00",
       "snippet": "<strong>Devold Tekstil blei slått konkurs i juli 2002 etter å ha gått med underskot dei ti siste åra av drifta</strong>.",
       "source": "Brave Search",
-      "source_rank": 10,
+      "source_rank": 9,
       "title": "Devold Tekstil frifunne",
       "url": "https://www.nrk.no/mr/devold-tekstil-frifunne-1.244617"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "extra_snippets": [
+        "Se etter Sorteringsmerkene der du leverer klær og tekstiler du ikke lenger trenger eller som er ødelagte, enten det er på tekstiltårn fra tekstilinnsamlere som Fretex, UFF, Røde Kors og Kirkens Bymisjon Miljø, kommunale returpunkt eller nærmeste gjenvinningsstasjon.",
+        "Noen kommuner samler inn brukbare og ødelagte klær og tekstiler hver for seg, mens andre kommuner samler dem inn sammen.",
+        "Våte og skitne tekstiler kastes i restavfallet*. Dersom de leveres sammen brukbare og ødelagte klær og tekstiler ødelegger de for gjenbruk og gjenvinning.",
+        "På Sortere finner du svar på hva du gjør med brukbare og ødelagte klær og tekstiler i din kommune."
+      ],
+      "id": "a4a7a1411fea626aeac4bb42",
+      "language": "nb",
+      "published_at": "2025-10-15T07:18:50",
+      "snippet": "På Sortere finner du svar på hva du gjør med brukbare og ødelagte klær og tekstiler i din kommune.",
+      "source": "Brave Search",
+      "source_rank": 10,
+      "title": "Slik sorterer du klær og tekstiler i din kommune | Sortere",
+      "url": "https://sortere.no/sorteringsguider/hvordan-sorterer-du-klaer-og-tekstiler"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -169,20 +174,6 @@
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
       "extra_snippets": [
-        "opphørssalg · substantiv · MODERAT BOKMÅLet · genus · nøytrum · ubestemt artikkel · et · FULL BOKMÅLSNORM · ETYMOLOGI · første ledd opphør · BETYDNING OG BRUK · salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned · SITATER · en liten butikk som har opphørssalg ·"
-      ],
-      "id": "0fd193c4d16fd92ffb58fc87",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "opphørssalg · substantiv · MODERAT ... · første ledd opphør · BETYDNING OG BRUK · <strong>salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned</strong> · SITATER · en liten butikk som ......",
-      "source": "Brave Search",
-      "source_rank": 2,
-      "title": "opphørssalg - Det Norske Akademis ordbok",
-      "url": "https://naob.no/ordbok/opph%C3%B8rssalg"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
         "Opphørssalg er en type salgsarrangement hvor varer blir solgt for å tømme lageret før en bedrift stenger eller flytter. Dette kan være en god mulighet for kunder å kjøpe produkter til lave priser, men det kan også være en tegn på at bedriften har økonomiske problemer. Butikken har opphørssalg før den lukker.",
         "Oppløsningene av opphørssalgiene ble annonsert i går. ... Butikkene holder opphørssalga før de stenger.",
         "Butikken holder opphørssalget før den stenger.",
@@ -193,9 +184,23 @@
       "published_at": null,
       "snippet": "<strong>Opphørssalg er en type salgsarrangement hvor varer blir solgt for å tømme lageret før en bedrift stenger eller flytter</strong>. Dette kan være en god mulighet for kunder å kjøpe produkter til lave priser, men det kan også være en tegn på at bedriften har økonomiske problemer.",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 2,
       "title": "Opphørssalg - hva er det?",
       "url": "https://www.ordlista.no/ord/opph%C3%B8rssalga"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "opphørssalg · substantiv · MODERAT BOKMÅLet · genus · nøytrum · ubestemt artikkel · et · FULL BOKMÅLSNORM · ETYMOLOGI · første ledd opphør · BETYDNING OG BRUK · salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned · SITATER · en liten butikk som har opphørssalg ·"
+      ],
+      "id": "0fd193c4d16fd92ffb58fc87",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "opphørssalg · substantiv · MODERAT ... · første ledd opphør · BETYDNING OG BRUK · <strong>salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned</strong> · SITATER · en liten butikk som ......",
+      "source": "Brave Search",
+      "source_rank": 3,
+      "title": "opphørssalg - Det Norske Akademis ordbok",
+      "url": "https://naob.no/ordbok/opph%C3%B8rssalg"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -490,6 +495,21 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [
+        "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
+        "Alt innen butikkinnredning – over 7000 artikler klare for rask levering."
+      ],
+      "id": "bd6977fd8acb108de8393557",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
+      "source": "Brave Search",
+      "source_rank": 3,
+      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
+      "url": "https://www.supersellers.no/katalog"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "extra_snippets": [
         "Vårt profesjonelle og moderne utvalg av butikkinnredning. Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
         "Vi tilbyr inventar til butikkinnredning til gode priser.",
         "Under vårt utvalg av løst butikkinnredning finner du for eksempel stativer, salgsbord, utstillingsbord, puffer, podier, gardinstenger til prøverom samt TUBO-/wirereoler.",
@@ -500,24 +520,9 @@
       "published_at": null,
       "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med <strong>SuperSellerS&#x27; butikkinnredning</strong> blir butikkoppsettet ditt litt enklere ...",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 4,
       "title": "Butikkinnredning og inventar. 5–7 dagers levering. ⭐ SE mer HER – SuperSellerS",
       "url": "https://www.supersellers.no/"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [
-        "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
-        "Alt innen butikkinnredning – over 7000 artikler klare for rask levering."
-      ],
-      "id": "bd6977fd8acb108de8393557",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
-      "url": "https://www.supersellers.no/katalog"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -553,27 +558,29 @@
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [],
-      "id": "875f71823b7227328ea295d7",
+      "extra_snippets": [
+        "Butikkinnredning (716) Lagerutstyr (538) Sikkerhet og overvåkning (309) Vareparti og konkursbo (594) Annet butikkutstyr (447)Gå til resultat · Fiks ferdig (88)Gå til resultat · Ingen resultater ·"
+      ],
+      "id": "4d96f214044f8d44d022d4d3",
       "language": "nb",
       "published_at": null,
-      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
       "source_rank": 7,
-      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
+      "title": "Butikkinnredning | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [],
-      "id": "72d343831b08e2486a3f5b73",
+      "id": "e71772deae49d9ffbeb504c2",
       "language": "no",
       "published_at": null,
       "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
       "source": "Brave Search",
       "source_rank": 8,
       "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
-      "url": "https://www.supersellerskatalog.no/inspirasjon"
+      "url": "https://www.supersellerskatalog.no/"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -653,18 +660,6 @@
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
-      "extra_snippets": [],
-      "id": "72d343831b08e2486a3f5b73",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
-      "url": "https://www.supersellerskatalog.no/inspirasjon"
-    },
-    {
-      "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
         "Vi kan også skreddersy butikkinnredning som går under navnet butikkhyller, dette er hyllesystem man ofte ser bl.a. i dagligvarebutikker. Uansett om du driver klesbutikk, sportsbutikk, hobbybutikk, blomsterforretning eller annen detaljhandel, har vi innredningen som lar deg vise frem varene på en profesjonell og inspirerende måte.",
         "Butikkinnredning til markedsledende priser - se vår nettbutikk for innredninger og artikler til din virksomhet - avabutikkinnredning.no",
@@ -676,9 +671,21 @@
       "published_at": null,
       "snippet": "Vi kan også skreddersy butikkinnredning som går under navnet butikkhyller, dette er hyllesystem man ofte ser bl.a. i dagligvarebutikker. Uansett om du driver klesbutikk, sportsbutikk, hobbybutikk, blomsterforretning eller annen detaljhandel, har vi innredningen som lar deg vise frem varene ...",
       "source": "Brave Search",
-      "source_rank": 5,
+      "source_rank": 4,
       "title": "Butikkinnredning - AVAbutikkinnredning",
       "url": "https://avabutikkinnredning.no/produktkategori/butikkinnredning/"
+    },
+    {
+      "discovery_query": "butikkinnredning klesbutikk Norge",
+      "extra_snippets": [],
+      "id": "72d343831b08e2486a3f5b73",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
+      "source": "Brave Search",
+      "source_rank": 5,
+      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
+      "url": "https://www.supersellerskatalog.no/inspirasjon"
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
@@ -835,20 +842,6 @@
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
       "extra_snippets": [
-        "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·"
-      ],
-      "id": "83c0878f4fce92ca326f92de",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Utstillingsdukker - Boltreplassen",
-      "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
-    },
-    {
-      "discovery_query": "klesstativ utstillingsdukker selges Norge",
-      "extra_snippets": [
         "I motsetning til en tørketrommel, som bruker mye strøm, er et tørkestativ en helt passiv og kostnadsfri metode som i tillegg er mye mer skånsom mot tekstilene. Ved å lufttørke klærne på et Klesstativ, unngår man den harde slitasjen og krympingen som en tørketrommel kan forårsake, noe som forlenger levetiden på favorittplaggene dine betraktelig.",
         "Selges kun i varehus."
       ],
@@ -857,9 +850,23 @@
       "published_at": null,
       "snippet": "Tørk klærne effektivt inne eller ute med et solid tørkestativ. Vi har et bredt utvalg av sammenleggbare modeller for enhver plass. Kjøp ditt tørkestativ.",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 6,
       "title": "Tørkestativ | For effektiv og skånsom tørking av klær | Jula",
       "url": "https://www.jula.no/catalog/hjem-og-husholdning/klesvask-og-stell/klespleie/torkestativer/"
+    },
+    {
+      "discovery_query": "klesstativ utstillingsdukker selges Norge",
+      "extra_snippets": [
+        "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·"
+      ],
+      "id": "83c0878f4fce92ca326f92de",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·",
+      "source": "Brave Search",
+      "source_rank": 7,
+      "title": "Utstillingsdukker - Boltreplassen",
+      "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -937,18 +944,6 @@
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
-      "extra_snippets": [],
-      "id": "f413b0e27b2c75607ca7fca6",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 1 224 annonse(r) i kategorien Symaskiner under Fritid, hobby og underholdning til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 3,
-      "title": "Symaskiner | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.86.7734.123"
-    },
-    {
-      "discovery_query": "industrisymaskin brukt Norge",
       "extra_snippets": [
         "Tilstand: god (brukt), Symaskin, stativ-kjedesting symaskin, industrisymaskin, industri-symaskin, stativsymaskin, overlock-symaskin på mobil stativ, stofftransport via skyvehjul - Produsent: Dohle, industrisymaskin type 751-914 stativ-kjedesting symaskin - Drift: Siemens 0,37 kW - Betjening: med fotpedal - Mål: 740/620/H1320 mm Lrjc Icxnjvaz Tme Ssp - Vekt: 102 kg",
         "Brukt Symaskin til salgs - Machineseeker ✔️ Stort utvalg av brukte maskiner fra kjente produsenter og forhandlere.",
@@ -960,9 +955,21 @@
       "published_at": null,
       "snippet": "- Produsent: Dohle, industrisymaskin type 751-914, kjedesting-symaskin på stativ - Drift: Kobold 0,37 kW - Betjening: med fotpedal - Mål: 630/470/H1360 mm - Vekt: 93 kg Lrecova Acpj Icxn Sop · Prisinformasjon Prisinformasjon Allerede forespurt Se detaljer ... Tilstand: god (brukt), Byggeår: 1966, Symaskin, kjedesting-symaskin på stativ, industrisymaskin, industrisymaskin på stativ, overlockmaskin på rullestativ, stofftransport via skyvehjul -Produsent: Dohle, industrisymaskin, type 751-914, kjedesting-symaskin på stativ Lecovcxrls Icxn Serp -Drift: Loher 0,37 kW -Betjening: med fotpedal -Mål: 750/600/H1330 mm -Vekt: 101 kg",
       "source": "Brave Search",
-      "source_rank": 4,
+      "source_rank": 3,
       "title": "▷ Brukt Symaskin til salgs - Machineseeker",
       "url": "https://www.machineseeker.no/mss/symaskin"
+    },
+    {
+      "discovery_query": "industrisymaskin brukt Norge",
+      "extra_snippets": [],
+      "id": "f413b0e27b2c75607ca7fca6",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Du finner 1 224 annonse(r) i kategorien Symaskiner under Fritid, hobby og underholdning til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "source": "Brave Search",
+      "source_rank": 4,
+      "title": "Symaskiner | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.86.7734.123"
     },
     {
       "discovery_query": "industrisymaskin brukt Norge",
@@ -1156,6 +1163,23 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
+        "Montering av lagerreoler skjer i to trinn og utføres av kvalifisert personell. Først vurderer montørene forholdene på stedet, som gulv, plassering og eksisterende utstyr. Våre spesialister finner den sikreste og mest effektive måten å sette opp reolsystemet på.",
+        "Lastekapasiteten til lagerreoler avhenger av flere faktorer, blant annet hvilken type reolsystem som brukes. Hos Jungheinrich beregner vi bæreevnen for hvert enkelt system, med høy nøyaktighet, ved å analysere ulike komponenter og konstruksjonsdetaljer.",
+        "Kjøp lagerreoler på nett via vår nettbutikk www.jungheinrich-shop.no, eller send en produktforespørsel og få grundig rådgivning.",
+        "Lagerreoler er robuste reolsystemer utviklet for sikker og oversiktlig lagring av varer i flere nivåer."
+      ],
+      "id": "76a8b44880e350452a2a05e2",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
+      "source": "Brave Search",
+      "source_rank": 8,
+      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
+      "url": "https://jungheinrich.no/produkter/reol-og-lagerl%C3%B8sning"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "extra_snippets": [
         "Lagerreoler og lagerhyller er en sentral del av en effektiv lagerinnredning – enten det gjelder verksted, nettbutikk, arkiv eller industri. En gjennomtenkt lagerreol skaper struktur og oversikt, slik at varer kan håndteres raskt og uten unødvendige arbeidsprosesser.",
         "Våre lagerreoler er utviklet for profesjonell bruk og konstruert for å tåle høy belastning i daglig drift. De fungerer som stabile reoler til lager, hvor både mindre kasser, verktøy og tyngre industrivarer kan oppbevares sikkert. Samtidig gir lagerhyller nødvendig fleksibilitet, ettersom hyllenivåene kan tilpasses ulike varetyper og arbeidsprosesser.",
         "Når du velger reoler til lager i et industrielt miljø, er riktig dimensjonering avgjørende. En solid lagerreol reduserer risikoen for skader, driftsstans og unødvendig håndtering. Samtidig bidrar robuste lagerhyller til bedre struktur og et tryggere arbeidsmiljø.",
@@ -1166,26 +1190,9 @@
       "published_at": null,
       "snippet": "Finn lagerreoler, lagerhyller og reoler til lager hos <strong>HHL Lagerinnredning</strong>. Fleksible og robuste lagerreoler til industri med rask levering og profesjonell rådgivning.",
       "source": "Brave Search",
-      "source_rank": 8,
+      "source_rank": 9,
       "title": "Lagerreoler og lagerhyller | Reoler til lager og industri",
       "url": "https://www.hhl-lagerinnredning.no/lagerreoler"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "extra_snippets": [
-        "Montering av lagerreoler skjer i to trinn og utføres av kvalifisert personell. Først vurderer montørene forholdene på stedet, som gulv, plassering og eksisterende utstyr. Våre spesialister finner den sikreste og mest effektive måten å sette opp reolsystemet på.",
-        "Lastekapasiteten til lagerreoler avhenger av flere faktorer, blant annet hvilken type reolsystem som brukes. Hos Jungheinrich beregner vi bæreevnen for hvert enkelt system, med høy nøyaktighet, ved å analysere ulike komponenter og konstruksjonsdetaljer.",
-        "Kjøp lagerreoler på nett via vår nettbutikk www.jungheinrich-shop.no, eller send en produktforespørsel og få grundig rådgivning.",
-        "Lagerreoler er robuste reolsystemer utviklet for sikker og oversiktlig lagring av varer i flere nivåer."
-      ],
-      "id": "0623254318f1aaf8f835c57c",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
-      "source": "Brave Search",
-      "source_rank": 9,
-      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
-      "url": "https://www.jungheinrich.no/produkter/reoler-og-lagerlosninger"
     },
     {
       "discovery_query": "lagerreoler selges Norge",

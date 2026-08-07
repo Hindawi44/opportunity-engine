@@ -5,6 +5,231 @@
   "bankruptcy_discovery_records": [
     {
       "country": "Norway",
+      "document_id": "konkurs-app-938220549",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "NORDRE FOLLO",
+        "current_price_nok": null,
+        "description": "Utvikling og drift av fast eiendom, herunder erverv av tomter og bygg, samt deltakelse i andre eiendomsselskaper og alt som står i forbindelse med dette. Selskapet kan også gi gaver til veldedige og allmennyttige formål.",
+        "ends_at": null,
+        "industry_code": "68.120",
+        "industry_description": "Utvikling og salg av byggeprosjekter",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938220549",
+        "trustee": "Adv. Harald Jahren"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Utvikling og drift av fast eiendom, herunder erverv av tomter og bygg, samt deltakelse i andre eiendomsselskaper og alt som står i forbindelse med dette. Selskapet kan også gi gaver til veldedige og allmennyttige formål.",
+      "title": "ALGETA AS",
+      "url": "https://konkurs.app/konkursbo/938220549"
+    },
+    {
+      "country": "Norway",
+      "document_id": "konkurs-app-938221286",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "ASKER",
+        "current_price_nok": null,
+        "description": "Arkitektvirksomhet",
+        "ends_at": null,
+        "industry_code": "71.110",
+        "industry_description": "Arkitektvirksomhet",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938221286",
+        "trustee": "Adv. Atle Zerwekh"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Arkitektvirksomhet",
+      "title": "ARTUR MAREK BLAROWSKI KONKURSBO",
+      "url": "https://konkurs.app/konkursbo/938221286"
+    },
+    {
+      "country": "Norway",
+      "document_id": "konkurs-app-938221308",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "NES",
+        "current_price_nok": null,
+        "description": "Drift av cafe og catering.",
+        "ends_at": null,
+        "industry_code": "56.110",
+        "industry_description": "Drift av restauranter",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938221308",
+        "trustee": "Adv. Ellen Dorthea Tangen Eilerås"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Drift av cafe og catering.",
+      "title": "BEVERLAND AS",
+      "url": "https://konkurs.app/konkursbo/938221308"
+    },
+    {
+      "country": "Norway",
+      "document_id": "konkurs-app-938221200",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "LIER",
+        "current_price_nok": null,
+        "description": "Butikkhandel med klær.",
+        "ends_at": null,
+        "industry_code": "47.710",
+        "industry_description": "Detaljhandel med klær",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938221200",
+        "trustee": "Adv. Hans V. Haug"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Butikkhandel med klær.",
+      "title": "FRONT LIER AS",
+      "url": "https://konkurs.app/konkursbo/938221200"
+    },
+    {
+      "country": "Norway",
+      "document_id": "konkurs-app-938219761",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "SANDNES",
+        "current_price_nok": null,
+        "description": "Drive blikkenslagerverksted samt videreutvikling, produksjon og salg innenfor faget V.V.S. og hva hermed står i forbindelse. I tillegg produksjon av metallartikler innen bygg og industri.",
+        "ends_at": null,
+        "industry_code": "25.110",
+        "industry_description": "Produksjon av metallkonstruksjoner og deler",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938219761",
+        "trustee": "Adv. Andreas Haukland Westlye"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Drive blikkenslagerverksted samt videreutvikling, produksjon og salg innenfor faget V.V.S. og hva hermed står i forbindelse. I tillegg produksjon av metallartikler innen bygg og industri.",
+      "title": "GANN BLIKK AS",
+      "url": "https://konkurs.app/konkursbo/938219761"
+    },
+    {
+      "country": "Norway",
+      "document_id": "konkurs-app-938218617",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "KINN",
+        "current_price_nok": null,
+        "description": "Utleie av eiendommer og produksjonsutstyr.",
+        "ends_at": null,
+        "industry_code": "68.200",
+        "industry_description": "Utleie av egen eller leid fast eiendom",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938218617",
+        "trustee": "Adv. Endre Rutledal"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Utleie av eiendommer og produksjonsutstyr.",
+      "title": "HJELPER MYE AS",
+      "url": "https://konkurs.app/konkursbo/938218617"
+    },
+    {
+      "country": "Norway",
+      "document_id": "konkurs-app-938220816",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "NESODDEN",
+        "current_price_nok": null,
+        "description": "Kafédrift. Kjøp og salg og servering av mat og drikke.",
+        "ends_at": null,
+        "industry_code": "56.110",
+        "industry_description": "Drift av restauranter",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938220816",
+        "trustee": "Adv. Harald Jahren"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Kafédrift. Kjøp og salg og servering av mat og drikke.",
+      "title": "KAFFE OG SÅNT AS",
+      "url": "https://konkurs.app/konkursbo/938220816"
+    },
+    {
+      "country": "Norway",
+      "document_id": "konkurs-app-938220182",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "SANDEFJORD",
+        "current_price_nok": null,
+        "description": "Transport av gods på vei.",
+        "ends_at": null,
+        "industry_code": "49.410",
+        "industry_description": "Godstransport på vei",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938220182",
+        "trustee": "Adv. Jessica Nazareno Ellingsen"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Transport av gods på vei.",
+      "title": "OL TRANSPORT AS",
+      "url": "https://konkurs.app/konkursbo/938220182"
+    },
+    {
+      "country": "Norway",
+      "document_id": "konkurs-app-938217777",
+      "metadata": {
+        "access_mode": "public_api",
+        "asset_type": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "city": "GISKE",
+        "current_price_nok": null,
+        "description": "Bygg og anlegg, samt service innen bygg og håndtverk.",
+        "ends_at": null,
+        "industry_code": "41.000",
+        "industry_description": "Oppføring av bygninger",
+        "lead_only": true,
+        "mva_status": "unknown",
+        "organization_number": "938217777",
+        "trustee": "Adv. Christian Garmann"
+      },
+      "published_at": "2026-08-06T00:00:00",
+      "source_name": "Konkurs.app",
+      "source_type": "bankruptcy_discovery_lead",
+      "text": "Bygg og anlegg, samt service innen bygg og håndtverk.",
+      "title": "TRÅ BYGGSERVICE AS",
+      "url": "https://konkurs.app/konkursbo/938217777"
+    },
+    {
+      "country": "Norway",
       "document_id": "konkurs-app-938213593",
       "metadata": {
         "access_mode": "public_api",
@@ -402,236 +627,11 @@
       "text": "Utleie og forvaltning av eiendom, samt vaktmestertjenester og det som naturlig faller under dette.",
       "title": "ARCTIC EIENDOM NORD AS",
       "url": "https://konkurs.app/konkursbo/938206260"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938206392",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "city": "OSLO",
-        "current_price_nok": null,
-        "description": "Salg og formidling av kunstobjekter herunder drift av nettbutikk, samt delta i selskaper som det faller naturlig å delta i.",
-        "ends_at": null,
-        "industry_code": "47.690",
-        "industry_description": "Detaljhandel med kulturvarer ikke nevnt annet sted",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938206392",
-        "trustee": "Adv. Tom Hugo Ottesen"
-      },
-      "published_at": "2026-08-04T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Salg og formidling av kunstobjekter herunder drift av nettbutikk, samt delta i selskaper som det faller naturlig å delta i.",
-      "title": "ART ATTACK AS",
-      "url": "https://konkurs.app/konkursbo/938206392"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938206368",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "city": "HALDEN",
-        "current_price_nok": null,
-        "description": "Snekkerarbeid, montering av dører, vinduer, kjøkken med mer. Tømrer, oppføring og vedlikehold av bygninger.",
-        "ends_at": null,
-        "industry_code": "43.320",
-        "industry_description": "Snekkerarbeid",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938206368",
-        "trustee": "Adv. Ole Richard Holm-Olsen"
-      },
-      "published_at": "2026-08-04T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Snekkerarbeid, montering av dører, vinduer, kjøkken med mer. Tømrer, oppføring og vedlikehold av bygninger.",
-      "title": "HUS SERVICE AS",
-      "url": "https://konkurs.app/konkursbo/938206368"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938207151",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "city": "OSLO",
-        "current_price_nok": null,
-        "description": "Rørleggervirksomhet og prosjektering innen VVS",
-        "ends_at": null,
-        "industry_code": "43.221",
-        "industry_description": "Rørleggerarbeid",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938207151",
-        "trustee": "Adv. Tom Hugo Ottesen"
-      },
-      "published_at": "2026-08-04T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Rørleggervirksomhet og prosjektering innen VVS",
-      "title": "MERCUR VVS ENTREPRENØR AS",
-      "url": "https://konkurs.app/konkursbo/938207151"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938206929",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "city": "BERGEN",
-        "current_price_nok": null,
-        "description": "Utføre elektriske installasjoner og smarthus systemer i bolig, forretningsbygg og industribygg. Samt ha service og installasjon av storkjøkkenutstyr og robotsystemer. Import og salg av eletronisk og elektrisk utstyr og komponenter.",
-        "ends_at": null,
-        "industry_code": "43.210",
-        "industry_description": "Elektrisk installasjonsarbeid",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938206929",
-        "trustee": "Adv. Gunnar A. Haahjem"
-      },
-      "published_at": "2026-08-04T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Utføre elektriske installasjoner og smarthus systemer i bolig, forretningsbygg og industribygg. Samt ha service og installasjon av storkjøkkenutstyr og robotsystemer. Import og salg av eletronisk og elektrisk utstyr og komponenter.",
-      "title": "SMART ELEKTRONIKK AS",
-      "url": "https://konkurs.app/konkursbo/938206929"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938206325",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "city": "SANDEFJORD",
-        "current_price_nok": null,
-        "description": "Transport, Lager og pakking. Komplett lager og transportløsning for butikker og nettbutikker. Inngående og utgående logistikk, samt plukk og pakking av varer.",
-        "ends_at": null,
-        "industry_code": "53.200",
-        "industry_description": "Andre post- og budtjenester",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938206325",
-        "trustee": "Adv. Øyvind Røed"
-      },
-      "published_at": "2026-08-04T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Transport, Lager og pakking. Komplett lager og transportløsning for butikker og nettbutikker. Inngående og utgående logistikk, samt plukk og pakking av varer.",
-      "title": "SPRING LOGISTIKK VARETRANSPORT AS",
-      "url": "https://konkurs.app/konkursbo/938206325"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938206872",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "city": "OSLO",
-        "current_price_nok": null,
-        "description": "Interkulturell og interreligiøs kontakt basert på universelle menneskerettigheter.",
-        "ends_at": null,
-        "industry_code": "94.992",
-        "industry_description": "Aktiviteter i andre medlemsorganisasjoner ellers",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938206872",
-        "trustee": "Adv. Tom Hugo Ottesen"
-      },
-      "published_at": "2026-08-04T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Interkulturell og interreligiøs kontakt basert på universelle menneskerettigheter.",
-      "title": "STIFTELSEN DIALOG FOR FRED",
-      "url": "https://konkurs.app/konkursbo/938206872"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938210802",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "city": "OSLO",
-        "current_price_nok": null,
-        "description": "Bygg- og anleggsarbeider samt byggteknisk rådgivning.",
-        "ends_at": null,
-        "industry_code": "41.000",
-        "industry_description": "Oppføring av bygninger",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938210802",
-        "trustee": "Adv. Johan Henrik Nossum"
-      },
-      "published_at": "2026-08-04T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Bygg- og anleggsarbeider samt byggteknisk rådgivning.",
-      "title": "F8 ENTREPRENØR AS",
-      "url": "https://konkurs.app/konkursbo/938210802"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938210772",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "city": "TOKKE",
-        "current_price_nok": null,
-        "description": "Eige andel i selskap, etablere og starte selskap.",
-        "ends_at": null,
-        "industry_code": "00.000",
-        "industry_description": "Uoppgitt",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938210772",
-        "trustee": "Adv. Inge Evja"
-      },
-      "published_at": "2026-08-04T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Eige andel i selskap, etablere og starte selskap.",
-      "title": "HAUGEN INVEST&HOLDING AS",
-      "url": "https://konkurs.app/konkursbo/938210772"
-    },
-    {
-      "country": "Norway",
-      "document_id": "konkurs-app-938200920",
-      "metadata": {
-        "access_mode": "public_api",
-        "asset_type": null,
-        "bankruptcy_date": "2026-08-03T00:00:00",
-        "city": "HAMARØY",
-        "current_price_nok": null,
-        "description": "Salg av takeawat thaimat. Salg av snekkertjenester.",
-        "ends_at": null,
-        "industry_code": "56.110",
-        "industry_description": "Drift av restauranter",
-        "lead_only": true,
-        "mva_status": "unknown",
-        "organization_number": "938200920",
-        "trustee": "Adv. Øyvind J Eidnes"
-      },
-      "published_at": "2026-08-03T00:00:00",
-      "source_name": "Konkurs.app",
-      "source_type": "bankruptcy_discovery_lead",
-      "text": "Salg av takeawat thaimat. Salg av snekkertjenester.",
-      "title": "AROYDEE THAIMAT AS",
-      "url": "https://konkurs.app/konkursbo/938200920"
     }
   ],
   "buy_count": 0,
   "decision_source": "data/decision_intelligence.json",
-  "deduplicated_count": 51,
+  "deduplicated_count": 50,
   "discovery_by_id": {
     "unified-auksjonen-567886": {
       "discovery_score": 16.0,
@@ -748,11 +748,11 @@
       ]
     },
     "unified-auksjonen-596850": {
-      "discovery_score": 19.0,
+      "discovery_score": 23.5,
       "is_exceptional": false,
       "opportunity_id": "unified-auksjonen-596850",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 19/100."
+        "درجة جودة الفرصة الأساسية 24/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -884,25 +884,6 @@
       "discovery_score": 16.0,
       "is_exceptional": false,
       "opportunity_id": "unified-auksjonen-599806",
-      "reasons": [
-        "درجة جودة الفرصة الأساسية 16/100."
-      ],
-      "requires_immediate_review": false,
-      "signals": [],
-      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
-      "tier": "low",
-      "tier_label": "⚪ أولوية منخفضة",
-      "warnings": [
-        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
-        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
-        "موثوقية البائع غير متحققة.",
-        "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
-      ]
-    },
-    "unified-auksjonen-608112": {
-      "discovery_score": 16.0,
-      "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-608112",
       "reasons": [
         "درجة جودة الفرصة الأساسية 16/100."
       ],
@@ -1051,25 +1032,6 @@
         "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
       ]
     },
-    "unified-auksjonen-614297": {
-      "discovery_score": 16.0,
-      "is_exceptional": false,
-      "opportunity_id": "unified-auksjonen-614297",
-      "reasons": [
-        "درجة جودة الفرصة الأساسية 16/100."
-      ],
-      "requires_immediate_review": false,
-      "signals": [],
-      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
-      "tier": "low",
-      "tier_label": "⚪ أولوية منخفضة",
-      "warnings": [
-        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
-        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
-        "موثوقية البائع غير متحققة.",
-        "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
-      ]
-    },
     "unified-auksjonen-614667": {
       "discovery_score": 11.5,
       "is_exceptional": false,
@@ -1204,11 +1166,11 @@
       ]
     },
     "unified-auksjonen-616111": {
-      "discovery_score": 11.5,
+      "discovery_score": 16.0,
       "is_exceptional": false,
       "opportunity_id": "unified-auksjonen-616111",
       "reasons": [
-        "درجة جودة الفرصة الأساسية 12/100."
+        "درجة جودة الفرصة الأساسية 16/100."
       ],
       "requires_immediate_review": false,
       "signals": [],
@@ -1601,13 +1563,32 @@
         "موثوقية البائع غير متحققة.",
         "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
       ]
+    },
+    "unified-auksjonen-617387": {
+      "discovery_score": 11.5,
+      "is_exceptional": false,
+      "opportunity_id": "unified-auksjonen-617387",
+      "reasons": [
+        "درجة جودة الفرصة الأساسية 12/100."
+      ],
+      "requires_immediate_review": false,
+      "signals": [],
+      "suggested_action": "لا تعطِ الفرصة أولوية حاليًا.",
+      "tier": "low",
+      "tier_label": "⚪ أولوية منخفضة",
+      "warnings": [
+        "لا توجد أدلة سوق كافية لاحتساب ميزة سعرية مؤكدة.",
+        "الربحية غير مكتملة بسبب غياب سعر سوق أو تكاليف مؤكدة.",
+        "موثوقية البائع غير متحققة.",
+        "توجد فجوات أدلة تمنع إصدار قرار شراء آمن."
+      ]
     }
   },
   "duplicate_count": 0,
   "duplicate_groups_merged": 0,
-  "extracted_count": 51,
-  "fetched_count": 76,
-  "generated_at": "2026-08-06T14:34:35.265090+00:00",
+  "extracted_count": 50,
+  "fetched_count": 75,
+  "generated_at": "2026-08-07T00:15:15.015168+00:00",
   "history_path": "data/price_history.json",
   "intelligence_by_id": {
     "unified-auksjonen-567886": {
@@ -1823,7 +1804,7 @@
     },
     "unified-auksjonen-596850": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 19/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 24/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -2102,41 +2083,6 @@
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     },
-    "unified-auksjonen-608112": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-608112",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
     "unified-auksjonen-611173": {
       "confidence": "insufficient",
       "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
@@ -2372,41 +2318,6 @@
         "التحقق من هوية البائع وشروط التسليم قبل الدفع."
       ],
       "opportunity_id": "unified-auksjonen-612667",
-      "recommendation": "monitor",
-      "recommendation_label": "🟡 راقب",
-      "risks": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ],
-      "strengths": [],
-      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
-    },
-    "unified-auksjonen-614297": {
-      "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
-      "is_actionable": false,
-      "missing_evidence": [
-        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
-        "بيانات موثقة كافية عن البائع.",
-        "قيمة إعادة بيع محافظة.",
-        "التكلفة النهائية الكاملة.",
-        "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند auction_fee_nok.",
-        "تكلفة مؤكدة للبند vat_status.",
-        "تكلفة مؤكدة للبند transport_nok.",
-        "تكلفة مؤكدة للبند dismantling_nok.",
-        "تكلفة مؤكدة للبند storage_nok.",
-        "تكلفة مؤكدة للبند repair_nok.",
-        "تكلفة مؤكدة للبند cleaning_nok.",
-        "تكلفة مؤكدة للبند selling_cost_nok.",
-        "تكلفة مؤكدة للبند other_cost_nok."
-      ],
-      "next_actions": [
-        "جمع مقارنات سوق موثقة قبل أي شراء.",
-        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
-      ],
-      "opportunity_id": "unified-auksjonen-614297",
       "recommendation": "monitor",
       "recommendation_label": "🟡 راقب",
       "risks": [
@@ -2665,7 +2576,7 @@
     },
     "unified-auksjonen-616111": {
       "confidence": "insufficient",
-      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 12/100",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 16/100",
       "is_actionable": false,
       "missing_evidence": [
         "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
@@ -2673,7 +2584,6 @@
         "قيمة إعادة بيع محافظة.",
         "التكلفة النهائية الكاملة.",
         "مقارنات سوق موثقة.",
-        "تكلفة مؤكدة للبند purchase_price_nok.",
         "تكلفة مؤكدة للبند auction_fee_nok.",
         "تكلفة مؤكدة للبند vat_status.",
         "تكلفة مؤكدة للبند transport_nok.",
@@ -3401,14 +3311,133 @@
       ],
       "strengths": [],
       "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
+    },
+    "unified-auksjonen-617387": {
+      "confidence": "insufficient",
+      "headline": "فرصة تحتاج استكمال تحقق قبل الشراء — الدرجة 12/100",
+      "is_actionable": false,
+      "missing_evidence": [
+        "تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.",
+        "بيانات موثقة كافية عن البائع.",
+        "قيمة إعادة بيع محافظة.",
+        "التكلفة النهائية الكاملة.",
+        "مقارنات سوق موثقة.",
+        "تكلفة مؤكدة للبند purchase_price_nok.",
+        "تكلفة مؤكدة للبند auction_fee_nok.",
+        "تكلفة مؤكدة للبند vat_status.",
+        "تكلفة مؤكدة للبند transport_nok.",
+        "تكلفة مؤكدة للبند dismantling_nok.",
+        "تكلفة مؤكدة للبند storage_nok.",
+        "تكلفة مؤكدة للبند repair_nok.",
+        "تكلفة مؤكدة للبند cleaning_nok.",
+        "تكلفة مؤكدة للبند selling_cost_nok.",
+        "تكلفة مؤكدة للبند other_cost_nok."
+      ],
+      "next_actions": [
+        "جمع مقارنات سوق موثقة قبل أي شراء.",
+        "التحقق من هوية البائع وشروط التسليم قبل الدفع."
+      ],
+      "opportunity_id": "unified-auksjonen-617387",
+      "recommendation": "monitor",
+      "recommendation_label": "🟡 راقب",
+      "risks": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ],
+      "strengths": [],
+      "summary": "لا توجد أدلة كافية لإصدار قرار شراء آمن حتى الآن. أهم مخاطرة: No verified market comparables were supplied. أهم معلومة ناقصة: تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل."
     }
   },
   "keyword": null,
-  "monitor_count": 51,
+  "monitor_count": 50,
   "official_decision_field": "final_decision",
   "reject_count": 0,
-  "report_date": "2026-08-06",
+  "report_date": "2026-08-07",
   "rows": [
+    {
+      "asking_price_nok": 10000.0,
+      "blockers": [
+        "conservative_resale_nok",
+        "total_cost_nok",
+        "market_comparables",
+        "cost:auction_fee_nok",
+        "cost:vat_status",
+        "cost:transport_nok",
+        "cost:dismantling_nok",
+        "cost:storage_nok",
+        "cost:repair_nok",
+        "cost:cleaning_nok",
+        "cost:selling_cost_nok",
+        "cost:other_cost_nok"
+      ],
+      "city": "ke",
+      "confidence": "insufficient",
+      "decision": "monitor",
+      "decision_label": "🟡 راقب",
+      "ends_at": null,
+      "expected_profit_nok": null,
+      "first_price_nok": 10000.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 10000.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "listing_age_days": 0,
+      "lowest_price_nok": 10000.0,
+      "market_comparable_count": 0,
+      "market_discount": null,
+      "market_is_verified": false,
+      "market_median_nok": null,
+      "market_value_nok": null,
+      "market_verification_label": "⚪ سوق غير متحقق",
+      "market_verification_status": "unavailable",
+      "maximum_purchase_price_nok": null,
+      "opportunity_id": "unified-auksjonen-596850",
+      "price_change_count": 0,
+      "price_change_from_first": 0.0,
+      "price_history_label": "🔵 سعر أولي",
+      "price_history_status": "new",
+      "rank": 1,
+      "reasons": [
+        "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
+      ],
+      "roi": null,
+      "score": 23.5,
+      "score_breakdown": [
+        "financial=0.0/40",
+        "confidence=0.0/15",
+        "data_quality=7.5/15",
+        "resale=10.0/15",
+        "logistics=15.0/15",
+        "evidence_gap_penalty=6.0",
+        "warning_penalty=3.0",
+        "risk_penalty=9.0"
+      ],
+      "score_grade": "E",
+      "seller_confidence": "insufficient",
+      "seller_evidence_count": 0,
+      "seller_grade": "U",
+      "seller_id": null,
+      "seller_is_verified": false,
+      "seller_name": null,
+      "seller_reasons": [
+        "لا توجد بيانات بائع موثقة في المصدر."
+      ],
+      "seller_risk": "unknown",
+      "seller_risk_label": "⚪ بائع غير متحقق",
+      "seller_score": null,
+      "seller_type": null,
+      "seller_warnings": [
+        "Seller reliability cannot be assessed without source-provided seller facts."
+      ],
+      "significant_price_drop": false,
+      "title": "11 paller med 650 mm justeringsringer og Alustar støttringer til kum Stokke 6 bud 5d 16t 44m",
+      "url": "https://www.auksjonen.no/auksjon/torget/11_paller_med_650_mm_justeringsringer_og_Alustar_st%C3%B8ttringer_til_kum/596850",
+      "warnings": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ]
+    },
     {
       "asking_price_nok": 250.0,
       "blockers": [
@@ -3432,9 +3461,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 250.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 250.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 250.0,
       "market_comparable_count": 0,
@@ -3450,7 +3479,7 @@
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
       "price_history_status": "new",
-      "rank": 1,
+      "rank": 2,
       "reasons": [
         "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
       ],
@@ -3484,7 +3513,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2025 10 stykk UFO High Bay – 300W lampe for industribelysning!Perfekt for store rom med høy takhøyde! Helt nye!! Luxnor Tolvsrød 1 bud 3d 22t 33m",
+      "title": "2025 10 stykk UFO High Bay – 300W lampe for industribelysning!Perfekt for store rom med høy takhøyde! Helt nye!! Luxnor Tolvsrød 1 bud 3d 12t 52m",
       "url": "https://www.auksjonen.no/auksjon/torget/2025_10_stykk_UFO_High_Bay__300W_lampe_for_industribelysningPerfekt_for_store_rom_med_h%C3%B8y_takh%C3%B8yde_Helt_nye_Luxnor/616303",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3493,7 +3522,7 @@
       ]
     },
     {
-      "asking_price_nok": 1700.0,
+      "asking_price_nok": 1800.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3514,12 +3543,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 1700.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 1700.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 1800.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 1800.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 1700.0,
+      "lowest_price_nok": 1800.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3529,89 +3558,6 @@
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
       "opportunity_id": "unified-auksjonen-616912",
-      "price_change_count": 0,
-      "price_change_from_first": 0.0,
-      "price_history_label": "🔵 سعر أولي",
-      "price_history_status": "new",
-      "rank": 2,
-      "reasons": [
-        "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
-      ],
-      "roi": null,
-      "score": 19.0,
-      "score_breakdown": [
-        "financial=0.0/40",
-        "confidence=0.0/15",
-        "data_quality=5.0/15",
-        "resale=10.0/15",
-        "logistics=13.0/15",
-        "evidence_gap_penalty=6.0",
-        "warning_penalty=3.0",
-        "risk_penalty=9.0"
-      ],
-      "score_grade": "E",
-      "seller_confidence": "insufficient",
-      "seller_evidence_count": 0,
-      "seller_grade": "U",
-      "seller_id": null,
-      "seller_is_verified": false,
-      "seller_name": null,
-      "seller_reasons": [
-        "لا توجد بيانات بائع موثقة في المصدر."
-      ],
-      "seller_risk": "unknown",
-      "seller_risk_label": "⚪ بائع غير متحقق",
-      "seller_score": null,
-      "seller_type": null,
-      "seller_warnings": [
-        "Seller reliability cannot be assessed without source-provided seller facts."
-      ],
-      "significant_price_drop": false,
-      "title": "40,32kvm utefliser , Helt nye i esker å pall!! Selges etter oppkjøp etter husbygging. Exclusive ute fliser 60x120 / 20mm tykke Tolvsrød 17 bud 5d 21t 29m",
-      "url": "https://www.auksjonen.no/auksjon/torget/4032kvm_utefliser__Helt_nye_i_esker_%C3%A5_pall_Selges_etter_oppkj%C3%B8p_etter_husbygging_Exclusive_ute_fliser_60x120__20mm_tykke/616912",
-      "warnings": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ]
-    },
-    {
-      "asking_price_nok": 13000.0,
-      "blockers": [
-        "conservative_resale_nok",
-        "total_cost_nok",
-        "market_comparables",
-        "cost:auction_fee_nok",
-        "cost:vat_status",
-        "cost:transport_nok",
-        "cost:dismantling_nok",
-        "cost:storage_nok",
-        "cost:repair_nok",
-        "cost:cleaning_nok",
-        "cost:selling_cost_nok",
-        "cost:other_cost_nok"
-      ],
-      "city": null,
-      "confidence": "insufficient",
-      "decision": "monitor",
-      "decision_label": "🟡 راقب",
-      "ends_at": null,
-      "expected_profit_nok": null,
-      "first_price_nok": 13000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 13000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "listing_age_days": 0,
-      "lowest_price_nok": 13000.0,
-      "market_comparable_count": 0,
-      "market_discount": null,
-      "market_is_verified": false,
-      "market_median_nok": null,
-      "market_value_nok": null,
-      "market_verification_label": "⚪ سوق غير متحقق",
-      "market_verification_status": "unavailable",
-      "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-616680",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3650,7 +3596,90 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Uten minstepris! Helt nytt i esker, lekker garasjeinnredning komplett! Tønsberg 26 bud 4d 21t 55m",
+      "title": "40,32kvm utefliser , Helt nye i esker å pall!! Selges etter oppkjøp etter husbygging. Exclusive ute fliser 60x120 / 20mm tykke Tolvsrød 18 bud 5d 11t 48m",
+      "url": "https://www.auksjonen.no/auksjon/torget/4032kvm_utefliser__Helt_nye_i_esker_%C3%A5_pall_Selges_etter_oppkj%C3%B8p_etter_husbygging_Exclusive_ute_fliser_60x120__20mm_tykke/616912",
+      "warnings": [
+        "No verified market comparables were supplied.",
+        "VAT treatment is unknown; total cost is provisional.",
+        "One or more operating costs are missing; no zero value was assumed."
+      ]
+    },
+    {
+      "asking_price_nok": 13000.0,
+      "blockers": [
+        "conservative_resale_nok",
+        "total_cost_nok",
+        "market_comparables",
+        "cost:auction_fee_nok",
+        "cost:vat_status",
+        "cost:transport_nok",
+        "cost:dismantling_nok",
+        "cost:storage_nok",
+        "cost:repair_nok",
+        "cost:cleaning_nok",
+        "cost:selling_cost_nok",
+        "cost:other_cost_nok"
+      ],
+      "city": null,
+      "confidence": "insufficient",
+      "decision": "monitor",
+      "decision_label": "🟡 راقب",
+      "ends_at": null,
+      "expected_profit_nok": null,
+      "first_price_nok": 13000.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 13000.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "listing_age_days": 0,
+      "lowest_price_nok": 13000.0,
+      "market_comparable_count": 0,
+      "market_discount": null,
+      "market_is_verified": false,
+      "market_median_nok": null,
+      "market_value_nok": null,
+      "market_verification_label": "⚪ سوق غير متحقق",
+      "market_verification_status": "unavailable",
+      "maximum_purchase_price_nok": null,
+      "opportunity_id": "unified-auksjonen-616680",
+      "price_change_count": 0,
+      "price_change_from_first": 0.0,
+      "price_history_label": "🔵 سعر أولي",
+      "price_history_status": "new",
+      "rank": 4,
+      "reasons": [
+        "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
+      ],
+      "roi": null,
+      "score": 19.0,
+      "score_breakdown": [
+        "financial=0.0/40",
+        "confidence=0.0/15",
+        "data_quality=5.0/15",
+        "resale=10.0/15",
+        "logistics=13.0/15",
+        "evidence_gap_penalty=6.0",
+        "warning_penalty=3.0",
+        "risk_penalty=9.0"
+      ],
+      "score_grade": "E",
+      "seller_confidence": "insufficient",
+      "seller_evidence_count": 0,
+      "seller_grade": "U",
+      "seller_id": null,
+      "seller_is_verified": false,
+      "seller_name": null,
+      "seller_reasons": [
+        "لا توجد بيانات بائع موثقة في المصدر."
+      ],
+      "seller_risk": "unknown",
+      "seller_risk_label": "⚪ بائع غير متحقق",
+      "seller_score": null,
+      "seller_type": null,
+      "seller_warnings": [
+        "Seller reliability cannot be assessed without source-provided seller facts."
+      ],
+      "significant_price_drop": false,
+      "title": "Uten minstepris! Helt nytt i esker, lekker garasjeinnredning komplett! Tønsberg 26 bud 4d 12t 14m",
       "url": "https://www.auksjonen.no/auksjon/torget/Uten_minstepris_Helt_nytt_i_esker_lekker_garasjeinnredning_komplett/616680",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3690,9 +3719,9 @@
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
       "first_price_nok": 3000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 3000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 3000.0,
       "market_comparable_count": 0,
@@ -3713,7 +3742,7 @@
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
       "price_history_status": "new",
-      "rank": 4,
+      "rank": 5,
       "reasons": [
         "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
       ],
@@ -3749,7 +3778,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 5d 2t 25m",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d 16t 44m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -3758,7 +3787,7 @@
       ]
     },
     {
-      "asking_price_nok": 3000.0,
+      "asking_price_nok": 3500.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -3779,12 +3808,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 3000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 3000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 3500.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 3500.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 3000.0,
+      "lowest_price_nok": 3500.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -3794,89 +3823,6 @@
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
       "opportunity_id": "unified-auksjonen-599803",
-      "price_change_count": 0,
-      "price_change_from_first": 0.0,
-      "price_history_label": "🔵 سعر أولي",
-      "price_history_status": "new",
-      "rank": 5,
-      "reasons": [
-        "البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن."
-      ],
-      "roi": null,
-      "score": 19.0,
-      "score_breakdown": [
-        "financial=0.0/40",
-        "confidence=0.0/15",
-        "data_quality=5.0/15",
-        "resale=10.0/15",
-        "logistics=13.0/15",
-        "evidence_gap_penalty=6.0",
-        "warning_penalty=3.0",
-        "risk_penalty=9.0"
-      ],
-      "score_grade": "E",
-      "seller_confidence": "insufficient",
-      "seller_evidence_count": 0,
-      "seller_grade": "U",
-      "seller_id": null,
-      "seller_is_verified": false,
-      "seller_name": null,
-      "seller_reasons": [
-        "لا توجد بيانات بائع موثقة في المصدر."
-      ],
-      "seller_risk": "unknown",
-      "seller_risk_label": "⚪ بائع غير متحقق",
-      "seller_score": null,
-      "seller_type": null,
-      "seller_warnings": [
-        "Seller reliability cannot be assessed without source-provided seller facts."
-      ],
-      "significant_price_drop": false,
-      "title": "Pall med Simpson Strong-Tie Quik Drive WSV51E Skruer - 62 Esker Uggdal 4 bud 4d 2t 37m",
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Pall_med_Simpson_Strong-Tie_Quik_Drive_WSV51E_Skruer_-_62_Esker/599803",
-      "warnings": [
-        "No verified market comparables were supplied.",
-        "VAT treatment is unknown; total cost is provisional.",
-        "One or more operating costs are missing; no zero value was assumed."
-      ]
-    },
-    {
-      "asking_price_nok": 7000.0,
-      "blockers": [
-        "conservative_resale_nok",
-        "total_cost_nok",
-        "market_comparables",
-        "cost:auction_fee_nok",
-        "cost:vat_status",
-        "cost:transport_nok",
-        "cost:dismantling_nok",
-        "cost:storage_nok",
-        "cost:repair_nok",
-        "cost:cleaning_nok",
-        "cost:selling_cost_nok",
-        "cost:other_cost_nok"
-      ],
-      "city": null,
-      "confidence": "insufficient",
-      "decision": "monitor",
-      "decision_label": "🟡 راقب",
-      "ends_at": null,
-      "expected_profit_nok": null,
-      "first_price_nok": 7000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 7000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "listing_age_days": 0,
-      "lowest_price_nok": 7000.0,
-      "market_comparable_count": 0,
-      "market_discount": null,
-      "market_is_verified": false,
-      "market_median_nok": null,
-      "market_value_nok": null,
-      "market_verification_label": "⚪ سوق غير متحقق",
-      "market_verification_status": "unavailable",
-      "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-596850",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -3915,8 +3861,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "11 paller med 650 mm justeringsringer og Alustar støttringer til kum Stokke 4 bud 6d 2t 25m",
-      "url": "https://www.auksjonen.no/auksjon/torget/11_paller_med_650_mm_justeringsringer_og_Alustar_st%C3%B8ttringer_til_kum/596850",
+      "title": "Pall med Simpson Strong-Tie Quik Drive WSV51E Skruer - 62 Esker Uggdal 5 bud 3d 16t 56m",
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Pall_med_Simpson_Strong-Tie_Quik_Drive_WSV51E_Skruer_-_62_Esker/599803",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -3946,9 +3892,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 3000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 3000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 3000.0,
       "market_comparable_count": 0,
@@ -3998,7 +3944,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "15 paller med tilbehør til kabelrør, kabelvern og forskalingsholdere – Selges samlet Stokke 6 bud 5d 2t 45m",
+      "title": "15 paller med tilbehør til kabelrør, kabelvern og forskalingsholdere – Selges samlet Stokke 6 bud 4d 17t 4m",
       "url": "https://www.auksjonen.no/auksjon/torget/15_paller_med_tilbeh%C3%B8r_til_kabelr%C3%B8r_kabelvern_og_forskalingsholdere__Selges_samlet/596846",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4007,7 +3953,7 @@
       ]
     },
     {
-      "asking_price_nok": 4000.0,
+      "asking_price_nok": 5000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4028,12 +3974,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 4000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 4000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 5000.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 5000.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 4000.0,
+      "lowest_price_nok": 5000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4081,7 +4027,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "31 paller med diverse VA-plastdeler selges samlet Stokke 2 bud 6d 2t 45m",
+      "title": "31 paller med diverse VA-plastdeler selges samlet Stokke 4 bud 5d 17t 4m",
       "url": "https://www.auksjonen.no/auksjon/torget/31_paller_med_diverse_VA-plastdeler_selges_samlet/596841",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4112,9 +4058,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 100.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 100.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 100.0,
       "market_comparable_count": 0,
@@ -4164,7 +4110,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "60 stk LED Downlights ECOVISTA – 15W IP65 (2700–3200K) Tolvsrød 1 bud 5d 22t 59m",
+      "title": "60 stk LED Downlights ECOVISTA – 15W IP65 (2700–3200K) Tolvsrød 1 bud 5d 13t 18m",
       "url": "https://www.auksjonen.no/auksjon/torget/60_stk_LED_Downlights_ECOVISTA__15W_IP65_27003200K/617106",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4173,7 +4119,7 @@
       ]
     },
     {
-      "asking_price_nok": 250.0,
+      "asking_price_nok": 750.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4194,12 +4140,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 250.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 250.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 750.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 750.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 250.0,
+      "lowest_price_nok": 750.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4247,7 +4193,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "2025 20 stykker Luxnor Led Lyskaster 200W! Kvalitet - Helt nye! Luxnor Tolvsrød 1 bud 5d 23t 1m",
+      "title": "2025 20 stykker Luxnor Led Lyskaster 200W! Kvalitet - Helt nye! Luxnor Tolvsrød 3 bud 5d 13t 20m",
       "url": "https://www.auksjonen.no/auksjon/torget/2025_20_stykker_Luxnor_Led_Lyskaster_200W_Kvalitet_-_Helt_nye_Luxnor/617105",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4256,7 +4202,7 @@
       ]
     },
     {
-      "asking_price_nok": 5200.0,
+      "asking_price_nok": 5400.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4277,12 +4223,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 5200.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 5200.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 5400.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 5400.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 5200.0,
+      "lowest_price_nok": 5400.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4330,7 +4276,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Helt ny kvalitet Garasjeinnredning, med full garanti! Tønsberg 48 bud 5d 22t 31m",
+      "title": "Helt ny kvalitet Garasjeinnredning, med full garanti! Tønsberg 50 bud 5d 12t 50m",
       "url": "https://www.auksjonen.no/auksjon/torget/Helt_ny_kvalitet__Garasjeinnredning_med_full_garanti/616992",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4361,9 +4307,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 1000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 1000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 1000.0,
       "market_comparable_count": 0,
@@ -4413,7 +4359,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "22 stykk IBC-beholdere i plast - Såpe Melhus 1 bud 4d 3t 10m",
+      "title": "22 stykk IBC-beholdere i plast - Såpe Melhus 1 bud 3d 17t 29m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/22_stykk_IBC-beholdere_i_plast_-_S%C3%A5pe/616716",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4422,7 +4368,7 @@
       ]
     },
     {
-      "asking_price_nok": 1300.0,
+      "asking_price_nok": 1700.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4443,12 +4389,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 1300.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 1300.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 1700.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 1700.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 1300.0,
+      "lowest_price_nok": 1700.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4496,7 +4442,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Helt nytt drivhus – emballasjen har vannskade Tønsberg 13 bud 3d 22t 51m",
+      "title": "Helt nytt drivhus – emballasjen har vannskade Tønsberg 17 bud 3d 13t 10m",
       "url": "https://www.auksjonen.no/auksjon/torget/Helt_nytt_drivhus__emballasjen_har_vannskade/616678",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4527,9 +4473,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 5000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 5000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 5000.0,
       "market_comparable_count": 0,
@@ -4579,7 +4525,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "60stk 10w Ecovista Dimbare Led Spotter WHITE! Helt nye moderne og kvalitets Led spotter! Ecovista Tolvsrød 20 bud 4d 20t 7m",
+      "title": "60stk 10w Ecovista Dimbare Led Spotter WHITE! Helt nye moderne og kvalitets Led spotter! Ecovista Tolvsrød 20 bud 4d 10t 26m",
       "url": "https://www.auksjonen.no/auksjon/torget/60stk_10w_Ecovista_Dimbare_Led_Spotter_WHITE_Helt_nye_moderne_og_kvalitets_Led_spotter_Ecovista/616316",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4610,9 +4556,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 2500.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 2500.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 2500.0,
       "market_comparable_count": 0,
@@ -4662,7 +4608,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "60stk 10w Ecovista Dimbare Led Spotter BLACK EDITION! Helt nye moderne og kvalitets Led spotter! Ecovista Tolvsrød 10 bud 3d 22t 31m",
+      "title": "60stk 10w Ecovista Dimbare Led Spotter BLACK EDITION! Helt nye moderne og kvalitets Led spotter! Ecovista Tolvsrød 10 bud 3d 12t 50m",
       "url": "https://www.auksjonen.no/auksjon/torget/60stk_10w_Ecovista_Dimbare_Led_Spotter_BLACK_EDITION_Helt_nye_moderne_og_kvalitets_Led_spotter_Ecovista/616307",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4693,9 +4639,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 1000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 1000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 1000.0,
       "market_comparable_count": 0,
@@ -4745,7 +4691,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Stort parti - 47 stk. knallgode Portwest pilotjakker PJ10 - 4-i-1-funksjon Florvåg 4 bud 7d 2t 55m",
+      "title": "Stort parti - 47 stk. knallgode Portwest pilotjakker PJ10 - 4-i-1-funksjon Florvåg 4 bud 6d 17t 14m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_-_47_stk_knallgode_Portwest_pilotjakker_PJ10_-_4-i-1-funksjon/616288",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4754,7 +4700,7 @@
       ]
     },
     {
-      "asking_price_nok": 200.0,
+      "asking_price_nok": 400.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4784,12 +4730,12 @@
       "expected_profit_nok": null,
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
-      "first_price_nok": 200.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 200.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 400.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 400.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 200.0,
+      "lowest_price_nok": 400.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4844,7 +4790,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 2 bud 6d 4t 17m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d 18t 36m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4853,7 +4799,7 @@
       ]
     },
     {
-      "asking_price_nok": 600.0,
+      "asking_price_nok": 1000.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -4883,12 +4829,12 @@
       "expected_profit_nok": null,
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
-      "first_price_nok": 600.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 600.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 1000.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 1000.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 600.0,
+      "lowest_price_nok": 1000.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -4943,7 +4889,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 6 bud 5d 4t 20m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d 18t 39m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -4983,9 +4929,9 @@
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
       "first_price_nok": 2000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 2000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 2000.0,
       "market_comparable_count": 0,
@@ -5042,7 +4988,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 7d 4t 10m",
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d 18t 29m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -5082,9 +5028,9 @@
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
       "first_price_nok": 2000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 2000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 2000.0,
       "market_comparable_count": 0,
@@ -5141,7 +5087,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 6d 4t 40m",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 5d 18t 59m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -5181,9 +5127,9 @@
       "final_decision": "WATCH",
       "final_decision_ar": "مراقبة وجمع الأدلة",
       "first_price_nok": 500.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 500.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 500.0,
       "market_comparable_count": 0,
@@ -5240,7 +5186,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 5d 4t 10m",
+      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d 18t 29m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -5271,9 +5217,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 3000.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 3000.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 3000.0,
       "market_comparable_count": 0,
@@ -5323,7 +5269,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Parti med vernesko og arbeidssko - 33 par Florvåg 30 bud 4d 3t 40m",
+      "title": "Parti med vernesko og arbeidssko - 33 par Florvåg 30 bud 3d 17t 59m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_vernesko_og_arbeidssko_-_33_par/616261",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -5354,9 +5300,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 300.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 300.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 300.0,
       "market_comparable_count": 0,
@@ -5406,7 +5352,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Parti nytt verneutstyr – Peltor, hjelmer og engangsfrakker Florvåg 3 bud 4d 3t 25m",
+      "title": "Parti nytt verneutstyr – Peltor, hjelmer og engangsfrakker Florvåg 3 bud 3d 17t 44m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_nytt_verneutstyr__Peltor_hjelmer_og_engangsfrakker/616255",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -5437,9 +5383,9 @@
       "ends_at": null,
       "expected_profit_nok": null,
       "first_price_nok": 2700.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "highest_price_nok": 2700.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
       "lowest_price_nok": 2700.0,
       "market_comparable_count": 0,
@@ -5489,7 +5435,7 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "Parti med støvler, fritidssko og innleggssåler – 104 enheter Florvåg 27 bud 3d 3t 10m",
+      "title": "Parti med støvler, fritidssko og innleggssåler – 104 enheter Florvåg 27 bud 2d 17t 29m",
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_st%C3%B8vler_fritidssko_og_innleggss%C3%A5ler__104_enheter/616117",
       "warnings": [
         "No verified market comparables were supplied.",
@@ -5498,7 +5444,7 @@
       ]
     },
     {
-      "asking_price_nok": 1250.0,
+      "asking_price_nok": 500.0,
       "blockers": [
         "conservative_resale_nok",
         "total_cost_nok",
@@ -5519,12 +5465,12 @@
       "decision_label": "🟡 راقب",
       "ends_at": null,
       "expected_profit_nok": null,
-      "first_price_nok": 1250.0,
-      "first_seen_at": "2026-08-06T14:34:35.265090+00:00",
-      "highest_price_nok": 1250.0,
-      "last_seen_at": "2026-08-06T14:34:35.265090+00:00",
+      "first_price_nok": 500.0,
+      "first_seen_at": "2026-08-07T00:15:15.015168+00:00",
+      "highest_price_nok": 500.0,
+      "last_seen_at": "2026-08-07T00:15:15.015168+00:00",
       "listing_age_days": 0,
-      "lowest_price_nok": 1250.0,
+      "lowest_price_nok": 500.0,
       "market_comparable_count": 0,
       "market_discount": null,
       "market_is_verified": false,
@@ -5533,7 +5479,7 @@
       "market_verification_label": "⚪ سوق غير متحقق",
       "market_verification_status": "unavailable",
       "maximum_purchase_price_nok": null,
-      "opportunity_id": "unified-auksjonen-615833",
+      "opportunity_id": "unified-auksjonen-616111",
       "price_change_count": 0,
       "price_change_from_first": 0.0,
       "price_history_label": "🔵 سعر أولي",
@@ -5572,8 +5518,8 @@
         "Seller reliability cannot be assessed without source-provided seller facts."
       ],
       "significant_price_drop": false,
-      "title": "600 stk. Star Zone Solbriller Strømmen 5 bud 20t 45m 28s",
-      "url": "https://www.auksjonen.no/auksjon/torget/600_stk_Star_Zone_Solbriller/615833",
+      "title": "Stort parti - Ubrukte Nokian vinter-/gummistøvler med uttagbart filtfôr – 92 par Nokian Kaira Florvåg 1 bud 6d 16t 44m",
+      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_-_Ubrukte_Nokian_vinter-gummist%C3%B8vler_med_uttagbart_filtfr__92_par_Nokian_Kaira/616111",
       "warnings": [
         "No verified market comparables were supplied.",
         "VAT treatment is unknown; total cost is provisional.",
@@ -5588,8 +5534,8 @@
     "schema_version": 2,
     "sources": {
       "Auksjonen.no": {
-        "accounted_total": 51,
-        "excluded_record_count": 26,
+        "accounted_total": 50,
+        "excluded_record_count": 25,
         "excluded_records": [
           {
             "reason": "daily_report_limit",
@@ -5628,12 +5574,12 @@
           },
           {
             "reason": "daily_report_limit",
-            "record_id": "auksjonen-615594",
+            "record_id": "auksjonen-615833",
             "stage": "daily_report"
           },
           {
             "reason": "daily_report_limit",
-            "record_id": "auksjonen-614297",
+            "record_id": "auksjonen-615594",
             "stage": "daily_report"
           },
           {
@@ -5649,6 +5595,11 @@
           {
             "reason": "daily_report_limit",
             "record_id": "auksjonen-611693",
+            "stage": "daily_report"
+          },
+          {
+            "reason": "daily_report_limit",
+            "record_id": "auksjonen-617387",
             "stage": "daily_report"
           },
           {
@@ -5698,11 +5649,6 @@
           },
           {
             "reason": "daily_report_limit",
-            "record_id": "auksjonen-608112",
-            "stage": "daily_report"
-          },
-          {
-            "reason": "daily_report_limit",
             "record_id": "auksjonen-611744",
             "stage": "daily_report"
           },
@@ -5715,19 +5661,13 @@
             "reason": "daily_report_limit",
             "record_id": "auksjonen-611731",
             "stage": "daily_report"
-          },
-          {
-            "reason": "daily_report_limit",
-            "record_id": "auksjonen-616111",
-            "stage": "daily_report"
           }
         ],
         "excluded_records_by_reason": {
-          "daily_report_limit": 26
+          "daily_report_limit": 25
         },
-        "fetched_count": 51,
+        "fetched_count": 50,
         "fetched_record_ids": [
-          "auksjonen-608112",
           "auksjonen-615594",
           "auksjonen-615833",
           "auksjonen-611173",
@@ -5746,6 +5686,7 @@
           "auksjonen-596855",
           "auksjonen-596846",
           "auksjonen-597184",
+          "auksjonen-617387",
           "auksjonen-614949",
           "auksjonen-596877",
           "auksjonen-616912",
@@ -5757,7 +5698,6 @@
           "auksjonen-596841",
           "auksjonen-615274",
           "auksjonen-587911",
-          "auksjonen-614297",
           "auksjonen-616117",
           "auksjonen-599806",
           "auksjonen-599803",
@@ -5785,7 +5725,7 @@
           "unified-auksjonen-596850",
           "unified-auksjonen-599803",
           "unified-auksjonen-612667",
-          "unified-auksjonen-615833",
+          "unified-auksjonen-616111",
           "unified-auksjonen-616117",
           "unified-auksjonen-616255",
           "unified-auksjonen-616261",
@@ -5813,7 +5753,7 @@
           "auksjonen-596850",
           "auksjonen-599803",
           "auksjonen-612667",
-          "auksjonen-615833",
+          "auksjonen-616111",
           "auksjonen-616117",
           "auksjonen-616255",
           "auksjonen-616261",
@@ -5856,8 +5796,8 @@
             "record_id": "auksjonen-612667"
           },
           {
-            "opportunity_id": "unified-auksjonen-615833",
-            "record_id": "auksjonen-615833"
+            "opportunity_id": "unified-auksjonen-616111",
+            "record_id": "auksjonen-616111"
           },
           {
             "opportunity_id": "unified-auksjonen-616117",
@@ -5944,6 +5884,51 @@
         "excluded_records": [
           {
             "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938220549",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938221286",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938221308",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938221200",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938219761",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938218617",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938220816",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938220182",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
+            "record_id": "konkurs-app-938217777",
+            "stage": "extraction"
+          },
+          {
+            "reason": "unsupported_source_type_for_sale_pipeline",
             "record_id": "konkurs-app-938213593",
             "stage": "extraction"
           },
@@ -6021,51 +6006,6 @@
             "reason": "unsupported_source_type_for_sale_pipeline",
             "record_id": "konkurs-app-938206260",
             "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938206392",
-            "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938206368",
-            "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938207151",
-            "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938206929",
-            "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938206325",
-            "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938206872",
-            "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938210802",
-            "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938210772",
-            "stage": "extraction"
-          },
-          {
-            "reason": "unsupported_source_type_for_sale_pipeline",
-            "record_id": "konkurs-app-938200920",
-            "stage": "extraction"
           }
         ],
         "excluded_records_by_reason": {
@@ -6073,6 +6013,15 @@
         },
         "fetched_count": 25,
         "fetched_record_ids": [
+          "konkurs-app-938220549",
+          "konkurs-app-938221286",
+          "konkurs-app-938221308",
+          "konkurs-app-938221200",
+          "konkurs-app-938219761",
+          "konkurs-app-938218617",
+          "konkurs-app-938220816",
+          "konkurs-app-938220182",
+          "konkurs-app-938217777",
           "konkurs-app-938213593",
           "konkurs-app-938213410",
           "konkurs-app-938212988",
@@ -6088,16 +6037,7 @@
           "konkurs-app-938211639",
           "konkurs-app-938213283",
           "konkurs-app-938212880",
-          "konkurs-app-938206260",
-          "konkurs-app-938206392",
-          "konkurs-app-938206368",
-          "konkurs-app-938207151",
-          "konkurs-app-938206929",
-          "konkurs-app-938206325",
-          "konkurs-app-938206872",
-          "konkurs-app-938210802",
-          "konkurs-app-938210772",
-          "konkurs-app-938200920"
+          "konkurs-app-938206260"
         ],
         "published_audit_opportunity_ids": [],
         "published_audit_record_count": 0,
@@ -6109,12 +6049,12 @@
     "valid": true
   },
   "sources": {
-    "Auksjonen.no": 51,
+    "Auksjonen.no": 50,
     "Konkurs.app": 25
   },
   "summary_lines": [
-    "الفرص: 51 — شراء: 0، مراقبة: 51، رفض: 0.",
-    "أفضل فرصة: unified-auksjonen-616303 — 🟡 راقب — درجة 21/100 (E) — ربح غير متوفر — ROI غير متوفر."
+    "الفرص: 50 — شراء: 0، مراقبة: 50، رفض: 0.",
+    "أفضل فرصة: unified-auksjonen-596850 — 🟡 راقب — درجة 24/100 (E) — ربح غير متوفر — ROI غير متوفر."
   ],
-  "total_count": 51
+  "total_count": 50
 }

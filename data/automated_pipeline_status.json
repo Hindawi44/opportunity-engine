@@ -1,8 +1,8 @@
 {
-  "duration_seconds": 23.595,
-  "ended_at": "2026-08-06T14:34:47.546793+00:00",
+  "duration_seconds": 26.579,
+  "ended_at": "2026-08-07T00:15:30.116955+00:00",
   "failed_stage": null,
-  "run_id": "a0976ea4-e661-476f-87b8-e943f7af36ce",
+  "run_id": "c19f4d45-d682-485c-8a85-0fe9d5b76e03",
   "safety": {
     "automatic_bid": false,
     "automatic_external_action": false,
@@ -15,11 +15,11 @@
         "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
         "scripts/run_p5_learning_pipeline.py"
       ],
-      "duration_seconds": 23.55,
-      "ended_at": "2026-08-06T14:34:47.502416+00:00",
+      "duration_seconds": 26.387,
+      "ended_at": "2026-08-07T00:15:29.924641+00:00",
       "exit_code": 0,
       "name": "complete_sources_decisions_actions_learning",
-      "started_at": "2026-08-06T14:34:23.952167+00:00",
+      "started_at": "2026-08-07T00:15:03.537755+00:00",
       "status": "SUCCESS"
     },
     {
@@ -27,15 +27,15 @@
         "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
         "scripts/run_v2_smart_alert_pipeline.py"
       ],
-      "duration_seconds": 0.044,
-      "ended_at": "2026-08-06T14:34:47.546401+00:00",
+      "duration_seconds": 0.067,
+      "ended_at": "2026-08-07T00:15:30.047894+00:00",
       "exit_code": 0,
       "name": "smart_alert_engine",
-      "started_at": "2026-08-06T14:34:47.502787+00:00",
+      "started_at": "2026-08-07T00:15:29.980543+00:00",
       "status": "SUCCESS"
     }
   ],
-  "started_at": "2026-08-06T14:34:23.951819+00:00",
+  "started_at": "2026-08-07T00:15:03.537495+00:00",
   "status": "SUCCESS",
   "trigger": "schedule"
 }

@@ -12,6 +12,34 @@
     "items": [
       {
         "asking_price_nok": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "channel": "bankruptcy_lead",
+        "city": "LIER",
+        "description": "Butikkhandel med klær.",
+        "expected_profit_nok": null,
+        "industry_code": "47.710",
+        "industry_description": "Detaljhandel med klær",
+        "lead_id": "konkurs-app-938221200",
+        "lead_score": 51,
+        "organization_number": "938221200",
+        "roi_percent": null,
+        "score_reasons": [
+          "target:butikk+12",
+          "target:klær+16",
+          "target:handel+8",
+          "location_present+5",
+          "organization_number_present+5",
+          "trustee_present+5"
+        ],
+        "source": "Konkurs.app",
+        "status": "FOLLOW_UP_LEAD",
+        "title": "FRONT LIER AS",
+        "trustee": "Adv. Hans V. Haug",
+        "url": "https://konkurs.app/konkursbo/938221200",
+        "warning": "Discovery lead only; assets and sale availability are not confirmed."
+      },
+      {
+        "asking_price_nok": null,
         "bankruptcy_date": "2026-08-05T00:00:00",
         "channel": "bankruptcy_lead",
         "city": "KRISTIANSAND",
@@ -36,60 +64,6 @@
         "title": "MØE ITEMS AS",
         "trustee": "Adv. Øyvind Sund",
         "url": "https://konkurs.app/konkursbo/938211663",
-        "warning": "Discovery lead only; assets and sale availability are not confirmed."
-      },
-      {
-        "asking_price_nok": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "channel": "bankruptcy_lead",
-        "city": "SANDEFJORD",
-        "description": "Transport, Lager og pakking. Komplett lager og transportløsning for butikker og nettbutikker. Inngående og utgående logistikk, samt plukk og pakking av varer.",
-        "expected_profit_nok": null,
-        "industry_code": "53.200",
-        "industry_description": "Andre post- og budtjenester",
-        "lead_id": "konkurs-app-938206325",
-        "lead_score": 37,
-        "organization_number": "938206325",
-        "roi_percent": null,
-        "score_reasons": [
-          "target:butikk+12",
-          "target:lager+10",
-          "location_present+5",
-          "organization_number_present+5",
-          "trustee_present+5"
-        ],
-        "source": "Konkurs.app",
-        "status": "FOLLOW_UP_LEAD",
-        "title": "SPRING LOGISTIKK VARETRANSPORT AS",
-        "trustee": "Adv. Øyvind Røed",
-        "url": "https://konkurs.app/konkursbo/938206325",
-        "warning": "Discovery lead only; assets and sale availability are not confirmed."
-      },
-      {
-        "asking_price_nok": null,
-        "bankruptcy_date": "2026-08-04T00:00:00",
-        "channel": "bankruptcy_lead",
-        "city": "OSLO",
-        "description": "Salg og formidling av kunstobjekter herunder drift av nettbutikk, samt delta i selskaper som det faller naturlig å delta i.",
-        "expected_profit_nok": null,
-        "industry_code": "47.690",
-        "industry_description": "Detaljhandel med kulturvarer ikke nevnt annet sted",
-        "lead_id": "konkurs-app-938206392",
-        "lead_score": 35,
-        "organization_number": "938206392",
-        "roi_percent": null,
-        "score_reasons": [
-          "target:butikk+12",
-          "target:handel+8",
-          "location_present+5",
-          "organization_number_present+5",
-          "trustee_present+5"
-        ],
-        "source": "Konkurs.app",
-        "status": "FOLLOW_UP_LEAD",
-        "title": "ART ATTACK AS",
-        "trustee": "Adv. Tom Hugo Ottesen",
-        "url": "https://konkurs.app/konkursbo/938206392",
         "warning": "Discovery lead only; assets and sale availability are not confirmed."
       },
       {
@@ -121,6 +95,32 @@
       },
       {
         "asking_price_nok": null,
+        "bankruptcy_date": "2026-08-06T00:00:00",
+        "channel": "bankruptcy_lead",
+        "city": "SANDNES",
+        "description": "Drive blikkenslagerverksted samt videreutvikling, produksjon og salg innenfor faget V.V.S. og hva hermed står i forbindelse. I tillegg produksjon av metallartikler innen bygg og industri.",
+        "expected_profit_nok": null,
+        "industry_code": "25.110",
+        "industry_description": "Produksjon av metallkonstruksjoner og deler",
+        "lead_id": "konkurs-app-938219761",
+        "lead_score": 25,
+        "organization_number": "938219761",
+        "roi_percent": null,
+        "score_reasons": [
+          "target:lager+10",
+          "location_present+5",
+          "organization_number_present+5",
+          "trustee_present+5"
+        ],
+        "source": "Konkurs.app",
+        "status": "FOLLOW_UP_LEAD",
+        "title": "GANN BLIKK AS",
+        "trustee": "Adv. Andreas Haukland Westlye",
+        "url": "https://konkurs.app/konkursbo/938219761",
+        "warning": "Discovery lead only; assets and sale availability are not confirmed."
+      },
+      {
+        "asking_price_nok": null,
         "bankruptcy_date": "2026-08-05T00:00:00",
         "channel": "bankruptcy_lead",
         "city": "MOSS",
@@ -148,7 +148,7 @@
     ],
     "top_count": 5
   },
-  "generated_at": "2026-08-06T14:34:45.531194+00:00",
+  "generated_at": "2026-08-07T00:15:25.937115+00:00",
   "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
   "schema_version": 2,
   "source_funnel": {

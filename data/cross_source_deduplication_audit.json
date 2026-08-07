@@ -3,7 +3,7 @@
   "automatic_bid": false,
   "automatic_merge_pair_count": 0,
   "automatic_purchase": false,
-  "excluded_record_count": 46,
+  "excluded_record_count": 45,
   "excluded_record_ids": [
     "auksjonen-596860",
     "auksjonen-611173",
@@ -12,11 +12,12 @@
     "auksjonen-615442",
     "auksjonen-588231",
     "auksjonen-615274",
+    "auksjonen-615833",
     "auksjonen-615594",
-    "auksjonen-614297",
     "auksjonen-567886",
     "auksjonen-596852",
     "auksjonen-611693",
+    "auksjonen-617387",
     "auksjonen-615704",
     "auksjonen-599806",
     "auksjonen-589356",
@@ -26,11 +27,16 @@
     "auksjonen-596855",
     "auksjonen-614949",
     "auksjonen-596877",
-    "auksjonen-608112",
     "auksjonen-611744",
     "auksjonen-611719",
     "auksjonen-611731",
-    "auksjonen-616111",
+    "konkurs-app-938220549",
+    "konkurs-app-938221286",
+    "konkurs-app-938221308",
+    "konkurs-app-938218617",
+    "konkurs-app-938220816",
+    "konkurs-app-938220182",
+    "konkurs-app-938217777",
     "konkurs-app-938213593",
     "konkurs-app-938213410",
     "konkurs-app-938212988",
@@ -43,20 +49,13 @@
     "konkurs-app-938213119",
     "konkurs-app-938213283",
     "konkurs-app-938212880",
-    "konkurs-app-938206260",
-    "konkurs-app-938206368",
-    "konkurs-app-938207151",
-    "konkurs-app-938206929",
-    "konkurs-app-938206872",
-    "konkurs-app-938210802",
-    "konkurs-app-938210772",
-    "konkurs-app-938200920"
+    "konkurs-app-938206260"
   ],
   "excluded_records_by_reason": {
-    "daily_report_limit": 26,
+    "daily_report_limit": 25,
     "unsupported_source_type_for_sale_pipeline": 20
   },
-  "generated_at": "2026-08-06T14:34:45.695022+00:00",
+  "generated_at": "2026-08-07T00:15:26.227249+00:00",
   "ignored_non_official_record_count": 57,
   "input_record_count": 33,
   "match_counts": {
@@ -81,11 +80,11 @@
   "source_funnel_reconciliation": {
     "Auksjonen.no": {
       "audit_record_count": 26,
-      "difference": 25,
+      "difference": 24,
       "exclusion_reasons": [
         "upstream_fetched_count_includes_records removed by normalization or deduplication before audit"
       ],
-      "fetched_count": 51,
+      "fetched_count": 50,
       "status": "EXPLAINED_DIFFERENCE"
     },
     "Konkurs.app": {
@@ -117,7 +116,7 @@
   },
   "verified_exclusion_accounting": {
     "Auksjonen.no": {
-      "accounted_total": 51,
+      "accounted_total": 50,
       "audit_record_count": 26,
       "audited_fetched_record_count": 25,
       "audited_fetched_record_ids": [
@@ -126,7 +125,7 @@
         "auksjonen-596850",
         "auksjonen-599803",
         "auksjonen-612667",
-        "auksjonen-615833",
+        "auksjonen-616111",
         "auksjonen-616117",
         "auksjonen-616255",
         "auksjonen-616261",
@@ -159,11 +158,12 @@
         "auksjonen-615442",
         "auksjonen-588231",
         "auksjonen-615274",
+        "auksjonen-615833",
         "auksjonen-615594",
-        "auksjonen-614297",
         "auksjonen-567886",
         "auksjonen-596852",
         "auksjonen-611693",
+        "auksjonen-617387",
         "auksjonen-615704",
         "auksjonen-599806",
         "auksjonen-589356",
@@ -173,47 +173,52 @@
         "auksjonen-596855",
         "auksjonen-614949",
         "auksjonen-596877",
-        "auksjonen-608112",
         "auksjonen-611744",
         "auksjonen-611719",
-        "auksjonen-611731",
-        "auksjonen-616111"
+        "auksjonen-611731"
       ],
       "excluded_records_by_reason": {
-        "daily_report_limit": 26
+        "daily_report_limit": 25
       },
       "external_audit_record_count": 1,
       "external_audit_record_ids": [
         "web-bbaee8d1437e0f872a7d"
       ],
-      "fetched_count": 51,
+      "fetched_count": 50,
       "funnel_matches_snapshot": true,
       "missing_published_record_ids": [],
       "observed_channel_duplicate_count": 0,
-      "pipeline_excluded_count": 26,
-      "snapshot_fetched_count": 51,
+      "pipeline_excluded_count": 25,
+      "snapshot_fetched_count": 50,
       "status": "RECONCILED",
       "unaccounted_record_ids": [],
       "unexpected_exclusion_record_ids": [],
       "unique_input_record_count": 26,
-      "verified_excluded_count": 26
+      "verified_excluded_count": 25
     },
     "Konkurs.app": {
       "accounted_total": 25,
       "audit_record_count": 5,
       "audited_fetched_record_count": 5,
       "audited_fetched_record_ids": [
-        "konkurs-app-938206325",
-        "konkurs-app-938206392",
         "konkurs-app-938211639",
         "konkurs-app-938211663",
-        "konkurs-app-938214239"
+        "konkurs-app-938214239",
+        "konkurs-app-938219761",
+        "konkurs-app-938221200"
       ],
       "channel_duplicate_excluded_count": 0,
       "difference": 0,
       "duplicate_fetched_record_ids": [],
       "equation_holds": true,
       "excluded_record_ids": [
+        "konkurs-app-938220549",
+        "konkurs-app-938221286",
+        "konkurs-app-938221308",
+        "konkurs-app-938218617",
+        "konkurs-app-938220816",
+        "konkurs-app-938220182",
+        "konkurs-app-938217777",
         "konkurs-app-938213593",
         "konkurs-app-938213410",
         "konkurs-app-938212988",
@@ -226,14 +231,7 @@
         "konkurs-app-938213119",
         "konkurs-app-938213283",
         "konkurs-app-938212880",
-        "konkurs-app-938206260",
-        "konkurs-app-938206368",
-        "konkurs-app-938207151",
-        "konkurs-app-938206929",
-        "konkurs-app-938206872",
-        "konkurs-app-938210802",
-        "konkurs-app-938210772",
-        "konkurs-app-938200920"
+        "konkurs-app-938206260"
       ],
       "excluded_records_by_reason": {
         "unsupported_source_type_for_sale_pipeline": 20
@@ -273,7 +271,7 @@
   "verified_exclusion_accounting_valid": true,
   "verified_source_record_accounting": {
     "Auksjonen.no": {
-      "accounted_total": 51,
+      "accounted_total": 50,
       "audit_record_count": 26,
       "audited_fetched_record_count": 25,
       "audited_fetched_record_ids": [
@@ -282,7 +280,7 @@
         "auksjonen-596850",
         "auksjonen-599803",
         "auksjonen-612667",
-        "auksjonen-615833",
+        "auksjonen-616111",
         "auksjonen-616117",
         "auksjonen-616255",
         "auksjonen-616261",
@@ -315,11 +313,12 @@
         "auksjonen-615442",
         "auksjonen-588231",
         "auksjonen-615274",
+        "auksjonen-615833",
         "auksjonen-615594",
-        "auksjonen-614297",
         "auksjonen-567886",
         "auksjonen-596852",
         "auksjonen-611693",
+        "auksjonen-617387",
         "auksjonen-615704",
         "auksjonen-599806",
         "auksjonen-589356",
@@ -329,47 +328,52 @@
         "auksjonen-596855",
         "auksjonen-614949",
         "auksjonen-596877",
-        "auksjonen-608112",
         "auksjonen-611744",
         "auksjonen-611719",
-        "auksjonen-611731",
-        "auksjonen-616111"
+        "auksjonen-611731"
       ],
       "excluded_records_by_reason": {
-        "daily_report_limit": 26
+        "daily_report_limit": 25
       },
       "external_audit_record_count": 1,
       "external_audit_record_ids": [
         "web-bbaee8d1437e0f872a7d"
       ],
-      "fetched_count": 51,
+      "fetched_count": 50,
       "funnel_matches_snapshot": true,
       "missing_published_record_ids": [],
       "observed_channel_duplicate_count": 0,
-      "pipeline_excluded_count": 26,
-      "snapshot_fetched_count": 51,
+      "pipeline_excluded_count": 25,
+      "snapshot_fetched_count": 50,
       "status": "RECONCILED",
       "unaccounted_record_ids": [],
       "unexpected_exclusion_record_ids": [],
       "unique_input_record_count": 26,
-      "verified_excluded_count": 26
+      "verified_excluded_count": 25
     },
     "Konkurs.app": {
       "accounted_total": 25,
       "audit_record_count": 5,
       "audited_fetched_record_count": 5,
       "audited_fetched_record_ids": [
-        "konkurs-app-938206325",
-        "konkurs-app-938206392",
         "konkurs-app-938211639",
         "konkurs-app-938211663",
-        "konkurs-app-938214239"
+        "konkurs-app-938214239",
+        "konkurs-app-938219761",
+        "konkurs-app-938221200"
       ],
       "channel_duplicate_excluded_count": 0,
       "difference": 0,
       "duplicate_fetched_record_ids": [],
       "equation_holds": true,
       "excluded_record_ids": [
+        "konkurs-app-938220549",
+        "konkurs-app-938221286",
+        "konkurs-app-938221308",
+        "konkurs-app-938218617",
+        "konkurs-app-938220816",
+        "konkurs-app-938220182",
+        "konkurs-app-938217777",
         "konkurs-app-938213593",
         "konkurs-app-938213410",
         "konkurs-app-938212988",
@@ -382,14 +386,7 @@
         "konkurs-app-938213119",
         "konkurs-app-938213283",
         "konkurs-app-938212880",
-        "konkurs-app-938206260",
-        "konkurs-app-938206368",
-        "konkurs-app-938207151",
-        "konkurs-app-938206929",
-        "konkurs-app-938206872",
-        "konkurs-app-938210802",
-        "konkurs-app-938210772",
-        "konkurs-app-938200920"
+        "konkurs-app-938206260"
       ],
       "excluded_records_by_reason": {
         "unsupported_source_type_for_sale_pipeline": 20
