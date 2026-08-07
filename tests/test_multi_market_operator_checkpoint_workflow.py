@@ -7,11 +7,14 @@ RECONCILE = ROOT / "scripts/reconcile_checkpoint_human_reviews.py"
 BUILD_INTELLIGENCE = ROOT / "scripts/build_domain_market_intelligence_feed.py"
 
 
-def test_checkpoint_workflow_is_manual_and_read_only() -> None:
+def test_checkpoint_workflow_is_daily_and_read_only() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     assert "name: Multi-Market Daily Operator Checkpoint" in text
     assert "workflow_dispatch:" in text
-    assert "schedule:" not in text
+    assert "schedule:" in text
+    assert 'cron: "17 5 * * *"' in text
+    assert "operator-read-only-checkpoint:" in text
+    assert "github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'" in text
     assert "permissions:\n  contents: read\n  actions: read" in text
     assert "automatic_purchase" in text
     assert "automatic_payment" in text

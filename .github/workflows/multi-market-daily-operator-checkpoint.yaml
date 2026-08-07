@@ -1,6 +1,8 @@
 name: Multi-Market Daily Operator Checkpoint
 
 on:
+  schedule:
+    - cron: "17 5 * * *"
   workflow_dispatch:
     inputs:
       sweden_query_budget:
@@ -114,8 +116,8 @@ jobs:
           pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
           pytest tests/test_sweden_valuable_datasets_status_feed_v1.py -q
 
-  manual-read-only-checkpoint:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+  operator-read-only-checkpoint:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
     runs-on: ubuntu-latest
     timeout-minutes: 75
     env:
