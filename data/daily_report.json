@@ -3,7 +3,7 @@
     "alerts": [],
     "decision_source": "data/decision_intelligence.json",
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-08-07T13:38:31.123707+00:00",
+    "last_scoring_run": "2026-08-07T19:15:02.699910+00:00",
     "official_decision_field": "final_decision",
     "schema_version": 2,
     "signatures": []
@@ -50,16 +50,16 @@
         },
         {
           "asking_price_nok": null,
-          "bankruptcy_date": "2026-08-05T00:00:00",
+          "bankruptcy_date": "2026-08-06T00:00:00",
           "channel": "bankruptcy_lead",
-          "city": "KRISTIANSAND",
-          "description": "Importere klær og selge disse videre på nett og i butikk.",
+          "city": "DRAMMEN",
+          "description": "Butikkhandel med klær.",
           "expected_profit_nok": null,
           "industry_code": "47.710",
           "industry_description": "Detaljhandel med klær",
-          "lead_id": "konkurs-app-938211663",
+          "lead_id": "konkurs-app-938223408",
           "lead_score": 51,
-          "organization_number": "938211663",
+          "organization_number": "938223408",
           "roi_percent": null,
           "score_reasons": [
             "target:butikk+12",
@@ -71,23 +71,78 @@
           ],
           "source": "Konkurs.app",
           "status": "FOLLOW_UP_LEAD",
-          "title": "MØE ITEMS AS",
-          "trustee": "Adv. Øyvind Sund",
-          "url": "https://konkurs.app/konkursbo/938211663",
+          "title": "FRONT VEST AS",
+          "trustee": "Adv. Hans V. Haug",
+          "url": "https://konkurs.app/konkursbo/938223408",
           "warning": "Discovery lead only; assets and sale availability are not confirmed."
         },
         {
           "asking_price_nok": null,
-          "bankruptcy_date": "2026-08-05T00:00:00",
+          "bankruptcy_date": "2026-08-06T00:00:00",
+          "channel": "bankruptcy_lead",
+          "city": "MOSS",
+          "description": "Butikkhandel med klær.",
+          "expected_profit_nok": null,
+          "industry_code": "47.710",
+          "industry_description": "Detaljhandel med klær",
+          "lead_id": "konkurs-app-938224226",
+          "lead_score": 51,
+          "organization_number": "938224226",
+          "roi_percent": null,
+          "score_reasons": [
+            "target:butikk+12",
+            "target:klær+16",
+            "target:handel+8",
+            "location_present+5",
+            "organization_number_present+5",
+            "trustee_present+5"
+          ],
+          "source": "Konkurs.app",
+          "status": "FOLLOW_UP_LEAD",
+          "title": "VIA OTER AS",
+          "trustee": "Adv. Karianne Hulaas",
+          "url": "https://konkurs.app/konkursbo/938224226",
+          "warning": "Discovery lead only; assets and sale availability are not confirmed."
+        },
+        {
+          "asking_price_nok": null,
+          "bankruptcy_date": "2026-08-07T00:00:00",
           "channel": "bankruptcy_lead",
           "city": "OSLO",
-          "description": "Salg av blomster og tilhørende produkter fra butikklokale og internett.",
+          "description": "Kjøp og salg av eksklusive tekstil produkter.",
           "expected_profit_nok": null,
-          "industry_code": "47.761",
-          "industry_description": "Detaljhandel med blomster, planter, gjødsel og plantevernmidler",
-          "lead_id": "konkurs-app-938214239",
+          "industry_code": "46.410",
+          "industry_description": "Engroshandel med tekstiler og utstyrsvarer",
+          "lead_id": "konkurs-app-938226385",
+          "lead_score": 41,
+          "organization_number": "938226385",
+          "roi_percent": null,
+          "score_reasons": [
+            "target:tekstil+18",
+            "target:handel+8",
+            "location_present+5",
+            "organization_number_present+5",
+            "trustee_present+5"
+          ],
+          "source": "Konkurs.app",
+          "status": "FOLLOW_UP_LEAD",
+          "title": "LUNASILK AS",
+          "trustee": "Adv. Anne Christine Wettre",
+          "url": "https://konkurs.app/konkursbo/938226385",
+          "warning": "Discovery lead only; assets and sale availability are not confirmed."
+        },
+        {
+          "asking_price_nok": null,
+          "bankruptcy_date": "2026-08-06T00:00:00",
+          "channel": "bankruptcy_lead",
+          "city": "BÆRUM",
+          "description": "Import og salg av sykkeldeler til grossister og sykkelbutikker, samt oppgaver som hører naturlig sammen med dette.",
+          "expected_profit_nok": null,
+          "industry_code": "46.490",
+          "industry_description": "Engroshandel med andre husholdningsvarer",
+          "lead_id": "konkurs-app-938224579",
           "lead_score": 35,
-          "organization_number": "938214239",
+          "organization_number": "938224579",
           "roi_percent": null,
           "score_reasons": [
             "target:butikk+12",
@@ -98,67 +153,15 @@
           ],
           "source": "Konkurs.app",
           "status": "FOLLOW_UP_LEAD",
-          "title": "FLORAMIN AS",
-          "trustee": "Adv. Karen Margrethe Rime",
-          "url": "https://konkurs.app/konkursbo/938214239",
-          "warning": "Discovery lead only; assets and sale availability are not confirmed."
-        },
-        {
-          "asking_price_nok": null,
-          "bankruptcy_date": "2026-08-06T00:00:00",
-          "channel": "bankruptcy_lead",
-          "city": "SANDNES",
-          "description": "Drive blikkenslagerverksted samt videreutvikling, produksjon og salg innenfor faget V.V.S. og hva hermed står i forbindelse. I tillegg produksjon av metallartikler innen bygg og industri.",
-          "expected_profit_nok": null,
-          "industry_code": "25.110",
-          "industry_description": "Produksjon av metallkonstruksjoner og deler",
-          "lead_id": "konkurs-app-938219761",
-          "lead_score": 25,
-          "organization_number": "938219761",
-          "roi_percent": null,
-          "score_reasons": [
-            "target:lager+10",
-            "location_present+5",
-            "organization_number_present+5",
-            "trustee_present+5"
-          ],
-          "source": "Konkurs.app",
-          "status": "FOLLOW_UP_LEAD",
-          "title": "GANN BLIKK AS",
-          "trustee": "Adv. Andreas Haukland Westlye",
-          "url": "https://konkurs.app/konkursbo/938219761",
-          "warning": "Discovery lead only; assets and sale availability are not confirmed."
-        },
-        {
-          "asking_price_nok": null,
-          "bankruptcy_date": "2026-08-05T00:00:00",
-          "channel": "bankruptcy_lead",
-          "city": "MOSS",
-          "description": "Manuell behandling med osteopatiske og andre terapeutiske teknikker for lindring av muskel- og skjelettplager.",
-          "expected_profit_nok": null,
-          "industry_code": "86.960",
-          "industry_description": "Aktiviteter innenfor tradisjonell, komplementær og alternativ medisin",
-          "lead_id": "konkurs-app-938211639",
-          "lead_score": 25,
-          "organization_number": "938211639",
-          "roi_percent": null,
-          "score_reasons": [
-            "target:lager+10",
-            "location_present+5",
-            "organization_number_present+5",
-            "trustee_present+5"
-          ],
-          "source": "Konkurs.app",
-          "status": "FOLLOW_UP_LEAD",
-          "title": "STENBERG OSTEOPATI AS",
-          "trustee": "Adv. Karianne Hulaas",
-          "url": "https://konkurs.app/konkursbo/938211639",
+          "title": "CYCLE SERVICE NORDIC AS",
+          "trustee": "Adv. Atle Zerwekh",
+          "url": "https://konkurs.app/konkursbo/938224579",
           "warning": "Discovery lead only; assets and sale availability are not confirmed."
         }
       ],
       "top_count": 5
     },
-    "generated_at": "2026-08-07T13:38:31.316334+00:00",
+    "generated_at": "2026-08-07T19:15:02.893081+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
     "schema_version": 2,
     "source_funnel": {
@@ -168,11 +171,11 @@
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-08-07T13:38:31.391823+00:00",
+  "generated_at": "2026-08-07T19:15:02.965579+00:00",
   "opportunities": {
     "actionable_count": 0,
     "candidate_count": 6,
-    "generated_at": "2026-08-07T13:38:31.158048+00:00",
+    "generated_at": "2026-08-07T19:15:02.734265+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -183,7 +186,7 @@
     "actionable_count": 0,
     "buy_review_count": 0,
     "candidate_count": 6,
-    "generated_at": "2026-08-07T13:38:31.123707+00:00",
+    "generated_at": "2026-08-07T19:15:02.699910+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
@@ -203,7 +206,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d",
+        "market_search_query": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 3d",
         "matched_target_terms": [
           "varelager"
         ],
@@ -249,7 +252,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 4d 3t 21m",
+        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 3d 21t 45m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
       },
@@ -269,7 +272,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d",
+        "market_search_query": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 4d",
         "matched_target_terms": [
           "klær"
         ],
@@ -315,7 +318,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 5d 5t 13m",
+        "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 4d 23t 37m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276"
       },
@@ -335,7 +338,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d",
+        "market_search_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 3d",
         "matched_target_terms": [
           "klær"
         ],
@@ -381,7 +384,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 4d 5t 6m",
+        "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 3d 23t 30m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267"
       },
@@ -401,7 +404,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d",
+        "market_search_query": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 5d",
         "matched_target_terms": [
           "klær"
         ],
@@ -447,7 +450,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 6d 5t 6m",
+        "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 2 bud 5d 23t 30m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274"
       },
@@ -467,7 +470,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d",
+        "market_search_query": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 3d",
         "matched_target_terms": [
           "klær"
         ],
@@ -513,7 +516,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 4d 5t 16m",
+        "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 3d 23t 40m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
       },
@@ -579,7 +582,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 5d 5t 36m",
+        "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 5d 0t 0m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271"
       }
@@ -589,7 +592,7 @@
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-08-07T13:38:31.361394+00:00",
+    "generated_at": "2026-08-07T19:15:02.934931+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [
