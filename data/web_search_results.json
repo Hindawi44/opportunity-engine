@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-08-07T00:15:10.418020+00:00",
+  "generated_at": "2026-08-07T03:18:36.649804+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -142,19 +142,19 @@
     {
       "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [
-        "Se etter Sorteringsmerkene der du leverer klær og tekstiler du ikke lenger trenger eller som er ødelagte, enten det er på tekstiltårn fra tekstilinnsamlere som Fretex, UFF, Røde Kors og Kirkens Bymisjon Miljø, kommunale returpunkt eller nærmeste gjenvinningsstasjon.",
-        "Noen kommuner samler inn brukbare og ødelagte klær og tekstiler hver for seg, mens andre kommuner samler dem inn sammen.",
-        "Våte og skitne tekstiler kastes i restavfallet*. Dersom de leveres sammen brukbare og ødelagte klær og tekstiler ødelegger de for gjenbruk og gjenvinning.",
-        "På Sortere finner du svar på hva du gjør med brukbare og ødelagte klær og tekstiler i din kommune."
+        "Visste du at både brukbare og ødelagte klær skal i ombrukscontaineren?",
+        "Per i dag har finnes det kun ett operativt anlegg for materialgjenvinning av tekstiler i Norge – Norsk Tekstilgjenvinning i Sandefjord.",
+        "Bare i Oslo blir det kastet over tre tusen tonn klær og tekstiler i restavfallet hvert år. Det er nok til å fylle nesten fem og et halvt olympiske svømmebasseng. Både brukbare òg ødelagte klær og tekstiler skal leveres i ombrukscontainerne rundt i byen.",
+        "Siste utvei: Levere plagget til en tekstilcontainer. Alle tekstiler, også ødelagte klær, kan leveres i tekstilcontainerne som står sammen med glass- og metallcontainerne. Husk å levere tørt og rent i en plastpose!"
       ],
-      "id": "a4a7a1411fea626aeac4bb42",
+      "id": "68d9c831f2dca7774a774016",
       "language": "nb",
-      "published_at": "2025-10-15T07:18:50",
-      "snippet": "På Sortere finner du svar på hva du gjør med brukbare og ødelagte klær og tekstiler i din kommune.",
+      "published_at": "2026-03-17T12:17:00",
+      "snippet": "Siste utvei: <strong>Levere plagget til en tekstilcontainer</strong>. Alle tekstiler, også ødelagte klær, kan leveres i tekstilcontainerne som står sammen med glass- og metallcontainerne. Husk å levere tørt og rent i en plastpose!",
       "source": "Brave Search",
       "source_rank": 10,
-      "title": "Slik sorterer du klær og tekstiler i din kommune | Sortere",
-      "url": "https://sortere.no/sorteringsguider/hvordan-sorterer-du-klaer-og-tekstiler"
+      "title": "Hit skal alle klærne - også de hullete sokkene dine",
+      "url": "https://www.klimaoslo.no/hvor-skal-du-levere-odelagte-klaer/"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -174,6 +174,20 @@
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
       "extra_snippets": [
+        "opphørssalg · substantiv · MODERAT BOKMÅLet · genus · nøytrum · ubestemt artikkel · et · FULL BOKMÅLSNORM · ETYMOLOGI · første ledd opphør · BETYDNING OG BRUK · salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned · SITATER · en liten butikk som har opphørssalg ·"
+      ],
+      "id": "0fd193c4d16fd92ffb58fc87",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "opphørssalg · substantiv · MODERAT ... · første ledd opphør · BETYDNING OG BRUK · <strong>salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned</strong> · SITATER · en liten butikk som ......",
+      "source": "Brave Search",
+      "source_rank": 2,
+      "title": "opphørssalg - Det Norske Akademis ordbok",
+      "url": "https://naob.no/ordbok/opph%C3%B8rssalg"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
         "Opphørssalg er en type salgsarrangement hvor varer blir solgt for å tømme lageret før en bedrift stenger eller flytter. Dette kan være en god mulighet for kunder å kjøpe produkter til lave priser, men det kan også være en tegn på at bedriften har økonomiske problemer. Butikken har opphørssalg før den lukker.",
         "Oppløsningene av opphørssalgiene ble annonsert i går. ... Butikkene holder opphørssalga før de stenger.",
         "Butikken holder opphørssalget før den stenger.",
@@ -184,23 +198,9 @@
       "published_at": null,
       "snippet": "<strong>Opphørssalg er en type salgsarrangement hvor varer blir solgt for å tømme lageret før en bedrift stenger eller flytter</strong>. Dette kan være en god mulighet for kunder å kjøpe produkter til lave priser, men det kan også være en tegn på at bedriften har økonomiske problemer.",
       "source": "Brave Search",
-      "source_rank": 2,
+      "source_rank": 3,
       "title": "Opphørssalg - hva er det?",
       "url": "https://www.ordlista.no/ord/opph%C3%B8rssalga"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
-        "opphørssalg · substantiv · MODERAT BOKMÅLet · genus · nøytrum · ubestemt artikkel · et · FULL BOKMÅLSNORM · ETYMOLOGI · første ledd opphør · BETYDNING OG BRUK · salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned · SITATER · en liten butikk som har opphørssalg ·"
-      ],
-      "id": "0fd193c4d16fd92ffb58fc87",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "opphørssalg · substantiv · MODERAT ... · første ledd opphør · BETYDNING OG BRUK · <strong>salg (vanligvis til sterkt nedsatte priser) av varer i forretning som skal legges ned</strong> · SITATER · en liten butikk som ......",
-      "source": "Brave Search",
-      "source_rank": 3,
-      "title": "opphørssalg - Det Norske Akademis ordbok",
-      "url": "https://naob.no/ordbok/opph%C3%B8rssalg"
     },
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
@@ -279,22 +279,6 @@
     {
       "discovery_query": "butikk inventar opphørssalg Norge",
       "extra_snippets": [
-        "– Vi har kjøpt varelager, inventar, utstyr og varemerker og skal drive butikkene videre i en måned for å rydde opp og holde opphørssalg, sier Jan Egil Flo til Tekstilforum. - Hva som skjer videre er ikke avklart.",
-        "Flo er også hovedeier i Moods, som ble etablert etter konkursen i Moods of Norway. I tillegg til en butikk i Grensen i Oslo og i Stryn har Moods hatt pop up-butikker i Trondheim og Bergen fra januar til 1. mars i år. Nå konstaterer Flo at det nåværende Moods-konseptet skrinlegges.",
-        "Butikken i Grensen stenges i juli, da leiekontrakten går ut, og i stedet planlegger han et come back og relansering av Moods of Norway til høsten."
-      ],
-      "id": "340bfb344e98a6d682c6c9cc",
-      "language": "nb",
-      "published_at": "2020-05-01T15:30:26",
-      "snippet": "– <strong>Vi har kjøpt varelager, inventar, utstyr og varemerker og skal drive butikkene videre i en måned for å rydde opp og holde opphørssalg</strong>, sier Jan Egil Flo til Tekstilforum. - Hva som skjer videre er ikke avklart.",
-      "source": "Brave Search",
-      "source_rank": 9,
-      "title": "Flo kjøper Brandstad og Wagner",
-      "url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324"
-    },
-    {
-      "discovery_query": "butikk inventar opphørssalg Norge",
-      "extra_snippets": [
         "Din leverandør av butikkinventar og salgsfremmende produkter, et sortiment som spenner fra kroker og kleshengere til disker og prøverom. ... Ring eller skriv gjerne, hvis du har spørsmål. Vi tilbyr support både på e-post og telefon: 69 25 38 88. Vi legger oss i selen for å gi deg gode priser. Pålitelig standard inventar og butikktilbehør til konkurransedyktige priser.",
         "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
         "I vårt utvalg av systemer finner du blant annet rillepanelsinventar, som gir deg et vell av muligheter for å innrede butikken. Rillepaneler, også kjent som Slatboard, rillepaneler eller slatwall, er en utrolig flott og enkel type inventarsystem som gir deg utallige muligheter for display.",
@@ -305,9 +289,25 @@
       "published_at": null,
       "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS&#x27; butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
       "source": "Brave Search",
-      "source_rank": 10,
+      "source_rank": 9,
       "title": "Butikkinnredning og inventar. 5–7 dagers levering. ⭐ SE mer HER – SuperSellerS",
       "url": "https://www.supersellers.no/"
+    },
+    {
+      "discovery_query": "butikk inventar opphørssalg Norge",
+      "extra_snippets": [
+        "– Vi har kjøpt varelager, inventar, utstyr og varemerker og skal drive butikkene videre i en måned for å rydde opp og holde opphørssalg, sier Jan Egil Flo til Tekstilforum. - Hva som skjer videre er ikke avklart.",
+        "Flo er også hovedeier i Moods, som ble etablert etter konkursen i Moods of Norway. I tillegg til en butikk i Grensen i Oslo og i Stryn har Moods hatt pop up-butikker i Trondheim og Bergen fra januar til 1. mars i år. Nå konstaterer Flo at det nåværende Moods-konseptet skrinlegges.",
+        "Butikken i Grensen stenges i juli, da leiekontrakten går ut, og i stedet planlegger han et come back og relansering av Moods of Norway til høsten."
+      ],
+      "id": "340bfb344e98a6d682c6c9cc",
+      "language": "nb",
+      "published_at": "2020-05-01T15:30:26",
+      "snippet": "– <strong>Vi har kjøpt varelager, inventar, utstyr og varemerker og skal drive butikkene videre i en måned for å rydde opp og holde opphørssalg</strong>, sier Jan Egil Flo til Tekstilforum. - Hva som skjer videre er ikke avklart.",
+      "source": "Brave Search",
+      "source_rank": 10,
+      "title": "Flo kjøper Brandstad og Wagner",
+      "url": "https://www.tekstilforum.no/konkurser/flo-kjoper-brandstad-og-wagner/604324"
     },
     {
       "discovery_query": "varelager konkursbo Norge",
@@ -510,23 +510,6 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [
-        "Vårt profesjonelle og moderne utvalg av butikkinnredning. Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
-        "Vi tilbyr inventar til butikkinnredning til gode priser.",
-        "Under vårt utvalg av løst butikkinnredning finner du for eksempel stativer, salgsbord, utstillingsbord, puffer, podier, gardinstenger til prøverom samt TUBO-/wirereoler.",
-        "Vi tilbyr alt du trenger for å skape en flott og funksjonell butikkinnredning."
-      ],
-      "id": "7cad0e8a59e6e66434244c4f",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med <strong>SuperSellerS&#x27; butikkinnredning</strong> blir butikkoppsettet ditt litt enklere ...",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Butikkinnredning og inventar. 5–7 dagers levering. ⭐ SE mer HER – SuperSellerS",
-      "url": "https://www.supersellers.no/"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [
         "Skap en attraktiv butiksmiljø med vår omfattende butikkinnredningstjeneste. Et attraktivt konsept er en blanding av tiltalende miljøer, eksponeringer som selger, og en godt planlagt layout. Våre engasjerte prosjektgrupper settes sammen før hvert prosjekt for å sikre at dine behov blir ivaretatt og at alle muligheter i din butikk utnyttes.",
         "Vi kan butikkinnredning – fra idé til ferdig butikk. Vi har lang erfaring!",
         "Som en av Nordens største på butikkinnredning har vi gjennom 120 år hatt mulighet til å jobbe med kunder av alle slag og fra alle typer bransjer. Vi vet hvordan man skaper en butikk som tiltaler sluttbruker og som hjelper kundene deres i kjøpsprosessen. Vår butikkinnredning er mer enn bare oppbevaring av varer, den er en forlengelse av deres varemerke og hjelper å drive en fremgangsrik bedrift.",
@@ -537,9 +520,38 @@
       "published_at": "2024-08-21T08:17:24",
       "snippet": "<strong>Skap en attraktiv butiksmiljø med vår omfattende butikkinnredningstjeneste</strong>. Et attraktivt konsept er en blanding av tiltalende miljøer, eksponeringer som selger, og en godt planlagt layout. Våre engasjerte prosjektgrupper settes sammen før hvert prosjekt for å sikre at dine behov blir ...",
       "source": "Brave Search",
-      "source_rank": 5,
+      "source_rank": 4,
       "title": "Butikkinnredning - Attraktiv innredning for alle bransjer - Hestra",
       "url": "https://www.hestra.no/"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "extra_snippets": [
+        "Vårt profesjonelle og moderne utvalg av butikkinnredning. Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med SuperSellerS' butikkinnredning blir butikkoppsettet ditt litt enklere og mer effektivt.",
+        "Vi tilbyr inventar til butikkinnredning til gode priser.",
+        "Under vårt utvalg av løst butikkinnredning finner du for eksempel stativer, salgsbord, utstillingsbord, puffer, podier, gardinstenger til prøverom samt TUBO-/wirereoler.",
+        "Vi tilbyr alt du trenger for å skape en flott og funksjonell butikkinnredning."
+      ],
+      "id": "7cad0e8a59e6e66434244c4f",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Vi har organisert sortimentet av butikkinnredning i systemer og løst inventar, slik at du enkelt kan navigere og finne det du trenger for å innrede butikken din med stil. Med <strong>SuperSellerS&#x27; butikkinnredning</strong> blir butikkoppsettet ditt litt enklere ...",
+      "source": "Brave Search",
+      "source_rank": 5,
+      "title": "Butikkinnredning og inventar. 5–7 dagers levering. ⭐ SE mer HER – SuperSellerS",
+      "url": "https://www.supersellers.no/"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "extra_snippets": [],
+      "id": "875f71823b7227328ea295d7",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Du finner 39 460 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "source": "Brave Search",
+      "source_rank": 6,
+      "title": "Butikkinnredning | til salgs (side 30) | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?page=30&product_category=2.91.3108.359&sub_category=1.93.3215"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -552,23 +564,9 @@
       "published_at": "2025-11-12T11:53:03",
       "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
       "source": "Brave Search",
-      "source_rank": 6,
+      "source_rank": 7,
       "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
       "url": "https://avabutikkinnredning.no/om-oss/"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [
-        "Butikkinnredning (716) Lagerutstyr (538) Sikkerhet og overvåkning (309) Vareparti og konkursbo (594) Annet butikkutstyr (447)Gå til resultat · Fiks ferdig (88)Gå til resultat · Ingen resultater ·"
-      ],
-      "id": "4d96f214044f8d44d022d4d3",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 7,
-      "title": "Butikkinnredning | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -705,6 +703,23 @@
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
+        "De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK). Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere. Minstekravet til aksjekapital er 30 000 kroner.",
+        "Finansieringen kan komme fra egne midler, lån fra banken, eller støtteordninger gjennom Innovasjon Norge. I 2026 finnes det også flere tilskuddsordninger rettet mot bærekraftig handel og sirkulærøkonomi. Undersøk hva som er tilgjengelig i din region. Noen velger å starte med en crowdfunding-kampanje, noe som også fungerer som en tidlig markedstest av konseptet ditt. Innkjøpet er selve hjertet av en klesbutikk.",
+        "Å starte en klesbutikk uten en tydelig forretningsmodell er som å seile uten kart. Du trenger ikke bare en vag idé om hva du vil selge, men en gjennomtenkt plan for hvordan butikken din skal skille seg ut, hvem du selger til, og hvordan du skal tjene penger.",
+        "Bærekraft er ikke lenger et tillegg eller en markedsføringsstrategi. Det er en forventning. Norske forbrukere i 2026 forventer at klesbutikker kan dokumentere hvor plaggene kommer fra, hvilke materialer som brukes, og hvordan arbeiderne i produksjonskjeden behandles."
+      ],
+      "id": "4359f2fe36f47784d72dc461",
+      "language": "nb",
+      "published_at": "2026-07-31T07:43:34",
+      "snippet": "<strong>De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK).</strong> Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere.",
+      "source": "Brave Search",
+      "source_rank": 7,
+      "title": "Starte klesbutikk i 2026: komplett guide fra idé til åpning - Shoplabs",
+      "url": "https://shoplabs.no/butikkbloggen/starte-klesbutikk-i-2026-komplett-guide-fra-ide-til-apning-2/"
+    },
+    {
+      "discovery_query": "butikkinnredning klesbutikk Norge",
+      "extra_snippets": [
         "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ·"
       ],
       "id": "67f88cde81cc5ba7b27dc6ea",
@@ -712,7 +727,7 @@
       "published_at": "2024-05-16T13:05:10",
       "snippet": "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ...",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 8,
       "title": "Selected – Klesbutikk i Bergen - Heggland Heiltre AS",
       "url": "https://heggland-heiltre.no/selected-klesbutikk-i-bergen/"
     },
@@ -727,40 +742,23 @@
       "published_at": null,
       "snippet": "Type innredning Slatboard ... Svart Hvit Grå Se alle! <strong>Butikkinnredning for arbeidsklær med butikkhyller i stål, trådkurver, sjokkselgere, klesstativ og innebygde søyler med sporpanel</strong>....",
       "source": "Brave Search",
-      "source_rank": 8,
+      "source_rank": 9,
       "title": "Butikkinnredning Archives - Side 2 av 2 - Butikkartikler AS",
       "url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2/"
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
-        "De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK). Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere. Minstekravet til aksjekapital er 30 000 kroner.",
-        "Finansieringen kan komme fra egne midler, lån fra banken, eller støtteordninger gjennom Innovasjon Norge. I 2026 finnes det også flere tilskuddsordninger rettet mot bærekraftig handel og sirkulærøkonomi. Undersøk hva som er tilgjengelig i din region. Noen velger å starte med en crowdfunding-kampanje, noe som også fungerer som en tidlig markedstest av konseptet ditt. Innkjøpet er selve hjertet av en klesbutikk.",
-        "Å starte en klesbutikk uten en tydelig forretningsmodell er som å seile uten kart. Du trenger ikke bare en vag idé om hva du vil selge, men en gjennomtenkt plan for hvordan butikken din skal skille seg ut, hvem du selger til, og hvordan du skal tjene penger.",
-        "Bærekraft er ikke lenger et tillegg eller en markedsføringsstrategi. Det er en forventning. Norske forbrukere i 2026 forventer at klesbutikker kan dokumentere hvor plaggene kommer fra, hvilke materialer som brukes, og hvordan arbeiderne i produksjonskjeden behandles."
+        "Butikkinnredning (716) Lagerutstyr (538) Sikkerhet og overvåkning (309) Vareparti og konkursbo (594) Annet butikkutstyr (447)Gå til resultat · Fiks ferdig (88)Gå til resultat · Ingen resultater ·"
       ],
-      "id": "4359f2fe36f47784d72dc461",
+      "id": "2f5eb1f1cc67c45b4eca8b0d",
       "language": "nb",
-      "published_at": "2026-07-31T07:43:34",
-      "snippet": "<strong>De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK).</strong> Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere.",
-      "source": "Brave Search",
-      "source_rank": 9,
-      "title": "Starte klesbutikk i 2026: komplett guide fra idé til åpning - Shoplabs",
-      "url": "https://shoplabs.no/butikkbloggen/starte-klesbutikk-i-2026-komplett-guide-fra-ide-til-apning-2/"
-    },
-    {
-      "discovery_query": "butikkinnredning klesbutikk Norge",
-      "extra_snippets": [
-        "Ava Butikkinnredning har levert butikkinnredning og utstillingsmateriell til bedrifter over hele landet siden 2008."
-      ],
-      "id": "c27bfbff55509642b99887ea",
-      "language": "nb",
-      "published_at": "2025-11-12T11:53:03",
-      "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
+      "published_at": null,
+      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
       "source_rank": 10,
-      "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
-      "url": "https://avabutikkinnredning.no/om-oss/"
+      "title": "Butikkinnredning | til salgs | FINN Torget",
+      "url": "https://www.finn.no/bap/forsale/search.html?product_category=2.91.3108.359"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -1163,23 +1161,6 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
-        "Montering av lagerreoler skjer i to trinn og utføres av kvalifisert personell. Først vurderer montørene forholdene på stedet, som gulv, plassering og eksisterende utstyr. Våre spesialister finner den sikreste og mest effektive måten å sette opp reolsystemet på.",
-        "Lastekapasiteten til lagerreoler avhenger av flere faktorer, blant annet hvilken type reolsystem som brukes. Hos Jungheinrich beregner vi bæreevnen for hvert enkelt system, med høy nøyaktighet, ved å analysere ulike komponenter og konstruksjonsdetaljer.",
-        "Kjøp lagerreoler på nett via vår nettbutikk www.jungheinrich-shop.no, eller send en produktforespørsel og få grundig rådgivning.",
-        "Lagerreoler er robuste reolsystemer utviklet for sikker og oversiktlig lagring av varer i flere nivåer."
-      ],
-      "id": "76a8b44880e350452a2a05e2",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
-      "source": "Brave Search",
-      "source_rank": 8,
-      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
-      "url": "https://jungheinrich.no/produkter/reol-og-lagerl%C3%B8sning"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "extra_snippets": [
         "Lagerreoler og lagerhyller er en sentral del av en effektiv lagerinnredning – enten det gjelder verksted, nettbutikk, arkiv eller industri. En gjennomtenkt lagerreol skaper struktur og oversikt, slik at varer kan håndteres raskt og uten unødvendige arbeidsprosesser.",
         "Våre lagerreoler er utviklet for profesjonell bruk og konstruert for å tåle høy belastning i daglig drift. De fungerer som stabile reoler til lager, hvor både mindre kasser, verktøy og tyngre industrivarer kan oppbevares sikkert. Samtidig gir lagerhyller nødvendig fleksibilitet, ettersom hyllenivåene kan tilpasses ulike varetyper og arbeidsprosesser.",
         "Når du velger reoler til lager i et industrielt miljø, er riktig dimensjonering avgjørende. En solid lagerreol reduserer risikoen for skader, driftsstans og unødvendig håndtering. Samtidig bidrar robuste lagerhyller til bedre struktur og et tryggere arbeidsmiljø.",
@@ -1190,24 +1171,38 @@
       "published_at": null,
       "snippet": "Finn lagerreoler, lagerhyller og reoler til lager hos <strong>HHL Lagerinnredning</strong>. Fleksible og robuste lagerreoler til industri med rask levering og profesjonell rådgivning.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 8,
       "title": "Lagerreoler og lagerhyller | Reoler til lager og industri",
       "url": "https://www.hhl-lagerinnredning.no/lagerreoler"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
-        "Våre dyktige montører har utallige montasjejobber under beltet, og monterer både stort og smått enten det skulle være helt nord eller sør i Norge.",
-        "Vi leverer løsninger for lager og verksted"
+        "Montering av lagerreoler skjer i to trinn og utføres av kvalifisert personell. Først vurderer montørene forholdene på stedet, som gulv, plassering og eksisterende utstyr. Våre spesialister finner den sikreste og mest effektive måten å sette opp reolsystemet på.",
+        "Lastekapasiteten til lagerreoler avhenger av flere faktorer, blant annet hvilken type reolsystem som brukes. Hos Jungheinrich beregner vi bæreevnen for hvert enkelt system, med høy nøyaktighet, ved å analysere ulike komponenter og konstruksjonsdetaljer.",
+        "Kjøp lagerreoler på nett via vår nettbutikk www.jungheinrich-shop.no, eller send en produktforespørsel og få grundig rådgivning.",
+        "Lagerreoler er robuste reolsystemer utviklet for sikker og oversiktlig lagring av varer i flere nivåer."
       ],
-      "id": "63600f85f4126e808e6723ff",
-      "language": "nb",
-      "published_at": "2025-12-29T07:03:58",
-      "snippet": "Du har ingen produkter i handlekurven · Bygg din nye reolløsning i vår egenutviklede reolbygger og bestill i dag - kortest leveringstid får du i vår nettbutikk",
+      "id": "76a8b44880e350452a2a05e2",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
+      "url": "https://jungheinrich.no/produkter/reol-og-lagerl%C3%B8sning"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "extra_snippets": [],
+      "id": "f233ebf2b059bd695449e25e",
+      "language": "no",
+      "published_at": null,
+      "snippet": "<strong>PR Maskin AS 4323 Sandnes Norge</strong>",
       "source": "Brave Search",
       "source_rank": 10,
-      "title": "Reolteknikk AS - Vi leverer løsninger for lager og verksted",
-      "url": "https://reolteknikk.no/"
+      "title": "Stålreoler, lagerreoler - Verksteds- og lagerinventar - Inventar og Innretning - Produkter",
+      "url": "https://www.maskinregisteret.no/product/search/5017/stalreoler_lagerreoler"
     }
   ],
   "schema_version": 1
