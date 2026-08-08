@@ -191,7 +191,7 @@
   "selection_policy": "FIRST_RANKED_RECORD_WITH_KNOWN_ASKING_PRICE",
   "selection_reason": "Selected one operational decision record and copied only explicit cost values.",
   "selection_status": "SELECTED",
-  "source_generated_at": "2026-08-08T13:12:03.953032+00:00",
+  "source_generated_at": "2026-08-08T18:58:21.841766+00:00",
   "source_official_decision_field": "final_decision",
   "source_opportunity": {
     "asking_price_nok": 3000.0,
@@ -200,7 +200,7 @@
     "opportunity_score": 33.61,
     "priority": 1,
     "source_city": "Kristiansand s",
-    "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 3d 3t 48m",
+    "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 2d 22t 1m",
     "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
   },
   "source_schema_version": 2
