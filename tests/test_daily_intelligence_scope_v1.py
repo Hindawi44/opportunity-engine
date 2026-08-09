@@ -24,8 +24,13 @@ def test_daily_entrypoint_delegates_to_no_se_de_core_only() -> None:
     assert "build_domain_market_intelligence_feed_core.py" in text
     assert "DEFAULT_DAILY_SCOPE_NO_SE_DE_ONLY" in text
     assert "build_optional_market_intelligence_side_feeds.py" in text
-    for collector in SIDE_FEED_COLLECTORS:
-        assert collector not in text
+    assert "from opportunity_engine.discovery.fabric_procurement_watch import" not in text
+    assert "from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import" not in text
+    assert "from opportunity_engine.discovery.fashion_stock_netherlands_feed import" not in text
+    assert "from opportunity_engine.discovery.stockhurt_b2b_feed import" not in text
+    assert "from opportunity_engine.discovery.jobalots_clothing_auction_feed import" not in text
+    assert "def _run(" not in text
+    assert "collector(environment=os.environ)" not in text
 
 
 def test_optional_side_feed_implementation_is_preserved() -> None:
