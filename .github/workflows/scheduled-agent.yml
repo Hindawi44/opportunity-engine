@@ -1,9 +1,9 @@
 name: Scheduled ODS research agent
 
 on:
+  # Legacy ODS scheduler retired by SCHEDULER_CONSOLIDATION_AUDIT_V1.
+  # Keep available only for explicit operator runs.
   workflow_dispatch:
-  schedule:
-    - cron: "17 */6 * * *"
 
 permissions:
   contents: read
