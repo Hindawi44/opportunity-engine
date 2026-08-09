@@ -1,9 +1,8 @@
 name: Deutsche Pfandverwertung Active Clothing Watch
 
 on:
-  schedule:
-    # GitHub cron uses UTC: 06:17 UTC is 08:17 CEST / 07:17 CET in Norway.
-    - cron: "17 6 * * *"
+  # Automatic schedule retired by scheduler consolidation; this source now runs inside
+  # Multi-Market Daily Operator Checkpoint. Historical schedule: - cron: "17 6 * * *"
   workflow_dispatch:
     inputs:
       catalog_limit:
