@@ -17,14 +17,14 @@ ALLOWED_DISPOSITIONS = {
 }
 
 
-# The implementation plan is now a historical 31-workflow baseline. Current
-# .yml files must remain represented by that baseline, but archived workflow
-# shells are intentionally absent from .github/workflows.
+# The implementation plan remains a historical 31-workflow baseline. After
+# consolidation, only the canonical test workflow remains as a .yml file; the
+# historical V1/V2/V3 acceptance shells live in docs/workflow-archive.
 def test_cleanup_plan_represents_every_current_yml_workflow() -> None:
     text = PLAN.read_text(encoding="utf-8")
     workflow_names = sorted(path.name for path in WORKFLOWS.glob("*.yml"))
 
-    assert len(workflow_names) == 24
+    assert workflow_names == ["tests.yml"]
     for name in workflow_names:
         assert text.count(f"`{name}`") >= 1, name
 

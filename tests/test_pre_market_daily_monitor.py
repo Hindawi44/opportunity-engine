@@ -252,5 +252,6 @@ def test_existing_workflow_keeps_pre_market_monitor_manual_only():
     assert "--case-limit 10" in workflow
     assert "data/pre_market_cases.json" in workflow
     assert "concurrency:" in workflow
-    # Seven legacy .yml workflow shells were moved out of GitHub Actions.
-    assert len(list(Path(".github/workflows").glob("*.yml"))) == 24
+    # Historical .yml shells have moved out of GitHub Actions; tests.yml is the
+    # only current .yml workflow. Operational workflows use .yaml.
+    assert len(list(Path(".github/workflows").glob("*.yml"))) == 1
