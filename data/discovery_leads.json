@@ -2,15 +2,15 @@
   "category_counts": {
     "auction": 1,
     "bankruptcy": 16,
-    "clothing_shop_fixtures": 14,
+    "clothing_shop_fixtures": 15,
     "estate_sale": 3,
-    "inventory": 20,
+    "inventory": 22,
     "liquidation": 7,
-    "sale_listing": 10,
-    "shop_equipment": 14
+    "sale_listing": 9,
+    "shop_equipment": 15
   },
-  "deduplicated_lead_count": 56,
-  "generated_at": "2026-08-09T07:15:33.351258+00:00",
+  "deduplicated_lead_count": 59,
+  "generated_at": "2026-08-09T13:15:19.295570+00:00",
   "input_result_count": 80,
   "items": [
     {
@@ -21,7 +21,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348976+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293128+00:00",
       "image_count": null,
       "lead_id": "web-09fdcc107a66ac1b45ab",
       "price_nok": null,
@@ -44,7 +44,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348501+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292578+00:00",
       "image_count": null,
       "lead_id": "web-7c78687e8f228b645e34",
       "price_nok": null,
@@ -67,7 +67,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348817+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292953+00:00",
       "image_count": null,
       "lead_id": "web-5e74475b63c3939a78fe",
       "price_nok": null,
@@ -90,7 +90,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349387+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293624+00:00",
       "image_count": null,
       "lead_id": "web-7368b74c0e956c42b2b7",
       "price_nok": null,
@@ -106,13 +106,35 @@
       "url": "https://www.butikkartikler.no/tag/butikkinnredning/page/2/"
     },
     {
+      "canonical_url": "https://www.supersellerskatalog.no/",
+      "categories": [
+        "clothing_shop_fixtures",
+        "shop_equipment"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-09T13:15:19.293008+00:00",
+      "image_count": null,
+      "lead_id": "web-e71772deae49d9ffbeb5",
+      "price_nok": null,
+      "priority_score": 46,
+      "published_at": null,
+      "score_reasons": [
+        "category:clothing_shop_fixtures+24",
+        "category:shop_equipment+22"
+      ],
+      "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
+      "source": "Brave Search",
+      "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
+      "url": "https://www.supersellerskatalog.no/"
+    },
+    {
       "canonical_url": "https://www.supersellerskatalog.no/inspirasjon",
       "categories": [
         "clothing_shop_fixtures",
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348867+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293326+00:00",
       "image_count": null,
       "lead_id": "web-72d343831b08e2486a3f",
       "price_nok": null,
@@ -134,7 +156,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348593+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292756+00:00",
       "image_count": null,
       "lead_id": "web-bd6977fd8acb108de839",
       "price_nok": null,
@@ -156,7 +178,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349838+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294064+00:00",
       "image_count": null,
       "lead_id": "web-a9922918a03cfccae302",
       "price_nok": null,
@@ -179,7 +201,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350870+00:00",
+      "discovered_at": "2026-08-09T13:15:19.295098+00:00",
       "image_count": null,
       "lead_id": "web-bbaee8d1437e0f872a7d",
       "price_nok": null,
@@ -202,7 +224,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347596+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291536+00:00",
       "image_count": null,
       "lead_id": "web-504182e141c47ae32298",
       "price_nok": null,
@@ -225,7 +247,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347426+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291366+00:00",
       "image_count": null,
       "lead_id": "web-61d06a7585e140c934b7",
       "price_nok": null,
@@ -247,7 +269,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347300+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291232+00:00",
       "image_count": null,
       "lead_id": "web-3c91305f7ea2ad44bc3d",
       "price_nok": null,
@@ -269,7 +291,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347697+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291668+00:00",
       "image_count": null,
       "lead_id": "web-bfd07690aa50b7514dff",
       "price_nok": null,
@@ -291,7 +313,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347887+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291883+00:00",
       "image_count": null,
       "lead_id": "web-739247ba7577dd9e153e",
       "price_nok": null,
@@ -314,7 +336,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.346945+00:00",
+      "discovered_at": "2026-08-09T13:15:19.290885+00:00",
       "image_count": null,
       "lead_id": "web-83de9ca3a65e8b6a6b20",
       "price_nok": null,
@@ -337,7 +359,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350030+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294275+00:00",
       "image_count": null,
       "lead_id": "web-989e695b776848998740",
       "price_nok": null,
@@ -359,7 +381,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350081+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294332+00:00",
       "image_count": null,
       "lead_id": "web-9a1b9c6b529b06a2bf10",
       "price_nok": null,
@@ -382,7 +404,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348003+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292079+00:00",
       "image_count": null,
       "lead_id": "web-895651357b4952b5a7ee",
       "price_nok": null,
@@ -405,7 +427,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348458+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292529+00:00",
       "image_count": null,
       "lead_id": "web-a556ee3a676d9da9ccd7",
       "price_nok": null,
@@ -421,35 +443,13 @@
       "url": "https://www.rubrikk.no/torget-brukt-til-salgs/butikkinnredning-selges.html"
     },
     {
-      "canonical_url": "https://www.finn.no/bap/webstore/ad.html",
-      "categories": [
-        "inventory",
-        "sale_listing"
-      ],
-      "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350767+00:00",
-      "image_count": null,
-      "lead_id": "web-c1e3e1a07794eb2a24ac",
-      "price_nok": null,
-      "priority_score": 32,
-      "published_at": null,
-      "score_reasons": [
-        "category:inventory+22",
-        "category:sale_listing+10"
-      ],
-      "snippet": "Reolen er også kjent som Electrolux og Høvik-lagerreoler. Den kan leveres åpen, eventuelt med tette rygger og endevegger. Pent brukte gavler, hyller og mellomvegger. Ta kontakt for spørsmål og tilbud. Vi skaffer også nytt, hvis ikke du finner ønsket dimensjon over. Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt. ... Ta kontakt om du ønsker mer informasjon om reolene. Utstyret selges meget prisgunstige og er enkle å montere, demontere, bygge på og bygge om.",
-      "source": "Brave Search",
-      "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
-      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
-    },
-    {
       "canonical_url": "https://www.machineseeker.no/Tekstilmaskiner/ci-19",
       "categories": [
         "inventory",
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350419+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294722+00:00",
       "image_count": null,
       "lead_id": "web-10c7baeebdb991abc31f",
       "price_nok": null,
@@ -471,7 +471,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348317+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292364+00:00",
       "image_count": null,
       "lead_id": "web-7c85d59249f9065a7874",
       "price_nok": null,
@@ -493,7 +493,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347927+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291930+00:00",
       "image_count": null,
       "lead_id": "web-7095af232aa83fda9586",
       "price_nok": null,
@@ -515,7 +515,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348242+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292283+00:00",
       "image_count": null,
       "lead_id": "web-a6413d135a87bc18522a",
       "price_nok": null,
@@ -536,7 +536,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348705+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292830+00:00",
       "image_count": null,
       "lead_id": "web-1782b771d92903c88329",
       "price_nok": null,
@@ -557,7 +557,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349065+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293227+00:00",
       "image_count": null,
       "lead_id": "web-a51fe9a70f780a57d999",
       "price_nok": null,
@@ -578,7 +578,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349466+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293546+00:00",
       "image_count": null,
       "lead_id": "web-f7fe2d09f32e4cbfda29",
       "price_nok": null,
@@ -599,7 +599,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349896+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294218+00:00",
       "image_count": null,
       "lead_id": "web-15defc847337cd18eca8",
       "price_nok": null,
@@ -619,7 +619,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349785+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293854+00:00",
       "image_count": null,
       "lead_id": "web-5d1caedc0f687ca45737",
       "price_nok": null,
@@ -639,7 +639,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349591+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293800+00:00",
       "image_count": null,
       "lead_id": "web-da69efc40719142bd2b6",
       "price_nok": null,
@@ -659,7 +659,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349736+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294005+00:00",
       "image_count": null,
       "lead_id": "web-d8adeb8c515443238a4b",
       "price_nok": null,
@@ -679,7 +679,7 @@
         "clothing_shop_fixtures"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349951+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294127+00:00",
       "image_count": null,
       "lead_id": "web-b9100172d742fc440381",
       "price_nok": null,
@@ -700,7 +700,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348181+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292214+00:00",
       "image_count": null,
       "lead_id": "web-318117add644f04c71b7",
       "price_nok": null,
@@ -722,7 +722,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349272+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293461+00:00",
       "image_count": null,
       "lead_id": "web-3acde5d4a176692a975c",
       "price_nok": null,
@@ -742,7 +742,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348929+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293075+00:00",
       "image_count": null,
       "lead_id": "web-34cee4bf8bfb11e74c6b",
       "price_nok": null,
@@ -762,7 +762,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347826+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291814+00:00",
       "image_count": null,
       "lead_id": "web-7cad0e8a59e6e6643424",
       "price_nok": null,
@@ -782,7 +782,7 @@
         "shop_equipment"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.349333+00:00",
+      "discovered_at": "2026-08-09T13:15:19.293728+00:00",
       "image_count": null,
       "lead_id": "web-e42d52eb07a436ed3cfe",
       "price_nok": null,
@@ -797,12 +797,32 @@
       "url": "https://www.gerdmans.no/kontor-og-konferanse/butikkinnredning"
     },
     {
+      "canonical_url": "https://www.finn.no/bap/webstore/ad.html",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-09T13:15:19.295168+00:00",
+      "image_count": null,
+      "lead_id": "web-c1e3e1a07794eb2a24ac",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "<strong>NoBolt småvare- og lagerreol</strong>: Et særdeles robust, fleksibelt og stilrent reolsystem uten noen form for skruer! NoBolt lagerreol er spesielt utviklet for oppbevaring av diverse varer, gods og utstyr i ulike vektklasser, og representerer det ...",
+      "source": "Brave Search",
+      "title": "Div. reoler / reol / lagerreol / småvarereol / universalreol / stålreol / arkiv | FINN-torget",
+      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
+    },
+    {
       "canonical_url": "https://www.sono.no/lager-industri/lager.html",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350822+00:00",
+      "discovered_at": "2026-08-09T13:15:19.295048+00:00",
       "image_count": null,
       "lead_id": "web-1ced43e391ceb5d18407",
       "price_nok": null,
@@ -822,7 +842,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350677+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294984+00:00",
       "image_count": null,
       "lead_id": "web-af4d49012ba98b9e814e",
       "price_nok": null,
@@ -837,12 +857,32 @@
       "url": "https://www.witre.no/no/wno/lagerhyller-pallestativer"
     },
     {
+      "canonical_url": "https://www.hhl-lagerinnredning.no/lagerreoler",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-09T13:15:19.295411+00:00",
+      "image_count": null,
+      "lead_id": "web-add7d4049039ffe37bd3",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "Finn lagerreoler, lagerhyller og reoler til lager hos <strong>HHL Lagerinnredning</strong>. Fleksible og robuste lagerreoler til industri med rask levering og profesjonell rådgivning.",
+      "source": "Brave Search",
+      "title": "Lagerreoler og lagerhyller | Reoler til lager og industri",
+      "url": "https://www.hhl-lagerinnredning.no/lagerreoler"
+    },
+    {
       "canonical_url": "https://www.finn.no/recommerce/forsale/item/412276314",
       "categories": [
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.351059+00:00",
+      "discovered_at": "2026-08-09T13:15:19.295248+00:00",
       "image_count": null,
       "lead_id": "web-5cfdee104ddf209ca63f",
       "price_nok": null,
@@ -862,7 +902,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350625+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294929+00:00",
       "image_count": null,
       "lead_id": "web-cecaedbad94f2c556672",
       "price_nok": null,
@@ -882,7 +922,7 @@
         "inventory"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350988+00:00",
+      "discovered_at": "2026-08-09T13:15:19.295304+00:00",
       "image_count": null,
       "lead_id": "web-1609c742e786f62fa2e6",
       "price_nok": null,
@@ -897,13 +937,33 @@
       "url": "https://www.supersellers.no/collections/lagerreoler"
     },
     {
+      "canonical_url": "https://jungheinrich.no/produkter/reol-og-lagerl%C3%B8sning",
+      "categories": [
+        "inventory"
+      ],
+      "city": null,
+      "discovered_at": "2026-08-09T13:15:19.295357+00:00",
+      "image_count": null,
+      "lead_id": "web-76a8b44880e350452a2a",
+      "price_nok": null,
+      "priority_score": 22,
+      "published_at": null,
+      "score_reasons": [
+        "category:inventory+22"
+      ],
+      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
+      "source": "Brave Search",
+      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
+      "url": "https://jungheinrich.no/produkter/reol-og-lagerl%C3%B8sning"
+    },
+    {
       "canonical_url": "https://konkurs-bo.no/",
       "categories": [
         "bankruptcy",
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348417+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292481+00:00",
       "image_count": null,
       "lead_id": "web-69939d672dc42fe60d24",
       "price_nok": null,
@@ -925,7 +985,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347535+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291485+00:00",
       "image_count": null,
       "lead_id": "web-91761ae2e8ab330867f3",
       "price_nok": null,
@@ -945,7 +1005,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347360+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291297+00:00",
       "image_count": null,
       "lead_id": "web-0fd193c4d16fd92ffb58",
       "price_nok": null,
@@ -965,7 +1025,7 @@
         "liquidation"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347475+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291420+00:00",
       "image_count": null,
       "lead_id": "web-bc68cdb969104e9e06f3",
       "price_nok": null,
@@ -985,7 +1045,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347078+00:00",
+      "discovered_at": "2026-08-09T13:15:19.290960+00:00",
       "image_count": null,
       "lead_id": "web-6f80d243272ec5979920",
       "price_nok": null,
@@ -1006,7 +1066,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347197+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291119+00:00",
       "image_count": null,
       "lead_id": "web-d2192f749651b034d4eb",
       "price_nok": null,
@@ -1027,7 +1087,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347136+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291052+00:00",
       "image_count": null,
       "lead_id": "web-ccf7065118a5bf95db40",
       "price_nok": null,
@@ -1049,7 +1109,7 @@
         "estate_sale"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348125+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292152+00:00",
       "image_count": null,
       "lead_id": "web-0268831f86ac1b504e78",
       "price_nok": null,
@@ -1070,7 +1130,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350481+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294791+00:00",
       "image_count": null,
       "lead_id": "web-8e13c53b2da84a607b83",
       "price_nok": null,
@@ -1090,7 +1150,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350257+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294523+00:00",
       "image_count": null,
       "lead_id": "web-eb8ce2849d7d7dbac981",
       "price_nok": null,
@@ -1110,7 +1170,7 @@
         "sale_listing"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.350135+00:00",
+      "discovered_at": "2026-08-09T13:15:19.294392+00:00",
       "image_count": null,
       "lead_id": "web-5cc051d2ee52f67fd96b",
       "price_nok": null,
@@ -1130,7 +1190,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348059+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291992+00:00",
       "image_count": null,
       "lead_id": "web-f47652f646757f4a5e07",
       "price_nok": null,
@@ -1150,7 +1210,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.346713+00:00",
+      "discovered_at": "2026-08-09T13:15:19.290538+00:00",
       "image_count": null,
       "lead_id": "web-d09fa9d52c55f40584df",
       "price_nok": null,
@@ -1170,7 +1230,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.347242+00:00",
+      "discovered_at": "2026-08-09T13:15:19.291168+00:00",
       "image_count": null,
       "lead_id": "web-1f4f8aa14e2afaa10a68",
       "price_nok": null,
@@ -1190,7 +1250,7 @@
         "bankruptcy"
       ],
       "city": null,
-      "discovered_at": "2026-08-09T07:15:33.348358+00:00",
+      "discovered_at": "2026-08-09T13:15:19.292413+00:00",
       "image_count": null,
       "lead_id": "web-a8b396d321a9a13c10d3",
       "price_nok": null,
@@ -1208,6 +1268,6 @@
   "method": "authorized search-provider results are normalized, classified, deduplicated by canonical URL, and ranked without inventing missing facts",
   "schema_version": 1,
   "source_counts": {
-    "Brave Search": 56
+    "Brave Search": 59
   }
 }

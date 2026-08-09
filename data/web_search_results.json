@@ -1,6 +1,6 @@
 {
   "errors": {},
-  "generated_at": "2026-08-09T07:15:33.222469+00:00",
+  "generated_at": "2026-08-09T13:15:19.140041+00:00",
   "provider": "Brave Search API",
   "request_count": 8,
   "result_count": 80,
@@ -55,17 +55,15 @@
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [
-        "Norges ledende leverandør av tekstiltjenester · Norgesledende på tekstilservice · Se våre ledige stillinger · Aktuelle saker i Nor Tekstil · Arbeidstøy · Restauranttøy · Kokketøy · Sengetøy · Matter · Mopper og kluter · Tekstilservice · Featured · June 29, 2026 ·"
-      ],
-      "id": "e181d58b4dad60ee5ec91f4a",
-      "language": "no",
+      "extra_snippets": [],
+      "id": "f7aa75f522d1fcb540d5624a",
+      "language": "nb",
       "published_at": null,
-      "snippet": "Nor Tekstil er Norges ledende aktør innen tekstilservice og vaskeritjenester. Vi yter tjenester til helsesektor, hotell, industri-, handels- og servicebedrifter - også på arbeidstøy, sengetøy, matter og mopper.",
+      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
       "source": "Brave Search",
       "source_rank": 4,
-      "title": "Nor Tekstil",
-      "url": "https://www.nortekstil.no/"
+      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -87,26 +85,28 @@
     {
       "discovery_query": "konkurslager tekstil Norge",
       "extra_snippets": [],
-      "id": "f7aa75f522d1fcb540d5624a",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 228 annonse(r) i kategorien Vareparti og konkursbo under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Vareparti og konkursbo | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.363"
-    },
-    {
-      "discovery_query": "konkurslager tekstil Norge",
-      "extra_snippets": [],
       "id": "6f80d243272ec5979920784f",
       "language": "no",
       "published_at": "2022-10-24T17:00:33",
       "snippet": "<strong>Tre personer fra Hedmarken, en kar fra Jessheim og Silkesvarten AS skulle satse på tekstiler klær og mote i et Hamar-selskap</strong>. To år senere er det konkurs.",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 6,
       "title": "(+) Konkurs to år etter at fem eiere satset på mote",
       "url": "https://www.h-a.no/konkurs-to-ar-etter-at-fem-eiere-satset-pa-mote/s/5-139-553095"
+    },
+    {
+      "discovery_query": "konkurslager tekstil Norge",
+      "extra_snippets": [
+        "Norges ledende leverandør av tekstiltjenester · Norgesledende på tekstilservice · Se våre ledige stillinger · Aktuelle saker i Nor Tekstil · Arbeidstøy · Restauranttøy · Kokketøy · Sengetøy · Matter · Mopper og kluter · Tekstilservice · Featured · June 29, 2026 ·"
+      ],
+      "id": "e181d58b4dad60ee5ec91f4a",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Nor Tekstil er Norges ledende aktør innen tekstilservice og vaskeritjenester. Vi yter tjenester til helsesektor, hotell, industri-, handels- og servicebedrifter - også på arbeidstøy, sengetøy, matter og mopper.",
+      "source": "Brave Search",
+      "source_rank": 7,
+      "title": "Nor Tekstil",
+      "url": "https://www.nortekstil.no/"
     },
     {
       "discovery_query": "konkurslager tekstil Norge",
@@ -330,20 +330,6 @@
     {
       "discovery_query": "varelager konkursbo Norge",
       "extra_snippets": [
-        "Verktøy fra konkursbo · July 11, 2023 · Esben Føge Jensen · SOLGT -Fra dødsbo har vi NISSAN NISSAN PIXO til ... January 19, 2023 · Esben Føge Jensen · TRUKKET -På vegne av bobestyrer ha vi en Honda ... Honda CBR600RR Hanspree NHA66 · February 1, 2021 · Esben Føge Jensen · SOLGT - Fra konkutsboet til Buskerud ... varelager ·"
-      ],
-      "id": "895651357b4952b5a7eecc4b",
-      "language": "en",
-      "published_at": null,
-      "snippet": "Verktøy fra konkursbo · July 11, 2023 · Esben Føge Jensen · SOLGT -Fra dødsbo har vi NISSAN NISSAN PIXO til ... January 19, 2023 · Esben Føge Jensen · TRUKKET -På vegne av bobestyrer ha vi en Honda ... Honda CBR600RR Hanspree NHA66 · February 1, 2021 · Esben Føge Jensen · SOLGT - Fra konkutsboet til Buskerud ... varelager ·",
-      "source": "Brave Search",
-      "source_rank": 3,
-      "title": "varelager — Konkursbo (Nye innlegg) — Verdirealisering AS",
-      "url": "https://www.verdirealisering.no/konkursbo-b/tag/varelager"
-    },
-    {
-      "discovery_query": "varelager konkursbo Norge",
-      "extra_snippets": [
         "Normalordningen i næringslivet er at leverandører leverer varer og tjenester på usikret kreditt. Hva skjer med leverandørens krav dersom kunden går konkurs? Og finnes det måter for leverandører å sikre seg mot et økonomisk tap? Dersom det åpnes konkurs hos en kunde, vil alt som \"tilhører\" kunden være...",
         "Dersom salgspant er en del av leverandørens vanlige salgsvilkår, og dette også fremkommer av senere oversendt faktura e.l., vil salgspantet være gyldig overfor et konkursbo, og leverandøren kan enten kreve oppgjør eller å få varen tilbake. Ved salg av motorvogner må salgspant også registreres i løsøreregisteret. Vær oppmerksom på at det ikke er mulig å avtale salgspant i varer som er ment for videresalg. Satt på spissen betyr det at det kan avtales salgspant i en liter melk som er levert til kundens kantine, men ikke til en bil som er en del av kundens varelager ment for videresalg.",
         "De aller fleste konkursbo i Norge blir avsluttet uten midler til dividendeutbetaling til de alminnelige kreditorene.",
@@ -354,9 +340,23 @@
       "published_at": null,
       "snippet": "<strong>Dersom det åpnes konkurs hos en kunde, vil alt som &quot;tilhører&quot; kunden være underlagt konkursboets beslag etter dekningsloven § 2-2</strong>. Dette innebærer at konkursboet beholder varen eller tjenesten som er levert.",
       "source": "Brave Search",
-      "source_rank": 4,
+      "source_rank": 3,
       "title": "Hvis kunden går konkurs | DLA Piper",
       "url": "https://norway.dlapiper.com/no/nyhet/hvis-kunden-gar-konkurs"
+    },
+    {
+      "discovery_query": "varelager konkursbo Norge",
+      "extra_snippets": [
+        "Verktøy fra konkursbo · July 11, 2023 · Esben Føge Jensen · SOLGT -Fra dødsbo har vi NISSAN NISSAN PIXO til ... January 19, 2023 · Esben Føge Jensen · TRUKKET -På vegne av bobestyrer ha vi en Honda ... Honda CBR600RR Hanspree NHA66 · February 1, 2021 · Esben Føge Jensen · SOLGT - Fra konkutsboet til Buskerud ... varelager ·"
+      ],
+      "id": "895651357b4952b5a7eecc4b",
+      "language": "en",
+      "published_at": null,
+      "snippet": "Verktøy fra konkursbo · July 11, 2023 · Esben Føge Jensen · SOLGT -Fra dødsbo har vi NISSAN NISSAN PIXO til ... January 19, 2023 · Esben Føge Jensen · TRUKKET -På vegne av bobestyrer ha vi en Honda ... Honda CBR600RR Hanspree NHA66 · February 1, 2021 · Esben Føge Jensen · SOLGT - Fra konkutsboet til Buskerud ... varelager ·",
+      "source": "Brave Search",
+      "source_rank": 4,
+      "title": "varelager — Konkursbo (Nye innlegg) — Verdirealisering AS",
+      "url": "https://www.verdirealisering.no/konkursbo-b/tag/varelager"
     },
     {
       "discovery_query": "varelager konkursbo Norge",
@@ -483,6 +483,20 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [
+        "Butikkinnredning (716) Lagerutstyr (538) Sikkerhet og overvåkning (309) Vareparti og konkursbo (594) Annet butikkutstyr (447)Gå til resultat · Fiks ferdig (88)Gå til resultat · Ingen resultater ·"
+      ],
+      "id": "4d96f214044f8d44d022d4d3",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
+      "source": "Brave Search",
+      "source_rank": 3,
+      "title": "Butikkinnredning | til salgs | FINN Torget",
+      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
+    },
+    {
+      "discovery_query": "butikkinnredning selges Norge",
+      "extra_snippets": [
         "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
         "Alt innen butikkinnredning – over 7000 artikler klare for rask levering."
       ],
@@ -491,23 +505,9 @@
       "published_at": null,
       "snippet": "Vi har utstillingslokaler i Moss, Norge, hvor du alltid er velkommen innom. .｡.:•*¨*•.¸¸✿.｡.:•*¨*•.¸¸ · Klikk på kapitel for å se kataloget online i PDF.fil. JULEINNPAKNING · 2025 · Hele vår katalog! Få full oversikt! 400sider med flotte produkter. Butikkinnredning · Rillepanel · TUBO reolsystem · Prøverom · Disker · Salgsbord og display · Vitriner · Stativer · Butikkens uteplass · Den kjørende selger ·",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 4,
       "title": "Innredning og Inventar til Butikker og Bedrifter | SuperSellerS.no",
       "url": "https://www.supersellers.no/katalog"
-    },
-    {
-      "discovery_query": "butikkinnredning selges Norge",
-      "extra_snippets": [
-        "Butikkinnredning (716) Lagerutstyr (538) Sikkerhet og overvåkning (309) Vareparti og konkursbo (594) Annet butikkutstyr (447)Gå til resultat · Fiks ferdig (88)Gå til resultat · Ingen resultater ·"
-      ],
-      "id": "4d96f214044f8d44d022d4d3",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Du finner 715 annonse(r) i kategorien Butikkinnredning under Næringsvirksomhet til salgs på FINN Torget. Søk og sammenlign pris blant alle typer nye og brukte ting i hele Norge!",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Butikkinnredning | til salgs | FINN Torget",
-      "url": "https://www.finn.no/recommerce/forsale/search?product_category=2.91.3108.359"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -561,14 +561,14 @@
     {
       "discovery_query": "butikkinnredning selges Norge",
       "extra_snippets": [],
-      "id": "72d343831b08e2486a3f5b73",
+      "id": "e71772deae49d9ffbeb504c2",
       "language": "no",
       "published_at": null,
       "snippet": "Ring oss i SuperSellerS så hjelper vi deg! Butikkinnredning, utstillingsdukker, kleshengere, butikkbelysning, display, salgskurver, konfeksjonsstativer, messeinnredninger, og mye mer..",
       "source": "Brave Search",
       "source_rank": 8,
       "title": "Butikkinnredning | SuperSellerS Butikkinnredning | Norge",
-      "url": "https://www.supersellerskatalog.no/inspirasjon"
+      "url": "https://www.supersellerskatalog.no/"
     },
     {
       "discovery_query": "butikkinnredning selges Norge",
@@ -693,18 +693,16 @@
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
-        "Hos Gerdmans finner du et bredt utvalg innredninger til butikker. Vi har butikkhyller, handlekurver, sjokkselgere og mye mer. Ta kontakt, vi hjelper deg gjerne!Praktisk butikkinnredningForskjellige type butikker har litt ulike behov når det kommer til butikkinnredning, men felle",
-        "Vi har et stort utvalg butikkinnredning. Hos oss finer du sikkert en løsning som passer dine behov. Trenger du hjelp med innredning av hjemmekontoret, ikke nøl med å kontakte oss på telefon, chat eller e-post.",
-        "Forskjellige type butikker har litt ulike behov når det kommer til butikkinnredning, men felles for alle butikker er at man ønsker å selge varer. God eksponering av produktene vil øke salget."
+        "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ·"
       ],
-      "id": "e42d52eb07a436ed3cfefa97",
-      "language": "no",
-      "published_at": null,
-      "snippet": "<strong>Hos Gerdmans finner du et bredt utvalg innredninger til butikker</strong>. Vi har butikkhyller, handlekurver, sjokkselgere og mye mer. Ta kontakt, vi hjelper deg gjerne!Praktisk butikkinnredningForskjellige type butikker har litt ulike behov når det kommer til butikkinnredning, men felle",
+      "id": "67f88cde81cc5ba7b27dc6ea",
+      "language": "en",
+      "published_at": "2024-05-16T13:05:10",
+      "snippet": "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ...",
       "source": "Brave Search",
       "source_rank": 7,
-      "title": "Butikkinnredning på Nett | Fri Frakt | Gerdmans",
-      "url": "https://www.gerdmans.no/kontor-og-konferanse/butikkinnredning"
+      "title": "Selected – Klesbutikk i Bergen - Heggland Heiltre AS",
+      "url": "https://heggland-heiltre.no/selected-klesbutikk-i-bergen/"
     },
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
@@ -724,20 +722,6 @@
     {
       "discovery_query": "butikkinnredning klesbutikk Norge",
       "extra_snippets": [
-        "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ·"
-      ],
-      "id": "67f88cde81cc5ba7b27dc6ea",
-      "language": "en",
-      "published_at": "2024-05-16T13:05:10",
-      "snippet": "butikkinnredning · spesialinnredning · barmobler-mobler · oppussing · utstmykking-datafres · kjokken · innredning-storkjokken · messeinnredning · hytteinnredning · Referanser · Om oss · Kontakt oss · Hjem · Om Oss · Referanser · Jeg har et prosjekt - Kontakt meg · Lang erfaring og høy kvalitet på våre tjenester · Skreddersøm i tre · All produksjon i Norge ...",
-      "source": "Brave Search",
-      "source_rank": 9,
-      "title": "Selected – Klesbutikk i Bergen - Heggland Heiltre AS",
-      "url": "https://heggland-heiltre.no/selected-klesbutikk-i-bergen/"
-    },
-    {
-      "discovery_query": "butikkinnredning klesbutikk Norge",
-      "extra_snippets": [
         "De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK). Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere. Minstekravet til aksjekapital er 30 000 kroner.",
         "Finansieringen kan komme fra egne midler, lån fra banken, eller støtteordninger gjennom Innovasjon Norge. I 2026 finnes det også flere tilskuddsordninger rettet mot bærekraftig handel og sirkulærøkonomi. Undersøk hva som er tilgjengelig i din region. Noen velger å starte med en crowdfunding-kampanje, noe som også fungerer som en tidlig markedstest av konseptet ditt. Innkjøpet er selve hjertet av en klesbutikk.",
         "Å starte en klesbutikk uten en tydelig forretningsmodell er som å seile uten kart. Du trenger ikke bare en vag idé om hva du vil selge, men en gjennomtenkt plan for hvordan butikken din skal skille seg ut, hvem du selger til, og hvordan du skal tjene penger.",
@@ -748,9 +732,25 @@
       "published_at": "2026-07-31T07:43:34",
       "snippet": "<strong>De fleste som starter klesbutikk i Norge, velger å registrere et aksjeselskap (AS) eller et enkeltpersonforetak (ENK).</strong> Et AS gir deg begrenset personlig ansvar og virker mer profesjonelt overfor leverandører og samarbeidspartnere.",
       "source": "Brave Search",
-      "source_rank": 10,
+      "source_rank": 9,
       "title": "Starte klesbutikk i 2026: komplett guide fra idé til åpning - Shoplabs",
       "url": "https://shoplabs.no/butikkbloggen/starte-klesbutikk-i-2026-komplett-guide-fra-ide-til-apning-2/"
+    },
+    {
+      "discovery_query": "butikkinnredning klesbutikk Norge",
+      "extra_snippets": [
+        "Hos Gerdmans finner du et bredt utvalg innredninger til butikker. Vi har butikkhyller, handlekurver, sjokkselgere og mye mer. Ta kontakt, vi hjelper deg gjerne!Praktisk butikkinnredningForskjellige type butikker har litt ulike behov når det kommer til butikkinnredning, men felle",
+        "Vi har et stort utvalg butikkinnredning. Hos oss finer du sikkert en løsning som passer dine behov. Trenger du hjelp med innredning av hjemmekontoret, ikke nøl med å kontakte oss på telefon, chat eller e-post.",
+        "Forskjellige type butikker har litt ulike behov når det kommer til butikkinnredning, men felles for alle butikker er at man ønsker å selge varer. God eksponering av produktene vil øke salget."
+      ],
+      "id": "e42d52eb07a436ed3cfefa97",
+      "language": "no",
+      "published_at": null,
+      "snippet": "<strong>Hos Gerdmans finner du et bredt utvalg innredninger til butikker</strong>. Vi har butikkhyller, handlekurver, sjokkselgere og mye mer. Ta kontakt, vi hjelper deg gjerne!Praktisk butikkinnredningForskjellige type butikker har litt ulike behov når det kommer til butikkinnredning, men felle",
+      "source": "Brave Search",
+      "source_rank": 10,
+      "title": "Butikkinnredning på Nett | Fri Frakt | Gerdmans",
+      "url": "https://www.gerdmans.no/kontor-og-konferanse/butikkinnredning"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -770,6 +770,21 @@
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
       "extra_snippets": [
+        "Utstillingsdukker · Stativer · Kontakt oss · Logg inn / Registrer · Søke · 0 Ønskeliste · 0 items · 0.00 kr · Meny · 0 items · 0.00 kr · Lukk · Imagine mannequins · Utstillingsdukker · Urban abstract · Urban realistisk · Sincere mannequins ·",
+        "Utstillingsdukker med egghead · Utstillingsdukker med hode · Utstillingsdukker uten hode · Ben · Torso · Utstillingsdukker Barn · Sportsdukker · Butikkinnredninger · Nyhet · Frittstående · Italiensk innredning · Veggskinner · Sporpanel/Rillepanel ·"
+      ],
+      "id": "ff74b94ab401e47e00894221",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Vi har et bredt utvalg av klesstativ til butikker og privatpersoner. Du finner blant annet reisestativ, stativ med rette armer og undertøystativ.",
+      "source": "Brave Search",
+      "source_rank": 2,
+      "title": "Klesstativ | Se vårt store utvalg | Kjøp i nettbutikken",
+      "url": "https://finckenhagen.no/stikkord/klesstativ/"
+    },
+    {
+      "discovery_query": "klesstativ utstillingsdukker selges Norge",
+      "extra_snippets": [
         "Våre produkter holder høy kvalitet, og vi fører et bredt sortiment av stålhyller, rillepanel, utstillingsdukker, display og mye mer. Hvorfor velge oss? – Over 15 års bransjeerfaring – Norsk leverandør med lager i Innlandet – Bredt og fleksibelt sortiment – Raske leveranser og personlig kundeservice – Profesjonell aktør – vi selger kun til bedrifter"
       ],
       "id": "c27bfbff55509642b99887ea",
@@ -777,7 +792,7 @@
       "published_at": "2025-11-12T11:53:03",
       "snippet": "<strong>Ava Butikkinnredning</strong> tilbyr butikkinnredning, rillepanel, klesstativ og utstillingsdukker i Norge. Lave kostnader, rask levering, høy service.",
       "source": "Brave Search",
-      "source_rank": 2,
+      "source_rank": 3,
       "title": "Butikkinnredning, Rillepanel, Klesstativ, Dukker | Om Ava",
       "url": "https://avabutikkinnredning.no/om-oss/"
     },
@@ -793,24 +808,9 @@
       "published_at": null,
       "snippet": "Naturtro proporsjoner er en naturlig holdning og fine ansiktstrekk kjennetegner utstillingsdukken fra tectake. Med sitt dreibare og vippbare hode og de bevegelige armene kan man alltid sette figuren på en ny måte. Dukkens eklsusive og moderne design harmonerer med forskjellige moter og tilbehør. Glassplaten med festere av aluminium sørger for at den står stabilt og gjør det mulig at dukken kan ha sko på. Om det er til vindusutstilling, som dekorasjon til en fest eller som et annerledes klesstativ, passer denne utstillingsdukken perfekt.",
       "source": "Brave Search",
-      "source_rank": 3,
+      "source_rank": 4,
       "title": "Utstillingsdukke - mann - Elkjøp | Elkjøp",
       "url": "https://www.elkjop.no/product/tjenester-og-tilbehor/diverse-tilbehor/utstillingsdukke-mann/609127"
-    },
-    {
-      "discovery_query": "klesstativ utstillingsdukker selges Norge",
-      "extra_snippets": [
-        "Utstillingsdukker · Stativer · Kontakt oss · Logg inn / Registrer · Søke · 0 Ønskeliste · 0 items · 0.00 kr · Meny · 0 items · 0.00 kr · Lukk · Imagine mannequins · Utstillingsdukker · Urban abstract · Urban realistisk · Sincere mannequins ·",
-        "Utstillingsdukker med egghead · Utstillingsdukker med hode · Utstillingsdukker uten hode · Ben · Torso · Utstillingsdukker Barn · Sportsdukker · Butikkinnredninger · Nyhet · Frittstående · Italiensk innredning · Veggskinner · Sporpanel/Rillepanel ·"
-      ],
-      "id": "ff74b94ab401e47e00894221",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Vi har et bredt utvalg av klesstativ til butikker og privatpersoner. Du finner blant annet reisestativ, stativ med rette armer og undertøystativ.",
-      "source": "Brave Search",
-      "source_rank": 4,
-      "title": "Klesstativ | Se vårt store utvalg | Kjøp i nettbutikken",
-      "url": "https://finckenhagen.no/stikkord/klesstativ/"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -832,22 +832,6 @@
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
       "extra_snippets": [
-        "Utstillingsdukker · Glassmonter · Klesstativ · Veggskinner · Butikkdisker · Displayutstyr · Dette er vår bestselger! Utstillingsdukker med flotte linjer og et elegant uttrykk med et moderne og minimalistisk hode gjør at disse utstillingsdukker egner seg til de fleste bransjer.",
-        "Utstillingsdukker · Glassmonter · Klesstativ · Veggskinner · Butikkdisker · Displayutstyr · Min konto · - Kontakt oss på tlf 69 35 33 33 eller post@butikkartikler.no · Menu · Min konto · - Kontakt oss på tlf 69 35 33 33 eller post@butikkartikler.no ·",
-        "Dette er vår bestselger! Utstillingsdukker med flotte linjer og et elegant uttrykk med et moderne og minimalistisk hode gjør at disse utstillingsdukker egner seg til de fleste bransjer. Utstillingsdukkene er produsert i lakkert glassfiber med solide koblinger mellom de forskjellige delene."
-      ],
-      "id": "15defc847337cd18eca88bd0",
-      "language": "no",
-      "published_at": null,
-      "snippet": "Utstillingsdukker · Glassmonter · Klesstativ · Veggskinner · Butikkdisker · Displayutstyr · Dette er vår bestselger! Utstillingsdukker med flotte linjer og et elegant uttrykk med et moderne og minimalistisk hode gjør at disse utstillingsdukker egner seg til de fleste bransjer.",
-      "source": "Brave Search",
-      "source_rank": 6,
-      "title": "Hvite og sorte - Utstillingsdukker",
-      "url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-75.html"
-    },
-    {
-      "discovery_query": "klesstativ utstillingsdukker selges Norge",
-      "extra_snippets": [
         "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·"
       ],
       "id": "83c0878f4fce92ca326f92de",
@@ -855,7 +839,7 @@
       "published_at": null,
       "snippet": "Skaporganisering og klesstativer · Skohyller og -ordnere · Oppbevaringsbeholdere for hjemmet · Oppbevaringsbokser for hjemmet · Oppbevaringskroker og -stativer · Lagringskroker · Paraplystativer og -holdere · Oppbevaringssekker · Oppbevaringsskuffer ·",
       "source": "Brave Search",
-      "source_rank": 7,
+      "source_rank": 6,
       "title": "Utstillingsdukker - Boltreplassen",
       "url": "https://boltreplassen.no/produktkategori/naeringsliv-og-industri/detaljhandel/utstillingsdukker/"
     },
@@ -870,9 +854,25 @@
       "published_at": null,
       "snippet": "Tørk klærne effektivt inne eller ute med et solid tørkestativ. Vi har et bredt utvalg av sammenleggbare modeller for enhver plass. Kjøp ditt tørkestativ.",
       "source": "Brave Search",
-      "source_rank": 8,
+      "source_rank": 7,
       "title": "Tørkestativ | For effektiv og skånsom tørking av klær | Jula",
       "url": "https://www.jula.no/catalog/hjem-og-husholdning/klesvask-og-stell/klespleie/torkestativer/"
+    },
+    {
+      "discovery_query": "klesstativ utstillingsdukker selges Norge",
+      "extra_snippets": [
+        "Utstillingsdukker · Glassmonter · Klesstativ · Veggskinner · Butikkdisker · Displayutstyr · Dette er vår bestselger! Utstillingsdukker med flotte linjer og et elegant uttrykk med et moderne og minimalistisk hode gjør at disse utstillingsdukker egner seg til de fleste bransjer.",
+        "Utstillingsdukker · Glassmonter · Klesstativ · Veggskinner · Butikkdisker · Displayutstyr · Min konto · - Kontakt oss på tlf 69 35 33 33 eller post@butikkartikler.no · Menu · Min konto · - Kontakt oss på tlf 69 35 33 33 eller post@butikkartikler.no ·",
+        "Dette er vår bestselger! Utstillingsdukker med flotte linjer og et elegant uttrykk med et moderne og minimalistisk hode gjør at disse utstillingsdukker egner seg til de fleste bransjer. Utstillingsdukkene er produsert i lakkert glassfiber med solide koblinger mellom de forskjellige delene."
+      ],
+      "id": "15defc847337cd18eca88bd0",
+      "language": "no",
+      "published_at": null,
+      "snippet": "Utstillingsdukker · Glassmonter · Klesstativ · Veggskinner · Butikkdisker · Displayutstyr · Dette er vår bestselger! Utstillingsdukker med flotte linjer og et elegant uttrykk med et moderne og minimalistisk hode gjør at disse utstillingsdukker egner seg til de fleste bransjer.",
+      "source": "Brave Search",
+      "source_rank": 8,
+      "title": "Hvite og sorte - Utstillingsdukker",
+      "url": "https://www.butikkartikler.no/utstillingsdukker/utstillingsdukker-75.html"
     },
     {
       "discovery_query": "klesstativ utstillingsdukker selges Norge",
@@ -1022,6 +1022,20 @@
     {
       "discovery_query": "industrisymaskin brukt Norge",
       "extra_snippets": [
+        "Vi er i dag en totalleverandør av maskiner og utstyr for søm, tilskjæring pressing, brodering, lasergravering, strikking m.m. Dette strekker seg fra enkle maskiner for håndverk og småindustri opp til store komplekse automater for industrien. Vi yter også bistand i form av opplæring og teknisk service på våre produkter.Ta kontakt for nærmere informasjon, eller klikk på logo for å komme inn på vår hjemmeside. Her finner du også oversikt over alle våre brukte maskiner."
+      ],
+      "id": "a28b1ec8fa4760f37eb9c1bc",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Vi er i dag en totalleverandør av maskiner og utstyr for søm, tilskjæring pressing, brodering, lasergravering, strikking m.m. Dette strekker seg fra enkle maskiner for håndverk og småindustri opp til store komplekse automater for industrien. Vi yter også bistand i form av opplæring og teknisk service på våre produkter.Ta kontakt for nærmere informasjon, eller klikk på logo for å komme inn på vår hjemmeside. Her finner du også oversikt over alle våre brukte maskiner.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "JUKI DDL-8700H industrisymaskin | FINN-torget",
+      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=68285526"
+    },
+    {
+      "discovery_query": "industrisymaskin brukt Norge",
+      "extra_snippets": [
         "Pent brukt Pfaff industrisymaskin, Mod 487-g Rettsøm med overtransportør. Automatisk trådkutt, feste og labbløft.",
         "3 - fas Clutch motor for industri-symaskin nesten ikke brukt selges. Kontakt meg på sms 916 71 664 eller e-post. ... Typical gc0617d er non-stop industrisymaskin med forstørret skyttel og trippel matemekanisme.",
         "Kraftig Industrisymaskin, Alternerende føtter med nåltransport (Compound feed) med direkt drevet motor, led-lys, og spoleapparat intergrert i maskinen Vår mest...",
@@ -1032,23 +1046,9 @@
       "published_at": null,
       "snippet": "Pent brukt <strong>Pfaff industrisymaskin, Mod 487-g Rettsøm med overtransportør</strong>. Automatisk trådkutt, feste og labbløft.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 10,
       "title": "Industrisymaskin til salg - September 2023",
       "url": "https://www.rubrikk.no/torget-brukt-til-salgs/industrisymaskin-til-salg.html"
-    },
-    {
-      "discovery_query": "industrisymaskin brukt Norge",
-      "extra_snippets": [
-        "Vi er i dag en totalleverandør av maskiner og utstyr for søm, tilskjæring pressing, brodering, lasergravering, strikking m.m. Dette strekker seg fra enkle maskiner for håndverk og småindustri opp til store komplekse automater for industrien. Vi yter også bistand i form av opplæring og teknisk service på våre produkter.Ta kontakt for nærmere informasjon, eller klikk på logo for å komme inn på vår hjemmeside. Her finner du også oversikt over alle våre brukte maskiner."
-      ],
-      "id": "a28b1ec8fa4760f37eb9c1bc",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Vi er i dag en totalleverandør av maskiner og utstyr for søm, tilskjæring pressing, brodering, lasergravering, strikking m.m. Dette strekker seg fra enkle maskiner for håndverk og småindustri opp til store komplekse automater for industrien. Vi yter også bistand i form av opplæring og teknisk service på våre produkter.Ta kontakt for nærmere informasjon, eller klikk på logo for å komme inn på vår hjemmeside. Her finner du også oversikt over alle våre brukte maskiner.",
-      "source": "Brave Search",
-      "source_rank": 10,
-      "title": "JUKI DDL-8700H industrisymaskin | FINN-torget",
-      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=68285526"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -1084,21 +1084,6 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
-        "Reolen er også kjent som Electrolux og Høvik-lagerreoler. Den kan leveres åpen, eventuelt med tette rygger og endevegger. Pent brukte gavler, hyller og mellomvegger. Ta kontakt for spørsmål og tilbud. Vi skaffer også nytt, hvis ikke du finner ønsket dimensjon over. Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt. ... Ta kontakt om du ønsker mer informasjon om reolene. Utstyret selges meget prisgunstige og er enkle å montere, demontere, bygge på og bygge om.",
-        "Vi har fortsatt en del igjen på lager.Alle detaljene er meget pent brukt.Vi har bl a følgende igjen til gammel prislistepris:Gavler:900x600 tett 1 stk.900x600"
-      ],
-      "id": "a2584e6e15ba81f72183651d",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "Reolen er også kjent som Electrolux og Høvik-lagerreoler. Den kan leveres åpen, eventuelt med tette rygger og endevegger. Pent brukte gavler, hyller og mellomvegger. Ta kontakt for spørsmål og tilbud. Vi skaffer også nytt, hvis ikke du finner ønsket dimensjon over. Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt. ... Ta kontakt om du ønsker mer informasjon om reolene. Utstyret selges meget prisgunstige og er enkle å montere, demontere, bygge på og bygge om.",
-      "source": "Brave Search",
-      "source_rank": 3,
-      "title": "Lagerreol - småvarereol HI280 pent brukt og nytt | FINN-torget",
-      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=33375136"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "extra_snippets": [
         "I vårt omfattende produktsortiment finner du et stort utvalg av lagerreoler og pallereoler, smarte hyllesystemer, lagerbokser og Eurokasser, samt praktiske løsninger for pakkemateriell, merking og plastlommer. Alle produkter kan bestilles direkte fra webshoppen her på siden. Klikk i kategoriene under og la deg inspirere i vår store og spennende produktkatalog · Vi leverer til virksomheter over hele fastlands-Norge, raskt og sikkert.",
         "Fundamentet i et velfungerende lager er robuste og velprøvde reoler. Slik kan gods og varer, verktøy og utstyr oppbevares på oversiktlig, sikker og effektivt vis. Hos Sono finner du et stort utvalg av lagerhyller, lagerreoler og pallereoler i forskjellige størrelser og utforminger.",
         "Brorparten av det sortiment vi har av lagerinnredning, lagerreoler og -hyller finnes tilgjengelig for rask levering fra vårt sentrallager i Sarpsborg. Oppgrader din lagerinnredning allerede i dag og se frem til større sikkerhet, effektivitet og orden. Har du spørsmål om vårt sortiment av lagerinnredning, er du alltid velkommen til å kontakte oss."
@@ -1108,7 +1093,7 @@
       "published_at": null,
       "snippet": "I vårt omfattende produktsortiment ... kategoriene under og la deg inspirere i vår store og spennende produktkatalog · <strong>Vi leverer til virksomheter over hele fastlands-Norge, raskt og sikkert</strong>....",
       "source": "Brave Search",
-      "source_rank": 4,
+      "source_rank": 3,
       "title": "Funksjonell lagerinnredning til lager og verksted | Sono",
       "url": "https://www.sono.no/lager-industri/lager.html"
     },
@@ -1120,7 +1105,7 @@
       "published_at": null,
       "snippet": "Kjøp og selg brukte maskiner, kjøretøy, utstyr og overskuddsvarer på Norges største nettauksjon.",
       "source": "Brave Search",
-      "source_rank": 5,
+      "source_rank": 4,
       "title": "Lagerreoler og lagerinventar selges samlet",
       "url": "https://www.auksjonen.no/auksjon/torget/Lagerreoler_og_lagerinventar_selges_samlet/563904"
     },
@@ -1135,9 +1120,23 @@
       "published_at": null,
       "snippet": "<strong>NoBolt småvare- og lagerreol</strong>: Et særdeles robust, fleksibelt og stilrent reolsystem uten noen form for skruer! NoBolt lagerreol er spesielt utviklet for oppbevaring av diverse varer, gods og utstyr i ulike vektklasser, og representerer det ...",
       "source": "Brave Search",
-      "source_rank": 6,
+      "source_rank": 5,
       "title": "Div. reoler / reol / lagerreol / småvarereol / universalreol / stålreol / arkiv | FINN-torget",
       "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=130138784"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "extra_snippets": [
+        "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!"
+      ],
+      "id": "5cfdee104ddf209ca63fadf4",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!",
+      "source": "Brave Search",
+      "source_rank": 6,
+      "title": "Lagerreoler | FINN-torget",
+      "url": "https://www.finn.no/recommerce/forsale/item/412276314"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -1154,16 +1153,36 @@
     {
       "discovery_query": "lagerreoler selges Norge",
       "extra_snippets": [
-        "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!"
+        "Montering av lagerreoler skjer i to trinn og utføres av kvalifisert personell. Først vurderer montørene forholdene på stedet, som gulv, plassering og eksisterende utstyr. Våre spesialister finner den sikreste og mest effektive måten å sette opp reolsystemet på.",
+        "Lastekapasiteten til lagerreoler avhenger av flere faktorer, blant annet hvilken type reolsystem som brukes. Hos Jungheinrich beregner vi bæreevnen for hvert enkelt system, med høy nøyaktighet, ved å analysere ulike komponenter og konstruksjonsdetaljer.",
+        "Kjøp lagerreoler på nett via vår nettbutikk www.jungheinrich-shop.no, eller send en produktforespørsel og få grundig rådgivning.",
+        "Lagerreoler er robuste reolsystemer utviklet for sikker og oversiktlig lagring av varer i flere nivåer."
       ],
-      "id": "5cfdee104ddf209ca63fadf4",
-      "language": "nb",
+      "id": "76a8b44880e350452a2a05e2",
+      "language": "no",
       "published_at": null,
-      "snippet": "Lagerreoler totalt ca 14m. ... Vis hele beskrivelsenNB: Knappen for å vise hele beskrivelsen har kun en visuell effekt.5179, Godvik · Du må være logget inn for å se brukerprofiler og sende meldinger.Logg inn ... Sist endret: 11.6.2025 kl. 22:00 ・ FINN-kode: 412276314Rapporter annonse ... Be om at selgeren sender med Fiks ferdig!",
+      "snippet": "Kjøp lagerreoler på nett via vår nettbutikk <strong>www.jungheinrich-shop.no</strong>, eller send en produktforespørsel og få grundig rådgivning.",
       "source": "Brave Search",
       "source_rank": 8,
-      "title": "Lagerreoler | FINN-torget",
-      "url": "https://www.finn.no/recommerce/forsale/item/412276314"
+      "title": "Reolløsninger for dine behov i over 70 år | Jungheinrich",
+      "url": "https://jungheinrich.no/produkter/reol-og-lagerl%C3%B8sning"
+    },
+    {
+      "discovery_query": "lagerreoler selges Norge",
+      "extra_snippets": [
+        "Lagerreoler og lagerhyller er en sentral del av en effektiv lagerinnredning – enten det gjelder verksted, nettbutikk, arkiv eller industri. En gjennomtenkt lagerreol skaper struktur og oversikt, slik at varer kan håndteres raskt og uten unødvendige arbeidsprosesser.",
+        "Våre lagerreoler er utviklet for profesjonell bruk og konstruert for å tåle høy belastning i daglig drift. De fungerer som stabile reoler til lager, hvor både mindre kasser, verktøy og tyngre industrivarer kan oppbevares sikkert. Samtidig gir lagerhyller nødvendig fleksibilitet, ettersom hyllenivåene kan tilpasses ulike varetyper og arbeidsprosesser.",
+        "Når du velger reoler til lager i et industrielt miljø, er riktig dimensjonering avgjørende. En solid lagerreol reduserer risikoen for skader, driftsstans og unødvendig håndtering. Samtidig bidrar robuste lagerhyller til bedre struktur og et tryggere arbeidsmiljø.",
+        "Stålreoler er en allsidig løsning som dekker mange behov, mens tunglastreoler er utviklet for høy belastning og industrielle miljøer. Lagerreoler på hjul gir fleksibilitet i lagre hvor oppsettet endres jevnlig, og dekk­reoler er tilpasset spesialisert oppbevaring av dekk."
+      ],
+      "id": "add7d4049039ffe37bd30b2a",
+      "language": "nb",
+      "published_at": null,
+      "snippet": "Finn lagerreoler, lagerhyller og reoler til lager hos <strong>HHL Lagerinnredning</strong>. Fleksible og robuste lagerreoler til industri med rask levering og profesjonell rådgivning.",
+      "source": "Brave Search",
+      "source_rank": 9,
+      "title": "Lagerreoler og lagerhyller | Reoler til lager og industri",
+      "url": "https://www.hhl-lagerinnredning.no/lagerreoler"
     },
     {
       "discovery_query": "lagerreoler selges Norge",
@@ -1176,25 +1195,9 @@
       "published_at": "2024-04-24T13:12:56",
       "snippet": "Det finnes ikke mange i Norge som har så mye erfaringer med pallereoler som Areol. <strong>Her finner du alltid et utvalg av brukte og nye pallereoler</strong>.",
       "source": "Brave Search",
-      "source_rank": 9,
+      "source_rank": 10,
       "title": "Pallereoler - Brukte og Nye - Areol Innredninger AS",
       "url": "https://areol.no/pallereoler/"
-    },
-    {
-      "discovery_query": "lagerreoler selges Norge",
-      "extra_snippets": [
-        "Pent brukte lagerreoler selges meget prisgunstig. Reolene kan selges samlet eller separat. Hver reolstige består av 2 blå bein og 4-6 grå stag som danner stigen(vange). Bærejernene vi har er for det meste 190 cm og man trenger 2 stk for hvert nivå man ønsker i reolen.",
-        "Dagsnytt AS har fått inn et lager av brukte lagerreoler og butikkinnredning fra et velrenommert firma som driver med tømming av et lager. Varene selges som de står på lager i Hamar, men vi kan være behjelpelig med demontering og frakt hvis det er ønskelig.",
-        "7.360 Lagerreolene befinner seg på et lager i Hamar og reolene må demonteres og hentes der. Vi kan være behjelpelig med demontering og frakt mot et tillegg i pris. Da reolene selges til sterkt rabatterte priser, så vil ikke useriøse prishenvendelser bli besvart."
-      ],
-      "id": "5dff4f7984a151f940535d18",
-      "language": "nb",
-      "published_at": null,
-      "snippet": "<strong>Pent brukte lagerreoler selges meget prisgunstig</strong>. Reolene kan selges samlet eller separat. Hver reolstige består av 2 blå bein og 4-6 grå stag som danner stigen",
-      "source": "Brave Search",
-      "source_rank": 10,
-      "title": "Pent brukte lagerreoler selges meget prisgunstig | FINN-torget",
-      "url": "https://www.finn.no/bap/webstore/ad.html?finnkode=316535070"
     }
   ],
   "schema_version": 1
