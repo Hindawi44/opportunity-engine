@@ -17,6 +17,7 @@ from zipfile import BadZipFile, ZipFile
 
 
 ARTIFACT_NAME = "multi-market-daily-operator-checkpoint"
+RESTORABLE_EVENTS = {"workflow_dispatch", "schedule"}
 DATABASE_RELATIVE_PATHS = (
     "no-auksjonen/opportunity_engine.db",
     "no-finn-email/opportunity_engine.db",
@@ -140,7 +141,7 @@ def restore_previous_checkpoint_databases(
     branch: str = "main",
     api_url: str = "https://api.github.com",
 ) -> dict[str, Any]:
-    """Restore the newest non-expired successful checkpoint database artifact."""
+    """Restore the newest successful manual or scheduled checkpoint artifact."""
     output = Path(status_path)
     base = api_url.rstrip("/")
     if not repository or "/" not in repository:
@@ -155,12 +156,14 @@ def restore_previous_checkpoint_databases(
         return status
 
     try:
+        # GitHub's workflow-run API accepts only one event filter. Omitting the
+        # event filter lets scheduled runs participate in continuity; we then
+        # explicitly allow only the two checkpoint-producing events below.
         query = urlencode(
             {
                 "branch": branch,
-                "event": "workflow_dispatch",
                 "status": "success",
-                "per_page": 10,
+                "per_page": 20,
             }
         )
         runs_url = (
@@ -173,6 +176,9 @@ def restore_previous_checkpoint_databases(
 
         for run in runs:
             if not isinstance(run, Mapping):
+                continue
+            event = str(run.get("event") or "").strip()
+            if event not in RESTORABLE_EVENTS:
                 continue
             run_id = run.get("id")
             if not isinstance(run_id, int) or run_id == current_run_id:
@@ -207,6 +213,7 @@ def restore_previous_checkpoint_databases(
             status = {
                 "status": "RESTORED" if restored else "NO_DATABASES_IN_ARTIFACT",
                 "previous_run_id": run_id,
+                "previous_run_event": event,
                 "previous_artifact_id": artifact_id,
                 "restored_databases": restored,
             }
