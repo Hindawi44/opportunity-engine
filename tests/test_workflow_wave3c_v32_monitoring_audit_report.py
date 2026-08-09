@@ -8,7 +8,7 @@ V37 = ROOT / ".github" / "workflows" / "v3.7-production-pilot.yml"
 V33 = ROOT / ".github" / "workflows" / "v3.3-live-source-ingestion.yml"
 
 
-def test_wave3c_report_records_current_v32_contract() -> None:
+def test_wave3c_report_records_historical_v32_contract_and_cleanup_state() -> None:
     report = REPORT.read_text(encoding="utf-8")
     workflow = V32.read_text(encoding="utf-8")
 
@@ -20,7 +20,8 @@ def test_wave3c_report_records_current_v32_contract() -> None:
 
     assert "pull_request:" in workflow
     assert "workflow_dispatch:" in workflow
-    assert "cron: '17 * * * *'" in workflow
+    assert "cron: '17 * * * *'" not in workflow
+    assert "Legacy hourly scheduler retired" in workflow
     assert "data/monitoring/v3.2-seen-state.json" in workflow
     assert "v3.2-monitoring-state-${{ github.run_id }}" in workflow
     assert "pytest tests/test_v32_continuous_opportunity_monitoring.py -q" in workflow

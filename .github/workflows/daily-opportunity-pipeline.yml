@@ -1,10 +1,9 @@
 name: Automated opportunity pipeline
 
 on:
+  # Legacy V2.3 scheduler retired by SCHEDULER_CONSOLIDATION_AUDIT_V1.
+  # Keep this workflow available only for explicit operator runs.
   workflow_dispatch:
-  schedule:
-    - cron: "15 */6 * * *"
-    - cron: "37 5 * * *"
 
 permissions:
   contents: write

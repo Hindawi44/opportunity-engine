@@ -10,9 +10,8 @@ on:
       - 'scripts/run_v32_continuous_opportunity_monitoring.py'
       - 'tests/test_v33_live_source_ingestion.py'
       - 'tests/fixtures/v33_auksjonen_page.html'
+  # Legacy hourly scheduler retired by SCHEDULER_CONSOLIDATION_AUDIT_V1.
   workflow_dispatch:
-  schedule:
-    - cron: '12 * * * *'
 
 jobs:
   auksjonen-source-ingestion:
