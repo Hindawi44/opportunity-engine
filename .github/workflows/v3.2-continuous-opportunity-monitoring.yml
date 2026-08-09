@@ -10,9 +10,8 @@ on:
       - 'scripts/run_v31_live_batch_validation.py'
       - 'tests/test_v32_continuous_opportunity_monitoring.py'
       - 'data/live_validation/v3.1-auksjonen-live-batch.json'
+  # Legacy hourly scheduler retired by SCHEDULER_CONSOLIDATION_AUDIT_V1.
   workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
 
 jobs:
   continuous-monitoring:
