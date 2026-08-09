@@ -1,0 +1,34 @@
+name: Discovery V1.1 Live Search Adapter
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/discovery-v1.1-live-search.yml"
+      - "src/opportunity_engine/discovery/brave_search.py"
+      - "src/opportunity_engine/discovery/live_search.py"
+      - "src/opportunity_engine/discovery/search_provider.py"
+      - "src/opportunity_engine/discovery/query_builder.py"
+      - "src/opportunity_engine/discovery/result_filter.py"
+      - "tests/test_discovery_v11_live_search.py"
+  workflow_dispatch:
+
+jobs:
+  discovery-live-search:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependency
+        run: pip install pytest
+
+      - name: Run Discovery V1.1 acceptance tests
+        run: pytest tests/test_discovery_v11_live_search.py -q

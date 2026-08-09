@@ -1,0 +1,55 @@
+name: V3.2 Continuous Opportunity Monitoring
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/v3.2-continuous-opportunity-monitoring.yml'
+      - 'scripts/run_v32_continuous_opportunity_monitoring.py'
+      - 'src/opportunity_engine/continuous_opportunity_monitoring.py'
+      - 'scripts/run_v31_live_batch_validation.py'
+      - 'tests/test_v32_continuous_opportunity_monitoring.py'
+      - 'data/live_validation/v3.1-auksjonen-live-batch.json'
+  # Legacy hourly scheduler retired by SCHEDULER_CONSOLIDATION_AUDIT_V1.
+  workflow_dispatch:
+
+jobs:
+  continuous-monitoring:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pytest
+      - name: Restore monitoring state
+        uses: actions/cache/restore@v4
+        with:
+          path: data/monitoring/v3.2-seen-state.json
+          key: v3.2-monitoring-state-${{ github.run_id }}
+          restore-keys: |
+            v3.2-monitoring-state-
+      - name: Validate monitoring behavior
+        run: pytest tests/test_v32_continuous_opportunity_monitoring.py -q
+      - name: Run continuous monitor
+        run: python scripts/run_v32_continuous_opportunity_monitoring.py
+      - name: Save monitoring state
+        uses: actions/cache/save@v4
+        with:
+          path: data/monitoring/v3.2-seen-state.json
+          key: v3.2-monitoring-state-${{ github.run_id }}
+      - name: Print one monitoring report
+        if: always()
+        run: cat data/validation/v3.2-continuous-monitoring.json || true
+      - name: Upload monitoring report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3.2-continuous-monitoring
+          path: data/validation/v3.2-continuous-monitoring.json
+          if-no-files-found: warn
