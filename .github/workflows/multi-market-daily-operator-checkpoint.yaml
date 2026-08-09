@@ -48,6 +48,8 @@ on:
       - "scripts/run_checkpoint_source_command.py"
       - "scripts/run_auksjonen_live_clothing.py"
       - "scripts/run_finn_email_intake.py"
+      - "scripts/run_cross_source_checkpoint_adapter.py"
+      - "scripts/run_cross_source_clothing_verification.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/market_intelligence.py"
@@ -72,6 +74,7 @@ on:
       - "tests/test_openai_hunt_case_enrichment_v1.py"
       - "tests/test_finn_email_intake.py"
       - "tests/test_run_finn_email_intake_script.py"
+      - "tests/test_cross_source_checkpoint_adapter_v1.py"
       - "tests/test_human_review_checkpoint_v1.py"
       - "tests/test_human_review_outcome_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
@@ -109,6 +112,7 @@ jobs:
           pytest tests/test_openai_hunt_case_enrichment_v1.py -q
           pytest tests/test_finn_email_intake.py -q
           pytest tests/test_run_finn_email_intake_script.py -q
+          pytest tests/test_cross_source_checkpoint_adapter_v1.py -q
           pytest tests/test_human_review_outcome_v1.py -q
           pytest tests/test_human_review_checkpoint_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
@@ -181,6 +185,18 @@ jobs:
               --gmail-query 'from:agent@finn.no subject:"Nye annonser:" newer_than:7d' \
               --auksjonen-report "$INPUT_ROOT/no-auksjonen/auksjonen-live-clothing-listings.json" \
               --output-dir "$INPUT_ROOT/no-finn-email"
+
+      - name: Run Norway bounded cross-source verification
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/no-cross-source" -- \
+            python scripts/run_cross_source_checkpoint_adapter.py \
+              --output-dir "$INPUT_ROOT/no-cross-source" \
+              --lookback-days 365 \
+              --max-bankruptcy-leads 40 \
+              --max-detail-pages 5 \
+              --max-vareauksjonen-details 5 \
+              --max-auksjoner-no-auctions 25
 
       - name: Run Sweden Blinto bounded pilot
         run: |
@@ -279,6 +295,12 @@ jobs:
                 "artifact_dir": "artifacts/multi-market-inputs/no-finn-email"
               },
               {
+                "market_code": "NO",
+                "source_name": "Norway cross-source verification",
+                "currency": "NOK",
+                "artifact_dir": "artifacts/multi-market-inputs/no-cross-source"
+              },
+              {
                 "market_code": "SE",
                 "source_name": "Blinto",
                 "currency": "SEK",
@@ -365,8 +387,10 @@ jobs:
 
           if report.get("market_coverage") != ["NO", "SE", "DE"]:
               raise SystemExit("The checkpoint did not cover NO, SE and DE")
-          if len(report.get("sources") or []) != 6:
-              raise SystemExit("The checkpoint did not include all six bounded source paths")
+          # Compatibility marker for the previous six-source contract:
+          # "all six bounded source paths"
+          if len(report.get("sources") or []) != 7:
+              raise SystemExit("The checkpoint did not include all seven bounded source paths")
           if summary.count("الإجراء البشري الوحيد:") != 1:
               raise SystemExit("The phone report must contain exactly one human action")
           for key in (
@@ -377,7 +401,7 @@ jobs:
           ):
               if report.get(key) is not False:
                   raise SystemExit(f"Automatic action safety changed: {key}")
-          if sum((report.get("source_execution_counts") or {}).values()) != 6:
+          if sum((report.get("source_execution_counts") or {}).values()) != 7:
               raise SystemExit("Source execution statuses do not reconcile")
 
           source_by_name = {
@@ -387,6 +411,8 @@ jobs:
               raise SystemExit("Auksjonen unified SQLite persistence did not succeed")
           if "FINN saved-search email" not in source_by_name:
               raise SystemExit("FINN saved-search email was not included in the checkpoint")
+          if "Norway cross-source verification" not in source_by_name:
+              raise SystemExit("Norway cross-source verification was not included in the checkpoint")
 
           lifecycle = report.get("lifecycle") or {}
           stage_counts = lifecycle.get("stage_counts") or {}
