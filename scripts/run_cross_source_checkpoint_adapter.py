@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import subprocess
@@ -103,10 +104,12 @@ def main() -> int:
     scan_complete = bool(live_report.get("scan_complete"))
     error_count = int(live_report.get("errors") or 0)
     status = "PASS" if scan_complete and error_count == 0 and completed.returncode == 0 else "FAILED"
+    discovered_at = datetime.now(timezone.utc).isoformat()
 
     report = {
         "schema_version": "checkpoint-cross-source-no-1.0",
         "status": status,
+        "discovered_at": discovered_at,
         "market_code": "NO",
         "currency": "NOK",
         "source_mode": "NORWAY_CROSS_SOURCE_VERIFICATION",
@@ -133,6 +136,7 @@ def main() -> int:
 
     print("checkpoint_cross_source_status:", status)
     print("checkpoint_cross_source_records:", len(top5))
+    print("checkpoint_cross_source_discovered_at:", discovered_at)
     print("paid_search_used: false")
     print("openai_api_used: false")
     return 0 if status == "PASS" else (completed.returncode or 2)
