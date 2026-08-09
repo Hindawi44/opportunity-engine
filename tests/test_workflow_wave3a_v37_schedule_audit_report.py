@@ -21,13 +21,15 @@ def test_wave3a_report_records_audited_v37_contract() -> None:
     assert "3e6c65449e093e7051f980ef4b1b04af3470a443" in report
 
 
-def test_wave3a_report_records_exact_minute_17_collision() -> None:
+def test_wave3a_report_keeps_historical_collision_evidence_after_cleanup() -> None:
     report = REPORT.read_text(encoding="utf-8")
     v32 = V32.read_text(encoding="utf-8")
 
     assert "17 * * * *" in report
-    assert "cron: '17 * * * *'" in v32
     assert "confirmed trigger collision" in report.lower()
+    assert "workflow_dispatch:" in v32
+    assert "cron: '17 * * * *'" not in v32
+    assert "Legacy hourly scheduler retired" in v32
 
 
 def test_wave3a_remains_a_historical_documentation_audit() -> None:
