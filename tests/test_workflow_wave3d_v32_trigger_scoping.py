@@ -32,13 +32,12 @@ def test_v32_pull_request_trigger_has_exact_approved_paths():
     assert path_lines == set(APPROVED_PATHS)
 
 
-def test_v32_schedule_manual_state_cache_report_and_artifact_are_preserved():
+def test_v32_manual_state_cache_report_and_artifact_are_preserved():
     text = _workflow_text()
 
     required_fragments = (
         'name: V3.2 Continuous Opportunity Monitoring',
         'workflow_dispatch:',
-        "cron: '17 * * * *'",
         'continuous-monitoring:',
         "python-version: '3.11'",
         'PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}',
@@ -56,4 +55,7 @@ def test_v32_schedule_manual_state_cache_report_and_artifact_are_preserved():
     for fragment in required_fragments:
         assert fragment in text
 
+    assert "cron: '17 * * * *'" not in text
+    assert '\n  schedule:' not in text
+    assert 'Legacy hourly scheduler retired' in text
     assert text.count('if: always()') == 2
