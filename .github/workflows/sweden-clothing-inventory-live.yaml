@@ -1,6 +1,8 @@
 name: Sweden Clothing Inventory Live Pilot
 
 on:
+  # Production Sweden discovery now runs inside Multi-Market Daily Operator Checkpoint.
+  # Keep this workflow only for explicit source diagnostics to avoid paid live searches on PRs.
   workflow_dispatch:
     inputs:
       source:
@@ -37,31 +39,6 @@ on:
         required: false
         default: true
         type: boolean
-  pull_request:
-    paths:
-      - ".github/workflows/sweden-clothing-inventory-live.yaml"
-      - "scripts/run_market_clothing_inventory_discovery.py"
-      - "scripts/run_sweden_clothing_inventory_discovery_search.py"
-      - "src/opportunity_engine/discovery/sweden_blinto.py"
-      - "src/opportunity_engine/discovery/sweden_clothing_inventory.py"
-      - "src/opportunity_engine/discovery/sweden_klaravik.py"
-      - "src/opportunity_engine/discovery/sweden_psauction.py"
-      - "src/opportunity_engine/discovery/sweden_psauction_playwright.py"
-      - "src/opportunity_engine/discovery/brave_search.py"
-      - "src/opportunity_engine/discovery/unified_opportunity_adapter.py"
-      - "src/opportunity_engine/discovery/unified_opportunity_report.py"
-      - "src/opportunity_engine/markets/sweden.py"
-      - "config/markets/se_v1.json"
-      - "docs/BLINTO_PUBLIC_ACCESS_AUDIT_v1.md"
-      - "docs/KLARAVIK_PUBLIC_ACCESS_AUDIT_v1.md"
-      - "docs/PSAUCTION_PUBLIC_ACCESS_AUDIT_v1.md"
-      - "docs/WORKFLOW_INVENTORY_REPORT_v1.1.md"
-      - "tests/test_sweden_blinto_source.py"
-      - "tests/test_sweden_clothing_discovery_v1.py"
-      - "tests/test_sweden_klaravik_source.py"
-      - "tests/test_sweden_psauction_source.py"
-      - "tests/test_sweden_psauction_playwright.py"
-      - "tests/test_workflow_inventory_report.py"
 
 permissions:
   contents: read
