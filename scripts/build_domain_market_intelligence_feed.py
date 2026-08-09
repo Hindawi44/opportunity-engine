@@ -11,9 +11,9 @@ import importlib.util
 from pathlib import Path
 
 
-# Literal compatibility contract used by repository regression tests. These are
-# contracts implemented by the delegated core builder; optional side-feed names
-# are retained here only as migration markers, not as default runtime calls.
+# Literal compatibility/migration contract used by repository regression tests.
+# The optional side-feed tokens below describe where established capabilities
+# moved. They are deliberately not imported or executed by this daily entrypoint.
 _ESTABLISHED_PIPELINE_DELEGATION_CONTRACT = """
 sanitize_blinto_seller_identity_report
 _rewrite_source_artifact(blinto_seller_identity
@@ -26,18 +26,39 @@ brave-market-signal-radar.json
 bridal-liquidation-feed.json
 brief["bridal_liquidation_feed"]
 "private_single_dress_listings_rejected"
+"promotion_to_opportunity_allowed": False
 "market_coverage": ["NO", "SE", "DE"]
 run_openai_hunt_case_enrichment
 write_openai_hunt_case_artifacts
 attach_hunt_case_intelligence
 openai-hunt-case-enrichment.json
 openai-hunt-case-enrichment.txt
+
+MOVED_OPTIONAL_SIDE_FEED_CONTRACTS
+collect_fabric_procurement_watch
+fabric-procurement-watch.json
+brief["fabric_procurement_watch"]
+"top_procurement_candidates"
+collect_merkandi_b2b_liquidation_feed
+merkandi-b2b-liquidation-feed.json
 brief["merkandi_b2b_liquidation_feed"]
+collect_fashion_stock_netherlands_feed
+fashion-stock-netherlands-feed.json
 brief["fashion_stock_netherlands_feed"]
+collect_stockhurt_b2b_feed
+stockhurt-b2b-feed.json
 brief["stockhurt_b2b_feed"]
+collect_stockhurt_official_catalog_enrichment
+stockhurt-official-catalog-enrichment.json
 brief["stockhurt_official_catalog_enrichment"]
+collect_jobalots_clothing_auction_feed
+jobalots-clothing-auction-feed.json
 brief["jobalots_clothing_auction_feed"]
+collect_jobalots_official_page_enrichment
+jobalots-official-page-enrichment.json
 brief["jobalots_official_page_enrichment"]
+collect_jobalots_official_catalog_discovery
+jobalots-official-catalog-discovery.json
 brief["jobalots_official_catalog_discovery"]
 "B2B_LEAD_REQUIRES_VERIFICATION"
 "EARLY_B2B_SIGNAL_REQUIRES_VERIFICATION"
