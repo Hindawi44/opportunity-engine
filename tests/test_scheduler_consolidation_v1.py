@@ -14,6 +14,8 @@ LEGACY_MANUAL_ONLY = (
     "dpv-active-clothing-watch.yaml",
 )
 
+AUTOMATIC_SCHEDULE_OWNER = "multi-market-daily-operator-checkpoint.yaml"
+
 
 def _text(name: str) -> str:
     return (WORKFLOWS / name).read_text(encoding="utf-8")
@@ -27,7 +29,18 @@ def test_legacy_schedulers_are_manual_only() -> None:
 
 
 def test_multi_market_checkpoint_keeps_automatic_schedule() -> None:
-    workflow = _text("multi-market-daily-operator-checkpoint.yaml")
+    workflow = _text(AUTOMATIC_SCHEDULE_OWNER)
     assert "\n  schedule:" in workflow
     assert 'cron: "17 5 * * *"' in workflow
     assert "workflow_dispatch:" in workflow
+
+
+def test_multi_market_checkpoint_is_the_only_live_schedule_owner() -> None:
+    scheduled = []
+    for path in sorted(WORKFLOWS.iterdir()):
+        if path.suffix not in {".yml", ".yaml"}:
+            continue
+        if "\n  schedule:" in path.read_text(encoding="utf-8"):
+            scheduled.append(path.name)
+
+    assert scheduled == [AUTOMATIC_SCHEDULE_OWNER]
