@@ -32,14 +32,11 @@ ARCHIVED = {
 }
 
 EXPECTED_LIVE = {
-    "dpv-active-clothing-watch.yaml",
     "germany-clothing-inventory-live.yaml",
     "multi-market-daily-operator-checkpoint.yaml",
     "one-opportunity-commercial-analysis.yaml",
-    "riegermann-active-auctions-live.yaml",
     "sweden-clothing-inventory-live.yaml",
     "tests.yml",
-    "venta-active-clothing-watch.yaml",
 }
 
 
@@ -49,7 +46,7 @@ def test_acceptance_workflows_are_archived_not_runnable() -> None:
         assert (ARCHIVE / name).exists(), name
 
 
-def test_actions_surface_is_reduced_to_eight_current_workflows() -> None:
+def test_actions_surface_is_reduced_to_five_current_workflows() -> None:
     current = {
         path.name
         for path in WORKFLOWS.iterdir()

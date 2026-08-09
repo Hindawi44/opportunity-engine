@@ -36,6 +36,9 @@ _ARCHIVED_WORKFLOW_NAMES = {
     "v3.5-opportunity-alert-review-queue.yml",
     "v3.6-multi-source-ingestion.yml",
     "v3.7-production-pilot.yml",
+    "riegermann-active-auctions-live.yaml",
+    "venta-active-clothing-watch.yaml",
+    "dpv-active-clothing-watch.yaml",
 }
 _ORIGINAL_PATH_READ_TEXT = Path.read_text
 
