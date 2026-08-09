@@ -17,17 +17,21 @@ ALLOWED_DISPOSITIONS = {
 }
 
 
-def test_cleanup_plan_represents_every_workflow_exactly_once() -> None:
+# The implementation plan is now a historical 31-workflow baseline. Current
+# .yml files must remain represented by that baseline, but archived workflow
+# shells are intentionally absent from .github/workflows.
+def test_cleanup_plan_represents_every_current_yml_workflow() -> None:
     text = PLAN.read_text(encoding="utf-8")
     workflow_names = sorted(path.name for path in WORKFLOWS.glob("*.yml"))
 
-    assert len(workflow_names) == 31
+    assert len(workflow_names) == 24
     for name in workflow_names:
         assert text.count(f"`{name}`") >= 1, name
 
     numbered_rows = re.findall(r"^\|\s*(\d+)\s*\|\s*`([^`]+\.yml)`\s*\|", text, re.MULTILINE)
     assert len(numbered_rows) == 31
-    assert sorted(name for _, name in numbered_rows) == workflow_names
+    planned_names = {name for _, name in numbered_rows}
+    assert set(workflow_names).issubset(planned_names)
 
 
 def test_cleanup_plan_uses_one_allowed_disposition_per_workflow_row() -> None:
