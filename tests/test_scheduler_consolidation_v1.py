@@ -9,6 +9,9 @@ LEGACY_MANUAL_ONLY = (
     "scheduled-agent.yml",
     "v3.2-continuous-opportunity-monitoring.yml",
     "v3.3-live-source-ingestion.yml",
+    "riegermann-active-auctions-live.yaml",
+    "venta-active-clothing-watch.yaml",
+    "dpv-active-clothing-watch.yaml",
 )
 
 
