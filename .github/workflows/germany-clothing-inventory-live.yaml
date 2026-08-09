@@ -1,6 +1,8 @@
 name: Germany Clothing Inventory Live Pilot
 
 on:
+  # Production Germany discovery now runs inside Multi-Market Daily Operator Checkpoint.
+  # Keep this workflow only for explicit source diagnostics to avoid live network work on PRs.
   workflow_dispatch:
     inputs:
       source:
@@ -39,26 +41,6 @@ on:
         required: false
         default: true
         type: boolean
-  pull_request:
-    paths:
-      - ".github/workflows/germany-clothing-inventory-live.yaml"
-      - "scripts/run_germany_clothing_inventory_discovery_search.py"
-      - "scripts/run_riegermann_live_discovery.py"
-      - "scripts/run_market_clothing_inventory_discovery.py"
-      - "src/opportunity_engine/discovery/germany_clothing_inventory.py"
-      - "src/opportunity_engine/discovery/germany_riegermann.py"
-      - "src/opportunity_engine/discovery/germany_riegermann_live.py"
-      - "src/opportunity_engine/discovery/brave_search.py"
-      - "src/opportunity_engine/discovery/unified_opportunity_adapter.py"
-      - "src/opportunity_engine/discovery/unified_opportunity_report.py"
-      - "src/opportunity_engine/markets/germany.py"
-      - "config/markets/de_v1.json"
-      - "config/sources/de_riegermann_v1.json"
-      - "docs/WORKFLOW_INVENTORY_REPORT_v1.2.md"
-      - "tests/test_germany_clothing_discovery_v1.py"
-      - "tests/test_germany_riegermann_adapter.py"
-      - "tests/test_germany_riegermann_live.py"
-      - "tests/test_workflow_inventory_report.py"
 
 permissions:
   contents: read
