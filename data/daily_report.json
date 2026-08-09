@@ -3,7 +3,7 @@
     "alerts": [],
     "decision_source": "data/decision_intelligence.json",
     "last_scoring_alert_count": 0,
-    "last_scoring_run": "2026-08-08T18:58:21.274455+00:00",
+    "last_scoring_run": "2026-08-09T02:28:16.032750+00:00",
     "official_decision_field": "final_decision",
     "schema_version": 2,
     "signatures": []
@@ -161,7 +161,7 @@
       ],
       "top_count": 5
     },
-    "generated_at": "2026-08-08T18:58:21.468448+00:00",
+    "generated_at": "2026-08-09T02:28:16.226232+00:00",
     "method": "sale listings and bankruptcy discovery leads are ranked in separate channels from the same persisted daily source snapshot; no financial values are invented",
     "schema_version": 2,
     "source_funnel": {
@@ -171,11 +171,11 @@
       "bankruptcy_leads_selected": 5
     }
   },
-  "generated_at": "2026-08-08T18:58:21.543804+00:00",
+  "generated_at": "2026-08-09T02:28:16.301519+00:00",
   "opportunities": {
     "actionable_count": 0,
     "candidate_count": 6,
-    "generated_at": "2026-08-08T18:58:21.309445+00:00",
+    "generated_at": "2026-08-09T02:28:16.067904+00:00",
     "method": "unified P2 evidence-gated scoring; rejected candidates excluded from top report",
     "schema_version": 2,
     "top_count": 0,
@@ -186,7 +186,7 @@
     "actionable_count": 0,
     "buy_review_count": 0,
     "candidate_count": 6,
-    "generated_at": "2026-08-08T18:58:21.274455+00:00",
+    "generated_at": "2026-08-09T02:28:16.032750+00:00",
     "method": "transparent evidence-gated unified scoring; BUY_REVIEW always requires human approval",
     "monitor_count": 0,
     "opportunities": [
@@ -252,7 +252,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_first",
-        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 2d 22t 1m",
+        "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 2d 14t 31m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667"
       },
@@ -318,7 +318,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 3d 23t 53m",
+        "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 3d 16t 23m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276"
       },
@@ -384,7 +384,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 2d 23t 46m",
+        "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 2d 16t 16m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267"
       },
@@ -450,7 +450,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 4 bud 4d 23t 46m",
+        "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 4 bud 4d 16t 16m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274"
       },
@@ -516,7 +516,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 2d 23t 56m",
+        "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 2d 16t 26m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275"
       },
@@ -536,7 +536,7 @@
         ],
         "exclusion_reasons": [],
         "expected_profit_nok": null,
-        "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 4d",
+        "market_search_query": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 3d",
         "matched_target_terms": [
           "klær"
         ],
@@ -582,7 +582,7 @@
           "evidence_gate:EVIDENCE_REQUIRED"
         ],
         "status": "review_if_capacity",
-        "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 4d 0t 16m",
+        "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 3d 16t 46m",
         "total_cost_nok": null,
         "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271"
       }
@@ -592,7 +592,7 @@
   },
   "scoring_history_path": "data/scoring_history.json",
   "source_funnel": {
-    "generated_at": "2026-08-08T18:58:21.512634+00:00",
+    "generated_at": "2026-08-09T02:28:16.270555+00:00",
     "method": "per-source visibility from coverage, collection snapshot and separated output channels; zero means no verified records collected",
     "schema_version": 2,
     "sources": [
