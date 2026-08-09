@@ -238,12 +238,13 @@ def test_daily_monitor_rejects_unbounded_configuration():
         )
 
 
-def test_existing_workflow_schedules_daily_monitor_without_new_workflow_file():
+def test_existing_workflow_keeps_pre_market_monitor_manual_only():
     workflow = Path(".github/workflows/daily-opportunity-pipeline.yml").read_text(
         encoding="utf-8"
     )
 
-    assert 'cron: "37 5 * * *"' in workflow
+    assert "workflow_dispatch:" in workflow
+    assert "\n  schedule:" not in workflow
     assert "pre-market-monitor:" in workflow
     assert "needs: generate" in workflow
     assert "BRAVE_SEARCH_API_KEY" in workflow
