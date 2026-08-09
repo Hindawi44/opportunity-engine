@@ -1,9 +1,8 @@
 name: Riegermann Active Clothing Auctions
 
 on:
-  schedule:
-    # GitHub cron uses UTC: 05:17 UTC is 07:17 CEST / 06:17 CET in Norway.
-    - cron: "17 5 * * *"
+  # Automatic schedule retired by scheduler consolidation; this source now runs inside
+  # Multi-Market Daily Operator Checkpoint. Historical schedule: - cron: "17 5 * * *"
   workflow_dispatch:
     inputs:
       auction_limit:

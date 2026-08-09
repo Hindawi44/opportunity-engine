@@ -1,9 +1,8 @@
 name: VENTA Active Clothing Watch
 
 on:
-  schedule:
-    # GitHub cron uses UTC: 05:47 UTC is 07:47 CEST / 06:47 CET in Norway.
-    - cron: "47 5 * * *"
+  # Automatic schedule retired by scheduler consolidation; this source now runs inside
+  # Multi-Market Daily Operator Checkpoint. Historical schedule: - cron: "47 5 * * *"
   workflow_dispatch:
     inputs:
       catalog_limit:
