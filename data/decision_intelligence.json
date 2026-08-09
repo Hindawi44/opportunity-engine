@@ -1,6 +1,6 @@
 {
   "buy_review_count": 0,
-  "decision_count": 6,
+  "decision_count": 5,
   "decisions": [
     {
       "asking_price_nok": 3000.0,
@@ -90,7 +90,7 @@
       ],
       "status": "review_first",
       "target_profit_buffer_nok": null,
-      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 2d 14t 31m",
+      "title": "BUTIKK AVVIKLING - KOMPLETT VARELAGER – KAWAII - CA 4500 ARTIKLER Kristiansand s 3 bud 2d 9t 44m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/BUTIKK_AVVIKLING_-_KOMPLETT_VARELAGER__KAWAII_-_CA_4500_ARTIKLER/612667",
       "verified_operating_costs_nok": null
@@ -183,102 +183,9 @@
       ],
       "status": "review_if_capacity",
       "target_profit_buffer_nok": null,
-      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 3d 16t 23m",
+      "title": "Parti med flammehemmende og offshore arbeidsklær – 24 plagg Florvåg 4 bud 3d 11t 36m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Parti_med_flammehemmende_og_offshore_arbeidskl%C3%A6r__24_plagg/616276",
-      "verified_operating_costs_nok": null
-    },
-    {
-      "asking_price_nok": 500.0,
-      "automatic_purchase": false,
-      "city": "Florvåg",
-      "conservative_resale_value_nok": null,
-      "decision": "EVIDENCE_REQUIRED",
-      "decision_confidence": "LOW",
-      "decision_reasons_ar": [
-        "البيانات الاقتصادية غير مكتملة، لذلك لا يمكن إصدار توصية شراء موثوقة."
-      ],
-      "decision_warnings_ar": [
-        "أدلة ناقصة: عمولة المزاد، تكلفة الفك، التكاليف الأخرى، تكلفة الإصلاح، تكلفة التخزين، ثلاث مقارنات سوقية موثقة، تكلفة النقل، قيمة ضريبة القيمة المضافة"
-      ],
-      "ends_at": "1786473900000",
-      "evidence_needed": [
-        "three_verified_market_comparables",
-        "auction_fee",
-        "vat_status",
-        "transport_cost",
-        "dismantling_cost",
-        "condition_and_missing_parts"
-      ],
-      "exclusion_reasons": [],
-      "expected_profit_nok": null,
-      "final_decision": "WATCH",
-      "final_decision_ar": "مراقبة وجمع الأدلة",
-      "market_search_query": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 2d",
-      "matched_target_terms": [
-        "klær"
-      ],
-      "maximum_safe_bid_nok": null,
-      "missing_evidence": [
-        "auction_fee_nok",
-        "dismantling_cost_nok",
-        "other_costs_nok",
-        "repair_cost_nok",
-        "storage_cost_nok",
-        "three_verified_market_comparables",
-        "transport_cost_nok",
-        "vat_nok"
-      ],
-      "missing_evidence_ar": [
-        "عمولة المزاد",
-        "تكلفة الفك",
-        "التكاليف الأخرى",
-        "تكلفة الإصلاح",
-        "تكلفة التخزين",
-        "ثلاث مقارنات سوقية موثقة",
-        "تكلفة النقل",
-        "قيمة ضريبة القيمة المضافة"
-      ],
-      "next_actions_ar": [
-        "استكمال ثلاث مقارنات سوقية موثقة.",
-        "توثيق العمولة والضريبة والنقل والفك والتخزين والإصلاح."
-      ],
-      "official_decision_field": "final_decision",
-      "opportunity_id": "unified-auksjonen-616267",
-      "opportunity_score": 24.47,
-      "priority": 2,
-      "reasons": [
-        "target:klær+16",
-        "asking_price_present+5"
-      ],
-      "recommendation": "WATCH",
-      "recommendation_ar": "مراقبة وجمع الأدلة",
-      "relevance_score": 21,
-      "requires_human_approval": false,
-      "roi_percent": null,
-      "score_components": {
-        "evidence": 0.0,
-        "listing_quality": 8.47,
-        "logistics": 7.0,
-        "marketability": 9.0,
-        "verified_economics": 0.0
-      },
-      "score_grade": "E",
-      "score_reasons": [
-        "verified_economics:0/35",
-        "evidence_completeness:0.0/15",
-        "verified_comparables:0.0/10",
-        "marketability:9.0/15",
-        "logistics:7.0/10",
-        "relevance:1.5/7",
-        "listing_fields:7.0/8",
-        "evidence_gate:EVIDENCE_REQUIRED"
-      ],
-      "status": "review_if_capacity",
-      "target_profit_buffer_nok": null,
-      "title": "Stort parti helse- og næringsmiddelklær - 137 plagg Florvåg 1 bud 2d 16t 16m",
-      "total_cost_nok": null,
-      "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_helse-_og_n%C3%A6ringsmiddelkl%C3%A6r_-_137_plagg/616267",
       "verified_operating_costs_nok": null
     },
     {
@@ -369,7 +276,7 @@
       ],
       "status": "review_if_capacity",
       "target_profit_buffer_nok": null,
-      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 4 bud 4d 16t 16m",
+      "title": "Stort parti med arbeidsklær - 140 plagg - bukser, shorts og jakker Florvåg 4 bud 4d 11t 29m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_med_arbeidskl%C3%A6r_-_140_plagg_-_bukser_shorts_og_jakker/616274",
       "verified_operating_costs_nok": null
@@ -462,7 +369,7 @@
       ],
       "status": "review_if_capacity",
       "target_profit_buffer_nok": null,
-      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 2d 16t 26m",
+      "title": "Stort parti nye profilklær, dameskjorter og fritidsklær – 117 plagg Florvåg 10 bud 2d 11t 39m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_nye_profilkl%C3%A6r_dameskjorter_og_fritidskl%C3%A6r__117_plagg/616275",
       "verified_operating_costs_nok": null
@@ -555,16 +462,16 @@
       ],
       "status": "review_if_capacity",
       "target_profit_buffer_nok": null,
-      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 3d 16t 46m",
+      "title": "Stort parti synlighetsklær, bukser, refleks og regntøy – 272 plagg arbeidsklær Florvåg 2 bud 3d 11t 59m",
       "total_cost_nok": null,
       "url": "https://www.auksjonen.no/auksjon/overskuddsvarer/Stort_parti_synlighetskl%C3%A6r_bukser_refleks_og_regnt%C3%B8y__272_plagg_arbeidskl%C3%A6r/616271",
       "verified_operating_costs_nok": null
     }
   ],
-  "generated_at": "2026-08-09T02:28:16.586386+00:00",
+  "generated_at": "2026-08-09T07:15:49.006139+00:00",
   "method": "canonical final decision, verified evidence, conservative target-profit buffer, human approval required",
   "official_decision_field": "final_decision",
   "reject_count": 0,
   "schema_version": 2,
-  "watch_count": 6
+  "watch_count": 5
 }
