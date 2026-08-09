@@ -12,6 +12,9 @@ REMOVED = {
     "discovery-v1.2-live-pilot.yml",
     "v3.2-continuous-opportunity-monitoring.yml",
     "v3.3-live-source-ingestion.yml",
+    "riegermann-active-auctions-live.yaml",
+    "venta-active-clothing-watch.yaml",
+    "dpv-active-clothing-watch.yaml",
 }
 
 REQUIRED = {
@@ -20,9 +23,6 @@ REQUIRED = {
     "one-opportunity-commercial-analysis.yaml",
     "sweden-clothing-inventory-live.yaml",
     "germany-clothing-inventory-live.yaml",
-    "riegermann-active-auctions-live.yaml",
-    "venta-active-clothing-watch.yaml",
-    "dpv-active-clothing-watch.yaml",
 }
 
 
@@ -31,6 +31,6 @@ def test_superseded_workflow_shells_are_removed() -> None:
     assert REMOVED.isdisjoint(present)
 
 
-def test_current_production_ci_and_diagnostic_workflows_remain() -> None:
+def test_current_production_ci_and_manual_diagnostic_workflows_remain() -> None:
     present = {path.name for path in WORKFLOWS.iterdir() if path.is_file()}
     assert REQUIRED.issubset(present)
