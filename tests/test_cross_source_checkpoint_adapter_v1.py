@@ -1,5 +1,8 @@
+from datetime import datetime
 from importlib.util import module_from_spec, spec_from_file_location
+import json
 from pathlib import Path
+from types import SimpleNamespace
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,11 +46,45 @@ def test_adapter_writes_standard_checkpoint_artifact_names() -> None:
     assert '"search-run-report.json"' in text
     assert '"all-discovered-candidates.json"' in text
     assert '"discovery-top5.json"' in text
+    assert '"discovered_at": discovered_at' in text
     assert '"market_code": "NO"' in text
     assert '"currency": "NOK"' in text
     assert '"paid_search_used": False' in text
     assert '"openai_api_used": False' in text
     assert '"automatic_purchase": False' in text
+
+
+def test_adapter_emits_parseable_utc_discovered_at_for_continuity(
+    tmp_path: Path, monkeypatch
+) -> None:
+    module = _module()
+    output_dir = tmp_path / "no-cross-source"
+    output_dir.mkdir()
+    (output_dir / "multi-source-live-report.json").write_text(
+        json.dumps({"scan_complete": True, "errors": 0}),
+        encoding="utf-8",
+    )
+    (output_dir / "live-clothing-top5.json").write_text("[]\n", encoding="utf-8")
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(returncode=0),
+    )
+    monkeypatch.setattr(
+        module.sys,
+        "argv",
+        ["run_cross_source_checkpoint_adapter.py", "--output-dir", str(output_dir)],
+    )
+
+    assert module.main() == 0
+
+    report = json.loads(
+        (output_dir / "search-run-report.json").read_text(encoding="utf-8")
+    )
+    discovered_at = datetime.fromisoformat(report["discovered_at"])
+    assert discovered_at.tzinfo is not None
+    assert discovered_at.utcoffset() is not None
+    assert report["status"] == "PASS"
 
 
 def test_daily_checkpoint_runs_cross_source_as_seventh_bounded_source() -> None:
