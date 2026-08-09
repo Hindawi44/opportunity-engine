@@ -54,7 +54,7 @@ def test_wave3e_report_defines_proposal_without_authorizing_change():
     assert "Do not alter shared state or separate cache namespaces" in text
 
 
-def test_v33_workflow_preserves_contract_after_wave3f_path_scoping():
+def test_v33_workflow_preserves_manual_contract_after_scheduler_cleanup():
     text = WORKFLOW.read_text(encoding="utf-8")
 
     required = (
@@ -69,7 +69,6 @@ def test_v33_workflow_preserves_contract_after_wave3f_path_scoping():
         "tests/test_v33_live_source_ingestion.py",
         "tests/fixtures/v33_auksjonen_page.html",
         "workflow_dispatch:",
-        "cron: '12 * * * *'",
         "auksjonen-source-ingestion:",
         "python-version: '3.11'",
         "path: data/monitoring/v3.2-seen-state.json",
@@ -86,4 +85,7 @@ def test_v33_workflow_preserves_contract_after_wave3f_path_scoping():
     for fragment in required:
         assert fragment in text
 
+    assert "cron: '12 * * * *'" not in text
+    assert "\n  schedule:" not in text
+    assert "Legacy hourly scheduler retired" in text
     assert text.count("if: always()") == 3
