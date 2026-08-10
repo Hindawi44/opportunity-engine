@@ -1,0 +1,132 @@
+name: Como Biella Unified Live Proof
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/como-biella-unified-live-proof.yaml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prove-como-biella-unified:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/como-biella-unified-live-proof
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run production post-bulletin hooks with live Brave
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import sys
+
+          output = Path(os.environ["OUTPUT_DIR"])
+          output.mkdir(parents=True, exist_ok=True)
+          (output / "domain-market-intelligence-brief.json").write_text(
+              json.dumps({
+                  "market_coverage": ["NO", "SE", "DE"],
+                  "current_direct_opportunities": [],
+                  "early_signals_to_watch": [],
+                  "automatic_contact": False,
+                  "automatic_bid": False,
+                  "automatic_purchase": False,
+                  "automatic_payment": False,
+              }, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          (output / "domain-market-intelligence-brief.txt").write_text(
+              "LIVE PROOF BASE BULLETIN\n", encoding="utf-8"
+          )
+          sys.argv = [
+              "build_domain_market_intelligence_feed.py",
+              "--output-dir",
+              str(output),
+          ]
+          import opportunity_engine.discovery  # noqa: F401
+          print("production hooks registered; fabric -> river -> comparables will run at exit")
+          PY
+
+      - name: Assert Como and Biella reached unified river
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          output = Path(os.environ["OUTPUT_DIR"])
+          fabric = json.loads((output / "fabric-procurement-watch.json").read_text(encoding="utf-8"))
+          unified = json.loads((output / "unified-intelligence-items.json").read_text(encoding="utf-8"))
+          brief = json.loads((output / "domain-market-intelligence-brief.json").read_text(encoding="utf-8"))
+
+          items = unified.get("items") or []
+          como = [
+              item for item in items
+              if item.get("record_kind") == "FABRIC_PROCUREMENT_ITEM"
+              and item.get("source_country") == "IT"
+              and item.get("location") == "Como, IT"
+          ]
+          biella = [
+              item for item in items
+              if item.get("record_kind") == "FABRIC_PROCUREMENT_ITEM"
+              and item.get("source_country") == "IT"
+              and item.get("location") == "Biella, IT"
+          ]
+          section = brief.get("fabric_procurement_watch") or {}
+
+          print("fabric_candidate_count:", fabric.get("candidate_count"))
+          print("district_candidate_counts:", fabric.get("district_candidate_counts"))
+          print("unified_item_count:", unified.get("deduplicated_item_count"))
+          print("unified_como_count:", len(como))
+          print("unified_biella_count:", len(biella))
+          print("brief_como_count:", section.get("como_candidate_count"))
+          print("brief_biella_count:", section.get("biella_candidate_count"))
+          for item in (como[:3] + biella[:3]):
+              print(json.dumps({
+                  "record_kind": item.get("record_kind"),
+                  "source_country": item.get("source_country"),
+                  "source_name": item.get("source_name"),
+                  "location": item.get("location"),
+                  "title": item.get("title"),
+                  "score": item.get("score"),
+                  "decision_owner": item.get("decision_owner"),
+                  "source_url": item.get("source_url"),
+              }, ensure_ascii=False, sort_keys=True))
+
+          if not como:
+              raise SystemExit("Como candidates did not reach unified intelligence items")
+          if not biella:
+              raise SystemExit("Biella candidates did not reach unified intelligence items")
+          if int(section.get("como_candidate_count") or 0) < 1:
+              raise SystemExit("Como count missing from daily brief")
+          if int(section.get("biella_candidate_count") or 0) < 1:
+              raise SystemExit("Biella count missing from daily brief")
+          if any(item.get("decision_owner") != "HUMAN_OPERATOR" for item in como + biella):
+              raise SystemExit("Decision ownership changed")
+          if unified.get("automatic_purchase") is not False:
+              raise SystemExit("Unified automatic purchase safety changed")
+          PY
+
+      - name: Upload proof artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: como-biella-unified-live-proof
+          path: artifacts/como-biella-unified-live-proof
+          if-no-files-found: error
+          retention-days: 3
