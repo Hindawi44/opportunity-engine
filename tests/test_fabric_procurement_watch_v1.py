@@ -62,7 +62,10 @@ def test_accepts_prato_stock_result_in_italian() -> None:
         SearchHit(
             title="Tessuti a stock in lana e mohair pronti in magazzino €18.50",
             url="https://www.tessutistockprato.it/en-gb/il-magazzino",
-            description="Tessuti italiani a stock e pronta consegna dal magazzino di Prato.",
+            description=(
+                "Tessuti italiani a stock e pronta consegna dal magazzino di Prato. "
+                "Quantità: 1000 mt."
+            ),
             provider="Brave Search",
         ),
         source=SOURCES[2],
@@ -76,6 +79,8 @@ def test_accepts_prato_stock_result_in_italian() -> None:
     assert candidate["location"] == "Prato, IT"
     assert candidate["currency"] == "EUR"
     assert candidate["price"] == 18.5
+    assert candidate["quantity"] == 1000.0
+    assert candidate["quantity_unit"] == "m"
     assert "tessuti" in candidate["fabric_terms"]
     assert "magazzino" in candidate["value_terms"]
     assert candidate["not_a_liquidation_opportunity"] is True
@@ -161,7 +166,7 @@ class FakeProvider:
                 SearchHit(
                     title="Tessuti a stock lana e seta €18.50",
                     url="https://www.tessutistockprato.it/en-gb/il-magazzino",
-                    description="Magazzino a Prato con tessuti in pronta consegna.",
+                    description="Magazzino a Prato con tessuti in pronta consegna. Quantità: 1000 mt.",
                     provider=self.name,
                 )
             ]
@@ -208,6 +213,9 @@ def test_collection_is_bounded_to_five_official_source_requests() -> None:
     assert report["requests_made"] == 5
     assert report["candidate_count"] == 5
     assert report["status_counts"] == {"SUCCESS": 5}
+    prato = next(item for item in report["candidates"] if item["source_id"] == "verian-prato")
+    assert prato["quantity"] == 1000.0
+    assert prato["quantity_unit"] == "m"
     assert report["not_part_of_opportunity_top5"] is True
     assert report["automatic_purchase"] is False
     assert len(providers) == 5
