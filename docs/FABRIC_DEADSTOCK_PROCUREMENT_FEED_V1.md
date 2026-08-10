@@ -7,23 +7,46 @@ This lane watches approved official supplier domains for premium deadstock and
 bridal fabrics. It does not convert supplier products into clothing-liquidation
 opportunities.
 
+The Italy expansion starts with one bounded target: the Prato textile district.
+Prato sources feed the same existing procurement artifact and unified market
+intelligence river; there is no separate Italy engine, database, lifecycle, or
+daily report.
+
 ## Approved sources
 
 - `evaresource.com` — Italian premium deadstock fabrics.
 - `fabrichouse.com` — Italian premium deadstock fabrics and samples.
+- `tessutistockprato.it` — Verian, Prato-based wholesale and premium deadstock fabrics.
+- `tessutiastock.com` — Eurostock, Prato-based stock fabrics sold in rolls and by the metre.
 - `bridalfabrics.com` — specialist bridal lace, tulle, fabrics, trims, and samples.
 
 Unverified names from brainstorming are not enabled.
 
 ## Daily budget
 
-- 3 official-domain Brave queries.
+- 5 official-domain Brave queries.
 - 1 query per approved source.
 - 8 results requested per source by default.
 - At most 5 accepted candidates per source.
-- English search language.
+- English and Italian search terms for Italian sources.
 - One-month freshness window.
 - Existing `BRAVE_SEARCH_API_KEY`; no new secret or provider.
+
+## Prato scope
+
+The first Italy target is intentionally narrow. It looks for textile stock and
+deadstock language such as:
+
+- `tessuti a stock`;
+- `magazzino`;
+- `pronta consegna`;
+- `rotoli` / `al metro`;
+- `fine pezza` / `fine serie`;
+- wool / `lana`, silk / `seta`, linen / `lino`, cotton / `cotone`, lace / `pizzo`, velvet / `velluto`, and mohair.
+
+Accepted Prato candidates carry `source_country: IT`, `location: Prato, IT`, and
+`source_kind: PRATO_DEADSTOCK`, then continue through the existing
+`fabric-procurement-watch.json` input to the unified market-intelligence river.
 
 ## Candidate gate
 
@@ -31,9 +54,9 @@ Every result must:
 
 1. use HTTPS;
 2. belong to the exact approved supplier domain or its subdomain;
-3. contain a recognized fabric term;
+3. contain a recognized English or Italian fabric term;
 4. for deadstock suppliers, contain a stock, deadstock, sale, clearance, deal,
-   sample, or new-arrival term;
+   sample, new-arrival, warehouse, ready-stock, roll, or end-of-series term;
 5. for Bridal Fabrics, contain bridal or wedding context.
 
 The watch extracts visible price and currency when present, records fabric and
