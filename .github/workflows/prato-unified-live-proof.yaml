@@ -1,0 +1,129 @@
+name: Prato Unified Live Proof
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/prato-unified-live-proof.yaml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prove-unified-prato:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/prato-unified-live-proof
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run production daily post-bulletin hooks with live Brave
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import sys
+
+          output = Path(os.environ["OUTPUT_DIR"])
+          output.mkdir(parents=True, exist_ok=True)
+          (output / "domain-market-intelligence-brief.json").write_text(
+              json.dumps(
+                  {
+                      "market_coverage": ["NO", "SE", "DE"],
+                      "current_direct_opportunities": [],
+                      "early_signals_to_watch": [],
+                      "automatic_contact": False,
+                      "automatic_bid": False,
+                      "automatic_purchase": False,
+                      "automatic_payment": False,
+                  },
+                  indent=2,
+              ) + "\n",
+              encoding="utf-8",
+          )
+          (output / "domain-market-intelligence-brief.txt").write_text(
+              "LIVE PROOF BASE BULLETIN\n", encoding="utf-8"
+          )
+
+          sys.argv = [
+              "build_domain_market_intelligence_feed.py",
+              "--output-dir",
+              str(output),
+          ]
+          import opportunity_engine.discovery  # noqa: F401
+          print("production hooks registered; atexit will run fabric -> river -> comparables")
+          PY
+
+      - name: Assert Prato reached unified river
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          output = Path(os.environ["OUTPUT_DIR"])
+          fabric = json.loads((output / "fabric-procurement-watch.json").read_text(encoding="utf-8"))
+          items = json.loads((output / "unified-intelligence-items.json").read_text(encoding="utf-8"))
+          brief = json.loads((output / "domain-market-intelligence-brief.json").read_text(encoding="utf-8"))
+
+          prato_candidates = [
+              item for item in fabric.get("candidates") or []
+              if item.get("source_kind") == "PRATO_DEADSTOCK"
+          ]
+          prato_items = [
+              item for item in items.get("items") or []
+              if item.get("source_country") == "IT"
+              and item.get("record_kind") == "FABRIC_PROCUREMENT_ITEM"
+              and item.get("location") == "Prato, IT"
+          ]
+
+          print("fabric_status_counts:", fabric.get("status_counts"))
+          print("fabric_requests_made:", fabric.get("requests_made"))
+          print("fabric_candidate_count:", fabric.get("candidate_count"))
+          print("prato_candidate_count:", len(prato_candidates))
+          print("unified_item_count:", items.get("deduplicated_item_count"))
+          print("unified_prato_item_count:", len(prato_items))
+          print("brief_prato_candidate_count:", (brief.get("fabric_procurement_watch") or {}).get("prato_candidate_count"))
+          for item in prato_items[:5]:
+              print(json.dumps({
+                  "record_kind": item.get("record_kind"),
+                  "source_country": item.get("source_country"),
+                  "source_name": item.get("source_name"),
+                  "location": item.get("location"),
+                  "title": item.get("title"),
+                  "score": item.get("score"),
+                  "source_url": item.get("source_url"),
+              }, ensure_ascii=False, sort_keys=True))
+
+          if not prato_candidates:
+              raise SystemExit("Live fabric watch returned no Prato candidates")
+          if not prato_items:
+              raise SystemExit("Prato candidates did not reach unified intelligence items")
+          if (brief.get("fabric_procurement_watch") or {}).get("prato_candidate_count", 0) < 1:
+              raise SystemExit("Prato count is missing from unified daily brief")
+          if any(item.get("decision_owner") != "HUMAN_OPERATOR" for item in prato_items):
+              raise SystemExit("Prato unified items changed decision ownership")
+          if items.get("automatic_purchase") is not False:
+              raise SystemExit("Unified river automatic purchase safety changed")
+          PY
+
+      - name: Upload proof artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prato-unified-live-proof
+          path: artifacts/prato-unified-live-proof
+          if-no-files-found: error
+          retention-days: 3
