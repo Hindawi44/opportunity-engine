@@ -5,8 +5,9 @@ The primary opportunity scope remains Norway, Sweden, and Germany. Bridal
 clearance already runs inside the established core bulletin; this wrapper makes
 its strongest current signals visible in the daily brief. A single bounded
 Merkandi B2B clothing-liquidation lane is also restored for the Germany search
-region. Other optional NL/PL/UK procurement/B2B lanes remain outside the
-default daily checkpoint.
+region. A targeted Sweden/Germany source-gap radar runs before the core bulletin
+so accepted source signals enter the existing persistence and AI path. Other
+optional NL/PL/UK procurement/B2B lanes remain outside the default checkpoint.
 """
 from __future__ import annotations
 
@@ -19,6 +20,9 @@ from typing import Any
 
 from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import (
     collect_merkandi_b2b_liquidation_feed,
+)
+from opportunity_engine.discovery.se_de_source_coverage_gap import (
+    collect_manifest_se_de_source_coverage_gap,
 )
 
 
@@ -52,6 +56,16 @@ brief["merkandi_b2b_liquidation_feed"]
 brief["daily_b2b_clothing_watch"]
 "not_part_of_opportunity_top5": True
 "decision_owner": "HUMAN_OPERATOR"
+
+SE_DE_SOURCE_COVERAGE_GAP_V1
+collect_manifest_se_de_source_coverage_gap
+se-de-source-coverage-gap.json
+brief["se_de_source_coverage_gap"]
+Budi Auktioner
+Kronofogden Webauktion
+HTKG Online-Versteigerungen
+Sen & Sen
+"source_page_verification_required": True
 
 MOVED_OPTIONAL_SIDE_FEED_CONTRACTS
 collect_fabric_procurement_watch
@@ -130,6 +144,134 @@ def _append_text(output_dir: Path, lines: list[str]) -> None:
         return
     with path.open("a", encoding="utf-8") as handle:
         handle.write("\n" + "\n".join(lines) + "\n")
+
+
+def _runtime_manifest_and_root() -> tuple[dict[str, Any], str]:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--manifest", required=True)
+    parser.add_argument("--root", default=".")
+    args, _ = parser.parse_known_args()
+    manifest = _read_json(Path(args.manifest))
+    if manifest is None:
+        raise ValueError(f"manifest must be a JSON object: {args.manifest}")
+    return manifest, str(args.root)
+
+
+def _run_se_de_source_gap_pre_core(output_dir: Path) -> dict[str, Any]:
+    try:
+        manifest, root = _runtime_manifest_and_root()
+        report = collect_manifest_se_de_source_coverage_gap(
+            manifest,
+            root=root,
+            environment=os.environ,
+        )
+    except Exception as exc:
+        report = {
+            "schema_version": "se-de-source-coverage-gap-1.0",
+            "feed_family": "SE_DE_SOURCE_COVERAGE_GAP_V1",
+            "purpose": "TARGETED_SE_DE_CLOTHING_LIQUIDATION_SOURCE_COVERAGE",
+            "market_coverage": ["SE", "DE"],
+            "query_budget_total": 4,
+            "requests_made": 0,
+            "signal_count": 0,
+            "status_counts": {"FAILED": 1},
+            "sources": [],
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "source_page_verification_required": True,
+            "promotion_to_opportunity_allowed": False,
+            "analysis_eligible": False,
+            "top5_eligible": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_reservation": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+    _write_json(output_dir / "se-de-source-coverage-gap.json", report)
+    print(
+        "se_de_source_coverage_gap_status_counts:",
+        json.dumps(report.get("status_counts") or {}, sort_keys=True),
+    )
+    print("se_de_source_coverage_gap_requests:", report.get("requests_made", 0))
+    print("se_de_source_coverage_gap_signals:", report.get("signal_count", 0))
+    return report
+
+
+def _source_gap_highlights(report: dict[str, Any], *, limit: int = 8) -> list[dict[str, Any]]:
+    by_identity: dict[str, dict[str, Any]] = {}
+    for source in report.get("sources") or []:
+        if not isinstance(source, dict):
+            continue
+        for signal in source.get("signals") or []:
+            if not isinstance(signal, dict):
+                continue
+            identity = str(signal.get("signal_id") or signal.get("source_url") or "").strip()
+            if not identity:
+                continue
+            metadata = signal.get("metadata") or {}
+            by_identity[identity] = {
+                "signal_id": signal.get("signal_id"),
+                "source_country": signal.get("source_country"),
+                "source_name": metadata.get("coverage_gap_source_name"),
+                "source_domain": metadata.get("coverage_gap_source_domain"),
+                "title": signal.get("title"),
+                "source_url": signal.get("source_url"),
+                "signal_type": signal.get("signal_type"),
+                "status": signal.get("status"),
+                "confidence": signal.get("confidence"),
+                "verification_status": metadata.get("verification_status"),
+            }
+    ranked = sorted(
+        by_identity.values(),
+        key=lambda item: (-float(item.get("confidence") or 0), str(item.get("source_url") or "")),
+    )
+    return ranked[:limit]
+
+
+def _attach_se_de_source_gap(output_dir: Path, report: dict[str, Any]) -> None:
+    highlights = _source_gap_highlights(report)
+    brief_path = output_dir / "domain-market-intelligence-brief.json"
+    brief = _read_json(brief_path)
+    if brief is not None:
+        brief["se_de_source_coverage_gap"] = {
+            "feed_family": report.get("feed_family"),
+            "market_coverage": report.get("market_coverage") or ["SE", "DE"],
+            "query_budget_total": report.get("query_budget_total", 4),
+            "requests_made": report.get("requests_made", 0),
+            "signal_count": report.get("signal_count", 0),
+            "visible_highlight_count": len(highlights),
+            "top_source_gap_signals": highlights,
+            "source_page_verification_required": True,
+            "not_part_of_opportunity_top5": True,
+            "promotion_to_opportunity_allowed": False,
+            "decision_owner": "HUMAN_OPERATOR",
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        _write_json(brief_path, brief)
+    lines = [
+        "SE/DE SOURCE COVERAGE GAP WATCH",
+        f"requests_made: {report.get('requests_made', 0)}",
+        f"signals: {report.get('signal_count', 0)}",
+        f"visible_highlights: {len(highlights)}",
+    ]
+    if not highlights:
+        lines.append("result: No current source-specific clothing liquidation signal passed the gate.")
+    for item in highlights:
+        lines.append(
+            f"- [{item.get('source_country')}] [{item.get('source_name')}] "
+            f"{item.get('title')} | type={item.get('signal_type')} | "
+            f"confidence={item.get('confidence')} | {item.get('source_url')}"
+        )
+    lines += [
+        "source_page_verification_required: true",
+        "top5_eligible: false",
+        "automatic_purchase: false",
+    ]
+    _append_text(output_dir, lines)
 
 
 def _bridal_highlights(report: dict[str, Any], *, limit: int = 5) -> list[dict[str, Any]]:
@@ -309,10 +451,12 @@ def _run_daily_b2b_watch(output_dir: Path) -> None:
 
 
 def main() -> int:
+    output_dir = _output_dir()
+    source_gap_report = _run_se_de_source_gap_pre_core(output_dir)
     status = int(_load_core_module().main())
     if status != 0:
         return status
-    output_dir = _output_dir()
+    _attach_se_de_source_gap(output_dir, source_gap_report)
     _attach_bridal_clearance_watch(output_dir)
     _run_daily_b2b_watch(output_dir)
     return 0
