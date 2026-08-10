@@ -48,6 +48,7 @@ DAILY_COMMERCIAL_FEEDS_RECONCILIATION_V1
 DAILY_B2B_SCOPE_DE_MERKANDI_ONLY
 collect_merkandi_b2b_liquidation_feed
 merkandi-b2b-liquidation-feed.json
+brief["merkandi_b2b_liquidation_feed"]
 brief["daily_b2b_clothing_watch"]
 "not_part_of_opportunity_top5": True
 "decision_owner": "HUMAN_OPERATOR"
@@ -260,7 +261,7 @@ def _run_daily_b2b_watch(output_dir: Path) -> None:
     brief_path = output_dir / "domain-market-intelligence-brief.json"
     brief = _read_json(brief_path)
     if brief is not None:
-        brief["daily_b2b_clothing_watch"] = {
+        b2b_payload = {
             "feed_family": report.get("feed_family"),
             "source_name": "Merkandi",
             "search_lane_country": "DE",
@@ -278,6 +279,8 @@ def _run_daily_b2b_watch(output_dir: Path) -> None:
             "automatic_purchase": False,
             "automatic_payment": False,
         }
+        brief["merkandi_b2b_liquidation_feed"] = b2b_payload
+        brief["daily_b2b_clothing_watch"] = b2b_payload
         _write_json(brief_path, brief)
     lines = [
         "B2B CLOTHING LIQUIDATION WATCH",
