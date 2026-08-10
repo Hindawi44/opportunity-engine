@@ -16,6 +16,16 @@ OPTIONAL_SIDE_FEED_COLLECTORS = (
     "collect_jobalots_official_catalog_discovery",
 )
 
+OPTIONAL_SIDE_FEED_MODULES = (
+    "fabric_procurement_watch",
+    "fashion_stock_netherlands_feed",
+    "stockhurt_b2b_feed",
+    "stockhurt_official_catalog_enrichment",
+    "jobalots_clothing_auction_feed",
+    "jobalots_official_page_enrichment",
+    "jobalots_official_catalog_discovery",
+)
+
 
 def test_daily_entrypoint_keeps_primary_scope_no_se_de_and_restores_only_bounded_de_b2b() -> None:
     text = DAILY.read_text(encoding="utf-8")
@@ -24,12 +34,13 @@ def test_daily_entrypoint_keeps_primary_scope_no_se_de_and_restores_only_bounded
     assert "DEFAULT_DAILY_SCOPE_NO_SE_DE_ONLY" in text
     assert "DAILY_COMMERCIAL_FEEDS_RECONCILIATION_V1" in text
     assert "DAILY_B2B_SCOPE_DE_MERKANDI_ONLY" in text
+    assert "from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import" in text
     assert "collect_merkandi_b2b_liquidation_feed" in text
     assert '"search_lane_country": "DE"' in text
     assert '"stock_country_must_be_verified": True' in text
 
-    for collector in OPTIONAL_SIDE_FEED_COLLECTORS:
-        assert f"from opportunity_engine.discovery.{collector}" not in text
+    for module in OPTIONAL_SIDE_FEED_MODULES:
+        assert f"from opportunity_engine.discovery.{module} import" not in text
 
 
 def test_daily_entrypoint_surfaces_bridal_clearance_without_promoting_it_to_top5() -> None:
