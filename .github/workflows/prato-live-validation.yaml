@@ -1,0 +1,57 @@
+name: Prato Live Validation
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/prato-live-validation.yaml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validate-prato-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/prato-live-validation
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run live Prato fabric procurement watch
+        run: python scripts/build_fabric_procurement_watch.py --output-dir "$OUTPUT_DIR"
+
+      - name: Show Prato summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("artifacts/prato-live-validation/fabric-procurement-watch.json")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          print("feed_family:", data.get("feed_family"))
+          print("status_counts:", data.get("status_counts"))
+          print("requests_made:", data.get("requests_made"))
+          print("candidate_count:", data.get("candidate_count"))
+          for item in data.get("candidates") or []:
+              if item.get("source_kind") == "PRATO_DEADSTOCK":
+                  print(json.dumps(item, ensure_ascii=False, sort_keys=True))
+          PY
+
+      - name: Upload live validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prato-live-validation
+          path: artifacts/prato-live-validation
+          if-no-files-found: error
+          retention-days: 3
