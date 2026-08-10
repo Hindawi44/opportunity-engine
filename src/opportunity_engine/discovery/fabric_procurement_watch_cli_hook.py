@@ -8,8 +8,8 @@ from pathlib import Path
 import sys
 from typing import Any, Callable, Mapping
 
-from opportunity_engine.discovery.fabric_procurement_watch import (
-    collect_fabric_procurement_watch,
+from opportunity_engine.discovery.italy_textile_district_sources import (
+    collect_italy_district_expanded_fabric_watch,
 )
 
 _INSTALLED = False
@@ -48,13 +48,19 @@ def _compact_candidate(candidate: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _district_candidates(
+    candidates: list[Mapping[str, Any]], source_kind: str
+) -> list[Mapping[str, Any]]:
+    return [item for item in candidates if item.get("source_kind") == source_kind]
+
+
 def _summary(report: Mapping[str, Any]) -> dict[str, Any]:
     candidates = [
         item for item in (report.get("candidates") or []) if isinstance(item, Mapping)
     ]
-    prato = [
-        item for item in candidates if item.get("source_kind") == "PRATO_DEADSTOCK"
-    ]
+    prato = _district_candidates(candidates, "PRATO_DEADSTOCK")
+    como = _district_candidates(candidates, "COMO_SILK_STOCK")
+    biella = _district_candidates(candidates, "BIELLA_WOOL_STOCK")
     return {
         "feed_family": report.get("feed_family"),
         "purpose": report.get("purpose"),
@@ -65,11 +71,19 @@ def _summary(report: Mapping[str, Any]) -> dict[str, Any]:
         "query_budget_total": report.get("query_budget_total", 0),
         "requests_made": report.get("requests_made", 0),
         "candidate_count": report.get("candidate_count", 0),
+        "italy_textile_district_scope": report.get("italy_textile_district_scope")
+        or ["Prato", "Como", "Biella"],
+        "district_candidate_counts": report.get("district_candidate_counts")
+        or {"Prato": len(prato), "Como": len(como), "Biella": len(biella)},
         "prato_candidate_count": len(prato),
+        "como_candidate_count": len(como),
+        "biella_candidate_count": len(biella),
         "top_procurement_candidates": [
             _compact_candidate(item) for item in candidates[:5]
         ],
         "top_prato_candidates": [_compact_candidate(item) for item in prato[:5]],
+        "top_como_candidates": [_compact_candidate(item) for item in como[:5]],
+        "top_biella_candidates": [_compact_candidate(item) for item in biella[:5]],
         "seller_or_source_verification_required": True,
         "not_part_of_opportunity_top5": True,
         "promotion_to_opportunity_allowed": False,
@@ -85,27 +99,39 @@ def _render_text(report: Mapping[str, Any]) -> str:
     candidates = [
         item for item in (report.get("candidates") or []) if isinstance(item, Mapping)
     ]
-    prato = [
-        item for item in candidates if item.get("source_kind") == "PRATO_DEADSTOCK"
-    ]
+    regions = (
+        ("Prato", "PRATO_DEADSTOCK"),
+        ("Como", "COMO_SILK_STOCK"),
+        ("Biella", "BIELLA_WOOL_STOCK"),
+    )
+    grouped = {
+        region: _district_candidates(candidates, source_kind)
+        for region, source_kind in regions
+    }
     lines = [
         "FABRIC PROCUREMENT WATCH",
         f"status_counts: {json.dumps(report.get('status_counts') or {}, sort_keys=True)}",
         f"requests_made: {report.get('requests_made', 0)}",
         f"candidate_count: {report.get('candidate_count', 0)}",
-        f"prato_candidate_count: {len(prato)}",
+        f"prato_candidate_count: {len(grouped['Prato'])}",
+        f"como_candidate_count: {len(grouped['Como'])}",
+        f"biella_candidate_count: {len(grouped['Biella'])}",
         "freshness: none (supplier catalog discovery)",
         "purchase_mode: MANUAL_ONLY",
     ]
-    for index, item in enumerate(prato[:5], start=1):
-        lines.append(
-            f"{index}. [IT/Prato] {item.get('source_name')} — {item.get('title')} | "
-            f"quantity={item.get('quantity')} {item.get('quantity_unit') or ''} | "
-            f"price={item.get('price')} {item.get('currency') or ''} | "
-            f"score={item.get('procurement_relevance_score', 0)} | {item.get('source_url')}"
-        )
-    if not prato:
-        lines.append("prato_result: No current Prato supplier result passed the gate.")
+    for region, _ in regions:
+        items = grouped[region]
+        for index, item in enumerate(items[:5], start=1):
+            lines.append(
+                f"{index}. [IT/{region}] {item.get('source_name')} — {item.get('title')} | "
+                f"quantity={item.get('quantity')} {item.get('quantity_unit') or ''} | "
+                f"price={item.get('price')} {item.get('currency') or ''} | "
+                f"score={item.get('procurement_relevance_score', 0)} | {item.get('source_url')}"
+            )
+        if not items:
+            lines.append(
+                f"{region.casefold()}_result: No current {region} supplier result passed the gate."
+            )
     lines += [
         "human_verification_required: true",
         "top5_eligible: false",
@@ -118,7 +144,7 @@ def write_daily_fabric_procurement_watch(
     output_dir: Path,
     *,
     environment: Mapping[str, str] | None = None,
-    collector: Collector = collect_fabric_procurement_watch,
+    collector: Collector = collect_italy_district_expanded_fabric_watch,
 ) -> dict[str, Any]:
     """Write the supplier watch before the unified river consumes daily artifacts."""
     try:
@@ -136,6 +162,8 @@ def write_daily_fabric_procurement_watch(
             "requests_made": 0,
             "candidate_count": 0,
             "candidates": [],
+            "italy_textile_district_scope": ["Prato", "Como", "Biella"],
+            "district_candidate_counts": {"Prato": 0, "Como": 0, "Biella": 0},
             "error_type": type(exc).__name__,
             "error": " ".join(str(exc).split())[:500],
             "promotion_to_opportunity_allowed": False,
@@ -199,6 +227,7 @@ def install_fabric_procurement_watch_cli_hook() -> None:
                     "status_counts": report.get("status_counts"),
                     "requests_made": report.get("requests_made"),
                     "candidate_count": report.get("candidate_count"),
+                    "district_candidate_counts": report.get("district_candidate_counts"),
                     "freshness": report.get("freshness"),
                 },
                 sort_keys=True,
