@@ -186,6 +186,12 @@ _PRICE_RE = re.compile(
     r"|(?P<amount2>\d{1,5}(?:[.,]\d{1,2})?)\s?(?P<code>EUR|GBP|USD)",
     re.IGNORECASE,
 )
+_QUANTITY_RE = re.compile(
+    r"(?:quantit[aà]|quantity)\s*[:\-]?\s*"
+    r"(?P<amount>\d{1,7}(?:[.,]\d{1,2})?)\s*"
+    r"(?P<unit>mt|m|metri|meters|metres)\b",
+    re.IGNORECASE,
+)
 
 
 def _safety_payload() -> dict[str, bool]:
@@ -228,6 +234,19 @@ def _extract_price(text: str) -> tuple[str | None, float | None, str | None]:
     return match.group(0), amount, currency
 
 
+def _extract_quantity(text: str) -> tuple[float | None, str | None]:
+    match = _QUANTITY_RE.search(text)
+    if not match:
+        return None, None
+    try:
+        quantity = float(match.group("amount").replace(",", "."))
+    except ValueError:
+        return None, None
+    if quantity <= 0:
+        return None, None
+    return quantity, "m"
+
+
 def procurement_candidate_from_hit(
     hit: SearchHit,
     *,
@@ -262,6 +281,7 @@ def procurement_candidate_from_hit(
         return None
 
     price_text, price, currency = _extract_price(combined)
+    quantity, quantity_unit = _extract_quantity(combined)
     score = 40
     if _matched_terms(combined, _PREMIUM_TERMS):
         score += 20
@@ -270,6 +290,8 @@ def procurement_candidate_from_hit(
     if value_terms:
         score += 15
     if price is not None:
+        score += 10
+    if quantity is not None:
         score += 10
     score = min(100, score)
 
@@ -294,6 +316,8 @@ def procurement_candidate_from_hit(
         "price_text": price_text,
         "price": price,
         "currency": currency,
+        "quantity": quantity,
+        "quantity_unit": quantity_unit,
         "procurement_relevance_score": score,
         "recommended_operator_action": "REVIEW_SAMPLE_PRICE_AND_SHIPPING",
         "verification_status": "UNVERIFIED_SEARCH_RESULT",
