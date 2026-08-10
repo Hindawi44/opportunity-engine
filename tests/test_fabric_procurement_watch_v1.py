@@ -19,13 +19,16 @@ BUILD_SCRIPT = ROOT / "scripts/build_domain_market_intelligence_feed.py"
 CORE_SCRIPT = ROOT / "scripts/build_domain_market_intelligence_feed_core.py"
 
 
-def test_watch_uses_three_verified_official_domains() -> None:
+def test_watch_uses_verified_official_domains_with_prato_expansion() -> None:
     assert [source.domain for source in SOURCES] == [
         "evaresource.com",
         "fabrichouse.com",
+        "tessutistockprato.it",
+        "tessutiastock.com",
         "bridalfabrics.com",
     ]
-    assert [source.country for source in SOURCES] == ["IT", "IT", "GB"]
+    assert [source.country for source in SOURCES] == ["IT", "IT", "IT", "IT", "GB"]
+    assert [source.location for source in SOURCES[2:4]] == ["Prato, IT", "Prato, IT"]
     assert all(f"site:{source.domain}" in source.query for source in SOURCES)
 
 
@@ -54,6 +57,30 @@ def test_accepts_high_value_eva_deadstock_fabric_result() -> None:
     assert candidate["automatic_purchase"] is False
 
 
+def test_accepts_prato_stock_result_in_italian() -> None:
+    candidate = procurement_candidate_from_hit(
+        SearchHit(
+            title="Tessuti a stock in lana e mohair pronti in magazzino €18.50",
+            url="https://www.tessutistockprato.it/en-gb/il-magazzino",
+            description="Tessuti italiani a stock e pronta consegna dal magazzino di Prato.",
+            provider="Brave Search",
+        ),
+        source=SOURCES[2],
+        observed_at=NOW,
+    )
+
+    assert candidate is not None
+    assert candidate["source_name"] == "Verian Tessuti a Stock"
+    assert candidate["source_kind"] == "PRATO_DEADSTOCK"
+    assert candidate["source_country"] == "IT"
+    assert candidate["location"] == "Prato, IT"
+    assert candidate["currency"] == "EUR"
+    assert candidate["price"] == 18.5
+    assert "tessuti" in candidate["fabric_terms"]
+    assert "magazzino" in candidate["value_terms"]
+    assert candidate["not_a_liquidation_opportunity"] is True
+
+
 def test_rejects_result_from_unapproved_domain() -> None:
     candidate = procurement_candidate_from_hit(
         SearchHit(
@@ -76,7 +103,7 @@ def test_accepts_specialist_bridal_fabric_without_deadstock_claim() -> None:
             description="Sample available from a specialist bridal fabric supplier.",
             provider="Brave Search",
         ),
-        source=SOURCES[2],
+        source=SOURCES[4],
         observed_at=NOW,
     )
 
@@ -129,6 +156,24 @@ class FakeProvider:
                     provider=self.name,
                 )
             ]
+        if "tessutistockprato.it" in query:
+            return [
+                SearchHit(
+                    title="Tessuti a stock lana e seta €18.50",
+                    url="https://www.tessutistockprato.it/en-gb/il-magazzino",
+                    description="Magazzino a Prato con tessuti in pronta consegna.",
+                    provider=self.name,
+                )
+            ]
+        if "tessutiastock.com" in query:
+            return [
+                SearchHit(
+                    title="Stock tessuti in rotoli: lino, pizzo e velluto €12.00",
+                    url="https://www.tessutiastock.com/contatti",
+                    description="Tessuti italiani a stock venduti in rotoli e al metro.",
+                    provider=self.name,
+                )
+            ]
         return [
             SearchHit(
                 title="Ivory wedding tulle and bridal lace £28.00",
@@ -139,7 +184,7 @@ class FakeProvider:
         ]
 
 
-def test_collection_is_bounded_to_three_official_source_requests() -> None:
+def test_collection_is_bounded_to_five_official_source_requests() -> None:
     providers: list[FakeProvider] = []
 
     def factory(country: str, api_key: str, freshness: str | None) -> FakeProvider:
@@ -158,13 +203,14 @@ def test_collection_is_bounded_to_three_official_source_requests() -> None:
     )
 
     assert report["feed_family"] == FEED_FAMILY
-    assert report["query_budget_total"] == 3
-    assert report["requests_made"] == 3
-    assert report["candidate_count"] == 3
-    assert report["status_counts"] == {"SUCCESS": 3}
+    assert report["search_language"] == "en+it"
+    assert report["query_budget_total"] == 5
+    assert report["requests_made"] == 5
+    assert report["candidate_count"] == 5
+    assert report["status_counts"] == {"SUCCESS": 5}
     assert report["not_part_of_opportunity_top5"] is True
     assert report["automatic_purchase"] is False
-    assert len(providers) == 3
+    assert len(providers) == 5
     assert all(len(provider.calls) == 1 for provider in providers)
 
 
@@ -180,7 +226,7 @@ def test_missing_brave_key_is_explicit_and_makes_no_request() -> None:
 
     assert report["requests_made"] == 0
     assert report["candidate_count"] == 0
-    assert report["status_counts"] == {"BLOCKED_CONFIGURATION": 3}
+    assert report["status_counts"] == {"BLOCKED_CONFIGURATION": 5}
     assert all(
         source["block_reason"] == "BRAVE_SEARCH_API_KEY_MISSING"
         for source in report["sources"]
