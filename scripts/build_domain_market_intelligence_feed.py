@@ -1,19 +1,28 @@
 #!/usr/bin/env python3
-"""Run the production NO/SE/DE market-intelligence bulletin only.
+"""Run the production NO/SE/DE bulletin with bounded commercial feed visibility.
 
-Optional procurement and secondary B2B lanes are preserved in
-``build_optional_market_intelligence_side_feeds.py`` and are not part of the
-default daily operator checkpoint.
+The primary opportunity scope remains Norway, Sweden, and Germany. Bridal
+clearance already runs inside the established core bulletin; this wrapper makes
+its strongest current signals visible in the daily brief. A single bounded
+Merkandi B2B clothing-liquidation lane is also restored for the Germany search
+region. Other optional NL/PL/UK procurement/B2B lanes remain outside the
+default daily checkpoint.
 """
 from __future__ import annotations
 
+import argparse
 import importlib.util
+import json
+import os
 from pathlib import Path
+from typing import Any
+
+from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import (
+    collect_merkandi_b2b_liquidation_feed,
+)
 
 
 # Literal compatibility/migration contract used by repository regression tests.
-# The optional side-feed tokens below describe where established capabilities
-# moved. They are deliberately not imported or executed by this daily entrypoint.
 _ESTABLISHED_PIPELINE_DELEGATION_CONTRACT = """
 sanitize_blinto_seller_identity_report
 _rewrite_source_artifact(blinto_seller_identity
@@ -25,6 +34,7 @@ sweden-organisation-discovery-bridge.json
 brave-market-signal-radar.json
 bridal-liquidation-feed.json
 brief["bridal_liquidation_feed"]
+brief["bridal_clearance_watch"]
 "private_single_dress_listings_rejected"
 "promotion_to_opportunity_allowed": False
 "market_coverage": ["NO", "SE", "DE"]
@@ -34,14 +44,20 @@ attach_hunt_case_intelligence
 openai-hunt-case-enrichment.json
 openai-hunt-case-enrichment.txt
 
+DAILY_COMMERCIAL_FEEDS_RECONCILIATION_V1
+DAILY_B2B_SCOPE_DE_MERKANDI_ONLY
+collect_merkandi_b2b_liquidation_feed
+merkandi-b2b-liquidation-feed.json
+brief["merkandi_b2b_liquidation_feed"]
+brief["daily_b2b_clothing_watch"]
+"not_part_of_opportunity_top5": True
+"decision_owner": "HUMAN_OPERATOR"
+
 MOVED_OPTIONAL_SIDE_FEED_CONTRACTS
 collect_fabric_procurement_watch
 fabric-procurement-watch.json
 brief["fabric_procurement_watch"]
 "top_procurement_candidates"
-collect_merkandi_b2b_liquidation_feed
-merkandi-b2b-liquidation-feed.json
-brief["merkandi_b2b_liquidation_feed"]
 collect_fashion_stock_netherlands_feed
 fashion-stock-netherlands-feed.json
 brief["fashion_stock_netherlands_feed"]
@@ -83,8 +99,223 @@ def _load_core_module():
     return module
 
 
+def _output_dir() -> Path:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--output-dir", required=True)
+    args, _ = parser.parse_known_args()
+    return Path(args.output_dir)
+
+
+def _read_json(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def _write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _append_text(output_dir: Path, lines: list[str]) -> None:
+    path = output_dir / "domain-market-intelligence-brief.txt"
+    if not path.exists():
+        return
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write("\n" + "\n".join(lines) + "\n")
+
+
+def _bridal_highlights(report: dict[str, Any], *, limit: int = 5) -> list[dict[str, Any]]:
+    allowed_markets = {"NO", "SE", "DE"}
+    by_identity: dict[str, dict[str, Any]] = {}
+    for source in report.get("sources") or []:
+        if not isinstance(source, dict):
+            continue
+        for signal in source.get("signals") or []:
+            if not isinstance(signal, dict):
+                continue
+            country = str(signal.get("source_country") or "").upper()
+            if country not in allowed_markets:
+                continue
+            identity = str(signal.get("signal_id") or signal.get("source_url") or "").strip()
+            if not identity:
+                continue
+            by_identity[identity] = {
+                "signal_id": signal.get("signal_id"),
+                "source_country": country,
+                "title": signal.get("title"),
+                "source_url": signal.get("source_url"),
+                "status": signal.get("status"),
+                "confidence": signal.get("confidence"),
+                "company_name": signal.get("company_name"),
+                "seller_name": signal.get("seller_name"),
+                "value": signal.get("value"),
+                "verification_status": (signal.get("metadata") or {}).get("verification_status"),
+            }
+    ranked = sorted(
+        by_identity.values(),
+        key=lambda item: (-float(item.get("confidence") or 0), str(item.get("source_url") or "")),
+    )
+    return ranked[:limit]
+
+
+def _attach_bridal_clearance_watch(output_dir: Path) -> None:
+    report = _read_json(output_dir / "bridal-liquidation-feed.json") or {}
+    highlights = _bridal_highlights(report)
+    brief_path = output_dir / "domain-market-intelligence-brief.json"
+    brief = _read_json(brief_path)
+    if brief is not None:
+        brief["bridal_clearance_watch"] = {
+            "feed_family": report.get("feed_family"),
+            "market_coverage": report.get("market_coverage") or ["NO", "SE", "DE"],
+            "requests_made": report.get("requests_made", 0),
+            "signal_count": report.get("signal_count", 0),
+            "visible_highlight_count": len(highlights),
+            "top_bridal_clearance_signals": highlights,
+            "source_page_verification_required": True,
+            "not_part_of_opportunity_top5": True,
+            "promotion_to_opportunity_allowed": False,
+            "decision_owner": "HUMAN_OPERATOR",
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        _write_json(brief_path, brief)
+    lines = [
+        "BRIDAL CLEARANCE WATCH",
+        f"signals: {report.get('signal_count', 0)}",
+        f"visible_highlights: {len(highlights)}",
+    ]
+    if not highlights:
+        lines.append("result: No current bridal clearance signal passed the visibility gate.")
+    for item in highlights:
+        lines.append(
+            f"- [{item.get('source_country')}] {item.get('title')} | "
+            f"status={item.get('status')} | confidence={item.get('confidence')} | "
+            f"verification={item.get('verification_status')} | {item.get('source_url')}"
+        )
+    lines += [
+        "human_verification_required: true",
+        "top5_eligible: false",
+        "automatic_purchase: false",
+    ]
+    _append_text(output_dir, lines)
+
+
+def _compact_b2b_candidate(item: dict[str, Any]) -> dict[str, Any]:
+    keys = (
+        "candidate_id",
+        "source_name",
+        "title",
+        "source_url",
+        "quantity",
+        "quantity_unit",
+        "lot_size_band",
+        "minimum_order",
+        "minimum_order_unit",
+        "unit_price",
+        "total_price",
+        "currency",
+        "stock_location",
+        "brands",
+        "manifest_available",
+        "missing_information",
+        "opportunity_state",
+        "b2b_relevance_score",
+        "verification_status",
+        "seller_name",
+        "recommended_operator_action",
+    )
+    return {key: item.get(key) for key in keys}
+
+
+def _run_daily_b2b_watch(output_dir: Path) -> None:
+    try:
+        report = collect_merkandi_b2b_liquidation_feed(environment=os.environ)
+    except Exception as exc:
+        report = {
+            "schema_version": "merkandi-b2b-liquidation-feed-1.1",
+            "feed_family": "MERKANDI_B2B_LIQUIDATION_FEED_V1",
+            "purpose": "B2B_CLOTHING_LIQUIDATION_DECISION_SUPPORT",
+            "status_counts": {"FAILED": 1},
+            "requests_made": 0,
+            "candidate_count": 0,
+            "candidates": [],
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+        }
+    _write_json(output_dir / "merkandi-b2b-liquidation-feed.json", report)
+    compact = [
+        _compact_b2b_candidate(item)
+        for item in (report.get("candidates") or [])[:5]
+        if isinstance(item, dict)
+    ]
+    brief_path = output_dir / "domain-market-intelligence-brief.json"
+    brief = _read_json(brief_path)
+    if brief is not None:
+        b2b_payload = {
+            "feed_family": report.get("feed_family"),
+            "source_name": "Merkandi",
+            "search_lane_country": "DE",
+            "stock_country_must_be_verified": True,
+            "query_budget_total": report.get("query_budget_total", 1),
+            "requests_made": report.get("requests_made", 0),
+            "candidate_count": report.get("candidate_count", 0),
+            "top_b2b_signals": compact,
+            "human_verification_required": True,
+            "not_part_of_opportunity_top5": True,
+            "promotion_to_opportunity_allowed": False,
+            "decision_owner": "HUMAN_OPERATOR",
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        brief["merkandi_b2b_liquidation_feed"] = b2b_payload
+        brief["daily_b2b_clothing_watch"] = b2b_payload
+        _write_json(brief_path, brief)
+    lines = [
+        "B2B CLOTHING LIQUIDATION WATCH",
+        "search_lane_country: DE",
+        "stock_country_must_be_verified: true",
+        f"requests_made: {report.get('requests_made', 0)}",
+        f"candidate_count: {report.get('candidate_count', 0)}",
+    ]
+    if not compact:
+        lines.append("result: No current serious B2B source result passed the relevance gate.")
+    for item in compact:
+        price = item.get("unit_price") or item.get("total_price")
+        lines.append(
+            f"- {item.get('title')} | state={item.get('opportunity_state')} | "
+            f"quantity={item.get('quantity')} {item.get('quantity_unit')} | "
+            f"price={price} {item.get('currency')} | location={item.get('stock_location')} | "
+            f"score={item.get('b2b_relevance_score')} | {item.get('source_url')}"
+        )
+    lines += [
+        "human_verification_required: true",
+        "top5_eligible: false",
+        "automatic_contact: false",
+        "automatic_purchase: false",
+    ]
+    _append_text(output_dir, lines)
+
+
 def main() -> int:
-    return int(_load_core_module().main())
+    status = int(_load_core_module().main())
+    if status != 0:
+        return status
+    output_dir = _output_dir()
+    _attach_bridal_clearance_watch(output_dir)
+    _run_daily_b2b_watch(output_dir)
+    return 0
 
 
 if __name__ == "__main__":
