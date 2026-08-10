@@ -29,8 +29,26 @@ Unverified names from brainstorming are not enabled.
 - 8 results requested per source by default.
 - At most 5 accepted candidates per source.
 - English and Italian search terms for Italian sources.
-- One-month freshness window.
+- No freshness restriction in the unified daily supplier-catalog run. Supplier stock pages are long-lived catalog pages rather than news pages; the official-domain and content gates remain mandatory.
 - Existing `BRAVE_SEARCH_API_KEY`; no new secret or provider.
+
+The standalone collector keeps its freshness argument configurable. The unified
+daily CLI hook explicitly uses `freshness=None` so current supplier catalog pages
+are not hidden by a one-month search filter.
+
+## Unified daily integration
+
+The established `build_domain_market_intelligence_feed.py` command remains the
+single daily bulletin entrypoint. A bounded CLI hook runs after the base bulletin
+has been written and before the existing unified-river projection:
+
+`BASE BULLETIN -> FABRIC PROCUREMENT WATCH -> UNIFIED MARKET INTELLIGENCE RIVER -> COMPARABLES`
+
+The hook writes `fabric-procurement-watch.json` into the same daily output
+directory. The existing unified river already consumes that artifact and maps its
+accepted rows to `FABRIC_PROCUREMENT_ITEM` records. Italy therefore enters the
+same final intelligence river without becoming a separate engine or changing the
+canonical NO/SE/DE opportunity-market completion contract.
 
 ## Prato scope
 
@@ -60,19 +78,24 @@ Every result must:
 5. for Bridal Fabrics, contain bridal or wedding context.
 
 The watch extracts visible price and currency when present, records fabric and
-bridal terms, and assigns a bounded procurement relevance score.
+bridal terms, extracts explicit metre quantities when visible, and assigns a
+bounded procurement relevance score.
 
 ## Output
 
-The daily run writes:
+The unified daily run writes:
 
 - `fabric-procurement-watch.json`
+- `fabric-procurement-watch.txt`
 - a compact `fabric_procurement_watch` section in
   `domain-market-intelligence-brief.json`
 - a readable section in `domain-market-intelligence-brief.txt`
+- fabric procurement items and cases inside the existing unified market-intelligence river artifacts.
 
-The compact bulletin includes up to five highest-scoring candidates with source,
-title, URL, visible price, material terms, score, and the required operator action.
+The compact bulletin exposes the overall candidate count, the Prato candidate
+count, up to five highest-scoring procurement candidates, and up to five Prato
+candidates with source, location, URL, visible price/quantity, score, and the
+required operator action.
 
 ## Operator rule
 
