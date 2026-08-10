@@ -29,8 +29,25 @@ jobs:
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Run live Prato fabric procurement watch
-        run: python scripts/build_fabric_procurement_watch.py --output-dir "$OUTPUT_DIR"
+      - name: Run live fabric watch without freshness filter
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from opportunity_engine.discovery.fabric_procurement_watch import collect_fabric_procurement_watch
+
+          output = Path(os.environ["OUTPUT_DIR"])
+          output.mkdir(parents=True, exist_ok=True)
+          report = collect_fabric_procurement_watch(environment=os.environ, freshness=None)
+          (output / "fabric-procurement-watch.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("status_counts:", report.get("status_counts"))
+          print("requests_made:", report.get("requests_made"))
+          print("candidate_count:", report.get("candidate_count"))
+          PY
 
       - name: Show Prato summary
         run: |
@@ -40,9 +57,13 @@ jobs:
           p = Path("artifacts/prato-live-validation/fabric-procurement-watch.json")
           data = json.loads(p.read_text(encoding="utf-8"))
           print("feed_family:", data.get("feed_family"))
+          print("freshness:", data.get("freshness"))
           print("status_counts:", data.get("status_counts"))
           print("requests_made:", data.get("requests_made"))
           print("candidate_count:", data.get("candidate_count"))
+          for source in data.get("sources") or []:
+              if source.get("source_kind") == "PRATO_DEADSTOCK":
+                  print("source:", source.get("source_name"), source.get("status"), source.get("accepted_candidate_count"), source.get("rejected_result_count"))
           for item in data.get("candidates") or []:
               if item.get("source_kind") == "PRATO_DEADSTOCK":
                   print(json.dumps(item, ensure_ascii=False, sort_keys=True))
