@@ -40,6 +40,7 @@ class FabricSource:
     country: str
     query: str
     source_kind: str
+    location: str | None = None
 
 
 SOURCES: tuple[FabricSource, ...] = (
@@ -66,6 +67,32 @@ SOURCES: tuple[FabricSource, ...] = (
             '(ivory OR white OR bridal OR wedding)'
         ),
         source_kind="ITALIAN_DEADSTOCK",
+    ),
+    FabricSource(
+        source_id="verian-prato",
+        name="Verian Tessuti a Stock",
+        domain="tessutistockprato.it",
+        country="IT",
+        query=(
+            'site:tessutistockprato.it (deadstock OR stock OR "tessuti a stock" OR '
+            'magazzino OR "pronta consegna") (lana OR wool OR mohair OR lino OR linen '
+            'OR seta OR silk OR cotone OR cotton OR tessuti OR fabrics)'
+        ),
+        source_kind="PRATO_DEADSTOCK",
+        location="Prato, IT",
+    ),
+    FabricSource(
+        source_id="eurostock-prato",
+        name="Eurostock Tessuti a Stock",
+        domain="tessutiastock.com",
+        country="IT",
+        query=(
+            'site:tessutiastock.com (stock OR "tessuti a stock" OR rotoli OR metro OR '
+            'magazzino) (lana OR wool OR seta OR silk OR lino OR linen OR cotone OR '
+            'cotton OR pizzo OR lace OR velluto OR velvet OR tessuti OR fabrics)'
+        ),
+        source_kind="PRATO_DEADSTOCK",
+        location="Prato, IT",
     ),
     FabricSource(
         source_id="bridal-fabrics",
@@ -97,6 +124,17 @@ _FABRIC_TERMS = (
     "fabric",
     "fabrics",
     "textile",
+    "tessuto",
+    "tessuti",
+    "stoffa",
+    "stoffe",
+    "lana",
+    "seta",
+    "lino",
+    "cotone",
+    "pizzo",
+    "velluto",
+    "mohair",
 )
 _BRIDAL_TERMS = (
     "bridal",
@@ -120,6 +158,13 @@ _VALUE_TERMS = (
     "last metres",
     "last meters",
     "final quantity",
+    "tessuti a stock",
+    "magazzino",
+    "pronta consegna",
+    "rotoli",
+    "al metro",
+    "fine pezza",
+    "fine serie",
 )
 _PREMIUM_TERMS = (
     "silk",
@@ -129,10 +174,22 @@ _PREMIUM_TERMS = (
     "lace",
     "tulle",
     "chiffon",
+    "seta",
+    "lana",
+    "mohair",
+    "lino",
+    "pizzo",
+    "velluto",
 )
 _PRICE_RE = re.compile(
     r"(?P<symbol>€|£|\$)\s?(?P<amount>\d{1,5}(?:[.,]\d{1,2})?)"
     r"|(?P<amount2>\d{1,5}(?:[.,]\d{1,2})?)\s?(?P<code>EUR|GBP|USD)",
+    re.IGNORECASE,
+)
+_QUANTITY_RE = re.compile(
+    r"(?:quantit[aà]|quantity)\s*[:\-]?\s*"
+    r"(?P<amount>\d{1,7}(?:[.,]\d{1,2})?)\s*"
+    r"(?P<unit>mt|m|metri|meters|metres)\b",
     re.IGNORECASE,
 )
 
@@ -177,6 +234,19 @@ def _extract_price(text: str) -> tuple[str | None, float | None, str | None]:
     return match.group(0), amount, currency
 
 
+def _extract_quantity(text: str) -> tuple[float | None, str | None]:
+    match = _QUANTITY_RE.search(text)
+    if not match:
+        return None, None
+    try:
+        quantity = float(match.group("amount").replace(",", "."))
+    except ValueError:
+        return None, None
+    if quantity <= 0:
+        return None, None
+    return quantity, "m"
+
+
 def procurement_candidate_from_hit(
     hit: SearchHit,
     *,
@@ -211,6 +281,7 @@ def procurement_candidate_from_hit(
         return None
 
     price_text, price, currency = _extract_price(combined)
+    quantity, quantity_unit = _extract_quantity(combined)
     score = 40
     if _matched_terms(combined, _PREMIUM_TERMS):
         score += 20
@@ -219,6 +290,8 @@ def procurement_candidate_from_hit(
     if value_terms:
         score += 15
     if price is not None:
+        score += 10
+    if quantity is not None:
         score += 10
     score = min(100, score)
 
@@ -232,6 +305,7 @@ def procurement_candidate_from_hit(
         "source_name": source.name,
         "source_country": source.country,
         "source_kind": source.source_kind,
+        "location": source.location,
         "title": title[:1000],
         "description": (description or title)[:1000],
         "source_url": canonical_url,
@@ -242,6 +316,8 @@ def procurement_candidate_from_hit(
         "price_text": price_text,
         "price": price,
         "currency": currency,
+        "quantity": quantity,
+        "quantity_unit": quantity_unit,
         "procurement_relevance_score": score,
         "recommended_operator_action": "REVIEW_SAMPLE_PRICE_AND_SHIPPING",
         "verification_status": "UNVERIFIED_SEARCH_RESULT",
@@ -284,6 +360,7 @@ def collect_fabric_procurement_watch(
             "official_domain": source.domain,
             "source_country": source.country,
             "source_kind": source.source_kind,
+            "location": source.location,
             "query": source.query,
             "query_budget": 1,
             "queries_attempted": 0,
@@ -384,7 +461,7 @@ def collect_fabric_procurement_watch(
         "generated_at": _iso_utc(now),
         "feed_family": FEED_FAMILY,
         "purpose": "TAILORING_SHOP_FABRIC_PROCUREMENT_INTELLIGENCE",
-        "search_language": "en",
+        "search_language": "en+it",
         "approved_official_domains": [source.domain for source in SOURCES],
         "source_count": len(SOURCES),
         "query_budget_total": len(SOURCES),
