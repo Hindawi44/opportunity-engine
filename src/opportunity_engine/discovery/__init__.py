@@ -52,6 +52,9 @@ from opportunity_engine.discovery.market_comparables_benchmark_cli_hook import (
 from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook import (
     install_unified_market_intelligence_river_cli_hook,
 )
+from opportunity_engine.discovery.openai_fabric_procurement_cli_hook import (
+    install_openai_fabric_procurement_cli_hook,
+)
 from opportunity_engine.discovery.fabric_procurement_watch_cli_hook import (
     install_fabric_procurement_watch_cli_hook,
 )
@@ -63,6 +66,7 @@ install_stockhurt_sale_mode_brand_cleanup()
 install_unified_decision_priority()
 install_market_comparables_benchmark_cli_hook()
 install_unified_market_intelligence_river_cli_hook()
+install_openai_fabric_procurement_cli_hook()
 install_fabric_procurement_watch_cli_hook()
 
 __all__ = [
