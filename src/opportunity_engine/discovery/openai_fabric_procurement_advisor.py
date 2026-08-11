@@ -24,6 +24,7 @@ DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_MAX_CANDIDATES = 7
 MAX_CANDIDATES = 7
 MAX_API_REQUESTS = 1
+MAX_OUTPUT_TOKENS = 3600
 
 
 class FabricProcurementAssessment(BaseModel):
@@ -133,7 +134,7 @@ def _input_candidate(candidate: Mapping[str, Any]) -> dict[str, Any]:
     return {key: candidate.get(key) for key in keys if candidate.get(key) is not None}
 
 
-INSTRUCTIONS = """You are an advisory procurement analyst for a Norwegian tailoring operator. Analyze only the supplied fabric supplier evidence. Do not invent composition, MOQ, price, VAT treatment, shipping availability, stock quantity, certifications, lead time, or suitability. If a fact is absent, list it as missing information or an operator question. Prioritize review based on the supplied evidence only. Norway import checks are questions/checks, not claims. Never recommend automatic contact, reservation, purchase or payment. Return strict JSON and use only supplied candidate IDs."""
+INSTRUCTIONS = """You are an advisory procurement analyst for a Norwegian tailoring operator. Analyze only the supplied fabric supplier evidence. Do not invent composition, MOQ, price, VAT treatment, shipping availability, stock quantity, certifications, lead time, or suitability. If a fact is absent, list it as missing information or an operator question. Prioritize review based on the supplied evidence only. Norway import checks are questions/checks, not claims. Keep every field concise: prefer short factual phrases over prose and avoid repeating the same missing fact in multiple fields. Never recommend automatic contact, reservation, purchase or payment. Return strict JSON and use only supplied candidate IDs."""
 
 
 def _empty(
@@ -204,7 +205,7 @@ def run_openai_fabric_procurement_advisor(
             schema_name="fabric_procurement_advisor",
             schema=strict_openai_schema(FabricProcurementAdvisorOutput),
             reasoning_effort="low",
-            max_output_tokens=1800,
+            max_output_tokens=MAX_OUTPUT_TOKENS,
         )
         parsed = FabricProcurementAdvisorOutput.model_validate(raw)
     except (OpenAIHuntCaseError, ValidationError, TypeError, ValueError) as exc:
