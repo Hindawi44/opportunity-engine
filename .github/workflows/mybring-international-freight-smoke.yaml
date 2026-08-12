@@ -1,0 +1,115 @@
+name: Mybring International Freight Quote Smoke Test
+
+on:
+  push:
+    branches:
+      - agent/mybring-live-smoke-2026-08-13
+
+permissions:
+  contents: read
+
+jobs:
+  freight-smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MYBRING_API_UID: ${{ secrets.MYBRING_API_UID }}
+      MYBRING_API_KEY: ${{ secrets.MYBRING_API_KEY }}
+      MYBRING_CLIENT_URL: ${{ secrets.MYBRING_CLIENT_URL }}
+      MYBRING_CUSTOMER_NUMBER: ${{ secrets.MYBRING_CUSTOMER_NUMBER }}
+    steps:
+      - name: Quote synthetic international freight shipment
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from urllib.request import Request, urlopen
+          from urllib.error import HTTPError, URLError
+
+          endpoint = "https://api.bring.com/shippingguide/api/v2/products"
+          uid = os.getenv("MYBRING_API_UID", "").strip()
+          key = os.getenv("MYBRING_API_KEY", "").strip()
+          client = os.getenv("MYBRING_CLIENT_URL", "").strip()
+          customer = os.getenv("MYBRING_CUSTOMER_NUMBER", "").strip()
+
+          result = {
+              "test_only": True,
+              "product_id": "4000",
+              "route": "10115 Berlin DE -> 7800 Namsos NO",
+              "shipment": "100kg 120x80x100cm",
+              "customer_number_supplied": bool(customer),
+              "automatic_booking": False,
+              "automatic_purchase": False,
+              "automatic_payment": False,
+          }
+          if not uid or not key or not client:
+              result["status"] = "MISSING_SECRET"
+              print(json.dumps(result, sort_keys=True))
+              raise SystemExit(0)
+
+          product = {"id": "4000"}
+          if customer:
+              product["customerNumber"] = customer
+              product["autoSelectCustomerNumber"] = False
+
+          payload = {
+              "language": "EN",
+              "withPrice": True,
+              "withExpectedDelivery": False,
+              "withGuiInformation": True,
+              "numberOfAlternativeDeliveryDates": 0,
+              "edi": False,
+              "postingAtPostoffice": False,
+              "trace": False,
+              "consignments": [{
+                  "id": "smoke-4000",
+                  "products": [product],
+                  "fromCountryCode": "DE",
+                  "toCountryCode": "NO",
+                  "fromPostalCode": "10115",
+                  "toPostalCode": "7800",
+                  "toCity": "Namsos",
+                  "packages": [{"id": "1", "length": 120, "width": 80, "height": 100, "grossWeight": 100}],
+                  "additionalServices": [],
+                  "pickupPoints": []
+              }]
+          }
+          req = Request(endpoint, data=json.dumps(payload).encode(), method="POST", headers={
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "X-Mybring-API-Uid": uid,
+              "X-Mybring-API-Key": key,
+              "X-Bring-Client-URL": client,
+          })
+          try:
+              with urlopen(req, timeout=20) as response:
+                  result["http_status"] = response.status
+                  body = json.loads(response.read().decode())
+              products = []
+              for consignment in body.get("consignments", []) if isinstance(body, dict) else []:
+                  if isinstance(consignment, dict):
+                      products += [p for p in consignment.get("products", []) if isinstance(p, dict)]
+              selected = next((p for p in products if str(p.get("id")) == "4000"), None)
+              result["product_returned"] = bool(selected)
+              result["prices"] = []
+              result["provider_errors"] = []
+              if selected:
+                  result["provider_errors"] = [{"code": e.get("code"), "message": e.get("message")} for e in selected.get("errors", []) if isinstance(e, dict)][:10]
+                  price = selected.get("price") if isinstance(selected.get("price"), dict) else {}
+                  for name in ("netPrice", "listPrice"):
+                      block = price.get(name)
+                      if not isinstance(block, dict):
+                          continue
+                      total = block.get("priceWithAdditionalServices") or block.get("priceWithoutAdditionalServices")
+                      if isinstance(total, dict):
+                          result["prices"].append({"type": name, "currency": block.get("currencyCode"), "amount_without_vat": total.get("amountWithoutVAT"), "amount_with_vat": total.get("amountWithVAT")})
+              result["status"] = "QUOTE_AVAILABLE" if result["prices"] else ("PRODUCT_ERROR" if result["provider_errors"] else "NO_PRICE_RETURNED")
+          except HTTPError as exc:
+              result.update({"status": "AUTH_REJECTED" if exc.code in (401,403) else "API_HTTP_ERROR", "http_status": exc.code})
+          except URLError as exc:
+              result.update({"status": "NETWORK_ERROR", "error_type": type(exc.reason).__name__})
+          except Exception as exc:
+              result.update({"status": "UNEXPECTED_ERROR", "error_type": type(exc).__name__})
+
+          print(json.dumps(result, sort_keys=True))
+          PY
