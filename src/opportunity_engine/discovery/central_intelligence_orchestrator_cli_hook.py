@@ -14,6 +14,9 @@ from opportunity_engine.discovery.central_intelligence_orchestrator import (
 from opportunity_engine.discovery.central_market_decision_quality import (
     apply_market_decision_quality,
 )
+from opportunity_engine.logistics.official_route_freight import (
+    apply_official_route_freight,
+)
 
 _INSTALLED = False
 
@@ -41,8 +44,37 @@ def _fabric_title(item: Mapping[str, Any]) -> str:
     return source or title or "NONE"
 
 
+def _route_freight_lines(opportunity: Mapping[str, Any]) -> list[str]:
+    route_freight = opportunity.get("route_freight")
+    if not isinstance(route_freight, Mapping):
+        return ["  الطريق: NOT_AVAILABLE", "  الشحن الرسمي: NOT_AVAILABLE"]
+    route_status = str(route_freight.get("route_status") or "NOT_AVAILABLE")
+    distance = route_freight.get("distance_km")
+    precision = str(route_freight.get("route_precision") or "NOT_AVAILABLE")
+    if distance is not None:
+        route_text = f"{distance} km | {precision} | {route_status}"
+    else:
+        route_text = route_status
+
+    freight_status = str(route_freight.get("freight_status") or "NOT_AVAILABLE")
+    provider = str(route_freight.get("freight_provider") or "BRING_SHIPPING_GUIDE")
+    quote = route_freight.get("official_quote")
+    if isinstance(quote, Mapping):
+        amount = quote.get("amount_with_vat")
+        currency = quote.get("currency") or ""
+        price_type = quote.get("price_type") or ""
+        freight_text = f"{provider}: {amount} {currency} | {price_type} | {freight_status}"
+    else:
+        freight_text = f"{provider}: {freight_status}"
+    lines = [f"  الطريق: {route_text}", f"  الشحن الرسمي: {freight_text}"]
+    missing = [str(value) for value in route_freight.get("shipping_missing_inputs") or []]
+    if missing:
+        lines.append("  بيانات الشحن الناقصة: " + ", ".join(missing))
+    return lines
+
+
 def render_daily_central_report(brief: Mapping[str, Any]) -> str:
-    """Render the operator report with a visible title and source link per item."""
+    """Render the operator report with title, source, market and logistics evidence."""
     visibility = " | ".join(brief.get("market_visibility") or []) or "NONE"
     snapshot = brief.get("today_snapshot") if isinstance(brief.get("today_snapshot"), Mapping) else {}
     opportunity = brief.get("top_actionable_opportunity") if isinstance(brief.get("top_actionable_opportunity"), Mapping) else {}
@@ -69,11 +101,14 @@ def render_daily_central_report(brief: Mapping[str, Any]) -> str:
         f"fabric_candidates: {snapshot.get('fabric_candidate_count', 0)}",
         f"fabric_ai_status: {snapshot.get('fabric_ai_status') or 'NOT_AVAILABLE'}",
         f"market_decision_quality: {snapshot.get('market_decision_quality') or 'UNIFIED_PRIORITY_ONLY'}",
+        f"official_route_status: {snapshot.get('official_route_status') or 'NOT_AVAILABLE'}",
+        f"official_freight_status: {snapshot.get('official_freight_status') or 'NOT_AVAILABLE'}",
         "",
         "أهم فرصة قابلة للمراجعة الآن:",
         f"- العنوان: {opportunity_title}",
         f"  الرابط: {opportunity_url}",
         f"  مقارنة السوق: {benchmark_classification} | comparables={comparable_count}",
+        *_route_freight_lines(opportunity),
         "",
         "أهم إشارة سوق للمراقبة:",
         f"- العنوان: {watch_title}",
@@ -113,7 +148,8 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
     This hook must be registered before the market-comparables and river hooks.
     Python executes atexit callbacks in reverse order, so the established order is:
 
-    fabric watch -> fabric AI -> unified river -> market comparables -> central brief
+    fabric watch -> fabric AI -> unified river -> market comparables -> central
+    decision quality -> official route/freight -> final report text.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -129,6 +165,7 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
             return
         brief = write_central_intelligence_orchestrator(output_dir)
         brief = apply_market_decision_quality(output_dir, brief)
+        brief = apply_official_route_freight(output_dir, brief)
         _rewrite_delivery_text(output_dir, brief)
         action = brief.get("primary_human_action") or {}
         print(
@@ -138,6 +175,8 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
                     "status": brief.get("status"),
                     "market_visibility": brief.get("market_visibility"),
                     "market_decision_quality": (brief.get("today_snapshot") or {}).get("market_decision_quality"),
+                    "official_route_status": (brief.get("today_snapshot") or {}).get("official_route_status"),
+                    "official_freight_status": (brief.get("today_snapshot") or {}).get("official_freight_status"),
                     "primary_action": action.get("action_type"),
                     "target": action.get("target"),
                     "output_files": brief.get("output_files"),
