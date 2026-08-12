@@ -92,6 +92,17 @@ def test_daily_hook_disables_freshness_and_attaches_prato_to_existing_brief(
     brief = json.loads(brief_json.read_text(encoding="utf-8"))
     section = brief["fabric_procurement_watch"]
     assert brief["market_coverage"] == ["NO", "SE", "DE"]
+    assert brief["daily_market_visibility"]["countries"] == ["NO", "SE", "DE", "IT"]
+    assert brief["daily_market_visibility"]["primary_opportunity_markets"] == [
+        "NO",
+        "SE",
+        "DE",
+    ]
+    assert brief["daily_market_visibility"]["advisory_markets"] == ["IT"]
+    assert brief["daily_market_visibility"]["market_roles"]["IT"] == "FABRIC_PROCUREMENT"
+    assert section["market_code"] == "IT"
+    assert section["market_role"] == "FABRIC_PROCUREMENT"
+    assert section["market_status"] == "ACTIVE"
     assert section["prato_candidate_count"] == 1
     assert section["top_prato_candidates"][0]["source_country"] == "IT"
     assert section["top_prato_candidates"][0]["quantity"] == 1000.0
@@ -100,6 +111,8 @@ def test_daily_hook_disables_freshness_and_attaches_prato_to_existing_brief(
 
     rendered = brief_text.read_text(encoding="utf-8")
     assert "FABRIC PROCUREMENT WATCH" in rendered
+    assert "daily_market_visibility: NO | SE | DE | IT" in rendered
+    assert "IT_market_role: FABRIC_PROCUREMENT" in rendered
     assert "[IT/Prato] Verian Tessuti a Stock" in rendered
     assert "purchase_mode: MANUAL_ONLY" in rendered
 
