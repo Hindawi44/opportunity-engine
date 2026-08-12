@@ -1,336 +1,191 @@
 # Opportunity Engine — Project Status
 
-**Last updated:** 2026-08-02  
-**Status:** ACTIVE  
+**Last updated:** 2026-08-12  
+**Status:** ACTIVE / OPERATIONAL  
 **Authoritative repository:** `Hindawi44/opportunity-engine`
 
-## Session startup rule
+## Source-of-truth rule
 
-Every development session must begin by reading, in this order:
+The repository and current `main` behavior are authoritative. Historical task documents and old PR status text must not override newer merged behavior.
+
+For a new development session, read:
 
 1. `docs/00_PROJECT_STATUS.md`
-2. `docs/Opportunity_Discovery_Analysis_Blueprint_v2.0.md`
-3. `docs/REPOSITORY_ARCHITECTURE_AUDIT_v2.0.md`
-4. `docs/MARKET_COMPLETION_MATRIX_v1.0.md`
-5. The current-task document named below
+2. `README.md`
+3. `config/market_completion_matrix.json`
+4. `docs/UNIFIED_MARKET_INTELLIGENCE_RIVER_V1.md`
+5. the documentation for the subsystem being changed
 
-The repository is the source of truth. Market completion and source activation must be read from separate fields.
+## Product goal
 
-## Product principle
+`opportunity-engine` is a conservative market-intelligence and decision-support system for clothing inventory, liquidation, auctions, insolvency/business-closure signals, and bounded fabric procurement.
 
-The project has two independent engines:
-
-- **Discovery Engine:** discovers and verifies traceable opportunities.
-- **Analysis Engine:** analyzes confirmed opportunities.
-
-Neither engine may perform the other engine's responsibility. The bridge between them is the **Opportunity Dossier**.
-
-## Approved end-to-end path
+It preserves the distinction between:
 
 ```text
-Opportunity Map
-  -> Discovery Engine
-  -> Opportunity Dossier
-  -> Verified Market Comparables
-  -> Verified Acquisition Costs
-  -> Existing Analysis Engine
-  -> Opportunity Score
-  -> Decision Intelligence
-  -> Final Investment Report or Evidence-Required Outcome
+source observation
+→ market signal / procurement item / historical evidence
+→ linked market case
+→ verified opportunity when evidence allows
+→ analysis
+→ human decision
 ```
 
-Canonical investment decisions remain:
+Signals are not automatically promoted into opportunities, and AI output is advisory only.
+
+## Current market model
+
+### Canonical opportunity markets
+
+The validated clothing-inventory opportunity scope remains:
 
 ```text
-BUY_REVIEW / WATCH / REJECT
+NO — Norway
+SE — Sweden
+DE — Germany
 ```
 
-`BUY_REVIEW` is a human-review state only.
+The foundations of these three markets are complete. Individual source activation, a valid zero-result run, or a blocked source must not be confused with market-foundation status.
 
-## Current scope lock
+### Italy visibility
 
-The only validated domain is:
+Italy is now explicitly visible in the daily market report as:
 
 ```text
-CLOTHING_INVENTORY
+IT — FABRIC_PROCUREMENT
 ```
 
-Blocked domains remain:
+This does **not** make Italy a fourth canonical liquidation/opportunity market and does not place fabric candidates into the opportunity Top 5.
 
-- Wedding dresses
-- Sewing equipment
-- Fabrics
-- Store fixtures
-- Other opportunity domains
-
-No new domain, country, or source implementation is currently approved.
-
-## Current project decision
+Current daily visibility is therefore:
 
 ```text
-PROJECT_ENGINE_OPERATIONAL
-COUNTRY_FOUNDATIONS_NO_SE_DE_COMPLETE
-SOURCE_ACTIVATION_PARTIAL_AND_EXPLICIT
-NEW_SOURCE_EXPANSION_PAUSED
-MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_IMPLEMENTED_IN_PR_413
-POST_MERGE_MANUAL_LIVE_VALIDATION_PENDING
+NO | SE | DE | IT
 ```
 
-Norway, Sweden and Germany must not be restarted merely because an individual source is `PLANNED`, authorization-blocked, or waiting for a qualifying live case.
+with `IT` serving the fabric-procurement tributary.
 
-## Market completion semantics
-
-The project tracks five separate dimensions:
+## Current operating architecture
 
 ```text
-MARKET_FOUNDATION_STATUS
-SOURCE_IMPLEMENTATION_STATUS
-RUNTIME_ACTIVATION_STATUS
-DAILY_WATCH_STATUS
-CURRENT_OPPORTUNITY_STATUS
+NO / SE / DE opportunity discovery
+        +
+early market / closure / insolvency signals
+        +
+bridal and bounded B2B intelligence
+        +
+IT fabric procurement
+        ↓
+UNIFIED MARKET INTELLIGENCE RIVER
+        ↓
+linked intelligence items / market cases
+        ↓
+daily decision brief
+        ↓
+human review
 ```
 
-Authoritative files:
+The river preserves record kinds such as:
+
+- `MARKET_SIGNAL`
+- `BUSINESS_EVENT_SIGNAL`
+- `B2B_STOCK_OFFER`
+- `AUCTION_LOT`
+- `BRIDAL_LIQUIDATION_SIGNAL`
+- `FABRIC_PROCUREMENT_ITEM`
+- `CANONICAL_OPPORTUNITY`
+- `HISTORICAL_EVIDENCE`
+
+## Fabric procurement state
+
+The fabric lane is operational and is no longer a blocked future domain.
+
+Current flow:
 
 ```text
-config/market_completion_matrix.json
-docs/MARKET_COMPLETION_MATRIX_v1.0.md
-config/source_expansion_plan.json
-data/source_gap_matrix.json
+FABRIC PROCUREMENT WATCH
+→ OPENAI FABRIC PROCUREMENT ADVISOR
+→ UNIFIED MARKET INTELLIGENCE RIVER
 ```
 
-`data/source_gap_matrix.json` remains the official runtime source-status snapshot. It does not by itself describe whether a bounded pilot or daily watch has already been implemented.
+The advisor:
 
-## Country status
+- selects at most one candidate per supplier, maximum 7;
+- uses at most one OpenAI request when eligible candidates and an API key are available;
+- assigns `HIGH`, `MEDIUM`, or `LOW` human review priority;
+- summarizes only source-backed facts;
+- identifies missing commercial facts such as price, MOQ, available quantity, composition, width, VAT basis, lead time, and Norway shipping/logistics;
+- never contacts, reserves, buys, or pays automatically;
+- never promotes fabric candidates into the canonical opportunity Top 5.
 
-### Norway (`NO`)
+Recent merged implementation chain:
 
 ```text
-MARKET_FOUNDATION_STATUS = COMPLETE
-SOURCE_NETWORK_STATUS = PARTIAL
-RESTART_MARKET = false
+PR #483 — OpenAI Fabric Procurement Advisor
+PR #484 — fabric advisor output-budget fix
+PR #486 — Italy explicitly visible in the daily report
 ```
 
-Active public channels:
+Temporary validation PR #485 was intentionally closed without merge after the fixed advisor was proven against production candidates.
 
-- Auksjonen.no;
-- Konkurs.app as a bankruptcy-lead channel;
-- Politiet.no as a public-auction-event lead channel.
+## Multi-market daily checkpoint
 
-Authorization dependencies:
+`MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT` is implemented and merged; it is not the next unimplemented project phase.
 
-- FINN.no;
-- Konkurskupp;
-- Bjarøy.
+The current workflow is scheduled daily and can also be dispatched manually. It is part of the production support surface and feeds the wider market-intelligence path.
 
-Other planned Norwegian sources are backlog entries and do not make the market foundation incomplete.
-
-### Sweden (`SE`)
-
-```text
-MARKET_FOUNDATION_STATUS = COMPLETE
-SOURCE_IMPLEMENTATION_STATUS = BOUNDED_PILOT_IMPLEMENTED
-RESTART_MARKET = false
-```
-
-Implemented paths:
-
-- Blinto;
-- Klaravik;
-- PS Auction;
-- Swedish open-web discovery.
-
-Latest validated Blinto evidence:
-
-```text
-status = PASS
-merged_candidates = 6
-ended_or_historical = 6
-confirmed_sales = 0
-top5_count = 0
-sqlite_persisted_record_count = 6
-conversion_error_count = 0
-```
-
-This proves the Swedish pipeline and SQLite path. It does not prove a current active opportunity and does not automatically change the source runtime status to `ACTIVE`.
-
-### Germany (`DE`)
-
-```text
-MARKET_FOUNDATION_STATUS = COMPLETE
-SOURCE_NETWORK_STATUS = ONE_ACTIVE_TWO_OPERATIONAL_WATCHES
-RESTART_MARKET = false
-```
-
-Current source paths:
-
-| Source | Runtime status | Implementation | Schedule |
-|---|---|---|---|
-| Riegermann | `ACTIVE` | Active discovery and complete catalog handling | `05:17 UTC` |
-| VENTA Industrieversteigerungen | `PLANNED` | Daily active-index and complete-catalog watch | `05:47 UTC` |
-| Deutsche Pfandverwertung | `PLANNED` | Daily active-index, catalog and exact bulk-item watch | `06:17 UTC` |
-
-VENTA and Deutsche Pfandverwertung are implemented watches that remain unactivated until their required live clothing evidence appears and passes verification.
-
-### Denmark (`DK`)
-
-```text
-MARKET_FOUNDATION_STATUS = PLANNED
-SOURCE_IMPLEMENTATION_STATUS = NOT_IMPLEMENTED
-```
-
-No Denmark implementation is authorized by the current task.
-
-## Completed and retained
-
-- Blueprint v2.0 approved.
-- Repository Architecture Audit v2.0 approved.
-- Existing Analysis Engine V2.8–V3.7 retained and frozen.
-- Clothing Inventory selected as the reference MVP domain.
-- Opportunity Dossier specification and confirmed-dossier intake retained.
-- Controlled end-to-end and real-case validation chain retained.
-- Scenario-driven Clothing Inventory discovery and strict verification gates retained.
-- Post-verification Top 5 hard gate retained.
-- Norway market profile and active public channels retained.
-- Sweden market profile and bounded Blinto, Klaravik and PS Auction pilots retained.
-- Germany market profile and open-web pilot retained.
-- Riegermann active source with daily discovery retained.
-- VENTA daily zero-result-capable watch retained.
-- Deutsche Pfandverwertung daily zero-result-capable watch retained.
-- Unified JSON reporting and SQLite persistence retained.
-- Full project review checkpoint merged through PR #411.
-- Market/source completion semantics reconciled through PR #412.
-- Manual three-market checkpoint implementation is present in PR #413 with green CI.
-
-## Accepted operator surface
-
-```text
-1 — Discover Clothing Inventory Opportunities
-2 — Review One Opportunity End to End
-```
-
-The canonical repository-wide regression owner remains:
-
-```text
-.github/workflows/tests.yml
-```
-
-The new `Multi-Market Daily Operator Checkpoint` is a manual read-only supporting workflow. Geographic and source-specific workflows remain supporting workflows, not replacements for the two principal operator workflows.
+Do not use old text saying that PR #413 is still awaiting merge or that the first post-merge checkpoint run is pending.
 
 ## Workflow state
 
-The repository retains 37 workflow files, including production support, acceptance checks, geographic pilots, the manual multi-market checkpoint, and historical diagnostics.
-
-Many `TEMP` and `Temporary` workflows remain visible in GitHub Actions. This is an operator-usability defect, not a product blocker. No workflow may be deleted or disabled without preserved history, equivalent coverage evidence and a rollback path.
-
-## Current phase
-
-**Phase:** Multi-market operator checkpoint  
-**Status:** `DRAFT_PR_CI_GREEN_POST_MERGE_LIVE_VALIDATION_PENDING`
-
-## Current implementation checkpoint
+The active `.github/workflows` directory currently contains five workflows:
 
 ```text
-MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_v1.0
+germany-clothing-inventory-live.yaml
+multi-market-daily-operator-checkpoint.yaml
+one-opportunity-commercial-analysis.yaml
+sweden-clothing-inventory-live.yaml
+tests.yml
 ```
 
-The implementation establishes:
+Older workflow-audit documents are historical records. Their old workflow counts are not the current runtime inventory.
 
-- one manual read-only workflow for Norway, Sweden and Germany;
-- five bounded existing source paths: Auksjonen, Blinto, Riegermann, VENTA and Deutsche Pfandverwertung;
-- explicit `SUCCESS`, `VALID_ZERO_RESULT`, `FAILURE` and `BLOCKED` source semantics;
-- active, upcoming, historical, ended and unresolved record counts;
-- deduplicated opportunity identities;
-- unified JSON and SQLite reconciliation where persistence is enabled;
-- exactly one bounded next human action;
-- no new source, country, schedule, financial assumption or automatic external action.
+## Authoritative operational files
 
-## Current task document
+- `config/market_completion_matrix.json` — market foundation and source-state semantics.
+- `config/source_expansion_plan.json` — source expansion/activation planning.
+- `data/source_gap_matrix.json` — runtime source-status snapshot.
+- `data/decision_intelligence.json` — decision intelligence.
+- `data/action_queue.json` — operator actions.
+- `data/follow_up_status.json` — follow-up state.
+- `data/discovery_health.json` — discovery/source health.
+- `data/source_funnel.json` — source coverage/funnel.
+- `docs/UNIFIED_MARKET_INTELLIGENCE_RIVER_V1.md` — unified intelligence projection.
+- `docs/OPENAI_FABRIC_PROCUREMENT_ADVISOR_V1.md` — bounded fabric AI behavior.
+
+## Decision and safety invariants
+
+- Missing facts remain unknown; do not invent price, quantity, company, location, VAT, customs, logistics, profit, or ROI.
+- Source failure is not a zero-opportunity result.
+- A valid zero-result run is not a failure.
+- Historical or ended records are not active opportunities.
+- AI recommendations remain advisory and evidence-backed.
+- `BUY_REVIEW` requires human review and is not automatic buying.
+- No automatic contact, bid, reservation, purchase, or payment.
+- Do not run authorization-gated collectors without permission.
+
+## Current development priority
+
+Do **not** restart completed markets or add tooling merely because it is available.
+
+The near-term priority is to strengthen the existing unified system:
 
 ```text
-docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md
+collect existing evidence
+→ link related signals/items
+→ improve one central daily decision view
+→ verify commercial facts for the best candidates
+→ human action
 ```
 
-## Validation status
-
-PR #413 currently reports:
-
-```text
-Full repository tests = 1292 passed
-Multi-Market Daily Operator Checkpoint contract tests = PASS
-Sweden Clothing Inventory Live Pilot = PASS
-Germany Clothing Inventory Live Pilot = PASS
-```
-
-The manual live aggregation job is intentionally not executed on pull-request events. It must be dispatched once from `main` after merge.
-
-## Strict confirmation conjunction
-
-`CONFIRMED_SALE` requires:
-
-```text
-page_role == ITEM_LISTING
-AND stable opportunity identity
-AND bounded clothing-inventory evidence
-AND bounded sale evidence
-AND listing_status == ACTIVE
-AND successful public verification
-```
-
-Search snippets, source names, company names, category labels and historical records cannot confirm a sale by themselves.
-
-## Source-state rules
-
-- `ACTIVE`: formally activated source with validated runtime evidence.
-- `CODE_READY`: implementation ready but activation configuration remains.
-- `BLOCKED_AUTH`: official authorization or feed is required.
-- `PLANNED`: runtime activation is not approved; implementation detail must be read separately.
-- `DEPRECATED`: source removed by an explicit documented decision.
-
-Implementation detail uses:
-
-```text
-NOT_IMPLEMENTED
-BOUNDED_PILOT_IMPLEMENTED
-DAILY_WATCH_IMPLEMENTED
-ACTIVE_IMPLEMENTATION
-```
-
-## Non-negotiable rules
-
-- Do not restart Norway, Sweden or Germany.
-- Do not add Denmark or another country in the current task.
-- Do not add a new opportunity domain.
-- Do not weaken public verification or eligibility gates.
-- Do not modify the Opportunity Dossier contract.
-- Do not modify V2.8–V3.7 financial formulas.
-- Do not invent price, quantity, company, location, VAT, customs, logistics, profit or ROI.
-- Do not treat source failure as zero opportunities.
-- Do not treat a valid zero result as failure.
-- Do not contact sellers.
-- Do not bid, reserve, purchase or pay.
-- Do not run authorization-gated collectors without explicit permission.
-
-## Immediate next action
-
-Review and merge only:
-
-```text
-PR #413 — Add manual three-market operator checkpoint
-```
-
-After merge, manually run:
-
-```text
-Multi-Market Daily Operator Checkpoint
-branch = main
-```
-
-Inspect:
-
-```text
-multi-market-daily-checkpoint.json
-multi-market-phone-summary.txt
-```
-
-Do not begin a fourth market or another source task until the first `main` checkpoint run is validated.
+New tools, sources, or countries should be added only when they solve a demonstrated gap in this flow.
