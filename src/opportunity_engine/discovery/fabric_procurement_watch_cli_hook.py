@@ -64,6 +64,9 @@ def _summary(report: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "feed_family": report.get("feed_family"),
         "purpose": report.get("purpose"),
+        "market_code": "IT",
+        "market_role": "FABRIC_PROCUREMENT",
+        "market_status": "ACTIVE",
         "search_language": report.get("search_language"),
         "freshness": report.get("freshness"),
         "approved_official_domains": report.get("approved_official_domains") or [],
@@ -110,6 +113,8 @@ def _render_text(report: Mapping[str, Any]) -> str:
     }
     lines = [
         "FABRIC PROCUREMENT WATCH",
+        "daily_market_visibility: NO | SE | DE | IT",
+        "IT_market_role: FABRIC_PROCUREMENT",
         f"status_counts: {json.dumps(report.get('status_counts') or {}, sort_keys=True)}",
         f"requests_made: {report.get('requests_made', 0)}",
         f"candidate_count: {report.get('candidate_count', 0)}",
@@ -187,6 +192,20 @@ def write_daily_fabric_procurement_watch(
         except (OSError, json.JSONDecodeError):
             brief = None
         if isinstance(brief, dict):
+            primary_markets = [
+                str(code).upper()
+                for code in (brief.get("market_coverage") or ["NO", "SE", "DE"])
+                if str(code).strip()
+            ]
+            brief["daily_market_visibility"] = {
+                "countries": list(dict.fromkeys([*primary_markets, "IT"])),
+                "primary_opportunity_markets": primary_markets,
+                "advisory_markets": ["IT"],
+                "market_roles": {
+                    **{code: "OPPORTUNITY_MARKET" for code in primary_markets},
+                    "IT": "FABRIC_PROCUREMENT",
+                },
+            }
             brief["fabric_procurement_watch"] = _summary(report)
             _write_json(brief_path, brief)
 
