@@ -11,6 +11,9 @@ from opportunity_engine.discovery.central_intelligence_orchestrator import (
     TEXT_FILENAME,
     write_central_intelligence_orchestrator,
 )
+from opportunity_engine.discovery.central_market_decision_quality import (
+    apply_market_decision_quality,
+)
 
 _INSTALLED = False
 
@@ -46,6 +49,7 @@ def render_daily_central_report(brief: Mapping[str, Any]) -> str:
     watch = brief.get("top_market_signal") if isinstance(brief.get("top_market_signal"), Mapping) else {}
     fabric = brief.get("top_fabric_supplier") if isinstance(brief.get("top_fabric_supplier"), Mapping) else {}
     action = brief.get("primary_human_action") if isinstance(brief.get("primary_human_action"), Mapping) else {}
+    benchmark = opportunity.get("market_benchmark") if isinstance(opportunity.get("market_benchmark"), Mapping) else {}
 
     opportunity_title = str(opportunity.get("headline") or "NONE")
     watch_title = str(watch.get("headline") or "NONE")
@@ -53,6 +57,8 @@ def render_daily_central_report(brief: Mapping[str, Any]) -> str:
     opportunity_url = _first_url(opportunity) or "NONE"
     watch_url = _first_url(watch) or "NONE"
     fabric_url = _first_url(fabric) or "NONE"
+    benchmark_classification = str(benchmark.get("benchmark_classification") or "NOT_AVAILABLE")
+    comparable_count = int(benchmark.get("comparable_count") or 0)
 
     lines = [
         "CENTRAL INTELLIGENCE ORCHESTRATOR",
@@ -62,10 +68,12 @@ def render_daily_central_report(brief: Mapping[str, Any]) -> str:
         f"market_watch: {snapshot.get('market_watch_count', 0)}",
         f"fabric_candidates: {snapshot.get('fabric_candidate_count', 0)}",
         f"fabric_ai_status: {snapshot.get('fabric_ai_status') or 'NOT_AVAILABLE'}",
+        f"market_decision_quality: {snapshot.get('market_decision_quality') or 'UNIFIED_PRIORITY_ONLY'}",
         "",
         "أهم فرصة قابلة للمراجعة الآن:",
         f"- العنوان: {opportunity_title}",
         f"  الرابط: {opportunity_url}",
+        f"  مقارنة السوق: {benchmark_classification} | comparables={comparable_count}",
         "",
         "أهم إشارة سوق للمراقبة:",
         f"- العنوان: {watch_title}",
@@ -120,6 +128,7 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
         if not (output_dir / "domain-market-intelligence-brief.json").exists():
             return
         brief = write_central_intelligence_orchestrator(output_dir)
+        brief = apply_market_decision_quality(output_dir, brief)
         _rewrite_delivery_text(output_dir, brief)
         action = brief.get("primary_human_action") or {}
         print(
@@ -128,6 +137,7 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
                 {
                     "status": brief.get("status"),
                     "market_visibility": brief.get("market_visibility"),
+                    "market_decision_quality": (brief.get("today_snapshot") or {}).get("market_decision_quality"),
                     "primary_action": action.get("action_type"),
                     "target": action.get("target"),
                     "output_files": brief.get("output_files"),
