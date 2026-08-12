@@ -1,0 +1,152 @@
+name: Mybring Live Smoke Test
+
+on:
+  push:
+    branches:
+      - agent/mybring-live-smoke-2026-08-13
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MYBRING_API_UID: ${{ secrets.MYBRING_API_UID }}
+      MYBRING_API_KEY: ${{ secrets.MYBRING_API_KEY }}
+      MYBRING_CLIENT_URL: ${{ secrets.MYBRING_CLIENT_URL }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Call Bring Shipping Guide once
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from urllib.error import HTTPError, URLError
+          from urllib.request import Request, urlopen
+
+          endpoint = "https://api.bring.com/shippingguide/api/v2/products"
+          uid = os.environ.get("MYBRING_API_UID", "").strip()
+          key = os.environ.get("MYBRING_API_KEY", "").strip()
+          client_url = os.environ.get("MYBRING_CLIENT_URL", "").strip()
+
+          result = {
+              "schema_version": "mybring-live-smoke-test-1.0",
+              "endpoint": endpoint,
+              "request_count": 0,
+              "automatic_booking": False,
+              "automatic_purchase": False,
+              "automatic_payment": False,
+          }
+
+          missing = [
+              name for name, value in (
+                  ("MYBRING_API_UID", uid),
+                  ("MYBRING_API_KEY", key),
+                  ("MYBRING_CLIENT_URL", client_url),
+              ) if not value
+          ]
+
+          if missing:
+              result.update({
+                  "status": "MISSING_SECRET",
+                  "missing_secrets": missing,
+                  "auth_accepted": False,
+              })
+          else:
+              payload = {
+                  "language": "EN",
+                  "withPrice": False,
+                  "withExpectedDelivery": False,
+                  "withGuiInformation": True,
+                  "numberOfAlternativeDeliveryDates": 0,
+                  "edi": False,
+                  "postingAtPostoffice": False,
+                  "trace": False,
+                  "consignments": [
+                      {
+                          "id": "smoke-test-1",
+                          "products": [{"id": "5800"}],
+                          "fromCountryCode": "NO",
+                          "toCountryCode": "NO",
+                          "fromPostalCode": "0015",
+                          "toPostalCode": "5518",
+                          "packages": [
+                              {
+                                  "id": "1",
+                                  "length": 10,
+                                  "width": 10,
+                                  "height": 10,
+                                  "grossWeight": 1,
+                              }
+                          ],
+                          "additionalServices": [],
+                          "pickupPoints": [],
+                      }
+                  ],
+              }
+              request = Request(
+                  endpoint,
+                  data=json.dumps(payload).encode("utf-8"),
+                  method="POST",
+                  headers={
+                      "Accept": "application/json",
+                      "Content-Type": "application/json",
+                      "X-Mybring-API-Uid": uid,
+                      "X-Mybring-API-Key": key,
+                      "X-Bring-Client-URL": client_url,
+                  },
+              )
+              result["request_count"] = 1
+              try:
+                  with urlopen(request, timeout=20) as response:
+                      http_status = int(response.status)
+                      body = json.loads(response.read(1_000_000).decode("utf-8"))
+                  consignments = body.get("consignments") if isinstance(body, dict) else None
+                  result.update({
+                      "status": "SUCCESS" if http_status == 200 else "API_RESPONDED",
+                      "http_status": http_status,
+                      "auth_accepted": http_status == 200,
+                      "response_has_consignments": isinstance(consignments, list),
+                      "response_consignment_count": len(consignments) if isinstance(consignments, list) else 0,
+                  })
+              except HTTPError as exc:
+                  result.update({
+                      "status": "AUTH_REJECTED" if exc.code in (401, 403) else "API_HTTP_ERROR",
+                      "http_status": int(exc.code),
+                      "auth_accepted": False if exc.code in (401, 403) else None,
+                  })
+              except URLError as exc:
+                  result.update({
+                      "status": "NETWORK_ERROR",
+                      "auth_accepted": None,
+                      "error_type": type(exc.reason).__name__,
+                  })
+              except Exception as exc:
+                  result.update({
+                      "status": "UNEXPECTED_ERROR",
+                      "auth_accepted": None,
+                      "error_type": type(exc).__name__,
+                  })
+
+          out = Path("artifacts/mybring-live-smoke")
+          out.mkdir(parents=True, exist_ok=True)
+          (out / "mybring-live-smoke-result.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(result, sort_keys=True))
+          PY
+
+      - name: Upload smoke result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mybring-live-smoke-result
+          path: artifacts/mybring-live-smoke/mybring-live-smoke-result.json
+          if-no-files-found: error
