@@ -5,12 +5,98 @@ import atexit
 import json
 from pathlib import Path
 import sys
+from typing import Any, Mapping
 
 from opportunity_engine.discovery.central_intelligence_orchestrator import (
+    TEXT_FILENAME,
     write_central_intelligence_orchestrator,
 )
 
 _INSTALLED = False
+
+
+def _first_url(item: Mapping[str, Any] | None) -> str | None:
+    if not isinstance(item, Mapping):
+        return None
+    direct = str(item.get("source_url") or "").strip()
+    if direct:
+        return direct
+    urls = item.get("source_urls")
+    if isinstance(urls, list):
+        for value in urls:
+            url = str(value or "").strip()
+            if url:
+                return url
+    return None
+
+
+def _fabric_title(item: Mapping[str, Any]) -> str:
+    source = str(item.get("source_name") or "").strip()
+    title = str(item.get("title") or "").strip()
+    if source and title and source.casefold() not in title.casefold():
+        return f"{source} — {title}"
+    return source or title or "NONE"
+
+
+def render_daily_central_report(brief: Mapping[str, Any]) -> str:
+    """Render the operator report with a visible title and source link per item."""
+    visibility = " | ".join(brief.get("market_visibility") or []) or "NONE"
+    snapshot = brief.get("today_snapshot") if isinstance(brief.get("today_snapshot"), Mapping) else {}
+    opportunity = brief.get("top_actionable_opportunity") if isinstance(brief.get("top_actionable_opportunity"), Mapping) else {}
+    watch = brief.get("top_market_signal") if isinstance(brief.get("top_market_signal"), Mapping) else {}
+    fabric = brief.get("top_fabric_supplier") if isinstance(brief.get("top_fabric_supplier"), Mapping) else {}
+    action = brief.get("primary_human_action") if isinstance(brief.get("primary_human_action"), Mapping) else {}
+
+    opportunity_title = str(opportunity.get("headline") or "NONE")
+    watch_title = str(watch.get("headline") or "NONE")
+    fabric_title = _fabric_title(fabric) if fabric else "NONE"
+    opportunity_url = _first_url(opportunity) or "NONE"
+    watch_url = _first_url(watch) or "NONE"
+    fabric_url = _first_url(fabric) or "NONE"
+
+    lines = [
+        "CENTRAL INTELLIGENCE ORCHESTRATOR",
+        f"status: {brief.get('status')}",
+        f"daily_market_visibility: {visibility}",
+        f"actionable_now: {snapshot.get('actionable_now_count', 0)}",
+        f"market_watch: {snapshot.get('market_watch_count', 0)}",
+        f"fabric_candidates: {snapshot.get('fabric_candidate_count', 0)}",
+        f"fabric_ai_status: {snapshot.get('fabric_ai_status') or 'NOT_AVAILABLE'}",
+        "",
+        "أهم فرصة قابلة للمراجعة الآن:",
+        f"- العنوان: {opportunity_title}",
+        f"  الرابط: {opportunity_url}",
+        "",
+        "أهم إشارة سوق للمراقبة:",
+        f"- العنوان: {watch_title}",
+        f"  الرابط: {watch_url}",
+        "",
+        "أفضل مورد أقمشة للمراجعة:",
+        f"- العنوان: {fabric_title}",
+        f"  الرابط: {fabric_url}",
+        (f"  AI: {fabric.get('ai_review_priority')}" if fabric.get("ai_review_priority") else "  AI: NOT_AVAILABLE"),
+        "",
+        "الإجراء البشري الوحيد:",
+        f"- {action.get('action_type')}: {action.get('target') or action.get('recommended_next_action')}",
+        f"reason: {action.get('reason')}",
+        "decision_owner: HUMAN_OPERATOR",
+        "automatic_purchase: false",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def _rewrite_delivery_text(output_dir: Path, brief: Mapping[str, Any]) -> None:
+    rendered = render_daily_central_report(brief)
+    (output_dir / TEXT_FILENAME).write_text(rendered, encoding="utf-8")
+
+    domain_text = output_dir / "domain-market-intelligence-brief.txt"
+    if not domain_text.exists():
+        return
+    existing = domain_text.read_text(encoding="utf-8")
+    marker = "CENTRAL INTELLIGENCE ORCHESTRATOR"
+    if marker in existing:
+        prefix = existing.split(marker, 1)[0].rstrip()
+        domain_text.write_text(prefix + "\n\n" + rendered, encoding="utf-8")
 
 
 def install_central_intelligence_orchestrator_cli_hook() -> None:
@@ -34,6 +120,7 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
         if not (output_dir / "domain-market-intelligence-brief.json").exists():
             return
         brief = write_central_intelligence_orchestrator(output_dir)
+        _rewrite_delivery_text(output_dir, brief)
         action = brief.get("primary_human_action") or {}
         print(
             "central_intelligence_orchestrator:",
