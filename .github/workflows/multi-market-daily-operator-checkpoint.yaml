@@ -62,12 +62,15 @@ on:
       - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
       - "src/opportunity_engine/discovery/lifecycle_checkpoint_integration.py"
       - "src/opportunity_engine/discovery/sweden_valuable_datasets_status_feed.py"
+      - "src/opportunity_engine/discovery/central_intelligence_orchestrator_cli_hook.py"
+      - "src/opportunity_engine/logistics/official_route_freight.py"
       - "src/opportunity_engine/persistence/__init__.py"
       - "src/opportunity_engine/persistence/human_review.py"
       - "src/opportunity_engine/persistence/human_review_models.py"
       - "src/opportunity_engine/persistence/market_signal_models.py"
       - "src/opportunity_engine/persistence/market_signal_repository.py"
       - "src/opportunity_engine/persistence/unified_report_adapter.py"
+      - "config/buyers/mahmoud_namsos_v1.json"
       - "config/market_completion_matrix.json"
       - "tests/test_auksjonen_unified_lifecycle_persistence_v1.py"
       - "tests/test_domain_market_intelligence_feed_v1.py"
@@ -79,6 +82,8 @@ on:
       - "tests/test_human_review_outcome_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "tests/test_official_route_freight_v1.py"
+      - "tests/test_official_route_freight_workflow_wiring_v1.py"
       - "tests/test_lifecycle_checkpoint_integration_v1.py"
       - "tests/test_sweden_valuable_datasets_status_feed_v1.py"
       - "docs/FINN_GMAIL_INTAKE_BRIDGE_V1.md"
@@ -117,6 +122,8 @@ jobs:
           pytest tests/test_human_review_checkpoint_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
+          pytest tests/test_official_route_freight_v1.py -q
+          pytest tests/test_official_route_freight_workflow_wiring_v1.py -q
           pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
           pytest tests/test_sweden_valuable_datasets_status_feed_v1.py -q
 
@@ -134,6 +141,11 @@ jobs:
       GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
       GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      MYBRING_API_UID: ${{ secrets.MYBRING_API_UID }}
+      MYBRING_API_KEY: ${{ secrets.MYBRING_API_KEY }}
+      MYBRING_CLIENT_URL: ${{ secrets.MYBRING_CLIENT_URL }}
+      MYBRING_CUSTOMER_NUMBER: ${{ secrets.MYBRING_CUSTOMER_NUMBER }}
       OPENAI_HUNT_TRIAGE_MODEL: gpt-5.6-luna
       OPENAI_HUNT_DEEP_MODEL: gpt-5.6-terra
       OPENAI_HUNT_MAX_SIGNALS: "10"
