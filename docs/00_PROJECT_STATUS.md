@@ -6,7 +6,8 @@
 
 ## Source-of-truth rule
 
-The repository and current `main` behavior are authoritative. Historical task documents and old PR status text must not override newer merged behavior.
+Current `main` behavior is authoritative. Historical task documents and old PR
+status text must not override newer merged behavior.
 
 For a new development session, read:
 
@@ -14,30 +15,32 @@ For a new development session, read:
 2. `README.md`
 3. `config/market_completion_matrix.json`
 4. `docs/UNIFIED_MARKET_INTELLIGENCE_RIVER_V1.md`
-5. the documentation for the subsystem being changed
+5. `docs/CENTRAL_INTELLIGENCE_ORCHESTRATOR_V1.md`
+6. the documentation for the subsystem being changed
 
 ## Product goal
 
-`opportunity-engine` is a conservative market-intelligence and decision-support system for clothing inventory, liquidation, auctions, insolvency/business-closure signals, and bounded fabric procurement.
+`opportunity-engine` is a conservative market-intelligence and decision-support
+system for clothing inventory, liquidation, auctions, insolvency/business-closure
+signals, and bounded fabric procurement.
 
-It preserves the distinction between:
+The system preserves this distinction:
 
 ```text
 source observation
 → market signal / procurement item / historical evidence
 → linked market case
 → verified opportunity when evidence allows
-→ analysis
+→ analysis / benchmark
+→ central operator view
 → human decision
 ```
 
-Signals are not automatically promoted into opportunities, and AI output is advisory only.
+Signals are not automatically promoted into opportunities. AI output is advisory.
 
 ## Current market model
 
 ### Canonical opportunity markets
-
-The validated clothing-inventory opportunity scope remains:
 
 ```text
 NO — Norway
@@ -45,25 +48,26 @@ SE — Sweden
 DE — Germany
 ```
 
-The foundations of these three markets are complete. Individual source activation, a valid zero-result run, or a blocked source must not be confused with market-foundation status.
+These three clothing-inventory market foundations are complete. Individual source
+activation, a valid zero-result run, or a blocked source must not be confused with
+market-foundation status.
 
 ### Italy visibility
 
-Italy is now explicitly visible in the daily market report as:
+Italy is explicitly visible in the daily report as:
 
 ```text
 IT — FABRIC_PROCUREMENT
 ```
 
-This does **not** make Italy a fourth canonical liquidation/opportunity market and does not place fabric candidates into the opportunity Top 5.
+Italy is not a fourth canonical liquidation/opportunity market and fabric
+candidates do not enter the opportunity Top 5.
 
-Current daily visibility is therefore:
+Current daily visibility:
 
 ```text
 NO | SE | DE | IT
 ```
-
-with `IT` serving the fabric-procurement tributary.
 
 ## Current operating architecture
 
@@ -78,14 +82,16 @@ IT fabric procurement
         ↓
 UNIFIED MARKET INTELLIGENCE RIVER
         ↓
-linked intelligence items / market cases
+UNIFIED DECISION PRIORITY
         ↓
-daily decision brief
+MARKET COMPARABLES BENCHMARK
         ↓
-human review
+CENTRAL INTELLIGENCE ORCHESTRATOR
+        ↓
+one operator view / one human action
 ```
 
-The river preserves record kinds such as:
+The river preserves independent record kinds such as:
 
 - `MARKET_SIGNAL`
 - `BUSINESS_EVENT_SIGNAL`
@@ -96,11 +102,60 @@ The river preserves record kinds such as:
 - `CANONICAL_OPPORTUNITY`
 - `HISTORICAL_EVIDENCE`
 
+## Unified decision priority
+
+The existing priority layer separates:
+
+```text
+ACTIONABLE_NOW
+MARKET_WATCH
+HISTORICAL_EVIDENCE
+```
+
+Actionability is evaluated before raw source-signal strength so a strong watch-only
+insolvency signal does not outrank a current commercial item that can be reviewed
+now.
+
+## Central intelligence state
+
+`CENTRAL_INTELLIGENCE_ORCHESTRATOR_V1` is the bounded final coordination layer.
+
+It does not create another engine. It reads existing daily outputs and exposes:
+
+- strongest current direct/B2B/auction commercial opportunity;
+- strongest market-watch signal;
+- strongest current fabric supplier candidate;
+- market visibility and compact daily counts;
+- exactly one recommended human action.
+
+Decision precedence is:
+
+```text
+1. Current commercial opportunity / offer
+2. Otherwise top fabric procurement candidate
+3. Otherwise top market-watch signal
+4. Otherwise continue monitoring
+```
+
+Outputs:
+
+```text
+central-intelligence-brief.json
+central-intelligence-brief.txt
+```
+
+The compact central summary is also attached to
+`domain-market-intelligence-brief.json`.
+
+Reference:
+
+```text
+docs/CENTRAL_INTELLIGENCE_ORCHESTRATOR_V1.md
+```
+
 ## Fabric procurement state
 
-The fabric lane is operational and is no longer a blocked future domain.
-
-Current flow:
+The fabric lane is operational.
 
 ```text
 FABRIC PROCUREMENT WATCH
@@ -111,34 +166,36 @@ FABRIC PROCUREMENT WATCH
 The advisor:
 
 - selects at most one candidate per supplier, maximum 7;
-- uses at most one OpenAI request when eligible candidates and an API key are available;
+- uses at most one OpenAI request when eligible candidates and an API key exist;
 - assigns `HIGH`, `MEDIUM`, or `LOW` human review priority;
 - summarizes only source-backed facts;
-- identifies missing commercial facts such as price, MOQ, available quantity, composition, width, VAT basis, lead time, and Norway shipping/logistics;
+- identifies missing commercial facts such as price, MOQ, available quantity,
+  composition, width, VAT basis, lead time, and Norway shipping/logistics;
 - never contacts, reserves, buys, or pays automatically;
 - never promotes fabric candidates into the canonical opportunity Top 5.
 
-Recent merged implementation chain:
+Recent retained implementation chain:
 
 ```text
 PR #483 — OpenAI Fabric Procurement Advisor
 PR #484 — fabric advisor output-budget fix
 PR #486 — Italy explicitly visible in the daily report
+PR #487 — project-status cleanup
 ```
 
-Temporary validation PR #485 was intentionally closed without merge after the fixed advisor was proven against production candidates.
+Temporary validation PR #485 was intentionally closed without merge.
 
 ## Multi-market daily checkpoint
 
-`MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT` is implemented and merged; it is not the next unimplemented project phase.
+`MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT` is implemented, merged, scheduled daily,
+and manually dispatchable. It is not an unimplemented project phase.
 
-The current workflow is scheduled daily and can also be dispatched manually. It is part of the production support surface and feeds the wider market-intelligence path.
-
-Do not use old text saying that PR #413 is still awaiting merge or that the first post-merge checkpoint run is pending.
+Do not restart Norway, Sweden, or Germany because one source returns zero, is
+blocked, or remains planned.
 
 ## Workflow state
 
-The active `.github/workflows` directory currently contains five workflows:
+The active `.github/workflows` directory contains five workflows:
 
 ```text
 germany-clothing-inventory-live.yaml
@@ -148,7 +205,8 @@ sweden-clothing-inventory-live.yaml
 tests.yml
 ```
 
-Older workflow-audit documents are historical records. Their old workflow counts are not the current runtime inventory.
+Older workflow-audit documents are historical records and do not define current
+runtime inventory.
 
 ## Authoritative operational files
 
@@ -161,11 +219,15 @@ Older workflow-audit documents are historical records. Their old workflow counts
 - `data/discovery_health.json` — discovery/source health.
 - `data/source_funnel.json` — source coverage/funnel.
 - `docs/UNIFIED_MARKET_INTELLIGENCE_RIVER_V1.md` — unified intelligence projection.
+- `docs/UNIFIED_DECISION_PRIORITY_V1.md` — actionability ordering.
+- `docs/MARKET_COMPARABLES_BENCHMARK_V1.md` — bounded public comparables.
 - `docs/OPENAI_FABRIC_PROCUREMENT_ADVISOR_V1.md` — bounded fabric AI behavior.
+- `docs/CENTRAL_INTELLIGENCE_ORCHESTRATOR_V1.md` — final operator synthesis.
 
 ## Decision and safety invariants
 
-- Missing facts remain unknown; do not invent price, quantity, company, location, VAT, customs, logistics, profit, or ROI.
+- Missing facts remain unknown; never invent price, quantity, company, location,
+  VAT, customs, logistics, profit, or ROI.
 - Source failure is not a zero-opportunity result.
 - A valid zero-result run is not a failure.
 - Historical or ended records are not active opportunities.
@@ -176,16 +238,16 @@ Older workflow-audit documents are historical records. Their old workflow counts
 
 ## Current development priority
 
-Do **not** restart completed markets or add tooling merely because it is available.
+Do not restart completed markets or add tools merely because they are available.
 
-The near-term priority is to strengthen the existing unified system:
+The priority is now:
 
 ```text
-collect existing evidence
-→ link related signals/items
-→ improve one central daily decision view
-→ verify commercial facts for the best candidates
-→ human action
+run existing daily intelligence
+→ inspect the central operator brief
+→ verify commercial facts for the selected target
+→ improve only demonstrated gaps
 ```
 
-New tools, sources, or countries should be added only when they solve a demonstrated gap in this flow.
+New tools, sources, or countries should be added only when the central daily flow
+shows a concrete gap that existing components cannot solve.
