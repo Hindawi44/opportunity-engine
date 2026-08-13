@@ -1,98 +1,14 @@
-name: Google Routes Live Smoke 2026-08-13
+name: Google Routes Live Smoke 2026-08-13 (disabled)
 
 on:
-  push:
-    branches:
-      - agent/google-routes-live-smoke-2026-08-13
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  google-routes-live-smoke:
+  disabled:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Test Google Routes API with repository secret
-        env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          import urllib.error
-          import urllib.request
-
-          key = os.environ.get('GOOGLE_MAPS_API_KEY', '').strip()
-          if not key:
-              print('GOOGLE_ROUTES_LIVE_SMOKE=' + json.dumps({
-                  'status': 'MISSING_SECRET',
-                  'secret_name': 'GOOGLE_MAPS_API_KEY',
-                  'automatic_purchase': False,
-                  'automatic_payment': False,
-              }, sort_keys=True))
-              raise SystemExit(1)
-
-          url = 'https://routes.googleapis.com/directions/v2:computeRoutes'
-          payload = {
-              'origin': {'address': 'Oslo, Norway'},
-              'destination': {'address': 'Trondheim, Norway'},
-              'travelMode': 'DRIVE',
-              'routingPreference': 'TRAFFIC_UNAWARE',
-              'units': 'METRIC',
-          }
-          req = urllib.request.Request(
-              url,
-              data=json.dumps(payload).encode('utf-8'),
-              method='POST',
-              headers={
-                  'Content-Type': 'application/json',
-                  'X-Goog-Api-Key': key,
-                  'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration',
-              },
-          )
-          try:
-              with urllib.request.urlopen(req, timeout=30) as response:
-                  status_code = response.getcode()
-                  body = json.loads(response.read().decode('utf-8'))
-          except urllib.error.HTTPError as exc:
-              raw = exc.read().decode('utf-8', errors='replace')
-              try:
-                  err = json.loads(raw)
-                  message = ((err.get('error') or {}).get('message') or 'HTTP error')
-              except Exception:
-                  message = 'HTTP error'
-              print('GOOGLE_ROUTES_LIVE_SMOKE=' + json.dumps({
-                  'status': 'FAIL',
-                  'http_status': exc.code,
-                  'error_message': message[:300],
-                  'api_key_exposed': False,
-                  'automatic_purchase': False,
-                  'automatic_payment': False,
-              }, sort_keys=True))
-              raise SystemExit(1)
-
-          routes = body.get('routes') or []
-          route = routes[0] if routes else {}
-          distance_m = route.get('distanceMeters')
-          duration = route.get('duration')
-          ok = status_code == 200 and isinstance(distance_m, int) and distance_m > 0 and bool(duration)
-          result = {
-              'status': 'SUCCESS' if ok else 'FAIL',
-              'http_status': status_code,
-              'route_returned': bool(routes),
-              'distance_km': round(distance_m / 1000, 1) if isinstance(distance_m, int) else None,
-              'duration': duration,
-              'test_route': 'Oslo, Norway -> Trondheim, Norway',
-              'request_count': 1,
-              'api_key_exposed': False,
-              'automatic_purchase': False,
-              'automatic_payment': False,
-          }
-          print('GOOGLE_ROUTES_LIVE_SMOKE=' + json.dumps(result, sort_keys=True))
-          if not ok:
-              raise SystemExit(1)
-          PY
+      - run: echo "Disabled after successful one-time Google Routes live smoke test."
