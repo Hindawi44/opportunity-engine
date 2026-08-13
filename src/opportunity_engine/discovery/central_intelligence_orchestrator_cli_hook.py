@@ -128,6 +128,31 @@ def render_daily_central_report(brief: Mapping[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _remove_legacy_human_action(text: str) -> str:
+    """Remove the earlier bulletin action block before central decision synthesis.
+
+    The domain bulletin historically emitted its own single action before the central
+    orchestrator existed. Once the central layer is present, that legacy action is an
+    intermediate recommendation, not the operator's final decision. Drop only that
+    paragraph so the final user-facing report contains exactly one human action while
+    preserving all source, signal, fabric and market-intelligence sections.
+    """
+    lines = text.splitlines()
+    cleaned: list[str] = []
+    index = 0
+    while index < len(lines):
+        if lines[index].startswith("الإجراء البشري الوحيد:"):
+            index += 1
+            while index < len(lines) and lines[index].strip():
+                index += 1
+            while index < len(lines) and not lines[index].strip():
+                index += 1
+            continue
+        cleaned.append(lines[index])
+        index += 1
+    return "\n".join(cleaned).rstrip()
+
+
 def _rewrite_delivery_text(output_dir: Path, brief: Mapping[str, Any]) -> None:
     rendered = render_daily_central_report(brief)
     (output_dir / TEXT_FILENAME).write_text(rendered, encoding="utf-8")
@@ -138,8 +163,12 @@ def _rewrite_delivery_text(output_dir: Path, brief: Mapping[str, Any]) -> None:
     existing = domain_text.read_text(encoding="utf-8")
     marker = "CENTRAL INTELLIGENCE ORCHESTRATOR"
     if marker in existing:
-        prefix = existing.split(marker, 1)[0].rstrip()
+        existing = existing.split(marker, 1)[0]
+    prefix = _remove_legacy_human_action(existing)
+    if prefix:
         domain_text.write_text(prefix + "\n\n" + rendered, encoding="utf-8")
+    else:
+        domain_text.write_text(rendered, encoding="utf-8")
 
 
 def install_central_intelligence_orchestrator_cli_hook() -> None:
