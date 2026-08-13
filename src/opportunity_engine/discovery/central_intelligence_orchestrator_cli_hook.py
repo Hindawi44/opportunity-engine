@@ -14,6 +14,9 @@ from opportunity_engine.discovery.central_intelligence_orchestrator import (
 from opportunity_engine.discovery.central_market_decision_quality import (
     apply_market_decision_quality,
 )
+from opportunity_engine.discovery.source_logistics_hydration import (
+    hydrate_selected_source_logistics,
+)
 from opportunity_engine.logistics.official_route_freight import (
     apply_official_route_freight,
 )
@@ -178,7 +181,8 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
     Python executes atexit callbacks in reverse order, so the established order is:
 
     fabric watch -> fabric AI -> unified river -> market comparables -> central
-    decision quality -> official route/freight -> final report text.
+    decision quality -> selected-source logistics hydration -> official route/freight
+    -> final report text.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -194,6 +198,7 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
             return
         brief = write_central_intelligence_orchestrator(output_dir)
         brief = apply_market_decision_quality(output_dir, brief)
+        hydration = hydrate_selected_source_logistics(output_dir, brief)
         brief = apply_official_route_freight(output_dir, brief)
         _rewrite_delivery_text(output_dir, brief)
         action = brief.get("primary_human_action") or {}
@@ -204,6 +209,8 @@ def install_central_intelligence_orchestrator_cli_hook() -> None:
                     "status": brief.get("status"),
                     "market_visibility": brief.get("market_visibility"),
                     "market_decision_quality": (brief.get("today_snapshot") or {}).get("market_decision_quality"),
+                    "source_logistics_hydration_status": hydration.get("status"),
+                    "source_logistics_hydrated_fields": hydration.get("hydrated_fields"),
                     "official_route_status": (brief.get("today_snapshot") or {}).get("official_route_status"),
                     "official_freight_status": (brief.get("today_snapshot") or {}).get("official_freight_status"),
                     "primary_action": action.get("action_type"),
