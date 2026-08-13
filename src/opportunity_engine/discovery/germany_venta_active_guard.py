@@ -4,6 +4,10 @@ VENTA repeats the global category browser on some pages. A label such as
 ``Textil (0)`` is not clothing inventory evidence. This guard requires either a
 bounded catalog heading that describes the whole catalog as clothing inventory
 or at least one clothing child lot before a parent opportunity is retained.
+
+After that catalog gate, exact public item verification removes clothing-word
+false positives such as ``Kleiderstangen`` and hydrates explicit source
+logistics for bounded bulk clothing lots.
 """
 from __future__ import annotations
 
@@ -13,6 +17,10 @@ from typing import Any
 from opportunity_engine.discovery.germany_venta_active import (
     VentaActiveWatchResult,
     run_venta_active_clothing_watch,
+)
+from opportunity_engine.discovery.germany_venta_item_verification import (
+    DEFAULT_ITEM_VERIFICATION_LIMIT,
+    apply_venta_exact_item_verification,
 )
 
 
@@ -115,7 +123,20 @@ def apply_venta_explicit_clothing_gate(
 
 
 def run_venta_active_clothing_watch_strict(*args: Any, **kwargs: Any) -> VentaActiveWatchResult:
-    """Run the public watch and apply the strict bounded evidence gate."""
-    return apply_venta_explicit_clothing_gate(
+    """Run public VENTA watch, catalog gate, then exact bounded item verification."""
+    item_verification_limit = int(
+        kwargs.pop("item_verification_limit", DEFAULT_ITEM_VERIFICATION_LIMIT)
+    )
+    session = kwargs.get("session")
+    timeout = float(kwargs.get("timeout", 20.0))
+    max_response_bytes = int(kwargs.get("max_response_bytes", 4_000_000))
+    gated = apply_venta_explicit_clothing_gate(
         run_venta_active_clothing_watch(*args, **kwargs)
+    )
+    return apply_venta_exact_item_verification(
+        gated,
+        session=session,
+        timeout=timeout,
+        max_response_bytes=max_response_bytes,
+        item_verification_limit=item_verification_limit,
     )
