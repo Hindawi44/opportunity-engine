@@ -82,18 +82,45 @@ def test_direct_opportunity_outranks_stronger_liquidation_signal() -> None:
     assert historical == []
 
 
+def test_unverified_direct_opportunity_stays_in_market_watch() -> None:
+    direct = _card(
+        case_id="direct",
+        headline="Exact quantity missing",
+        case_type="DIRECT_OPPORTUNITY",
+        strength=80,
+        direct=1,
+        status="WATCH",
+    )
+
+    all_cards, actionable, watch, historical = prioritise_decision_cards([direct])
+
+    assert actionable == []
+    assert historical == []
+    assert watch[0]["case_id"] == "direct"
+    assert watch[0]["decision_lane"] == MARKET_WATCH
+    assert watch[0]["priority_class"] == "DIRECT_OPPORTUNITY_VERIFICATION_WATCH"
+    assert all_cards == watch
+
+
 def test_actionable_lane_orders_direct_then_b2b_then_auction_then_fabric() -> None:
     cards = [
         _card(case_id="fabric", headline="Fabric", case_type="FABRIC_PROCUREMENT", strength=95, offers=1),
         _card(case_id="auction", headline="Auction", case_type="AUCTION_INVENTORY", strength=95, offers=1),
         _card(case_id="b2b", headline="B2B", case_type="B2B_INVENTORY", strength=20, offers=1, prices=True, quantities=True),
-        _card(case_id="direct", headline="Direct", case_type="DIRECT_OPPORTUNITY", strength=0, direct=1),
+        _card(
+            case_id="direct",
+            headline="Direct",
+            case_type="DIRECT_OPPORTUNITY",
+            strength=0,
+            direct=1,
+            status="ACTIVE_REQUIRES_VERIFICATION",
+        ),
     ]
 
     _, actionable, _, _ = prioritise_decision_cards(cards)
 
     assert [card["case_id"] for card in actionable] == ["direct", "b2b", "auction", "fabric"]
-    assert [card["actionability_tier"] for card in actionable] == [3, 4, 6, 7]
+    assert [card["actionability_tier"] for card in actionable] == [2, 4, 6, 7]
 
 
 def test_historical_case_never_enters_actionable_or_watch_lane() -> None:
@@ -128,6 +155,7 @@ def _artifacts() -> dict[str, dict]:
                     "workflow_status": "REQUIRES_VERIFICATION",
                     "listing_status": "ACTIVE",
                     "discovery_score": 0,
+                    "missing_information": ["EXACT LOT QUANTITY"],
                 }
             ],
             "early_signals_to_watch": [
@@ -149,22 +177,22 @@ def _artifacts() -> dict[str, dict]:
     }
 
 
-def test_river_brief_exposes_separate_actionable_and_watch_lanes() -> None:
+def test_river_brief_keeps_requires_verification_direct_case_out_of_actionable_lane() -> None:
     result = build_unified_market_intelligence_river(_artifacts(), generated_at=NOW)
     brief = result["brief"]
 
     assert brief["priority_schema_version"] == PRIORITY_SCHEMA_VERSION
     assert brief["priority_rule"] == "ACTIONABILITY_BEFORE_SOURCE_SIGNAL_STRENGTH"
     assert brief["priority_counts"] == {
-        ACTIONABLE_NOW: 1,
-        MARKET_WATCH: 1,
+        ACTIONABLE_NOW: 0,
+        MARKET_WATCH: 2,
         HISTORICAL_EVIDENCE: 0,
     }
-    assert brief["top_actionable_card"]["headline"] == "Current clothing stock"
-    assert brief["top_market_watch_card"]["headline"] == "High-confidence insolvency signal"
-    assert brief["top_decision_card"] == brief["top_actionable_card"]
-    assert brief["decision_cards"][0]["decision_lane"] == ACTIONABLE_NOW
-    assert result["cases"]["cases"][0]["decision_lane"] == ACTIONABLE_NOW
+    assert brief["top_actionable_card"] is None
+    assert brief["top_market_watch_card"]["headline"] == "Current clothing stock"
+    assert brief["top_decision_card"] == brief["top_market_watch_card"]
+    assert brief["decision_cards"][0]["decision_lane"] == MARKET_WATCH
+    assert result["cases"]["cases"][0]["decision_lane"] == MARKET_WATCH
 
 
 def test_writer_attaches_priority_summary_to_existing_bulletin(tmp_path: Path) -> None:
@@ -177,12 +205,13 @@ def test_writer_attaches_priority_summary_to_existing_bulletin(tmp_path: Path) -
     domain = json.loads((tmp_path / "domain-market-intelligence-brief.json").read_text(encoding="utf-8"))
     attached = domain["unified_market_intelligence_river"]
     assert attached["priority_schema_version"] == PRIORITY_SCHEMA_VERSION
-    assert attached["top_actionable_card"]["headline"] == "Current clothing stock"
-    assert attached["top_market_watch_card"]["headline"] == "High-confidence insolvency signal"
+    assert attached["top_actionable_card"] is None
+    assert attached["top_market_watch_card"]["headline"] == "Current clothing stock"
     text = (tmp_path / "domain-market-intelligence-brief.txt").read_text(encoding="utf-8")
     assert "UNIFIED DECISION PRIORITY" in text
-    assert "top_actionable: Current clothing stock" in text
-    assert brief["top_decision_card"] == brief["top_actionable_card"]
+    assert "top_actionable: NONE" in text
+    assert "top_market_watch: Current clothing stock" in text
+    assert brief["top_decision_card"] == brief["top_market_watch_card"]
 
 
 def test_priority_installs_before_existing_river_cli_hook() -> None:
