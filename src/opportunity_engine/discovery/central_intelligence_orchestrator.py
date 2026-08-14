@@ -3,8 +3,8 @@
 This layer is intentionally deterministic and read-only. It does not collect new
 data, call a model, promote records into opportunities, or perform commercial
 actions. It turns already-produced daily artifacts into one concise operator
-brief with separate opportunity, market-watch, and fabric-procurement views plus
-exactly one recommended human action.
+brief with separate actionable, verification-required, study-required,
+market-watch, and fabric-procurement views plus exactly one human action.
 """
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-SCHEMA_VERSION = "central-intelligence-orchestrator-1.0"
+SCHEMA_VERSION = "central-intelligence-orchestrator-1.1"
 JSON_FILENAME = "central-intelligence-brief.json"
 TEXT_FILENAME = "central-intelligence-brief.txt"
 DECISION_OWNER = "HUMAN_OPERATOR"
@@ -52,6 +52,7 @@ def _rows(value: object) -> list[dict[str, Any]]:
 def _card_projection(card: Mapping[str, Any] | None) -> dict[str, Any] | None:
     if not isinstance(card, Mapping):
         return None
+    gate = card.get("verification_gate") if isinstance(card.get("verification_gate"), Mapping) else {}
     return {
         "case_id": card.get("case_id"),
         "headline": card.get("headline"),
@@ -65,6 +66,7 @@ def _card_projection(card: Mapping[str, Any] | None) -> dict[str, Any] | None:
         "missing_information": list(card.get("missing_information") or []),
         "risk_flags": list(card.get("risk_flags") or []),
         "source_urls": list(card.get("source_urls") or [])[:5],
+        "verification_gate": dict(gate),
     }
 
 
@@ -78,12 +80,37 @@ def _top_commercial_opportunity(unified: Mapping[str, Any]) -> dict[str, Any] | 
     return None
 
 
-def _top_market_watch(unified: Mapping[str, Any]) -> dict[str, Any] | None:
-    top = unified.get("top_market_watch_card")
+def _top_lane(
+    unified: Mapping[str, Any],
+    *,
+    list_key: str,
+    top_key: str,
+) -> dict[str, Any] | None:
+    top = unified.get(top_key)
     if isinstance(top, Mapping):
         return _card_projection(top)
-    rows = _rows(unified.get("market_watch"))
+    rows = _rows(unified.get(list_key))
     return _card_projection(rows[0]) if rows else None
+
+
+def _top_verification_required(unified: Mapping[str, Any]) -> dict[str, Any] | None:
+    return _top_lane(
+        unified,
+        list_key="verification_required",
+        top_key="top_verification_required_card",
+    )
+
+
+def _top_study_required(unified: Mapping[str, Any]) -> dict[str, Any] | None:
+    return _top_lane(
+        unified,
+        list_key="study_required",
+        top_key="top_study_required_card",
+    )
+
+
+def _top_market_watch(unified: Mapping[str, Any]) -> dict[str, Any] | None:
+    return _top_lane(unified, list_key="market_watch", top_key="top_market_watch_card")
 
 
 def _advisor_by_candidate(advisor: Mapping[str, Any] | None) -> dict[str, dict[str, Any]]:
@@ -167,11 +194,15 @@ def _priority_counts(unified: Mapping[str, Any]) -> dict[str, int]:
     if isinstance(raw, Mapping):
         return {
             "ACTIONABLE_NOW": int(raw.get("ACTIONABLE_NOW") or 0),
+            "VERIFICATION_REQUIRED": int(raw.get("VERIFICATION_REQUIRED") or 0),
+            "STUDY_REQUIRED": int(raw.get("STUDY_REQUIRED") or 0),
             "MARKET_WATCH": int(raw.get("MARKET_WATCH") or 0),
             "HISTORICAL_EVIDENCE": int(raw.get("HISTORICAL_EVIDENCE") or 0),
         }
     return {
         "ACTIONABLE_NOW": len(_rows(unified.get("actionable_now"))),
+        "VERIFICATION_REQUIRED": len(_rows(unified.get("verification_required"))),
+        "STUDY_REQUIRED": len(_rows(unified.get("study_required"))),
         "MARKET_WATCH": len(_rows(unified.get("market_watch"))),
         "HISTORICAL_EVIDENCE": len(_rows(unified.get("historical_evidence"))),
     }
@@ -179,6 +210,8 @@ def _priority_counts(unified: Mapping[str, Any]) -> dict[str, int]:
 
 def _primary_action(
     opportunity: Mapping[str, Any] | None,
+    verification: Mapping[str, Any] | None,
+    study: Mapping[str, Any] | None,
     fabric: Mapping[str, Any] | None,
     market_watch: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
@@ -189,7 +222,29 @@ def _primary_action(
             "target_id": opportunity.get("case_id"),
             "target": opportunity.get("headline"),
             "recommended_next_action": opportunity.get("recommended_next_action"),
-            "reason": "A current commercial opportunity or offer is actionable before watch-only signals.",
+            "reason": "A current commercial opportunity passed its verification gate.",
+        }
+    if isinstance(verification, Mapping):
+        gate = verification.get("verification_gate") if isinstance(verification.get("verification_gate"), Mapping) else {}
+        return {
+            "action_type": "COMPLETE_STANDARD_OPPORTUNITY_VERIFICATION",
+            "target_type": verification.get("case_type"),
+            "target_id": verification.get("case_id"),
+            "target": verification.get("headline"),
+            "recommended_next_action": verification.get("recommended_next_action"),
+            "verification_focus": list(gate.get("missing_required_evidence") or [])[:8],
+            "reason": "A real standard-profile opportunity exists but is missing required source evidence.",
+        }
+    if isinstance(study, Mapping):
+        gate = study.get("verification_gate") if isinstance(study.get("verification_gate"), Mapping) else {}
+        return {
+            "action_type": "STUDY_NONSTANDARD_OPPORTUNITY",
+            "target_type": study.get("case_type"),
+            "target_id": study.get("case_id"),
+            "target": study.get("headline"),
+            "recommended_next_action": "DEFINE_CUSTOM_VERIFICATION_AND_COMMERCIAL_MODEL",
+            "study_focus": list(gate.get("required_evidence") or [])[:8],
+            "reason": "A credible commercial opportunity does not fit a known matrix and must be studied rather than discarded.",
         }
     if isinstance(fabric, Mapping):
         checks = list(fabric.get("missing_information") or [])
@@ -215,7 +270,7 @@ def _primary_action(
             "target_id": market_watch.get("case_id"),
             "target": market_watch.get("headline"),
             "recommended_next_action": market_watch.get("recommended_next_action"),
-            "reason": "No current commercial opportunity or fabric candidate outranks the top watch signal.",
+            "reason": "No current commercial review case or fabric candidate outranks the top watch signal.",
         }
     return {
         "action_type": "NO_IMMEDIATE_ACTION_CONTINUE_MONITORING",
@@ -223,7 +278,7 @@ def _primary_action(
         "target_id": None,
         "target": None,
         "recommended_next_action": "CONTINUE_DAILY_MONITORING",
-        "reason": "No actionable opportunity, fabric candidate, or market-watch signal is available.",
+        "reason": "No actionable, verification-required, study-required, fabric, or market-watch case is available.",
     }
 
 
@@ -243,6 +298,8 @@ def build_central_intelligence_brief(
     comparables = market_comparables if isinstance(market_comparables, Mapping) else {}
 
     opportunity = _top_commercial_opportunity(unified)
+    verification = _top_verification_required(unified)
+    study = _top_study_required(unified)
     watch = _top_market_watch(unified)
     top_fabric = _top_fabric_supplier(fabric, advisor)
     counts = _priority_counts(unified)
@@ -259,6 +316,8 @@ def build_central_intelligence_brief(
     elif (
         unified.get("truthful_zero_result") is True
         and not opportunity
+        and not verification
+        and not study
         and not watch
         and fabric_candidates == 0
     ):
@@ -269,7 +328,7 @@ def build_central_intelligence_brief(
     advisor_status = _compact(advisor.get("status")).upper() or "NOT_AVAILABLE"
     comparables_status = _compact(comparables.get("status")).upper() or "NOT_AVAILABLE"
 
-    primary_action = _primary_action(opportunity, top_fabric, watch)
+    primary_action = _primary_action(opportunity, verification, study, top_fabric, watch)
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at": generated_at,
@@ -280,6 +339,8 @@ def build_central_intelligence_brief(
         "today_snapshot": {
             "river_status": unified_status,
             "actionable_now_count": counts["ACTIONABLE_NOW"],
+            "verification_required_count": counts["VERIFICATION_REQUIRED"],
+            "study_required_count": counts["STUDY_REQUIRED"],
             "market_watch_count": counts["MARKET_WATCH"],
             "historical_evidence_count": counts["HISTORICAL_EVIDENCE"],
             "fabric_candidate_count": fabric_candidates,
@@ -287,10 +348,16 @@ def build_central_intelligence_brief(
             "market_comparables_status": comparables_status,
         },
         "top_actionable_opportunity": opportunity,
+        "top_verification_required_opportunity": verification,
+        "top_study_required_opportunity": study,
         "top_market_signal": watch,
         "top_fabric_supplier": top_fabric,
         "primary_human_action": primary_action,
         "single_human_action_enforced": True,
+        "universal_verification_gate_enabled": bool(
+            unified.get("universal_verification_gate_enabled")
+        ),
+        "nonstandard_opportunities_are_preserved_for_study": True,
         "model_output_is_advisory": True,
         "source_evidence_remains_authoritative": True,
         "promotion_to_opportunity_allowed": False,
@@ -308,6 +375,8 @@ def render_central_intelligence_text(brief: Mapping[str, Any]) -> str:
     visibility = " | ".join(brief.get("market_visibility") or []) or "NONE"
     snapshot = brief.get("today_snapshot") if isinstance(brief.get("today_snapshot"), Mapping) else {}
     opportunity = brief.get("top_actionable_opportunity") if isinstance(brief.get("top_actionable_opportunity"), Mapping) else {}
+    verification = brief.get("top_verification_required_opportunity") if isinstance(brief.get("top_verification_required_opportunity"), Mapping) else {}
+    study = brief.get("top_study_required_opportunity") if isinstance(brief.get("top_study_required_opportunity"), Mapping) else {}
     watch = brief.get("top_market_signal") if isinstance(brief.get("top_market_signal"), Mapping) else {}
     fabric = brief.get("top_fabric_supplier") if isinstance(brief.get("top_fabric_supplier"), Mapping) else {}
     action = brief.get("primary_human_action") if isinstance(brief.get("primary_human_action"), Mapping) else {}
@@ -316,12 +385,18 @@ def render_central_intelligence_text(brief: Mapping[str, Any]) -> str:
         f"status: {brief.get('status')}",
         f"daily_market_visibility: {visibility}",
         f"actionable_now: {snapshot.get('actionable_now_count', 0)}",
+        f"verification_required: {snapshot.get('verification_required_count', 0)}",
+        f"study_required: {snapshot.get('study_required_count', 0)}",
         f"market_watch: {snapshot.get('market_watch_count', 0)}",
         f"fabric_candidates: {snapshot.get('fabric_candidate_count', 0)}",
         f"fabric_ai_status: {snapshot.get('fabric_ai_status') or 'NOT_AVAILABLE'}",
         "",
-        "أهم فرصة قابلة للمراجعة الآن:",
+        "أهم فرصة جاهزة للمراجعة الآن:",
         f"- {opportunity.get('headline') or 'NONE'}",
+        "أهم فرصة تحتاج استكمال تحقق قياسي:",
+        f"- {verification.get('headline') or 'NONE'}",
+        "أهم فرصة غير قياسية تحتاج دراسة:",
+        f"- {study.get('headline') or 'NONE'}",
         "أهم إشارة سوق للمراقبة:",
         f"- {watch.get('headline') or 'NONE'}",
         "أفضل مورد أقمشة للمراجعة:",
@@ -366,10 +441,14 @@ def _attach_to_domain_brief(output_dir: Path, brief: Mapping[str, Any]) -> None:
             "market_visibility": brief.get("market_visibility"),
             "today_snapshot": brief.get("today_snapshot"),
             "top_actionable_opportunity": brief.get("top_actionable_opportunity"),
+            "top_verification_required_opportunity": brief.get("top_verification_required_opportunity"),
+            "top_study_required_opportunity": brief.get("top_study_required_opportunity"),
             "top_market_signal": brief.get("top_market_signal"),
             "top_fabric_supplier": brief.get("top_fabric_supplier"),
             "primary_human_action": brief.get("primary_human_action"),
             "single_human_action_enforced": True,
+            "universal_verification_gate_enabled": brief.get("universal_verification_gate_enabled"),
+            "nonstandard_opportunities_are_preserved_for_study": True,
             "decision_owner": DECISION_OWNER,
             "automatic_purchase": False,
             "output_files": brief.get("output_files"),
