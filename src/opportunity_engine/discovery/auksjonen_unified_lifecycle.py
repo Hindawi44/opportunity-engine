@@ -1,8 +1,8 @@
 """Canonical lifecycle output for bounded Auksjonen clothing inventory lots.
 
 The public collector remains authoritative for discovery and Top 5 ordering. This
-module only maps its active inventory-lot records into the existing unified report
-contract so they can use the shared SQLite lifecycle persistence path.
+module maps active inventory lots plus optional exact public item-page evidence
+into the existing unified report contract and shared SQLite lifecycle path.
 """
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from datetime import datetime
 import json
 from pathlib import Path
 import re
-from typing import Any
+from typing import Any, Mapping
 
 from .auksjonen_public_api_adapter import (
     AuksjonenLiveClothingCollection,
@@ -21,9 +21,6 @@ from .unified_opportunity_report import (
     serialize_unified_opportunity_report,
 )
 
-# Only facts required to trust the source-native listing belong in the lifecycle
-# verification gate. Commercial calculations are deliberately deferred to the
-# one-opportunity analysis dossier and must not masquerade as source blockers.
 AUKSJONEN_REQUIRED_VERIFICATION = (
     "verified exact item-page evidence",
 )
@@ -48,7 +45,6 @@ def _location(listing: AuksjonenLiveClothingListing) -> str | None:
 
 
 def _explicit_quantity(title: str) -> int | None:
-    """Return a title-native quantity only when it is explicitly stated."""
     match = _QUANTITY_PATTERN.search(str(title or ""))
     if match is None:
         return None
@@ -57,7 +53,6 @@ def _explicit_quantity(title: str) -> int | None:
 
 
 def _current_price(listing: AuksjonenLiveClothingListing) -> tuple[float | None, str | None]:
-    """Return one source-native current price without estimating final payable cost."""
     if listing.current_bid_nok is not None:
         return float(listing.current_bid_nok), "CURRENT_BID"
     if listing.buy_now_price_nok is not None:
@@ -67,9 +62,17 @@ def _current_price(listing: AuksjonenLiveClothingListing) -> tuple[float | None,
     return None, None
 
 
-def _verification_blockers(listing: AuksjonenLiveClothingListing) -> list[str]:
-    """Return only missing source facts that block trusted analysis entry."""
-    blockers = list(AUKSJONEN_REQUIRED_VERIFICATION)
+def _verified_exact_item(evidence: Mapping[str, Any] | None) -> bool:
+    return bool(evidence and evidence.get("exact_item_page_verified") is True)
+
+
+def _verification_blockers(
+    listing: AuksjonenLiveClothingListing,
+    evidence: Mapping[str, Any] | None = None,
+) -> list[str]:
+    blockers: list[str] = []
+    if not _verified_exact_item(evidence):
+        blockers.extend(AUKSJONEN_REQUIRED_VERIFICATION)
     price, _ = _current_price(listing)
     if price is None:
         blockers.append("current bid, buy-now price, or start price")
@@ -78,10 +81,18 @@ def _verification_blockers(listing: AuksjonenLiveClothingListing) -> list[str]:
     return blockers
 
 
+def _observed(evidence: Mapping[str, Any] | None, key: str) -> Any:
+    if not evidence:
+        return None
+    value = evidence.get(key)
+    return None if value in (None, "", [], {}) else value
+
+
 def auksjonen_listing_to_discovery_candidate(
     listing: AuksjonenLiveClothingListing,
     *,
     top5_eligible: bool,
+    exact_item_evidence: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Map one source-native inventory lot without estimating missing facts."""
     if not listing.inventory_lot_signal:
@@ -90,56 +101,83 @@ def auksjonen_listing_to_discovery_candidate(
         raise ValueError("only active Auksjonen inventory lots may be unified")
 
     price_nok, price_kind = _current_price(listing)
-    blockers = _verification_blockers(listing)
+    blockers = _verification_blockers(listing, exact_item_evidence)
+    verified = _verified_exact_item(exact_item_evidence)
+    analysis_eligible = not blockers
+    quantity = _observed(exact_item_evidence, "quantity")
+    if quantity is None:
+        quantity = _explicit_quantity(listing.title)
 
-    return {
+    evidence_signals = ["active_public_api_listing", "explicit_inventory_lot_signal"]
+    if verified:
+        evidence_signals.append("verified_exact_public_item_page")
+
+    verification_row: dict[str, Any] = {
+        "url": listing.url,
+        "title": _observed(exact_item_evidence, "title") or listing.title,
+        "bounded_context": (
+            "The bounded public category API reports an active clothing listing "
+            "with an explicit multi-item lot signal."
+        ),
+        "page_role": "ITEM_DETAIL" if verified else "PUBLIC_API_LISTING",
+        "listing_status": listing.listing_status,
+        "verified": verified,
+    }
+    if exact_item_evidence:
+        verification_row["item_page_status"] = exact_item_evidence.get("status")
+        verification_row["page_sha256"] = exact_item_evidence.get("page_sha256")
+        verification_row["response_bytes"] = exact_item_evidence.get("response_bytes")
+        if exact_item_evidence.get("error"):
+            verification_row["error"] = exact_item_evidence.get("error")
+
+    candidate: dict[str, Any] = {
         "title": listing.title,
         "scenario": "WAREHOUSE_SURPLUS",
-        "opportunity_state": "STRONG_LEAD_REQUIRES_VERIFICATION",
+        "opportunity_state": "ACTIVE_OPPORTUNITY" if analysis_eligible else "STRONG_LEAD_REQUIRES_VERIFICATION",
         "reason": (
-            "active public API clothing-inventory lot; exact item-page verification "
-            "is the remaining lifecycle gate, while fees, logistics, condition, and "
-            "resale evidence are downstream analysis tasks"
+            "active Auksjonen clothing-inventory lot with verified exact item-page evidence"
+            if verified
+            else "active public API clothing-inventory lot; exact item-page verification remains required"
         ),
         "page_role": "ITEM_LISTING",
         "opportunity_identity": listing.url,
         "identity_stable": True,
         "listing_status": listing.listing_status,
         "top5_eligible": bool(top5_eligible),
-        "analysis_eligible": False,
-        "verified": False,
+        "analysis_eligible": analysis_eligible,
+        "verified": verified,
         "source_urls": [listing.url],
         "source_providers": ["Auksjonen.no"],
         "textile_category": "CLOTHING_INVENTORY",
         "inventory_type": "clothing_inventory_lot",
         "location": _location(listing),
-        "quantity": _explicit_quantity(listing.title),
+        "quantity": quantity,
+        "condition": _observed(exact_item_evidence, "condition"),
+        "source_description": _observed(exact_item_evidence, "description"),
         "price_nok": price_nok,
         "price_kind": price_kind,
         "current_bid_nok": listing.current_bid_nok,
         "buy_now_price_nok": listing.buy_now_price_nok,
         "start_price_nok": listing.start_price_nok,
         "source_object_id": str(listing.object_id),
-        "auction_occurrence_id": (
-            f"auksjonen-auction:{listing.auction_id}:object:{listing.object_id}"
-        ),
-        "evidence_signals": [
-            "active_public_api_listing",
-            "explicit_inventory_lot_signal",
-        ],
-        "verification": [
-            {
-                "url": listing.url,
-                "title": listing.title,
-                "bounded_context": (
-                    "The bounded public category API reports an active clothing "
-                    "listing with an explicit multi-item lot signal."
-                ),
-                "page_role": "PUBLIC_API_LISTING",
-                "listing_status": listing.listing_status,
-                "verified": False,
-            }
-        ],
+        "auction_occurrence_id": f"auksjonen-auction:{listing.auction_id}:object:{listing.object_id}",
+        "source_postal_code": _observed(exact_item_evidence, "source_postal_code") or listing.zip_code,
+        "source_city": _observed(exact_item_evidence, "source_city") or listing.city,
+        "weight_kg": _observed(exact_item_evidence, "weight_kg"),
+        "length_cm": _observed(exact_item_evidence, "length_cm"),
+        "width_cm": _observed(exact_item_evidence, "width_cm"),
+        "height_cm": _observed(exact_item_evidence, "height_cm"),
+        "pallet_count": _observed(exact_item_evidence, "pallet_count"),
+        "buyer_premium_percent": _observed(exact_item_evidence, "buyer_premium_percent"),
+        "vat_percent": _observed(exact_item_evidence, "vat_percent"),
+        "exact_item_page_verified": verified,
+        "shipping_details_source": _observed(exact_item_evidence, "shipping_details_source"),
+        "source_item_url": listing.url,
+        "source_image_urls": list(exact_item_evidence.get("image_urls") or []) if exact_item_evidence else [],
+        "source_image_count": int(exact_item_evidence.get("image_count") or 0) if exact_item_evidence else 0,
+        "visual_quantity_inference_performed": False,
+        "evidence_signals": evidence_signals,
+        "verification": [verification_row],
         "verification_blockers": blockers,
         "analysis_tasks": list(AUKSJONEN_ANALYSIS_TASKS),
         "missing_information": blockers,
@@ -148,17 +186,21 @@ def auksjonen_listing_to_discovery_candidate(
         "automatic_purchase": False,
         "automatic_payment": False,
     }
+    return candidate
 
 
 def build_auksjonen_discovery_result(
     collection: AuksjonenLiveClothingCollection,
+    *,
+    exact_item_evidence: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Return the minimum discovery envelope used by the unified report builder."""
     opportunities = collection.inventory_opportunities
+    evidence = exact_item_evidence or {}
     candidates = [
         auksjonen_listing_to_discovery_candidate(
             listing,
             top5_eligible=index < 5,
+            exact_item_evidence=evidence.get(listing.url),
         )
         for index, listing in enumerate(opportunities)
     ]
@@ -170,9 +212,10 @@ def build_auksjonen_discovery_result(
 
 def build_auksjonen_unified_report(
     collection: AuksjonenLiveClothingCollection,
+    *,
+    exact_item_evidence: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Build source candidates and their canonical lifecycle report."""
-    result = build_auksjonen_discovery_result(collection)
+    result = build_auksjonen_discovery_result(collection, exact_item_evidence=exact_item_evidence)
     generated_at = datetime.fromisoformat(collection.captured_at.replace("Z", "+00:00"))
     report = build_unified_opportunity_report(
         result,
@@ -187,11 +230,15 @@ def build_auksjonen_unified_report(
 def write_auksjonen_unified_artifacts(
     collection: AuksjonenLiveClothingCollection,
     output_dir: str | Path,
+    *,
+    exact_item_evidence: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Path]:
-    """Write audit candidates and the canonical report beside source artifacts."""
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
-    result, report = build_auksjonen_unified_report(collection)
+    result, report = build_auksjonen_unified_report(
+        collection,
+        exact_item_evidence=exact_item_evidence,
+    )
 
     candidates_path = destination / "all-discovered-candidates.json"
     unified_path = destination / "unified-opportunity-report.json"
