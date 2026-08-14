@@ -1,0 +1,77 @@
+name: Auksjonen Exact Item Live Smoke 2026-08-14
+
+on:
+  push:
+    branches:
+      - agent/auksjonen-live-smoke-2026-08-14
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run bounded live Auksjonen scan
+        run: |
+          python scripts/run_auksjonen_live_clothing.py \
+            --max-listings 30 \
+            --item-verification-limit 5 \
+            --output-dir artifacts/auksjonen-live-smoke
+      - name: Print safe exact-item summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/auksjonen-live-smoke')
+          evidence = json.loads((root / 'auksjonen-exact-item-verification.json').read_text(encoding='utf-8'))
+          candidates = json.loads((root / 'all-discovered-candidates.json').read_text(encoding='utf-8'))
+
+          bauer = [row for row in candidates if 'bauer' in str(row.get('title') or '').casefold()]
+          safe = {
+              'exact_item_attempted_count': evidence.get('attempted_count'),
+              'exact_item_verified_count': evidence.get('verified_count'),
+              'exact_item_failed_count': evidence.get('failed_count'),
+              'bauer_candidate_count': len(bauer),
+              'bauer': [
+                  {
+                      'title': row.get('title'),
+                      'verified': row.get('verified'),
+                      'analysis_eligible': row.get('analysis_eligible'),
+                      'opportunity_state': row.get('opportunity_state'),
+                      'quantity': row.get('quantity'),
+                      'condition': row.get('condition'),
+                      'source_postal_code': row.get('source_postal_code'),
+                      'source_city': row.get('source_city'),
+                      'weight_kg': row.get('weight_kg'),
+                      'length_cm': row.get('length_cm'),
+                      'width_cm': row.get('width_cm'),
+                      'height_cm': row.get('height_cm'),
+                      'pallet_count': row.get('pallet_count'),
+                      'verification_blockers': row.get('verification_blockers'),
+                      'visual_quantity_inference_performed': row.get('visual_quantity_inference_performed'),
+                      'automatic_contact': row.get('automatic_contact'),
+                      'automatic_bid': row.get('automatic_bid'),
+                      'automatic_purchase': row.get('automatic_purchase'),
+                      'automatic_payment': row.get('automatic_payment'),
+                  }
+                  for row in bauer
+              ],
+          }
+          print(json.dumps(safe, ensure_ascii=False, sort_keys=True))
+          PY
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: auksjonen-exact-item-live-smoke
+          path: artifacts/auksjonen-live-smoke/
