@@ -1,9 +1,8 @@
 """Prioritise unified river cases by commercial actionability.
 
-The river's source-strength score remains visible, but it is no longer the
-primary ordering key for the operator brief. Current opportunities and offers
-are separated from early market-watch signals so a strong insolvency signal
-cannot outrank stock that can be reviewed now.
+Current, analysis-ready opportunities are separated from cases that still need
+source verification. A direct-opportunity label alone is not enough to enter the
+ACTIONABLE_NOW lane.
 """
 from __future__ import annotations
 
@@ -14,7 +13,7 @@ from typing import Any, Mapping, Sequence
 
 from opportunity_engine.discovery import unified_market_intelligence_river as river
 
-PRIORITY_SCHEMA_VERSION = "unified-decision-priority-1.0"
+PRIORITY_SCHEMA_VERSION = "unified-decision-priority-1.1"
 ACTIONABLE_NOW = "ACTIONABLE_NOW"
 MARKET_WATCH = "MARKET_WATCH"
 HISTORICAL_EVIDENCE = "HISTORICAL_EVIDENCE"
@@ -54,10 +53,18 @@ def _decision_lane(card: Mapping[str, Any]) -> str:
 
     if case_type == "HISTORICAL_MARKET_EVIDENCE" or case_status == "HISTORICAL_ONLY":
         return HISTORICAL_EVIDENCE
-    if direct_count > 0 or offer_count > 0:
+
+    # A canonical/direct record can exist while its exact source evidence is
+    # incomplete. Only lifecycle states that passed the verification gate may
+    # enter ACTIONABLE_NOW. REQUIRES_VERIFICATION remains visible in MARKET_WATCH.
+    if direct_count > 0 or case_type == "DIRECT_OPPORTUNITY":
+        if case_status in {"QUALIFIED_OPPORTUNITY", "ACTIVE_REQUIRES_VERIFICATION"}:
+            return ACTIONABLE_NOW
+        return MARKET_WATCH
+
+    if offer_count > 0:
         return ACTIONABLE_NOW
     if case_type in {
-        "DIRECT_OPPORTUNITY",
         "B2B_INVENTORY",
         "AUCTION_INVENTORY",
         "FABRIC_PROCUREMENT",
@@ -77,6 +84,8 @@ def _priority_tier(card: Mapping[str, Any], lane: str) -> tuple[int, str]:
     if lane == HISTORICAL_EVIDENCE:
         return 90, "HISTORICAL_REFERENCE_ONLY"
     if direct_count > 0 or case_type == "DIRECT_OPPORTUNITY":
+        if lane == MARKET_WATCH:
+            return 19, "DIRECT_OPPORTUNITY_VERIFICATION_WATCH"
         if case_status == "QUALIFIED_OPPORTUNITY":
             return 1, "QUALIFIED_DIRECT_OPPORTUNITY"
         if case_status == "ACTIVE_REQUIRES_VERIFICATION":
@@ -113,6 +122,7 @@ def _actionability_score(card: Mapping[str, Any], lane: str, tier: int) -> float
         6: 76.0,
         7: 68.0,
         8: 64.0,
+        19: 48.0,
         20: 44.0,
         21: 40.0,
         22: 32.0,

@@ -8,6 +8,11 @@ import os
 from pathlib import Path
 import sys
 
+from opportunity_engine.discovery.auksjonen_exact_item_verification import (
+    DEFAULT_ITEM_VERIFICATION_LIMIT,
+    verify_auksjonen_inventory_lots,
+    write_auksjonen_exact_item_evidence,
+)
 from opportunity_engine.discovery.auksjonen_multi_category_adapter import (
     AuksjonenMultiCategoryCollector,
     write_multi_category_artifact,
@@ -59,6 +64,12 @@ def main() -> int:
     parser.add_argument("--max-listings", type=int, default=MAX_LISTINGS)
     parser.add_argument("--page-size", type=int, default=DEFAULT_PAGE_SIZE)
     parser.add_argument("--max-pages", type=int, default=MAX_PAGES)
+    parser.add_argument(
+        "--item-verification-limit",
+        type=int,
+        default=DEFAULT_ITEM_VERIFICATION_LIMIT,
+        help="Maximum active inventory lots whose exact public item pages are verified.",
+    )
     parser.add_argument("--persist-unified", action="store_true")
     parser.add_argument(
         "--database-url",
@@ -72,6 +83,8 @@ def main() -> int:
 
     if args.persist_unified and not str(args.database_url).strip():
         raise SystemExit("--database-url must not be empty with --persist-unified")
+    if args.item_verification_limit < 0:
+        raise SystemExit("--item-verification-limit must be non-negative")
 
     output_dir = Path(args.output_dir)
     result = AuksjonenMultiCategoryCollector(
@@ -80,9 +93,25 @@ def main() -> int:
         max_pages=args.max_pages,
     ).collect()
     collection = result.combined
+
+    exact_item_evidence = verify_auksjonen_inventory_lots(
+        collection.inventory_opportunities,
+        limit=args.item_verification_limit,
+    )
+
     paths = write_live_clothing_artifacts(collection, output_dir)
     paths["category_scans"] = write_multi_category_artifact(result, output_dir)
-    paths.update(write_auksjonen_unified_artifacts(collection, output_dir))
+    paths["exact_item_verification"] = write_auksjonen_exact_item_evidence(
+        exact_item_evidence,
+        output_dir,
+    )
+    paths.update(
+        write_auksjonen_unified_artifacts(
+            collection,
+            output_dir,
+            exact_item_evidence=exact_item_evidence,
+        )
+    )
 
     persistence_failure: Exception | None = None
     if args.persist_unified:
@@ -111,6 +140,9 @@ def main() -> int:
 
     opportunities = collection.inventory_opportunities
     individuals = collection.individual_clothing_items
+    verified_count = sum(
+        1 for row in exact_item_evidence.values() if row.get("exact_item_page_verified") is True
+    )
     print(f"Categories scanned: {len(result.scans)}")
     for scan in result.scans:
         print(
@@ -124,6 +156,8 @@ def main() -> int:
     print(f"Full multi-category scan complete: {result.scan_complete}")
     print(f"Active clothing items: {len(collection.listings)}")
     print(f"Valid inventory opportunities: {len(opportunities)}")
+    print(f"Exact item pages attempted: {len(exact_item_evidence)}")
+    print(f"Exact item pages verified: {verified_count}")
     print(f"Individual clothing items excluded from Top 5: {len(individuals)}")
     print(f"Errors: {len(collection.errors)}")
     print("Paid Brave/OpenAI calls: 0")
@@ -139,7 +173,6 @@ def main() -> int:
     if persistence_failure is not None:
         print(f"Unified persistence failed: {persistence_failure}", file=sys.stderr)
         return 2
-    # An empty Top 5 is valid when every approved category was read completely.
     return 0 if result.scan_complete and not collection.errors else 2
 
 
