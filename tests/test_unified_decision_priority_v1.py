@@ -9,6 +9,8 @@ from opportunity_engine.discovery.unified_decision_priority import (
     HISTORICAL_EVIDENCE,
     MARKET_WATCH,
     PRIORITY_SCHEMA_VERSION,
+    STUDY_REQUIRED,
+    VERIFICATION_REQUIRED,
     prioritise_decision_cards,
 )
 from opportunity_engine.discovery.unified_market_intelligence_river import (
@@ -32,6 +34,8 @@ def _card(
     status: str = "WATCH",
     prices: bool = False,
     quantities: bool = False,
+    source_urls: bool = True,
+    **extra: object,
 ) -> dict:
     return {
         "case_id": case_id,
@@ -50,12 +54,13 @@ def _card(
         "missing_information": [],
         "risk_flags": [],
         "recommended_next_action": "REVIEW",
-        "source_urls": [f"https://example.test/{case_id}"],
+        "source_urls": [f"https://example.test/{case_id}"] if source_urls else [],
         "decision_owner": "HUMAN_OPERATOR",
+        **extra,
     }
 
 
-def test_direct_opportunity_outranks_stronger_liquidation_signal() -> None:
+def test_verified_direct_opportunity_outranks_stronger_liquidation_signal() -> None:
     signal = _card(
         case_id="signal",
         headline="Very strong insolvency signal",
@@ -71,18 +76,17 @@ def test_direct_opportunity_outranks_stronger_liquidation_signal() -> None:
         status="ACTIVE_REQUIRES_VERIFICATION",
     )
 
-    all_cards, actionable, watch, historical = prioritise_decision_cards([signal, direct])
+    all_cards, actionable, review, historical = prioritise_decision_cards([signal, direct])
 
     assert all_cards[0]["case_id"] == "direct"
     assert actionable[0]["case_id"] == "direct"
     assert actionable[0]["decision_lane"] == ACTIONABLE_NOW
-    assert actionable[0]["actionability_score"] > watch[0]["actionability_score"]
-    assert watch[0]["case_id"] == "signal"
-    assert watch[0]["decision_lane"] == MARKET_WATCH
+    assert review[0]["case_id"] == "signal"
+    assert review[0]["decision_lane"] == MARKET_WATCH
     assert historical == []
 
 
-def test_unverified_direct_opportunity_stays_in_market_watch() -> None:
+def test_unverified_direct_opportunity_enters_verification_required() -> None:
     direct = _card(
         case_id="direct",
         headline="Exact quantity missing",
@@ -92,21 +96,91 @@ def test_unverified_direct_opportunity_stays_in_market_watch() -> None:
         status="WATCH",
     )
 
-    all_cards, actionable, watch, historical = prioritise_decision_cards([direct])
+    all_cards, actionable, review, historical = prioritise_decision_cards([direct])
 
     assert actionable == []
     assert historical == []
-    assert watch[0]["case_id"] == "direct"
-    assert watch[0]["decision_lane"] == MARKET_WATCH
-    assert watch[0]["priority_class"] == "DIRECT_OPPORTUNITY_VERIFICATION_WATCH"
-    assert all_cards == watch
+    assert review[0]["case_id"] == "direct"
+    assert review[0]["decision_lane"] == VERIFICATION_REQUIRED
+    assert review[0]["priority_class"] == "DIRECT_OPPORTUNITY_VERIFICATION_REQUIRED"
+    assert review[0]["verification_gate"]["gate_passed"] is False
+    assert all_cards == review
+
+
+def test_standard_b2b_requires_price_and_quantity_before_actionable() -> None:
+    incomplete = _card(
+        case_id="b2b-incomplete",
+        headline="B2B stock without manifest quantity",
+        case_type="B2B_INVENTORY",
+        strength=90,
+        offers=1,
+        prices=True,
+        quantities=False,
+    )
+    complete = _card(
+        case_id="b2b-complete",
+        headline="B2B stock with price and quantity",
+        case_type="B2B_INVENTORY",
+        strength=60,
+        offers=1,
+        prices=True,
+        quantities=True,
+    )
+
+    all_cards, actionable, review, _ = prioritise_decision_cards([incomplete, complete])
+
+    assert actionable[0]["case_id"] == "b2b-complete"
+    assert review[0]["case_id"] == "b2b-incomplete"
+    assert review[0]["decision_lane"] == VERIFICATION_REQUIRED
+    assert review[0]["verification_gate"]["missing_required_evidence"] == ["quantity"]
+    assert all_cards[0]["case_id"] == "b2b-complete"
+
+
+def test_nonstandard_real_commercial_case_is_preserved_for_study() -> None:
+    unusual = _card(
+        case_id="unusual",
+        headline="Store contents transfer with revenue-share terms",
+        case_type="OTHER_COMMERCIAL_CASE",
+        strength=92,
+        offers=1,
+        prices=False,
+        quantities=False,
+    )
+
+    all_cards, actionable, review, historical = prioritise_decision_cards([unusual])
+
+    assert actionable == []
+    assert historical == []
+    assert review[0]["decision_lane"] == STUDY_REQUIRED
+    assert review[0]["verification_gate"]["study_required"] is True
+    assert review[0]["verification_gate"]["known_standard_profile"] is False
+    assert review[0]["verification_gate"]["reason_code"] == (
+        "CREDIBLE_COMMERCIAL_CASE_NEEDS_CUSTOM_STUDY_PROFILE"
+    )
+    assert all_cards == review
 
 
 def test_actionable_lane_orders_direct_then_b2b_then_auction_then_fabric() -> None:
     cards = [
         _card(case_id="fabric", headline="Fabric", case_type="FABRIC_PROCUREMENT", strength=95, offers=1),
-        _card(case_id="auction", headline="Auction", case_type="AUCTION_INVENTORY", strength=95, offers=1),
-        _card(case_id="b2b", headline="B2B", case_type="B2B_INVENTORY", strength=20, offers=1, prices=True, quantities=True),
+        _card(
+            case_id="auction",
+            headline="Auction",
+            case_type="AUCTION_INVENTORY",
+            strength=95,
+            offers=1,
+            prices=True,
+            quantities=True,
+        ),
+        _card(
+            case_id="b2b",
+            headline="B2B",
+            case_type="B2B_INVENTORY",
+            strength=20,
+            offers=1,
+            prices=True,
+            quantities=True,
+        ),
         _card(
             case_id="direct",
             headline="Direct",
@@ -123,7 +197,7 @@ def test_actionable_lane_orders_direct_then_b2b_then_auction_then_fabric() -> No
     assert [card["actionability_tier"] for card in actionable] == [2, 4, 6, 7]
 
 
-def test_historical_case_never_enters_actionable_or_watch_lane() -> None:
+def test_historical_case_never_enters_active_review_lanes() -> None:
     historical_card = _card(
         case_id="old",
         headline="Ended lot",
@@ -132,10 +206,10 @@ def test_historical_case_never_enters_actionable_or_watch_lane() -> None:
         status="HISTORICAL_ONLY",
     )
 
-    all_cards, actionable, watch, historical = prioritise_decision_cards([historical_card])
+    all_cards, actionable, review, historical = prioritise_decision_cards([historical_card])
 
     assert actionable == []
-    assert watch == []
+    assert review == []
     assert historical[0]["decision_lane"] == HISTORICAL_EVIDENCE
     assert historical[0]["actionability_score"] == 0
     assert all_cards == historical
@@ -177,25 +251,30 @@ def _artifacts() -> dict[str, dict]:
     }
 
 
-def test_river_brief_keeps_requires_verification_direct_case_out_of_actionable_lane() -> None:
+def test_river_brief_separates_verification_required_from_market_watch() -> None:
     result = build_unified_market_intelligence_river(_artifacts(), generated_at=NOW)
     brief = result["brief"]
 
     assert brief["priority_schema_version"] == PRIORITY_SCHEMA_VERSION
-    assert brief["priority_rule"] == "ACTIONABILITY_BEFORE_SOURCE_SIGNAL_STRENGTH"
+    assert brief["priority_rule"] == (
+        "VERIFIED_ACTIONABILITY_THEN_VERIFICATION_THEN_STUDY_THEN_WATCH"
+    )
     assert brief["priority_counts"] == {
         ACTIONABLE_NOW: 0,
-        MARKET_WATCH: 2,
+        VERIFICATION_REQUIRED: 1,
+        STUDY_REQUIRED: 0,
+        MARKET_WATCH: 1,
         HISTORICAL_EVIDENCE: 0,
     }
     assert brief["top_actionable_card"] is None
-    assert brief["top_market_watch_card"]["headline"] == "Current clothing stock"
-    assert brief["top_decision_card"] == brief["top_market_watch_card"]
-    assert brief["decision_cards"][0]["decision_lane"] == MARKET_WATCH
-    assert result["cases"]["cases"][0]["decision_lane"] == MARKET_WATCH
+    assert brief["top_verification_required_card"]["headline"] == "Current clothing stock"
+    assert brief["top_market_watch_card"]["headline"] == "High-confidence insolvency signal"
+    assert brief["top_decision_card"] == brief["top_verification_required_card"]
+    assert brief["decision_cards"][0]["decision_lane"] == VERIFICATION_REQUIRED
+    assert result["cases"]["cases"][0]["decision_lane"] == VERIFICATION_REQUIRED
 
 
-def test_writer_attaches_priority_summary_to_existing_bulletin(tmp_path: Path) -> None:
+def test_writer_attaches_all_verification_lanes_to_existing_bulletin(tmp_path: Path) -> None:
     for filename, payload in _artifacts().items():
         (tmp_path / filename).write_text(json.dumps(payload), encoding="utf-8")
     (tmp_path / "domain-market-intelligence-brief.txt").write_text("BASE\n", encoding="utf-8")
@@ -206,12 +285,15 @@ def test_writer_attaches_priority_summary_to_existing_bulletin(tmp_path: Path) -
     attached = domain["unified_market_intelligence_river"]
     assert attached["priority_schema_version"] == PRIORITY_SCHEMA_VERSION
     assert attached["top_actionable_card"] is None
-    assert attached["top_market_watch_card"]["headline"] == "Current clothing stock"
+    assert attached["top_verification_required_card"]["headline"] == "Current clothing stock"
+    assert attached["top_market_watch_card"]["headline"] == "High-confidence insolvency signal"
+    assert attached["universal_verification_gate_enabled"] is True
     text = (tmp_path / "domain-market-intelligence-brief.txt").read_text(encoding="utf-8")
     assert "UNIFIED DECISION PRIORITY" in text
     assert "top_actionable: NONE" in text
-    assert "top_market_watch: Current clothing stock" in text
-    assert brief["top_decision_card"] == brief["top_market_watch_card"]
+    assert "top_verification_required: Current clothing stock" in text
+    assert "top_market_watch: High-confidence insolvency signal" in text
+    assert brief["top_decision_card"] == brief["top_verification_required_card"]
 
 
 def test_priority_installs_before_existing_river_cli_hook() -> None:
