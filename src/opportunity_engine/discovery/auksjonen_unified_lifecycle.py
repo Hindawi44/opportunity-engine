@@ -66,26 +66,49 @@ def _verified_exact_item(evidence: Mapping[str, Any] | None) -> bool:
     return bool(evidence and evidence.get("exact_item_page_verified") is True)
 
 
+def _observed(evidence: Mapping[str, Any] | None, key: str) -> Any:
+    if not evidence:
+        return None
+    value = evidence.get(key)
+    return None if value in (None, "", [], {}) else value
+
+
+def _verified_quantity(
+    listing: AuksjonenLiveClothingListing,
+    evidence: Mapping[str, Any] | None,
+) -> int | None:
+    observed = _observed(evidence, "quantity")
+    if observed is not None:
+        try:
+            value = int(observed)
+        except (TypeError, ValueError):
+            value = 0
+        return value if value > 0 else None
+    return _explicit_quantity(listing.title)
+
+
 def _verification_blockers(
     listing: AuksjonenLiveClothingListing,
     evidence: Mapping[str, Any] | None = None,
 ) -> list[str]:
     blockers: list[str] = []
-    if not _verified_exact_item(evidence):
+    verified = _verified_exact_item(evidence)
+    if not verified:
         blockers.extend(AUKSJONEN_REQUIRED_VERIFICATION)
     price, _ = _current_price(listing)
     if price is None:
         blockers.append("current bid, buy-now price, or start price")
     if _location(listing) is None:
         blockers.append("pickup location")
+    # Once the exact page was read, absence of these fields is meaningful. Keep
+    # the lot out of analysis-ready state instead of treating a vague pallet
+    # description as a known piece count or condition.
+    if verified:
+        if _verified_quantity(listing, evidence) is None:
+            blockers.append("exact lot quantity")
+        if _observed(evidence, "condition") is None:
+            blockers.append("item condition")
     return blockers
-
-
-def _observed(evidence: Mapping[str, Any] | None, key: str) -> Any:
-    if not evidence:
-        return None
-    value = evidence.get(key)
-    return None if value in (None, "", [], {}) else value
 
 
 def auksjonen_listing_to_discovery_candidate(
@@ -104,9 +127,7 @@ def auksjonen_listing_to_discovery_candidate(
     blockers = _verification_blockers(listing, exact_item_evidence)
     verified = _verified_exact_item(exact_item_evidence)
     analysis_eligible = not blockers
-    quantity = _observed(exact_item_evidence, "quantity")
-    if quantity is None:
-        quantity = _explicit_quantity(listing.title)
+    quantity = _verified_quantity(listing, exact_item_evidence)
 
     evidence_signals = ["active_public_api_listing", "explicit_inventory_lot_signal"]
     if verified:
@@ -130,15 +151,18 @@ def auksjonen_listing_to_discovery_candidate(
         if exact_item_evidence.get("error"):
             verification_row["error"] = exact_item_evidence.get("error")
 
+    if analysis_eligible:
+        reason = "active Auksjonen clothing-inventory lot with exact item-page quantity and condition verified"
+    elif verified:
+        reason = "exact Auksjonen item page was verified, but required source facts remain missing"
+    else:
+        reason = "active public API clothing-inventory lot; exact item-page verification remains required"
+
     candidate: dict[str, Any] = {
         "title": listing.title,
         "scenario": "WAREHOUSE_SURPLUS",
         "opportunity_state": "ACTIVE_OPPORTUNITY" if analysis_eligible else "STRONG_LEAD_REQUIRES_VERIFICATION",
-        "reason": (
-            "active Auksjonen clothing-inventory lot with verified exact item-page evidence"
-            if verified
-            else "active public API clothing-inventory lot; exact item-page verification remains required"
-        ),
+        "reason": reason,
         "page_role": "ITEM_LISTING",
         "opportunity_identity": listing.url,
         "identity_stable": True,
@@ -161,8 +185,10 @@ def auksjonen_listing_to_discovery_candidate(
         "start_price_nok": listing.start_price_nok,
         "source_object_id": str(listing.object_id),
         "auction_occurrence_id": f"auksjonen-auction:{listing.auction_id}:object:{listing.object_id}",
-        "source_postal_code": _observed(exact_item_evidence, "source_postal_code") or listing.zip_code,
-        "source_city": _observed(exact_item_evidence, "source_city") or listing.city,
+        # The category API already exposes clean structured pickup city/postcode;
+        # prefer it over any fallback text parsing from the item page.
+        "source_postal_code": listing.zip_code or _observed(exact_item_evidence, "source_postal_code"),
+        "source_city": listing.city or _observed(exact_item_evidence, "source_city"),
         "weight_kg": _observed(exact_item_evidence, "weight_kg"),
         "length_cm": _observed(exact_item_evidence, "length_cm"),
         "width_cm": _observed(exact_item_evidence, "width_cm"),
