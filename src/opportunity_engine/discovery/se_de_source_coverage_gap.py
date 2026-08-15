@@ -26,8 +26,9 @@ from opportunity_engine.discovery.brave_market_signal_radar import (
 )
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
 
-SCHEMA_VERSION = "se-de-source-coverage-gap-1.3"
+SCHEMA_VERSION = "se-de-source-coverage-gap-1.4"
 FEED_FAMILY = "SE_DE_SOURCE_COVERAGE_GAP_V1"
+COVERAGE_HEALTH_VERSION = "SE_DE_COVERAGE_HEALTH_V1"
 SUPPORTED_MARKETS = ("SE", "DE")
 DEFAULT_RESULTS_PER_QUERY = 8
 MAX_RESULTS_PER_QUERY = 10
@@ -170,6 +171,65 @@ def _candidate_from_hit(
     return payload
 
 
+def _ratio(numerator: int, denominator: int) -> float:
+    if denominator <= 0:
+        return 0.0
+    return round(numerator / denominator, 3)
+
+
+def _coverage_health(report: Mapping[str, Any]) -> dict[str, Any]:
+    query_budget = int(report.get("query_budget") or 0)
+    attempted = int(report.get("queries_attempted") or 0)
+    succeeded = int(report.get("queries_succeeded") or 0)
+    accepted = int(report.get("accepted_signal_count") or 0)
+    rejected = int(report.get("rejected_result_count") or 0)
+    duplicates = int(report.get("duplicate_result_count") or 0)
+    source_queries = [item for item in (report.get("source_queries") or []) if isinstance(item, Mapping)]
+    source_roles = sorted({str(item.get("source_role") or "UNKNOWN") for item in source_queries})
+    direct_source_count = sum(
+        1 for item in source_queries if item.get("source_role") == "DIRECT_SALE_OR_AUCTION_SOURCE"
+    )
+    early_source_count = sum(
+        1 for item in source_queries if item.get("source_role") == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
+    )
+    retrieval_rate = _ratio(succeeded, query_budget)
+    observed_result_count = accepted + rejected + duplicates
+    rejection_rate = _ratio(rejected, accepted + rejected)
+    signal_yield_per_successful_query = _ratio(accepted, succeeded)
+
+    if attempted == 0 or succeeded == 0:
+        diagnosis = "RETRIEVAL_BLOCKED"
+    elif retrieval_rate < 0.8:
+        diagnosis = "RETRIEVAL_GAP"
+    elif accepted == 0 and observed_result_count == 0:
+        diagnosis = "HEALTHY_ZERO_SIGNAL"
+    elif accepted == 0:
+        diagnosis = "RESULTS_SEEN_BUT_NONE_ACCEPTED"
+    elif signal_yield_per_successful_query < 0.25:
+        diagnosis = "LOW_SIGNAL_YIELD"
+    else:
+        diagnosis = "SIGNAL_FLOWING"
+
+    return {
+        "market_code": report.get("source_country"),
+        "query_budget": query_budget,
+        "queries_attempted": attempted,
+        "queries_succeeded": succeeded,
+        "retrieval_rate": retrieval_rate,
+        "accepted_signal_count": accepted,
+        "rejected_result_count": rejected,
+        "duplicate_result_count": duplicates,
+        "observed_result_count": observed_result_count,
+        "rejection_rate": rejection_rate,
+        "signal_yield_per_successful_query": signal_yield_per_successful_query,
+        "source_count": len(source_queries),
+        "direct_sale_or_auction_source_count": direct_source_count,
+        "early_insolvency_source_count": early_source_count,
+        "source_role_diversity": source_roles,
+        "diagnosis": diagnosis,
+    }
+
+
 def collect_manifest_se_de_source_coverage_gap(
     manifest: Mapping[str, Any],
     *,
@@ -221,10 +281,12 @@ def collect_manifest_se_de_source_coverage_gap(
         }
         if target is None:
             common.update(status="BLOCKED_CONFIGURATION", block_reason="MARKET_ARTIFACT_DIRECTORY_MISSING")
+            common["coverage_health"] = _coverage_health(common)
             market_reports.append(common)
             continue
         if not api_key:
             common.update(status="BLOCKED_CONFIGURATION", block_reason="BRAVE_SEARCH_API_KEY_MISSING")
+            common["coverage_health"] = _coverage_health(common)
             market_reports.append(common)
             continue
 
@@ -236,6 +298,7 @@ def collect_manifest_se_de_source_coverage_gap(
                 block_reason="PROVIDER_INITIALIZATION_FAILED",
                 errors=[f"{type(exc).__name__}: {_compact(exc)[:300]}"],
             )
+            common["coverage_health"] = _coverage_health(common)
             market_reports.append(common)
             continue
 
@@ -283,6 +346,7 @@ def collect_manifest_se_de_source_coverage_gap(
             else ("SUCCESS" if accepted else "VALID_ZERO")
         )
         common["block_reason"] = None
+        common["coverage_health"] = _coverage_health(common)
 
         artifact_dir = root_path / _compact(target.get("artifact_dir"))
         report_path = artifact_dir / _compact(target.get("market_signal_report_file") or "market-signal-report.json")
@@ -300,6 +364,11 @@ def collect_manifest_se_de_source_coverage_gap(
         status = _compact(report.get("status")).upper() or "UNKNOWN"
         status_counts[status] = status_counts.get(status, 0) + 1
 
+    coverage_health = {
+        str(report.get("source_country")): report.get("coverage_health") or _coverage_health(report)
+        for report in market_reports
+    }
+
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at": _iso_utc(now),
@@ -312,6 +381,8 @@ def collect_manifest_se_de_source_coverage_gap(
         "freshness": freshness,
         "status_counts": status_counts,
         "signal_count": sum(int(report.get("accepted_signal_count") or 0) for report in market_reports),
+        "coverage_health_version": COVERAGE_HEALTH_VERSION,
+        "coverage_health": coverage_health,
         "sources": market_reports,
         "source_page_verification_required": True,
         **_safety_payload(),
