@@ -25,7 +25,7 @@ from opportunity_engine.discovery.brave_market_signal_radar import (
 )
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
 
-SCHEMA_VERSION = "se-de-source-coverage-gap-1.0"
+SCHEMA_VERSION = "se-de-source-coverage-gap-1.1"
 FEED_FAMILY = "SE_DE_SOURCE_COVERAGE_GAP_V1"
 SUPPORTED_MARKETS = ("SE", "DE")
 DEFAULT_RESULTS_PER_QUERY = 8
@@ -63,6 +63,24 @@ SOURCE_QUERIES: dict[str, tuple[CoverageSourceQuery, ...]] = {
                 'kläder OR skor) (auktion OR försäljning)'
             ),
         ),
+        CoverageSourceQuery(
+            query_id="se-psauction-bankruptcy-clothing-stock",
+            source_name="PS Auction",
+            source_domain="psauction.se",
+            query=(
+                'site:psauction.se (konkurs OR konkursauktion OR varulager OR '
+                '"parti med") (kläder OR skor OR mode OR textil)'
+            ),
+        ),
+        CoverageSourceQuery(
+            query_id="se-klaravik-bankruptcy-clothing-stock",
+            source_name="Klaravik",
+            source_domain="klaravik.se",
+            query=(
+                'site:klaravik.se (konkursbo OR konkurs OR varulager OR '
+                'konkursparti) (kläder OR märkeskläder OR skor OR klädbutik)'
+            ),
+        ),
     ),
     "DE": (
         CoverageSourceQuery(
@@ -81,6 +99,15 @@ SOURCE_QUERIES: dict[str, tuple[CoverageSourceQuery, ...]] = {
             query=(
                 'site:sen-sen.de (Liquidationsverkauf OR Insolvenz OR Warenbestand) '
                 '(Textil OR Bekleidung OR Arbeitskleidung OR Mode)'
+            ),
+        ),
+        CoverageSourceQuery(
+            query_id="de-restlos-insolvency-clothing-stock",
+            source_name="RESTLOS",
+            source_domain="restlos.com",
+            query=(
+                'site:restlos.com (Insolvenzauktion OR Insolvenzversteigerung OR '
+                'Warenbestand) (Bekleidung OR Mode OR Textil OR Sportbekleidung)'
             ),
         ),
     ),
@@ -157,7 +184,7 @@ def collect_manifest_se_de_source_coverage_gap(
     results_per_query: int = DEFAULT_RESULTS_PER_QUERY,
     freshness: str | None = DEFAULT_FRESHNESS,
 ) -> dict[str, Any]:
-    """Run four bounded source-specific searches and merge accepted signals."""
+    """Run seven bounded source-specific searches and merge accepted signals."""
     if not 1 <= results_per_query <= MAX_RESULTS_PER_QUERY:
         raise ValueError(
             f"results_per_query must be between 1 and {MAX_RESULTS_PER_QUERY}"
