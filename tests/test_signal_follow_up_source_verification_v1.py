@@ -105,7 +105,7 @@ def test_exact_auksjonen_item_routes_and_extracts_quantity_weight_and_shipping()
       <h1>Stores For You AB - 24 stk arbeidsjakker</h1>
       <div>Antall: 24</div>
       <div>Tilstand: Ubrukt</div>
-      <div>Hentested: 7800 Namsos</div>
+      <div>Hentested: 7800 Namsos, Trøndelag</div>
       <div>Vekt: 84 kg</div>
       <div>Dimensjoner: 120 x 80 x 95 cm</div>
       <div>Antall paller: 1</div>
