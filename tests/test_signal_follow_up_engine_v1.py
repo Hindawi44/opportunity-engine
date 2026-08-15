@@ -60,9 +60,9 @@ def test_plan_builds_targeted_company_and_location_queries() -> None:
 
     assert len(plan) == 2
     by_id = {row["case_id"]: row for row in plan}
-    assert by_id["adenauer"]["target_label"] == "Adenauer & Co."
+    assert by_id["adenauer"]["target_label"] == "Adenauer & Co"
     assert by_id["adenauer"]["target_kind"] == "TITLE_COMPANY_PREFIX"
-    assert '"Adenauer & Co."' in by_id["adenauer"]["query"]
+    assert '"Adenauer & Co"' in by_id["adenauer"]["query"]
     assert "Restposten" in by_id["adenauer"]["query"]
     assert by_id["knarvik"]["target_label"] == "Knarvik"
     assert by_id["knarvik"]["target_kind"] == "LOCATION_EVENT_FALLBACK"
