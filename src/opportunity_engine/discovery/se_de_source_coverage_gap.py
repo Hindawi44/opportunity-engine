@@ -26,9 +26,10 @@ from opportunity_engine.discovery.brave_market_signal_radar import (
 )
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
 
-SCHEMA_VERSION = "se-de-source-coverage-gap-1.4"
+SCHEMA_VERSION = "se-de-source-coverage-gap-1.5"
 FEED_FAMILY = "SE_DE_SOURCE_COVERAGE_GAP_V1"
 COVERAGE_HEALTH_VERSION = "SE_DE_COVERAGE_HEALTH_V1"
+SOURCE_YIELD_DIAGNOSTICS_VERSION = "SE_DE_SOURCE_YIELD_DIAGNOSTICS_V1"
 SUPPORTED_MARKETS = ("SE", "DE")
 DEFAULT_RESULTS_PER_QUERY = 8
 MAX_RESULTS_PER_QUERY = 10
@@ -109,6 +110,47 @@ SOURCE_QUERIES: dict[str, tuple[CoverageSourceQuery, ...]] = {
     ),
 }
 
+_COMMON_CLOTHING_TERMS = (
+    "clothing",
+    "fashion",
+    "apparel",
+    "garment",
+    "garments",
+    "footwear",
+)
+_MARKET_CLOTHING_TERMS: dict[str, tuple[str, ...]] = {
+    "SE": (
+        "kläder",
+        "klader",
+        "kläd",
+        "klad",
+        "skor",
+        "textil",
+        "mode",
+        "märkeskläder",
+        "markesklader",
+        "klädbutik",
+        "kladbutik",
+        "konfektion",
+        "skodon",
+        "textilier",
+        "plagg",
+        "accessoar",
+    ),
+    "DE": (
+        "bekleidung",
+        "kleidung",
+        "textil",
+        "mode",
+        "schuhe",
+        "schuh",
+        "sportbekleidung",
+        "arbeitskleidung",
+        "konfektion",
+        "warenbestand mode",
+    ),
+}
+
 
 def _safety_payload() -> dict[str, bool]:
     return {
@@ -133,18 +175,39 @@ def _radar_query(item: CoverageSourceQuery) -> MarketRadarQuery:
     return MarketRadarQuery(query_id=item.query_id, query=item.query)
 
 
-def _candidate_from_hit(
+def _hit_text(hit: SearchHit) -> str:
+    return " ".join(
+        (
+            _compact(getattr(hit, "title", "")),
+            _compact(getattr(hit, "description", "")),
+            _compact(getattr(hit, "url", "")),
+        )
+    ).casefold()
+
+
+def _has_clothing_relevance(hit: SearchHit, market_code: str) -> bool:
+    text = _hit_text(hit)
+    terms = _COMMON_CLOTHING_TERMS + _MARKET_CLOTHING_TERMS.get(
+        market_code.upper(), ()
+    )
+    return any(term.casefold() in text for term in terms)
+
+
+def _candidate_from_hit_with_reason(
     hit: SearchHit,
     *,
     market_code: str,
     source_query: CoverageSourceQuery,
     rank: int,
     observed_at: datetime,
-) -> dict[str, Any] | None:
+) -> tuple[dict[str, Any] | None, str | None]:
     if not isinstance(hit, SearchHit):
-        return None
+        return None, "INVALID_HIT"
     if not _approved_domain(_compact(hit.url), source_query.source_domain):
-        return None
+        return None, "UNAPPROVED_DOMAIN"
+    if not _has_clothing_relevance(hit, market_code):
+        return None, "CLOTHING_RELEVANCE_MISSING"
+
     signal = market_signal_from_brave_hit(
         hit,
         market_code=market_code,
@@ -153,7 +216,8 @@ def _candidate_from_hit(
         observed_at=observed_at,
     )
     if signal is None:
-        return None
+        return None, "MARKET_SIGNAL_REJECTED"
+
     payload = signal.model_dump(mode="json")
     payload["source"] = "SE/DE source coverage gap radar"
     metadata = dict(payload.get("metadata") or {})
@@ -168,7 +232,25 @@ def _candidate_from_hit(
         }
     )
     payload["metadata"] = metadata
-    return payload
+    return payload, None
+
+
+def _candidate_from_hit(
+    hit: SearchHit,
+    *,
+    market_code: str,
+    source_query: CoverageSourceQuery,
+    rank: int,
+    observed_at: datetime,
+) -> dict[str, Any] | None:
+    candidate, _ = _candidate_from_hit_with_reason(
+        hit,
+        market_code=market_code,
+        source_query=source_query,
+        rank=rank,
+        observed_at=observed_at,
+    )
+    return candidate
 
 
 def _ratio(numerator: int, denominator: int) -> float:
@@ -184,18 +266,54 @@ def _coverage_health(report: Mapping[str, Any]) -> dict[str, Any]:
     accepted = int(report.get("accepted_signal_count") or 0)
     rejected = int(report.get("rejected_result_count") or 0)
     duplicates = int(report.get("duplicate_result_count") or 0)
-    source_queries = [item for item in (report.get("source_queries") or []) if isinstance(item, Mapping)]
-    source_roles = sorted({str(item.get("source_role") or "UNKNOWN") for item in source_queries})
+    source_queries = [
+        item
+        for item in (report.get("source_queries") or [])
+        if isinstance(item, Mapping)
+    ]
+    query_diagnostics = [
+        item
+        for item in (report.get("query_diagnostics") or [])
+        if isinstance(item, Mapping)
+    ]
+    source_roles = sorted(
+        {str(item.get("source_role") or "UNKNOWN") for item in source_queries}
+    )
     direct_source_count = sum(
-        1 for item in source_queries if item.get("source_role") == "DIRECT_SALE_OR_AUCTION_SOURCE"
+        1
+        for item in source_queries
+        if item.get("source_role") == "DIRECT_SALE_OR_AUCTION_SOURCE"
     )
     early_source_count = sum(
-        1 for item in source_queries if item.get("source_role") == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
+        1
+        for item in source_queries
+        if item.get("source_role") == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
     )
     retrieval_rate = _ratio(succeeded, query_budget)
     observed_result_count = accepted + rejected + duplicates
     rejection_rate = _ratio(rejected, accepted + rejected)
     signal_yield_per_successful_query = _ratio(accepted, succeeded)
+    productive_source_count = sum(
+        1 for item in query_diagnostics if int(item.get("accepted_count") or 0) > 0
+    )
+    result_bearing_source_count = sum(
+        1 for item in query_diagnostics if int(item.get("result_count") or 0) > 0
+    )
+    zero_result_source_count = sum(
+        1
+        for item in query_diagnostics
+        if item.get("search_status") == "SUCCESS"
+        and int(item.get("result_count") or 0) == 0
+    )
+    relevance_rejection_count = sum(
+        int(
+            (item.get("rejection_reasons") or {}).get(
+                "CLOTHING_RELEVANCE_MISSING"
+            )
+            or 0
+        )
+        for item in query_diagnostics
+    )
 
     if attempted == 0 or succeeded == 0:
         diagnosis = "RETRIEVAL_BLOCKED"
@@ -226,6 +344,11 @@ def _coverage_health(report: Mapping[str, Any]) -> dict[str, Any]:
         "direct_sale_or_auction_source_count": direct_source_count,
         "early_insolvency_source_count": early_source_count,
         "source_role_diversity": source_roles,
+        "productive_source_count": productive_source_count,
+        "productive_source_rate": _ratio(productive_source_count, query_budget),
+        "result_bearing_source_count": result_bearing_source_count,
+        "zero_result_source_count": zero_result_source_count,
+        "clothing_relevance_rejection_count": relevance_rejection_count,
         "diagnosis": diagnosis,
     }
 
@@ -242,14 +365,18 @@ def collect_manifest_se_de_source_coverage_gap(
 ) -> dict[str, Any]:
     """Run nine bounded source-specific searches and merge accepted signals."""
     if not 1 <= results_per_query <= MAX_RESULTS_PER_QUERY:
-        raise ValueError(f"results_per_query must be between 1 and {MAX_RESULTS_PER_QUERY}")
+        raise ValueError(
+            f"results_per_query must be between 1 and {MAX_RESULTS_PER_QUERY}"
+        )
 
     now = observed_at or datetime.now(timezone.utc)
     if now.tzinfo is None or now.utcoffset() is None:
         now = now.replace(tzinfo=timezone.utc)
     now = now.astimezone(timezone.utc)
     env = environment if environment is not None else os.environ
-    api_key = _compact(env.get("BRAVE_SEARCH_API_KEY")) or _compact(env.get("BRAVE_API_KEY"))
+    api_key = _compact(env.get("BRAVE_SEARCH_API_KEY")) or _compact(
+        env.get("BRAVE_API_KEY")
+    )
     root_path = Path(root)
     market_reports: list[dict[str, Any]] = []
     request_count = 0
@@ -276,16 +403,23 @@ def collect_manifest_se_de_source_coverage_gap(
                 }
                 for item in source_queries
             ],
+            "query_diagnostics": [],
             "errors": [],
             **_safety_payload(),
         }
         if target is None:
-            common.update(status="BLOCKED_CONFIGURATION", block_reason="MARKET_ARTIFACT_DIRECTORY_MISSING")
+            common.update(
+                status="BLOCKED_CONFIGURATION",
+                block_reason="MARKET_ARTIFACT_DIRECTORY_MISSING",
+            )
             common["coverage_health"] = _coverage_health(common)
             market_reports.append(common)
             continue
         if not api_key:
-            common.update(status="BLOCKED_CONFIGURATION", block_reason="BRAVE_SEARCH_API_KEY_MISSING")
+            common.update(
+                status="BLOCKED_CONFIGURATION",
+                block_reason="BRAVE_SEARCH_API_KEY_MISSING",
+            )
             common["coverage_health"] = _coverage_health(common)
             market_reports.append(common)
             continue
@@ -306,23 +440,52 @@ def collect_manifest_se_de_source_coverage_gap(
         seen_urls: set[str] = set()
         errors: list[str] = []
         rejected = duplicates = succeeded = 0
+
         for source_query in source_queries:
             common["queries_attempted"] = int(common["queries_attempted"]) + 1
             request_count += 1
+            query_diagnostic: dict[str, Any] = {
+                "query_id": source_query.query_id,
+                "source_name": source_query.source_name,
+                "source_domain": source_query.source_domain,
+                "source_role": source_query.source_role,
+                "search_status": "SUCCESS",
+                "result_count": 0,
+                "accepted_count": 0,
+                "rejected_count": 0,
+                "duplicate_count": 0,
+                "rejection_reasons": {},
+            }
+
             try:
-                hits = provider.search(source_query.query, count=results_per_query)
+                hits = provider.search(
+                    source_query.query, count=results_per_query
+                )
                 succeeded += 1
+                query_diagnostic["result_count"] = len(hits)
             except Exception as exc:
-                errors.append(f"{source_query.query_id}: {type(exc).__name__}: {_compact(exc)[:300]}")
+                message = (
+                    f"{source_query.query_id}: {type(exc).__name__}: "
+                    f"{_compact(exc)[:300]}"
+                )
+                errors.append(message)
+                query_diagnostic["search_status"] = "ERROR"
+                query_diagnostic["error"] = message
+                common["query_diagnostics"].append(query_diagnostic)
                 continue
+
             for rank, hit in enumerate(hits, start=1):
                 raw_url = _compact(getattr(hit, "url", ""))
                 if raw_url in seen_urls:
                     duplicates += 1
+                    query_diagnostic["duplicate_count"] = (
+                        int(query_diagnostic["duplicate_count"]) + 1
+                    )
                     continue
                 if raw_url:
                     seen_urls.add(raw_url)
-                candidate = _candidate_from_hit(
+
+                candidate, rejection_reason = _candidate_from_hit_with_reason(
                     hit,
                     market_code=market_code,
                     source_query=source_query,
@@ -331,8 +494,21 @@ def collect_manifest_se_de_source_coverage_gap(
                 )
                 if candidate is None:
                     rejected += 1
+                    query_diagnostic["rejected_count"] = (
+                        int(query_diagnostic["rejected_count"]) + 1
+                    )
+                    reason = rejection_reason or "UNKNOWN_REJECTION"
+                    reasons = dict(query_diagnostic["rejection_reasons"])
+                    reasons[reason] = int(reasons.get(reason) or 0) + 1
+                    query_diagnostic["rejection_reasons"] = reasons
                     continue
+
+                query_diagnostic["accepted_count"] = (
+                    int(query_diagnostic["accepted_count"]) + 1
+                )
                 accepted[str(candidate["signal_id"])] = candidate
+
+            common["query_diagnostics"].append(query_diagnostic)
 
         common["queries_succeeded"] = succeeded
         common["accepted_signal_count"] = len(accepted)
@@ -349,7 +525,10 @@ def collect_manifest_se_de_source_coverage_gap(
         common["coverage_health"] = _coverage_health(common)
 
         artifact_dir = root_path / _compact(target.get("artifact_dir"))
-        report_path = artifact_dir / _compact(target.get("market_signal_report_file") or "market-signal-report.json")
+        report_path = artifact_dir / _compact(
+            target.get("market_signal_report_file")
+            or "market-signal-report.json"
+        )
         common["stored_signal_count"] = _write_merged_market_signal_report(
             report_path,
             market_code=market_code,
@@ -365,7 +544,12 @@ def collect_manifest_se_de_source_coverage_gap(
         status_counts[status] = status_counts.get(status, 0) + 1
 
     coverage_health = {
-        str(report.get("source_country")): report.get("coverage_health") or _coverage_health(report)
+        str(report.get("source_country")): report.get("coverage_health")
+        or _coverage_health(report)
+        for report in market_reports
+    }
+    source_yield_diagnostics = {
+        str(report.get("source_country")): report.get("query_diagnostics") or []
         for report in market_reports
     }
 
@@ -375,14 +559,21 @@ def collect_manifest_se_de_source_coverage_gap(
         "feed_family": FEED_FAMILY,
         "purpose": "TARGETED_SE_DE_CLOTHING_LIQUIDATION_SOURCE_COVERAGE",
         "market_coverage": list(SUPPORTED_MARKETS),
-        "query_budget_total": sum(len(SOURCE_QUERIES[m]) for m in SUPPORTED_MARKETS),
+        "query_budget_total": sum(
+            len(SOURCE_QUERIES[m]) for m in SUPPORTED_MARKETS
+        ),
         "requests_made": request_count,
         "results_per_query": results_per_query,
         "freshness": freshness,
         "status_counts": status_counts,
-        "signal_count": sum(int(report.get("accepted_signal_count") or 0) for report in market_reports),
+        "signal_count": sum(
+            int(report.get("accepted_signal_count") or 0)
+            for report in market_reports
+        ),
         "coverage_health_version": COVERAGE_HEALTH_VERSION,
         "coverage_health": coverage_health,
+        "source_yield_diagnostics_version": SOURCE_YIELD_DIAGNOSTICS_VERSION,
+        "source_yield_diagnostics": source_yield_diagnostics,
         "sources": market_reports,
         "source_page_verification_required": True,
         **_safety_payload(),
