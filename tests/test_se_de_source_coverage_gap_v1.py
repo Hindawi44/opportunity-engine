@@ -23,7 +23,7 @@ def _manifest() -> dict:
     }
 
 
-def test_source_gap_queries_cover_seven_strict_sources() -> None:
+def test_source_gap_queries_cover_eight_strict_sources() -> None:
     assert tuple(SOURCE_QUERIES) == ("SE", "DE")
     assert [item.source_name for item in SOURCE_QUERIES["SE"]] == [
         "Budi Auktioner",
@@ -35,17 +35,19 @@ def test_source_gap_queries_cover_seven_strict_sources() -> None:
         "HTKG Online-Versteigerungen",
         "Sen & Sen",
         "RESTLOS",
+        "Versteigerungskalender",
     ]
-    assert sum(len(items) for items in SOURCE_QUERIES.values()) == 7
+    assert sum(len(items) for items in SOURCE_QUERIES.values()) == 8
     assert all("site:" in item.query for items in SOURCE_QUERIES.values() for item in items)
+    early = SOURCE_QUERIES["DE"][-1]
+    assert early.source_role == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
 
 
-def test_source_gap_radar_runs_seven_requests_and_keeps_safety_gates(tmp_path: Path) -> None:
+def test_source_gap_radar_runs_eight_requests_and_keeps_safety_gates(tmp_path: Path) -> None:
     for relative in ("inputs/se-blinto", "inputs/de-riegermann"):
         (tmp_path / relative).mkdir(parents=True)
 
     calls: list[tuple[str, str, int]] = []
-
     fixtures = {
         "site:budi.se": SearchHit(
             title="Kläder säljes via konkursauktion",
@@ -89,6 +91,12 @@ def test_source_gap_radar_runs_seven_requests_and_keeps_safety_gates(tmp_path: P
             description="Neuware und Warenbestand aus Bekleidung werden versteigert.",
             provider="Brave Search",
         ),
+        "site:versteigerungskalender.de": SearchHit(
+            title="Defier Clothing GmbH | Versteigerungskalender",
+            url="https://www.versteigerungskalender.de/insolvenzkalender/defier-clothing-gmbh",
+            description="Insolvenzeröffnung im Textilhandel; Verkauf von Textilien und Bekleidung.",
+            provider="Brave Search",
+        ),
     }
 
     class FakeProvider:
@@ -112,11 +120,11 @@ def test_source_gap_radar_runs_seven_requests_and_keeps_safety_gates(tmp_path: P
         provider_factory=lambda market, api_key, freshness: FakeProvider(market),
     )
 
-    assert report["query_budget_total"] == 7
-    assert report["requests_made"] == 7
-    assert len(calls) == 7
+    assert report["query_budget_total"] == 8
+    assert report["requests_made"] == 8
+    assert len(calls) == 8
     assert all(count == 8 for _, _, count in calls)
-    assert report["signal_count"] == 7
+    assert report["signal_count"] == 8
     assert report["status_counts"] == {"SUCCESS": 2}
     assert report["promotion_to_opportunity_allowed"] is False
     assert report["top5_eligible"] is False
@@ -127,22 +135,15 @@ def test_source_gap_radar_runs_seven_requests_and_keeps_safety_gates(tmp_path: P
 
     by_market = {item["source_country"]: item for item in report["sources"]}
     assert by_market["SE"]["accepted_signal_count"] == 4
-    assert by_market["DE"]["accepted_signal_count"] == 3
+    assert by_market["DE"]["accepted_signal_count"] == 4
 
-    source_names = {
-        signal["metadata"]["coverage_gap_source_name"]
-        for source in report["sources"]
-        for signal in source["signals"]
-    }
-    assert source_names == {
-        "Budi Auktioner",
-        "Kronofogden Webauktion",
-        "PS Auction",
-        "Klaravik",
-        "HTKG Online-Versteigerungen",
-        "Sen & Sen",
-        "RESTLOS",
-    }
+    early_signal = next(
+        signal
+        for signal in by_market["DE"]["signals"]
+        if signal["metadata"]["coverage_gap_source_name"] == "Versteigerungskalender"
+    )
+    assert early_signal["metadata"]["coverage_gap_source_role"] == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
+    assert early_signal["metadata"]["promotion_to_opportunity_allowed"] is False
 
 
 def test_source_gap_rejects_unapproved_domain(tmp_path: Path) -> None:
@@ -171,7 +172,7 @@ def test_source_gap_rejects_unapproved_domain(tmp_path: Path) -> None:
         provider_factory=lambda market, api_key, freshness: FakeProvider(),
     )
 
-    assert report["requests_made"] == 7
+    assert report["requests_made"] == 8
     assert report["signal_count"] == 0
     assert report["status_counts"] == {"VALID_ZERO": 2}
     assert report["sources"][0]["rejected_result_count"] == 1
@@ -183,6 +184,4 @@ def test_daily_wrapper_still_runs_source_gap_before_core() -> None:
     assert "collect_manifest_se_de_source_coverage_gap" in text
     assert "se-de-source-coverage-gap.json" in text
     assert 'brief["se_de_source_coverage_gap"]' in text
-    assert main_block.index("_run_se_de_source_gap_pre_core") < main_block.index(
-        "_load_core_module().main()"
-    )
+    assert main_block.index("_run_se_de_source_gap_pre_core") < main_block.index("_load_core_module().main()")
