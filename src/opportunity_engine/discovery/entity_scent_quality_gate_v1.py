@@ -15,9 +15,10 @@ from urllib.parse import urlparse
 import re
 from typing import Any, Mapping, Sequence
 
-SCHEMA_VERSION = "entity-scent-quality-gate-v1-1.0"
+SCHEMA_VERSION = "entity-scent-quality-gate-v1-1.1"
 ENGINE_VERSION = "ENTITY_SCENT_QUALITY_GATE_V1"
 MIN_QUALIFIED_ENTITY_SCORE = 55
+MIN_HEADLINE_INDEPENDENT_SOURCES = 2
 
 _LEGAL_MARKERS = {
     "DE": ("GmbH", "AG", "KG", "UG", "GmbH & Co. KG", "e.K."),
@@ -43,6 +44,8 @@ _GENERIC_PAGE_PREFIXES = (
     "restlager ",
     "warenbestand ",
     "warenarten ",
+    "ware ankauf",
+    "waren ankauf",
     "was sind ",
     "was ist ",
     "wie ",
@@ -61,6 +64,11 @@ _GENERIC_PAGE_TERMS = (
     "einfach erklaert",
     "warenarten",
     "ankauf von marken-schuhen",
+)
+
+_GENERIC_HEADLINE_PATTERNS = (
+    r"^(?:ware|waren|schuhe|bekleidung|mode|textil)\s+ankauf\b",
+    r"^(?:traditionsreich(?:e|er|es|en)?|bekannt(?:e|er|es|en)?|deutsch(?:e|er|es|en)?)\s+(?:mode[- ]?kette|modehaus|textilhändler|textilhaendler|bekleidungshändler|bekleidungshaendler)\b",
 )
 
 _EVENT_SUFFIXES = {
@@ -112,7 +120,6 @@ def _normalize_label(value: str) -> str:
 
 def _strip_leading_context(text: str) -> str:
     value = text
-    # News sites often prepend a section label before the actual company name.
     value = re.sub(
         r"^(?:handel|wirtschaft|news|fashion|mode)\s*:\s*",
         "",
@@ -155,6 +162,8 @@ def _looks_generic(value: str) -> bool:
         return True
     if any(term in folded for term in _GENERIC_PAGE_TERMS):
         return True
+    if any(re.search(pattern, folded, flags=re.IGNORECASE) for pattern in _GENERIC_HEADLINE_PATTERNS):
+        return True
     if folded in {"handel", "mode", "fashion", "textil", "bekleidung", "kläder", "klader", "skor"}:
         return True
     return False
@@ -172,7 +181,6 @@ def _entity_key(label: str) -> str:
 def _legal_marker_candidate(text: str, market_code: str) -> str | None:
     markers = sorted(_LEGAL_MARKERS[market_code], key=len, reverse=True)
     union = "|".join(re.escape(marker) for marker in markers)
-    # Bound the left side so a whole article headline is not swallowed.
     match = re.search(
         rf"([A-ZÄÖÜÅÆØÉÈÁÀÍÌÓÒÚÙ][^|–—:!?]{{1,85}}?\b(?:{union})\b)",
         text,
@@ -211,8 +219,6 @@ def extract_entity_label(title: str, market_code: str) -> EntityAssessment:
             entity_shape = "AMPERSAND_COMPANY"
 
     if candidate is None:
-        # Fall back to the headline segment before the event phrase. This allows
-        # brands without a legal suffix while the generic-page guard stays strict.
         first_segment = re.split(r"\s+[|–—]\s+", contextual, maxsplit=1)[0]
         candidate = _strip_event_suffix(first_segment, market)
         candidate = _strip_leading_context(candidate)
@@ -249,7 +255,12 @@ def build_entity_scent_quality_gate(
     *,
     min_qualified_score: int = MIN_QUALIFIED_ENTITY_SCORE,
 ) -> dict[str, Any]:
-    """Classify and cluster raw scent candidates around concrete entities."""
+    """Classify and cluster raw scent candidates around concrete entities.
+
+    A legal-form/company-shaped identity can qualify from one source. A fallback
+    HEADLINE_ENTITY must be corroborated by at least two independent domains before
+    it is allowed to consume a follow-up search request.
+    """
     clusters: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     source_intelligence: list[dict[str, Any]] = []
 
@@ -271,7 +282,7 @@ def build_entity_scent_quality_gate(
             payload["rejection_reason"] = assessment.rejection_reason
             source_intelligence.append(payload)
             continue
-        payload["classification"] = "ENTITY_SCENT"
+        payload["classification"] = "ENTITY_SCENT_CANDIDATE"
         clusters[(market, assessment.entity_key)].append(payload)
 
     entity_scents: list[dict[str, Any]] = []
@@ -286,10 +297,36 @@ def build_entity_scent_quality_gate(
         domains = {_domain(_compact(item.get("source_url"))) for item in evidence}
         domains.discard("")
         base_score = max(int(item.get("score") or 0) for item in evidence)
-        shape_bonus = 10 if any(item.get("entity_shape") in {"LEGAL_MARKER", "AMPERSAND_COMPANY"} for item in evidence) else 5
+        explicit_company_shape = any(
+            item.get("entity_shape") in {"LEGAL_MARKER", "AMPERSAND_COMPANY"}
+            for item in evidence
+        )
+        headline_corroborated = (
+            not explicit_company_shape
+            and len(domains) >= MIN_HEADLINE_INDEPENDENT_SOURCES
+        )
+        identity_policy_passed = explicit_company_shape or headline_corroborated
+
+        if not identity_policy_passed:
+            for item in evidence:
+                demoted = dict(item)
+                demoted["classification"] = "SOURCE_INTELLIGENCE"
+                demoted["rejection_reason"] = "UNCORROBORATED_HEADLINE_ENTITY"
+                demoted["required_independent_source_count"] = MIN_HEADLINE_INDEPENDENT_SOURCES
+                demoted["observed_independent_source_count"] = len(domains)
+                source_intelligence.append(demoted)
+            continue
+
+        shape_bonus = 10 if explicit_company_shape else 5
         evidence_bonus = min(30, max(0, len(evidence) - 1) * 10)
         domain_bonus = min(15, max(0, len(domains) - 1) * 5)
         entity_score = min(100, base_score + shape_bonus + evidence_bonus + domain_bonus)
+        qualification_reason = (
+            "EXPLICIT_COMPANY_SHAPE"
+            if explicit_company_shape
+            else "CORROBORATED_HEADLINE_ENTITY"
+        )
+        qualified_for_follow_up = entity_score >= min_qualified_score
         entity_scents.append(
             {
                 "market_code": market,
@@ -298,6 +335,8 @@ def build_entity_scent_quality_gate(
                 "score": entity_score,
                 "base_score": base_score,
                 "entity_shape": best.get("entity_shape"),
+                "identity_policy_passed": True,
+                "identity_qualification_reason": qualification_reason,
                 "evidence_count": len(evidence),
                 "independent_source_count": len(domains),
                 "source_url": best.get("source_url"),
@@ -312,7 +351,7 @@ def build_entity_scent_quality_gate(
                     }
                     for item in evidence
                 ],
-                "qualified_for_follow_up": entity_score >= min_qualified_score,
+                "qualified_for_follow_up": qualified_for_follow_up,
                 "entity_quality_gate": ENGINE_VERSION,
             }
         )
@@ -332,6 +371,7 @@ def build_entity_scent_quality_gate(
         "schema_version": SCHEMA_VERSION,
         "engine_version": ENGINE_VERSION,
         "candidate_count": len(candidates),
+        "headline_independent_source_requirement": MIN_HEADLINE_INDEPENDENT_SOURCES,
         "entity_cluster_count": len(entity_scents),
         "qualified_entity_count": len(qualified),
         "source_intelligence_count": len(source_intelligence),
