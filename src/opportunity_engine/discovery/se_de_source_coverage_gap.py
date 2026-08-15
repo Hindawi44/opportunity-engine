@@ -26,7 +26,7 @@ from opportunity_engine.discovery.brave_market_signal_radar import (
 )
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
 
-SCHEMA_VERSION = "se-de-source-coverage-gap-1.2"
+SCHEMA_VERSION = "se-de-source-coverage-gap-1.3"
 FEED_FAMILY = "SE_DE_SOURCE_COVERAGE_GAP_V1"
 SUPPORTED_MARKETS = ("SE", "DE")
 DEFAULT_RESULTS_PER_QUERY = 8
@@ -70,6 +70,13 @@ SOURCE_QUERIES: dict[str, tuple[CoverageSourceQuery, ...]] = {
             "Klaravik",
             "klaravik.se",
             'site:klaravik.se (konkursbo OR konkurs OR varulager OR konkursparti) (kläder OR märkeskläder OR skor OR klädbutik)',
+        ),
+        CoverageSourceQuery(
+            "se-allabolag-clothing-insolvency",
+            "Allabolag",
+            "allabolag.se",
+            'site:allabolag.se/foretag ("Konkurs inledd") (kläder OR konfektion OR skodon OR mode OR textilier)',
+            "EARLY_INSOLVENCY_SIGNAL_SOURCE",
         ),
     ),
     "DE": (
@@ -173,7 +180,7 @@ def collect_manifest_se_de_source_coverage_gap(
     results_per_query: int = DEFAULT_RESULTS_PER_QUERY,
     freshness: str | None = DEFAULT_FRESHNESS,
 ) -> dict[str, Any]:
-    """Run eight bounded source-specific searches and merge accepted signals."""
+    """Run nine bounded source-specific searches and merge accepted signals."""
     if not 1 <= results_per_query <= MAX_RESULTS_PER_QUERY:
         raise ValueError(f"results_per_query must be between 1 and {MAX_RESULTS_PER_QUERY}")
 
