@@ -10,6 +10,9 @@ import sys
 from opportunity_engine.discovery.signal_follow_up_continuity import (
     write_signal_follow_up_engine_with_continuity,
 )
+from opportunity_engine.discovery.signal_follow_up_source_verification import (
+    write_signal_follow_up_source_verification,
+)
 from opportunity_engine.discovery.unified_market_intelligence_river import (
     write_unified_market_intelligence_river,
 )
@@ -24,8 +27,10 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
     only when that command has produced its base domain brief. The unified river
     is written first; then the signal follow-up continuity layer searches durable
     entity scents before filling any remaining budget with current early-signal
-    cases. Search hits remain unverified leads and cannot promote an opportunity
-    or perform any commercial action.
+    cases. Finally, supported exact public item URLs are routed into the existing
+    source-specific VENTA/Auksjonen verifiers so explicit price, quantity,
+    weight, dimensions, pallet, location and fee facts can be exposed. Generic
+    search hits remain unverified and are never guessed into item URLs.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -68,6 +73,44 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                     "commercial_lead_count": follow_up.get("commercial_lead_count"),
                     "explicit_commercial_case_link_count": follow_up.get(
                         "explicit_commercial_case_link_count"
+                    ),
+                },
+                sort_keys=True,
+            ),
+        )
+        source_verification = write_signal_follow_up_source_verification(
+            output_dir,
+            follow_up_report=follow_up,
+        )
+        print(
+            "signal_follow_up_source_verification:",
+            json.dumps(
+                {
+                    "status": source_verification.get("status"),
+                    "candidate_lead_count": source_verification.get("candidate_lead_count"),
+                    "supported_exact_item_lead_count": source_verification.get(
+                        "supported_exact_item_lead_count"
+                    ),
+                    "verification_request_count": source_verification.get(
+                        "verification_request_count"
+                    ),
+                    "source_page_verified_count": source_verification.get(
+                        "source_page_verified_count"
+                    ),
+                    "source_page_failed_count": source_verification.get(
+                        "source_page_failed_count"
+                    ),
+                    "verified_with_price_count": source_verification.get(
+                        "verified_with_price_count"
+                    ),
+                    "verified_with_weight_count": source_verification.get(
+                        "verified_with_weight_count"
+                    ),
+                    "verified_with_quantity_count": source_verification.get(
+                        "verified_with_quantity_count"
+                    ),
+                    "verified_with_pallet_count": source_verification.get(
+                        "verified_with_pallet_count"
                     ),
                 },
                 sort_keys=True,
