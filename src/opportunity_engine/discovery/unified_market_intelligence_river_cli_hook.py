@@ -1,11 +1,15 @@
-"""Install the unified river after the established bulletin CLI completes."""
+"""Install the unified river and bounded signal follow-up after the bulletin CLI."""
 from __future__ import annotations
 
 import atexit
 import json
+import os
 from pathlib import Path
 import sys
 
+from opportunity_engine.discovery.signal_follow_up_engine import (
+    write_signal_follow_up_engine,
+)
 from opportunity_engine.discovery.unified_market_intelligence_river import (
     write_unified_market_intelligence_river,
 )
@@ -14,11 +18,14 @@ _INSTALLED = False
 
 
 def install_unified_market_intelligence_river_cli_hook() -> None:
-    """Register a bounded post-bulletin projection for the existing CLI only.
+    """Register bounded post-bulletin projections for the existing CLI only.
 
     The hook activates only for ``build_domain_market_intelligence_feed.py`` and
-    only when that command has produced its base domain brief. No collector or
-    network path is changed.
+    only when that command has produced its base domain brief. The unified river
+    is written first; then the signal follow-up engine may run a very small number
+    of targeted Brave searches over early-signal cases. Search hits remain
+    unverified leads and cannot promote an opportunity or perform any commercial
+    action.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -40,6 +47,26 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                     "status": brief.get("status"),
                     "counts": brief.get("counts"),
                     "output_files": brief.get("output_files"),
+                },
+                sort_keys=True,
+            ),
+        )
+        follow_up = write_signal_follow_up_engine(
+            output_dir,
+            environment=os.environ,
+        )
+        print(
+            "signal_follow_up_engine:",
+            json.dumps(
+                {
+                    "status": follow_up.get("status"),
+                    "eligible_follow_up_case_count": follow_up.get("eligible_follow_up_case_count"),
+                    "selected_case_count": follow_up.get("selected_case_count"),
+                    "search_request_count": follow_up.get("search_request_count"),
+                    "commercial_lead_count": follow_up.get("commercial_lead_count"),
+                    "explicit_commercial_case_link_count": follow_up.get(
+                        "explicit_commercial_case_link_count"
+                    ),
                 },
                 sort_keys=True,
             ),
