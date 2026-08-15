@@ -5,8 +5,8 @@ import argparse
 import json
 from pathlib import Path
 
-from opportunity_engine.discovery.cross_source_scent_expansion_v2 import (
-    collect_cross_source_scent_expansion_v2,
+from opportunity_engine.discovery.cross_source_scent_entity_gated_v1 import (
+    collect_entity_gated_cross_source_scent_expansion_v2,
 )
 
 
@@ -19,7 +19,7 @@ def main() -> int:
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    report = collect_cross_source_scent_expansion_v2(
+    report = collect_entity_gated_cross_source_scent_expansion_v2(
         max_requests=args.max_requests,
         results_per_query=args.results_per_query,
     )
@@ -30,22 +30,27 @@ def main() -> int:
     )
 
     lines = [
-        "CROSS-SOURCE SCENT EXPANSION V2",
+        "CROSS-SOURCE SCENT EXPANSION V2 + ENTITY SCENT QUALITY GATE V1",
         f"status: {report.get('status')}",
         f"requests_made: {report.get('requests_made', 0)}/{report.get('request_budget', 0)}",
         f"accepted_signals: {report.get('accepted_signal_count', 0)}",
-        f"strong_scents: {report.get('strong_scent_count', 0)}",
-        f"followed_scents: {report.get('followed_scent_count', 0)}",
+        f"entity_clusters: {report.get('entity_cluster_count', 0)}",
+        f"qualified_entity_scents: {report.get('strong_scent_count', 0)}",
+        f"source_intelligence_filtered: {report.get('source_intelligence_count', 0)}",
+        f"followed_entity_scents: {report.get('followed_scent_count', 0)}",
     ]
     for scent in (report.get("followed_scents") or [])[:8]:
         lines.append(
             f"- [{scent.get('market_code')}] score={scent.get('score')} "
-            f"{scent.get('label')} | follow_up_new={scent.get('new_follow_up_signal_count')} | "
+            f"{scent.get('label')} | evidence={scent.get('evidence_count')} | "
+            f"sources={scent.get('independent_source_count')} | "
+            f"follow_up_new={scent.get('new_follow_up_signal_count')} | "
             f"{scent.get('source_url')}"
         )
     if not report.get("followed_scents"):
-        lines.append("result: No strong cross-source scent qualified for follow-up.")
+        lines.append("result: No concrete entity scent qualified for follow-up.")
     lines += [
+        "generic_pages_are_source_intelligence_only: true",
         "signal_only: true",
         "source_page_verification_required: true",
         "automatic_purchase: false",
@@ -59,6 +64,8 @@ def main() -> int:
     print("cross_source_scent_v2_requests:", report.get("requests_made", 0))
     print("cross_source_scent_v2_signals:", report.get("accepted_signal_count", 0))
     print("cross_source_scent_v2_strong_scents:", report.get("strong_scent_count", 0))
+    print("entity_scent_gate_clusters:", report.get("entity_cluster_count", 0))
+    print("entity_scent_gate_source_intelligence:", report.get("source_intelligence_count", 0))
     return 0 if report.get("status") != "BLOCKED_CONFIGURATION" else 2
 
 
