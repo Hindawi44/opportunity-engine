@@ -17,6 +17,15 @@ on:
         description: Maximum active catalogs for each German watch
         required: false
         default: "5"
+      run_cross_source_scent_v2:
+        description: Run experimental cross-source scent expansion V2
+        required: false
+        type: boolean
+        default: false
+      cross_source_scent_v2_max_requests:
+        description: Maximum Brave requests for the optional V2 trial
+        required: false
+        default: "12"
       human_review_opportunity_id:
         description: Exact opportunity identity to review; leave empty when outcome is NONE
         required: false
@@ -50,6 +59,7 @@ on:
       - "scripts/run_finn_email_intake.py"
       - "scripts/run_cross_source_checkpoint_adapter.py"
       - "scripts/run_cross_source_clothing_verification.py"
+      - "scripts/run_cross_source_scent_expansion_v2.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/market_intelligence.py"
@@ -63,6 +73,7 @@ on:
       - "src/opportunity_engine/discovery/lifecycle_checkpoint_integration.py"
       - "src/opportunity_engine/discovery/sweden_valuable_datasets_status_feed.py"
       - "src/opportunity_engine/discovery/central_intelligence_orchestrator_cli_hook.py"
+      - "src/opportunity_engine/discovery/cross_source_scent_expansion_v2.py"
       - "src/opportunity_engine/logistics/official_route_freight.py"
       - "src/opportunity_engine/persistence/__init__.py"
       - "src/opportunity_engine/persistence/human_review.py"
@@ -86,6 +97,7 @@ on:
       - "tests/test_official_route_freight_workflow_wiring_v1.py"
       - "tests/test_lifecycle_checkpoint_integration_v1.py"
       - "tests/test_sweden_valuable_datasets_status_feed_v1.py"
+      - "tests/test_cross_source_scent_expansion_v2.py"
       - "docs/FINN_GMAIL_INTAKE_BRIDGE_V1.md"
       - "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
       - "docs/OPENAI_HUNT_CASE_ENRICHMENT_V1.md"
@@ -126,6 +138,7 @@ jobs:
           pytest tests/test_official_route_freight_workflow_wiring_v1.py -q
           pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
           pytest tests/test_sweden_valuable_datasets_status_feed_v1.py -q
+          pytest tests/test_cross_source_scent_expansion_v2.py -q
 
   operator-read-only-checkpoint:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
@@ -372,6 +385,15 @@ jobs:
             --manifest "$OUTPUT_DIR/input-manifest.json" \
             --root . \
             --output-dir "$OUTPUT_DIR"
+
+      - name: Run optional cross-source scent expansion V2 trial
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_cross_source_scent_v2 }}
+        continue-on-error: true
+        run: |
+          python scripts/run_cross_source_scent_expansion_v2.py \
+            --output-dir "$OUTPUT_DIR/cross-source-scent-v2" \
+            --max-requests "${{ inputs.cross_source_scent_v2_max_requests || '12' }}" \
+            --results-per-query 8
 
       - name: Validate checkpoint safety, coverage and lifecycle integrity
         run: |
