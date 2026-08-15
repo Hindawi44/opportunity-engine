@@ -1,9 +1,10 @@
 """Targeted Sweden/Germany source-coverage radar for clothing liquidation.
 
 This bounded feed supplements the broad market radar with source-specific
-searches for public auction/liquidation pages that have demonstrated relevance
-to clothing stock in Sweden and Germany. It produces market signals only;
-source pages must still be verified before any commercial decision.
+searches for public auction, liquidation, and early insolvency pages that have
+demonstrated relevance to clothing stock in Sweden and Germany. Search hits are
+signals only and must still pass source-page verification before any commercial
+decision.
 """
 from __future__ import annotations
 
@@ -25,7 +26,7 @@ from opportunity_engine.discovery.brave_market_signal_radar import (
 )
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
 
-SCHEMA_VERSION = "se-de-source-coverage-gap-1.1"
+SCHEMA_VERSION = "se-de-source-coverage-gap-1.2"
 FEED_FAMILY = "SE_DE_SOURCE_COVERAGE_GAP_V1"
 SUPPORTED_MARKETS = ("SE", "DE")
 DEFAULT_RESULTS_PER_QUERY = 8
@@ -41,74 +42,61 @@ class CoverageSourceQuery:
     source_name: str
     source_domain: str
     query: str
+    source_role: str = "DIRECT_SALE_OR_AUCTION_SOURCE"
 
 
 SOURCE_QUERIES: dict[str, tuple[CoverageSourceQuery, ...]] = {
     "SE": (
         CoverageSourceQuery(
-            query_id="se-budi-bankruptcy-clothing",
-            source_name="Budi Auktioner",
-            source_domain="budi.se",
-            query=(
-                'site:budi.se (konkursauktion OR konkurslager OR varulager OR '
-                'utförsäljning) (kläder OR skor OR textil OR mode)'
-            ),
+            "se-budi-bankruptcy-clothing",
+            "Budi Auktioner",
+            "budi.se",
+            'site:budi.se (konkursauktion OR konkurslager OR varulager OR utförsäljning) (kläder OR skor OR textil OR mode)',
         ),
         CoverageSourceQuery(
-            query_id="se-kronofogden-varuparti-clothing",
-            source_name="Kronofogden Webauktion",
-            source_domain="auktion.kronofogden.se",
-            query=(
-                'site:auktion.kronofogden.se ("Varuparti" OR "Konkurslager" OR '
-                'kläder OR skor) (auktion OR försäljning)'
-            ),
+            "se-kronofogden-varuparti-clothing",
+            "Kronofogden Webauktion",
+            "auktion.kronofogden.se",
+            'site:auktion.kronofogden.se ("Varuparti" OR "Konkurslager" OR kläder OR skor) (auktion OR försäljning)',
         ),
         CoverageSourceQuery(
-            query_id="se-psauction-bankruptcy-clothing-stock",
-            source_name="PS Auction",
-            source_domain="psauction.se",
-            query=(
-                'site:psauction.se (konkurs OR konkursauktion OR varulager OR '
-                '"parti med") (kläder OR skor OR mode OR textil)'
-            ),
+            "se-psauction-bankruptcy-clothing-stock",
+            "PS Auction",
+            "psauction.se",
+            'site:psauction.se (konkurs OR konkursauktion OR varulager OR "parti med") (kläder OR skor OR mode OR textil)',
         ),
         CoverageSourceQuery(
-            query_id="se-klaravik-bankruptcy-clothing-stock",
-            source_name="Klaravik",
-            source_domain="klaravik.se",
-            query=(
-                'site:klaravik.se (konkursbo OR konkurs OR varulager OR '
-                'konkursparti) (kläder OR märkeskläder OR skor OR klädbutik)'
-            ),
+            "se-klaravik-bankruptcy-clothing-stock",
+            "Klaravik",
+            "klaravik.se",
+            'site:klaravik.se (konkursbo OR konkurs OR varulager OR konkursparti) (kläder OR märkeskläder OR skor OR klädbutik)',
         ),
     ),
     "DE": (
         CoverageSourceQuery(
-            query_id="de-htkg-insolvency-fashion",
-            source_name="HTKG Online-Versteigerungen",
-            source_domain="online-versteigerungen.ht-kg.de",
-            query=(
-                'site:online-versteigerungen.ht-kg.de (Insolvenzversteigerung OR '
-                'Warenbestand) (Mode OR Bekleidung OR Textil OR Kleidung)'
-            ),
+            "de-htkg-insolvency-fashion",
+            "HTKG Online-Versteigerungen",
+            "online-versteigerungen.ht-kg.de",
+            'site:online-versteigerungen.ht-kg.de (Insolvenzversteigerung OR Warenbestand) (Mode OR Bekleidung OR Textil OR Kleidung)',
         ),
         CoverageSourceQuery(
-            query_id="de-sen-sen-textile-liquidation",
-            source_name="Sen & Sen",
-            source_domain="sen-sen.de",
-            query=(
-                'site:sen-sen.de (Liquidationsverkauf OR Insolvenz OR Warenbestand) '
-                '(Textil OR Bekleidung OR Arbeitskleidung OR Mode)'
-            ),
+            "de-sen-sen-textile-liquidation",
+            "Sen & Sen",
+            "sen-sen.de",
+            'site:sen-sen.de (Liquidationsverkauf OR Insolvenz OR Warenbestand) (Textil OR Bekleidung OR Arbeitskleidung OR Mode)',
         ),
         CoverageSourceQuery(
-            query_id="de-restlos-insolvency-clothing-stock",
-            source_name="RESTLOS",
-            source_domain="restlos.com",
-            query=(
-                'site:restlos.com (Insolvenzauktion OR Insolvenzversteigerung OR '
-                'Warenbestand) (Bekleidung OR Mode OR Textil OR Sportbekleidung)'
-            ),
+            "de-restlos-insolvency-clothing-stock",
+            "RESTLOS",
+            "restlos.com",
+            'site:restlos.com (Insolvenzauktion OR Insolvenzversteigerung OR Warenbestand) (Bekleidung OR Mode OR Textil OR Sportbekleidung)',
+        ),
+        CoverageSourceQuery(
+            "de-versteigerungskalender-fashion-insolvency",
+            "Versteigerungskalender",
+            "versteigerungskalender.de",
+            'site:versteigerungskalender.de/insolvenzkalender (Insolvenzeröffnung OR Insolvenz) (Textilhandel OR Bekleidung OR Mode OR Schuhe)',
+            "EARLY_INSOLVENCY_SIGNAL_SOURCE",
         ),
     ),
 }
@@ -166,6 +154,7 @@ def _candidate_from_hit(
             "coverage_gap_feed_family": FEED_FAMILY,
             "coverage_gap_source_name": source_query.source_name,
             "coverage_gap_source_domain": source_query.source_domain,
+            "coverage_gap_source_role": source_query.source_role,
             "source_page_verification_required": True,
             "promotion_to_opportunity_allowed": False,
         }
@@ -184,20 +173,16 @@ def collect_manifest_se_de_source_coverage_gap(
     results_per_query: int = DEFAULT_RESULTS_PER_QUERY,
     freshness: str | None = DEFAULT_FRESHNESS,
 ) -> dict[str, Any]:
-    """Run seven bounded source-specific searches and merge accepted signals."""
+    """Run eight bounded source-specific searches and merge accepted signals."""
     if not 1 <= results_per_query <= MAX_RESULTS_PER_QUERY:
-        raise ValueError(
-            f"results_per_query must be between 1 and {MAX_RESULTS_PER_QUERY}"
-        )
+        raise ValueError(f"results_per_query must be between 1 and {MAX_RESULTS_PER_QUERY}")
 
     now = observed_at or datetime.now(timezone.utc)
     if now.tzinfo is None or now.utcoffset() is None:
         now = now.replace(tzinfo=timezone.utc)
     now = now.astimezone(timezone.utc)
     env = environment if environment is not None else os.environ
-    api_key = _compact(env.get("BRAVE_SEARCH_API_KEY")) or _compact(
-        env.get("BRAVE_API_KEY")
-    )
+    api_key = _compact(env.get("BRAVE_SEARCH_API_KEY")) or _compact(env.get("BRAVE_API_KEY"))
     root_path = Path(root)
     market_reports: list[dict[str, Any]] = []
     request_count = 0
@@ -219,6 +204,7 @@ def collect_manifest_se_de_source_coverage_gap(
                     "query_id": item.query_id,
                     "source_name": item.source_name,
                     "source_domain": item.source_domain,
+                    "source_role": item.source_role,
                     "query": item.query,
                 }
                 for item in source_queries
@@ -227,17 +213,11 @@ def collect_manifest_se_de_source_coverage_gap(
             **_safety_payload(),
         }
         if target is None:
-            common.update(
-                status="BLOCKED_CONFIGURATION",
-                block_reason="MARKET_ARTIFACT_DIRECTORY_MISSING",
-            )
+            common.update(status="BLOCKED_CONFIGURATION", block_reason="MARKET_ARTIFACT_DIRECTORY_MISSING")
             market_reports.append(common)
             continue
         if not api_key:
-            common.update(
-                status="BLOCKED_CONFIGURATION",
-                block_reason="BRAVE_SEARCH_API_KEY_MISSING",
-            )
+            common.update(status="BLOCKED_CONFIGURATION", block_reason="BRAVE_SEARCH_API_KEY_MISSING")
             market_reports.append(common)
             continue
 
@@ -255,9 +235,7 @@ def collect_manifest_se_de_source_coverage_gap(
         accepted: dict[str, dict[str, Any]] = {}
         seen_urls: set[str] = set()
         errors: list[str] = []
-        rejected = 0
-        duplicates = 0
-        succeeded = 0
+        rejected = duplicates = succeeded = 0
         for source_query in source_queries:
             common["queries_attempted"] = int(common["queries_attempted"]) + 1
             request_count += 1
@@ -265,9 +243,7 @@ def collect_manifest_se_de_source_coverage_gap(
                 hits = provider.search(source_query.query, count=results_per_query)
                 succeeded += 1
             except Exception as exc:
-                errors.append(
-                    f"{source_query.query_id}: {type(exc).__name__}: {_compact(exc)[:300]}"
-                )
+                errors.append(f"{source_query.query_id}: {type(exc).__name__}: {_compact(exc)[:300]}")
                 continue
             for rank, hit in enumerate(hits, start=1):
                 raw_url = _compact(getattr(hit, "url", ""))
@@ -294,16 +270,15 @@ def collect_manifest_se_de_source_coverage_gap(
         common["duplicate_result_count"] = duplicates
         common["signals"] = [accepted[key] for key in sorted(accepted)]
         common["errors"] = errors
-        if errors:
-            common["status"] = "PARTIAL_RETRIEVAL" if succeeded else "BLOCKED_RETRIEVAL"
-        else:
-            common["status"] = "SUCCESS" if accepted else "VALID_ZERO"
+        common["status"] = (
+            ("PARTIAL_RETRIEVAL" if succeeded else "BLOCKED_RETRIEVAL")
+            if errors
+            else ("SUCCESS" if accepted else "VALID_ZERO")
+        )
         common["block_reason"] = None
 
         artifact_dir = root_path / _compact(target.get("artifact_dir"))
-        report_path = artifact_dir / _compact(
-            target.get("market_signal_report_file") or "market-signal-report.json"
-        )
+        report_path = artifact_dir / _compact(target.get("market_signal_report_file") or "market-signal-report.json")
         common["stored_signal_count"] = _write_merged_market_signal_report(
             report_path,
             market_code=market_code,
@@ -329,9 +304,7 @@ def collect_manifest_se_de_source_coverage_gap(
         "results_per_query": results_per_query,
         "freshness": freshness,
         "status_counts": status_counts,
-        "signal_count": sum(
-            int(report.get("accepted_signal_count") or 0) for report in market_reports
-        ),
+        "signal_count": sum(int(report.get("accepted_signal_count") or 0) for report in market_reports),
         "sources": market_reports,
         "source_page_verification_required": True,
         **_safety_payload(),
