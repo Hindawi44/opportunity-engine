@@ -42,16 +42,19 @@ def test_source_gap_queries_are_explicitly_bounded_to_se_de_sources() -> None:
     assert [item.source_name for item in SOURCE_QUERIES["SE"]] == [
         "Budi Auktioner",
         "Kronofogden Webauktion",
+        "PS Auction",
+        "Klaravik",
     ]
     assert [item.source_name for item in SOURCE_QUERIES["DE"]] == [
         "HTKG Online-Versteigerungen",
         "Sen & Sen",
+        "RESTLOS",
     ]
-    assert sum(len(items) for items in SOURCE_QUERIES.values()) == 4
+    assert sum(len(items) for items in SOURCE_QUERIES.values()) == 7
     assert all("site:" in item.query for items in SOURCE_QUERIES.values() for item in items)
 
 
-def test_source_gap_radar_merges_four_strict_signals_before_core(tmp_path: Path) -> None:
+def test_source_gap_radar_merges_seven_strict_signals_before_core(tmp_path: Path) -> None:
     for relative in ("inputs/se-blinto", "inputs/de-riegermann"):
         (tmp_path / relative).mkdir(parents=True)
 
@@ -83,6 +86,24 @@ def test_source_gap_radar_merges_four_strict_signals_before_core(tmp_path: Path)
                         provider="Brave Search",
                     )
                 ]
+            if "site:psauction.se" in query:
+                return [
+                    SearchHit(
+                        title="Parti med kläder och accessoarer från konkurs",
+                        url="https://psauction.se/item/view/200001/parti-med-klader",
+                        description="Varulager med cirka 600 plagg säljs på konkursauktion.",
+                        provider="Brave Search",
+                    )
+                ]
+            if "site:klaravik.se" in query:
+                return [
+                    SearchHit(
+                        title="Klädbutik i konkurs - Varulager",
+                        url="https://www.klaravik.se/auktion/produkt/kladbutik-i-konkurs-varulager/",
+                        description="Konkursparti med märkeskläder och accessoarer.",
+                        provider="Brave Search",
+                    )
+                ]
             if "site:online-versteigerungen.ht-kg.de" in query:
                 return [
                     SearchHit(
@@ -92,11 +113,20 @@ def test_source_gap_radar_merges_four_strict_signals_before_core(tmp_path: Path)
                         provider="Brave Search",
                     )
                 ]
+            if "site:sen-sen.de" in query:
+                return [
+                    SearchHit(
+                        title="Textil-Warenbestand, Freizeit- und Arbeitskleidung",
+                        url="https://www.sen-sen.de/php/t9999-Textil-Warenbestand",
+                        description="Liquidationsverkauf aus Insolvenz mit Bekleidung und Textil.",
+                        provider="Brave Search",
+                    )
+                ]
             return [
                 SearchHit(
-                    title="Textil-Warenbestand, Freizeit- und Arbeitskleidung",
-                    url="https://www.sen-sen.de/php/t9999-Textil-Warenbestand",
-                    description="Liquidationsverkauf aus Insolvenz mit Bekleidung und Textil.",
+                    title="Insolvenzauktion Sporthaus - Bekleidung und Zubehör",
+                    url="https://auktionen.restlos.com/auktionen/-/2000/insolvenzauktion-sporthaus/lose/1",
+                    description="Neuware und Warenbestand aus Bekleidung werden versteigert.",
                     provider="Brave Search",
                 )
             ]
@@ -111,11 +141,11 @@ def test_source_gap_radar_merges_four_strict_signals_before_core(tmp_path: Path)
 
     assert report["feed_family"] == "SE_DE_SOURCE_COVERAGE_GAP_V1"
     assert report["market_coverage"] == ["SE", "DE"]
-    assert report["query_budget_total"] == 4
-    assert report["requests_made"] == 4
-    assert len(calls) == 4
+    assert report["query_budget_total"] == 7
+    assert report["requests_made"] == 7
+    assert len(calls) == 7
     assert all(count == 8 for _, _, count in calls)
-    assert report["signal_count"] == 4
+    assert report["signal_count"] == 7
     assert report["status_counts"] == {"SUCCESS": 2}
     assert report["promotion_to_opportunity_allowed"] is False
     assert report["top5_eligible"] is False
@@ -125,8 +155,8 @@ def test_source_gap_radar_merges_four_strict_signals_before_core(tmp_path: Path)
     assert report["automatic_payment"] is False
 
     by_market = {item["source_country"]: item for item in report["sources"]}
-    assert by_market["SE"]["accepted_signal_count"] == 2
-    assert by_market["DE"]["accepted_signal_count"] == 2
+    assert by_market["SE"]["accepted_signal_count"] == 4
+    assert by_market["DE"]["accepted_signal_count"] == 3
 
     source_names = {
         signal["metadata"]["coverage_gap_source_name"]
@@ -136,8 +166,11 @@ def test_source_gap_radar_merges_four_strict_signals_before_core(tmp_path: Path)
     assert source_names == {
         "Budi Auktioner",
         "Kronofogden Webauktion",
+        "PS Auction",
+        "Klaravik",
         "HTKG Online-Versteigerungen",
         "Sen & Sen",
+        "RESTLOS",
     }
 
     se_stored = json.loads(
@@ -150,8 +183,8 @@ def test_source_gap_radar_merges_four_strict_signals_before_core(tmp_path: Path)
             encoding="utf-8"
         )
     )
-    assert se_stored["signal_count"] == 2
-    assert de_stored["signal_count"] == 2
+    assert se_stored["signal_count"] == 4
+    assert de_stored["signal_count"] == 3
     assert not (tmp_path / "inputs/no-auksjonen/market-signal-report.json").exists()
 
 
@@ -184,7 +217,7 @@ def test_source_gap_rejects_result_outside_approved_source_domain(tmp_path: Path
         provider_factory=lambda market, api_key, freshness: FakeProvider(market),
     )
 
-    assert report["requests_made"] == 4
+    assert report["requests_made"] == 7
     assert report["signal_count"] == 0
     assert report["status_counts"] == {"VALID_ZERO": 2}
     assert report["sources"][0]["rejected_result_count"] == 1
@@ -202,5 +235,8 @@ def test_daily_wrapper_runs_source_gap_before_existing_core_and_surfaces_it() ->
     )
     assert "Budi Auktioner" in text
     assert "Kronofogden Webauktion" in text
+    assert "PS Auction" in text
+    assert "Klaravik" in text
     assert "HTKG Online-Versteigerungen" in text
     assert "Sen & Sen" in text
+    assert "RESTLOS" in text
