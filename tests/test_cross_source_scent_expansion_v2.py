@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 from opportunity_engine.discovery.cross_source_scent_expansion_v2 import (
     collect_cross_source_scent_expansion_v2,
 )
 from opportunity_engine.discovery.search_provider import SearchHit
+
+
+ROOT = Path(__file__).resolve().parents[1]
+CHECKPOINT_WORKFLOW = ROOT / ".github" / "workflows" / "multi-market-daily-operator-checkpoint.yaml"
 
 
 def test_cross_source_discovers_and_follows_company_scent() -> None:
@@ -117,3 +122,13 @@ def test_cross_source_budget_is_hard_bounded() -> None:
 
     assert report["requests_made"] == 7
     assert report["follow_up_request_count"] <= 1
+
+
+def test_v2_trial_is_wired_into_existing_checkpoint_without_sixth_workflow() -> None:
+    text = CHECKPOINT_WORKFLOW.read_text(encoding="utf-8")
+    assert "run_cross_source_scent_v2:" in text
+    assert "cross_source_scent_v2_max_requests:" in text
+    assert "Run optional cross-source scent expansion V2 trial" in text
+    assert "scripts/run_cross_source_scent_expansion_v2.py" in text
+    assert "tests/test_cross_source_scent_expansion_v2.py -q" in text
+    assert not (ROOT / ".github" / "workflows" / "cross-source-scent-expansion-v2.yaml").exists()
