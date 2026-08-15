@@ -23,13 +23,14 @@ def _manifest() -> dict:
     }
 
 
-def test_source_gap_queries_cover_eight_strict_sources() -> None:
+def test_source_gap_queries_cover_nine_strict_sources() -> None:
     assert tuple(SOURCE_QUERIES) == ("SE", "DE")
     assert [item.source_name for item in SOURCE_QUERIES["SE"]] == [
         "Budi Auktioner",
         "Kronofogden Webauktion",
         "PS Auction",
         "Klaravik",
+        "Allabolag",
     ]
     assert [item.source_name for item in SOURCE_QUERIES["DE"]] == [
         "HTKG Online-Versteigerungen",
@@ -37,13 +38,13 @@ def test_source_gap_queries_cover_eight_strict_sources() -> None:
         "RESTLOS",
         "Versteigerungskalender",
     ]
-    assert sum(len(items) for items in SOURCE_QUERIES.values()) == 8
+    assert sum(len(items) for items in SOURCE_QUERIES.values()) == 9
     assert all("site:" in item.query for items in SOURCE_QUERIES.values() for item in items)
-    early = SOURCE_QUERIES["DE"][-1]
-    assert early.source_role == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
+    assert SOURCE_QUERIES["SE"][-1].source_role == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
+    assert SOURCE_QUERIES["DE"][-1].source_role == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
 
 
-def test_source_gap_radar_runs_eight_requests_and_keeps_safety_gates(tmp_path: Path) -> None:
+def test_source_gap_radar_runs_nine_requests_and_keeps_safety_gates(tmp_path: Path) -> None:
     for relative in ("inputs/se-blinto", "inputs/de-riegermann"):
         (tmp_path / relative).mkdir(parents=True)
 
@@ -71,6 +72,12 @@ def test_source_gap_radar_runs_eight_requests_and_keeps_safety_gates(tmp_path: P
             title="Klädbutik i konkurs - Varulager",
             url="https://www.klaravik.se/auktion/produkt/kladbutik-i-konkurs-varulager/",
             description="Konkursparti med märkeskläder och accessoarer.",
+            provider="Brave Search",
+        ),
+        "site:allabolag.se": SearchHit(
+            title="Österholms Kläder AB - Konkurs inledd",
+            url="https://www.allabolag.se/foretag/osterholms-klader-ab/visby/konfektion/2K1HTOOI63II4",
+            description="Konkurs inledd. Detaljhandel med kläder och konfektion.",
             provider="Brave Search",
         ),
         "site:online-versteigerungen.ht-kg.de": SearchHit(
@@ -120,11 +127,11 @@ def test_source_gap_radar_runs_eight_requests_and_keeps_safety_gates(tmp_path: P
         provider_factory=lambda market, api_key, freshness: FakeProvider(market),
     )
 
-    assert report["query_budget_total"] == 8
-    assert report["requests_made"] == 8
-    assert len(calls) == 8
+    assert report["query_budget_total"] == 9
+    assert report["requests_made"] == 9
+    assert len(calls) == 9
     assert all(count == 8 for _, _, count in calls)
-    assert report["signal_count"] == 8
+    assert report["signal_count"] == 9
     assert report["status_counts"] == {"SUCCESS": 2}
     assert report["promotion_to_opportunity_allowed"] is False
     assert report["top5_eligible"] is False
@@ -134,16 +141,23 @@ def test_source_gap_radar_runs_eight_requests_and_keeps_safety_gates(tmp_path: P
     assert report["automatic_payment"] is False
 
     by_market = {item["source_country"]: item for item in report["sources"]}
-    assert by_market["SE"]["accepted_signal_count"] == 4
+    assert by_market["SE"]["accepted_signal_count"] == 5
     assert by_market["DE"]["accepted_signal_count"] == 4
 
-    early_signal = next(
+    se_early_signal = next(
+        signal
+        for signal in by_market["SE"]["signals"]
+        if signal["metadata"]["coverage_gap_source_name"] == "Allabolag"
+    )
+    de_early_signal = next(
         signal
         for signal in by_market["DE"]["signals"]
         if signal["metadata"]["coverage_gap_source_name"] == "Versteigerungskalender"
     )
-    assert early_signal["metadata"]["coverage_gap_source_role"] == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
-    assert early_signal["metadata"]["promotion_to_opportunity_allowed"] is False
+    assert se_early_signal["metadata"]["coverage_gap_source_role"] == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
+    assert de_early_signal["metadata"]["coverage_gap_source_role"] == "EARLY_INSOLVENCY_SIGNAL_SOURCE"
+    assert se_early_signal["metadata"]["promotion_to_opportunity_allowed"] is False
+    assert de_early_signal["metadata"]["promotion_to_opportunity_allowed"] is False
 
 
 def test_source_gap_rejects_unapproved_domain(tmp_path: Path) -> None:
@@ -172,7 +186,7 @@ def test_source_gap_rejects_unapproved_domain(tmp_path: Path) -> None:
         provider_factory=lambda market, api_key, freshness: FakeProvider(),
     )
 
-    assert report["requests_made"] == 8
+    assert report["requests_made"] == 9
     assert report["signal_count"] == 0
     assert report["status_counts"] == {"VALID_ZERO": 2}
     assert report["sources"][0]["rejected_result_count"] == 1
