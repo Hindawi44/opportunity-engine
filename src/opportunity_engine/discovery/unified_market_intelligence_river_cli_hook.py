@@ -7,8 +7,8 @@ import os
 from pathlib import Path
 import sys
 
-from opportunity_engine.discovery.signal_follow_up_engine import (
-    write_signal_follow_up_engine,
+from opportunity_engine.discovery.signal_follow_up_continuity import (
+    write_signal_follow_up_engine_with_continuity,
 )
 from opportunity_engine.discovery.unified_market_intelligence_river import (
     write_unified_market_intelligence_river,
@@ -22,10 +22,10 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
 
     The hook activates only for ``build_domain_market_intelligence_feed.py`` and
     only when that command has produced its base domain brief. The unified river
-    is written first; then the signal follow-up engine may run a very small number
-    of targeted Brave searches over early-signal cases. Search hits remain
-    unverified leads and cannot promote an opportunity or perform any commercial
-    action.
+    is written first; then the signal follow-up continuity layer searches durable
+    entity scents before filling any remaining budget with current early-signal
+    cases. Search hits remain unverified leads and cannot promote an opportunity
+    or perform any commercial action.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -51,7 +51,7 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                 sort_keys=True,
             ),
         )
-        follow_up = write_signal_follow_up_engine(
+        follow_up = write_signal_follow_up_engine_with_continuity(
             output_dir,
             environment=os.environ,
         )
@@ -62,6 +62,8 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                     "status": follow_up.get("status"),
                     "eligible_follow_up_case_count": follow_up.get("eligible_follow_up_case_count"),
                     "selected_case_count": follow_up.get("selected_case_count"),
+                    "persistent_entity_case_count": follow_up.get("persistent_entity_case_count"),
+                    "persistent_entity_selected_count": follow_up.get("persistent_entity_selected_count"),
                     "search_request_count": follow_up.get("search_request_count"),
                     "commercial_lead_count": follow_up.get("commercial_lead_count"),
                     "explicit_commercial_case_link_count": follow_up.get(
