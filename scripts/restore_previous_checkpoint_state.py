@@ -6,9 +6,10 @@ import argparse
 import json
 import os
 
-from opportunity_engine.discovery.checkpoint_state_restore import (
-    restore_previous_checkpoint_databases,
-)
+from opportunity_engine.discovery import checkpoint_state_restore
+
+
+ITALY_MEMORY_RELATIVE_PATH = "it-market/opportunity_engine.db"
 
 
 def parse_args() -> argparse.Namespace:
@@ -27,12 +28,22 @@ def parse_args() -> argparse.Namespace:
         default="multi-market-daily-operator-checkpoint.yaml",
     )
     parser.add_argument("--branch", default="main")
+    parser.add_argument(
+        "--include-italy-memory",
+        action="store_true",
+        help="Also restore the Italy sidecar SQLite state from the same checkpoint artifact.",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    status = restore_previous_checkpoint_databases(
+    if args.include_italy_memory and ITALY_MEMORY_RELATIVE_PATH not in checkpoint_state_restore.DATABASE_RELATIVE_PATHS:
+        checkpoint_state_restore.DATABASE_RELATIVE_PATHS = (
+            *checkpoint_state_restore.DATABASE_RELATIVE_PATHS,
+            ITALY_MEMORY_RELATIVE_PATH,
+        )
+    status = checkpoint_state_restore.restore_previous_checkpoint_databases(
         repository=args.repository,
         token=args.token,
         current_run_id=args.current_run_id,
