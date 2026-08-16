@@ -34,11 +34,13 @@ def test_canonical_checkpoint_runner_owns_italy_sidecar_without_changing_coverag
     assert "collect_italy_market_signals" in runner
     assert "run_italy_case_memory_cycle" in runner
     assert "run_italy_exact_lot_verification" in runner
+    assert "run_italy_commercial_qualification" in runner
     assert "_run_italy_memory_sidecar" in runner
     assert '"canonical_market_coverage_unchanged": ["NO", "SE", "DE"]' in runner
     assert 'output_dir / "italy-case-memory-v1.json"' in runner
     assert 'output_dir / "italy-signal-follow-up-v1.json"' in runner
     assert 'output_dir / "italy-exact-lot-verification-v1.json"' in runner
+    assert 'output_dir / "italy-commercial-qualification-v1.json"' in runner
     assert 'input_root / "it-market"' in runner
 
     assert 'ITALY_MEMORY_RELATIVE_PATH = "it-market/opportunity_engine.db"' in restore
