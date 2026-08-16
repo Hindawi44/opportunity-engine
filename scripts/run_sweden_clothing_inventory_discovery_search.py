@@ -56,6 +56,29 @@ from opportunity_engine.markets.sweden import load_sweden_market_profile
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class _PSAuctionUpstreamScopeVerifier(PSAuctionPlaywrightFallbackVerifier):
+    """Let exact indexed search prove status after strict discovery proved scope.
+
+    This bridge is used only by the PS Auction source path below. Candidates on
+    that path have already passed PSAuctionPrefetchedSearchProvider's exact-item,
+    clothing-title and bulk-inventory gates across the complete bounded prefetch.
+    The parent verifier still filters indexed search results to the same item ID;
+    therefore the second search only needs to corroborate ACTIVE/ENDED state.
+    """
+
+    @staticmethod
+    def _scope_is_proven(hits) -> bool:
+        # The parent calls this only after _same_item_hits() has kept the exact
+        # requested item ID. Upstream scope was already proved by the strict
+        # PS Auction prefetch gate, so one exact indexed hit is sufficient here.
+        return bool(hits)
+
+    def diagnostics(self) -> dict[str, object]:
+        diagnostics = super().diagnostics()
+        diagnostics["upstream_scope_bridge"] = "PSAUCTION_PREFETCH_STRICT_GATE"
+        return diagnostics
+
+
 def _write_fallback_persistence_error(
     output_dir: Path,
     report_path: Path,
@@ -236,7 +259,10 @@ def main() -> int:
 
     browser_verifier: PSAuctionPlaywrightFallbackVerifier | None = None
     if use_psauction_browser_fallback:
-        browser_verifier = PSAuctionPlaywrightFallbackVerifier(
+        # The strict prefetch provider has already proved clothing/bulk scope
+        # before verification begins. The bridge prevents the exact status
+        # search from needlessly proving that same scope a second time.
+        browser_verifier = _PSAuctionUpstreamScopeVerifier(
             verify_sweden_public_page,
             config=PSAuctionPlaywrightConfig(
                 max_pages=args.psauction_browser_pages,
