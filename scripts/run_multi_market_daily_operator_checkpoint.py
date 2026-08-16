@@ -30,7 +30,7 @@ from opportunity_engine.discovery.italy_exact_lot_verification import (
 from opportunity_engine.discovery.italy_market_discovery import (
     collect_italy_market_signals,
 )
-from opportunity_engine.discovery.netherlands_case_memory_adapter import (
+from opportunity_engine.discovery.netherlands_identity_pending_cycle import (
     run_netherlands_case_memory_cycle,
 )
 from opportunity_engine.discovery.netherlands_market_discovery import (
@@ -231,7 +231,24 @@ def _run_netherlands_memory_sidecar(
             "automatic_purchase": False,
             "automatic_payment": False,
         }
+        pending_skipped = {
+            "schema_version": "netherlands-identity-pending-cycle-1.0",
+            "engine_version": "NETHERLANDS_IDENTITY_PENDING_CYCLE_V1",
+            "status": "SKIPPED_NO_API_KEY",
+            "source_country": "NL",
+            "remaining_pending_identity_count": 0,
+            "pending_is_not_entity_scent": True,
+            "pending_is_not_follow_up_eligible": True,
+            "promotion_to_opportunity_allowed": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_reservation": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        skipped["identity_pending_memory"] = pending_skipped
         _write_json(output_dir / "netherlands-case-memory-v1.json", skipped)
+        _write_json(output_dir / "netherlands-identity-pending-v1.json", pending_skipped)
         _write_json(
             output_dir / "netherlands-signal-follow-up-v1.json",
             {
@@ -261,7 +278,9 @@ def _run_netherlands_memory_sidecar(
     cycle["discovery_accepted_signal_count"] = discovery.get("accepted_signal_count")
     cycle["exact_lot_verification_status"] = "NOT_BUILT_YET_REQUIRES_SOURCE_SPECIFIC_VALIDATION"
 
+    pending_summary = dict(cycle.get("identity_pending_memory") or {})
     _write_json(output_dir / "netherlands-case-memory-v1.json", cycle)
+    _write_json(output_dir / "netherlands-identity-pending-v1.json", pending_summary)
     _write_json(
         output_dir / "netherlands-signal-follow-up-v1.json",
         dict(cycle.get("follow_up") or {}),
@@ -404,6 +423,7 @@ def main() -> int:
         )
     )
     nl_follow_up = netherlands_sidecar.get("follow_up") or {}
+    nl_pending = netherlands_sidecar.get("identity_pending_memory") or {}
     print(
         "netherlands_memory_sidecar: "
         + json.dumps(
@@ -413,6 +433,12 @@ def main() -> int:
                 "discovery_status": netherlands_sidecar.get("discovery_status"),
                 "discovery_accepted_signal_count": netherlands_sidecar.get(
                     "discovery_accepted_signal_count", 0
+                ),
+                "pending_identity_count": nl_pending.get(
+                    "remaining_pending_identity_count", 0
+                ),
+                "resolved_from_pending_identity_count": nl_pending.get(
+                    "resolved_from_pending_identity_count", 0
                 ),
                 "follow_up_status": nl_follow_up.get("status"),
                 "commercial_lead_count": nl_follow_up.get("commercial_lead_count", 0),
