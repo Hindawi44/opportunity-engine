@@ -10,6 +10,7 @@ from opportunity_engine.discovery import checkpoint_state_restore
 
 
 ITALY_MEMORY_RELATIVE_PATH = "it-market/opportunity_engine.db"
+NETHERLANDS_MEMORY_RELATIVE_PATH = "nl-market/opportunity_engine.db"
 
 
 def parse_args() -> argparse.Namespace:
@@ -33,11 +34,13 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    if ITALY_MEMORY_RELATIVE_PATH not in checkpoint_state_restore.DATABASE_RELATIVE_PATHS:
-        checkpoint_state_restore.DATABASE_RELATIVE_PATHS = (
-            *checkpoint_state_restore.DATABASE_RELATIVE_PATHS,
-            ITALY_MEMORY_RELATIVE_PATH,
-        )
+    extra_paths = (ITALY_MEMORY_RELATIVE_PATH, NETHERLANDS_MEMORY_RELATIVE_PATH)
+    for relative_path in extra_paths:
+        if relative_path not in checkpoint_state_restore.DATABASE_RELATIVE_PATHS:
+            checkpoint_state_restore.DATABASE_RELATIVE_PATHS = (
+                *checkpoint_state_restore.DATABASE_RELATIVE_PATHS,
+                relative_path,
+            )
     status = checkpoint_state_restore.restore_previous_checkpoint_databases(
         repository=args.repository,
         token=args.token,
