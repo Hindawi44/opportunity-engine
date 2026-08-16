@@ -172,8 +172,14 @@ jobs:
               )
               if summary.get("status") != "TARGETED_ENRICHMENT_COMPLETE":
                   raise SystemExit("Eligible targeted enrichment did not complete")
+              if summary.get("openai_hunt_status") == "SKIPPED_NO_API_KEY":
+                  raise SystemExit("Eligible enrichment is missing OPENAI_API_KEY")
+              if summary.get("targeted_followup_status") == "SKIPPED_NO_BRAVE_KEY":
+                  raise SystemExit("Eligible enrichment is missing BRAVE_SEARCH_API_KEY")
               if int(summary.get("openai_api_request_count") or 0) > 3:
                   raise SystemExit("OpenAI targeted request limit changed")
+              if float(summary.get("openai_estimated_cost_usd") or 0.0) > 0.16:
+                  raise SystemExit("OpenAI targeted cost guard changed")
               if int(summary.get("targeted_brave_request_count") or 0) > 6:
                   raise SystemExit("Brave targeted request limit changed")
           else:
