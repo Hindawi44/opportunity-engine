@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       sweden_query_budget:
-        description: Bounded Blinto search queries
+        description: Bounded queries per Swedish direct source
         required: false
         default: "8"
       riegermann_auction_limit:
@@ -239,6 +239,34 @@ jobs:
               --persist-unified \
               --database-url "sqlite:///$INPUT_ROOT/se-blinto/opportunity_engine.db"
 
+      - name: Run Sweden Klaravik bounded direct scan
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/se-klaravik" -- \
+            python scripts/run_market_clothing_inventory_discovery.py \
+              --market SE \
+              --source klaravik \
+              --output-dir "$INPUT_ROOT/se-klaravik" \
+              --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
+              --results-per-query 10 \
+              --freshness none \
+              --verify-pages \
+              --verification-limit 20
+
+      - name: Run Sweden PS Auction bounded direct scan
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/se-psauction" -- \
+            python scripts/run_market_clothing_inventory_discovery.py \
+              --market SE \
+              --source psauction \
+              --output-dir "$INPUT_ROOT/se-psauction" \
+              --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
+              --results-per-query 10 \
+              --freshness none \
+              --verify-pages \
+              --verification-limit 20
+
       - name: Run active Riegermann discovery
         run: |
           python scripts/run_checkpoint_source_command.py \
@@ -332,6 +360,18 @@ jobs:
                 "artifact_dir": "artifacts/multi-market-inputs/se-blinto"
               },
               {
+                "market_code": "SE",
+                "source_name": "Klaravik",
+                "currency": "SEK",
+                "artifact_dir": "artifacts/multi-market-inputs/se-klaravik"
+              },
+              {
+                "market_code": "SE",
+                "source_name": "PS Auction",
+                "currency": "SEK",
+                "artifact_dir": "artifacts/multi-market-inputs/se-psauction"
+              },
+              {
                 "market_code": "DE",
                 "source_name": "Riegermann",
                 "currency": "EUR",
@@ -423,8 +463,8 @@ jobs:
               raise SystemExit("The checkpoint did not cover NO, SE and DE")
           # Compatibility marker for the previous six-source contract:
           # "all six bounded source paths"
-          if len(report.get("sources") or []) != 7:
-              raise SystemExit("The checkpoint did not include all seven bounded source paths")
+          if len(report.get("sources") or []) != 9:
+              raise SystemExit("The checkpoint did not include all nine bounded source paths")
           if summary.count("الإجراء البشري الوحيد:") != 1:
               raise SystemExit("The phone report must contain exactly one human action")
           for key in (
@@ -435,7 +475,7 @@ jobs:
           ):
               if report.get(key) is not False:
                   raise SystemExit(f"Automatic action safety changed: {key}")
-          if sum((report.get("source_execution_counts") or {}).values()) != 7:
+          if sum((report.get("source_execution_counts") or {}).values()) != 9:
               raise SystemExit("Source execution statuses do not reconcile")
 
           source_by_name = {
@@ -447,6 +487,12 @@ jobs:
               raise SystemExit("FINN saved-search email was not included in the checkpoint")
           if "Norway cross-source verification" not in source_by_name:
               raise SystemExit("Norway cross-source verification was not included in the checkpoint")
+          if "Blinto" not in source_by_name:
+              raise SystemExit("Blinto was not included in the checkpoint")
+          if "Klaravik" not in source_by_name:
+              raise SystemExit("Klaravik was not included in the checkpoint")
+          if "PS Auction" not in source_by_name:
+              raise SystemExit("PS Auction was not included in the checkpoint")
 
           lifecycle = report.get("lifecycle") or {}
           stage_counts = lifecycle.get("stage_counts") or {}

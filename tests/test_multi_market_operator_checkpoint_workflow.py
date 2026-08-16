@@ -30,6 +30,15 @@ def test_checkpoint_workflow_covers_only_completed_markets() -> None:
     assert "run_auksjonen_live_clothing.py" in text
     assert "run_finn_email_intake.py" in text
     assert "--market SE" in text
+    assert "--source blinto" in text
+    assert "--source klaravik" in text
+    assert "--source psauction" in text
+    assert '"source_name": "Blinto"' in text
+    assert '"source_name": "Klaravik"' in text
+    assert '"source_name": "PS Auction"' in text
+    assert '"artifact_dir": "artifacts/multi-market-inputs/se-blinto"' in text
+    assert '"artifact_dir": "artifacts/multi-market-inputs/se-klaravik"' in text
+    assert '"artifact_dir": "artifacts/multi-market-inputs/se-psauction"' in text
     assert "run_riegermann_active_discovery.py" in text
     assert "run_venta_active_discovery.py" in text
     assert "run_dpv_active_discovery.py" in text
@@ -51,6 +60,20 @@ def test_checkpoint_reads_finn_gmail_after_auksjonen() -> None:
     assert "--auksjonen-report" in text
     assert '"source_name": "FINN saved-search email"' in text
     assert "all six bounded source paths" in text
+
+
+def test_sweden_daily_checkpoint_runs_three_direct_source_packs_before_germany() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    blinto = text.index("- name: Run Sweden Blinto bounded pilot")
+    klaravik = text.index("- name: Run Sweden Klaravik bounded direct scan")
+    psauction = text.index("- name: Run Sweden PS Auction bounded direct scan")
+    germany = text.index("- name: Run active Riegermann discovery")
+
+    assert blinto < klaravik < psauction < germany
+    assert "all nine bounded source paths" in text
+    assert '!= 9' in text
+    assert '"Klaravik" not in source_by_name' in text
+    assert '"PS Auction" not in source_by_name' in text
 
 
 def test_checkpoint_workflow_preserves_one_human_action() -> None:
