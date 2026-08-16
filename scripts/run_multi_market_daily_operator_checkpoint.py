@@ -115,7 +115,9 @@ def _run_italy_memory_sidecar(
             "status": "SKIPPED_NO_API_KEY",
             "source_country": "IT",
             "qualification_count": 0,
+            "source_unit_reference_derived_count": 0,
             "financial_decision_ready_count": 0,
+            "source_price_never_treated_as_final_payable": True,
             "missing_values_are_never_estimated": True,
             "canonical_market_coverage_unchanged": ["NO", "SE", "DE"],
             "promotion_to_opportunity_allowed": False,
@@ -173,8 +175,8 @@ def _run_italy_memory_sidecar(
         "engine_version": qualification.get("engine_version"),
         "status": qualification.get("status"),
         "qualification_count": qualification.get("qualification_count"),
-        "source_unit_economics_verified_count": qualification.get(
-            "source_unit_economics_verified_count"
+        "source_unit_reference_derived_count": qualification.get(
+            "source_unit_reference_derived_count"
         ),
         "financial_decision_ready_count": qualification.get(
             "financial_decision_ready_count"
@@ -314,6 +316,9 @@ def main() -> int:
                 "commercial_qualification_status": qualification_summary.get("status"),
                 "commercial_qualification_count": qualification_summary.get(
                     "qualification_count", 0
+                ),
+                "source_unit_reference_derived_count": qualification_summary.get(
+                    "source_unit_reference_derived_count", 0
                 ),
                 "financial_decision_ready_count": qualification_summary.get(
                     "financial_decision_ready_count", 0
