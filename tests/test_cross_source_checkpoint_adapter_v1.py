@@ -87,15 +87,16 @@ def test_adapter_emits_parseable_utc_discovered_at_for_continuity(
     assert report["status"] == "PASS"
 
 
-def test_daily_checkpoint_keeps_norway_cross_source_with_nine_bounded_sources() -> None:
+def test_daily_checkpoint_keeps_norway_cross_source_with_ten_bounded_sources() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
 
     assert "Run Norway bounded cross-source verification" in text
     assert "run_cross_source_checkpoint_adapter.py" in text
     assert '"source_name": "Norway cross-source verification"' in text
     assert '"artifact_dir": "artifacts/multi-market-inputs/no-cross-source"' in text
-    assert 'len(report.get("sources") or []) != 9' in text
-    assert 'sum((report.get("source_execution_counts") or {}).values()) != 9' in text
+    assert 'len(report.get("sources") or []) != 10' in text
+    assert 'sum((report.get("source_execution_counts") or {}).values()) != 10' in text
     assert '"source_name": "Klaravik"' in text
     assert '"source_name": "PS Auction"' in text
+    assert '"source_name": "Sen & Sen"' in text
     assert 'cron: "17 5 * * *"' in text

@@ -9,6 +9,10 @@ on:
         description: Bounded queries per Swedish direct source
         required: false
         default: "8"
+      germany_sen_sen_query_budget:
+        description: Bounded Sen & Sen direct-source queries
+        required: false
+        default: "6"
       riegermann_auction_limit:
         description: Maximum active Riegermann clothing auctions
         required: false
@@ -60,6 +64,8 @@ on:
       - "scripts/run_cross_source_checkpoint_adapter.py"
       - "scripts/run_cross_source_clothing_verification.py"
       - "scripts/run_cross_source_scent_expansion_v2.py"
+      - "scripts/run_market_clothing_inventory_discovery.py"
+      - "scripts/run_germany_clothing_inventory_discovery_search.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/market_intelligence.py"
@@ -74,6 +80,7 @@ on:
       - "src/opportunity_engine/discovery/sweden_valuable_datasets_status_feed.py"
       - "src/opportunity_engine/discovery/central_intelligence_orchestrator_cli_hook.py"
       - "src/opportunity_engine/discovery/cross_source_scent_expansion_v2.py"
+      - "src/opportunity_engine/discovery/germany_sen_sen.py"
       - "src/opportunity_engine/logistics/official_route_freight.py"
       - "src/opportunity_engine/persistence/__init__.py"
       - "src/opportunity_engine/persistence/human_review.py"
@@ -93,6 +100,8 @@ on:
       - "tests/test_human_review_outcome_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "tests/test_germany_sen_sen_source_v1.py"
+      - "tests/test_germany_targeted_source_runner_v1.py"
       - "tests/test_official_route_freight_v1.py"
       - "tests/test_official_route_freight_workflow_wiring_v1.py"
       - "tests/test_lifecycle_checkpoint_integration_v1.py"
@@ -134,6 +143,8 @@ jobs:
           pytest tests/test_human_review_checkpoint_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
+          pytest tests/test_germany_sen_sen_source_v1.py -q
+          pytest tests/test_germany_targeted_source_runner_v1.py -q
           pytest tests/test_official_route_freight_v1.py -q
           pytest tests/test_official_route_freight_workflow_wiring_v1.py -q
           pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
@@ -267,6 +278,22 @@ jobs:
               --verify-pages \
               --verification-limit 20
 
+      - name: Run Sen & Sen bounded clothing liquidation scan
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-sen-sen" -- \
+            python scripts/run_market_clothing_inventory_discovery.py \
+              --market DE \
+              --source sen-sen \
+              --output-dir "$INPUT_ROOT/de-sen-sen" \
+              --query-budget "${{ github.event.inputs.germany_sen_sen_query_budget || '6' }}" \
+              --results-per-query 10 \
+              --freshness pm \
+              --verify-pages \
+              --verification-limit 20 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-sen-sen/opportunity_engine.db"
+
       - name: Run active Riegermann discovery
         run: |
           python scripts/run_checkpoint_source_command.py \
@@ -373,6 +400,12 @@ jobs:
               },
               {
                 "market_code": "DE",
+                "source_name": "Sen & Sen",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-sen-sen"
+              },
+              {
+                "market_code": "DE",
                 "source_name": "Riegermann",
                 "currency": "EUR",
                 "artifact_dir": "artifacts/multi-market-inputs/de-riegermann"
@@ -461,10 +494,11 @@ jobs:
 
           if report.get("market_coverage") != ["NO", "SE", "DE"]:
               raise SystemExit("The checkpoint did not cover NO, SE and DE")
-          # Compatibility marker for the previous six-source contract:
+          # Compatibility markers for previous source-count contracts:
           # "all six bounded source paths"
-          if len(report.get("sources") or []) != 9:
-              raise SystemExit("The checkpoint did not include all nine bounded source paths")
+          # "all nine bounded source paths"
+          if len(report.get("sources") or []) != 10:
+              raise SystemExit("The checkpoint did not include all ten bounded source paths")
           if summary.count("الإجراء البشري الوحيد:") != 1:
               raise SystemExit("The phone report must contain exactly one human action")
           for key in (
@@ -475,7 +509,7 @@ jobs:
           ):
               if report.get(key) is not False:
                   raise SystemExit(f"Automatic action safety changed: {key}")
-          if sum((report.get("source_execution_counts") or {}).values()) != 9:
+          if sum((report.get("source_execution_counts") or {}).values()) != 10:
               raise SystemExit("Source execution statuses do not reconcile")
 
           source_by_name = {
@@ -493,6 +527,8 @@ jobs:
               raise SystemExit("Klaravik was not included in the checkpoint")
           if "PS Auction" not in source_by_name:
               raise SystemExit("PS Auction was not included in the checkpoint")
+          if "Sen & Sen" not in source_by_name:
+              raise SystemExit("Sen & Sen was not included in the checkpoint")
 
           lifecycle = report.get("lifecycle") or {}
           stage_counts = lifecycle.get("stage_counts") or {}
