@@ -29,10 +29,24 @@ from opportunity_engine.discovery.germany_clothing_inventory import (
     build_germany_clothing_inventory_queries,
     verify_germany_public_page,
 )
+from opportunity_engine.discovery.germany_sen_sen import (
+    SenSenPrefetchedSearchProvider,
+    build_sen_sen_clothing_queries,
+)
 from opportunity_engine.discovery.unified_opportunity_report import (
     write_unified_opportunity_report,
 )
 from opportunity_engine.markets.germany import load_germany_market_profile
+
+
+TARGETED_SOURCES = frozenset({"sen-sen"})
+
+
+def _effective_brave_freshness(source: str, requested: str) -> str:
+    """Use exact-page lifecycle verification rather than search-index age for direct sources."""
+    if source in TARGETED_SOURCES:
+        return "none"
+    return requested
 
 
 def _write_fallback_persistence_error(
@@ -71,16 +85,25 @@ def main() -> int:
     )
     parser.add_argument("--results-per-query", type=int, default=10)
     parser.add_argument(
+        "--source",
+        choices=("open-web", "sen-sen"),
+        default="open-web",
+        help="Use broad German open-web discovery or bounded Sen & Sen source targeting",
+    )
+    parser.add_argument(
         "--query-budget",
         type=int,
-        default=16,
-        help="Number of German open-web discovery queries (1-16)",
+        default=None,
+        help="Query count (default: open-web=16, sen-sen=6)",
     )
     parser.add_argument(
         "--freshness",
         choices=("none", "pd", "pw", "pm", "py"),
         default="pm",
-        help="Brave page-age filter",
+        help=(
+            "Brave page-age filter for open-web mode. Direct source mode ignores "
+            "index age and relies on exact-page lifecycle verification."
+        ),
     )
     parser.add_argument(
         "--verify-pages",
@@ -115,15 +138,37 @@ def main() -> int:
         raise SystemExit("BRAVE_SEARCH_API_KEY is required")
 
     profile = load_germany_market_profile(ROOT)
+    effective_freshness = _effective_brave_freshness(args.source, args.freshness)
     brave = BraveSearchProvider(
         api_key,
         country=profile.market_code,
-        freshness=None if args.freshness == "none" else args.freshness,
+        freshness=None if effective_freshness == "none" else effective_freshness,
         extra_snippets=True,
         operators=True,
     )
-    queries = build_germany_clothing_inventory_queries(args.query_budget)
-    provider = GermanyLocalizedSearchProvider(brave)
+
+    query_budget = args.query_budget
+    if query_budget is None:
+        query_budget = 6 if args.source == "sen-sen" else 16
+
+    source_diagnostics = None
+    sen_sen_provider: SenSenPrefetchedSearchProvider | None = None
+    if args.source == "sen-sen":
+        queries = build_sen_sen_clothing_queries(query_budget)
+        sen_sen_provider = SenSenPrefetchedSearchProvider(
+            brave,
+            queries=queries,
+            request_budget=len(queries),
+        )
+        provider = GermanyLocalizedSearchProvider(sen_sen_provider)
+        query_pack = "GERMANY_SEN_SEN_CLOTHING_INVENTORY_V1"
+        source_target = "sen-sen.de"
+    else:
+        queries = build_germany_clothing_inventory_queries(query_budget)
+        provider = GermanyLocalizedSearchProvider(brave)
+        query_pack = "GERMANY_CLOTHING_INVENTORY_V1"
+        source_target = None
+
     verifier = verify_germany_public_page if args.verify_pages else None
 
     raw_result = run_clothing_inventory_discovery(
@@ -135,6 +180,8 @@ def main() -> int:
     )
     result = apply_early_opportunity_gate(raw_result)
     result = apply_post_verification_top5_hard_gate(result)
+    if sen_sen_provider is not None:
+        source_diagnostics = sen_sen_provider.diagnostics()
 
     report = result["search_run_report"]
     report["domain"] = "CLOTHING_INVENTORY"
@@ -144,12 +191,15 @@ def main() -> int:
     report["language_codes"] = list(profile.language_codes)
     report["transaction_scope"] = profile.transaction_scope
     report["market_profile_id"] = profile.profile_id
-    report["source_mode"] = "OPEN_WEB"
-    report["source_target"] = None
-    report["query_pack"] = "GERMANY_CLOTHING_INVENTORY_V1"
+    report["source_mode"] = args.source.upper().replace("-", "_")
+    report["source_target"] = source_target
+    report["query_pack"] = query_pack
     report["query_budget"] = len(queries)
     report["brave_country"] = profile.market_code
-    report["brave_freshness"] = args.freshness
+    report["brave_freshness_requested"] = args.freshness
+    report["brave_freshness"] = effective_freshness
+    report["source_status_verification_authoritative"] = args.source in TARGETED_SOURCES
+    report["source_diagnostics"] = source_diagnostics
     report["brave_extra_snippets"] = True
     report["brave_operators"] = True
     report["currency_conversion_performed"] = False
