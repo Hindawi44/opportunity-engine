@@ -8,10 +8,13 @@ from typing import Sequence
 from opportunity_engine.discovery.bridal_english_market_search import (
     ENGLISH_BRIDAL_QUERIES,
     ENGLISH_SEARCH_LANE,
+    _ORIGINAL_LOCAL_COLLECTOR,
     english_bridal_signal_from_hit,
 )
 from opportunity_engine.discovery.bridal_liquidation_feed import (
+    ADAPTIVE_MARKETS,
     BRIDAL_QUERIES,
+    BRIDAL_QUERY_PACKS,
     FEED_FAMILY,
     SUPPORTED_MARKETS,
     bridal_signal_from_hit,
@@ -50,6 +53,23 @@ def test_feed_has_local_and_english_queries_for_each_existing_market() -> None:
         query.language == "en" and query.lane == ENGLISH_SEARCH_LANE
         for query in ENGLISH_BRIDAL_QUERIES.values()
     )
+
+
+def test_se_de_query_packs_cover_separate_commercial_intents() -> None:
+    assert ADAPTIVE_MARKETS == frozenset({"SE", "DE"})
+    assert len(BRIDAL_QUERY_PACKS["NO"]) == 1
+    assert len(BRIDAL_QUERY_PACKS["SE"]) == 5
+    assert len(BRIDAL_QUERY_PACKS["DE"]) == 5
+    for market in ("SE", "DE"):
+        assert [query.intent for query in BRIDAL_QUERY_PACKS[market]] == [
+            "LIQUIDATION",
+            "SAMPLE_STOCK",
+            "STOCKLOT_WHOLESALE",
+            "AUCTION",
+            "CLOSURE_STOCK",
+        ]
+        assert BRIDAL_QUERY_PACKS[market][0].phase == "CORE"
+        assert all(query.phase == "ADAPTIVE" for query in BRIDAL_QUERY_PACKS[market][1:])
 
 
 def test_accepts_commercial_norwegian_bridal_liquidation_signal() -> None:
@@ -208,7 +228,7 @@ class FakeProvider:
         return [_LOCAL_FIXTURES[self.market_code]]
 
 
-def test_collection_is_bounded_to_six_requests_and_flows_into_market_reports(
+def test_collection_is_bounded_to_fourteen_requests_and_flows_into_market_reports(
     tmp_path: Path,
 ) -> None:
     providers: dict[str, list[FakeProvider]] = {market: [] for market in SUPPORTED_MARKETS}
@@ -232,19 +252,30 @@ def test_collection_is_bounded_to_six_requests_and_flows_into_market_reports(
     assert report["status_counts"] == {"SUCCESS": 3}
     assert report["search_languages"] == ["local-market-language", "en"]
     assert report["english_market_search_enabled"] is True
-    assert report["query_budget_total"] == 6
-    assert report["requests_made"] == 6
-    assert report["local_requests_made"] == 3
+    assert report["query_budget_total"] == 14
+    assert report["requests_made"] == 14
+    assert report["local_requests_made"] == 11
     assert report["english_requests_made"] == 3
     assert report["signal_count"] == 6
     assert report["local_signal_count"] == 3
     assert report["english_signal_count"] == 3
     assert report["private_single_dress_listings_rejected"] is True
     assert report["automatic_purchase"] is False
-    assert all(
-        len(instances) == 2 and all(len(provider.calls) == 1 for provider in instances)
-        for instances in providers.values()
-    )
+
+    assert [len(provider.calls) for provider in providers["NO"]] == [1, 1]
+    assert [len(provider.calls) for provider in providers["SE"]] == [5, 1]
+    assert [len(provider.calls) for provider in providers["DE"]] == [5, 1]
+
+    local_sources = {
+        source["source_country"]: source
+        for source in report["local_language_report"]["sources"]
+    }
+    assert local_sources["NO"]["adaptive_expansion_eligible"] is False
+    for market in ("SE", "DE"):
+        assert local_sources[market]["adaptive_expansion_triggered"] is True
+        assert local_sources[market]["adaptive_stop_reason"] == "QUERY_PACK_EXHAUSTED"
+        assert local_sources[market]["queries_attempted"] == 5
+        assert local_sources[market]["distinct_domain_count"] == 1
 
     for market in ("no", "se", "de"):
         path = tmp_path / "artifacts" / market / "market-signal-report.json"
@@ -260,6 +291,75 @@ def test_collection_is_bounded_to_six_requests_and_flows_into_market_reports(
         )
 
 
+class DiversifyingLocalProvider:
+    def __init__(self, market_code: str) -> None:
+        self.market_code = market_code
+        self.calls: list[tuple[str, int]] = []
+
+    @property
+    def name(self) -> str:
+        return "Diversifying Fake Brave"
+
+    def search(self, query: str, *, count: int = 10) -> Sequence[SearchHit]:
+        self.calls.append((query, count))
+        if len(self.calls) == 1:
+            return [_LOCAL_FIXTURES[self.market_code]]
+        if self.market_code == "SE":
+            return [
+                SearchHit(
+                    title="Brudbutik lagerförsäljning – provklänningar",
+                    url="https://second-bridal.se/lager",
+                    description="Varulager med butiksexemplar säljes efter utförsäljning.",
+                    provider=self.name,
+                )
+            ]
+        if self.market_code == "DE":
+            return [
+                SearchHit(
+                    title="Brautladen Musterverkauf – Musterkleider",
+                    url="https://zweite-brautquelle.de/musterverkauf",
+                    description="Warenbestand mit Ausstellungsstücke im Abverkauf.",
+                    provider=self.name,
+                )
+            ]
+        return []
+
+
+def test_adaptive_depth_stops_after_two_signals_from_two_domains(tmp_path: Path) -> None:
+    providers: dict[str, DiversifyingLocalProvider] = {}
+
+    def factory(
+        market_code: str,
+        api_key: str,
+        freshness: str | None,
+    ) -> DiversifyingLocalProvider:
+        provider = DiversifyingLocalProvider(market_code)
+        providers[market_code] = provider
+        return provider
+
+    report = _ORIGINAL_LOCAL_COLLECTOR(
+        _manifest(),
+        root=tmp_path,
+        observed_at=NOW,
+        environment={"BRAVE_SEARCH_API_KEY": "secret"},
+        provider_factory=factory,
+        results_per_query=8,
+    )
+
+    assert report["query_budget_total"] == 11
+    assert report["requests_made"] == 5
+    by_market = {source["source_country"]: source for source in report["sources"]}
+    assert by_market["NO"]["queries_attempted"] == 1
+    for market in ("SE", "DE"):
+        source = by_market[market]
+        assert source["accepted_signal_count"] == 2
+        assert source["distinct_domain_count"] == 2
+        assert source["adaptive_expansion_triggered"] is True
+        assert source["adaptive_stop_reason"] == "EVIDENCE_DIVERSIFIED"
+        assert source["queries_attempted"] == 2
+        assert len(providers[market].calls) == 2
+
+
 def test_missing_brave_key_is_explicit_and_makes_no_request() -> None:
     def forbidden_factory(*args, **kwargs):
         raise AssertionError("provider must not be initialized")
@@ -273,7 +373,7 @@ def test_missing_brave_key_is_explicit_and_makes_no_request() -> None:
 
     assert report["requests_made"] == 0
     assert report["signal_count"] == 0
-    assert report["query_budget_total"] == 6
+    assert report["query_budget_total"] == 14
     assert report["status_counts"] == {"BLOCKED_CONFIGURATION": 3}
     assert all(
         source["local_language_status"] == "BLOCKED_CONFIGURATION"
