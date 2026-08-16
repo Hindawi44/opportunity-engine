@@ -22,6 +22,10 @@ from opportunity_engine.persistence.market_signal_repository import MarketSignal
 
 
 BRIEF_SCHEMA_VERSION = "domain-market-intelligence-brief-1.0"
+CORE_MARKETS = ("NO", "SE", "DE")
+CORE_MARKET_SET = frozenset(CORE_MARKETS)
+KNOWN_SIDECAR_MARKETS = ("IT", "NL", "FR")
+DECISION_SCOPE_MODE = "CORE_ONLY_WITH_SIDECAR_OBSERVATORY"
 DIRECT_WORKFLOWS = {
     "REQUIRES_VERIFICATION",
     "ACTIVE_OPPORTUNITY",
@@ -43,6 +47,14 @@ class DomainMarketIntelligenceError(ValueError):
 
 def _compact(value: object) -> str:
     return " ".join(str(value or "").split())
+
+
+def _market_code(value: object) -> str:
+    return _compact(value).upper()
+
+
+def _is_core_market(value: object) -> bool:
+    return _market_code(value) in CORE_MARKET_SET
 
 
 def _read_json(path: Path, *, default: Any = None) -> Any:
@@ -347,21 +359,53 @@ def _early_signals(signals: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]
     )
 
 
+def _existing_action_is_core(
+    existing: Mapping[str, Any],
+    direct_opportunities: Sequence[Mapping[str, Any]],
+) -> bool:
+    explicit_market = _market_code(existing.get("market_code"))
+    if explicit_market:
+        return explicit_market in CORE_MARKET_SET
+    identity = _compact(existing.get("opportunity_identity"))
+    if not identity:
+        return True
+    match = next(
+        (
+            item
+            for item in direct_opportunities
+            if _compact(item.get("opportunity_identity")) == identity
+        ),
+        None,
+    )
+    if match is None:
+        return True
+    return _is_core_market(match.get("market_code"))
+
+
 def _selected_action(
-    checkpoint: Mapping[str, Any], early_signals: Sequence[Mapping[str, Any]]
+    checkpoint: Mapping[str, Any],
+    early_signals: Sequence[Mapping[str, Any]],
+    direct_opportunities: Sequence[Mapping[str, Any]],
 ) -> dict[str, Any]:
     existing = checkpoint.get("next_human_action")
     if isinstance(existing, Mapping):
         action = _compact(existing.get("action")).upper()
-        if action and action != "NO_IMMEDIATE_ACTION":
+        if (
+            action
+            and action != "NO_IMMEDIATE_ACTION"
+            and _existing_action_is_core(existing, direct_opportunities)
+        ):
             return {
                 "action": action,
                 "reason": existing.get("reason"),
                 "opportunity_identity": existing.get("opportunity_identity"),
                 "signal_id": None,
             }
-    if early_signals:
-        signal = early_signals[0]
+    core_early = [
+        signal for signal in early_signals if _is_core_market(signal.get("source_country"))
+    ]
+    if core_early:
+        signal = core_early[0]
         signal_type = _compact(signal.get("signal_type")).upper()
         if signal_type == MarketSignalType.REPEATED_SELLER_ACTIVITY.value:
             action = "INVESTIGATE_RELATED_INVENTORY"
@@ -383,17 +427,38 @@ def _selected_action(
         }
     return {
         "action": "NO_IMMEDIATE_ACTION",
-        "reason": "No credible direct opportunity or early market signal requires action.",
+        "reason": "No credible core-market direct opportunity or early market signal requires action.",
         "opportunity_identity": None,
         "signal_id": None,
     }
+
+
+def _observed_sidecar_markets(
+    early_signals: Sequence[Mapping[str, Any]],
+    direct_opportunities: Sequence[Mapping[str, Any]],
+    coverage: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    observed: set[str] = set()
+    for item in early_signals:
+        code = _market_code(item.get("source_country"))
+        if code and code not in CORE_MARKET_SET:
+            observed.add(code)
+    for item in direct_opportunities:
+        code = _market_code(item.get("market_code"))
+        if code and code not in CORE_MARKET_SET:
+            observed.add(code)
+    for item in coverage:
+        code = _market_code(item.get("market_code"))
+        if code and code not in CORE_MARKET_SET:
+            observed.add(code)
+    return sorted(observed)
 
 
 def build_domain_market_intelligence_brief(
     checkpoint: Mapping[str, Any],
     signal_persistence: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Separate early market news from direct actionable opportunities."""
+    """Separate early market news from direct opportunities with core-only decisions."""
     current = [
         dict(item)
         for item in signal_persistence.get("current_signals") or []
@@ -421,11 +486,28 @@ def build_domain_market_intelligence_brief(
         for item in coverage
         if _compact(item.get("execution_status")).upper() in {"FAILURE", "BLOCKED"}
     ]
-    action = _selected_action(checkpoint, early)
+    core_early_count = sum(
+        1 for item in early if _is_core_market(item.get("source_country"))
+    )
+    core_direct_count = sum(
+        1 for item in direct if _is_core_market(item.get("market_code"))
+    )
+    observed_sidecars = _observed_sidecar_markets(early, direct, coverage)
+    action = _selected_action(checkpoint, early, direct)
     return {
         "schema_version": BRIEF_SCHEMA_VERSION,
         "generated_at": checkpoint.get("generated_at"),
-        "market_coverage": checkpoint.get("market_coverage") or ["NO", "SE", "DE"],
+        "market_coverage": checkpoint.get("market_coverage") or list(CORE_MARKETS),
+        "decision_scope": {
+            "mode": DECISION_SCOPE_MODE,
+            "core_markets": list(CORE_MARKETS),
+            "known_sidecar_markets": list(KNOWN_SIDECAR_MARKETS),
+            "observed_sidecar_markets": observed_sidecars,
+            "sidecar_records_retained": True,
+            "sidecars_drive_selected_human_action": False,
+            "sidecars_trigger_paid_targeted_enrichment": False,
+            "promotion_mode": "EXPLICIT_POLICY_CHANGE_ONLY",
+        },
         "new_signals_today": new_signals,
         "changed_signals_since_previous_checkpoint": changed_signals,
         "early_signals_to_watch": early,
@@ -438,6 +520,10 @@ def build_domain_market_intelligence_brief(
             "changed_signals_since_previous_checkpoint": len(changed_signals),
             "early_signals_to_watch": len(early),
             "current_direct_opportunities": len(direct),
+            "core_early_signals_to_watch": core_early_count,
+            "sidecar_early_signals_to_watch": len(early) - core_early_count,
+            "core_direct_opportunities": core_direct_count,
+            "sidecar_direct_opportunities": len(direct) - core_direct_count,
             "unavailable_or_failed_sources": len(unavailable),
         },
         "truthful_zero_result": not new_signals and not changed_signals and not early and not direct,
@@ -451,10 +537,13 @@ def build_domain_market_intelligence_brief(
 def render_domain_market_intelligence_brief(brief: Mapping[str, Any]) -> str:
     counts = brief.get("counts") or {}
     action = brief.get("selected_human_action") or {}
+    scope = brief.get("decision_scope") or {}
+    observed_sidecars = scope.get("observed_sidecar_markets") or []
     lines = [
         "نشرة استخبارات سوق مخزون الملابس",
         f"الوقت: {brief.get('generated_at')}",
-        "الأسواق: النرويج | السويد | ألمانيا",
+        "الأسواق الأساسية: النرويج | السويد | ألمانيا",
+        f"Sidecars مرصودة: {', '.join(str(item) for item in observed_sidecars) if observed_sidecars else 'لا يوجد'}",
         f"إشارات جديدة اليوم: {counts.get('new_signals_today', 0)}",
         f"إشارات تغيرت: {counts.get('changed_signals_since_previous_checkpoint', 0)}",
         f"إشارات مبكرة للمراقبة: {counts.get('early_signals_to_watch', 0)}",
