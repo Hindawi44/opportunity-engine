@@ -48,11 +48,14 @@ def test_targeted_workflow_reuses_upstream_artifact_and_never_rescans_markets() 
         assert forbidden not in text
 
 
-def test_paid_stage_is_bounded_and_read_only() -> None:
+def test_paid_stage_is_bounded_read_only_and_fails_closed_on_missing_keys() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     assert 'OPENAI_HUNT_MAX_API_REQUESTS: "3"' in text
     assert 'OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.16"' in text
     assert 'HUNT_FOLLOWUP_MAX_REQUESTS: "6"' in text
+    assert 'summary.get("openai_hunt_status") == "SKIPPED_NO_API_KEY"' in text
+    assert 'summary.get("targeted_followup_status") == "SKIPPED_NO_BRAVE_KEY"' in text
+    assert 'float(summary.get("openai_estimated_cost_usd") or 0.0) > 0.16' in text
     assert "automatic_contact" in text
     assert "automatic_bid" in text
     assert "automatic_purchase" in text
