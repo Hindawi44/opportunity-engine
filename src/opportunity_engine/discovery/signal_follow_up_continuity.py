@@ -48,6 +48,18 @@ _AUCTION_TERMS = {
     "SE": ("auktion", "konkursauktion", "auktionsobjekt"),
     "NO": ("auksjon", "konkursauksjon", "auksjonsobjekt"),
 }
+_LEGAL_ENTITY_TOKENS = {
+    "gmbh",
+    "gesellschaft",
+    "aktiebolag",
+    "handelsbolag",
+    "kommanditbolag",
+    "aksjeselskap",
+    "limited",
+    "incorporated",
+    "corporation",
+    "company",
+}
 
 
 def _compact(value: object) -> str:
@@ -81,6 +93,32 @@ def _matched(text: str, terms: Sequence[str]) -> list[str]:
     return sorted({term for term in terms if term.casefold() in folded})
 
 
+def _entity_identity_tokens(value: object) -> list[str]:
+    """Return entity-bearing tokens, never generic legal-form designators."""
+    return [
+        token
+        for token in _significant_tokens(value)
+        if token not in _LEGAL_ENTITY_TOKENS
+    ]
+
+
+def _matched_entity_tokens(target: object, text: object) -> list[str]:
+    """Require the entity's first distinctive token and exact token boundaries.
+
+    Legal-form words such as GmbH are never identity evidence. For a multi-token
+    name such as ``Schümer Textil GmbH``, ``Schümer`` is the anchor: a generic
+    auction result that merely contains ``GmbH`` or ``Textil`` cannot qualify.
+    """
+    target_tokens = _entity_identity_tokens(target)
+    if not target_tokens:
+        return []
+    observed_tokens = set(_normalise(text).split())
+    anchor = target_tokens[0]
+    if anchor not in observed_tokens:
+        return []
+    return [token for token in target_tokens if token in observed_tokens]
+
+
 def _lead(hit: SearchHit, *, case: Mapping[str, Any], rank: int) -> dict[str, Any] | None:
     market = _compact(case.get("_follow_up_market")).upper()
     target = _compact(case.get("_follow_up_target"))
@@ -95,9 +133,8 @@ def _lead(hit: SearchHit, *, case: Mapping[str, Any], rank: int) -> dict[str, An
     commercial = _matched(combined, _COMMERCIAL_TERMS[market])
     if not commercial:
         return None
-    target_tokens = _significant_tokens(target)
-    normalized = _normalise(combined)
-    matched_target = [token for token in target_tokens if token in normalized]
+    target_tokens = _entity_identity_tokens(target)
+    matched_target = _matched_entity_tokens(target, combined)
     if target_tokens and not matched_target:
         return None
     title_terms = _matched(title, _COMMERCIAL_TERMS[market])
@@ -112,6 +149,7 @@ def _lead(hit: SearchHit, *, case: Mapping[str, Any], rank: int) -> dict[str, An
         "provider": _compact(hit.provider) or "Brave Search",
         "search_rank": rank,
         "matched_target_tokens": matched_target,
+        "entity_identity_anchor": target_tokens[0] if target_tokens else None,
         "matched_commercial_terms": commercial,
         "follow_up_relevance_score": relevance,
         "verification_status": "UNVERIFIED_PUBLIC_WEB_SEARCH_HIT",
@@ -173,9 +211,9 @@ def _same_entity(case: Mapping[str, Any], memory: Mapping[str, Any]) -> bool:
         return False
     if _compact(countries[0]).upper() != _compact(memory_countries[0]).upper():
         return False
-    title = _normalise(case.get("case_title"))
-    tokens = _significant_tokens(memory.get("entity_label"))
-    return bool(tokens) and all(token in title for token in tokens)
+    title_tokens = set(_normalise(case.get("case_title")).split())
+    tokens = _entity_identity_tokens(memory.get("entity_label"))
+    return bool(tokens) and all(token in title_tokens for token in tokens)
 
 
 def _filtered_report(report: Mapping[str, Any], memory_cases: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
