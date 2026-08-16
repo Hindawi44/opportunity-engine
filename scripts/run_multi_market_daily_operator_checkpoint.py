@@ -19,6 +19,10 @@ for path in (ROOT, SRC):
 from opportunity_engine.discovery.italy_case_memory_adapter import (
     run_italy_case_memory_cycle,
 )
+from opportunity_engine.discovery.italy_commercial_qualification import (
+    ENGINE_VERSION as ITALY_COMMERCIAL_QUALIFICATION_ENGINE_VERSION,
+    run_italy_commercial_qualification,
+)
 from opportunity_engine.discovery.italy_exact_lot_verification import (
     ENGINE_VERSION as ITALY_EXACT_LOT_ENGINE_VERSION,
     run_italy_exact_lot_verification,
@@ -95,6 +99,27 @@ def _run_italy_memory_sidecar(
             "status": "SKIPPED_NO_API_KEY",
             "source_country": "IT",
             "verified_active_exact_lot_lead_count": 0,
+            "verifications": [],
+            "promotion_to_opportunity_allowed": False,
+            "top5_eligible": False,
+            "analysis_eligible": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_reservation": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        qualification_skipped = {
+            "schema_version": "italy-commercial-qualification-1.0",
+            "engine_version": ITALY_COMMERCIAL_QUALIFICATION_ENGINE_VERSION,
+            "status": "SKIPPED_NO_API_KEY",
+            "source_country": "IT",
+            "qualification_count": 0,
+            "source_unit_reference_derived_count": 0,
+            "financial_decision_ready_count": 0,
+            "source_price_never_treated_as_final_payable": True,
+            "missing_values_are_never_estimated": True,
+            "canonical_market_coverage_unchanged": ["NO", "SE", "DE"],
             "promotion_to_opportunity_allowed": False,
             "top5_eligible": False,
             "analysis_eligible": False,
@@ -106,7 +131,12 @@ def _run_italy_memory_sidecar(
         }
         _write_json(output_dir / "italy-case-memory-v1.json", skipped)
         _write_json(output_dir / "italy-exact-lot-verification-v1.json", exact_skipped)
+        _write_json(
+            output_dir / "italy-commercial-qualification-v1.json",
+            qualification_skipped,
+        )
         skipped["exact_lot_verification"] = exact_skipped
+        skipped["commercial_qualification"] = qualification_skipped
         return skipped
 
     discovery = collect_italy_market_signals(environment=os.environ)
@@ -140,6 +170,20 @@ def _run_italy_memory_sidecar(
         "output": "italy-exact-lot-verification-v1.json",
     }
 
+    qualification = run_italy_commercial_qualification(exact_lot)
+    cycle["commercial_qualification"] = {
+        "engine_version": qualification.get("engine_version"),
+        "status": qualification.get("status"),
+        "qualification_count": qualification.get("qualification_count"),
+        "source_unit_reference_derived_count": qualification.get(
+            "source_unit_reference_derived_count"
+        ),
+        "financial_decision_ready_count": qualification.get(
+            "financial_decision_ready_count"
+        ),
+        "output": "italy-commercial-qualification-v1.json",
+    }
+
     _write_json(output_dir / "italy-case-memory-v1.json", cycle)
     _write_json(
         output_dir / "italy-signal-follow-up-v1.json",
@@ -148,6 +192,10 @@ def _run_italy_memory_sidecar(
     _write_json(
         output_dir / "italy-exact-lot-verification-v1.json",
         exact_lot,
+    )
+    _write_json(
+        output_dir / "italy-commercial-qualification-v1.json",
+        qualification,
     )
     return cycle
 
@@ -253,6 +301,7 @@ def main() -> int:
     for name, path in paths.items():
         print(f"{name}: {path}")
     exact_summary = italy_sidecar.get("exact_lot_verification") or {}
+    qualification_summary = italy_sidecar.get("commercial_qualification") or {}
     print(
         "italy_memory_sidecar: "
         + json.dumps(
@@ -263,6 +312,16 @@ def main() -> int:
                 "exact_lot_status": exact_summary.get("status"),
                 "verified_active_exact_lot_lead_count": exact_summary.get(
                     "verified_active_exact_lot_lead_count", 0
+                ),
+                "commercial_qualification_status": qualification_summary.get("status"),
+                "commercial_qualification_count": qualification_summary.get(
+                    "qualification_count", 0
+                ),
+                "source_unit_reference_derived_count": qualification_summary.get(
+                    "source_unit_reference_derived_count", 0
+                ),
+                "financial_decision_ready_count": qualification_summary.get(
+                    "financial_decision_ready_count", 0
                 ),
                 "automatic_purchase": italy_sidecar.get("automatic_purchase"),
             },
