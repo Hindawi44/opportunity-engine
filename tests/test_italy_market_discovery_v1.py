@@ -192,13 +192,35 @@ def test_stocklot_query_rejects_editorial_inventory_article_without_commercial_a
     assert signal is None
 
 
-def test_stocklot_query_keeps_commercial_stock_source() -> None:
+def test_stocklot_query_rejects_sell_your_stock_service_article() -> None:
     query = next(q for q in ITALY_DISCOVERY_QUERIES if q.intent == "STOCKLOT_WHOLESALE")
     signal = italy_signal_from_hit(
         SearchHit(
-            title="Rimanenze moda: stock abbigliamento all'ingrosso",
-            url="https://stock.example.it/rimanenze-moda",
-            description="Vendere e acquistare lotti di rimanenze di magazzino.",
+            title=(
+                "Rimanenze moda: come vendere lo stock invenduto | Stock abbigliamento "
+                "firmato, stock scarpe, stock borse jeans anche all'ingrosso buying fashion office"
+            ),
+            url="https://www.stockoutlet.it/rimanenze-moda",
+            description=(
+                "Scopri come trasformare rimanenze di abbigliamento e calzature in liquidità. "
+                "Se possiedi un negozio o un magazzino puoi sottoporre lo stock al team."
+            ),
+            provider="Fake Brave",
+        ),
+        query=query,
+        rank=1,
+        observed_at=NOW,
+    )
+    assert signal is None
+
+
+def test_stocklot_query_keeps_buyer_facing_inventory_offer() -> None:
+    query = next(q for q in ITALY_DISCOVERY_QUERIES if q.intent == "STOCKLOT_WHOLESALE")
+    signal = italy_signal_from_hit(
+        SearchHit(
+            title="Stock abbigliamento firmato: lotto disponibile all'ingrosso",
+            url="https://stock.example.it/lotto-800-capi",
+            description="Lotto di 800 capi in vendita con prezzo stock e pronta consegna.",
             provider="Fake Brave",
         ),
         query=query,
@@ -206,7 +228,8 @@ def test_stocklot_query_keeps_commercial_stock_source() -> None:
         observed_at=NOW,
     )
     assert signal is not None
-    assert "vendere" in signal.metadata["commercial_action_terms"]
+    assert "in vendita" in signal.metadata["inventory_offer_terms"]
+    assert "prezzo" in signal.metadata["inventory_offer_terms"]
 
 
 class FakeProvider:

@@ -28,7 +28,7 @@ from opportunity_engine.market_intelligence import (
 from opportunity_engine.unified_models import Evidence
 
 
-SCHEMA_VERSION = "italy-market-discovery-1.1"
+SCHEMA_VERSION = "italy-market-discovery-1.2"
 FEED_FAMILY = "ITALY_MARKET_DISCOVERY_V1"
 MARKET_CODE = "IT"
 DEFAULT_RESULTS_PER_QUERY = 10
@@ -172,6 +172,27 @@ _COMMERCIAL_ACTION_TERMS = (
     "offerte",
     "outlet",
 )
+_INVENTORY_OFFER_TERMS = (
+    "in vendita",
+    "vendesi",
+    "disponibile",
+    "disponibili",
+    "prezzo",
+    "prezzi",
+    "offerta",
+    "offerte",
+    "pronta consegna",
+    "stock disponibile",
+    "stock disponibili",
+    "lotto disponibile",
+    "lotti disponibili",
+    "vendita stock",
+    "vendita di stock",
+    "vendita lotto",
+    "vendita di lotto",
+    "vendita lotti",
+    "vendita di lotti",
+)
 _COMMERCIAL_GATE_INTENTS = {"STOCKLOT_WHOLESALE", "WAREHOUSE_CLEARANCE"}
 _TRACKING_QUERY_KEYS = {"fbclid", "gclid", "mc_cid", "mc_eid", "ref", "source"}
 _OFFICIAL_PVP_DOMAIN = "pvp.giustizia.it"
@@ -281,10 +302,12 @@ def italy_signal_from_hit(
         return None
 
     commercial_action_terms = _matched(combined, _COMMERCIAL_ACTION_TERMS)
-    # Stock/warehouse editorial pages can mention inventory without offering any
-    # commercial action. Keep those out of durable opportunity scent storage.
-    if query.intent in _COMMERCIAL_GATE_INTENTS and not commercial_action_terms:
-        return None
+    inventory_offer_terms = _matched(combined, _INVENTORY_OFFER_TERMS)
+    # Stock/warehouse pages must show buyer-facing inventory availability, not
+    # merely discuss how a merchant can sell stock or manage unsold inventory.
+    if query.intent in _COMMERCIAL_GATE_INTENTS:
+        if not commercial_action_terms or not inventory_offer_terms:
+            return None
 
     official = _host(url) == _OFFICIAL_PVP_DOMAIN
     confidence = 0.58
@@ -346,6 +369,7 @@ def italy_signal_from_hit(
             "domain_terms": domain_terms,
             "event_terms": event_terms,
             "commercial_action_terms": commercial_action_terms,
+            "inventory_offer_terms": inventory_offer_terms,
             "canonical_url": url,
             "source_scope": "OFFICIAL_JUDICIAL_SALES" if official else "PUBLIC_WEB_DISCOVERY",
             "source_page_verification_required": True,
