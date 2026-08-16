@@ -15,12 +15,15 @@ from typing import Any, Callable, Mapping, Sequence
 
 from opportunity_engine.discovery import signal_follow_up_continuity as continuity
 from opportunity_engine.discovery import signal_follow_up_memory as memory
+from opportunity_engine.discovery.netherlands_entity_identity_resolution import (
+    resolve_netherlands_entity_identities,
+)
 from opportunity_engine.discovery.netherlands_market_discovery import FEED_FAMILY
 from opportunity_engine.discovery.search_provider import SearchProvider
 from opportunity_engine.persistence import upgrade_database
 
 
-SCHEMA_VERSION = "netherlands-case-memory-adapter-1.0"
+SCHEMA_VERSION = "netherlands-case-memory-adapter-1.1"
 ENGINE_VERSION = "NETHERLANDS_CASE_MEMORY_ADAPTER_V1"
 MARKET_CODE = "NL"
 NETHERLANDS_MEMORY_RELATIVE_PATH = Path("nl-market/opportunity_engine.db")
@@ -219,7 +222,9 @@ def adapt_netherlands_signal_to_entity_memory(
             "entity_shape": shape,
             "entity_cluster_score": score,
             "entity_evidence_count": 1,
-            "entity_independent_source_count": 1,
+            "entity_independent_source_count": int(
+                adapted_metadata.get("identity_independent_domain_count") or 1
+            ),
             "netherlands_case_memory_adapter": ENGINE_VERSION,
             "signal_only": True,
             "source_page_verification_required": True,
@@ -310,10 +315,26 @@ def run_netherlands_case_memory_cycle(
     results_per_case: int = continuity.DEFAULT_RESULTS_PER_CASE,
     config_path: str | Path = "alembic.ini",
 ) -> dict[str, Any]:
-    """Persist NL entity scents, reload memory, and run the existing Follow-Up engine."""
+    """Resolve identity, persist NL entity scents, reload memory, then Follow-Up."""
     register_netherlands_follow_up_contract()
     now = _utc(observed_at)
-    adapter = build_netherlands_case_memory_adapter(current_signals, observed_at=now)
+    env = environment or {}
+    identity_kwargs: dict[str, Any] = {
+        "environment": env,
+        "observed_at": now,
+    }
+    if provider_factory is not None:
+        identity_kwargs["provider_factory"] = provider_factory
+    identity_resolution = resolve_netherlands_entity_identities(
+        current_signals,
+        **identity_kwargs,
+    )
+    resolved_signals = [
+        item
+        for item in identity_resolution.get("enriched_signals") or []
+        if isinstance(item, Mapping)
+    ]
+    adapter = build_netherlands_case_memory_adapter(resolved_signals, observed_at=now)
     ensure_netherlands_memory_database(input_root, config_path=config_path)
     persistence = memory.persist_entity_scent_signals(
         adapter["entity_signals"],
@@ -331,7 +352,7 @@ def run_netherlands_case_memory_cycle(
     follow_up = continuity.run_signal_follow_up_engine_with_continuity(
         cases_report or {"cases": []},
         entity_signals=combined,
-        environment=environment or {},
+        environment=env,
         provider_factory=provider_factory,
         observed_at=now,
         max_cases=max_cases,
@@ -344,6 +365,12 @@ def run_netherlands_case_memory_cycle(
         "generated_at": now.isoformat(),
         "source_country": MARKET_CODE,
         "memory_database": (Path(input_root) / NETHERLANDS_MEMORY_RELATIVE_PATH).as_posix(),
+        "identity_resolution": identity_resolution,
+        "identity_resolution_status": identity_resolution.get("status"),
+        "resolved_identity_count": identity_resolution.get("resolved_identity_count", 0),
+        "officially_confirmed_identity_count": identity_resolution.get(
+            "officially_confirmed_identity_count", 0
+        ),
         "adapter": adapter,
         "persistence": {
             **persistence,
