@@ -13,6 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+from opportunity_engine.discovery import signal_follow_up_memory as entity_memory
 from opportunity_engine.discovery.netherlands_case_memory_adapter import (
     ensure_netherlands_memory_database,
     run_netherlands_case_memory_cycle as _run_existing_cycle,
@@ -37,6 +38,11 @@ def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
 
 
+def _metadata(signal: Mapping[str, Any]) -> dict[str, Any]:
+    value = signal.get("metadata")
+    return dict(value) if isinstance(value, Mapping) else {}
+
+
 def _signal_id_set(signals: Sequence[Mapping[str, Any]]) -> set[str]:
     return {
         signal_id
@@ -44,6 +50,28 @@ def _signal_id_set(signals: Sequence[Mapping[str, Any]]) -> set[str]:
         if isinstance(raw, Mapping)
         and (signal_id := _compact(raw.get("signal_id")))
     }
+
+
+def _mark_resolved_from_pending(
+    entity_rows: Sequence[Mapping[str, Any]],
+    *,
+    pending_ids_before: set[str],
+) -> list[dict[str, Any]]:
+    """Move resolved rows out of the pending lifecycle while keeping audit facts."""
+    result: list[dict[str, Any]] = []
+    for raw in entity_rows:
+        if not isinstance(raw, Mapping):
+            continue
+        row = deepcopy(dict(raw))
+        signal_id = _compact(row.get("signal_id"))
+        if signal_id in pending_ids_before:
+            metadata = _metadata(row)
+            metadata["identity_lifecycle_state"] = "IDENTITY_RESOLVED"
+            metadata["identity_resolved_from_pending"] = True
+            metadata["identity_pending_memory_history_retained"] = True
+            row["metadata"] = metadata
+        result.append(row)
+    return result
 
 
 def run_netherlands_case_memory_cycle(
@@ -91,6 +119,24 @@ def run_netherlands_case_memory_cycle(
     if not isinstance(identity_report, Mapping):
         identity_report = {}
 
+    adapter = cycle.get("adapter")
+    raw_entity_rows = (
+        adapter.get("entity_signals", []) if isinstance(adapter, Mapping) else []
+    )
+    entity_rows = _mark_resolved_from_pending(
+        [raw for raw in raw_entity_rows if isinstance(raw, Mapping)],
+        pending_ids_before=pending_ids_before,
+    )
+    if isinstance(adapter, dict):
+        adapter["entity_signals"] = entity_rows
+
+    resolved_entity_ids = _signal_id_set(entity_rows)
+    resolved_from_prior_pending = pending_ids_before & resolved_entity_ids
+    resolved_transition_persistence = entity_memory.persist_entity_scent_signals(
+        entity_rows,
+        input_root=input_root,
+    )
+
     unresolved = unresolved_signals_from_resolution(identity_report)
     pending_rows = mark_identity_pending_signals(
         unresolved,
@@ -106,16 +152,6 @@ def run_netherlands_case_memory_cycle(
         input_root=input_root
     )
     remaining_ids = _signal_id_set(remaining_pending)
-    entity_rows = (
-        cycle.get("adapter", {}).get("entity_signals", [])
-        if isinstance(cycle.get("adapter"), Mapping)
-        else []
-    )
-    resolved_entity_ids = _signal_id_set(
-        [raw for raw in entity_rows if isinstance(raw, Mapping)]
-    )
-
-    resolved_from_prior_pending = pending_ids_before & resolved_entity_ids
     new_pending_ids = (remaining_ids - pending_ids_before) & current_ids
     retried_still_pending_ids = pending_ids_before & remaining_ids
 
@@ -135,7 +171,9 @@ def run_netherlands_case_memory_cycle(
         "pending_load_errors": pending_load_errors,
         "pending_reload_error_count": len(pending_reload_errors),
         "pending_reload_errors": pending_reload_errors,
-        "persistence": pending_persistence,
+        "pending_persistence": pending_persistence,
+        "resolved_transition_persistence": resolved_transition_persistence,
+        "same_signal_id_transitions_to_entity_scent": True,
         "pending_is_not_entity_scent": True,
         "pending_is_not_follow_up_eligible": True,
         "promotion_to_opportunity_allowed": False,
