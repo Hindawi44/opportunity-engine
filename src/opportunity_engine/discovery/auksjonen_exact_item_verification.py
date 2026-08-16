@@ -35,6 +35,11 @@ _QUANTITY_RES = (
         re.I,
     ),
 )
+_QUANTITY_UNKNOWN_RE = re.compile(
+    r"(?:\b(?:eksakt\s+)?antall(?:et)?(?:\s+og\s+størrelsesfordeling)?\s+"
+    r"(?:er\s+)?(?:ikke\s+(?:kontrollert|oppgitt|kjent)|ukjent)\b|\bukjent\s+antall\b)",
+    re.I,
+)
 _CONDITION_RE = re.compile(
     r"\b(?:Tilstand|Condition)\s*:?\s*(?P<value>Ny|Nytt|Ubrukt|Brukt|New|Used)\b",
     re.I,
@@ -148,6 +153,20 @@ def _quantity_from_text(text: str) -> int | None:
     return None
 
 
+def _quantity_is_explicitly_unknown(text: str) -> bool:
+    """Return True when the seller explicitly says the piece count is unknown."""
+    return bool(_QUANTITY_UNKNOWN_RE.search(_compact(text)))
+
+
+def _labeled_quantity_from_visible_text(text: str) -> int | None:
+    """Accept page-wide quantity only when it carries an explicit Antall/Mengde label."""
+    match = _QUANTITY_RES[0].search(text)
+    if match is None:
+        return None
+    value = int(match.group("value"))
+    return value if value > 0 else None
+
+
 def parse_auksjonen_item_page(html: str, *, fallback_title: str = "") -> dict[str, Any]:
     """Extract explicit item, condition and shipment facts from one public page."""
     visible = _strip_html(html)
@@ -163,16 +182,25 @@ def parse_auksjonen_item_page(html: str, *, fallback_title: str = "") -> dict[st
         if meta:
             description = _compact(html_module.unescape(meta.group("value"))) or None
 
+    # Quantity is unusually prone to false positives because auction pages contain
+    # unrelated counters, navigation totals and model numbers. Trust the source's
+    # own title/description first, and let an explicit "unknown/not checked"
+    # statement veto any numeric field that would otherwise look authoritative.
+    quantity_context = " ".join(filter(None, (title, description)))
+    quantity_unknown = _quantity_is_explicitly_unknown(quantity_context)
     quantity = None
-    json_quantity = _first_json_value(objects, ("quantity", "itemCount", "numberOfItems", "amountOfItems"))
-    if json_quantity not in (None, ""):
-        try:
-            parsed_quantity = int(float(str(json_quantity)))
-        except (TypeError, ValueError):
-            parsed_quantity = 0
-        quantity = parsed_quantity if parsed_quantity > 0 else None
-    if quantity is None:
-        quantity = _quantity_from_text(" ".join(filter(None, (title, description, visible))))
+    if not quantity_unknown:
+        json_quantity = _first_json_value(objects, ("quantity", "itemCount", "numberOfItems", "amountOfItems"))
+        if json_quantity not in (None, ""):
+            try:
+                parsed_quantity = int(float(str(json_quantity)))
+            except (TypeError, ValueError):
+                parsed_quantity = 0
+            quantity = parsed_quantity if parsed_quantity > 0 else None
+        if quantity is None:
+            quantity = _quantity_from_text(quantity_context)
+        if quantity is None:
+            quantity = _labeled_quantity_from_visible_text(visible)
 
     condition = _normalize_condition(_first_json_value(objects, ("itemCondition", "condition")))
     if condition is None:
@@ -232,6 +260,7 @@ def parse_auksjonen_item_page(html: str, *, fallback_title: str = "") -> dict[st
         "title": title,
         "description": description,
         "quantity": quantity,
+        "quantity_explicitly_unknown": quantity_unknown,
         "condition": condition,
         "source_postal_code": source_postal_code,
         "source_city": source_city,
