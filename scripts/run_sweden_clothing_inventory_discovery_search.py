@@ -54,6 +54,21 @@ from opportunity_engine.markets.sweden import load_sweden_market_profile
 
 
 ROOT = Path(__file__).resolve().parents[1]
+TARGETED_SOURCES = frozenset({"psauction", "klaravik", "blinto"})
+
+
+def _effective_brave_freshness(source: str, requested: str) -> str:
+    """Use exact-page status, not search-index age, for direct auction sources.
+
+    Targeted Swedish source packs already restrict results to one source and then
+    verify exact public item pages as ACTIVE/ENDED. Search-engine page age is not
+    an authoritative auction-state signal and can suppress still-relevant indexed
+    inventory pages before the source verifier gets a chance to inspect them.
+    The broad open-web mode keeps the caller's freshness filter unchanged.
+    """
+    if source in TARGETED_SOURCES:
+        return "none"
+    return requested
 
 
 class _PSAuctionUpstreamScopeVerifier(PSAuctionPlaywrightFallbackVerifier):
@@ -136,7 +151,10 @@ def main() -> int:
         "--freshness",
         choices=("none", "pd", "pw", "pm", "py"),
         default="pm",
-        help="Brave page-age filter",
+        help=(
+            "Brave page-age filter for open-web mode. Direct source packs ignore "
+            "index age and use exact-page ACTIVE/ENDED verification instead."
+        ),
     )
     parser.add_argument(
         "--verify-pages",
@@ -194,10 +212,11 @@ def main() -> int:
         raise SystemExit("BRAVE_SEARCH_API_KEY is required")
 
     profile = load_sweden_market_profile(ROOT)
+    effective_freshness = _effective_brave_freshness(args.source, args.freshness)
     brave = BraveSearchProvider(
         api_key,
         country=profile.market_code,
-        freshness=None if args.freshness == "none" else args.freshness,
+        freshness=None if effective_freshness == "none" else effective_freshness,
         extra_snippets=True,
         operators=True,
     )
@@ -315,7 +334,9 @@ def main() -> int:
     report["query_pack"] = query_pack
     report["query_budget"] = len(queries)
     report["brave_country"] = profile.market_code
-    report["brave_freshness"] = args.freshness
+    report["brave_freshness_requested"] = args.freshness
+    report["brave_freshness"] = effective_freshness
+    report["source_status_verification_authoritative"] = args.source in TARGETED_SOURCES
     report["brave_extra_snippets"] = True
     report["brave_operators"] = True
     report["source_diagnostics"] = source_diagnostics
