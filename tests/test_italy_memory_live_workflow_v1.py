@@ -1,30 +1,48 @@
 from pathlib import Path
 
 
-def test_italy_memory_runs_daily_without_creating_sixth_workflow() -> None:
-    workflow_dir = Path(".github/workflows")
-    workflow_files = sorted(
-        [*workflow_dir.glob("*.yml"), *workflow_dir.glob("*.yaml")]
-    )
+WORKFLOWS = Path(".github/workflows")
+CHECKPOINT = WORKFLOWS / "multi-market-daily-operator-checkpoint.yaml"
+TESTS_WORKFLOW = WORKFLOWS / "tests.yml"
+
+
+def test_italy_memory_reuses_the_only_existing_schedule_owner() -> None:
+    workflow_files = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
     assert len(workflow_files) == 5
 
-    text = (workflow_dir / "tests.yml").read_text(encoding="utf-8")
-    assert 'cron: "47 5 * * *"' in text
-    assert "github.event_name != 'schedule'" in text
-    assert "github.event_name == 'schedule'" in text
+    scheduled = []
+    for path in workflow_files:
+        text = path.read_text(encoding="utf-8")
+        live_lines = [
+            line for line in text.splitlines() if not line.lstrip().startswith("#")
+        ]
+        if any(line.strip() == "schedule:" for line in live_lines):
+            scheduled.append(path.name)
+    assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
+    assert "\n  schedule:" not in TESTS_WORKFLOW.read_text(encoding="utf-8")
 
 
-def test_italy_live_job_restores_runs_and_uploads_durable_memory() -> None:
-    text = Path(".github/workflows/tests.yml").read_text(encoding="utf-8")
+def test_canonical_checkpoint_runner_owns_italy_sidecar_without_changing_coverage() -> None:
+    runner = Path("scripts/run_multi_market_daily_operator_checkpoint.py").read_text(
+        encoding="utf-8"
+    )
+    restore = Path("scripts/restore_previous_checkpoint_state.py").read_text(
+        encoding="utf-8"
+    )
+    workflow = CHECKPOINT.read_text(encoding="utf-8")
 
-    assert "Validate Italy discovery and memory contracts" in text
-    assert "tests/test_italy_case_memory_adapter_v1.py" in text
-    assert "tests/test_italy_case_memory_restore_v1.py" in text
-    assert "scripts/run_italy_case_memory_live.py" in text
-    assert "GITHUB_TOKEN: ${{ github.token }}" in text
-    assert "GITHUB_REPOSITORY: ${{ github.repository }}" in text
-    assert "GITHUB_RUN_ID: ${{ github.run_id }}" in text
-    assert "--state-root artifacts/italy-case-memory" in text
-    assert "name: italy-case-memory-v1" in text
-    assert "path: artifacts/italy-case-memory/" in text
-    assert "actions: read" in text
+    assert "collect_italy_market_signals" in runner
+    assert "run_italy_case_memory_cycle" in runner
+    assert "_run_italy_memory_sidecar" in runner
+    assert '"canonical_market_coverage_unchanged": ["NO", "SE", "DE"]' in runner
+    assert 'output_dir / "italy-case-memory-v1.json"' in runner
+    assert 'output_dir / "italy-signal-follow-up-v1.json"' in runner
+    assert 'input_root / "it-market"' in runner
+
+    assert 'ITALY_MEMORY_RELATIVE_PATH = "it-market/opportunity_engine.db"' in restore
+    assert "checkpoint_state_restore.DATABASE_RELATIVE_PATHS" in restore
+
+    assert "python scripts/restore_previous_checkpoint_state.py" in workflow
+    assert "python scripts/run_multi_market_daily_operator_checkpoint.py" in workflow
+    assert "artifacts/multi-market-daily-operator-checkpoint/" in workflow
+    assert "artifacts/multi-market-inputs/" in workflow
