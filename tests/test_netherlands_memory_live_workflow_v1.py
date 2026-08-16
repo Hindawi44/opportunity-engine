@@ -34,19 +34,33 @@ def test_checkpoint_runner_owns_netherlands_sidecar_without_changing_canonical_c
     adapter = Path(
         "src/opportunity_engine/discovery/netherlands_case_memory_adapter.py"
     ).read_text(encoding="utf-8")
+    pending_cycle = Path(
+        "src/opportunity_engine/discovery/netherlands_identity_pending_cycle.py"
+    ).read_text(encoding="utf-8")
+    pending_memory = Path(
+        "src/opportunity_engine/discovery/netherlands_identity_pending_memory.py"
+    ).read_text(encoding="utf-8")
 
     assert "collect_netherlands_market_signals" in runner
+    assert "netherlands_identity_pending_cycle" in runner
     assert "run_netherlands_case_memory_cycle" in runner
     assert "_run_netherlands_memory_sidecar" in runner
     assert '"canonical_market_coverage_unchanged": ["NO", "SE", "DE"]' in runner
     assert 'output_dir / "netherlands-market-discovery-v1.json"' in runner
     assert 'output_dir / "netherlands-case-memory-v1.json"' in runner
+    assert 'output_dir / "netherlands-identity-pending-v1.json"' in runner
     assert 'output_dir / "netherlands-signal-follow-up-v1.json"' in runner
     assert 'input_root / "nl-market"' in runner
     assert '"NOT_BUILT_YET_REQUIRES_SOURCE_SPECIFIC_VALIDATION"' in runner
 
     assert "resolve_netherlands_entity_identities" in adapter
     assert "identity_resolution" in adapter
+    assert "IDENTITY_PENDING" in pending_memory
+    assert "MarketSignalRepository" in pending_memory
+    assert "load_identity_pending_signals" in pending_cycle
+    assert "resolved_from_pending_identity_count" in pending_cycle
+    assert "pending_is_not_follow_up_eligible" in pending_cycle
+
     assert "test_netherlands_entity_identity_resolution_v1.py" in tests_workflow
     assert "netherlands-entity-identity-resolution.json" in tests_workflow
 
