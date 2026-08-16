@@ -185,6 +185,28 @@ def _extract_entity(signal: Mapping[str, Any]) -> tuple[str | None, str | None, 
     return label, key, "DUTCH_LEGAL_FORM_IN_TITLE", 78
 
 
+def _resolved_identity(signal: Mapping[str, Any]) -> tuple[str | None, str | None, str, int]:
+    """Trust a resolver-approved identity even when its distinctive token is short.
+
+    Example: ``MD Fashion Netherlands`` has only ``MD`` outside generic fashion
+    words. Once the identity resolver has corroborated it across independent
+    evidence (and possibly KvK/Rechtspraak), the adapter must not discard it merely
+    because the pre-resolution generic-name heuristic is intentionally strict.
+    """
+    metadata = _metadata(signal)
+    status = _compact(metadata.get("entity_identity_resolution_status")).upper()
+    if not status.startswith("RESOLVED_"):
+        return None, None, "NO_RESOLVER_APPROVED_IDENTITY", 0
+    label = _compact(signal.get("company_name") or metadata.get("resolved_company_name"))
+    key = _compact(metadata.get("resolved_entity_key")) or _entity_key(label)
+    if not label or not key:
+        return None, None, "RESOLVED_IDENTITY_MISSING_LABEL_OR_KEY", 0
+    if not 2 <= len(label) <= 120 or not 2 <= len(key) <= 100:
+        return None, None, "RESOLVED_IDENTITY_IMPLAUSIBLE_LENGTH", 0
+    score = 94 if metadata.get("identity_official_rechtspraak_confirmed") is True else 90
+    return label, key, status, score
+
+
 def register_netherlands_follow_up_contract() -> None:
     """Register NL with the existing memory and continuity engines."""
     memory._MEMORY_DATABASES[MARKET_CODE] = NETHERLANDS_MEMORY_RELATIVE_PATH
@@ -205,7 +227,9 @@ def adapt_netherlands_signal_to_entity_memory(
     if _compact(metadata.get("feed_family")) != FEED_FAMILY:
         return None, "NOT_NETHERLANDS_DISCOVERY_FEED"
 
-    label, key, shape, score = _extract_entity(signal)
+    label, key, shape, score = _resolved_identity(signal)
+    if not label or not key:
+        label, key, shape, score = _extract_entity(signal)
     if not label or not key:
         return None, shape
 
@@ -255,8 +279,8 @@ def build_netherlands_case_memory_adapter(
         if payload is not None:
             adapted.append(payload)
             continue
-        key = reason or "REJECTED"
-        rejections[key] = rejections.get(key, 0) + 1
+        rejection = reason or "REJECTED"
+        rejections[rejection] = rejections.get(rejection, 0) + 1
 
     stable = memory.dedupe_entity_signals(adapted)
     cases = memory.build_persistent_entity_cases(stable, observed_at=now)
@@ -315,26 +339,74 @@ def run_netherlands_case_memory_cycle(
     results_per_case: int = continuity.DEFAULT_RESULTS_PER_CASE,
     config_path: str | Path = "alembic.ini",
 ) -> dict[str, Any]:
-    """Resolve identity, persist NL entity scents, reload memory, then Follow-Up."""
+    """Resolve missing identity, persist NL entity scents, reload memory, then Follow-Up."""
     register_netherlands_follow_up_contract()
     now = _utc(observed_at)
     env = environment or {}
-    identity_kwargs: dict[str, Any] = {
-        "environment": env,
-        "observed_at": now,
-    }
-    if provider_factory is not None:
-        identity_kwargs["provider_factory"] = provider_factory
-    identity_resolution = resolve_netherlands_entity_identities(
-        current_signals,
-        **identity_kwargs,
-    )
-    resolved_signals = [
-        item
-        for item in identity_resolution.get("enriched_signals") or []
-        if isinstance(item, Mapping)
-    ]
-    adapter = build_netherlands_case_memory_adapter(resolved_signals, observed_at=now)
+
+    # Preserve the original contract: an explicit company field or a legal entity
+    # already visible in the discovery title is sufficient to seed memory and must
+    # not spend another search request. Identity Resolution V1 is only for the
+    # unresolved early-signal gap discovered by the first live NL run.
+    already_identified: list[dict[str, Any]] = []
+    unresolved: list[dict[str, Any]] = []
+    for raw in current_signals:
+        if not isinstance(raw, Mapping):
+            continue
+        signal = deepcopy(dict(raw))
+        label, _key, _shape, _score = _extract_entity(signal)
+        if label:
+            if not _compact(signal.get("company_name") or signal.get("seller_name")):
+                signal["company_name"] = label
+            already_identified.append(signal)
+        else:
+            unresolved.append(signal)
+
+    if unresolved:
+        identity_kwargs: dict[str, Any] = {
+            "environment": env,
+            "observed_at": now,
+        }
+        if provider_factory is not None:
+            identity_kwargs["provider_factory"] = provider_factory
+        identity_resolution = resolve_netherlands_entity_identities(
+            unresolved,
+            **identity_kwargs,
+        )
+        resolved_or_unresolved = [
+            dict(item)
+            for item in identity_resolution.get("enriched_signals") or []
+            if isinstance(item, Mapping)
+        ]
+    else:
+        identity_resolution = {
+            "schema_version": "netherlands-entity-identity-resolution-1.0",
+            "engine_version": "NETHERLANDS_ENTITY_IDENTITY_RESOLUTION_V1",
+            "generated_at": now.isoformat(),
+            "source_country": MARKET_CODE,
+            "status": "VALID_ZERO_NO_UNRESOLVED_IDENTITIES",
+            "input_signal_count": 0,
+            "processed_signal_count": 0,
+            "resolved_identity_count": 0,
+            "officially_confirmed_identity_count": 0,
+            "corroborated_public_identity_count": 0,
+            "unresolved_identity_count": 0,
+            "search_request_count": 0,
+            "search_error_count": 0,
+            "resolutions": [],
+            "enriched_signals": [],
+            "identity_required_before_memory": True,
+            "promotion_to_opportunity_allowed": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_reservation": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        resolved_or_unresolved = []
+
+    signals_for_adapter = [*already_identified, *resolved_or_unresolved]
+    adapter = build_netherlands_case_memory_adapter(signals_for_adapter, observed_at=now)
     ensure_netherlands_memory_database(input_root, config_path=config_path)
     persistence = memory.persist_entity_scent_signals(
         adapter["entity_signals"],
@@ -365,6 +437,7 @@ def run_netherlands_case_memory_cycle(
         "generated_at": now.isoformat(),
         "source_country": MARKET_CODE,
         "memory_database": (Path(input_root) / NETHERLANDS_MEMORY_RELATIVE_PATH).as_posix(),
+        "preidentified_signal_count": len(already_identified),
         "identity_resolution": identity_resolution,
         "identity_resolution_status": identity_resolution.get("status"),
         "resolved_identity_count": identity_resolution.get("resolved_identity_count", 0),
