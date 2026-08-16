@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """Run the production NO/SE/DE bulletin with bounded commercial feed visibility.
 
-The primary opportunity scope remains Norway, Sweden, and Germany. Bridal
-clearance already runs inside the established core bulletin; this wrapper makes
-its strongest current signals visible in the daily brief. A single bounded
-Merkandi B2B clothing-liquidation lane is also restored for the Germany search
-region. A targeted Sweden/Germany source-gap radar runs before the core bulletin
-so accepted source signals enter the existing persistence and AI path. Other
-optional NL/PL/UK procurement/B2B lanes remain outside the default checkpoint.
+The primary opportunity scope remains Norway, Sweden, and Germany. The normal
+daily invocation is cost-isolated: canonical and early-signal discovery still
+run, while OpenAI Hunt and the Brave targeted follow-up they can trigger are
+deferred. A dedicated targeted-enrichment stage can opt back in explicitly with
+OPPORTUNITY_ENGINE_TARGETED_ENRICHMENT=1.
 """
 from __future__ import annotations
 
@@ -98,6 +96,26 @@ brief["jobalots_official_catalog_discovery"]
 OPTIONAL_SIDE_FEEDS_MOVED_TO_build_optional_market_intelligence_side_feeds.py
 DEFAULT_DAILY_SCOPE_NO_SE_DE_ONLY
 """
+
+_TARGETED_ENRICHMENT_ENV = "OPPORTUNITY_ENGINE_TARGETED_ENRICHMENT"
+_TARGETED_FOLLOWUP_MAX_CASES_ENV = "HUNT_FOLLOWUP_MAX_CASES"
+
+
+def _targeted_enrichment_enabled() -> bool:
+    value = str(os.environ.get(_TARGETED_ENRICHMENT_ENV) or "").strip().casefold()
+    return value in {"1", "true", "yes", "on"}
+
+
+def _apply_cost_isolation() -> bool:
+    """Defer paid/model-driven enrichment without weakening daily discovery."""
+    enabled = _targeted_enrichment_enabled()
+    if enabled:
+        return True
+    os.environ.pop("OPENAI_API_KEY", None)
+    # Keep BRAVE_SEARCH_API_KEY available for daily discovery radars. Setting the
+    # follow-up case budget to zero prevents model-directed Brave searches only.
+    os.environ[_TARGETED_FOLLOWUP_MAX_CASES_ENV] = "0"
+    return False
 
 
 def _load_core_module():
@@ -450,8 +468,33 @@ def _run_daily_b2b_watch(output_dir: Path) -> None:
     _append_text(output_dir, lines)
 
 
+def _attach_cost_isolation_metadata(output_dir: Path, *, targeted_enabled: bool) -> None:
+    brief_path = output_dir / "domain-market-intelligence-brief.json"
+    brief = _read_json(brief_path)
+    if brief is not None:
+        brief["cost_isolation"] = {
+            "schema_version": "daily-cost-isolation-1.0",
+            "stage": "TARGETED_ENRICHMENT" if targeted_enabled else "CORE_DAILY",
+            "targeted_enrichment_enabled": targeted_enabled,
+            "openai_hunt_deferred": not targeted_enabled,
+            "targeted_brave_followup_deferred": not targeted_enabled,
+            "daily_brave_discovery_preserved": True,
+            "commercial_analysis_stage": "SEPARATE_MANUAL_WORKFLOW",
+        }
+        _write_json(brief_path, brief)
+    _append_text(
+        output_dir,
+        [
+            "COST ISOLATION",
+            f"stage: {'TARGETED_ENRICHMENT' if targeted_enabled else 'CORE_DAILY'}",
+            f"targeted_enrichment_enabled: {str(targeted_enabled).lower()}",
+        ],
+    )
+
+
 def main() -> int:
     output_dir = _output_dir()
+    targeted_enabled = _apply_cost_isolation()
     source_gap_report = _run_se_de_source_gap_pre_core(output_dir)
     status = int(_load_core_module().main())
     if status != 0:
@@ -459,6 +502,7 @@ def main() -> int:
     _attach_se_de_source_gap(output_dir, source_gap_report)
     _attach_bridal_clearance_watch(output_dir)
     _run_daily_b2b_watch(output_dir)
+    _attach_cost_isolation_metadata(output_dir, targeted_enabled=targeted_enabled)
     return 0
 
 
