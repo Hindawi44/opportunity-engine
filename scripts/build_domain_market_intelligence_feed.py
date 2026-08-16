@@ -2,8 +2,8 @@
 """Run the production NO/SE/DE bulletin with bounded commercial feed visibility.
 
 The primary opportunity scope remains Norway, Sweden, and Germany. The normal
-daily invocation is cost-isolated: canonical source discovery still runs in the
-checkpoint workflow, while OpenAI/extra Brave enrichment inside this builder is
+daily invocation is cost-isolated: canonical and early-signal discovery still
+run, while OpenAI Hunt and the Brave targeted follow-up they can trigger are
 deferred. A dedicated targeted-enrichment stage can opt back in explicitly with
 OPPORTUNITY_ENGINE_TARGETED_ENRICHMENT=1.
 """
@@ -98,11 +98,7 @@ DEFAULT_DAILY_SCOPE_NO_SE_DE_ONLY
 """
 
 _TARGETED_ENRICHMENT_ENV = "OPPORTUNITY_ENGINE_TARGETED_ENRICHMENT"
-_EXPENSIVE_ENRICHMENT_KEYS = (
-    "OPENAI_API_KEY",
-    "BRAVE_SEARCH_API_KEY",
-    "BRAVE_API_KEY",
-)
+_TARGETED_FOLLOWUP_MAX_CASES_ENV = "HUNT_FOLLOWUP_MAX_CASES"
 
 
 def _targeted_enrichment_enabled() -> bool:
@@ -111,12 +107,14 @@ def _targeted_enrichment_enabled() -> bool:
 
 
 def _apply_cost_isolation() -> bool:
-    """Hide paid enrichment credentials unless a targeted stage opts in."""
+    """Defer paid/model-driven enrichment without weakening daily discovery."""
     enabled = _targeted_enrichment_enabled()
     if enabled:
         return True
-    for key in _EXPENSIVE_ENRICHMENT_KEYS:
-        os.environ.pop(key, None)
+    os.environ.pop("OPENAI_API_KEY", None)
+    # Keep BRAVE_SEARCH_API_KEY available for daily discovery radars. Setting the
+    # follow-up case budget to zero prevents model-directed Brave searches only.
+    os.environ[_TARGETED_FOLLOWUP_MAX_CASES_ENV] = "0"
     return False
 
 
@@ -214,7 +212,7 @@ def _run_se_de_source_gap_pre_core(output_dir: Path) -> dict[str, Any]:
         json.dumps(report.get("status_counts") or {}, sort_keys=True),
     )
     print("se_de_source_coverage_gap_requests:", report.get("requests_made", 0))
-    print("se_de_source_gap_signals:", report.get("signal_count", 0))
+    print("se_de_source_coverage_gap_signals:", report.get("signal_count", 0))
     return report
 
 
@@ -479,7 +477,8 @@ def _attach_cost_isolation_metadata(output_dir: Path, *, targeted_enabled: bool)
             "stage": "TARGETED_ENRICHMENT" if targeted_enabled else "CORE_DAILY",
             "targeted_enrichment_enabled": targeted_enabled,
             "openai_hunt_deferred": not targeted_enabled,
-            "extra_brave_enrichment_deferred": not targeted_enabled,
+            "targeted_brave_followup_deferred": not targeted_enabled,
+            "daily_brave_discovery_preserved": True,
             "commercial_analysis_stage": "SEPARATE_MANUAL_WORKFLOW",
         }
         _write_json(brief_path, brief)
