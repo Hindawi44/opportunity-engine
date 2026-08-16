@@ -46,6 +46,9 @@ from opportunity_engine.discovery.stockhurt_sale_mode_brand_cleanup import (
 from opportunity_engine.discovery.unified_decision_priority import (
     install_unified_decision_priority,
 )
+from opportunity_engine.discovery.one_decision_consistency import (
+    install_one_decision_consistency,
+)
 from opportunity_engine.discovery.central_intelligence_orchestrator_cli_hook import (
     install_central_intelligence_orchestrator_cli_hook,
 )
@@ -67,6 +70,7 @@ install_bilingual_bridal_search()
 install_stockhurt_redirect_partial_recovery()
 install_stockhurt_sale_mode_brand_cleanup()
 install_unified_decision_priority()
+install_one_decision_consistency()
 install_central_intelligence_orchestrator_cli_hook()
 install_market_comparables_benchmark_cli_hook()
 install_unified_market_intelligence_river_cli_hook()
