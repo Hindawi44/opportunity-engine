@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -64,13 +68,28 @@ jobs:
       - name: Install project dependencies
         run: pip install -r requirements.txt
 
-      - name: Validate Italy discovery contract
-        run: pytest tests/test_italy_market_discovery_v1.py -q
+      - name: Validate Italy discovery and memory contracts
+        run: |
+          pytest tests/test_italy_market_discovery_v1.py -q
+          pytest tests/test_italy_case_memory_adapter_v1.py -q
+          pytest tests/test_italy_case_memory_restore_v1.py -q
 
       - name: Run bounded live Italy discovery
         run: |
           python scripts/build_italy_market_discovery.py \
             --output artifacts/italy-market-discovery/italy-market-discovery.json
+
+      - name: Restore and run Italy case memory follow-up
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          python scripts/run_italy_case_memory_live.py \
+            --discovery artifacts/italy-market-discovery/italy-market-discovery.json \
+            --state-root artifacts/italy-case-memory \
+            --output artifacts/italy-case-memory/italy-case-memory-v1.json \
+            --follow-up-output artifacts/italy-case-memory/italy-signal-follow-up-v1.json
 
       - name: Upload live Italy discovery artifact
         if: always()
@@ -78,5 +97,14 @@ jobs:
         with:
           name: italy-market-discovery-v1
           path: artifacts/italy-market-discovery/italy-market-discovery.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload durable Italy case memory artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: italy-case-memory-v1
+          path: artifacts/italy-case-memory/
           if-no-files-found: error
           retention-days: 30
