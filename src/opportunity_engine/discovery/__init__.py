@@ -40,6 +40,9 @@ from opportunity_engine.discovery.bridal_english_market_search import (
 from opportunity_engine.discovery.bridal_term_boundary_cleanup import (
     install_bridal_term_boundary_cleanup,
 )
+from opportunity_engine.discovery.bridal_identity_purity_cleanup import (
+    install_bridal_identity_purity_cleanup,
+)
 from opportunity_engine.discovery.stockhurt_redirect_partial_recovery import (
     install_stockhurt_redirect_partial_recovery,
 )
@@ -74,6 +77,7 @@ from opportunity_engine.discovery.fabric_procurement_watch_cli_hook import (
 install_openai_hunt_case_schema_compat()
 install_bilingual_bridal_search()
 install_bridal_term_boundary_cleanup()
+install_bridal_identity_purity_cleanup()
 install_stockhurt_redirect_partial_recovery()
 install_stockhurt_sale_mode_brand_cleanup()
 install_unified_decision_priority()
