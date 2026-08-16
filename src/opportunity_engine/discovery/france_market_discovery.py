@@ -1,9 +1,14 @@
 """Bounded France-wide clothing liquidation discovery foundation.
 
-France is opened as an official expansion market while the legacy canonical
-NO/SE/DE Top-5 contract stays unchanged for backward compatibility. This layer
-emits signal-only public-web evidence. Durable company memory and Follow-Up are
+France is an official expansion market while the legacy canonical NO/SE/DE
+Top-5 contract stays unchanged for backward compatibility. This layer emits
+signal-only public-web evidence. Durable company memory and Follow-Up are
 handled by the existing SIGNAL_FOLLOW_UP_ENGINE_V1 through the France adapter.
+
+Matching quality V1.1 deliberately requires page-local commercial evidence for
+auction/stock/bridal intents. Category footers, generic auction homepages and
+editorial guides must not become market signals merely because their snippets
+contain clothing and sale vocabulary somewhere on the page.
 """
 from __future__ import annotations
 
@@ -26,8 +31,9 @@ from opportunity_engine.market_intelligence import (
 from opportunity_engine.unified_models import Evidence
 
 
-SCHEMA_VERSION = "france-market-discovery-1.0"
+SCHEMA_VERSION = "france-market-discovery-1.1"
 FEED_FAMILY = "FRANCE_MARKET_DISCOVERY_V1"
+MATCHING_QUALITY_VERSION = "FRANCE_MATCHING_QUALITY_FIX_V1"
 MARKET_CODE = "FR"
 DEFAULT_RESULTS_PER_QUERY = 10
 MAX_RESULTS_PER_QUERY = 10
@@ -135,7 +141,33 @@ _INVENTORY_OFFER_TERMS = (
     "à vendre", "a vendre", "vente", "enchères", "encheres", "lot", "lots",
     "prix", "estimation", "stock entier", "pièces", "pieces", "palettes",
 )
+_EXPLICIT_CLOTHING_INVENTORY_TERMS = (
+    "stock de vêtements", "stock de vetements", "lot de vêtements", "lot de vetements",
+    "lots de vêtements", "lots de vetements", "stock prêt-à-porter", "stock pret-a-porter",
+    "lot prêt-à-porter", "lot pret-a-porter", "vêtements en lot", "vetements en lot",
+    "pièces de vêtements", "pieces de vetements", "pièces de prêt-à-porter",
+    "pieces de pret-a-porter", "palette de vêtements", "palettes de vêtements",
+)
+_SPECIFIC_OFFER_TITLE_TERMS = (
+    "à vendre", "a vendre", "déstockage", "destockage", "vente de stock",
+    "stock de vêtements", "stock de vetements", "lot de vêtements", "lot de vetements",
+    "lots de vêtements", "lots de vetements", "stock magasin", "stock entrepôt",
+    "stock entrepot", "vente aux enchères", "vente aux encheres", "vente judiciaire",
+    "lot judiciaire", "liquidation judiciaire", "redressement judiciaire",
+)
+_EDITORIAL_TITLE_TERMS = (
+    "guide", "conseil", "conseils", "comment ", "où acheter", "ou acheter",
+    "où chercher", "ou chercher", "budget", "tout savoir", "le guide complet",
+    "faire la différence", "faire la difference", "sans se faire arnaquer",
+    "levier de croissance", "acheter et revendre", "meilleures offres",
+)
+_FRENCH_LEGAL_IDENTITY_RE = re.compile(
+    r"\b(?:SASU|SAS|SARL|EURL|SA|SNC|SCA|SCS|SELARL|SELAS)\s+"
+    r"[A-ZÀ-ÖØ-Þ0-9][A-ZÀ-ÖØ-Þ0-9 &'’._-]{1,90}",
+    flags=re.UNICODE,
+)
 _COMMERCIAL_GATE_INTENTS = {"STOCKLOT_WHOLESALE", "WAREHOUSE_CLEARANCE"}
+_AUCTION_SPECIFIC_INTENTS = {"JUDICIAL_AUCTION_STOCK", "AUCTION_LOTS"}
 _TRACKING_QUERY_KEYS = {"fbclid", "gclid", "mc_cid", "mc_eid", "ref", "source"}
 _OFFICIAL_DOMAINS = {"bodacc.fr", "www.bodacc.fr"}
 
@@ -181,11 +213,20 @@ def _term_present(text: str, term: str) -> bool:
     normalized_term = _normalise_match_text(term)
     if not normalized_term:
         return False
-    return re.search(rf"(?<!\w){re.escape(normalized_term)}(?!\w)", normalized_text, flags=re.UNICODE) is not None
+    return re.search(
+        rf"(?<!\w){re.escape(normalized_term)}(?!\w)",
+        normalized_text,
+        flags=re.UNICODE,
+    ) is not None
 
 
 def _matched(text: str, terms: Sequence[str]) -> list[str]:
     return sorted({term for term in terms if _term_present(text, term)})
+
+
+def _is_editorial_title(title: str) -> bool:
+    folded = _normalise_match_text(title)
+    return any(term in folded for term in _EDITORIAL_TITLE_TERMS)
 
 
 def _classify(text: str) -> tuple[MarketSignalType | None, list[str], list[str], bool]:
@@ -204,6 +245,85 @@ def _classify(text: str) -> tuple[MarketSignalType | None, list[str], list[str],
         if event_terms:
             return signal_type, domain_terms, event_terms, bool(bridal)
     return None, domain_terms, [], bool(bridal)
+
+
+def _passes_intent_quality_gate(
+    *,
+    query: FranceDiscoveryQuery,
+    title: str,
+    description: str,
+    combined: str,
+    bridal: bool,
+    commercial_action_terms: Sequence[str],
+    inventory_offer_terms: Sequence[str],
+) -> bool:
+    """Require evidence tied to the result itself, not generic footer vocabulary."""
+    title_domain_terms = _matched(title, (*_CLOTHING_TERMS, *_BRIDAL_TERMS))
+    title_offer_terms = _matched(title, _SPECIFIC_OFFER_TITLE_TERMS)
+    explicit_clothing_inventory = _matched(combined, _EXPLICIT_CLOTHING_INVENTORY_TERMS)
+
+    if query.intent == "OFFICIAL_INSOLVENCY":
+        return True
+
+    if query.intent == "INSOLVENCY_LIQUIDATION":
+        # A generic legal-notice title is acceptable only when the snippet carries
+        # a concrete French legal identity; otherwise demand fashion evidence in
+        # the title itself. This preserves real early insolvency scents while
+        # rejecting unrelated liquidation pages with footer/category leakage.
+        title_has_insolvency = bool(_matched(title, _INSOLVENCY_TERMS))
+        concrete_legal_identity = bool(_FRENCH_LEGAL_IDENTITY_RE.search(html.unescape(description)))
+        return bool(title_domain_terms or concrete_legal_identity) and (
+            title_has_insolvency or concrete_legal_identity
+        )
+
+    if query.intent == "BUSINESS_CLOSURE":
+        return (
+            not _is_editorial_title(title)
+            and bool(title_domain_terms)
+            and bool(_matched(title, _CLOSURE_TERMS))
+        )
+
+    if query.intent in _COMMERCIAL_GATE_INTENTS:
+        return (
+            not _is_editorial_title(title)
+            and bool(commercial_action_terms)
+            and bool(inventory_offer_terms)
+            and bool(title_offer_terms)
+            and bool(title_domain_terms or explicit_clothing_inventory)
+        )
+
+    if query.intent in _AUCTION_SPECIFIC_INTENTS:
+        # Generic auction home/category pages often contain clothing labels in a
+        # footer. Require explicit clothing-inventory language, or clothing in the
+        # result title plus a page-specific sale/lot term in that same title.
+        title_has_auction = bool(_matched(title, _AUCTION_TERMS))
+        specific_product = bool(explicit_clothing_inventory) or bool(title_domain_terms)
+        title_specific_sale = title_has_auction and bool(
+            _matched(title, ("lot", "lots", "stock", "vente aux enchères", "vente judiciaire", "enchères"))
+        )
+        return not _is_editorial_title(title) and specific_product and title_specific_sale
+
+    if query.intent == "BRIDAL_LIQUIDATION":
+        # A wedding-budget article mentioning seasonal déstockage is not a
+        # liquidation lead. Bridal evidence must be in the title, and the title
+        # must itself describe a closure/liquidation/auction/stock-sale event.
+        return (
+            bridal
+            and not _is_editorial_title(title)
+            and bool(_matched(title, _BRIDAL_TERMS))
+            and bool(
+                _matched(
+                    title,
+                    (
+                        "liquidation judiciaire", "liquidation totale", "fermeture",
+                        "fermeture définitive", "déstockage", "destockage", "enchères",
+                        "vente aux enchères", "stock", "vente de stock",
+                    ),
+                )
+            )
+        )
+
+    return False
 
 
 def france_signal_from_hit(
@@ -235,8 +355,14 @@ def france_signal_from_hit(
 
     commercial_action_terms = _matched(combined, _COMMERCIAL_ACTION_TERMS)
     inventory_offer_terms = _matched(combined, _INVENTORY_OFFER_TERMS)
-    if query.intent in _COMMERCIAL_GATE_INTENTS and (
-        not commercial_action_terms or not inventory_offer_terms
+    if not _passes_intent_quality_gate(
+        query=query,
+        title=title,
+        description=description,
+        combined=combined,
+        bridal=bridal,
+        commercial_action_terms=commercial_action_terms,
+        inventory_offer_terms=inventory_offer_terms,
     ):
         return None
 
@@ -258,6 +384,7 @@ def france_signal_from_hit(
         verified=False,
         metadata={
             "feed_family": FEED_FAMILY,
+            "matching_quality_version": MATCHING_QUALITY_VERSION,
             "query_id": query.query_id,
             "intent": query.intent,
             "source_rank": rank,
@@ -289,6 +416,7 @@ def france_signal_from_hit(
             "signal_only": True,
             "not_an_opportunity": True,
             "feed_family": FEED_FAMILY,
+            "matching_quality_version": MATCHING_QUALITY_VERSION,
             "market_role": "OFFICIAL_EXPANSION_MARKET",
             "inventory_domain": "BRIDAL" if bridal else "CLOTHING_FASHION",
             "query_id": query.query_id,
@@ -348,6 +476,7 @@ def collect_france_market_signals(
     base = {
         "schema_version": SCHEMA_VERSION,
         "feed_family": FEED_FAMILY,
+        "matching_quality_version": MATCHING_QUALITY_VERSION,
         "generated_at": now.isoformat(),
         "source_country": MARKET_CODE,
         "market_role": "OFFICIAL_EXPANSION_MARKET",
