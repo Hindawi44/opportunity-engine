@@ -5,6 +5,7 @@ from typing import Sequence
 
 from opportunity_engine.discovery.france_market_discovery import (
     FRANCE_DISCOVERY_QUERIES,
+    MATCHING_QUALITY_VERSION,
     collect_france_market_signals,
     france_signal_from_hit,
 )
@@ -48,6 +49,7 @@ def test_bodacc_official_liquidation_is_signal_only_and_domain_bounded() -> None
     payload = signal.model_dump(mode="json")
     assert payload["source_country"] == "FR"
     assert payload["metadata"]["source_scope"] == "OFFICIAL_PUBLIC_SOURCE"
+    assert payload["metadata"]["matching_quality_version"] == MATCHING_QUALITY_VERSION
     assert payload["metadata"]["promotion_to_opportunity_allowed"] is False
     assert payload["metadata"]["automatic_purchase"] is False
 
@@ -72,7 +74,7 @@ def test_word_boundaries_prevent_substring_noise() -> None:
     assert france_signal_from_hit(noise, query=query, rank=1, observed_at=NOW) is None
 
 
-def test_stocklot_requires_buyer_facing_commercial_offer() -> None:
+def test_stocklot_requires_specific_buyer_facing_offer_not_editorial_article() -> None:
     query = _query("STOCKLOT_WHOLESALE")
     editorial = SearchHit(
         title="Le marché du stock de vêtements en France",
@@ -81,6 +83,25 @@ def test_stocklot_requires_buyer_facing_commercial_offer() -> None:
         provider="Fake Brave",
     )
     assert france_signal_from_hit(editorial, query=query, rank=1, observed_at=NOW) is None
+
+    live_false_positive = SearchHit(
+        title="Le Rachat de Stock Vêtements : Levier de Croissance ou Aubaine pour les Commerçants ?",
+        url="https://www.mydestockage.com/blog/boost/le-rachat-de-stock-vetements",
+        description=(
+            "On propose des lots de vêtements en gros. Un bon grossiste rachats de stocks "
+            "vous accompagne. Déstockage, lots et prix sont expliqués dans ce guide."
+        ),
+        provider="Fake Brave",
+    )
+    assert france_signal_from_hit(live_false_positive, query=query, rank=1, observed_at=NOW) is None
+
+    sourcing_guide = SearchHit(
+        title="Déstockage et grossiste pas cher : où chercher sans se faire arnaquer",
+        url="https://destockageenligne.fr/grossiste-sourcing",
+        description="Guide des lots de vêtements et marchés de déstockage en ligne.",
+        provider="Fake Brave",
+    )
+    assert france_signal_from_hit(sourcing_guide, query=query, rank=1, observed_at=NOW) is None
 
     offer = SearchHit(
         title="Lot de vêtements à vendre - déstockage professionnel",
@@ -95,7 +116,43 @@ def test_stocklot_requires_buyer_facing_commercial_offer() -> None:
     assert payload["metadata"]["inventory_offer_terms"]
 
 
-def test_bridal_query_rejects_generic_fashion_liquidation() -> None:
+def test_generic_auction_homepages_and_unrelated_stock_sale_are_rejected() -> None:
+    query = _query("AUCTION_LOTS")
+    for title, url, description in (
+        (
+            "Toutes les ventes aux enchères | Vavato",
+            "https://www.vavato.com/fr/auctions",
+            "Vêtements pour homme, chaussures, textile et beaucoup d'autres catégories. Enchères en cours.",
+        ),
+        (
+            "Voir toutes nos enchères | Surplex",
+            "https://www.surplex.com/fr/auctions",
+            "Tous les lots industriels. Catégories textile, machines, chimie et équipements. Prix et enchères.",
+        ),
+        (
+            "Voir toutes nos enchères | Troostwijk Auctions",
+            "https://www.troostwijkauctions.com/fr/auctions",
+            "Parcourez les lots. Catégories vêtements, chaussures et équipements. Enchères en ligne.",
+        ),
+        (
+            "Après sa liquidation judiciaire, l’Intermarché a vendu aux enchères ses stocks et équipements",
+            "https://www.vosgesmatin.fr/economie/intermarche-vente",
+            "Réserve du magasin avec produits d'épicerie. Une rubrique textile est aussi citée sur le site.",
+        ),
+    ):
+        hit = SearchHit(title=title, url=url, description=description, provider="Fake Brave")
+        assert france_signal_from_hit(hit, query=query, rank=1, observed_at=NOW) is None
+
+    specific = SearchHit(
+        title="Vente aux enchères - stock de vêtements prêt-à-porter - lot 1048 pièces",
+        url="https://auction.example.fr/stock-vetements-1048",
+        description="Lot judiciaire de vêtements après liquidation judiciaire, vente aux enchères.",
+        provider="Fake Brave",
+    )
+    assert france_signal_from_hit(specific, query=query, rank=1, observed_at=NOW) is not None
+
+
+def test_bridal_query_rejects_generic_fashion_and_wedding_budget_editorial() -> None:
     query = _query("BRIDAL_LIQUIDATION")
     generic = SearchHit(
         title="Liquidation judiciaire d'une boutique de vêtements",
@@ -105,13 +162,37 @@ def test_bridal_query_rejects_generic_fashion_liquidation() -> None:
     )
     assert france_signal_from_hit(generic, query=query, rank=1, observed_at=NOW) is None
 
+    live_budget_false_positive = SearchHit(
+        title="Budget robe de mariée : faire la différence entre prix affiché et coût réel",
+        url="https://www.la-mariee.fr/budget-robe-de-mariee",
+        description="Les périodes de soldes ou de déstockage en boutique de mariage existent.",
+        provider="Fake Brave",
+    )
+    assert france_signal_from_hit(live_budget_false_positive, query=query, rank=1, observed_at=NOW) is None
+
     bridal = SearchHit(
-        title="Boutique de mariage en liquidation judiciaire",
+        title="Boutique de mariage en liquidation judiciaire - robes de mariée en stock",
         url="https://example.fr/robes-mariee-liquidation",
         description="Stock de robes de mariée et accessoires de mariage mis en vente.",
         provider="Fake Brave",
     )
     assert france_signal_from_hit(bridal, query=query, rank=1, observed_at=NOW) is not None
+
+
+def test_real_legal_insolvency_signal_with_concrete_french_entity_survives_gate() -> None:
+    query = _query("INSOLVENCY_LIQUIDATION")
+    hit = SearchHit(
+        title="Annonce légale #91502917",
+        url="https://www.lagazettefrance.fr/annonce-legale/91502917",
+        description=(
+            "Redressement judiciaire. SAS KANA BEACH, RCS BREST 339 792 012. "
+            "Achat et vente de tous vêtements de prêt-à-porter, chaussures et accessoires."
+        ),
+        provider="Fake Brave",
+    )
+    signal = france_signal_from_hit(hit, query=query, rank=1, observed_at=NOW)
+    assert signal is not None
+    assert signal.metadata["intent"] == "INSOLVENCY_LIQUIDATION"
 
 
 def test_collection_valid_zero_is_acceptable() -> None:
@@ -122,6 +203,7 @@ def test_collection_valid_zero_is_acceptable() -> None:
         provider_factory=lambda market, key, freshness: provider,
     )
     assert report["status"] == "VALID_ZERO"
+    assert report["matching_quality_version"] == MATCHING_QUALITY_VERSION
     assert report["queries_attempted"] == len(FRANCE_DISCOVERY_QUERIES)
     assert report["queries_succeeded"] == len(FRANCE_DISCOVERY_QUERIES)
     assert report["accepted_signal_count"] == 0
