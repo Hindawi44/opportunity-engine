@@ -195,10 +195,17 @@ def mark_identity_pending_signals(
             continue
         payload = deepcopy(dict(raw))
         metadata = _metadata(payload)
-        resolution = resolution_map.get(_compact(payload.get("signal_id")), {})
-        resolution_status = _compact(resolution.get("status")) or report_status or "UNRESOLVED"
+        signal_id = _compact(payload.get("signal_id"))
+        resolution = resolution_map.get(signal_id)
+        if resolution is not None:
+            resolution_status = _compact(resolution.get("status")) or "UNRESOLVED"
+        elif report_status.startswith("SKIPPED_NO_API_KEY"):
+            resolution_status = report_status
+        else:
+            resolution_status = "NOT_ATTEMPTED_BOUNDED_BUDGET"
+
         prior_attempts = int(metadata.get("identity_resolution_attempt_count") or 0)
-        attempt_performed = not report_status.startswith("SKIPPED_NO_API_KEY")
+        attempt_performed = resolution is not None
         if resolution_status == "SKIPPED_ALREADY_IDENTIFIED":
             attempt_performed = False
 
@@ -245,8 +252,8 @@ def mark_identity_pending_signals(
         payload["metadata"] = metadata
         payload["company_name"] = None
         payload["seller_name"] = None
-        payload["observed_at"] = now.isoformat()
-        payload["latest_observed_at"] = now.isoformat()
+        # Do not move market recency forward merely because identity resolution
+        # was retried. Retry time lives only in identity_last_attempt_at.
         payload["status"] = "WATCH"
         pending.append(payload)
     return pending
