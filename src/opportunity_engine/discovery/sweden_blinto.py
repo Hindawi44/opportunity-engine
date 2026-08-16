@@ -45,12 +45,12 @@ _BLINTO_ID_SUFFIX = re.compile(
 BLINTO_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
     DiscoveryQuery("se-bl-01", "LARGE_LOT_SALE", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:blinto.se/auction "parti med arbetskläder"'),
     DiscoveryQuery("se-bl-02", "LARGE_LOT_SALE", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:blinto.se/auction "parti med kläder" -klädskåp'),
-    DiscoveryQuery("se-bl-03", "WAREHOUSE_SURPLUS", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:blinto.se/auction "överskott av nya kläder"'),
+    DiscoveryQuery("se-bl-03", "WAREHOUSE_SURPLUS", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:blinto.se/auction restlager kläder'),
     DiscoveryQuery("se-bl-04", "WAREHOUSE_SURPLUS", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:blinto.se/auction varulager kläder överskott'),
     DiscoveryQuery("se-bl-05", "INVENTORY_LIQUIDATION", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:blinto.se/auction utförsäljning parti kläder'),
     DiscoveryQuery("se-bl-06", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:blinto.se/auction parti arbetsskor arbetsbyxor', "SECONDARY"),
-    DiscoveryQuery("se-bl-07", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:blinto.se/auction varselkläder parti totalt', "SECONDARY"),
-    DiscoveryQuery("se-bl-08", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:blinto.se/auction secondhand kläder parti', "SECONDARY"),
+    DiscoveryQuery("se-bl-07", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:blinto.se/auction restparti arbetskläder varselkläder', "SECONDARY"),
+    DiscoveryQuery("se-bl-08", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:blinto.se/auction lagerparti kläder skor', "SECONDARY"),
 )
 
 _CLOTHING_TERMS = (

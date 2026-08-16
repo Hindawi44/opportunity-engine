@@ -38,12 +38,12 @@ KLARAVIK_PRODUCT_PATH = re.compile(
 
 KLARAVIK_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
     DiscoveryQuery("se-kl-01", "LARGE_LOT_SALE", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt kläder parti -maskin -fordon'),
-    DiscoveryQuery("se-kl-02", "LARGE_LOT_SALE", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt "kläder och skor" parti'),
+    DiscoveryQuery("se-kl-02", "LARGE_LOT_SALE", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt varulager kläder skor'),
     DiscoveryQuery("se-kl-03", "COMPANY_BANKRUPTCY", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt konkurs kläder lager'),
     DiscoveryQuery("se-kl-04", "WAREHOUSE_SURPLUS", "SALE_INTENT", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt restparti kläder'),
     DiscoveryQuery("se-kl-05", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt arbetskläder skor parti', "SECONDARY"),
     DiscoveryQuery("se-kl-06", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt damkläder kläder parti', "SECONDARY"),
-    DiscoveryQuery("se-kl-07", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt secondhand kläder skor', "SECONDARY"),
+    DiscoveryQuery("se-kl-07", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt butikslager kläder parti', "SECONDARY"),
     DiscoveryQuery("se-kl-08", "LARGE_LOT_SALE", "SPECIALIZED", "CLOTHING_INVENTORY", 'site:klaravik.se/auktion/produkt kläder accessoarer lager', "SECONDARY"),
 )
 
