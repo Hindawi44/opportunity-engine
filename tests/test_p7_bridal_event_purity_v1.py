@@ -120,4 +120,4 @@ def test_inventory_nouns_are_not_surplus_event_terms_anymore() -> None:
     assert "musterkleider" in bridal_feed._COMMERCIAL_BATCH_TERMS["DE"]
 
     assert bridal_feed.BRIDAL_EVENT_PURITY_PATCH_SCHEMA_VERSION == PATCH_SCHEMA_VERSION
-    assert PATCH_SCHEMA_VERSION == "bridal-event-purity-cleanup-1.0"
+    assert PATCH_SCHEMA_VERSION == "bridal-event-purity-cleanup-1.1"
