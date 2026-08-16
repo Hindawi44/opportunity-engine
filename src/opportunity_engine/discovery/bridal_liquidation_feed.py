@@ -5,6 +5,11 @@ searches Brave for commercial bridal-store liquidation, insolvency, stock-cleara
 and batch-sale signals. A private person selling one used wedding dress is rejected.
 Accepted links remain unverified market signals and can never be promoted directly
 into an opportunity or trigger contact, bidding, purchasing, reservation, or payment.
+
+Sweden and Germany use a bounded intent pack. One core query always runs; adaptive
+queries run only while the result set is weak (fewer than two accepted signals or
+fewer than two independent domains). This increases depth without turning the feed
+into an unbounded crawler.
 """
 from __future__ import annotations
 
@@ -14,6 +19,7 @@ from hashlib import sha256
 import os
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
+from urllib.parse import urlsplit
 
 from opportunity_engine.discovery.brave_market_signal_radar import (
     _canonical_url,
@@ -32,18 +38,23 @@ from opportunity_engine.market_intelligence import (
 from opportunity_engine.unified_models import Evidence
 
 
-SCHEMA_VERSION = "bridal-liquidation-feed-1.0"
+SCHEMA_VERSION = "bridal-liquidation-feed-1.1"
 FEED_FAMILY = "BRIDAL_LIQUIDATION_FEED_V1"
 SUPPORTED_MARKETS = ("NO", "SE", "DE")
 DEFAULT_RESULTS_PER_QUERY = 8
 MAX_RESULTS_PER_QUERY = 10
 DEFAULT_FRESHNESS = "py"
+ADAPTIVE_MARKETS = frozenset({"SE", "DE"})
+ADAPTIVE_MIN_SIGNAL_COUNT = 2
+ADAPTIVE_MIN_DISTINCT_DOMAINS = 2
 
 
 @dataclass(frozen=True, slots=True)
 class BridalQuery:
     query_id: str
     query: str
+    intent: str = "LIQUIDATION"
+    phase: str = "CORE"
 
 
 BRIDAL_QUERIES: dict[str, BridalQuery] = {
@@ -61,6 +72,79 @@ BRIDAL_QUERIES: dict[str, BridalQuery] = {
         "de-bridal-liquidation",
         '(Brautmodengeschäft OR Brautladen OR Brautkleider OR Musterkleider) '
         '(Geschäftsauflösung OR Insolvenz OR Räumungsverkauf OR Restposten OR Lagerverkauf)',
+    ),
+}
+
+# Preserve the original BRIDAL_QUERIES public contract while giving the two weak
+# large markets several distinct commercial intents. Adaptive rows are attempted
+# only while the core result remains shallow.
+BRIDAL_QUERY_PACKS: dict[str, tuple[BridalQuery, ...]] = {
+    "NO": (BRIDAL_QUERIES["NO"],),
+    "SE": (
+        BRIDAL_QUERIES["SE"],
+        BridalQuery(
+            "se-bridal-sample-stock",
+            '(brudklänningar OR provklänningar OR butiksexemplar) '
+            '("lagerförsäljning" OR utförsäljning OR lagerrensning OR "butiksexemplar säljes")',
+            intent="SAMPLE_STOCK",
+            phase="ADAPTIVE",
+        ),
+        BridalQuery(
+            "se-bridal-stocklot",
+            '(brudklänningar OR brudbutik OR bröllopsbutik) '
+            '(varulager OR restlager OR lagerparti OR parti OR grossist) '
+            '(säljes OR försäljning OR avveckling)',
+            intent="STOCKLOT_WHOLESALE",
+            phase="ADAPTIVE",
+        ),
+        BridalQuery(
+            "se-bridal-auction",
+            '(brudklänningar OR brudbutik OR provklänningar) '
+            '(auktion OR konkursauktion OR "exekutiv försäljning")',
+            intent="AUCTION",
+            phase="ADAPTIVE",
+        ),
+        BridalQuery(
+            "se-bridal-closure-stock",
+            '(brudbutik OR bröllopsbutik) '
+            '(butiksstängning OR butiksnedläggning OR konkurs OR likvidation) '
+            '(lager OR varulager OR brudklänningar)',
+            intent="CLOSURE_STOCK",
+            phase="ADAPTIVE",
+        ),
+    ),
+    "DE": (
+        BRIDAL_QUERIES["DE"],
+        BridalQuery(
+            "de-bridal-sample-stock",
+            '(Brautkleider OR Musterkleider OR Ausstellungsstücke) '
+            '(Musterverkauf OR Abverkauf OR Räumungsverkauf OR Lagerverkauf)',
+            intent="SAMPLE_STOCK",
+            phase="ADAPTIVE",
+        ),
+        BridalQuery(
+            "de-bridal-stocklot",
+            '(Brautkleider OR Brautmode OR Musterkleider) '
+            '(Restposten OR Warenbestand OR Warenposten OR Sonderposten OR Posten) '
+            '(Großhandel OR Verkauf OR Verwertung)',
+            intent="STOCKLOT_WHOLESALE",
+            phase="ADAPTIVE",
+        ),
+        BridalQuery(
+            "de-bridal-auction",
+            '(Brautkleider OR Brautladen OR Brautmode) '
+            '(Auktion OR Versteigerung OR Insolvenzauktion OR Insolvenzversteigerung)',
+            intent="AUCTION",
+            phase="ADAPTIVE",
+        ),
+        BridalQuery(
+            "de-bridal-closure-stock",
+            '(Brautladen OR Brautmodengeschäft) '
+            '(Geschäftsaufgabe OR Geschäftsauflösung OR Insolvenz OR Ladenschließung) '
+            '(Warenbestand OR Lager OR Musterkleider)',
+            intent="CLOSURE_STOCK",
+            phase="ADAPTIVE",
+        ),
     ),
 }
 
@@ -86,16 +170,20 @@ _BRIDAL_TERMS: dict[str, tuple[str, ...]] = {
         "provklänningar",
         "provklanning",
         "provklanningar",
+        "butiksexemplar",
     ),
     "DE": (
         "brautmodengeschäft",
         "brautmodengeschaft",
         "brautladen",
+        "brautmode",
         "brautkleid",
         "brautkleider",
         "musterkleid",
         "musterkleider",
         "brautkollektion",
+        "ausstellungsstücke",
+        "ausstellungsstucke",
     ),
 }
 
@@ -119,37 +207,66 @@ _COMMERCIAL_BATCH_TERMS: dict[str, tuple[str, ...]] = {
         "brudklanningar",
         "provklänningar",
         "provklanningar",
+        "butiksexemplar",
         "lager",
         "varulager",
         "restlager",
+        "lagerparti",
         "parti",
         "kollektion",
+        "grossist",
     ),
     "DE": (
         "brautmodengeschäft",
         "brautmodengeschaft",
         "brautladen",
+        "brautmode",
         "brautkleider",
         "musterkleider",
+        "ausstellungsstücke",
+        "ausstellungsstucke",
         "lager",
         "warenbestand",
         "restposten",
+        "sonderposten",
+        "warenposten",
         "posten",
         "kollektion",
+        "großhandel",
+        "grosshandel",
     ),
 }
 
 _INSOLVENCY_TERMS: dict[str, tuple[str, ...]] = {
     "NO": ("konkurs", "insolvens", "tvangsavvikling", "likvidasjon"),
     "SE": ("konkurs", "insolvens", "likvidation", "rekonstruktion"),
-    "DE": ("insolvenz", "insolvenzverfahren", "liquidation", "konkurs"),
+    "DE": (
+        "insolvenz",
+        "insolvenzverfahren",
+        "insolvenzauktion",
+        "insolvenzversteigerung",
+        "liquidation",
+        "konkurs",
+    ),
 }
 _CLOSURE_TERMS: dict[str, tuple[str, ...]] = {
     "NO": ("opphørssalg", "avvikling", "nedleggelse"),
-    "SE": ("utförsäljning", "utforsaljning", "avveckling", "butiksstängning"),
+    "SE": (
+        "utförsäljning",
+        "utforsaljning",
+        "avveckling",
+        "butiksstängning",
+        "butiksnedläggning",
+    ),
     "DE": (
         "geschäftsauflösung",
         "geschaftsauflosung",
+        "geschäftsaufgabe",
+        "geschaftsaufgabe",
+        "geschäftsschließung",
+        "geschaftsschliessung",
+        "ladenschließung",
+        "ladenschliessung",
         "räumungsverkauf",
         "raumungsverkauf",
         "ladenauflösung",
@@ -168,22 +285,43 @@ _SURPLUS_TERMS: dict[str, tuple[str, ...]] = {
         "lagerrensning",
         "lager säljes",
         "lager saljes",
+        "lagerförsäljning",
+        "lagerforsaljning",
         "restlager",
+        "lagerparti",
         "provklänningar",
         "provklanningar",
+        "butiksexemplar",
     ),
     "DE": (
         "lagerverkauf",
         "restposten",
         "warenbestand",
+        "warenposten",
+        "sonderposten",
         "abverkauf",
+        "musterverkauf",
         "musterkleider",
+        "ausstellungsstücke",
+        "ausstellungsstucke",
+        "verwertung",
     ),
 }
 _AUCTION_TERMS: dict[str, tuple[str, ...]] = {
     "NO": ("auksjon", "tvangssalg"),
-    "SE": ("auktion", "exekutiv försäljning", "exekutiv forsaljning"),
-    "DE": ("auktion", "versteigerung", "zwangsversteigerung"),
+    "SE": (
+        "auktion",
+        "konkursauktion",
+        "exekutiv försäljning",
+        "exekutiv forsaljning",
+    ),
+    "DE": (
+        "auktion",
+        "versteigerung",
+        "insolvenzauktion",
+        "insolvenzversteigerung",
+        "zwangsversteigerung",
+    ),
 }
 
 ProviderFactory = Callable[[str, str, str | None], SearchProvider]
@@ -261,6 +399,8 @@ def bridal_signal_from_hit(
         metadata={
             "feed_family": FEED_FAMILY,
             "query_id": query.query_id,
+            "query_intent": query.intent,
+            "query_phase": query.phase,
             "provider": _compact(hit.provider) or "Brave Search",
             "verification_status": "UNVERIFIED_PUBLIC_WEB",
         },
@@ -301,12 +441,35 @@ def bridal_signal_from_hit(
             "discovery_transport": "BRAVE_SEARCH",
             "verification_status": "UNVERIFIED_PUBLIC_WEB",
             "query_id": query.query_id,
+            "query_intent": query.intent,
+            "query_phase": query.phase,
             "bridal_terms": sorted(set(bridal_terms)),
             "commercial_batch_terms": sorted(set(batch_terms)),
             "event_terms": sorted(set(event_terms)),
             "canonical_url": canonical_url,
             **_safety_payload(),
         },
+    )
+
+
+def _distinct_signal_domains(signals: Mapping[str, Mapping[str, Any]]) -> int:
+    domains: set[str] = set()
+    for signal in signals.values():
+        raw = _compact(signal.get("source_url"))
+        if not raw:
+            continue
+        host = (urlsplit(raw).hostname or "").casefold()
+        if host.startswith("www."):
+            host = host[4:]
+        if host:
+            domains.add(host)
+    return len(domains)
+
+
+def _needs_adaptive(signals: Mapping[str, Mapping[str, Any]]) -> bool:
+    return (
+        len(signals) < ADAPTIVE_MIN_SIGNAL_COUNT
+        or _distinct_signal_domains(signals) < ADAPTIVE_MIN_DISTINCT_DOMAINS
     )
 
 
@@ -320,7 +483,7 @@ def collect_manifest_bridal_liquidation_signals(
     results_per_query: int = DEFAULT_RESULTS_PER_QUERY,
     freshness: str | None = DEFAULT_FRESHNESS,
 ) -> dict[str, Any]:
-    """Run one bounded bridal query per existing market and merge accepted signals."""
+    """Run bounded local bridal discovery with adaptive SE/DE depth."""
     if not 1 <= results_per_query <= MAX_RESULTS_PER_QUERY:
         raise ValueError(
             f"results_per_query must be between 1 and {MAX_RESULTS_PER_QUERY}"
@@ -340,22 +503,39 @@ def collect_manifest_bridal_liquidation_signals(
 
     for market_code in SUPPORTED_MARKETS:
         target = _target_spec(manifest, market_code)
-        query = BRIDAL_QUERIES[market_code]
+        primary_query = BRIDAL_QUERIES[market_code]
+        query_pack = BRIDAL_QUERY_PACKS[market_code]
         source: dict[str, Any] = {
             "schema_version": SCHEMA_VERSION,
             "feed_family": FEED_FAMILY,
             "source": "Brave Search bridal liquidation feed",
             "source_country": market_code,
             "freshness": freshness,
-            "query_id": query.query_id,
-            "query": query.query,
-            "query_budget": 1,
+            "query_id": primary_query.query_id,
+            "query": primary_query.query,
+            "query_budget": len(query_pack),
+            "query_plan": [
+                {
+                    "query_id": item.query_id,
+                    "query": item.query,
+                    "intent": item.intent,
+                    "phase": item.phase,
+                }
+                for item in query_pack
+            ],
+            "query_runs": [],
             "results_per_query": results_per_query,
             "queries_attempted": 0,
             "queries_succeeded": 0,
             "accepted_signal_count": 0,
             "rejected_result_count": 0,
             "duplicate_result_count": 0,
+            "distinct_domain_count": 0,
+            "adaptive_expansion_eligible": market_code in ADAPTIVE_MARKETS,
+            "adaptive_expansion_triggered": False,
+            "adaptive_stop_reason": (
+                "NOT_CONFIGURED" if market_code not in ADAPTIVE_MARKETS else None
+            ),
             "signals": [],
             "errors": [],
             **_safety_payload(),
@@ -380,52 +560,113 @@ def collect_manifest_bridal_liquidation_signals(
             sources.append(source)
             continue
 
-        source["queries_attempted"] = 1
-        requests_made += 1
-        try:
-            hits = provider.search(query.query, count=results_per_query)
-            source["queries_succeeded"] = 1
-        except Exception as exc:
-            source["status"] = "BLOCKED_RETRIEVAL"
-            source["block_reason"] = "SEARCH_REQUEST_FAILED"
-            source["errors"] = [f"{type(exc).__name__}: {_compact(exc)[:300]}"]
-            sources.append(source)
-            continue
-
         accepted: dict[str, dict[str, Any]] = {}
         seen_urls: set[str] = set()
         rejected = 0
         duplicates = 0
-        for hit in hits:
-            if not isinstance(hit, SearchHit):
-                rejected += 1
-                continue
+
+        for query in query_pack:
+            if query.phase == "ADAPTIVE":
+                if market_code not in ADAPTIVE_MARKETS:
+                    break
+                if not _needs_adaptive(accepted):
+                    source["adaptive_stop_reason"] = "CORE_OR_PRIOR_EVIDENCE_SUFFICIENT"
+                    break
+                source["adaptive_expansion_triggered"] = True
+
+            source["queries_attempted"] += 1
+            requests_made += 1
+            query_run: dict[str, Any] = {
+                "query_id": query.query_id,
+                "query": query.query,
+                "intent": query.intent,
+                "phase": query.phase,
+                "status": "PLANNED",
+                "returned_result_count": 0,
+                "accepted_signal_count": 0,
+                "rejected_result_count": 0,
+                "duplicate_result_count": 0,
+            }
             try:
-                canonical_url = _canonical_url(_compact(hit.url))
-            except ValueError:
-                rejected += 1
+                hits = provider.search(query.query, count=results_per_query)
+                source["queries_succeeded"] += 1
+                query_run["status"] = "SUCCESS"
+                query_run["returned_result_count"] = len(hits)
+            except Exception as exc:
+                message = f"{type(exc).__name__}: {_compact(exc)[:300]}"
+                source["errors"].append(f"{query.query_id}: {message}")
+                query_run["status"] = "FAILED"
+                query_run["error"] = message
+                source["query_runs"].append(query_run)
                 continue
-            if canonical_url in seen_urls:
-                duplicates += 1
-                continue
-            seen_urls.add(canonical_url)
-            signal = bridal_signal_from_hit(
-                hit,
-                market_code=market_code,
-                query=query,
-                observed_at=now,
-            )
-            if signal is None:
-                rejected += 1
-                continue
-            accepted[signal.signal_id] = signal.model_dump(mode="json")
+
+            accepted_before = len(accepted)
+            query_rejected = 0
+            query_duplicates = 0
+            for hit in hits:
+                if not isinstance(hit, SearchHit):
+                    rejected += 1
+                    query_rejected += 1
+                    continue
+                try:
+                    canonical_url = _canonical_url(_compact(hit.url))
+                except ValueError:
+                    rejected += 1
+                    query_rejected += 1
+                    continue
+                if canonical_url in seen_urls:
+                    duplicates += 1
+                    query_duplicates += 1
+                    continue
+                seen_urls.add(canonical_url)
+                signal = bridal_signal_from_hit(
+                    hit,
+                    market_code=market_code,
+                    query=query,
+                    observed_at=now,
+                )
+                if signal is None:
+                    rejected += 1
+                    query_rejected += 1
+                    continue
+                accepted.setdefault(signal.signal_id, signal.model_dump(mode="json"))
+
+            query_run["accepted_signal_count"] = len(accepted) - accepted_before
+            query_run["rejected_result_count"] = query_rejected
+            query_run["duplicate_result_count"] = query_duplicates
+            source["query_runs"].append(query_run)
+
+            if query.phase == "ADAPTIVE" and not _needs_adaptive(accepted):
+                source["adaptive_stop_reason"] = "EVIDENCE_DIVERSIFIED"
+                break
+
+        if market_code in ADAPTIVE_MARKETS and source["adaptive_stop_reason"] is None:
+            if source["adaptive_expansion_triggered"]:
+                source["adaptive_stop_reason"] = "QUERY_PACK_EXHAUSTED"
+            else:
+                source["adaptive_stop_reason"] = "CORE_EVIDENCE_SUFFICIENT"
 
         source["accepted_signal_count"] = len(accepted)
         source["rejected_result_count"] = rejected
         source["duplicate_result_count"] = duplicates
+        source["distinct_domain_count"] = _distinct_signal_domains(accepted)
         source["signals"] = [accepted[key] for key in sorted(accepted)]
-        source["status"] = "SUCCESS" if accepted else "VALID_ZERO"
-        source["block_reason"] = None
+
+        if source["queries_succeeded"] == 0 and source["errors"]:
+            source["status"] = "BLOCKED_RETRIEVAL"
+            source["block_reason"] = "ALL_SEARCH_REQUESTS_FAILED"
+        elif accepted and source["errors"]:
+            source["status"] = "PARTIAL_RETRIEVAL"
+            source["block_reason"] = None
+        elif accepted:
+            source["status"] = "SUCCESS"
+            source["block_reason"] = None
+        elif source["errors"]:
+            source["status"] = "PARTIAL_RETRIEVAL"
+            source["block_reason"] = None
+        else:
+            source["status"] = "VALID_ZERO"
+            source["block_reason"] = None
 
         artifact_dir = root_path / _compact(target.get("artifact_dir"))
         report_path = artifact_dir / _compact(
@@ -445,6 +686,7 @@ def collect_manifest_bridal_liquidation_signals(
         status = _compact(source.get("status")).upper() or "UNKNOWN"
         status_counts[status] = status_counts.get(status, 0) + 1
 
+    query_budget_total = sum(len(BRIDAL_QUERY_PACKS[market]) for market in SUPPORTED_MARKETS)
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at": _iso_utc(now),
@@ -452,10 +694,13 @@ def collect_manifest_bridal_liquidation_signals(
         "retrieval_transport": "BRAVE_SEARCH",
         "market_coverage": list(SUPPORTED_MARKETS),
         "market_count": len(sources),
-        "query_budget_total": len(SUPPORTED_MARKETS),
+        "query_budget_total": query_budget_total,
         "requests_made": requests_made,
         "results_per_query": results_per_query,
         "freshness": freshness,
+        "adaptive_markets": sorted(ADAPTIVE_MARKETS),
+        "adaptive_min_signal_count": ADAPTIVE_MIN_SIGNAL_COUNT,
+        "adaptive_min_distinct_domains": ADAPTIVE_MIN_DISTINCT_DOMAINS,
         "status_counts": status_counts,
         "sources": sources,
         "signal_count": sum(
