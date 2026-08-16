@@ -65,7 +65,7 @@ def test_word_boundaries_prevent_substring_noise() -> None:
     noise = SearchHit(
         title="Une solution moderne pour les entreprises",
         url="https://example.fr/moderne",
-        description="Présentation d'une plateforme de liquidation de données sans vêtements ni textile.",
+        description="Présentation d'une plateforme de liquidation de données pour sociétés commerciales.",
         provider="Fake Brave",
     )
     # 'mode' inside 'moderne' must never count as fashion evidence.
