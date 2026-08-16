@@ -76,6 +76,27 @@ def test_generic_french_auction_without_company_does_not_create_case() -> None:
     assert reason == "NO_EXPLICIT_FRENCH_ENTITY"
 
 
+def test_generic_legal_notice_words_never_become_company_identity() -> None:
+    signal = france_signal_from_hit(
+        SearchHit(
+            title="Annonce légale SARL LOGEHOME CLEMENCEAU",
+            url="https://www.lagazettefrance.fr/annonce-legale/example",
+            description=(
+                "Redressement judiciaire. SAS KANA BEACH, RCS BREST 339 792 012. "
+                "Achat et vente de tous vêtements de prêt-à-porter et chaussures."
+            ),
+            provider="Fake Brave",
+        ),
+        query=_query("INSOLVENCY_LIQUIDATION"),
+        rank=1,
+        observed_at=DAY_1,
+    )
+    assert signal is not None
+    adapted, reason = adapt_france_signal_to_entity_memory(signal.model_dump(mode="json"))
+    assert adapted is None
+    assert reason == "NO_EXPLICIT_FRENCH_ENTITY"
+
+
 def test_same_company_across_days_builds_one_stable_case_and_rotates_stages() -> None:
     first = _bodacc_signal(
         observed_at=DAY_1,

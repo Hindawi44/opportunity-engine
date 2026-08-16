@@ -20,7 +20,7 @@ from opportunity_engine.discovery.search_provider import SearchProvider
 from opportunity_engine.persistence import upgrade_database
 
 
-SCHEMA_VERSION = "france-case-memory-adapter-1.0"
+SCHEMA_VERSION = "france-case-memory-adapter-1.1"
 ENGINE_VERSION = "FRANCE_CASE_MEMORY_ADAPTER_V1"
 MARKET_CODE = "FR"
 FRANCE_MEMORY_RELATIVE_PATH = Path("fr-market/opportunity_engine.db")
@@ -85,6 +85,7 @@ _DENOMINATION_RE = re.compile(
     flags=re.IGNORECASE,
 )
 _GENERIC_ENTITY_TOKENS = {
+    "annonce", "legale", "légale",
     "boutique", "chaussures", "fashion", "france", "friperie", "habillement",
     "lingerie", "mariage", "mode", "outlet", "pret", "porter", "stock", "textile",
     "vetement", "vetements", "vêtement", "vêtements",
@@ -126,6 +127,28 @@ def _plausible_entity(label: str, key: str) -> bool:
     return any(token not in _GENERIC_ENTITY_TOKENS for token in tokens)
 
 
+def _value_supports_entity(signal: Mapping[str, Any], key: str) -> bool:
+    """Require a title-derived identity to be repeated in the result description.
+
+    Brave extra snippets can splice neighboring legal notices. Requiring the
+    distinctive company tokens from the title-derived key to recur in `value`
+    prevents a title for LOGEHOME from being paired with a KANA BEACH snippet.
+    """
+    context = _entity_key(_compact(signal.get("value")))
+    if not context:
+        return False
+    distinctive = [
+        token for token in key.split()
+        if len(token) >= 3 and token not in _GENERIC_ENTITY_TOKENS
+    ]
+    if not distinctive:
+        return False
+    context_tokens = set(context.split())
+    matches = sum(token in context_tokens for token in distinctive)
+    required = min(2, len(distinctive))
+    return matches >= required
+
+
 def _evidence_text(signal: Mapping[str, Any]) -> str:
     parts = [_compact(signal.get("title")), _compact(signal.get("value"))]
     evidence = signal.get("evidence")
@@ -160,14 +183,14 @@ def _extract_entity(signal: Mapping[str, Any]) -> tuple[str | None, str | None, 
     if suffix:
         label = _compact(suffix.group("label")).strip(" -–—|:,.;")
         key = _entity_key(label)
-        if _plausible_entity(label, key):
+        if _plausible_entity(label, key) and _value_supports_entity(signal, key):
             return label, key, "FRENCH_LEGAL_FORM_IN_TITLE", 82
 
     prefix = _LEGAL_PREFIX_RE.search(candidate_text)
     if prefix:
         label = _compact(f"{prefix.group('name')} {prefix.group('form')}").strip(" -–—|:,.;")
         key = _entity_key(label)
-        if _plausible_entity(label, key):
+        if _plausible_entity(label, key) and _value_supports_entity(signal, key):
             return label, key, "FRENCH_LEGAL_FORM_PREFIX", 80
 
     return None, None, "NO_EXPLICIT_FRENCH_ENTITY", 0
