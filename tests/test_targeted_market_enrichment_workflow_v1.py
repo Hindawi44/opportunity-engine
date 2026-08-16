@@ -24,7 +24,10 @@ def test_gate_runs_before_any_paid_secret_is_exposed() -> None:
 
     assert gate < paid <= openai_secret
     assert gate < paid <= brave_secret
+    assert "id: gate" in text[gate:paid]
     assert "--gate-only" in text[gate:paid]
+    assert 'steps.gate.outputs.should_run == \'true\'' in text
+    assert 'os.environ["GITHUB_OUTPUT"]' in text[gate:paid]
     assert "gate_uses_paid_api" in text
 
 
@@ -61,6 +64,6 @@ def test_paid_stage_is_bounded_and_read_only() -> None:
 def test_zero_eligibility_skips_openai_and_brave_followup_artifacts() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     assert "SKIPPED_NO_ELIGIBLE_HUNT_SIGNALS" in text
-    assert 'env.RUN_TARGETED_ENRICHMENT == \'true\'' in text
+    assert 'steps.gate.outputs.should_run == \'true\'' in text
     assert 'openai-hunt-case-enrichment.json").exists()' in text
     assert 'hunt-case-targeted-followup.json").exists()' in text
