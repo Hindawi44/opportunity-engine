@@ -1,14 +1,18 @@
 """Conservative commercial-readiness gate for verified Italy exact lots.
 
 ITALY_COMMERCIAL_QUALIFICATION_V1 consumes only rows already proven by
-ITALY_EXACT_LOT_VERIFICATION_V1 to be active, entity-linked clothing lots.  It
-never converts missing economics into estimates.  The gate records exact source
-facts, derives only arithmetic facts that are mathematically implied by those
-facts (for example total source price divided by source quantity), and names the
-existing project evidence lanes that must run before any financial decision.
+ITALY_EXACT_LOT_VERIFICATION_V1 to be active, entity-linked clothing lots. It
+never converts missing economics into estimates. The gate records exact source
+facts, derives only arithmetic facts mathematically implied by them, and names
+the existing project evidence lanes that must run before any financial decision.
+
+The exact-lot parser can observe a listed price, auction base price or minimum
+offer. Therefore this module deliberately calls it a *source listed price*, not
+a purchase price. Dividing that value by a source-page quantity creates only a
+unit reference; it is never a final payable unit cost.
 
 No FX rate, auction fee, VAT, freight, resale value, margin, ROI, bid ceiling or
-purchase decision is guessed here.  Italy remains outside the canonical
+purchase decision is guessed here. Italy remains outside the canonical
 NO/SE/DE Top-5 lane in V1.
 """
 from __future__ import annotations
@@ -99,7 +103,7 @@ def _source_fact_missing(row: Mapping[str, Any]) -> list[str]:
     if _positive_int(row.get("quantity")) is None:
         missing.append("source quantity")
     if _number(row.get("source_price_eur")) is None:
-        missing.append("source price EUR")
+        missing.append("source listed/base price EUR")
     if not _compact(row.get("location")):
         missing.append("source location")
     if not _compact(row.get("sale_deadline_text")):
@@ -117,9 +121,6 @@ def _decision_evidence_missing(row: Mapping[str, Any]) -> list[str]:
         "conservative resale value NOK from verified comparables",
         "verified inventory condition",
     ]
-    # Exact lot pages may eventually gain explicit fee/VAT fields.  Keep them
-    # separate from final payable price until the existing cost engine validates
-    # each component.
     if row.get("buyer_premium_percent") in (None, ""):
         missing.append("verified buyer/auction fee")
     if row.get("vat_percent") in (None, ""):
@@ -129,10 +130,10 @@ def _decision_evidence_missing(row: Mapping[str, Any]) -> list[str]:
 
 def _qualification_row(row: Mapping[str, Any], *, generated_at: datetime) -> dict[str, Any]:
     quantity = _positive_int(row.get("quantity"))
-    source_price_eur = _number(row.get("source_price_eur"))
-    unit_price_eur = None
-    if quantity is not None and source_price_eur is not None:
-        unit_price_eur = round(source_price_eur / quantity, 6)
+    listed_price_eur = _number(row.get("source_price_eur"))
+    unit_reference_eur = None
+    if quantity is not None and listed_price_eur is not None:
+        unit_reference_eur = round(listed_price_eur / quantity, 6)
 
     source_missing = _source_fact_missing(row)
     decision_missing = _decision_evidence_missing(row)
@@ -143,8 +144,8 @@ def _qualification_row(row: Mapping[str, Any], *, generated_at: datetime) -> dic
         stable.encode("utf-8")
     ).hexdigest()[:24]
 
-    if quantity is not None and source_price_eur is not None:
-        state = "SOURCE_UNIT_ECONOMICS_VERIFIED"
+    if quantity is not None and listed_price_eur is not None:
+        state = "SOURCE_PRICE_AND_QUANTITY_PRESENT"
     else:
         state = "SOURCE_ECONOMICS_INCOMPLETE"
 
@@ -166,20 +167,26 @@ def _qualification_row(row: Mapping[str, Any], *, generated_at: datetime) -> dic
         "source_facts": {
             "quantity": quantity,
             "quantity_unit": "ITEM" if quantity is not None else None,
-            "source_total_price_eur": source_price_eur,
-            "source_unit_price_eur": unit_price_eur,
-            "currency": "EUR" if source_price_eur is not None else None,
+            "source_listed_price_eur": listed_price_eur,
+            "source_price_semantics": (
+                "LISTED_OR_AUCTION_BASE_OR_MINIMUM_OFFER_NOT_FINAL_PAYABLE"
+                if listed_price_eur is not None
+                else None
+            ),
+            "source_listed_unit_reference_eur": unit_reference_eur,
+            "currency": "EUR" if listed_price_eur is not None else None,
             "location": _compact(row.get("location")) or None,
             "sale_deadline_text": _compact(row.get("sale_deadline_text")) or None,
             "response_sha256": row.get("response_sha256"),
         },
         "derived_facts": {
-            "source_unit_price_eur": unit_price_eur,
+            "source_listed_unit_reference_eur": unit_reference_eur,
             "derivation": (
-                "SOURCE_PAGE_TOTAL_PRICE_EUR_DIVIDED_BY_SOURCE_PAGE_QUANTITY"
-                if unit_price_eur is not None
+                "SOURCE_PAGE_LISTED_PRICE_EUR_DIVIDED_BY_SOURCE_PAGE_QUANTITY"
+                if unit_reference_eur is not None
                 else None
             ),
+            "final_payable_unit_cost": False,
             "estimated": False,
         },
         "missing_source_facts": source_missing,
@@ -189,6 +196,7 @@ def _qualification_row(row: Mapping[str, Any], *, generated_at: datetime) -> dic
         "ready_for_logistics_evidence": bool(_compact(row.get("location"))),
         "ready_for_financial_decision": False,
         "financial_decision": None,
+        "final_payable_price_nok": None,
         "profit_nok": None,
         "roi": None,
         "margin": None,
@@ -220,8 +228,8 @@ def run_italy_commercial_qualification(
     eligible = [row for row in all_rows if _verified_exact_lot(row)]
     qualifications = [_qualification_row(row, generated_at=now) for row in eligible]
 
-    source_economics_complete = sum(
-        item.get("qualification_state") == "SOURCE_UNIT_ECONOMICS_VERIFIED"
+    unit_reference_count = sum(
+        item.get("qualification_state") == "SOURCE_PRICE_AND_QUANTITY_PRESENT"
         for item in qualifications
     )
     with_location = sum(
@@ -246,11 +254,12 @@ def run_italy_commercial_qualification(
         "input_exact_lot_row_count": len(all_rows),
         "verified_active_exact_lot_input_count": len(eligible),
         "qualification_count": len(qualifications),
-        "source_unit_economics_verified_count": source_economics_complete,
+        "source_unit_reference_derived_count": unit_reference_count,
         "source_location_known_count": with_location,
         "financial_decision_ready_count": 0,
         "qualifications": qualifications,
         "existing_downstream_engines_reused": list(_DOWNSTREAM_EVIDENCE_LANES),
+        "source_price_never_treated_as_final_payable": True,
         "missing_values_are_never_estimated": True,
         "fx_rate_assumed": False,
         "shipping_cost_assumed": False,
