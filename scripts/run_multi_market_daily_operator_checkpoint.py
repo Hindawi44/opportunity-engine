@@ -19,6 +19,10 @@ for path in (ROOT, SRC):
 from opportunity_engine.discovery.italy_case_memory_adapter import (
     run_italy_case_memory_cycle,
 )
+from opportunity_engine.discovery.italy_exact_lot_verification import (
+    ENGINE_VERSION as ITALY_EXACT_LOT_ENGINE_VERSION,
+    run_italy_exact_lot_verification,
+)
 from opportunity_engine.discovery.italy_market_discovery import (
     collect_italy_market_signals,
 )
@@ -85,7 +89,24 @@ def _run_italy_memory_sidecar(
             "automatic_purchase": False,
             "automatic_payment": False,
         }
+        exact_skipped = {
+            "schema_version": "italy-exact-lot-verification-1.0",
+            "engine_version": ITALY_EXACT_LOT_ENGINE_VERSION,
+            "status": "SKIPPED_NO_API_KEY",
+            "source_country": "IT",
+            "verified_active_exact_lot_lead_count": 0,
+            "promotion_to_opportunity_allowed": False,
+            "top5_eligible": False,
+            "analysis_eligible": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_reservation": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
         _write_json(output_dir / "italy-case-memory-v1.json", skipped)
+        _write_json(output_dir / "italy-exact-lot-verification-v1.json", exact_skipped)
+        skipped["exact_lot_verification"] = exact_skipped
         return skipped
 
     discovery = collect_italy_market_signals(environment=os.environ)
@@ -104,10 +125,29 @@ def _run_italy_memory_sidecar(
     cycle["canonical_market_coverage_unchanged"] = ["NO", "SE", "DE"]
     cycle["discovery_status"] = discovery.get("status")
     cycle["discovery_accepted_signal_count"] = discovery.get("accepted_signal_count")
+
+    exact_lot = run_italy_exact_lot_verification(
+        dict(cycle.get("follow_up") or {}),
+    )
+    cycle["exact_lot_verification"] = {
+        "engine_version": exact_lot.get("engine_version"),
+        "status": exact_lot.get("status"),
+        "candidate_lead_count": exact_lot.get("candidate_lead_count"),
+        "source_page_verified_count": exact_lot.get("source_page_verified_count"),
+        "verified_active_exact_lot_lead_count": exact_lot.get(
+            "verified_active_exact_lot_lead_count"
+        ),
+        "output": "italy-exact-lot-verification-v1.json",
+    }
+
     _write_json(output_dir / "italy-case-memory-v1.json", cycle)
     _write_json(
         output_dir / "italy-signal-follow-up-v1.json",
         dict(cycle.get("follow_up") or {}),
+    )
+    _write_json(
+        output_dir / "italy-exact-lot-verification-v1.json",
+        exact_lot,
     )
     return cycle
 
@@ -212,6 +252,7 @@ def main() -> int:
     print(render_phone_summary(report), end="")
     for name, path in paths.items():
         print(f"{name}: {path}")
+    exact_summary = italy_sidecar.get("exact_lot_verification") or {}
     print(
         "italy_memory_sidecar: "
         + json.dumps(
@@ -219,6 +260,10 @@ def main() -> int:
                 "status": italy_sidecar.get("status") or "SUCCESS",
                 "persistent_case_count": italy_sidecar.get("persistent_case_count", 0),
                 "discovery_status": italy_sidecar.get("discovery_status"),
+                "exact_lot_status": exact_summary.get("status"),
+                "verified_active_exact_lot_lead_count": exact_summary.get(
+                    "verified_active_exact_lot_lead_count", 0
+                ),
                 "automatic_purchase": italy_sidecar.get("automatic_purchase"),
             },
             ensure_ascii=False,
