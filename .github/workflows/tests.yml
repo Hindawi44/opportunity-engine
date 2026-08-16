@@ -42,3 +42,41 @@ jobs:
       - name: إنهاء بالفشل عند فشل الاختبارات
         if: steps.pytest.outputs.exit_code != '0'
         run: exit 1
+
+  italy-market-discovery-live:
+    name: Italy market discovery live validation
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, 'Italy') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate Italy discovery contract
+        run: pytest tests/test_italy_market_discovery_v1.py -q
+
+      - name: Run bounded live Italy discovery
+        run: |
+          python scripts/build_italy_market_discovery.py \
+            --output artifacts/italy-market-discovery/italy-market-discovery.json
+
+      - name: Upload live Italy discovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: italy-market-discovery-v1
+          path: artifacts/italy-market-discovery/italy-market-discovery.json
+          if-no-files-found: error
+          retention-days: 30
