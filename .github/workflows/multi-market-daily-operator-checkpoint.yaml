@@ -233,7 +233,7 @@ jobs:
               --output-dir "$INPUT_ROOT/se-blinto" \
               --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
               --results-per-query 10 \
-              --freshness none \
+              --freshness pm \
               --verify-pages \
               --verification-limit 20 \
               --persist-unified \
@@ -249,7 +249,7 @@ jobs:
               --output-dir "$INPUT_ROOT/se-klaravik" \
               --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
               --results-per-query 10 \
-              --freshness none \
+              --freshness pm \
               --verify-pages \
               --verification-limit 20
 
@@ -263,7 +263,7 @@ jobs:
               --output-dir "$INPUT_ROOT/se-psauction" \
               --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
               --results-per-query 10 \
-              --freshness none \
+              --freshness pm \
               --verify-pages \
               --verification-limit 20
 
