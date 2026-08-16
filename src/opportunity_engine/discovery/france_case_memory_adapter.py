@@ -20,7 +20,7 @@ from opportunity_engine.discovery.search_provider import SearchProvider
 from opportunity_engine.persistence import upgrade_database
 
 
-SCHEMA_VERSION = "france-case-memory-adapter-1.0"
+SCHEMA_VERSION = "france-case-memory-adapter-1.1"
 ENGINE_VERSION = "FRANCE_CASE_MEMORY_ADAPTER_V1"
 MARKET_CODE = "FR"
 FRANCE_MEMORY_RELATIVE_PATH = Path("fr-market/opportunity_engine.db")
@@ -85,6 +85,7 @@ _DENOMINATION_RE = re.compile(
     flags=re.IGNORECASE,
 )
 _GENERIC_ENTITY_TOKENS = {
+    "annonce", "legale", "légale",
     "boutique", "chaussures", "fashion", "france", "friperie", "habillement",
     "lingerie", "mariage", "mode", "outlet", "pret", "porter", "stock", "textile",
     "vetement", "vetements", "vêtement", "vêtements",
