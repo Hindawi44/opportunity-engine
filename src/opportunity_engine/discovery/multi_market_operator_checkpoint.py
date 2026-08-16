@@ -219,8 +219,15 @@ def _load_source(spec: Mapping[str, Any], root: Path) -> dict[str, Any]:
 
     if spec.get("report_kind") == "AUKSJONEN_LIVE":
         report = report if isinstance(report, Mapping) else None
-        records = _as_list((report or {}).get("listings"))
-        records = [item for item in records if item.get("inventory_lot_signal") is True]
+        raw_records = _as_list((report or {}).get("listings"))
+        raw_records = [
+            item for item in raw_records if item.get("inventory_lot_signal") is True
+        ]
+        # Source-native candidates are written after exact item-page verification
+        # and therefore own eligibility/evidence truth. The raw public listing
+        # report remains a compatibility fallback for older artifacts/tests only.
+        verified_candidates = _as_list(candidates)
+        records = verified_candidates if verified_candidates else raw_records
         top5_records = _as_list(top5)
         source_success = bool((report or {}).get("scan_complete")) and not (
             (report or {}).get("errors") or []
