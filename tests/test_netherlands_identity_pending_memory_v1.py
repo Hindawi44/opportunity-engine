@@ -171,8 +171,10 @@ def test_unnamed_signal_survives_discovery_disappearance_and_resolves_next_day(
 
     entity = day_two["adapter"]["entity_signals"][0]
     assert entity["signal_id"] == signal_id
-    assert entity["company_name"].casefold() == "md fashion netherlands b.v."
+    assert entity["company_name"].casefold() == "md fashion netherlands b.v"
     assert entity["metadata"]["entity_scent_classification"] == "ENTITY_SCENT"
+    assert entity["metadata"]["identity_lifecycle_state"] == "IDENTITY_RESOLVED"
+    assert entity["metadata"]["identity_resolved_from_pending"] is True
     assert entity["metadata"]["promotion_to_opportunity_allowed"] is False
     assert entity["metadata"]["automatic_purchase"] is False
 
