@@ -29,6 +29,17 @@ def _blocked(url=PS_ITEM):
     )
 
 
+def _insufficient(url=PS_ITEM):
+    return PageVerification(
+        url=url,
+        page_role=UNRESOLVED_SOURCE,
+        opportunity_identity="url-id:1560018",
+        identity_stable=True,
+        verified=False,
+        error="insufficient public listing content",
+    )
+
+
 def _verified(url=PS_ITEM):
     return PageVerification(
         url=url,
@@ -48,9 +59,10 @@ def _verified(url=PS_ITEM):
     )
 
 
-def test_config_enforces_small_volume_and_delay():
+def test_config_enforces_bounded_volume_and_delay():
+    assert PSAuctionPlaywrightConfig(max_pages=6).max_pages == 6
     with pytest.raises(ValueError, match="max_pages"):
-        PSAuctionPlaywrightConfig(max_pages=4)
+        PSAuctionPlaywrightConfig(max_pages=7)
     with pytest.raises(ValueError, match="delay_seconds"):
         PSAuctionPlaywrightConfig(delay_seconds=1.5)
 
@@ -89,6 +101,56 @@ def test_403_on_specific_item_uses_rendered_page(monkeypatch):
     assert diagnostics["attempted"] == 1
     assert diagnostics["succeeded"] == 1
     assert diagnostics["failed"] == 0
+
+
+def test_insufficient_public_content_uses_rendered_page(monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        "opportunity_engine.discovery.sweden_psauction_playwright.verify_public_html",
+        lambda url, html: _verified(url),
+    )
+    verifier = PSAuctionPlaywrightFallbackVerifier(
+        lambda url: _insufficient(url),
+        rendered_page_loader=lambda url: (calls.append(url) or (url, "<html/>")),
+    )
+
+    result = verifier(PS_ITEM)
+    diagnostics = verifier.diagnostics()
+
+    assert result.verified is True
+    assert calls == [PS_ITEM]
+    assert diagnostics["attempted"] == 1
+    assert diagnostics["succeeded"] == 1
+
+
+def test_system_chromium_is_used_when_playwright_is_unavailable(monkeypatch):
+    monkeypatch.setattr(
+        "opportunity_engine.discovery.sweden_psauction_playwright.verify_public_html",
+        lambda url, html: _verified(url),
+    )
+    verifier = PSAuctionPlaywrightFallbackVerifier(lambda url: _insufficient(url))
+    monkeypatch.setattr(
+        verifier,
+        "_ensure_browser",
+        lambda: (_ for _ in ()).throw(RuntimeError("Playwright is not installed")),
+    )
+    chromium_calls = []
+
+    def render(url):
+        chromium_calls.append(url)
+        verifier._system_chromium_render_count += 1
+        verifier._system_chromium_executable = "/usr/bin/google-chrome"
+        return url, "<html><main>rendered PS Auction item</main></html>"
+
+    monkeypatch.setattr(verifier, "_load_with_system_chromium", render)
+
+    result = verifier(PS_ITEM)
+    diagnostics = verifier.diagnostics()
+
+    assert result.verified is True
+    assert chromium_calls == [PS_ITEM]
+    assert diagnostics["system_chromium_render_count"] == 1
+    assert diagnostics["system_chromium_executable"] == "/usr/bin/google-chrome"
 
 
 def test_fallback_does_not_run_for_other_hosts():
