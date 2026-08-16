@@ -59,6 +59,8 @@ _GERMAN_TO_NORWEGIAN_ALIASES: tuple[tuple[str, str], ...] = (
     ("bekleidungsposten", "klesparti"),
     ("textilposten", "vareparti"),
     ("zu verkaufen", "til salgs"),
+    ("liquidationsverkauf", "likvidasjon til salgs"),
+    ("verkauf gegen gebot", "til salgs budrunde"),
     ("versteigerung", "auksjon"),
     ("auktion", "auksjon"),
     ("gebotsabgabe", "budrunde"),
@@ -99,7 +101,8 @@ _GERMAN_INVENTORY_TERMS = (
     "posten bekleidung", "paletten", "kartons",
 )
 _GERMAN_SALE_TERMS = (
-    "zu verkaufen", "versteigerung", "auktion", "gebotsabgabe",
+    "zu verkaufen", "liquidationsverkauf", "verkauf gegen gebot",
+    "versteigerung", "auktion", "gebotsabgabe",
     "räumungsverkauf", "gesamtverkauf", "postenverkauf", "aktuelles gebot",
     "jetzt bieten", "zuschläge ab",
 )
