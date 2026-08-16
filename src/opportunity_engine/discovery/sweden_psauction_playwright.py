@@ -1,13 +1,17 @@
-"""Bounded Chromium fallback for specific public PS Auction item pages.
+"""Bounded browser fallback for specific public PS Auction item pages.
 
-The lightweight verifier remains primary. Chromium is used only when one exact
-PS Auction item page returns HTTP 403 or insufficient public content. The
-fallback never logs in, bypasses access controls, contacts a seller, places a
-bid, or performs any commercial action.
+The lightweight verifier remains primary. A rendered browser is used only when
+one exact PS Auction item page returns HTTP 403 or insufficient public content.
+Playwright is preferred when available; GitHub-hosted runners can otherwise use
+their installed Chrome/Chromium in headless dump-DOM mode. The fallback never
+logs in, bypasses access controls, contacts a seller, places a bid, or performs
+any commercial action.
 """
 from __future__ import annotations
 
 import re
+import shutil
+import subprocess
 from dataclasses import dataclass, replace
 from typing import Callable
 
@@ -22,7 +26,7 @@ from opportunity_engine.discovery.sweden_psauction import (
     canonicalize_psauction_item_url,
 )
 
-MAX_RENDERED_PAGES = 3
+MAX_RENDERED_PAGES = 6
 MIN_DELAY_SECONDS = 2.0
 _COOKIE_ACCEPT_LABELS = (
     "Godkänn alla",
@@ -35,6 +39,12 @@ _FALLBACK_ERROR_PARTS = (
     "forbidden",
     "insufficient public listing content",
 )
+_SYSTEM_CHROMIUM_CANDIDATES = (
+    "google-chrome",
+    "google-chrome-stable",
+    "chromium",
+    "chromium-browser",
+)
 
 PrimaryVerifier = Callable[[str], PageVerification]
 RenderedPageLoader = Callable[[str], tuple[str, str]]
@@ -42,7 +52,7 @@ RenderedPageLoader = Callable[[str], tuple[str, str]]
 
 @dataclass(frozen=True, slots=True)
 class PSAuctionPlaywrightConfig:
-    """Safety and volume limits for one manually initiated source run."""
+    """Safety and volume limits for one bounded PS Auction source run."""
 
     max_pages: int = MAX_RENDERED_PAGES
     delay_seconds: float = 2.5
@@ -63,7 +73,7 @@ class PSAuctionPlaywrightConfig:
 
 
 class PSAuctionPlaywrightFallbackVerifier:
-    """Use one shared Chromium page after the primary verifier fails closed."""
+    """Render one exact PS Auction item after the primary verifier fails closed."""
 
     def __init__(
         self,
@@ -84,6 +94,9 @@ class PSAuctionPlaywrightFallbackVerifier:
         self._failed_urls: list[str] = []
         self._errors: list[dict[str, str]] = []
         self._budget_exhausted = 0
+        self._playwright_render_count = 0
+        self._system_chromium_render_count = 0
+        self._system_chromium_executable: str | None = None
 
     def _should_fallback(self, url: str, result: PageVerification) -> bool:
         error = str(result.error or "").strip().casefold()
@@ -99,15 +112,21 @@ class PSAuctionPlaywrightFallbackVerifier:
         try:
             from playwright.sync_api import sync_playwright
         except ImportError as exc:  # pragma: no cover - optional runtime dependency
-            raise RuntimeError(
-                "Playwright is not installed; install requirements-playwright.txt "
-                "and Chromium"
-            ) from exc
+            raise RuntimeError("Playwright is not installed") from exc
 
         self._playwright = sync_playwright().start()
-        self._browser = self._playwright.chromium.launch(
-            headless=self.config.headless
-        )
+        try:
+            self._browser = self._playwright.chromium.launch(
+                headless=self.config.headless
+            )
+        except Exception:
+            # GitHub-hosted Ubuntu runners already include Google Chrome. When
+            # Playwright is installed without its bundled Chromium, prefer the
+            # public system browser rather than downloading another browser.
+            self._browser = self._playwright.chromium.launch(
+                channel="chrome",
+                headless=self.config.headless,
+            )
         self._context = self._browser.new_context(locale="sv-SE")
         self._page = self._context.new_page()
         self._page.set_default_navigation_timeout(
@@ -132,18 +151,75 @@ class PSAuctionPlaywrightFallbackVerifier:
                 continue
         return False
 
+    def _find_system_chromium(self) -> str | None:
+        for candidate in _SYSTEM_CHROMIUM_CANDIDATES:
+            executable = shutil.which(candidate)
+            if executable:
+                return executable
+        return None
+
+    def _load_with_system_chromium(self, url: str) -> tuple[str, str]:
+        executable = self._find_system_chromium()
+        if not executable:
+            raise RuntimeError("no system Chrome/Chromium executable found")
+        self._system_chromium_executable = executable
+        virtual_time_ms = max(2000, int(self.config.delay_seconds * 1000))
+        command = [
+            executable,
+            "--headless=new",
+            "--disable-gpu",
+            "--disable-dev-shm-usage",
+            "--no-sandbox",
+            "--lang=sv-SE",
+            f"--virtual-time-budget={virtual_time_ms}",
+            "--dump-dom",
+            url,
+        ]
+        completed = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=self.config.navigation_timeout_seconds + 10.0,
+            check=False,
+        )
+        if completed.returncode != 0:
+            detail = " ".join((completed.stderr or "").split())[:500]
+            raise RuntimeError(
+                f"system Chromium exited {completed.returncode}"
+                + (f": {detail}" if detail else "")
+            )
+        rendered_html = completed.stdout or ""
+        if len(rendered_html.strip()) < 80:
+            raise RuntimeError("system Chromium returned insufficient DOM content")
+        self._system_chromium_render_count += 1
+        return url, rendered_html
+
     def _load_rendered_page(self, url: str) -> tuple[str, str]:
         if self._injected_loader is not None:
             return self._injected_loader(url)
-        self._ensure_browser()
-        response = self._page.goto(url, wait_until="domcontentloaded")
-        self._page.wait_for_timeout(self.config.delay_seconds * 1000)
-        if self._dismiss_cookie_consent():
+
+        playwright_error: Exception | None = None
+        try:
+            self._ensure_browser()
+            response = self._page.goto(url, wait_until="domcontentloaded")
             self._page.wait_for_timeout(self.config.delay_seconds * 1000)
-        status = response.status if response is not None else None
-        if status is not None and status >= 400:
-            raise RuntimeError(f"rendered page returned HTTP {status}")
-        return self._page.url, self._page.content()
+            if self._dismiss_cookie_consent():
+                self._page.wait_for_timeout(self.config.delay_seconds * 1000)
+            status = response.status if response is not None else None
+            if status is not None and status >= 400:
+                raise RuntimeError(f"rendered page returned HTTP {status}")
+            self._playwright_render_count += 1
+            return self._page.url, self._page.content()
+        except Exception as exc:
+            playwright_error = exc
+
+        try:
+            return self._load_with_system_chromium(url)
+        except Exception as chromium_exc:
+            raise RuntimeError(
+                f"Playwright renderer failed: {playwright_error}; "
+                f"system Chromium renderer failed: {chromium_exc}"
+            ) from chromium_exc
 
     def __call__(self, url: str) -> PageVerification:
         primary_result = self.primary_verifier(url)
@@ -203,6 +279,9 @@ class PSAuctionPlaywrightFallbackVerifier:
             "failed_urls": list(self._failed_urls),
             "errors": list(self._errors),
             "used": bool(self._attempted_urls),
+            "playwright_render_count": self._playwright_render_count,
+            "system_chromium_render_count": self._system_chromium_render_count,
+            "system_chromium_executable": self._system_chromium_executable,
             "automatic_contact": False,
             "automatic_bid": False,
             "automatic_purchase_decision": False,

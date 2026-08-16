@@ -124,13 +124,16 @@ def main() -> int:
     parser.add_argument(
         "--psauction-browser-fallback",
         action="store_true",
-        help="Render at most three exact PS Auction item pages after HTTP 403",
+        help=(
+            "Explicitly request rendered verification for PS Auction. "
+            "Verified PS Auction source runs enable it automatically."
+        ),
     )
     parser.add_argument(
         "--psauction-browser-pages",
         type=int,
-        default=3,
-        help="Maximum rendered PS Auction item pages (1-3)",
+        default=6,
+        help="Maximum rendered PS Auction item pages (1-6)",
     )
     parser.add_argument(
         "--psauction-browser-delay-seconds",
@@ -221,8 +224,18 @@ def main() -> int:
             "klaravik": verify_klaravik_public_page,
             "blinto": verify_blinto_public_page,
         }.get(args.source, verify_sweden_public_page)
+
+    # Run #175 proved that PS Auction discovery can find strong exact-item
+    # clothing lots while the lightweight source-page reader receives only a
+    # public JS shell. For verified PS Auction runs, rendered verification is
+    # therefore part of the source contract rather than an optional manual
+    # diagnostic. It remains bounded to exact public item URLs and fails closed.
+    use_psauction_browser_fallback = (
+        args.source == "psauction" and args.verify_pages
+    ) or args.psauction_browser_fallback
+
     browser_verifier: PSAuctionPlaywrightFallbackVerifier | None = None
-    if args.psauction_browser_fallback:
+    if use_psauction_browser_fallback:
         browser_verifier = PSAuctionPlaywrightFallbackVerifier(
             verify_sweden_public_page,
             config=PSAuctionPlaywrightConfig(
