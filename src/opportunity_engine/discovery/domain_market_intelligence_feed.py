@@ -284,6 +284,19 @@ def persist_manifest_market_signals(
     }
 
 
+def _first_source_name(item: Mapping[str, Any]) -> str | None:
+    direct = _compact(item.get("source_name"))
+    if direct:
+        return direct
+    raw = item.get("source_names")
+    if isinstance(raw, Sequence) and not isinstance(raw, (str, bytes)):
+        for value in raw:
+            text = _compact(value)
+            if text:
+                return text
+    return None
+
+
 def _direct_opportunities(checkpoint: Mapping[str, Any]) -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
     for item in checkpoint.get("deduplicated_opportunities") or []:
@@ -292,18 +305,24 @@ def _direct_opportunities(checkpoint: Mapping[str, Any]) -> list[dict[str, Any]]
         workflow = _compact(item.get("workflow_status")).upper()
         if workflow not in DIRECT_WORKFLOWS:
             continue
+        missing = item.get("missing_evidence")
+        if not isinstance(missing, list):
+            missing = item.get("missing_information")
         result.append(
             {
                 "opportunity_identity": item.get("opportunity_identity"),
                 "title": item.get("title"),
                 "market_code": item.get("market_code"),
-                "source_name": item.get("source_name"),
-                "source_url": item.get("source_url"),
+                "source_name": _first_source_name(item),
+                "source_url": item.get("source_url") or item.get("canonical_url"),
                 "workflow_status": workflow,
                 "listing_status": item.get("listing_status"),
                 "discovery_score": item.get("discovery_score"),
                 "location": item.get("location"),
                 "quantity": item.get("quantity"),
+                "analysis_eligible": item.get("analysis_eligible") is True,
+                "top5_eligible": item.get("top5_eligible") is True,
+                "missing_information": list(missing or []),
             }
         )
     return result
