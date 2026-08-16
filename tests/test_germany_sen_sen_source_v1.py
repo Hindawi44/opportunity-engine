@@ -48,7 +48,7 @@ def test_canonicalizes_only_exact_sen_sen_detail_pages() -> None:
     identity = canonicalize_sen_sen_detail_url(TEXTILE_URL)
     assert identity is not None
     canonical, event_id = identity
-    assert canonical.startswith("https://www.sen-sen.de/php/t1113-")
+    assert canonical.startswith("https://sen-sen.de/php/t1113-")
     assert event_id == "1113"
     assert canonicalize_sen_sen_detail_url(
         "https://www.sen-sen.de/php/dilib.php?showfolder=term&snumber=108"
