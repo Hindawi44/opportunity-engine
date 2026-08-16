@@ -39,6 +39,10 @@ def test_checkpoint_workflow_covers_only_completed_markets() -> None:
     assert '"artifact_dir": "artifacts/multi-market-inputs/se-blinto"' in text
     assert '"artifact_dir": "artifacts/multi-market-inputs/se-klaravik"' in text
     assert '"artifact_dir": "artifacts/multi-market-inputs/se-psauction"' in text
+    assert "--market DE" in text
+    assert "--source sen-sen" in text
+    assert '"source_name": "Sen & Sen"' in text
+    assert '"artifact_dir": "artifacts/multi-market-inputs/de-sen-sen"' in text
     assert "run_riegermann_active_discovery.py" in text
     assert "run_venta_active_discovery.py" in text
     assert "run_dpv_active_discovery.py" in text
@@ -67,13 +71,16 @@ def test_sweden_daily_checkpoint_runs_three_direct_source_packs_before_germany()
     blinto = text.index("- name: Run Sweden Blinto bounded pilot")
     klaravik = text.index("- name: Run Sweden Klaravik bounded direct scan")
     psauction = text.index("- name: Run Sweden PS Auction bounded direct scan")
-    germany = text.index("- name: Run active Riegermann discovery")
+    sen_sen = text.index("- name: Run Sen & Sen bounded clothing liquidation scan")
+    riegermann = text.index("- name: Run active Riegermann discovery")
 
-    assert blinto < klaravik < psauction < germany
+    assert blinto < klaravik < psauction < sen_sen < riegermann
     assert "all nine bounded source paths" in text
-    assert '!= 9' in text
+    assert "all ten bounded source paths" in text
+    assert '!= 10' in text
     assert '"Klaravik" not in source_by_name' in text
     assert '"PS Auction" not in source_by_name' in text
+    assert '"Sen & Sen" not in source_by_name' in text
 
 
 def test_checkpoint_workflow_preserves_one_human_action() -> None:
