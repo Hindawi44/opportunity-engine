@@ -17,17 +17,19 @@ def _load_module():
     return module
 
 
-def test_daily_builder_hides_paid_enrichment_credentials_by_default(monkeypatch) -> None:
+def test_daily_builder_defers_model_driven_enrichment_but_keeps_discovery(monkeypatch) -> None:
     module = _load_module()
     monkeypatch.delenv("OPPORTUNITY_ENGINE_TARGETED_ENRICHMENT", raising=False)
     monkeypatch.setenv("OPENAI_API_KEY", "openai-test")
     monkeypatch.setenv("BRAVE_SEARCH_API_KEY", "brave-test")
     monkeypatch.setenv("BRAVE_API_KEY", "brave-alias-test")
+    monkeypatch.setenv("HUNT_FOLLOWUP_MAX_CASES", "2")
 
     assert module._apply_cost_isolation() is False
     assert "OPENAI_API_KEY" not in os.environ
-    assert "BRAVE_SEARCH_API_KEY" not in os.environ
-    assert "BRAVE_API_KEY" not in os.environ
+    assert os.environ["BRAVE_SEARCH_API_KEY"] == "brave-test"
+    assert os.environ["BRAVE_API_KEY"] == "brave-alias-test"
+    assert os.environ["HUNT_FOLLOWUP_MAX_CASES"] == "0"
 
 
 def test_targeted_stage_must_explicitly_opt_in(monkeypatch) -> None:
@@ -35,15 +37,18 @@ def test_targeted_stage_must_explicitly_opt_in(monkeypatch) -> None:
     monkeypatch.setenv("OPPORTUNITY_ENGINE_TARGETED_ENRICHMENT", "1")
     monkeypatch.setenv("OPENAI_API_KEY", "openai-test")
     monkeypatch.setenv("BRAVE_SEARCH_API_KEY", "brave-test")
+    monkeypatch.setenv("HUNT_FOLLOWUP_MAX_CASES", "2")
 
     assert module._apply_cost_isolation() is True
     assert os.environ["OPENAI_API_KEY"] == "openai-test"
     assert os.environ["BRAVE_SEARCH_API_KEY"] == "brave-test"
+    assert os.environ["HUNT_FOLLOWUP_MAX_CASES"] == "2"
 
 
 def test_builder_records_core_daily_vs_targeted_stage_contract() -> None:
     text = SCRIPT.read_text(encoding="utf-8")
     assert '"stage": "TARGETED_ENRICHMENT" if targeted_enabled else "CORE_DAILY"' in text
     assert '"openai_hunt_deferred": not targeted_enabled' in text
-    assert '"extra_brave_enrichment_deferred": not targeted_enabled' in text
+    assert '"targeted_brave_followup_deferred": not targeted_enabled' in text
+    assert '"daily_brave_discovery_preserved": True' in text
     assert '"commercial_analysis_stage": "SEPARATE_MANUAL_WORKFLOW"' in text
