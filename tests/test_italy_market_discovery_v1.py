@@ -124,6 +124,91 @@ def test_official_query_accepts_only_exact_pvp_domain() -> None:
     assert rejected is None
 
 
+def test_matching_uses_term_boundaries_for_moda_and_asta() -> None:
+    pvp_query = ITALY_DISCOVERY_QUERIES[0]
+    false_moda = italy_signal_from_hit(
+        SearchHit(
+            title="Dettaglio Annuncio - PVP Giustizia",
+            url="https://pvp.giustizia.it/pvp/it/detail_annuncio.page?idAnnuncio=4612723",
+            description=(
+                "Modalità di vendita. Prezzo base d'asta 309.726 euro. "
+                "Beni inclusi nel lotto."
+            ),
+            provider="Fake Brave",
+        ),
+        query=pvp_query,
+        rank=1,
+        observed_at=NOW,
+    )
+    assert false_moda is None
+
+    bridal_query = next(q for q in ITALY_DISCOVERY_QUERIES if q.intent == "BRIDAL_LIQUIDATION")
+    false_asta = italy_signal_from_hit(
+        SearchHit(
+            title="Outlet abbigliamento e scarpe",
+            url="https://www.secondastrada.example/it",
+            description="Vasto assortimento di abbigliamento e scarpe tutto l'anno.",
+            provider="Fake Brave",
+        ),
+        query=bridal_query,
+        rank=1,
+        observed_at=NOW,
+    )
+    assert false_asta is None
+
+
+def test_bridal_query_requires_explicit_bridal_evidence_in_hit() -> None:
+    query = next(q for q in ITALY_DISCOVERY_QUERIES if q.intent == "BRIDAL_LIQUIDATION")
+    signal = italy_signal_from_hit(
+        SearchHit(
+            title="Bancarotta di impresa del settore abbigliamento",
+            url="https://news.example.it/fallimento-moda",
+            description="Fallimento di una ditta di abbigliamento all'ingrosso.",
+            provider="Fake Brave",
+        ),
+        query=query,
+        rank=1,
+        observed_at=NOW,
+    )
+    assert signal is None
+
+
+def test_stocklot_query_rejects_editorial_inventory_article_without_commercial_action() -> None:
+    query = next(q for q in ITALY_DISCOVERY_QUERIES if q.intent == "STOCKLOT_WHOLESALE")
+    signal = italy_signal_from_hit(
+        SearchHit(
+            title="Invenduti moda, nuove regole UE per il tessile",
+            url="https://news.example.it/invenduti-moda",
+            description=(
+                "Le imprese devono gestire lo stock accumulato a magazzino e le "
+                "rimanenze di magazzino di abbigliamento e calzature."
+            ),
+            provider="Fake Brave",
+        ),
+        query=query,
+        rank=1,
+        observed_at=NOW,
+    )
+    assert signal is None
+
+
+def test_stocklot_query_keeps_commercial_stock_source() -> None:
+    query = next(q for q in ITALY_DISCOVERY_QUERIES if q.intent == "STOCKLOT_WHOLESALE")
+    signal = italy_signal_from_hit(
+        SearchHit(
+            title="Rimanenze moda: stock abbigliamento all'ingrosso",
+            url="https://stock.example.it/rimanenze-moda",
+            description="Vendere e acquistare lotti di rimanenze di magazzino.",
+            provider="Fake Brave",
+        ),
+        query=query,
+        rank=1,
+        observed_at=NOW,
+    )
+    assert signal is not None
+    assert "vendere" in signal.metadata["commercial_action_terms"]
+
+
 class FakeProvider:
     def __init__(self) -> None:
         self.calls: list[tuple[str, int]] = []

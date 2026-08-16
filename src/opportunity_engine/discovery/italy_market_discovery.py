@@ -12,6 +12,9 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
+import html
+import re
+import unicodedata
 from typing import Any, Callable, Mapping, Sequence
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
@@ -25,7 +28,7 @@ from opportunity_engine.market_intelligence import (
 from opportunity_engine.unified_models import Evidence
 
 
-SCHEMA_VERSION = "italy-market-discovery-1.0"
+SCHEMA_VERSION = "italy-market-discovery-1.1"
 FEED_FAMILY = "ITALY_MARKET_DISCOVERY_V1"
 MARKET_CODE = "IT"
 DEFAULT_RESULTS_PER_QUERY = 10
@@ -107,9 +110,9 @@ _BRIDAL_TERMS = (
     "atelier sposa",
     "abiti da sposa",
     "abito da sposa",
+    "abiti sposa",
     "negozio sposa",
     "campionario sposa",
-    "campionario",
 )
 _INSOLVENCY_TERMS = (
     "liquidazione giudiziale",
@@ -144,6 +147,32 @@ _AUCTION_TERMS = (
     "vendita giudiziaria",
     "lotto",
 )
+_COMMERCIAL_ACTION_TERMS = (
+    "vendita",
+    "vendite",
+    "vendesi",
+    "vendere",
+    "acquisto",
+    "acquistare",
+    "ingrosso",
+    "all'ingrosso",
+    "liquidazione",
+    "svendita",
+    "cessazione attività",
+    "cessazione attivita",
+    "asta",
+    "aste",
+    "lotto",
+    "lotti",
+    "prezzo",
+    "prezzi",
+    "disponibile",
+    "disponibili",
+    "offerta",
+    "offerte",
+    "outlet",
+)
+_COMMERCIAL_GATE_INTENTS = {"STOCKLOT_WHOLESALE", "WAREHOUSE_CLEARANCE"}
 _TRACKING_QUERY_KEYS = {"fbclid", "gclid", "mc_cid", "mc_eid", "ref", "source"}
 _OFFICIAL_PVP_DOMAIN = "pvp.giustizia.it"
 
@@ -182,9 +211,22 @@ def _host(url: str) -> str:
     return (urlsplit(url).hostname or "").casefold().rstrip(".")
 
 
+def _normalise_match_text(value: object) -> str:
+    decoded = html.unescape(_compact(value))
+    return unicodedata.normalize("NFKC", decoded).casefold()
+
+
+def _term_present(text: str, term: str) -> bool:
+    normalized_text = _normalise_match_text(text)
+    normalized_term = _normalise_match_text(term)
+    if not normalized_term:
+        return False
+    pattern = rf"(?<!\w){re.escape(normalized_term)}(?!\w)"
+    return re.search(pattern, normalized_text, flags=re.UNICODE) is not None
+
+
 def _matched(text: str, terms: Sequence[str]) -> list[str]:
-    folded = text.casefold()
-    return sorted({term for term in terms if term.casefold() in folded})
+    return sorted({term for term in terms if _term_present(text, term)})
 
 
 def _classify(text: str) -> tuple[MarketSignalType | None, list[str], list[str], bool]:
@@ -232,13 +274,25 @@ def italy_signal_from_hit(
     if signal_type is None:
         return None
 
+    # Query membership is not evidence. A Bridal search hit must itself contain
+    # explicit bridal language, otherwise general fashion/insolvency results leak
+    # into the bridal lane.
+    if query.intent == "BRIDAL_LIQUIDATION" and not bridal:
+        return None
+
+    commercial_action_terms = _matched(combined, _COMMERCIAL_ACTION_TERMS)
+    # Stock/warehouse editorial pages can mention inventory without offering any
+    # commercial action. Keep those out of durable opportunity scent storage.
+    if query.intent in _COMMERCIAL_GATE_INTENTS and not commercial_action_terms:
+        return None
+
     official = _host(url) == _OFFICIAL_PVP_DOMAIN
     confidence = 0.58
     if official:
         confidence += 0.09
-    if any(term.casefold() in title.casefold() for term in domain_terms):
+    if _matched(title, domain_terms):
         confidence += 0.04
-    if any(term.casefold() in title.casefold() for term in event_terms):
+    if _matched(title, event_terms):
         confidence += 0.04
     if len(event_terms) > 1:
         confidence += 0.03
@@ -291,6 +345,7 @@ def italy_signal_from_hit(
             "source_rank": rank,
             "domain_terms": domain_terms,
             "event_terms": event_terms,
+            "commercial_action_terms": commercial_action_terms,
             "canonical_url": url,
             "source_scope": "OFFICIAL_JUDICIAL_SALES" if official else "PUBLIC_WEB_DISCOVERY",
             "source_page_verification_required": True,
@@ -459,7 +514,11 @@ def collect_italy_market_signals(
         for signal in signals
         if isinstance(signal.get("metadata"), Mapping)
     )
-    status = "SUCCESS" if signals else ("PARTIAL_RETRIEVAL" if errors and succeeded else ("BLOCKED_RETRIEVAL" if errors else "VALID_ZERO"))
+    status = "SUCCESS" if signals else (
+        "PARTIAL_RETRIEVAL"
+        if errors and succeeded
+        else ("BLOCKED_RETRIEVAL" if errors else "VALID_ZERO")
+    )
     return {
         **base,
         "status": status,
