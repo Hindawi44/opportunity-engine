@@ -64,8 +64,10 @@ jobs:
       - name: Install project dependencies
         run: pip install -r requirements.txt
 
-      - name: Validate Italy discovery contract
-        run: pytest tests/test_italy_market_discovery_v1.py -q
+      - name: Validate Italy discovery and memory contracts
+        run: |
+          pytest tests/test_italy_market_discovery_v1.py -q
+          pytest tests/test_italy_case_memory_adapter_v1.py -q
 
       - name: Run bounded live Italy discovery
         run: |

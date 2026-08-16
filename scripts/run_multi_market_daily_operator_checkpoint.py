@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 from typing import Any
@@ -15,6 +16,12 @@ for path in (ROOT, SRC):
     if text not in sys.path:
         sys.path.insert(0, text)
 
+from opportunity_engine.discovery.italy_case_memory_adapter import (
+    run_italy_case_memory_cycle,
+)
+from opportunity_engine.discovery.italy_market_discovery import (
+    collect_italy_market_signals,
+)
 from opportunity_engine.discovery.multi_market_operator_checkpoint import (
     CheckpointIntegrityError,
     build_multi_market_checkpoint,
@@ -28,6 +35,81 @@ def _load(path: Path) -> dict:
     if not isinstance(value, dict):
         raise CheckpointIntegrityError(f"Expected a JSON object: {path}")
     return value
+
+
+def _write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _checkpoint_input_root(manifest: dict[str, Any], root: Path) -> Path:
+    sources = manifest.get("sources")
+    if not isinstance(sources, list) or not sources:
+        raise CheckpointIntegrityError("Manifest has no sources for input-root discovery")
+    parents: set[Path] = set()
+    for source in sources:
+        if not isinstance(source, dict):
+            continue
+        artifact_dir = str(source.get("artifact_dir") or "").strip()
+        if artifact_dir:
+            parents.add((root / artifact_dir).parent)
+    if len(parents) != 1:
+        raise CheckpointIntegrityError("Manifest sources do not share one checkpoint input root")
+    return parents.pop()
+
+
+def _run_italy_memory_sidecar(
+    *,
+    manifest: dict[str, Any],
+    root: Path,
+    output_dir: Path,
+) -> dict[str, Any]:
+    """Run Italy discovery + persistent follow-up outside canonical NO/SE/DE coverage."""
+    input_root = _checkpoint_input_root(manifest, root)
+    italy_input = input_root / "it-market"
+    italy_input.mkdir(parents=True, exist_ok=True)
+
+    if not str(os.environ.get("BRAVE_SEARCH_API_KEY") or "").strip():
+        skipped = {
+            "schema_version": "italy-memory-sidecar-1.0",
+            "status": "SKIPPED_NO_API_KEY",
+            "source_country": "IT",
+            "canonical_market_coverage_unchanged": ["NO", "SE", "DE"],
+            "promotion_to_opportunity_allowed": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_reservation": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        _write_json(output_dir / "italy-case-memory-v1.json", skipped)
+        return skipped
+
+    discovery = collect_italy_market_signals(environment=os.environ)
+    _write_json(italy_input / "italy-market-discovery-v1.json", discovery)
+    _write_json(output_dir / "italy-market-discovery-v1.json", discovery)
+
+    current_signals = [
+        item for item in discovery.get("signals") or [] if isinstance(item, dict)
+    ]
+    cycle = run_italy_case_memory_cycle(
+        current_signals,
+        input_root=input_root,
+        environment=os.environ,
+    )
+    cycle["state_restore_owner"] = "MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT"
+    cycle["canonical_market_coverage_unchanged"] = ["NO", "SE", "DE"]
+    cycle["discovery_status"] = discovery.get("status")
+    cycle["discovery_accepted_signal_count"] = discovery.get("accepted_signal_count")
+    _write_json(output_dir / "italy-case-memory-v1.json", cycle)
+    _write_json(
+        output_dir / "italy-signal-follow-up-v1.json",
+        dict(cycle.get("follow_up") or {}),
+    )
+    return cycle
 
 
 def _correct_review_reason(report: dict[str, Any]) -> None:
@@ -85,13 +167,14 @@ def main() -> int:
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)
+    root = Path(args.root)
     try:
         manifest = _load(Path(args.manifest))
         market_matrix = _load(Path(args.market_matrix))
         report = build_multi_market_checkpoint(
             manifest,
             market_matrix,
-            root=Path(args.root),
+            root=root,
         )
         _correct_review_reason(report)
         paths = write_checkpoint_artifacts(report, output_dir)
@@ -120,9 +203,28 @@ def main() -> int:
         print(f"error_report: {error_path}", file=sys.stderr)
         return 2
 
+    italy_sidecar = _run_italy_memory_sidecar(
+        manifest=manifest,
+        root=root,
+        output_dir=output_dir,
+    )
+
     print(render_phone_summary(report), end="")
     for name, path in paths.items():
         print(f"{name}: {path}")
+    print(
+        "italy_memory_sidecar: "
+        + json.dumps(
+            {
+                "status": italy_sidecar.get("status") or "SUCCESS",
+                "persistent_case_count": italy_sidecar.get("persistent_case_count", 0),
+                "discovery_status": italy_sidecar.get("discovery_status"),
+                "automatic_purchase": italy_sidecar.get("automatic_purchase"),
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
     return 0
 
 
