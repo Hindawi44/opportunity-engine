@@ -105,6 +105,7 @@ jobs:
           echo "UPSTREAM_BRIEF=$UPSTREAM_BRIEF" >> "$GITHUB_ENV"
 
       - name: Run zero-cost eligibility gate
+        id: gate
         run: |
           python scripts/run_targeted_market_enrichment.py \
             --brief "$UPSTREAM_BRIEF" \
@@ -120,14 +121,14 @@ jobs:
               .read_text(encoding="utf-8")
           )
           should_run = gate.get("should_run_targeted_enrichment") is True
-          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
-              handle.write(f"RUN_TARGETED_ENRICHMENT={'true' if should_run else 'false'}\n")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"should_run={'true' if should_run else 'false'}\n")
           print("paid_enrichment_required:", should_run)
           print("eligible_signal_count:", gate.get("eligible_signal_count", 0))
           PY
 
       - name: Run paid targeted enrichment only for eligible hunt signals
-        if: ${{ env.RUN_TARGETED_ENRICHMENT == 'true' }}
+        if: ${{ steps.gate.outputs.should_run == 'true' }}
         env:
           OPPORTUNITY_ENGINE_TARGETED_ENRICHMENT: "1"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -148,6 +149,8 @@ jobs:
             --output-dir "$OUTPUT_DIR"
 
       - name: Validate gate, safety and cost isolation
+        env:
+          SHOULD_RUN: ${{ steps.gate.outputs.should_run }}
         run: |
           python - <<'PY'
           import json
@@ -162,7 +165,7 @@ jobs:
               if gate.get(key) is not False:
                   raise SystemExit(f"Targeted gate changed read-only safety: {key}")
 
-          should_run = os.environ.get("RUN_TARGETED_ENRICHMENT") == "true"
+          should_run = os.environ.get("SHOULD_RUN") == "true"
           if should_run:
               summary = json.loads(
                   (root / "targeted-market-enrichment-summary.json").read_text(encoding="utf-8")
