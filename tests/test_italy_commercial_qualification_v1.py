@@ -45,7 +45,7 @@ def _report(*rows: dict) -> dict:
     }
 
 
-def test_verified_active_lot_derives_only_exact_source_unit_economics() -> None:
+def test_verified_active_lot_derives_only_listed_price_unit_reference() -> None:
     report = run_italy_commercial_qualification(
         _report(_verified_row()),
         observed_at=NOW,
@@ -54,17 +54,24 @@ def test_verified_active_lot_derives_only_exact_source_unit_economics() -> None:
     assert report["engine_version"] == ENGINE_VERSION
     assert report["status"] == "SUCCESS"
     assert report["verified_active_exact_lot_input_count"] == 1
-    assert report["source_unit_economics_verified_count"] == 1
+    assert report["source_unit_reference_derived_count"] == 1
     assert report["financial_decision_ready_count"] == 0
+    assert report["source_price_never_treated_as_final_payable"] is True
 
     row = report["qualifications"][0]
-    assert row["qualification_state"] == "SOURCE_UNIT_ECONOMICS_VERIFIED"
+    assert row["qualification_state"] == "SOURCE_PRICE_AND_QUANTITY_PRESENT"
     assert row["inventory_category"] == "CLOTHING"
     assert row["source_facts"]["quantity"] == 800
-    assert row["source_facts"]["source_total_price_eur"] == 3500.0
-    assert row["source_facts"]["source_unit_price_eur"] == 4.375
-    assert row["derived_facts"]["source_unit_price_eur"] == 4.375
+    assert row["source_facts"]["source_listed_price_eur"] == 3500.0
+    assert row["source_facts"]["source_listed_unit_reference_eur"] == 4.375
+    assert (
+        row["source_facts"]["source_price_semantics"]
+        == "LISTED_OR_AUCTION_BASE_OR_MINIMUM_OFFER_NOT_FINAL_PAYABLE"
+    )
+    assert row["derived_facts"]["source_listed_unit_reference_eur"] == 4.375
+    assert row["derived_facts"]["final_payable_unit_cost"] is False
     assert row["derived_facts"]["estimated"] is False
+    assert row["final_payable_price_nok"] is None
     assert row["ready_for_market_comparables"] is True
     assert row["ready_for_logistics_evidence"] is True
     assert row["ready_for_financial_decision"] is False
@@ -88,7 +95,7 @@ def test_verified_active_lot_derives_only_exact_source_unit_economics() -> None:
     assert row["automatic_payment"] is False
 
 
-def test_missing_quantity_or_price_never_creates_guessed_unit_economics() -> None:
+def test_missing_quantity_or_price_never_creates_guessed_unit_reference() -> None:
     no_quantity = _verified_row(
         verification_id="italy-exact-lot:no-qty",
         quantity=None,
@@ -105,17 +112,20 @@ def test_missing_quantity_or_price_never_creates_guessed_unit_economics() -> Non
     )
 
     assert report["qualification_count"] == 2
-    assert report["source_unit_economics_verified_count"] == 0
+    assert report["source_unit_reference_derived_count"] == 0
     assert all(
         row["qualification_state"] == "SOURCE_ECONOMICS_INCOMPLETE"
         for row in report["qualifications"]
     )
     assert all(
-        row["source_facts"]["source_unit_price_eur"] is None
+        row["source_facts"]["source_listed_unit_reference_eur"] is None
         for row in report["qualifications"]
     )
     assert "source quantity" in report["qualifications"][0]["missing_source_facts"]
-    assert "source price EUR" in report["qualifications"][1]["missing_source_facts"]
+    assert (
+        "source listed/base price EUR"
+        in report["qualifications"][1]["missing_source_facts"]
+    )
     assert report["financial_decision_ready_count"] == 0
 
 
@@ -186,6 +196,7 @@ def test_valid_zero_exact_lot_report_is_clean_and_safe() -> None:
     assert report["qualification_count"] == 0
     assert report["financial_decision_ready_count"] == 0
     assert report["missing_values_are_never_estimated"] is True
+    assert report["source_price_never_treated_as_final_payable"] is True
     assert report["promotion_to_opportunity_allowed"] is False
     assert report["top5_eligible"] is False
     assert report["analysis_eligible"] is False
