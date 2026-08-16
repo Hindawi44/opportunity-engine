@@ -18,6 +18,13 @@ Transport = Callable[[Request, float], bytes]
 _FRESHNESS_PRESETS = frozenset({"pd", "pw", "pm", "py"})
 _CUSTOM_FRESHNESS = re.compile(r"^(\d{4}-\d{2}-\d{2})to(\d{4}-\d{2}-\d{2})$")
 _COUNTRY_CODE = re.compile(r"^[A-Z]{2}$")
+# Exact PS Auction item-ID lookups are verification/status queries, not fresh
+# discovery. Applying a page-age filter can hide the historical item page that
+# proves an already-discovered candidate is ENDED, leaving stale lots unresolved.
+_PSAUCTION_EXACT_ITEM_STATUS_LOOKUP = re.compile(
+    r'^site:psauction\.se/item/view\s+"\d+"$',
+    re.I,
+)
 
 
 def _default_transport(request: Request, timeout: float) -> bytes:
@@ -141,8 +148,11 @@ class BraveSearchProvider:
             "result_filter": "web",
             "operators": "true" if self._operators else "false",
         }
-        if self._freshness:
-            params["freshness"] = self._freshness
+        effective_freshness = self._freshness
+        if _PSAUCTION_EXACT_ITEM_STATUS_LOOKUP.fullmatch(clean_query):
+            effective_freshness = None
+        if effective_freshness:
+            params["freshness"] = effective_freshness
         if self._extra_snippets:
             params["extra_snippets"] = "true"
 
