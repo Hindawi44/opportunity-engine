@@ -52,7 +52,7 @@ def test_stock_inside_stockholm_does_not_fake_english_inventory_evidence() -> No
         SearchHit(
             title="Wedding dress designer bankruptcy in Stockholm",
             url="https://example.se/stockholm-profile",
-            description="Profile of one dress designer; no inventory sale is described.",
+            description="Profile of one dress designer; no goods for sale are described.",
             provider="Brave Search",
         ),
         market_code="SE",
@@ -78,7 +78,7 @@ def test_valid_english_bridal_stock_clearance_still_passes() -> None:
 
     assert signal is not None
     assert signal.signal_type.value == "BUSINESS_CLOSURE"
-    assert "stock clearance" in signal.metadata["event_terms"]
+    assert "stock" in signal.metadata["commercial_batch_terms"]
     assert signal.metadata["commercial_batch_gate"] is True
 
 
