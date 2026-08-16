@@ -16,6 +16,12 @@ for path in (ROOT, SRC):
     if text not in sys.path:
         sys.path.insert(0, text)
 
+from opportunity_engine.discovery.france_case_memory_adapter import (
+    run_france_case_memory_cycle,
+)
+from opportunity_engine.discovery.france_market_discovery import (
+    collect_france_market_signals,
+)
 from opportunity_engine.discovery.italy_case_memory_adapter import (
     run_italy_case_memory_cycle,
 )
@@ -288,6 +294,71 @@ def _run_netherlands_memory_sidecar(
     return cycle
 
 
+def _run_france_memory_sidecar(
+    *,
+    manifest: dict[str, Any],
+    root: Path,
+    output_dir: Path,
+) -> dict[str, Any]:
+    """Run France as an official expansion market on the existing daily checkpoint."""
+    input_root = _checkpoint_input_root(manifest, root)
+    france_input = input_root / "fr-market"
+    france_input.mkdir(parents=True, exist_ok=True)
+
+    if not str(os.environ.get("BRAVE_SEARCH_API_KEY") or "").strip():
+        skipped = {
+            "schema_version": "france-memory-sidecar-1.0",
+            "status": "SKIPPED_NO_API_KEY",
+            "source_country": "FR",
+            "market_role": "OFFICIAL_EXPANSION_MARKET",
+            "canonical_market_coverage_unchanged": ["NO", "SE", "DE"],
+            "persistent_case_count": 0,
+            "promotion_to_opportunity_allowed": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_reservation": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        _write_json(output_dir / "france-case-memory-v1.json", skipped)
+        _write_json(
+            output_dir / "france-signal-follow-up-v1.json",
+            {
+                **skipped,
+                "schema_version": "signal-follow-up-engine-1.0",
+                "cases": [],
+                "commercial_lead_count": 0,
+            },
+        )
+        return skipped
+
+    discovery = collect_france_market_signals(environment=os.environ)
+    _write_json(france_input / "france-market-discovery-v1.json", discovery)
+    _write_json(output_dir / "france-market-discovery-v1.json", discovery)
+
+    current_signals = [
+        item for item in discovery.get("signals") or [] if isinstance(item, dict)
+    ]
+    cycle = run_france_case_memory_cycle(
+        current_signals,
+        input_root=input_root,
+        environment=os.environ,
+    )
+    cycle["state_restore_owner"] = "MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT"
+    cycle["market_role"] = "OFFICIAL_EXPANSION_MARKET"
+    cycle["canonical_market_coverage_unchanged"] = ["NO", "SE", "DE"]
+    cycle["discovery_status"] = discovery.get("status")
+    cycle["discovery_accepted_signal_count"] = discovery.get("accepted_signal_count")
+    cycle["exact_lot_verification_status"] = "NOT_BUILT_YET_REQUIRES_SOURCE_SPECIFIC_VALIDATION"
+
+    _write_json(output_dir / "france-case-memory-v1.json", cycle)
+    _write_json(
+        output_dir / "france-signal-follow-up-v1.json",
+        dict(cycle.get("follow_up") or {}),
+    )
+    return cycle
+
+
 def _correct_review_reason(report: dict[str, Any]) -> None:
     """Keep the operator action reason aligned with the selected record state."""
     action = report.get("next_human_action")
@@ -389,6 +460,11 @@ def main() -> int:
         root=root,
         output_dir=output_dir,
     )
+    france_sidecar = _run_france_memory_sidecar(
+        manifest=manifest,
+        root=root,
+        output_dir=output_dir,
+    )
 
     print(render_phone_summary(report), end="")
     for name, path in paths.items():
@@ -446,6 +522,29 @@ def main() -> int:
                     "exact_lot_verification_status"
                 ),
                 "automatic_purchase": netherlands_sidecar.get("automatic_purchase"),
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
+    fr_follow_up = france_sidecar.get("follow_up") or {}
+    print(
+        "france_memory_sidecar: "
+        + json.dumps(
+            {
+                "status": france_sidecar.get("status") or "SUCCESS",
+                "market_role": france_sidecar.get("market_role"),
+                "persistent_case_count": france_sidecar.get("persistent_case_count", 0),
+                "discovery_status": france_sidecar.get("discovery_status"),
+                "discovery_accepted_signal_count": france_sidecar.get(
+                    "discovery_accepted_signal_count", 0
+                ),
+                "follow_up_status": fr_follow_up.get("status"),
+                "commercial_lead_count": fr_follow_up.get("commercial_lead_count", 0),
+                "exact_lot_verification_status": france_sidecar.get(
+                    "exact_lot_verification_status"
+                ),
+                "automatic_purchase": france_sidecar.get("automatic_purchase"),
             },
             ensure_ascii=False,
             sort_keys=True,

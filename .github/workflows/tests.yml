@@ -126,3 +126,43 @@ jobs:
             artifacts/netherlands-market-discovery/netherlands-entity-identity-resolution.json
           if-no-files-found: error
           retention-days: 30
+
+  france-market-discovery-live:
+    name: France market discovery live validation
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, 'France') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate France discovery and memory contracts
+        run: |
+          pytest tests/test_france_market_discovery_v1.py -q
+          pytest tests/test_france_case_memory_adapter_v1.py -q
+
+      - name: Run bounded live France discovery
+        run: |
+          python scripts/build_france_market_discovery.py \
+            --output artifacts/france-market-discovery/france-market-discovery.json
+
+      - name: Upload live France discovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: france-market-discovery-v1
+          path: artifacts/france-market-discovery/france-market-discovery.json
+          if-no-files-found: error
+          retention-days: 30
