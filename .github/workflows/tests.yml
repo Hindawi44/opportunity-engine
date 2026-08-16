@@ -104,21 +104,25 @@ jobs:
       - name: Install project dependencies
         run: pip install -r requirements.txt
 
-      - name: Validate Netherlands discovery and memory contracts
+      - name: Validate Netherlands discovery, identity and memory contracts
         run: |
           pytest tests/test_netherlands_market_discovery_v1.py -q
+          pytest tests/test_netherlands_entity_identity_resolution_v1.py -q
           pytest tests/test_netherlands_case_memory_adapter_v1.py -q
 
-      - name: Run bounded live Netherlands discovery
+      - name: Run bounded live Netherlands discovery and identity resolution
         run: |
           python scripts/build_netherlands_market_discovery.py \
-            --output artifacts/netherlands-market-discovery/netherlands-market-discovery.json
+            --output artifacts/netherlands-market-discovery/netherlands-market-discovery.json \
+            --identity-output artifacts/netherlands-market-discovery/netherlands-entity-identity-resolution.json
 
       - name: Upload live Netherlands discovery artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: netherlands-market-discovery-v1
-          path: artifacts/netherlands-market-discovery/netherlands-market-discovery.json
+          path: |
+            artifacts/netherlands-market-discovery/netherlands-market-discovery.json
+            artifacts/netherlands-market-discovery/netherlands-entity-identity-resolution.json
           if-no-files-found: error
           retention-days: 30

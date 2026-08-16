@@ -30,6 +30,10 @@ def test_checkpoint_runner_owns_netherlands_sidecar_without_changing_canonical_c
         encoding="utf-8"
     )
     workflow = CHECKPOINT.read_text(encoding="utf-8")
+    tests_workflow = TESTS_WORKFLOW.read_text(encoding="utf-8")
+    adapter = Path(
+        "src/opportunity_engine/discovery/netherlands_case_memory_adapter.py"
+    ).read_text(encoding="utf-8")
 
     assert "collect_netherlands_market_signals" in runner
     assert "run_netherlands_case_memory_cycle" in runner
@@ -40,6 +44,11 @@ def test_checkpoint_runner_owns_netherlands_sidecar_without_changing_canonical_c
     assert 'output_dir / "netherlands-signal-follow-up-v1.json"' in runner
     assert 'input_root / "nl-market"' in runner
     assert '"NOT_BUILT_YET_REQUIRES_SOURCE_SPECIFIC_VALIDATION"' in runner
+
+    assert "resolve_netherlands_entity_identities" in adapter
+    assert "identity_resolution" in adapter
+    assert "test_netherlands_entity_identity_resolution_v1.py" in tests_workflow
+    assert "netherlands-entity-identity-resolution.json" in tests_workflow
 
     assert 'NETHERLANDS_MEMORY_RELATIVE_PATH = "nl-market/opportunity_engine.db"' in restore
     assert "checkpoint_state_restore.DATABASE_RELATIVE_PATHS" in restore
