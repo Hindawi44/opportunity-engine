@@ -30,6 +30,12 @@ from opportunity_engine.discovery.italy_exact_lot_verification import (
 from opportunity_engine.discovery.italy_market_discovery import (
     collect_italy_market_signals,
 )
+from opportunity_engine.discovery.netherlands_case_memory_adapter import (
+    run_netherlands_case_memory_cycle,
+)
+from opportunity_engine.discovery.netherlands_market_discovery import (
+    collect_netherlands_market_signals,
+)
 from opportunity_engine.discovery.multi_market_operator_checkpoint import (
     CheckpointIntegrityError,
     build_multi_market_checkpoint,
@@ -200,6 +206,69 @@ def _run_italy_memory_sidecar(
     return cycle
 
 
+def _run_netherlands_memory_sidecar(
+    *,
+    manifest: dict[str, Any],
+    root: Path,
+    output_dir: Path,
+) -> dict[str, Any]:
+    """Run NL discovery + durable follow-up without changing canonical NO/SE/DE coverage."""
+    input_root = _checkpoint_input_root(manifest, root)
+    nl_input = input_root / "nl-market"
+    nl_input.mkdir(parents=True, exist_ok=True)
+
+    if not str(os.environ.get("BRAVE_SEARCH_API_KEY") or "").strip():
+        skipped = {
+            "schema_version": "netherlands-memory-sidecar-1.0",
+            "status": "SKIPPED_NO_API_KEY",
+            "source_country": "NL",
+            "canonical_market_coverage_unchanged": ["NO", "SE", "DE"],
+            "persistent_case_count": 0,
+            "promotion_to_opportunity_allowed": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_reservation": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        _write_json(output_dir / "netherlands-case-memory-v1.json", skipped)
+        _write_json(
+            output_dir / "netherlands-signal-follow-up-v1.json",
+            {
+                **skipped,
+                "schema_version": "signal-follow-up-engine-1.0",
+                "cases": [],
+                "commercial_lead_count": 0,
+            },
+        )
+        return skipped
+
+    discovery = collect_netherlands_market_signals(environment=os.environ)
+    _write_json(nl_input / "netherlands-market-discovery-v1.json", discovery)
+    _write_json(output_dir / "netherlands-market-discovery-v1.json", discovery)
+
+    current_signals = [
+        item for item in discovery.get("signals") or [] if isinstance(item, dict)
+    ]
+    cycle = run_netherlands_case_memory_cycle(
+        current_signals,
+        input_root=input_root,
+        environment=os.environ,
+    )
+    cycle["state_restore_owner"] = "MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT"
+    cycle["canonical_market_coverage_unchanged"] = ["NO", "SE", "DE"]
+    cycle["discovery_status"] = discovery.get("status")
+    cycle["discovery_accepted_signal_count"] = discovery.get("accepted_signal_count")
+    cycle["exact_lot_verification_status"] = "NOT_BUILT_YET_REQUIRES_SOURCE_SPECIFIC_VALIDATION"
+
+    _write_json(output_dir / "netherlands-case-memory-v1.json", cycle)
+    _write_json(
+        output_dir / "netherlands-signal-follow-up-v1.json",
+        dict(cycle.get("follow_up") or {}),
+    )
+    return cycle
+
+
 def _correct_review_reason(report: dict[str, Any]) -> None:
     """Keep the operator action reason aligned with the selected record state."""
     action = report.get("next_human_action")
@@ -296,6 +365,11 @@ def main() -> int:
         root=root,
         output_dir=output_dir,
     )
+    netherlands_sidecar = _run_netherlands_memory_sidecar(
+        manifest=manifest,
+        root=root,
+        output_dir=output_dir,
+    )
 
     print(render_phone_summary(report), end="")
     for name, path in paths.items():
@@ -324,6 +398,28 @@ def main() -> int:
                     "financial_decision_ready_count", 0
                 ),
                 "automatic_purchase": italy_sidecar.get("automatic_purchase"),
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
+    nl_follow_up = netherlands_sidecar.get("follow_up") or {}
+    print(
+        "netherlands_memory_sidecar: "
+        + json.dumps(
+            {
+                "status": netherlands_sidecar.get("status") or "SUCCESS",
+                "persistent_case_count": netherlands_sidecar.get("persistent_case_count", 0),
+                "discovery_status": netherlands_sidecar.get("discovery_status"),
+                "discovery_accepted_signal_count": netherlands_sidecar.get(
+                    "discovery_accepted_signal_count", 0
+                ),
+                "follow_up_status": nl_follow_up.get("status"),
+                "commercial_lead_count": nl_follow_up.get("commercial_lead_count", 0),
+                "exact_lot_verification_status": netherlands_sidecar.get(
+                    "exact_lot_verification_status"
+                ),
+                "automatic_purchase": netherlands_sidecar.get("automatic_purchase"),
             },
             ensure_ascii=False,
             sort_keys=True,
