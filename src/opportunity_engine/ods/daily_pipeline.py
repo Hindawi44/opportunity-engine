@@ -24,7 +24,7 @@ from .market_verification import MarketPriceVerificationEngine
 from .multi_source import UnifiedMultiSourceEngine
 from .opportunity_discovery import OpportunityDiscoveryEngine
 from .opportunity_intelligence import OpportunityIntelligenceEngine
-from .opportunity_profit import OpportunityProfitDecisionEngine
+from .opportunity_profit import OpportunityDecisionContext, OpportunityProfitDecisionEngine
 from .opportunity_scoring import OpportunityScoringEngine
 from .opportunity_value import OpportunityValueEngine
 from .price_history import HistoricalPriceDatabase
@@ -185,7 +185,15 @@ class AutomatedDailyPipeline:
                 )
             costs = self.cost_engine.calculate(cost_inputs)
             value = self.value_engine.evaluate(market, costs)
-            decision = self.decision_engine.decide(value)
+            decision = self.decision_engine.decide(
+                value,
+                context=OpportunityDecisionContext(
+                    market_verification_status=verification.status,
+                    market_is_verified=verification.is_verified,
+                    seller_risk=seller.risk,
+                    seller_confidence=seller.confidence,
+                ),
+            )
             score = self.scoring_engine.score(opportunity, decision)
             intelligence = self.intelligence_engine.explain(
                 opportunity,

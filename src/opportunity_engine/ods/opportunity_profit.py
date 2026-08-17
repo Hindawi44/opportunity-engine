@@ -1,4 +1,4 @@
-"""Conservative decision policy consuming canonical financial value."""
+"""Conservative canonical decision policy consuming financial Value and risk facts."""
 
 from __future__ import annotations
 
@@ -29,8 +29,22 @@ class OpportunityDecisionPolicy:
 
 
 @dataclass(frozen=True)
+class OpportunityDecisionContext:
+    """Verified non-financial facts that are allowed to constrain final Decision.
+
+    These inputs are facts produced upstream. They do not calculate Value. Decision
+    owns only the classification effect of these facts.
+    """
+
+    market_verification_status: str | None = None
+    market_is_verified: bool | None = None
+    seller_risk: str | None = None
+    seller_confidence: str | None = None
+
+
+@dataclass(frozen=True)
 class OpportunityProfitDecision:
-    """Auditable decision carrying through canonical Value fields unchanged."""
+    """Canonical commercial decision carrying Value fields through unchanged."""
 
     opportunity_id: str
     decision: str
@@ -47,27 +61,68 @@ class OpportunityProfitDecision:
     warnings: tuple[str, ...]
     reasons: tuple[str, ...]
     is_actionable: bool
+    constraints: tuple[str, ...] = ()
 
 
 class OpportunityProfitDecisionEngine:
-    """Classify canonical Value as buy, monitor, or reject without recomputing it."""
+    """Issue the one canonical BUY/WATCH/REJECT decision without recomputing Value."""
 
     def __init__(self, policy: OpportunityDecisionPolicy | None = None) -> None:
         self.policy = policy or OpportunityDecisionPolicy()
 
-    def decide(self, value: OpportunityValueReport) -> OpportunityProfitDecision:
+    def decide(
+        self,
+        value: OpportunityValueReport,
+        *,
+        context: OpportunityDecisionContext | None = None,
+    ) -> OpportunityProfitDecision:
         if not isinstance(value, OpportunityValueReport):
             raise TypeError("decision engine requires canonical OpportunityValueReport")
+        if context is not None and not isinstance(context, OpportunityDecisionContext):
+            raise TypeError("context must be OpportunityDecisionContext")
 
+        context = context or OpportunityDecisionContext()
         reasons: list[str] = []
+        warnings = list(value.warnings)
+        constraints: list[str] = []
         profit = value.expected_profit_nok
         roi = value.roi
+        confidence = value.confidence
 
-        if value.blockers:
+        seller_high_risk = str(context.seller_risk or "").casefold() == "high"
+        market_overpriced = (
+            str(context.market_verification_status or "").casefold() == "overpriced"
+        )
+        market_unverified = context.market_is_verified is False
+
+        if seller_high_risk:
+            constraints.append("seller_risk_high")
+            warnings.append("Seller risk is high; canonical decision rejects the opportunity.")
+        if market_overpriced:
+            constraints.append("market_overpriced")
+            warnings.append("Verified market evidence indicates the opportunity is overpriced.")
+        if market_unverified:
+            constraints.append("market_verification_required")
+
+        if seller_high_risk or market_overpriced:
+            decision = "reject"
+            label = "🔴 ارفض"
+            if seller_high_risk:
+                reasons.append("مخاطر البائع المرتفعة تمنع قرار شراء محافظ.")
+            if market_overpriced:
+                reasons.append("السعر أعلى من القيمة السوقية المحافظة المتحققة.")
+            actionable = True
+        elif value.blockers:
             decision = "monitor"
             label = "🟡 راقب"
-            reasons.append("البيانات غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن.")
+            reasons.append("البيانات المالية غير مكتملة، لذلك لا يمكن إصدار قرار شراء آمن.")
             actionable = False
+        elif market_unverified:
+            decision = "monitor"
+            label = "🟡 راقب"
+            reasons.append("التحقق السوقي غير مكتمل، لذلك لا يمكن تثبيت قرار شراء.")
+            actionable = False
+            confidence = "insufficient"
         elif profit is not None and profit <= 0:
             decision = "reject"
             label = "🔴 ارفض"
@@ -104,9 +159,10 @@ class OpportunityProfitDecisionEngine:
             margin_on_resale=value.margin_on_resale,
             maximum_total_cost_nok=value.maximum_total_cost_nok,
             maximum_purchase_price_nok=value.maximum_purchase_price_nok,
-            confidence=value.confidence,
+            confidence=confidence,
             blockers=value.blockers,
-            warnings=value.warnings,
+            warnings=tuple(dict.fromkeys(warnings)),
             reasons=tuple(reasons),
             is_actionable=actionable,
+            constraints=tuple(dict.fromkeys(constraints)),
         )

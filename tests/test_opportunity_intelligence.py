@@ -127,7 +127,7 @@ def test_explains_strong_buy_with_auditable_actions() -> None:
     assert "88/100" in report.headline
 
 
-def test_missing_market_and_seller_evidence_forces_monitor() -> None:
+def test_missing_market_and_seller_evidence_explains_canonical_monitor() -> None:
     report = OpportunityIntelligenceEngine().explain(
         _opportunity(),
         _decision("monitor", blockers=("market_comparables", "cost:transport_nok")),
@@ -144,10 +144,10 @@ def test_missing_market_and_seller_evidence_forces_monitor() -> None:
     assert any("البائع" in item for item in report.missing_evidence)
 
 
-def test_high_risk_seller_or_overpriced_market_forces_reject() -> None:
+def test_high_risk_seller_or_overpriced_market_explains_canonical_reject() -> None:
     report = OpportunityIntelligenceEngine().explain(
         _opportunity(),
-        _decision(),
+        _decision("reject"),
         _score(),
         _verification("overpriced", True),
         _history(),
@@ -155,5 +155,6 @@ def test_high_risk_seller_or_overpriced_market_forces_reject() -> None:
     )
 
     assert report.recommendation == "reject"
+    assert report.recommendation_label == "🔴 ارفض"
     assert any("البائع" in item for item in report.risks)
     assert "لا تحقق" in report.headline

@@ -1,4 +1,4 @@
-"""Explain opportunity decisions from auditable engine outputs only."""
+"""Explain canonical opportunity decisions from auditable engine outputs only."""
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ class OpportunityIntelligenceReport:
 
 
 class OpportunityIntelligenceEngine:
-    """Create a deterministic explanation without inventing facts or using an LLM."""
+    """Explain the canonical Decision without inventing or overriding it."""
 
     def explain(
         self,
@@ -80,6 +80,13 @@ class OpportunityIntelligenceEngine:
 
         for blocker in decision.blockers:
             missing.append(_human_blocker(blocker))
+        for constraint in decision.constraints:
+            if constraint == "seller_risk_high":
+                risks.append("بيانات البائع المتاحة تشير إلى مخاطر مرتفعة.")
+            elif constraint == "market_overpriced":
+                risks.append("السعر المطلوب أعلى من القيمة السوقية المحافظة.")
+            elif constraint == "market_verification_required":
+                missing.append("تحقق سوقي موثوق بثلاث مقارنات مناسبة على الأقل.")
         risks.extend(decision.warnings)
 
         if decision.maximum_purchase_price_nok is not None:
@@ -99,7 +106,8 @@ class OpportunityIntelligenceEngine:
         risks = _unique(risks)
         missing = _unique(missing)
         actions = _unique(actions)
-        recommendation, label = _recommendation(decision, verification, seller)
+        recommendation = decision.decision
+        label = decision.decision_label
         confidence = _confidence(decision, verification, seller, missing)
         headline = _headline(recommendation, score.total_score)
         summary = _summary(recommendation, strengths, risks, missing)
@@ -117,18 +125,6 @@ class OpportunityIntelligenceEngine:
             confidence=confidence,
             is_actionable=decision.is_actionable and not missing,
         )
-
-
-def _recommendation(
-    decision: OpportunityProfitDecision,
-    verification: MarketPriceVerification,
-    seller: SellerReliabilityReport,
-) -> tuple[str, str]:
-    if decision.decision == "reject" or verification.status == "overpriced" or seller.risk == "high":
-        return "reject", "🔴 ارفض"
-    if decision.decision == "buy" and verification.is_verified and seller.risk != "high":
-        return "buy", "🟢 اشترِ"
-    return "monitor", "🟡 راقب"
 
 
 def _confidence(
