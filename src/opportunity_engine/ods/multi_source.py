@@ -47,13 +47,13 @@ class UnifiedMultiSourceEngine:
 
         merged: list[UnifiedOpportunity] = []
         groups_merged = 0
-        for group in groups.values():
+        for group_key, group in groups.items():
             self._validate_fact_conflicts(group)
             if len(group) == 1:
-                merged.append(self._annotate_single(group[0]))
+                merged.append(self._annotate_single(group[0], group_key))
                 continue
             groups_merged += 1
-            merged.append(self._merge_group(group))
+            merged.append(self._merge_group(group, group_key))
 
         merged.sort(key=lambda item: (item.source_name.casefold(), item.title.casefold(), item.opportunity_id))
         return MultiSourceMergeResult(
@@ -76,17 +76,33 @@ class UnifiedMultiSourceEngine:
             return f"fingerprint:{title}|{city}|{price}"
         return f"id:{item.opportunity_id}"
 
-    def _annotate_single(self, item: UnifiedOpportunity) -> UnifiedOpportunity:
+    def _annotate_single(
+        self,
+        item: UnifiedOpportunity,
+        group_key: str,
+    ) -> UnifiedOpportunity:
         metadata = dict(item.raw_metadata)
-        metadata["fact_provenance"] = self._fact_provenance([item])
+        metadata.update(
+            {
+                "canonical_fact_identity": group_key,
+                "source_opportunity_ids": (item.opportunity_id,),
+                "fact_provenance": self._fact_provenance([item]),
+            }
+        )
         return replace(item, raw_metadata=metadata)
 
-    def _merge_group(self, group: list[UnifiedOpportunity]) -> UnifiedOpportunity:
+    def _merge_group(
+        self,
+        group: list[UnifiedOpportunity],
+        group_key: str,
+    ) -> UnifiedOpportunity:
         ranked = sorted(group, key=self._completeness_score, reverse=True)
         primary = ranked[0]
 
         source_names = tuple(dict.fromkeys(item.source_name for item in ranked))
         source_document_ids = tuple(dict.fromkeys(item.source_document_id for item in ranked))
+        source_opportunity_ids = tuple(sorted({item.opportunity_id for item in group}))
+        canonical_alias = source_opportunity_ids[0]
         urls = tuple(dict.fromkeys(item.url for item in ranked if item.url))
         image_urls = tuple(dict.fromkeys(url for item in ranked for url in item.image_urls))
 
@@ -96,11 +112,14 @@ class UnifiedMultiSourceEngine:
             "merged_source_document_ids": source_document_ids,
             "merged_urls": urls,
             "merged_record_count": len(group),
+            "canonical_fact_identity": group_key,
+            "source_opportunity_ids": source_opportunity_ids,
             "fact_provenance": self._fact_provenance(group),
         })
 
         return replace(
             primary,
+            opportunity_id=canonical_alias,
             description=self._first_nonempty(ranked, "description") or primary.description,
             current_price_nok=self._first_not_none(ranked, "current_price_nok"),
             city=self._first_nonempty(ranked, "city"),
