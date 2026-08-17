@@ -140,6 +140,22 @@ def test_enrichment_adds_stage_counts_and_initial_events(tmp_path: Path) -> None
         ]
     }
     _write_json(
+        tmp_path / "no" / "unified-opportunity-report.json",
+        {
+            "records": [
+                {
+                    "opportunity_id": "no:1",
+                    "listing_status": "ACTIVE",
+                    "evaluation_status": "REQUIRES_VERIFICATION",
+                    "workflow_status": "REQUIRES_VERIFICATION",
+                    "metadata": {
+                        "lifecycle_reason_code": "MISSING_REQUIRED_VERIFICATION"
+                    },
+                }
+            ]
+        },
+    )
+    _write_json(
         tmp_path / "se" / "unified-opportunity-report.json",
         {
             "records": [
