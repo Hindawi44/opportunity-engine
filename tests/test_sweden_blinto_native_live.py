@@ -81,9 +81,10 @@ def test_native_listing_fetches_once_deduplicates_and_filters_locally() -> None:
     assert diagnostics["listing_requests"] == 1
     assert diagnostics["brave_requests"] == 0
     assert diagnostics["paid_search_used"] is False
-    assert diagnostics["raw_exact_auction_links"] == 4
+    # /auction/l/ is deliberately treated as source noise by the strict local gate.
+    assert diagnostics["raw_exact_auction_links"] == 5
     assert diagnostics["accepted_hits"] == 2
-    assert diagnostics["rejected_hits"] == 2
+    assert diagnostics["rejected_hits"] == 3
 
 
 def test_native_verifier_preserves_source_lifecycle_truth_and_counts_status() -> None:
