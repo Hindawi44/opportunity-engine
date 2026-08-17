@@ -17,7 +17,9 @@ for candidate in (ROOT, SRC):
 from opportunity_engine.discovery.search_validation_gate import CORE_MARKETS
 from opportunity_engine.discovery.search_validation_gate_integrity import (
     SearchValidationIntegrityPolicy,
-    build_integrity_search_validation_report,
+)
+from opportunity_engine.discovery.search_validation_gate_norway_official import (
+    build_norway_official_search_validation_report,
 )
 
 
@@ -53,7 +55,7 @@ def main() -> int:
         min_verified_active_runs=args.min_verified_active_runs,
         min_distinct_verified_active_leads=args.min_distinct_verified_active_leads,
     )
-    report = build_integrity_search_validation_report(
+    report = build_norway_official_search_validation_report(
         args.run_dir,
         policy=policy,
         required_markets=args.required_markets or CORE_MARKETS,
