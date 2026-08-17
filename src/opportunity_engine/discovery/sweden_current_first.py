@@ -1,9 +1,11 @@
 """Shared current-first retrieval for Sweden's indexed auction sources.
 
-The policy is deliberately narrow: it changes retrieval priority only. It does
-not increase Brave requests, weaken exact-page ACTIVE/ENDED verification, or
-change commercial eligibility. Blinto keeps auction-occurrence identity and
-Klaravik keeps exact product-slug identity.
+The policy changes retrieval priority only. It does not increase Brave requests,
+weaken exact-page ACTIVE/ENDED verification, or change commercial eligibility.
+Current-window search hits are hints, never ACTIVE proof, so unrelated fallback
+identities must remain available until exact source-page verification decides
+lifecycle state. Blinto keeps auction-occurrence identity and Klaravik keeps
+exact product-slug identity.
 """
 from __future__ import annotations
 
@@ -25,21 +27,34 @@ from opportunity_engine.discovery.sweden_klaravik import (
 )
 
 _STOCKHOLM_TZ = ZoneInfo("Europe/Stockholm")
+_SWEDISH_MONTHS = (
+    "januari",
+    "februari",
+    "mars",
+    "april",
+    "maj",
+    "juni",
+    "juli",
+    "augusti",
+    "september",
+    "oktober",
+    "november",
+    "december",
+)
 BLINTO_CURRENT_QUERY_IDS = frozenset({"se-bl-current-01", "se-bl-current-02"})
 KLARAVIK_CURRENT_QUERY_IDS = frozenset({"se-kl-current-01", "se-kl-current-02"})
-_CURRENT_WINDOW_DEFER_REASON = (
-    "generic indexed fallback deferred because current-window candidates exist"
-)
-_DUPLICATE_REASON = "duplicate exact source identity within bounded query pack"
 
 
-def _stockholm_month(now: datetime | None = None) -> str:
+def _stockholm_now(now: datetime | None = None) -> datetime:
     local_now = now or datetime.now(_STOCKHOLM_TZ)
     if local_now.tzinfo is None:
-        local_now = local_now.replace(tzinfo=_STOCKHOLM_TZ)
-    else:
-        local_now = local_now.astimezone(_STOCKHOLM_TZ)
-    return local_now.strftime("%Y-%m")
+        return local_now.replace(tzinfo=_STOCKHOLM_TZ)
+    return local_now.astimezone(_STOCKHOLM_TZ)
+
+
+def _swedish_current_window(now: datetime | None = None) -> str:
+    local_now = _stockholm_now(now)
+    return f"{_SWEDISH_MONTHS[local_now.month - 1]} {local_now.year}"
 
 
 def _compose_current_first(
@@ -58,22 +73,30 @@ def build_blinto_current_first_queries(
     *,
     now: datetime | None = None,
 ) -> tuple[DiscoveryQuery, ...]:
-    """Use two current-window hints inside Blinto's unchanged 8-query budget."""
-    month = _stockholm_month(now)
+    """Lead with Swedish retail-liquidation language inside the same budget."""
+    window = _swedish_current_window(now)
     current = (
         DiscoveryQuery(
             "se-bl-current-01",
-            "AUCTION",
+            "INVENTORY_LIQUIDATION",
             "SALE_INTENT",
             "CLOTHING_INVENTORY",
-            f'site:blinto.se/auction arbetskläder parti "Auktionen avslutas" {month}',
+            (
+                "site:blinto.se/auction "
+                "(klädbutik OR modebutik OR butikslager) "
+                f"(kläder OR skor OR accessoarer) \"{window}\""
+            ),
         ),
         DiscoveryQuery(
             "se-bl-current-02",
-            "AUCTION",
+            "INVENTORY_LIQUIDATION",
             "SALE_INTENT",
             "CLOTHING_INVENTORY",
-            f'site:blinto.se/auction kläder skor "Högsta bud" {month}',
+            (
+                "site:blinto.se/auction "
+                "(utförsäljning OR avveckling OR konkurs OR restlager) "
+                f"(kläder OR mode OR skor) \"{window}\""
+            ),
         ),
     )
     return _compose_current_first(current, BLINTO_CLOTHING_QUERY_MATRIX, query_budget)
@@ -84,22 +107,30 @@ def build_klaravik_current_first_queries(
     *,
     now: datetime | None = None,
 ) -> tuple[DiscoveryQuery, ...]:
-    """Use two current-window hints inside Klaravik's unchanged 8-query budget."""
-    month = _stockholm_month(now)
+    """Lead with Swedish retail-liquidation language inside the same budget."""
+    window = _swedish_current_window(now)
     current = (
         DiscoveryQuery(
             "se-kl-current-01",
-            "AUCTION",
+            "INVENTORY_LIQUIDATION",
             "SALE_INTENT",
             "CLOTHING_INVENTORY",
-            f'site:klaravik.se/auktion/produkt kläder parti "Auktionen avslutas" {month}',
+            (
+                "site:klaravik.se/auktion/produkt "
+                "(klädbutik OR modebutik OR butikslager) "
+                f"(kläder OR skor OR accessoarer) \"{window}\""
+            ),
         ),
         DiscoveryQuery(
             "se-kl-current-02",
-            "AUCTION",
+            "INVENTORY_LIQUIDATION",
             "SALE_INTENT",
             "CLOTHING_INVENTORY",
-            f'site:klaravik.se/auktion/produkt arbetskläder lager "Nuvarande bud" {month}',
+            (
+                "site:klaravik.se/auktion/produkt "
+                "(utförsäljning OR avveckling OR konkurs OR restlager) "
+                f"(kläder OR mode OR skor) \"{window}\""
+            ),
         ),
     )
     return _compose_current_first(current, KLARAVIK_CLOTHING_QUERY_MATRIX, query_budget)
@@ -120,7 +151,7 @@ def _klaravik_identity(hit: SearchHit) -> str:
 
 
 class _CurrentFirstWrapper:
-    """Prioritize current-window identities after a delegate's bounded prefetch."""
+    """Expose current-window identities first without hiding unverified fallback."""
 
     def __init__(
         self,
@@ -145,7 +176,7 @@ class _CurrentFirstWrapper:
         self._hits_by_query: dict[str, tuple[SearchHit, ...]] = {}
         self._current_identities: list[str] = []
         self._current_priority_applied = False
-        self._generic_deferred_count = 0
+        self._generic_preserved_count = 0
         self._duplicate_count = 0
         self._query_diagnostics: list[dict[str, object]] = []
 
@@ -155,9 +186,9 @@ class _CurrentFirstWrapper:
                 raise ValueError("count must remain stable during one current-first run")
             return
 
-        # The source delegate itself prefetches its complete bounded query pack on
-        # the first call. Reading every registered query here therefore consumes
-        # no requests beyond the delegate's existing fixed budget.
+        # The source delegate prefetches its complete bounded query pack on the
+        # first call. Reading every registered query here therefore consumes no
+        # requests beyond the delegate's existing fixed budget.
         raw_by_query = {
             query.query: tuple(self._delegate.search(query.query, count=count))
             for query in self._query_list
@@ -173,27 +204,29 @@ class _CurrentFirstWrapper:
                 if key not in current:
                     current.append(key)
         self._current_identities = current
-        current_set = set(current)
-        self._current_priority_applied = bool(current_set)
+        self._current_priority_applied = bool(current)
 
+        # Current queries are already first in the query pack, so their unique
+        # identities are exposed first. Generic identities stay available: an
+        # indexed "current" hit is not allowed to suppress them before exact-page
+        # ACTIVE/ENDED verification. Cross-query duplicates are still collapsed.
         seen: set[str] = set()
         for query in self._query_list:
             exposed: list[SearchHit] = []
-            deferred = 0
             duplicates = 0
             is_current_query = query.query_id in self._current_query_ids
+            preserved_generic = 0
             for hit in raw_by_query[query.query]:
                 key = self._identity(hit)
-                if current_set and not is_current_query and key not in current_set:
-                    deferred += 1
-                    self._generic_deferred_count += 1
-                    continue
                 if key in seen:
                     duplicates += 1
                     self._duplicate_count += 1
                     continue
                 seen.add(key)
                 exposed.append(hit)
+                if not is_current_query:
+                    preserved_generic += 1
+                    self._generic_preserved_count += 1
             self._hits_by_query[query.query] = tuple(exposed)
             self._query_diagnostics.append(
                 {
@@ -202,7 +235,8 @@ class _CurrentFirstWrapper:
                     "current_window_query": is_current_query,
                     "delegate_hits": len(raw_by_query[query.query]),
                     "exposed_hits": len(exposed),
-                    "deferred_generic_hits": deferred,
+                    "deferred_generic_hits": 0,
+                    "preserved_generic_hits": preserved_generic,
                     "duplicate_hits": duplicates,
                 }
             )
@@ -218,16 +252,20 @@ class _CurrentFirstWrapper:
         base = dict(diagnostics_method() if callable(diagnostics_method) else {})
         base.update(
             {
-                "current_first_policy": "SWEDEN_CURRENT_FIRST_V1",
+                "current_first_policy": "SWEDEN_CURRENT_FIRST_V2_VERIFY_BEFORE_SUPPRESS",
                 "current_first_source": self._source,
                 "current_window_identity_count": len(self._current_identities),
                 "current_window_identities": list(self._current_identities),
                 "current_window_priority_applied": self._current_priority_applied,
-                "generic_fallback_deferred_count": self._generic_deferred_count,
+                # Kept for report compatibility. V2 never defers unrelated fallback
+                # on search-snippet evidence alone.
+                "generic_fallback_deferred_count": 0,
+                "generic_fallback_preserved_count": self._generic_preserved_count,
                 "current_first_duplicate_count": self._duplicate_count,
                 "current_first_query_diagnostics": list(self._query_diagnostics),
                 "current_window_is_active_proof": False,
                 "active_state_still_requires_exact_page_verification": True,
+                "fallback_suppression_requires_verified_active": True,
             }
         )
         return base
