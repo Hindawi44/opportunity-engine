@@ -162,7 +162,7 @@ def _analysis_missing_evidence(
 
 
 def _canonical_lifecycle_index(unified: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
-    """Index lifecycle-owned unified records by their canonical opportunity ID."""
+    """Index and validate lifecycle-owned unified records by opportunity ID."""
     result: dict[str, Mapping[str, Any]] = {}
     records = unified.get("records")
     if not isinstance(records, list):
@@ -171,8 +171,52 @@ def _canonical_lifecycle_index(unified: Mapping[str, Any]) -> dict[str, Mapping[
         if not isinstance(raw, Mapping):
             continue
         identity = _compact(raw.get("opportunity_id"))
-        if identity:
-            result[identity] = raw
+        if not identity:
+            continue
+        required_text = {
+            "listing_status": _compact(raw.get("listing_status")).upper(),
+            "workflow_status": _compact(raw.get("workflow_status")).upper(),
+            "evaluation_status": _compact(raw.get("evaluation_status")).upper(),
+        }
+        metadata = raw.get("metadata")
+        reason_code = (
+            _compact(metadata.get("lifecycle_reason_code"))
+            if isinstance(metadata, Mapping)
+            else ""
+        )
+        missing = [key for key, value in required_text.items() if not value]
+        if not reason_code:
+            missing.append("lifecycle_reason_code")
+        for key in ("top5_eligible", "analysis_eligible"):
+            if not isinstance(raw.get(key), bool):
+                missing.append(key)
+        if missing:
+            raise CheckpointIntegrityError(
+                "incomplete canonical lifecycle truth for "
+                f"{identity}: {', '.join(missing)}"
+            )
+        existing = result.get(identity)
+        if existing is not None:
+            comparable_keys = (
+                "listing_status",
+                "workflow_status",
+                "evaluation_status",
+                "top5_eligible",
+                "analysis_eligible",
+            )
+            existing_metadata = existing.get("metadata")
+            existing_reason = (
+                _compact(existing_metadata.get("lifecycle_reason_code"))
+                if isinstance(existing_metadata, Mapping)
+                else ""
+            )
+            if any(existing.get(key) != raw.get(key) for key in comparable_keys) or (
+                existing_reason != reason_code
+            ):
+                raise CheckpointIntegrityError(
+                    f"conflicting canonical lifecycle truth for {identity}"
+                )
+        result[identity] = raw
     return result
 
 
@@ -182,18 +226,15 @@ def _apply_canonical_lifecycle(
     source_name: str,
     unified: Mapping[str, Any],
 ) -> None:
-    """Overlay lifecycle-owned state without replacing source-native evidence.
-
-    Discovery records remain the evidence carrier. The unified report is produced
-    through ``opportunity_lifecycle.py`` and therefore owns lifecycle/status and
-    eligibility truth whenever the same stable opportunity identity is present.
-    """
+    """Overlay lifecycle-owned state and eligibility onto source evidence."""
     canonical = _canonical_lifecycle_index(unified)
     for record in records:
         identity = opportunity_identity(record, source_name)
         lifecycle = canonical.get(identity)
         if lifecycle is None:
-            continue
+            raise CheckpointIntegrityError(
+                f"missing canonical lifecycle truth for {identity}"
+            )
         for key in (
             "listing_status",
             "workflow_status",
@@ -205,10 +246,12 @@ def _apply_canonical_lifecycle(
             if key in lifecycle:
                 record[key] = lifecycle[key]
         metadata = lifecycle.get("metadata")
-        if isinstance(metadata, Mapping):
-            reason_code = _compact(metadata.get("lifecycle_reason_code"))
-            if reason_code:
-                record["lifecycle_reason_code"] = reason_code
+        reason_code = (
+            _compact(metadata.get("lifecycle_reason_code"))
+            if isinstance(metadata, Mapping)
+            else ""
+        )
+        record["lifecycle_reason_code"] = reason_code
         record["_canonical_lifecycle_present"] = True
 
 
@@ -331,6 +374,10 @@ def _load_source(spec: Mapping[str, Any], root: Path) -> dict[str, Any]:
             source_name=source_name,
             unified=unified,
         )
+    elif records:
+        raise CheckpointIntegrityError(
+            f"{source_name} has records but no canonical lifecycle unified report"
+        )
 
     if isinstance(persistence, Mapping):
         persisted_count = int(persistence.get("persisted_record_count") or 0)
@@ -398,34 +445,21 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
         source_name = str(source["source_name"])
         market_code = str(source["market_code"])
         currency = str(source["currency"])
-        top5_ids = {
-            opportunity_identity(item, source_name)
-            for item in source.get("top5_records") or []
-        }
         for raw in source.get("records") or []:
             record = deepcopy(dict(raw))
             identity = opportunity_identity(record, source_name)
+            if record.get("_canonical_lifecycle_present") is not True:
+                raise CheckpointIntegrityError(
+                    f"missing canonical lifecycle truth for {identity}"
+                )
             status = _record_status(record)
-            canonical_lifecycle = record.get("_canonical_lifecycle_present") is True
-            raw_top5_eligible = bool(record.get("top5_eligible")) or identity in top5_ids
-            raw_analysis_eligible = bool(record.get("analysis_eligible"))
-
-            if canonical_lifecycle:
-                # Observer rule: canonical lifecycle owns eligibility. The
-                # checkpoint may validate it, but may not rewrite it.
-                top5_eligible = record.get("top5_eligible") is True
-                analysis_eligible = record.get("analysis_eligible") is True
-                if (top5_eligible or analysis_eligible) and status != "ACTIVE":
-                    raise CheckpointIntegrityError(
-                        f"{source_name} canonical lifecycle marks non-active record "
-                        f"eligible: {identity}"
-                    )
-            else:
-                # Legacy compatibility for source artifacts that predate unified
-                # lifecycle output. Remove this fallback only after all sources
-                # are proven to emit canonical records.
-                top5_eligible = raw_top5_eligible and status == "ACTIVE"
-                analysis_eligible = raw_analysis_eligible and status == "ACTIVE"
+            top5_eligible = record.get("top5_eligible") is True
+            analysis_eligible = record.get("analysis_eligible") is True
+            if (top5_eligible or analysis_eligible) and status != "ACTIVE":
+                raise CheckpointIntegrityError(
+                    f"{source_name} canonical lifecycle marks non-active record "
+                    f"eligible: {identity}"
+                )
 
             normalized = {
                 "opportunity_identity": identity,
@@ -434,6 +468,9 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
                 "currency": currency,
                 "source_names": [source_name],
                 "listing_status": status,
+                "workflow_status": _compact(record.get("workflow_status")).upper(),
+                "evaluation_status": _compact(record.get("evaluation_status")).upper(),
+                "lifecycle_reason_code": _compact(record.get("lifecycle_reason_code")),
                 "top5_eligible": top5_eligible,
                 "analysis_eligible": analysis_eligible,
                 "discovery_score": _score(record),
@@ -442,7 +479,7 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
                     source_name=source_name,
                     top5_eligible=top5_eligible,
                     analysis_eligible=analysis_eligible,
-                    canonical_lifecycle=canonical_lifecycle,
+                    canonical_lifecycle=True,
                 ),
                 "source_urls": list(record.get("source_urls") or []),
                 "canonical_url": _first_text(record, ("canonical_url", "url")),
@@ -451,14 +488,20 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
             if existing is None:
                 merged[identity] = normalized
                 continue
+            canonical_keys = (
+                "listing_status",
+                "workflow_status",
+                "evaluation_status",
+                "lifecycle_reason_code",
+                "top5_eligible",
+                "analysis_eligible",
+            )
+            if any(existing[key] != normalized[key] for key in canonical_keys):
+                raise CheckpointIntegrityError(
+                    f"conflicting canonical lifecycle truth for {identity}"
+                )
             existing["source_names"] = sorted(
                 set(existing["source_names"]) | {source_name}
-            )
-            existing["top5_eligible"] = bool(
-                existing["top5_eligible"] or normalized["top5_eligible"]
-            )
-            existing["analysis_eligible"] = bool(
-                existing["analysis_eligible"] or normalized["analysis_eligible"]
             )
             existing["discovery_score"] = max(
                 float(existing["discovery_score"]), normalized["discovery_score"]
@@ -466,14 +509,13 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
             existing["missing_evidence"] = sorted(
                 set(existing["missing_evidence"]) | set(normalized["missing_evidence"])
             )
-            if STATUS_RANK[normalized["listing_status"]] > STATUS_RANK[
-                existing["listing_status"]
-            ]:
-                existing["listing_status"] = normalized["listing_status"]
-                existing["title"] = normalized["title"] or existing["title"]
-                existing["canonical_url"] = (
-                    normalized["canonical_url"] or existing["canonical_url"]
-                )
+            existing["source_urls"] = sorted(
+                set(existing["source_urls"]) | set(normalized["source_urls"])
+            )
+            if not existing["title"] and normalized["title"]:
+                existing["title"] = normalized["title"]
+            if not existing["canonical_url"] and normalized["canonical_url"]:
+                existing["canonical_url"] = normalized["canonical_url"]
     return sorted(
         merged.values(),
         key=lambda item: (
