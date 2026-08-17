@@ -28,6 +28,9 @@ LISTING_HTML = """
   <a href="https://www.blinto.se/auction/Restlager-arbetsklader-24-stycken-275600-146255/">
     Restlager arbetskläder - 24 stycken
   </a>
+  <a href="/auction/For-dykare-271103-199137/">
+    Manskapskorg För dykare - 6 stycken
+  </a>
   <a href="/auction/Varulager-med-kladskap-20-stycken-275601-146256/">
     Varulager med klädskåp - 20 stycken
   </a>
@@ -81,10 +84,12 @@ def test_native_listing_fetches_once_deduplicates_and_filters_locally() -> None:
     assert diagnostics["listing_requests"] == 1
     assert diagnostics["brave_requests"] == 0
     assert diagnostics["paid_search_used"] is False
-    # /auction/l/ is deliberately treated as source noise by the strict local gate.
-    assert diagnostics["raw_exact_auction_links"] == 5
+    assert diagnostics["native_exact_title_filter"] is True
+    # Includes the category URL and the deliberate Manskapskorg substring trap.
+    assert diagnostics["raw_exact_auction_links"] == 6
     assert diagnostics["accepted_hits"] == 2
-    assert diagnostics["rejected_hits"] == 3
+    assert diagnostics["rejected_hits"] == 4
+    assert "specific Blinto title lacks exact clothing term" in diagnostics["rejection_reasons"]
 
 
 def test_native_verifier_preserves_source_lifecycle_truth_and_counts_status() -> None:
@@ -105,6 +110,39 @@ def test_native_verifier_preserves_source_lifecycle_truth_and_counts_status() ->
     assert diagnostics["active_pages"] == 1
     assert diagnostics["ended_pages"] == 1
     assert diagnostics["brave_requests"] == 0
+
+
+def test_native_verifier_repairs_legitimate_clothing_lot_with_excluded_hangers() -> None:
+    def delegate(url: str) -> PageVerification:
+        return PageVerification(
+            url=url,
+            title="Blinto - Varulager med Varseljackor - Fristads 6 stycken",
+            text=(
+                "Varulager med jackor Fabrikat: Fristads Modell: Skaljackor "
+                "Totalt antal: 6 Galgar och inredning ingår inte"
+            ),
+            bounded_context=(
+                "Varulager med jackor. Totalt antal: 6. "
+                "Galgar och inredning ingår inte. highest bid | ends"
+            ),
+            listing_status=ACTIVE,
+            page_role=ITEM_LISTING,
+            opportunity_identity="blinto-auction:271370:199421",
+            identity_stable=True,
+            clothing_inventory_evidence=False,
+            sale_evidence=False,
+            verified=True,
+        )
+
+    verifier = BlintoNativeLiveVerifier(delegate)
+    result = verifier("https://blinto.se/auction/Fristads-6-stycken-271370-199421")
+
+    assert result.listing_status == ACTIVE
+    assert result.clothing_inventory_evidence is True
+    assert result.sale_evidence is True
+    assert result.inventory_type == "workwear_inventory"
+    assert result.quantity == 6
+    assert verifier.diagnostics()["native_evidence_repairs"] == 1
 
 
 def test_pipeline_writes_opportunity_engine_artifacts_with_zero_brave(tmp_path: Path) -> None:
