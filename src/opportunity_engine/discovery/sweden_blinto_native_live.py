@@ -7,9 +7,10 @@ No login, bidding, contact, purchase, or access-control bypass is performed.
 """
 from __future__ import annotations
 
+import re
 from collections import Counter
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urljoin
@@ -19,6 +20,7 @@ import requests
 from opportunity_engine.discovery.clothing_inventory_search import (
     ACTIVE,
     ENDED,
+    ITEM_LISTING,
     UNKNOWN,
     DiscoveryQuery,
     PageVerification,
@@ -40,6 +42,142 @@ BLINTO_NATIVE_QUERY = DiscoveryQuery(
     "Blinto native live klær vareparti auksjon",
 )
 _SOURCE_POLICY_ALIASES = "klær vareparti auksjon"
+
+# Native listing titles are structured source data, so require whole-term matches.
+# This prevents substrings such as Swedish "skor" (shoes) inside "manskapskorg".
+_NATIVE_CLOTHING_TITLE_TERMS = (
+    "kläder",
+    "arbetskläder",
+    "yrkeskläder",
+    "varselkläder",
+    "skyddskläder",
+    "damkläder",
+    "herrkläder",
+    "barnkläder",
+    "sportkläder",
+    "träningskläder",
+    "arbetsbyxor",
+    "byxor",
+    "jackor",
+    "jacka",
+    "varseljackor",
+    "skaljackor",
+    "arbetsjackor",
+    "tröjor",
+    "t-shirts",
+    "piké",
+    "skjortor",
+    "shorts",
+    "västar",
+    "overaller",
+    "regnkläder",
+    "arbetsskor",
+    "skyddsskor",
+    "skor",
+    "stövlar",
+    "plagg",
+)
+_NATIVE_BULK_TERMS = (
+    "varulager",
+    "restlager",
+    "restparti",
+    "överskott",
+    "parti",
+    "sortiment",
+    "hela lagret",
+    "pall",
+    "pallar",
+    "kartong",
+    "kartonger",
+    "stycken",
+    "plagg",
+)
+_NATIVE_QUANTITY_RE = re.compile(
+    r"\b(?:totalt\s+antal\s*:?\s*)?(?P<count>\d{1,7})\s*"
+    r"(?:st|stycken|plagg|artiklar|enheter|delar|byxor|par)\b",
+    re.I,
+)
+
+
+def _contains_exact_term(text: str, term: str) -> bool:
+    normalized = " ".join((text or "").casefold().split())
+    pattern = rf"(?<!\w){re.escape(term.casefold())}(?!\w)"
+    return re.search(pattern, normalized, re.I) is not None
+
+
+def _native_title_has_clothing(title: str) -> bool:
+    return any(_contains_exact_term(title, term) for term in _NATIVE_CLOTHING_TITLE_TERMS)
+
+
+def _native_has_bulk_scope(text: str) -> bool:
+    return any(_contains_exact_term(text, term) for term in _NATIVE_BULK_TERMS) or bool(
+        _NATIVE_QUANTITY_RE.search(text or "")
+    )
+
+
+def _native_quantity(text: str) -> int | None:
+    match = _NATIVE_QUANTITY_RE.search(text or "")
+    return int(match.group("count")) if match else None
+
+
+def _native_inventory_type(text: str) -> str:
+    normalized = " ".join((text or "").casefold().split())
+    if any(
+        _contains_exact_term(normalized, term)
+        for term in (
+            "arbetskläder",
+            "yrkeskläder",
+            "varselkläder",
+            "skyddskläder",
+            "arbetsbyxor",
+            "varseljackor",
+            "arbetsjackor",
+            "arbetsskor",
+            "skyddsskor",
+        )
+    ):
+        return "workwear_inventory"
+    return "mixed_clothing_inventory"
+
+
+def _repair_native_verification(verification: PageVerification) -> PageVerification:
+    """Restore bounded clothing evidence when Blinto text contains incidental fixture words.
+
+    Blinto clothing lots can explicitly say that hangers/shop fittings are *not*
+    included. The generic verifier conservatively treats words such as ``galgar``
+    as equipment noise. For the native path we already have an exact Blinto item
+    identity and a source-native title, so clothing/bulk scope is re-established
+    only when the exact page title itself contains a whole clothing term and the
+    bounded page context proves bulk scope.
+    """
+    if not (
+        verification.verified
+        and verification.page_role == ITEM_LISTING
+        and verification.identity_stable
+    ):
+        return verification
+
+    title = verification.title or ""
+    context = " ".join(
+        value
+        for value in (verification.title, verification.text, verification.bounded_context)
+        if value
+    )
+    if not _native_title_has_clothing(title) or not _native_has_bulk_scope(context):
+        return verification
+
+    quantity = verification.quantity or _native_quantity(context)
+    sale_evidence = verification.sale_evidence or verification.listing_status in {
+        ACTIVE,
+        ENDED,
+    }
+    return replace(
+        verification,
+        clothing_inventory_evidence=True,
+        sale_evidence=sale_evidence,
+        inventory_type=verification.inventory_type or _native_inventory_type(context),
+        quantity=quantity,
+    )
 
 
 class _AuctionAnchorParser(HTMLParser):
@@ -154,17 +292,23 @@ class BlintoNativeLiveSearchProvider:
         accepted: list[SearchHit] = []
         for hit in raw_hits:
             decision = blinto_gate_decision(hit)
+            accepted_by_native_title = decision.accepted and _native_title_has_clothing(
+                hit.title
+            )
+            reason = decision.reason
+            if decision.accepted and not accepted_by_native_title:
+                reason = "specific Blinto title lacks exact clothing term"
             sample = {
                 "title": hit.title,
                 "url": hit.url,
                 "listing_key": decision.listing_key,
                 "object_id": decision.object_id,
                 "occurrence_id": decision.occurrence_id,
-                "reason": decision.reason,
+                "reason": reason,
             }
-            if not decision.accepted:
+            if not accepted_by_native_title:
                 self._rejected_hits += 1
-                self._rejection_reasons[decision.reason] += 1
+                self._rejection_reasons[reason] += 1
                 if len(self._rejected_samples) < 30:
                     self._rejected_samples.append(sample)
                 continue
@@ -200,6 +344,7 @@ class BlintoNativeLiveSearchProvider:
             "listing_requests": self._listing_requests,
             "brave_requests": 0,
             "paid_search_used": False,
+            "native_exact_title_filter": True,
             "raw_exact_auction_links": self._raw_exact_links,
             "accepted_hits": len(self._accepted),
             "rejected_hits": self._rejected_hits,
@@ -210,17 +355,21 @@ class BlintoNativeLiveSearchProvider:
 
 
 class BlintoNativeLiveVerifier:
-    """Count exact source-page checks while delegating lifecycle truth unchanged."""
+    """Count exact source-page checks and preserve source lifecycle truth."""
 
     def __init__(self, delegate: PageVerifier = verify_blinto_public_page) -> None:
         self._delegate = delegate
         self._attempts = 0
         self._verified = 0
         self._statuses: Counter[str] = Counter()
+        self._native_evidence_repairs = 0
 
     def __call__(self, url: str) -> PageVerification:
         self._attempts += 1
-        verification = self._delegate(url)
+        original = self._delegate(url)
+        verification = _repair_native_verification(original)
+        if verification != original:
+            self._native_evidence_repairs += 1
         if verification.verified:
             self._verified += 1
         status = verification.listing_status or UNKNOWN
@@ -235,6 +384,7 @@ class BlintoNativeLiveVerifier:
             "active_pages": self._statuses.get(ACTIVE, 0),
             "ended_pages": self._statuses.get(ENDED, 0),
             "unknown_pages": self._statuses.get(UNKNOWN, 0),
+            "native_evidence_repairs": self._native_evidence_repairs,
             "brave_requests": 0,
         }
 
