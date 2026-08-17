@@ -22,11 +22,11 @@ def main() -> int:
     parser.add_argument(
         "--freshness",
         default="none",
-        choices=("none", "pm", "py"),
+        choices=("", "none", "pm", "py"),
     )
     args = parser.parse_args()
 
-    freshness = None if args.freshness == "none" else args.freshness
+    freshness = None if args.freshness in {"", "none"} else args.freshness
     report = run_keyword_shadow_verification(
         environment=os.environ,
         freshness=freshness,
