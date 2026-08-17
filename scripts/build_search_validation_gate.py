@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build SEARCH_VALIDATION_GATE_V1 from saved JSON artifacts only."""
+"""Build the offline Search Validation Gate from saved artifacts only."""
 from __future__ import annotations
 
 import argparse
@@ -14,11 +14,10 @@ for candidate in (ROOT, SRC):
     if text not in sys.path:
         sys.path.insert(0, text)
 
-from opportunity_engine.discovery.search_validation_gate import (
-    CORE_MARKETS,
-    SearchValidationPolicy,
-    build_search_validation_report,
-    load_observations,
+from opportunity_engine.discovery.search_validation_gate import CORE_MARKETS
+from opportunity_engine.discovery.search_validation_gate_integrity import (
+    SearchValidationIntegrityPolicy,
+    build_integrity_search_validation_report,
 )
 
 
@@ -44,17 +43,18 @@ def main() -> int:
     parser.add_argument("--min-retrieval-success-rate", type=float, default=0.80)
     parser.add_argument("--min-productive-run-rate", type=float, default=0.50)
     parser.add_argument("--min-verified-active-runs", type=int, default=2)
+    parser.add_argument("--min-distinct-verified-active-leads", type=int, default=2)
     args = parser.parse_args()
 
-    policy = SearchValidationPolicy(
+    policy = SearchValidationIntegrityPolicy(
         min_live_runs=args.min_live_runs,
         min_retrieval_success_rate=args.min_retrieval_success_rate,
         min_productive_run_rate=args.min_productive_run_rate,
         min_verified_active_runs=args.min_verified_active_runs,
+        min_distinct_verified_active_leads=args.min_distinct_verified_active_leads,
     )
-    observations = load_observations(args.run_dir)
-    report = build_search_validation_report(
-        observations,
+    report = build_integrity_search_validation_report(
+        args.run_dir,
         policy=policy,
         required_markets=args.required_markets or CORE_MARKETS,
     )
@@ -68,6 +68,7 @@ def main() -> int:
         json.dumps(
             {
                 "status": "SUCCESS",
+                "engine_version": report.get("engine_version"),
                 "overall_verdict": report["overall_verdict"],
                 "progression_gate_open": report["progression_gate_open"],
                 "observation_count": report["observation_count"],
