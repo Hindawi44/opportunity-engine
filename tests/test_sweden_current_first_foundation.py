@@ -74,7 +74,9 @@ def test_blinto_current_occurrence_gets_priority_without_extra_requests():
         request_budget=8,
     )
 
-    assert provider.search(queries[0].query, count=10) == (current,)
+    current_hits = provider.search(queries[0].query, count=10)
+    assert len(current_hits) == 1
+    assert current_hits[0].url == "https://blinto.se/auction/Blaklader-178629-99002"
     assert provider.search(queries[2].query, count=10) == ()
     diagnostics = provider.diagnostics()
 
@@ -127,7 +129,11 @@ def test_klaravik_current_slug_gets_priority_without_extra_requests():
         request_budget=8,
     )
 
-    assert provider.search(queries[0].query, count=10) == (current,)
+    current_hits = provider.search(queries[0].query, count=10)
+    assert len(current_hits) == 1
+    assert current_hits[0].url == (
+        "https://klaravik.se/auktion/produkt/3100001-klader-och-skor-parti"
+    )
     assert provider.search(queries[2].query, count=10) == ()
     diagnostics = provider.diagnostics()
 
@@ -152,7 +158,11 @@ def test_generic_fallback_remains_available_when_current_window_is_empty():
     )
 
     assert provider.search(queries[0].query, count=10) == ()
-    assert provider.search(queries[2].query, count=10) == (fallback,)
+    fallback_hits = provider.search(queries[2].query, count=10)
+    assert len(fallback_hits) == 1
+    assert fallback_hits[0].url == (
+        "https://klaravik.se/auktion/produkt/848318-klader-och-skor-parti"
+    )
     diagnostics = provider.diagnostics()
 
     assert len(raw.calls) == 8
@@ -170,6 +180,10 @@ def test_same_current_identity_is_exposed_only_once_across_query_pack():
         request_budget=2,
     )
 
-    assert provider.search(queries[0].query, count=10) == (same,)
+    first_hits = provider.search(queries[0].query, count=10)
+    assert len(first_hits) == 1
+    assert first_hits[0].url == (
+        "https://klaravik.se/auktion/produkt/3100001-klader-och-skor-parti"
+    )
     assert provider.search(queries[1].query, count=10) == ()
     assert provider.diagnostics()["current_first_duplicate_count"] == 1
