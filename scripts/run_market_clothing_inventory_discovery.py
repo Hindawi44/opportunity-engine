@@ -16,6 +16,8 @@ for path in (ROOT, SRC):
     if text not in sys.path:
         sys.path.insert(0, text)
 
+from opportunity_engine.cost_guard import ensure_paid_brave_allowed
+
 
 def select_market_runner(market: str) -> Callable[[], int]:
     """Return the existing market runner and fail closed for unsupported codes."""
@@ -84,6 +86,11 @@ def main() -> int:
     selector = argparse.ArgumentParser(add_help=False)
     selector.add_argument("--market", choices=("NO", "SE", "DE"), default="NO")
     selected, remaining = selector.parse_known_args()
+
+    # Manual GitHub workflow runs are diagnostics by default.  Stop before the
+    # selected SE/DE/NO Brave-backed runner can consume paid search credit.
+    ensure_paid_brave_allowed()
+
     runner = select_market_runner(selected.market)
     persistence = _persistence_output_args(remaining)
     sys.argv = [sys.argv[0], *remaining]
