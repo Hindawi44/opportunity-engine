@@ -67,6 +67,9 @@ from opportunity_engine.discovery.market_comparables_benchmark_cli_hook import (
 from opportunity_engine.discovery.market_comparables_brand_cleanup import (
     install_market_comparables_brand_cleanup,
 )
+from opportunity_engine.discovery.mathematical_logic_shadow_cli_hook import (
+    install_mathematical_logic_shadow_cli_hook,
+)
 from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook import (
     install_unified_market_intelligence_river_cli_hook,
 )
@@ -89,6 +92,9 @@ install_one_decision_consistency()
 install_central_intelligence_orchestrator_cli_hook()
 install_market_comparables_benchmark_cli_hook()
 install_market_comparables_brand_cleanup()
+# Registered before the unified river because atexit handlers run LIFO: the
+# river writes unified-market-cases.json first, then Math V1 observes it.
+install_mathematical_logic_shadow_cli_hook()
 install_unified_market_intelligence_river_cli_hook()
 install_openai_fabric_procurement_cli_hook()
 install_fabric_procurement_watch_cli_hook()
