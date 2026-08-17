@@ -158,11 +158,61 @@ jobs:
           python scripts/build_france_market_discovery.py \
             --output artifacts/france-market-discovery/france-market-discovery.json
 
-      - name: Upload live France discovery artifact
+      - name: Upload live France live artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: france-market-discovery-v1
           path: artifacts/france-market-discovery/france-market-discovery.json
+          if-no-files-found: error
+          retention-days: 30
+
+  sweden-live-proof-2-klaravik:
+    name: TEMP Sweden Klaravik live proof 2
+    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'agent/sweden-live-proof-2-klaravik' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OPPORTUNITY_ALLOW_PAID_BRAVE_MANUAL: "true"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Confirm Brave secret exists
+        run: |
+          if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
+            echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
+            exit 1
+          fi
+
+      - name: Run one bounded Sweden Klaravik proof
+        run: |
+          python scripts/run_market_clothing_inventory_discovery.py \
+            --market SE \
+            --source klaravik \
+            --output-dir artifacts/sweden-live-proof-2-klaravik \
+            --query-budget 8 \
+            --results-per-query 10 \
+            --freshness none \
+            --verify-pages \
+            --verification-limit 20
+
+      - name: Upload Sweden proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweden-live-proof-2-klaravik
+          path: artifacts/sweden-live-proof-2-klaravik
           if-no-files-found: error
           retention-days: 30
