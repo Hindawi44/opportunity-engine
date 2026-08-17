@@ -127,7 +127,8 @@ def test_high_seller_risk_is_rejected_by_canonical_decision() -> None:
 
     assert decision.decision == "reject"
     assert decision.decision_label == "🔴 ارفض"
-    assert "seller_risk_high" in decision.blockers
+    assert decision.blockers == ()
+    assert "seller_risk_high" in decision.constraints
 
 
 def test_overpriced_market_is_rejected_by_canonical_decision() -> None:
@@ -142,7 +143,8 @@ def test_overpriced_market_is_rejected_by_canonical_decision() -> None:
     )
 
     assert decision.decision == "reject"
-    assert "market_overpriced" in decision.blockers
+    assert decision.blockers == ()
+    assert "market_overpriced" in decision.constraints
 
 
 def test_unverified_market_cannot_remain_canonical_buy() -> None:
@@ -158,7 +160,9 @@ def test_unverified_market_cannot_remain_canonical_buy() -> None:
 
     assert decision.decision == "monitor"
     assert decision.is_actionable is False
-    assert "market_verification_required" in decision.blockers
+    assert decision.blockers == ()
+    assert "market_verification_required" in decision.constraints
+    assert decision.confidence == "insufficient"
 
 
 def test_intelligence_mirrors_canonical_decision_without_second_recommendation() -> None:
