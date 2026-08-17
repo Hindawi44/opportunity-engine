@@ -28,6 +28,7 @@ jobs:
 
       - name: Run BLINTO_NATIVE_LIVE_DISCOVERY_V1
         run: |
+          mkdir -p artifacts
           python scripts/run_blinto_native_live_discovery.py \
             --output-dir artifacts/blinto-native-main-proof \
             --results-per-query 20 \
