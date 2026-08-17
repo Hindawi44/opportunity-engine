@@ -19,8 +19,6 @@ from opportunity_engine.discovery.clothing_inventory_search import (
 )
 from opportunity_engine.discovery.early_opportunity_gate import apply_early_opportunity_gate
 from opportunity_engine.discovery.sweden_blinto import (
-    BlintoPrefetchedSearchProvider,
-    build_blinto_clothing_queries,
     enrich_blinto_discovery_result,
     verify_blinto_public_page,
 )
@@ -29,11 +27,13 @@ from opportunity_engine.discovery.sweden_clothing_inventory import (
     build_sweden_clothing_inventory_queries,
     verify_sweden_public_page,
 )
-from opportunity_engine.discovery.sweden_klaravik import (
-    KlaravikPrefetchedSearchProvider,
-    build_klaravik_clothing_queries,
-    verify_klaravik_public_page,
+from opportunity_engine.discovery.sweden_current_first import (
+    BlintoCurrentFirstPrefetchedSearchProvider as BlintoPrefetchedSearchProvider,
+    KlaravikCurrentFirstPrefetchedSearchProvider as KlaravikPrefetchedSearchProvider,
+    build_blinto_current_first_queries as build_blinto_clothing_queries,
+    build_klaravik_current_first_queries as build_klaravik_clothing_queries,
 )
+from opportunity_engine.discovery.sweden_klaravik import verify_klaravik_public_page
 from opportunity_engine.discovery.sweden_psauction import (
     build_psauction_clothing_queries,
 )
