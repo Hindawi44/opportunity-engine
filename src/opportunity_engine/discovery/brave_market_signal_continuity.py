@@ -7,12 +7,15 @@ page title, snippet, URL, classification, or status did not change.
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from opportunity_engine.cost_guard import manual_paid_brave_block_reason
 from opportunity_engine.discovery.brave_market_signal_radar import (
     ProviderFactory,
+    SUPPORTED_MARKETS,
     collect_manifest_brave_market_signals as _collect_raw_brave_market_signals,
 )
 
@@ -79,6 +82,72 @@ def _rewrite_artifact(path: Path, stable_by_id: Mapping[str, Mapping[str, Any]])
     temporary.replace(path)
 
 
+def _manual_cost_guard_report(
+    *,
+    observed_at,
+    environment,
+    queries_per_market: int,
+    results_per_query: int,
+    freshness: str | None,
+    block_reason: str,
+) -> dict[str, Any]:
+    now = observed_at or datetime.now(timezone.utc)
+    if now.tzinfo is None or now.utcoffset() is None:
+        now = now.replace(tzinfo=timezone.utc)
+    now = now.astimezone(timezone.utc)
+    generated_at = now.isoformat()
+
+    sources = []
+    for market_code in SUPPORTED_MARKETS:
+        sources.append(
+            {
+                "schema_version": "brave-market-signal-radar-1.0",
+                "source": "Brave Search market signal radar",
+                "source_country": market_code,
+                "freshness": freshness,
+                "query_budget": queries_per_market,
+                "results_per_query": results_per_query,
+                "queries_attempted": 0,
+                "queries_succeeded": 0,
+                "accepted_signal_count": 0,
+                "rejected_result_count": 0,
+                "duplicate_result_count": 0,
+                "signals": [],
+                "errors": [],
+                "status": "SKIPPED_COST_GUARD",
+                "block_reason": block_reason,
+                "automatic_contact": False,
+                "automatic_bid": False,
+                "automatic_purchase": False,
+                "automatic_payment": False,
+            }
+        )
+
+    return {
+        "schema_version": "brave-market-signal-radar-1.0",
+        "generated_at": generated_at,
+        "retrieval_transport": "BRAVE_SEARCH",
+        "market_coverage": list(SUPPORTED_MARKETS),
+        "market_count": len(sources),
+        "query_budget_total": len(SUPPORTED_MARKETS) * queries_per_market,
+        "requests_made": 0,
+        "results_per_query": results_per_query,
+        "freshness": freshness,
+        "status_counts": {"SKIPPED_COST_GUARD": len(sources)},
+        "sources": sources,
+        "signal_count": 0,
+        "cost_guard": {
+            "manual_workflow": True,
+            "paid_brave_requests_blocked": True,
+            "block_reason": block_reason,
+        },
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase": False,
+        "automatic_payment": False,
+    }
+
+
 def collect_manifest_brave_market_signals(
     manifest: Mapping[str, Any],
     *,
@@ -91,6 +160,17 @@ def collect_manifest_brave_market_signals(
     freshness: str | None = "pm",
 ) -> dict[str, Any]:
     """Run the bounded radar and normalize its signals for stable replay."""
+    block_reason = manual_paid_brave_block_reason(environment)
+    if block_reason is not None:
+        return _manual_cost_guard_report(
+            observed_at=observed_at,
+            environment=environment,
+            queries_per_market=queries_per_market,
+            results_per_query=results_per_query,
+            freshness=freshness,
+            block_reason=block_reason,
+        )
+
     kwargs: dict[str, Any] = {
         "root": root,
         "observed_at": observed_at,
