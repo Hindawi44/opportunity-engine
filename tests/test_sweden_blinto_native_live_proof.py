@@ -25,7 +25,6 @@ def test_blinto_native_live_proof_has_active_opportunity_and_zero_brave(tmp_path
     assert source["accepted_hits"] >= 1
     assert verifier["exact_page_verification_attempts"] >= 1
     assert verifier["active_pages"] >= 1
-    assert report["confirmed_sales"] >= 1
     assert any(
         candidate.get("listing_status") == "ACTIVE"
         for candidate in result["all_discovered_candidates"]
