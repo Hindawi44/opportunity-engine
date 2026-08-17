@@ -17,6 +17,29 @@ def _write(path: Path, value: object) -> None:
     path.write_text(json.dumps(value), encoding="utf-8")
 
 
+def _canonical_record(candidate: dict) -> dict:
+    identity = candidate.get("opportunity_identity") or candidate.get("url")
+    listing_status = str(candidate.get("listing_status") or "ACTIVE").upper()
+    historical = listing_status in {"ENDED", "HISTORICAL"} or (
+        candidate.get("workflow_status") == "HISTORICAL_MARKET_EVIDENCE"
+    )
+    return {
+        "opportunity_id": identity,
+        "listing_status": listing_status,
+        "workflow_status": (
+            "HISTORICAL_MARKET_EVIDENCE" if historical else "CANDIDATE"
+        ),
+        "evaluation_status": "HISTORICAL_ONLY" if historical else "HOLD_WATCHLIST",
+        "top5_eligible": False if historical else bool(candidate.get("top5_eligible")),
+        "analysis_eligible": False if historical else bool(candidate.get("analysis_eligible")),
+        "metadata": {
+            "lifecycle_reason_code": (
+                "HISTORICAL_INACTIVE_LISTING" if historical else "CANDIDATE_DISCOVERED"
+            )
+        },
+    }
+
+
 def _standard_source(
     root: Path,
     name: str,
@@ -49,7 +72,7 @@ def _standard_source(
             "currency": currency,
             "record_count": len(candidates),
             "conversion_error_count": 0,
-            "records": [],
+            "records": [_canonical_record(item) for item in candidates],
         },
     )
     if persist:
@@ -109,6 +132,26 @@ def test_checkpoint_covers_three_markets_and_selects_one_review_action(tmp_path:
         {"scan_complete": True, "errors": [], "listings": [active]},
     )
     _write(no_dir / "live-clothing-top5.json", [active])
+    _write(
+        no_dir / "unified-opportunity-report.json",
+        {
+            "record_count": 1,
+            "conversion_error_count": 0,
+            "records": [
+                {
+                    "opportunity_id": active["url"],
+                    "listing_status": "ACTIVE",
+                    "workflow_status": "REQUIRES_VERIFICATION",
+                    "evaluation_status": "HOLD_WATCHLIST",
+                    "top5_eligible": True,
+                    "analysis_eligible": False,
+                    "metadata": {
+                        "lifecycle_reason_code": "MISSING_REQUIRED_VERIFICATION"
+                    },
+                }
+            ],
+        },
+    )
 
     se_source = _standard_source(
         tmp_path,

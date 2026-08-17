@@ -14,8 +14,6 @@ from pathlib import Path
 import sqlite3
 from typing import Any, Mapping, Sequence
 
-from opportunity_engine.opportunity_lifecycle import classify_opportunity_lifecycle
-
 
 WORKFLOW_STATUSES = (
     "EARLY_SIGNAL",
@@ -38,7 +36,7 @@ TERMINAL_WORKFLOWS = {"HISTORICAL_MARKET_EVIDENCE", "CLOSED", "REJECTED"}
 
 
 class LifecycleCheckpointIntegrityError(ValueError):
-    """Raised when lifecycle artifacts contradict their persistence summaries."""
+    """Raised when checkpoint lifecycle data violates canonical lifecycle integrity."""
 
 
 def _read_json(path: Path, *, default: Any = None) -> Any:
@@ -68,6 +66,23 @@ def _metadata_reason(record: Mapping[str, Any]) -> str | None:
     return value or None
 
 
+def _canonical_lifecycle_fields(
+    record: Mapping[str, Any], *, opportunity_id: str
+) -> dict[str, Any]:
+    lifecycle = {
+        "workflow_status": _compact(record.get("workflow_status")).upper(),
+        "evaluation_status": _compact(record.get("evaluation_status")).upper(),
+        "lifecycle_reason_code": _metadata_reason(record),
+    }
+    missing = [key for key, value in lifecycle.items() if not value]
+    if missing:
+        raise LifecycleCheckpointIntegrityError(
+            "incomplete canonical lifecycle truth for "
+            f"{opportunity_id}: {', '.join(missing)}"
+        )
+    return lifecycle
+
+
 def _canonical_lifecycle_map(
     manifest: Mapping[str, Any], root: Path
 ) -> dict[str, dict[str, Any]]:
@@ -88,35 +103,17 @@ def _canonical_lifecycle_map(
             opportunity_id = _compact(raw.get("opportunity_id"))
             if not opportunity_id:
                 continue
-            result[opportunity_id] = {
-                "workflow_status": _compact(raw.get("workflow_status")).upper(),
-                "evaluation_status": _compact(raw.get("evaluation_status")).upper(),
-                "lifecycle_reason_code": _metadata_reason(raw),
-            }
+            lifecycle = _canonical_lifecycle_fields(
+                raw,
+                opportunity_id=opportunity_id,
+            )
+            existing = result.get(opportunity_id)
+            if existing is not None and existing != lifecycle:
+                raise LifecycleCheckpointIntegrityError(
+                    f"conflicting canonical lifecycle truth for {opportunity_id}"
+                )
+            result[opportunity_id] = lifecycle
     return result
-
-
-def _derived_lifecycle(record: Mapping[str, Any]) -> dict[str, Any]:
-    listing_status = _compact(record.get("listing_status")).upper()
-    if listing_status == "HISTORICAL":
-        return {
-            "workflow_status": "HISTORICAL_MARKET_EVIDENCE",
-            "evaluation_status": "HISTORICAL_ONLY",
-            "lifecycle_reason_code": "HISTORICAL_INACTIVE_LISTING",
-        }
-
-    candidate = {
-        "listing_status": listing_status,
-        "top5_eligible": record.get("top5_eligible") is True,
-        "analysis_eligible": record.get("analysis_eligible") is True,
-        "verified": record.get("analysis_eligible") is True,
-    }
-    decision = classify_opportunity_lifecycle(candidate)
-    return {
-        "workflow_status": decision.workflow_status.value,
-        "evaluation_status": decision.evaluation_status.value,
-        "lifecycle_reason_code": decision.reason_code.value,
-    }
 
 
 def _enrich_opportunities(
@@ -127,8 +124,16 @@ def _enrich_opportunities(
         if not isinstance(record, dict):
             continue
         identity = _compact(record.get("opportunity_identity"))
-        lifecycle = dict(canonical.get(identity) or _derived_lifecycle(record))
-        record.update(lifecycle)
+        if not identity:
+            raise LifecycleCheckpointIntegrityError(
+                "checkpoint opportunity is missing opportunity_identity"
+            )
+        lifecycle = canonical.get(identity)
+        if lifecycle is None:
+            raise LifecycleCheckpointIntegrityError(
+                f"missing canonical lifecycle truth for {identity}"
+            )
+        record.update(dict(lifecycle))
 
 
 def _table_exists(connection: sqlite3.Connection, table_name: str) -> bool:

@@ -108,6 +108,8 @@ def test_verified_bauer_truth_survives_checkpoint_lifecycle_and_daily_selection(
                     "listing_status": "ACTIVE",
                     "evaluation_status": "NOT_EVALUATED",
                     "workflow_status": "ACTIVE_OPPORTUNITY",
+                    "top5_eligible": True,
+                    "analysis_eligible": True,
                     "metadata": {
                         "lifecycle_reason_code": "ACTIVE_READY_FOR_ANALYSIS"
                     },

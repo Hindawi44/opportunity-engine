@@ -4,14 +4,45 @@ import json
 from pathlib import Path
 
 from opportunity_engine.discovery.multi_market_operator_checkpoint import (
-    AUKSJONEN_ANALYSIS_BLOCKERS,
     build_multi_market_checkpoint,
+)
+
+
+EXPECTED_AUKSJONEN_EVIDENCE = (
+    "verified exact item-page evidence",
+    "verified quantity and condition",
+    "documented final payable price including auction fees and VAT",
+    "domestic pickup or delivery logistics basis",
+    "documented resale-market evidence",
 )
 
 
 def _write(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value), encoding="utf-8")
+
+
+def _canonical_record(candidate: dict) -> dict:
+    identity = candidate.get("opportunity_identity") or candidate.get("url")
+    listing_status = str(candidate.get("listing_status") or "ACTIVE").upper()
+    historical = listing_status in {"ENDED", "HISTORICAL"} or (
+        candidate.get("opportunity_state") == "HISTORICAL_MARKET_EVIDENCE"
+    )
+    return {
+        "opportunity_id": identity,
+        "listing_status": listing_status,
+        "workflow_status": (
+            "HISTORICAL_MARKET_EVIDENCE" if historical else "CANDIDATE"
+        ),
+        "evaluation_status": "HISTORICAL_ONLY" if historical else "HOLD_WATCHLIST",
+        "top5_eligible": False if historical else bool(candidate.get("top5_eligible")),
+        "analysis_eligible": False if historical else bool(candidate.get("analysis_eligible")),
+        "metadata": {
+            "lifecycle_reason_code": (
+                "HISTORICAL_INACTIVE_LISTING" if historical else "CANDIDATE_DISCOVERED"
+            )
+        },
+    }
 
 
 def _standard_source(
@@ -43,7 +74,7 @@ def _standard_source(
             "currency": currency,
             "record_count": len(candidates),
             "conversion_error_count": 0,
-            "records": [],
+            "records": [_canonical_record(item) for item in candidates],
         },
     )
     _write(
@@ -125,12 +156,33 @@ def test_auksjonen_top5_record_explains_analysis_ineligibility(tmp_path: Path) -
         "listing_status": "ACTIVE",
         "inventory_lot_signal": True,
         "current_bid_nok": 5000,
+        "missing_evidence": list(EXPECTED_AUKSJONEN_EVIDENCE),
     }
     _write(
         directory / "auksjonen-live-clothing-listings.json",
         {"scan_complete": True, "errors": [], "listings": [active]},
     )
     _write(directory / "live-clothing-top5.json", [active])
+    _write(
+        directory / "unified-opportunity-report.json",
+        {
+            "record_count": 1,
+            "conversion_error_count": 0,
+            "records": [
+                {
+                    "opportunity_id": active["url"],
+                    "listing_status": "ACTIVE",
+                    "workflow_status": "REQUIRES_VERIFICATION",
+                    "evaluation_status": "HOLD_WATCHLIST",
+                    "top5_eligible": True,
+                    "analysis_eligible": False,
+                    "metadata": {
+                        "lifecycle_reason_code": "MISSING_REQUIRED_VERIFICATION"
+                    },
+                }
+            ],
+        },
+    )
     no_source = {
         "market_code": "NO",
         "source_name": "Auksjonen.no",
@@ -164,6 +216,6 @@ def test_auksjonen_top5_record_explains_analysis_ineligibility(tmp_path: Path) -
     record = report["deduplicated_opportunities"][0]
     assert record["top5_eligible"] is True
     assert record["analysis_eligible"] is False
-    assert record["missing_evidence"] == sorted(AUKSJONEN_ANALYSIS_BLOCKERS)
-    assert set(AUKSJONEN_ANALYSIS_BLOCKERS).issubset(report["missing_evidence"])
+    assert record["missing_evidence"] == sorted(EXPECTED_AUKSJONEN_EVIDENCE)
+    assert set(EXPECTED_AUKSJONEN_EVIDENCE).issubset(report["missing_evidence"])
     assert report["next_human_action"]["action"] == "REVIEW_ONE_OPPORTUNITY"
