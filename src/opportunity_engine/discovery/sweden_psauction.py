@@ -250,16 +250,19 @@ def build_psauction_clothing_queries(
     """Return a bounded current-first PS Auction query pack.
 
     The request budget is unchanged. Current-window hints consume the first two
-    slots and the existing inventory matrix remains the fallback prefix.
+    slots and the existing inventory matrix remains the fallback prefix. The
+    historical hard maximum is preserved even though the composed pack has two
+    extra priority hints.
     """
     all_queries = (
         *build_psauction_current_window_queries(now),
         *PSAUCTION_CLOTHING_QUERY_MATRIX,
     )
-    if not 1 <= query_budget <= len(all_queries):
+    max_budget = len(PSAUCTION_CLOTHING_QUERY_MATRIX)
+    if not 1 <= query_budget <= max_budget:
         raise ValueError(
             "query_budget must be between 1 and "
-            f"{len(all_queries)}"
+            f"{max_budget}"
         )
     return all_queries[:query_budget]
 
