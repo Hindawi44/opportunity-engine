@@ -2,7 +2,7 @@ name: تشغيل الاختبارات
 
 on:
   push:
-    branches: [main]
+    branches: [main, lab/keyword-shadow-verification-run3-20260817]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -160,7 +160,7 @@ jobs:
   keyword-shadow-verification-v1:
     name: Italy keyword SHADOW page verification
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.keyword_shadow_verify }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.keyword_shadow_verify) || (github.event_name == 'push' && github.ref == 'refs/heads/lab/keyword-shadow-verification-run3-20260817') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -196,9 +196,13 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$OUTPUT_DIR"
+          FRESHNESS="${{ inputs.freshness }}"
+          if [ -z "$FRESHNESS" ]; then
+            FRESHNESS="none"
+          fi
           python scripts/run_keyword_shadow_verification.py \
             --output "$OUTPUT_DIR/keyword-shadow-verification-report.json" \
-            --freshness "${{ inputs.freshness }}"
+            --freshness "$FRESHNESS"
 
       - name: Print verified ranking
         shell: bash
