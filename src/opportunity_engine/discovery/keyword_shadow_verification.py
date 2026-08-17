@@ -120,7 +120,19 @@ def _public_https_url(raw_url: str) -> bool:
 
 
 def _parse_html(body: bytes, encoding: str | None) -> tuple[str, str]:
-    text = body.decode(encoding or "utf-8", errors="replace")
+    requested_encoding = str(encoding or "utf-8").strip() or "utf-8"
+    try:
+        text = body.decode(requested_encoding, errors="replace")
+    except LookupError:
+        # Some legacy sites incorrectly expose a database collation such as
+        # `latin1_general_ci` as the HTTP/HTML charset. Treat a latin1-prefixed
+        # value as ISO-8859-1; otherwise fall back conservatively to UTF-8.
+        fallback_encoding = (
+            "latin-1"
+            if requested_encoding.casefold().startswith(("latin1", "latin-1"))
+            else "utf-8"
+        )
+        text = body.decode(fallback_encoding, errors="replace")
     parser = _VisibleTextParser()
     parser.feed(text)
     title = " ".join(parser.title_parts).strip()
