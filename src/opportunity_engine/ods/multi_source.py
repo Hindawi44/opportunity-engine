@@ -1,13 +1,18 @@
-"""Merge normalized opportunities from multiple sources without losing evidence."""
+"""Merge normalized source evidence into canonical facts without hiding conflicts."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 import re
-from typing import Iterable
+from typing import Any, Iterable
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from .unified_opportunity import UnifiedOpportunity
+
+
+class MultiSourceFactConflictError(ValueError):
+    """Raised when duplicate evidence disagrees on a material canonical fact."""
 
 
 @dataclass(frozen=True)
@@ -20,12 +25,19 @@ class MultiSourceMergeResult:
 
 
 class UnifiedMultiSourceEngine:
-    """Deduplicate cross-source records and retain the most complete version."""
+    """Consolidate evidence while keeping canonical facts conflict-free and auditable."""
 
     TRACKING_QUERY_KEYS = frozenset({
         "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
         "fbclid", "gclid", "ref", "source",
     })
+    MATERIAL_FACT_FIELDS = (
+        "current_price_nok",
+        "city",
+        "ends_at",
+        "mva_status",
+    )
+    PROVENANCE_FIELDS = MATERIAL_FACT_FIELDS + ("fee_text",)
 
     def merge(self, opportunities: Iterable[UnifiedOpportunity]) -> MultiSourceMergeResult:
         items = tuple(opportunities)
@@ -36,8 +48,9 @@ class UnifiedMultiSourceEngine:
         merged: list[UnifiedOpportunity] = []
         groups_merged = 0
         for group in groups.values():
+            self._validate_fact_conflicts(group)
             if len(group) == 1:
-                merged.append(group[0])
+                merged.append(self._annotate_single(group[0]))
                 continue
             groups_merged += 1
             merged.append(self._merge_group(group))
@@ -63,6 +76,11 @@ class UnifiedMultiSourceEngine:
             return f"fingerprint:{title}|{city}|{price}"
         return f"id:{item.opportunity_id}"
 
+    def _annotate_single(self, item: UnifiedOpportunity) -> UnifiedOpportunity:
+        metadata = dict(item.raw_metadata)
+        metadata["fact_provenance"] = self._fact_provenance([item])
+        return replace(item, raw_metadata=metadata)
+
     def _merge_group(self, group: list[UnifiedOpportunity]) -> UnifiedOpportunity:
         ranked = sorted(group, key=self._completeness_score, reverse=True)
         primary = ranked[0]
@@ -78,6 +96,7 @@ class UnifiedMultiSourceEngine:
             "merged_source_document_ids": source_document_ids,
             "merged_urls": urls,
             "merged_record_count": len(group),
+            "fact_provenance": self._fact_provenance(group),
         })
 
         return replace(
@@ -92,6 +111,73 @@ class UnifiedMultiSourceEngine:
             missing_fields=self._recalculate_missing(ranked),
             raw_metadata=raw_metadata,
         )
+
+    def _validate_fact_conflicts(self, group: list[UnifiedOpportunity]) -> None:
+        for field in self.MATERIAL_FACT_FIELDS:
+            observed: dict[object, list[str]] = {}
+            for item in group:
+                value = getattr(item, field)
+                if not self._is_known_fact(field, value):
+                    continue
+                key = self._fact_equivalence_key(field, value)
+                observed.setdefault(key, []).append(self._source_ref(item))
+            if len(observed) > 1:
+                evidence = "; ".join(
+                    f"{key!r} from {', '.join(refs)}"
+                    for key, refs in observed.items()
+                )
+                raise MultiSourceFactConflictError(
+                    f"conflicting canonical fact {field}: {evidence}"
+                )
+
+    def _fact_provenance(
+        self,
+        items: list[UnifiedOpportunity],
+    ) -> dict[str, tuple[str, ...]]:
+        ordered = sorted(
+            items,
+            key=lambda item: (
+                item.source_name.casefold(),
+                item.source_document_id,
+                item.opportunity_id,
+            ),
+        )
+        provenance: dict[str, tuple[str, ...]] = {}
+        for field in self.PROVENANCE_FIELDS:
+            refs = tuple(
+                self._source_ref(item)
+                for item in ordered
+                if self._is_known_fact(field, getattr(item, field))
+            )
+            if refs:
+                provenance[field] = tuple(dict.fromkeys(refs))
+        return provenance
+
+    @staticmethod
+    def _source_ref(item: UnifiedOpportunity) -> str:
+        return f"{item.source_name}:{item.source_document_id}"
+
+    @classmethod
+    def _is_known_fact(cls, field: str, value: Any) -> bool:
+        if value is None or value == "" or value == ():
+            return False
+        if field == "mva_status" and str(value).casefold() == "unknown":
+            return False
+        return True
+
+    @classmethod
+    def _fact_equivalence_key(cls, field: str, value: Any) -> object:
+        if field == "current_price_nok":
+            return round(float(value), 2)
+        if field == "city":
+            return re.sub(r"\s+", " ", str(value)).strip().casefold()
+        if field == "mva_status":
+            return str(value).strip().casefold()
+        if field == "ends_at" and isinstance(value, datetime):
+            if value.tzinfo is not None:
+                return value.astimezone(timezone.utc).isoformat()
+            return value.isoformat()
+        return value
 
     @staticmethod
     def _completeness_score(item: UnifiedOpportunity) -> tuple[int, int, int]:
@@ -113,7 +199,7 @@ class UnifiedMultiSourceEngine:
     def _first_nonempty(items: list[UnifiedOpportunity], field: str):
         for item in items:
             value = getattr(item, field)
-            if value not in (None, "", ()): 
+            if value not in (None, "", ()):
                 return value
         return None
 
@@ -134,11 +220,15 @@ class UnifiedMultiSourceEngine:
 
     @classmethod
     def _recalculate_missing(cls, items: list[UnifiedOpportunity]) -> tuple[str, ...]:
-        fields = ("current_price_nok", "city", "ends_at", "fee_text")
-        missing = [
-            field for field in fields
-            if cls._first_not_none(items, field) is None
-        ]
+        missing: list[str] = []
+        if cls._first_not_none(items, "current_price_nok") is None:
+            missing.append("current_price_nok")
+        if cls._first_nonempty(items, "city") is None:
+            missing.append("city")
+        if cls._first_not_none(items, "ends_at") is None:
+            missing.append("ends_at")
+        if cls._first_nonempty(items, "fee_text") is None:
+            missing.append("fee_text")
         if cls._best_mva_status(items) == "unknown":
             missing.append("mva_status")
         return tuple(missing)
