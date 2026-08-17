@@ -1,17 +1,20 @@
 """Apply explicit commercial inputs to one selected daily opportunity.
 
 This module never estimates missing values. It accepts one manually reviewed,
-analysis-eligible opportunity, validates explicit NOK inputs, and delegates the
-profit decision to the existing conservative ODS decision engine.
+analysis-eligible opportunity, validates explicit NOK inputs, routes acquisition
+cost through the cost engine, derives canonical financial value once, and then
+passes that Value report to the conservative decision engine.
 """
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import asdict
 from typing import Any, Mapping
 
 from opportunity_engine.ods.market_pricing import MarketPriceReport
 from opportunity_engine.ods.opportunity_profit import OpportunityProfitDecisionEngine
-from opportunity_engine.ods.real_cost import RealCostReport
+from opportunity_engine.ods.opportunity_value import OpportunityValueEngine
+from opportunity_engine.ods.real_cost import RealCostEngine, RealCostInputs
 
 SCHEMA_VERSION = "one-opportunity-commercial-analysis-1.0"
 
@@ -164,6 +167,7 @@ def apply_commercial_inputs(
 
     if tasks:
         report["analysis_state"] = "REQUIRES_COMMERCIAL_INPUTS"
+        report["financial_value"] = None
         report["financial_readiness"] = {
             "ready_for_financial_engine": False,
             "total_cost_nok": None,
@@ -187,7 +191,6 @@ def apply_commercial_inputs(
     assert conservative_resale is not None
     assert comparable_count is not None and comparable_count > 0
 
-    total_cost = final_payable + transport
     market = MarketPriceReport(
         opportunity_id=supplied_identity,
         comparable_count=comparable_count,
@@ -196,26 +199,33 @@ def apply_commercial_inputs(
         high_price_nok=None,
         conservative_resale_nok=conservative_resale,
         confidence=_market_confidence(comparable_count),
-        comparable_ids=tuple(f"manual-comparable:{index}" for index in range(1, comparable_count + 1)),
+        comparable_ids=tuple(
+            f"manual-comparable:{index}" for index in range(1, comparable_count + 1)
+        ),
         warnings=(
             "Conservative resale is a manual aggregate input; individual comparable details are not stored in this version.",
         ),
     )
-    costs = RealCostReport(
-        purchase_price_nok=final_payable,
-        auction_fee_nok=0.0,
-        vat_nok=0.0,
-        direct_costs_nok=round(transport, 2),
-        contingency_nok=0.0,
-        total_cost_nok=round(total_cost, 2),
-        missing_fields=(),
-        warnings=(
-            "purchase_price_nok represents the entered final payable price including auction fees and VAT.",
-        ),
-        is_complete=True,
+    costs = RealCostEngine().calculate(
+        RealCostInputs(
+            purchase_price_nok=final_payable,
+            auction_fee_nok=0.0,
+            vat_status="included",
+            transport_nok=transport,
+            dismantling_nok=0.0,
+            storage_nok=0.0,
+            repair_nok=0.0,
+            cleaning_nok=0.0,
+            selling_cost_nok=0.0,
+            other_cost_nok=0.0,
+            contingency_rate=0.0,
+        )
     )
-    decision = OpportunityProfitDecisionEngine().decide(market, costs)
-    decision_code = {"buy": "BUY", "monitor": "WATCH", "reject": "REJECT"}[decision.decision]
+    value = OpportunityValueEngine().evaluate(market, costs)
+    decision = OpportunityProfitDecisionEngine().decide(value)
+    decision_code = {"buy": "BUY", "monitor": "WATCH", "reject": "REJECT"}[
+        decision.decision
+    ]
     next_action = {
         "BUY": "REVIEW_BUY_OR_BID_CANDIDATE",
         "WATCH": "WATCH_OPPORTUNITY",
@@ -224,14 +234,15 @@ def apply_commercial_inputs(
 
     report["analysis_state"] = "FINANCIAL_DECISION_COMPLETE"
     report["required_analysis_tasks"] = []
+    report["financial_value"] = asdict(value)
     report["financial_readiness"] = {
         "ready_for_financial_engine": True,
-        "total_cost_nok": decision.total_cost_nok,
-        "conservative_resale_nok": decision.conservative_resale_nok,
-        "expected_profit_nok": decision.expected_profit_nok,
-        "roi": decision.roi,
-        "margin_on_resale": decision.margin_on_resale,
-        "maximum_final_payable_price_nok": decision.maximum_purchase_price_nok,
+        "total_cost_nok": value.total_cost_nok,
+        "conservative_resale_nok": value.conservative_resale_nok,
+        "expected_profit_nok": value.expected_profit_nok,
+        "roi": value.roi,
+        "margin_on_resale": value.margin_on_resale,
+        "maximum_final_payable_price_nok": value.maximum_purchase_price_nok,
         "maximum_source_bid_nok": None,
     }
     report["financial_decision"] = {
