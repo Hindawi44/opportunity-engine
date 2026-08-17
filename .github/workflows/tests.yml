@@ -5,6 +5,30 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      keyword_lab:
+        description: Run KEYWORD_DISCOVERY_LAB_V1 after tests pass
+        required: false
+        default: false
+        type: boolean
+      keyword_limit:
+        description: Number of Italian keyword candidates to test
+        required: false
+        default: "10"
+      results_per_keyword:
+        description: Brave results per keyword (bounded to 10)
+        required: false
+        default: "5"
+      freshness:
+        description: Search freshness window
+        required: false
+        default: none
+        type: choice
+        options:
+          - none
+          - pm
+          - py
 
 jobs:
   test:
@@ -42,6 +66,91 @@ jobs:
       - name: إنهاء بالفشل عند فشل الاختبارات
         if: steps.pytest.outputs.exit_code != '0'
         run: exit 1
+
+  keyword-discovery-lab-v1:
+    name: Italy keyword quality shadow lab
+    needs: test
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.keyword_lab }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/keyword-discovery-lab-v1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify lab unit contracts
+        run: pytest tests/test_keyword_discovery_lab.py -q
+
+      - name: Confirm bounded search configuration
+        shell: bash
+        run: |
+          if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
+            echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
+            exit 1
+          fi
+          KEYWORD_LIMIT="${{ inputs.keyword_limit }}"
+          RESULTS_PER_KEYWORD="${{ inputs.results_per_keyword }}"
+          if [ "$KEYWORD_LIMIT" -lt 1 ] || [ "$KEYWORD_LIMIT" -gt 10 ]; then
+            echo "V1 workflow allows 1..10 keywords only" >&2
+            exit 1
+          fi
+          if [ "$RESULTS_PER_KEYWORD" -lt 1 ] || [ "$RESULTS_PER_KEYWORD" -gt 10 ]; then
+            echo "results_per_keyword must be 1..10" >&2
+            exit 1
+          fi
+
+      - name: Run bounded shadow keyword lab
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_keyword_discovery_lab.py \
+            --output "$OUTPUT_DIR/keyword-lab-report.json" \
+            --keyword-limit "${{ inputs.keyword_limit }}" \
+            --results-per-keyword "${{ inputs.results_per_keyword }}" \
+            --freshness "${{ inputs.freshness }}"
+
+      - name: Print ranked keyword summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("artifacts/keyword-discovery-lab-v1/keyword-lab-report.json").read_text())
+          print("status:", report.get("status"))
+          print("queries:", report.get("queries_succeeded"), "/", report.get("queries_attempted"))
+          print("PROMOTE:", report.get("promote_count", 0))
+          print("SHADOW:", report.get("shadow_count", 0))
+          print("REJECT:", report.get("reject_count", 0))
+          print("\nRANKING")
+          for item in report.get("ranking", []):
+              print(
+                  f"#{item['rank']:02d} {item['score']:6.2f} {item['decision']:7s} "
+                  f"yield={item['actionable_yield']:.2f} fp={item['false_positive_ratio']:.2f} "
+                  f"{item['query']}"
+              )
+          PY
+
+      - name: Upload keyword lab artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyword-discovery-lab-v1
+          path: artifacts/keyword-discovery-lab-v1/keyword-lab-report.json
+          if-no-files-found: error
+          retention-days: 30
 
   italy-market-discovery-live:
     name: Italy market discovery live validation
