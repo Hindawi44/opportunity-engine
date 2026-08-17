@@ -1,6 +1,6 @@
 # Sweden Search Foundation — CURRENT-FIRST V1
 
-Status: implementation under offline validation. Sweden is **not PROVEN** by this change alone.
+Status: **OFFLINE VALIDATED**. Sweden is still **NOT PROVEN** until independent live/scheduled evidence passes the frozen Search Validation Gate.
 
 ## Evidence that motivated the repair
 Saved scheduled Run #190 showed:
@@ -38,6 +38,12 @@ Blinto and Klaravik now use one shared `SWEDEN_CURRENT_FIRST_V1` retrieval polic
 - No bid, contact, purchase, payment, or automated commercial action is added.
 - No Norway, Germany, Italy, or other-country logic is changed.
 
+## Offline validation result
+
+- Full repository pytest: **1899 passed, 0 failed** (1 unrelated deprecation warning).
+- Pull-request live market jobs: skipped.
+- Paid Sweden search used for implementation validation: **0**.
+
 ## Proof discipline
 
-This repair does not declare Sweden PROVEN. After offline CI passes, Sweden still requires the frozen Search Validation Gate evidence from independent live/scheduled runs before the country can be closed.
+This repair does not declare Sweden PROVEN. Sweden still requires the frozen Search Validation Gate evidence from independent live/scheduled runs before the country can be closed.
