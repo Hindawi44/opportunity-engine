@@ -27,7 +27,7 @@ def select_market_runner(market: str) -> Callable[[], int]:
 
         return main
     if normalized == "SE":
-        from scripts.run_sweden_clothing_inventory_discovery_search import main
+        from scripts.run_sweden_clothing_inventory_discovery_search_current_first import main
 
         return main
     if normalized == "DE":
