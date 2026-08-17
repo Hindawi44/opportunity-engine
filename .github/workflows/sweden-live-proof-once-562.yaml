@@ -1,0 +1,80 @@
+name: Sweden Live Proof Once 562 V3
+
+on:
+  push:
+    branches:
+      - agent/sweden-live-proof-once-562
+
+permissions:
+  contents: read
+
+jobs:
+  blinto-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/sweden-live-proof-once-562-v3
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-playwright.txt
+      - name: Confirm Brave secret exists
+        run: |
+          if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
+            echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
+            exit 1
+          fi
+      - name: Run bounded Sweden Blinto V3 live proof
+        run: |
+          python scripts/run_market_clothing_inventory_discovery.py \
+            --market SE \
+            --source blinto \
+            --output-dir "$OUTPUT_DIR" \
+            --query-budget 4 \
+            --results-per-query 10 \
+            --freshness none \
+            --verify-pages \
+            --verification-limit 20
+      - name: Print proof summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("artifacts/sweden-live-proof-once-562-v3")
+          report = json.loads((root / "search-run-report.json").read_text(encoding="utf-8"))
+          d = report.get("source_diagnostics") or {}
+          print("status:", report.get("status"))
+          print("queries_submitted:", report.get("queries_submitted"))
+          print("hits_received:", report.get("hits_received"))
+          print("unique_public_urls:", report.get("unique_public_urls"))
+          print("merged_candidates:", report.get("merged_candidates"))
+          print("confirmed_sales:", report.get("confirmed_sales"))
+          print("ended_or_historical:", report.get("ended_or_historical"))
+          print("top5_count:", report.get("top5_count"))
+          print("raw_hits:", d.get("raw_hits"))
+          print("accepted_hits:", d.get("accepted_hits"))
+          print("rejected_hits:", d.get("rejected_hits"))
+          print("current_first_policy:", d.get("current_first_policy"))
+          print("current_window_identity_count:", d.get("current_window_identity_count"))
+          print("current_window_priority_applied:", d.get("current_window_priority_applied"))
+          print("generic_fallback_deferred_count:", d.get("generic_fallback_deferred_count"))
+          print("generic_fallback_preserved_count:", d.get("generic_fallback_preserved_count"))
+          print("current_first_duplicate_count:", d.get("current_first_duplicate_count"))
+          print("current_query_literal_month_required:", d.get("current_query_literal_month_required"))
+          print("current_query_uses_live_auction_cues:", d.get("current_query_uses_live_auction_cues"))
+          print("current_first_query_diagnostics:")
+          print(json.dumps(d.get("current_first_query_diagnostics") or [], ensure_ascii=False, indent=2))
+          PY
+      - name: Upload proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweden-live-proof-once-562-v3
+          path: artifacts/sweden-live-proof-once-562-v3
+          if-no-files-found: warn
