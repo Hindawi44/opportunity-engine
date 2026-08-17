@@ -2,7 +2,7 @@ name: تشغيل الاختبارات
 
 on:
   push:
-    branches: [main]
+    branches: [main, lab/keyword-shadow-verification-run-20260817]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -160,7 +160,7 @@ jobs:
   keyword-shadow-verification-v1:
     name: Italy keyword SHADOW page verification
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.keyword_shadow_verify }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.keyword_shadow_verify) || (github.event_name == 'push' && github.ref == 'refs/heads/lab/keyword-shadow-verification-run-20260817') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
