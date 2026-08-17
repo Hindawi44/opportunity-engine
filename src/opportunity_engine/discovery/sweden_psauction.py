@@ -9,8 +9,10 @@ from __future__ import annotations
 import re
 from collections import Counter
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Iterable, Sequence
 from urllib.parse import urlparse
+from zoneinfo import ZoneInfo
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     DiscoveryQuery,
@@ -20,10 +22,17 @@ from opportunity_engine.discovery.search_provider import SearchHit, SearchProvid
 
 PSAUCTION_HOST = "psauction.se"
 PSAUCTION_ITEM_PATH = re.compile(r"^/item/view/(?P<item_id>\d+)/[^/?#]+/?$", re.I)
+_STOCKHOLM_TZ = ZoneInfo("Europe/Stockholm")
+PSAUCTION_CURRENT_QUERY_IDS = frozenset({
+    "se-ps-current-01",
+    "se-ps-current-02",
+})
 
-# Keep the default eight-query daily budget inventory-first. Exact status-marker
-# queries remain in the full matrix for deeper/manual runs, but they must not
-# consume half of the normal discovery budget before inventory terms are tried.
+# The legacy matrix remains inventory-first and is retained as bounded fallback
+# coverage. The normal daily builder prepends two current-month status-intent
+# queries without increasing the eight-request budget. The month token is only
+# a retrieval-priority hint; exact-page verification remains authoritative for
+# ACTIVE/ENDED state.
 PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
     DiscoveryQuery(
         "se-ps-05",
@@ -201,16 +210,58 @@ class PSAuctionGateDecision:
     reason: str
 
 
+def build_psauction_current_window_queries(
+    now: datetime | None = None,
+) -> tuple[DiscoveryQuery, ...]:
+    """Build two bounded current-month retrieval hints for PS Auction.
+
+    These queries only improve which exact item identities reach verification
+    first. A month token or search snippet never establishes ACTIVE state.
+    """
+    local_now = now or datetime.now(_STOCKHOLM_TZ)
+    if local_now.tzinfo is None:
+        local_now = local_now.replace(tzinfo=_STOCKHOLM_TZ)
+    else:
+        local_now = local_now.astimezone(_STOCKHOLM_TZ)
+    month = local_now.strftime("%Y-%m")
+    return (
+        DiscoveryQuery(
+            "se-ps-current-01",
+            "AUCTION",
+            "SALE_INTENT",
+            "CLOTHING_INVENTORY",
+            f'site:psauction.se/item/view kläder parti "Auktionen avslutas" {month}',
+        ),
+        DiscoveryQuery(
+            "se-ps-current-02",
+            "AUCTION",
+            "SALE_INTENT",
+            "CLOTHING_INVENTORY",
+            f'site:psauction.se/item/view arbetskläder lager "Auktionen avslutas" {month}',
+        ),
+    )
+
+
 def build_psauction_clothing_queries(
     query_budget: int = 8,
+    *,
+    now: datetime | None = None,
 ) -> tuple[DiscoveryQuery, ...]:
-    """Return a bounded prefix of the PS Auction query matrix."""
-    if not 1 <= query_budget <= len(PSAUCTION_CLOTHING_QUERY_MATRIX):
+    """Return a bounded current-first PS Auction query pack.
+
+    The request budget is unchanged. Current-window hints consume the first two
+    slots and the existing inventory matrix remains the fallback prefix.
+    """
+    all_queries = (
+        *build_psauction_current_window_queries(now),
+        *PSAUCTION_CLOTHING_QUERY_MATRIX,
+    )
+    if not 1 <= query_budget <= len(all_queries):
         raise ValueError(
             "query_budget must be between 1 and "
-            f"{len(PSAUCTION_CLOTHING_QUERY_MATRIX)}"
+            f"{len(all_queries)}"
         )
-    return PSAUCTION_CLOTHING_QUERY_MATRIX[:query_budget]
+    return all_queries[:query_budget]
 
 
 def _normalized_host(host: str | None) -> str:
