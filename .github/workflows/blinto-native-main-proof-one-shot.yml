@@ -1,0 +1,90 @@
+name: Blinto Native Main Proof One Shot
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/blinto-native-main-proof-one-shot.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  blinto-native-main-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run BLINTO_NATIVE_LIVE_DISCOVERY_V1
+        run: |
+          python scripts/run_blinto_native_live_discovery.py \
+            --output-dir artifacts/blinto-native-main-proof \
+            --results-per-query 20 \
+            --verification-limit 20 | tee artifacts/blinto-native-main-proof-console.txt
+
+      - name: Enforce proof contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/blinto-native-main-proof")
+          report_path = root / "search-run-report.json"
+          if not report_path.exists():
+              raise SystemExit("Missing search-run-report.json")
+          report = json.loads(report_path.read_text(encoding="utf-8"))
+          source = report.get("source_diagnostics") or {}
+          verifier = report.get("source_page_verifier_diagnostics") or {}
+
+          print("BLINTO_NATIVE_MAIN_PROOF")
+          print("source_mode=", report.get("source_mode"))
+          print("brave_requests=", report.get("brave_requests"))
+          print("paid_search_used=", report.get("paid_search_used"))
+          print("search_engine_used=", report.get("search_engine_used"))
+          print("listing_requests=", source.get("listing_requests"))
+          print("accepted_hits=", source.get("accepted_hits"))
+          print("exact_page_verification_attempts=", verifier.get("exact_page_verification_attempts"))
+          print("active_pages=", verifier.get("active_pages"))
+          print("confirmed_sales=", report.get("confirmed_sales"))
+          print("top5_count=", report.get("top5_count"))
+
+          if report.get("source_mode") != "BLINTO_NATIVE_LIVE":
+              raise SystemExit("Wrong source_mode")
+          if report.get("brave_requests") != 0:
+              raise SystemExit("Brave usage detected")
+          if report.get("paid_search_used") is not False:
+              raise SystemExit("Paid search usage detected")
+          if report.get("search_engine_used") is not False:
+              raise SystemExit("Search engine usage detected")
+          if (source.get("listing_requests") or 0) < 1:
+              raise SystemExit("Native Blinto listing was not fetched")
+          if (source.get("accepted_hits") or 0) < 1:
+              raise SystemExit("No native clothing candidate was accepted")
+          if (verifier.get("exact_page_verification_attempts") or 0) < 1:
+              raise SystemExit("No exact Blinto page was verified")
+          if (verifier.get("active_pages") or 0) < 1:
+              raise SystemExit("No ACTIVE Blinto page was proven")
+          if (report.get("confirmed_sales") or 0) < 1:
+              raise SystemExit("No CONFIRMED_SALE was proven")
+          PY
+
+      - name: Upload proof artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blinto-native-main-proof-one-shot
+          path: |
+            artifacts/blinto-native-main-proof
+            artifacts/blinto-native-main-proof-console.txt
+          if-no-files-found: warn
