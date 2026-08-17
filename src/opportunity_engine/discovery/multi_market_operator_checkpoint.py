@@ -144,15 +144,72 @@ def _analysis_missing_evidence(
     source_name: str,
     top5_eligible: bool,
     analysis_eligible: bool,
+    canonical_lifecycle: bool = False,
 ) -> list[str]:
     values = _missing_evidence(record)
+    # Compatibility only: legacy Auksjonen artifacts did not carry canonical
+    # lifecycle truth and therefore needed checkpoint-side generic blockers.
+    # Once a unified canonical record exists, the checkpoint must not invent or
+    # re-derive blockers from eligibility flags.
     if (
-        source_name.casefold().startswith("auksjonen")
+        not canonical_lifecycle
+        and source_name.casefold().startswith("auksjonen")
         and top5_eligible
         and not analysis_eligible
     ):
         values.extend(AUKSJONEN_ANALYSIS_BLOCKERS)
     return sorted(set(values))
+
+
+def _canonical_lifecycle_index(unified: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+    """Index lifecycle-owned unified records by their canonical opportunity ID."""
+    result: dict[str, Mapping[str, Any]] = {}
+    records = unified.get("records")
+    if not isinstance(records, list):
+        return result
+    for raw in records:
+        if not isinstance(raw, Mapping):
+            continue
+        identity = _compact(raw.get("opportunity_id"))
+        if identity:
+            result[identity] = raw
+    return result
+
+
+def _apply_canonical_lifecycle(
+    records: list[dict[str, Any]],
+    *,
+    source_name: str,
+    unified: Mapping[str, Any],
+) -> None:
+    """Overlay lifecycle-owned state without replacing source-native evidence.
+
+    Discovery records remain the evidence carrier. The unified report is produced
+    through ``opportunity_lifecycle.py`` and therefore owns lifecycle/status and
+    eligibility truth whenever the same stable opportunity identity is present.
+    """
+    canonical = _canonical_lifecycle_index(unified)
+    for record in records:
+        identity = opportunity_identity(record, source_name)
+        lifecycle = canonical.get(identity)
+        if lifecycle is None:
+            continue
+        for key in (
+            "listing_status",
+            "workflow_status",
+            "evaluation_status",
+            "verified",
+            "top5_eligible",
+            "analysis_eligible",
+        ):
+            if key in lifecycle:
+                record[key] = lifecycle[key]
+        metadata = lifecycle.get("metadata")
+        if isinstance(metadata, Mapping):
+            reason_code = _compact(metadata.get("lifecycle_reason_code"))
+            if reason_code:
+                record["lifecycle_reason_code"] = reason_code
+        record["_canonical_lifecycle_present"] = True
 
 
 def _source_files(spec: Mapping[str, Any], root: Path) -> dict[str, Path]:
@@ -224,8 +281,8 @@ def _load_source(spec: Mapping[str, Any], root: Path) -> dict[str, Any]:
             item for item in raw_records if item.get("inventory_lot_signal") is True
         ]
         # Source-native candidates are written after exact item-page verification
-        # and therefore own eligibility/evidence truth. The raw public listing
-        # report remains a compatibility fallback for older artifacts/tests only.
+        # and therefore own evidence truth. The raw public listing report remains
+        # a compatibility fallback for older artifacts/tests only.
         verified_candidates = _as_list(candidates)
         records = verified_candidates if verified_candidates else raw_records
         top5_records = _as_list(top5)
@@ -269,6 +326,11 @@ def _load_source(spec: Mapping[str, Any], root: Path) -> dict[str, Any]:
             )
         if int(unified.get("conversion_error_count") or 0) != 0:
             raise CheckpointIntegrityError(f"{source_name} has unified conversion errors")
+        _apply_canonical_lifecycle(
+            records,
+            source_name=source_name,
+            unified=unified,
+        )
 
     if isinstance(persistence, Mapping):
         persisted_count = int(persistence.get("persisted_record_count") or 0)
@@ -344,10 +406,27 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
             record = deepcopy(dict(raw))
             identity = opportunity_identity(record, source_name)
             status = _record_status(record)
+            canonical_lifecycle = record.get("_canonical_lifecycle_present") is True
             raw_top5_eligible = bool(record.get("top5_eligible")) or identity in top5_ids
             raw_analysis_eligible = bool(record.get("analysis_eligible"))
-            top5_eligible = raw_top5_eligible and status == "ACTIVE"
-            analysis_eligible = raw_analysis_eligible and status == "ACTIVE"
+
+            if canonical_lifecycle:
+                # Observer rule: canonical lifecycle owns eligibility. The
+                # checkpoint may validate it, but may not rewrite it.
+                top5_eligible = record.get("top5_eligible") is True
+                analysis_eligible = record.get("analysis_eligible") is True
+                if (top5_eligible or analysis_eligible) and status != "ACTIVE":
+                    raise CheckpointIntegrityError(
+                        f"{source_name} canonical lifecycle marks non-active record "
+                        f"eligible: {identity}"
+                    )
+            else:
+                # Legacy compatibility for source artifacts that predate unified
+                # lifecycle output. Remove this fallback only after all sources
+                # are proven to emit canonical records.
+                top5_eligible = raw_top5_eligible and status == "ACTIVE"
+                analysis_eligible = raw_analysis_eligible and status == "ACTIVE"
+
             normalized = {
                 "opportunity_identity": identity,
                 "title": _first_text(record, ("title", "name")),
@@ -363,6 +442,7 @@ def _merge_records(source_runs: Sequence[Mapping[str, Any]]) -> list[dict[str, A
                     source_name=source_name,
                     top5_eligible=top5_eligible,
                     analysis_eligible=analysis_eligible,
+                    canonical_lifecycle=canonical_lifecycle,
                 ),
                 "source_urls": list(record.get("source_urls") or []),
                 "canonical_url": _first_text(record, ("canonical_url", "url")),
