@@ -44,6 +44,10 @@ def test_extracts_analysis_ready_record() -> None:
     assert opportunity.mva_status == "excluded"
     assert opportunity.image_urls == ("https://images.example/1.jpg",)
     assert opportunity.missing_fields == ()
+    assert opportunity.raw_metadata["source_evidence_identity"] == (
+        "auksjonen.no",
+        "auksjonen-123",
+    )
 
 
 def test_missing_values_are_reported_not_invented() -> None:
@@ -55,9 +59,9 @@ def test_missing_values_are_reported_not_invented() -> None:
     assert set(opportunity.missing_fields) == {"current_price_nok", "city", "ends_at"}
 
 
-def test_unsupported_documents_and_duplicates_are_skipped() -> None:
+def test_unsupported_documents_and_exact_duplicates_are_skipped() -> None:
     supported = _document(current_price_nok=1)
-    duplicate = _document(current_price_nok=2)
+    duplicate = _document(current_price_nok=1)
     unsupported = SourceDocument(
         document_id="ssb-1",
         source_name="SSB",

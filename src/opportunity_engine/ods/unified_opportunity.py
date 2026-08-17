@@ -1,13 +1,15 @@
-"""Normalize auction source documents into analysis-ready opportunities."""
+"""Normalize auditable source evidence into analysis-ready canonical facts."""
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
+import hashlib
 import re
 from typing import Any, Iterable
 
-from .live_data import SourceDocument
+from .live_data import SourceDocument, deduplicate_source_documents
 
 
 @dataclass(frozen=True)
@@ -31,7 +33,7 @@ class UnifiedOpportunity:
 
 
 class UnifiedOpportunityExtractor:
-    """Convert supported auction documents without inventing missing facts."""
+    """Convert supported evidence without inventing facts or hiding identity conflicts."""
 
     name = "unified_opportunity_extractor"
     supported_source_types = frozenset(
@@ -43,19 +45,38 @@ class UnifiedOpportunityExtractor:
     )
 
     def extract(self, documents: Iterable[SourceDocument]) -> tuple[UnifiedOpportunity, ...]:
+        evidence = deduplicate_source_documents(documents)
+        supported = tuple(
+            document
+            for document in evidence
+            if document.source_type in self.supported_source_types and document.url
+        )
+        document_id_counts = Counter(document.document_id for document in supported)
+
         opportunities: list[UnifiedOpportunity] = []
-        seen: set[str] = set()
-        for document in documents:
-            if document.source_type not in self.supported_source_types or not document.url:
-                continue
-            opportunity = self._extract_one(document)
-            if opportunity.opportunity_id in seen:
-                continue
-            seen.add(opportunity.opportunity_id)
-            opportunities.append(opportunity)
+        for document in supported:
+            collision = document_id_counts[document.document_id] > 1
+            opportunity_id = self._opportunity_id(document, collision=collision)
+            opportunities.append(
+                self._extract_one(document, opportunity_id=opportunity_id)
+            )
         return tuple(opportunities)
 
-    def _extract_one(self, document: SourceDocument) -> UnifiedOpportunity:
+    @classmethod
+    def _opportunity_id(cls, document: SourceDocument, *, collision: bool) -> str:
+        if not collision:
+            return f"unified-{document.document_id}"
+        source = document.source_name.strip().casefold()
+        slug = re.sub(r"[^a-z0-9æøå]+", "-", source).strip("-") or "source"
+        digest = hashlib.sha256(source.encode("utf-8")).hexdigest()[:8]
+        return f"unified-{slug}-{digest}-{document.document_id}"
+
+    def _extract_one(
+        self,
+        document: SourceDocument,
+        *,
+        opportunity_id: str,
+    ) -> UnifiedOpportunity:
         metadata = dict(document.metadata)
         price = _as_non_negative_float(metadata.get("current_price_nok"))
         city = _clean_optional(metadata.get("city"))
@@ -77,8 +98,13 @@ class UnifiedOpportunityExtractor:
         if mva_status == "unknown":
             missing.append("mva_status")
 
+        metadata["source_evidence_identity"] = (
+            document.source_name.strip().casefold(),
+            document.document_id.strip(),
+        )
+
         return UnifiedOpportunity(
-            opportunity_id=f"unified-{document.document_id}",
+            opportunity_id=opportunity_id,
             source_name=document.source_name,
             source_document_id=document.document_id,
             title=document.title.strip(),
