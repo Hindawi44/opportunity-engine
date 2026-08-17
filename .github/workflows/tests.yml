@@ -304,15 +304,18 @@ jobs:
 
       - name: Run bounded live Netherlands discovery and identity resolution
         run: |
-          python scripts/build_netherlands_clothing_inventory_discovery_search.py \
-            --output-dir artifacts/netherlands-clothing-discovery-live
+          python scripts/build_netherlands_market_discovery.py \
+            --output artifacts/netherlands-market-discovery/netherlands-market-discovery.json \
+            --identity-output artifacts/netherlands-market-discovery/netherlands-entity-identity-resolution.json
 
       - name: Upload live Netherlands discovery artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: netherlands-market-discovery-v1
-          path: artifacts/netherlands-clothing-discovery-live
+          path: |
+            artifacts/netherlands-market-discovery/netherlands-market-discovery.json
+            artifacts/netherlands-market-discovery/netherlands-entity-identity-resolution.json
           if-no-files-found: error
           retention-days: 30
 
