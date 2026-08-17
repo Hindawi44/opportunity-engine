@@ -2,7 +2,7 @@ name: تشغيل الاختبارات
 
 on:
   push:
-    branches: [main]
+    branches: [main, lab/keyword-discovery-run-20260817]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -70,7 +70,7 @@ jobs:
   keyword-discovery-lab-v1:
     name: Italy keyword quality shadow lab
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.keyword_lab }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.keyword_lab) || github.ref == 'refs/heads/lab/keyword-discovery-run-20260817' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -100,8 +100,8 @@ jobs:
             echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
             exit 1
           fi
-          KEYWORD_LIMIT="${{ inputs.keyword_limit }}"
-          RESULTS_PER_KEYWORD="${{ inputs.results_per_keyword }}"
+          KEYWORD_LIMIT="${{ inputs.keyword_limit || '10' }}"
+          RESULTS_PER_KEYWORD="${{ inputs.results_per_keyword || '5' }}"
           if [ "$KEYWORD_LIMIT" -lt 1 ] || [ "$KEYWORD_LIMIT" -gt 10 ]; then
             echo "V1 workflow allows 1..10 keywords only" >&2
             exit 1
@@ -117,9 +117,9 @@ jobs:
           mkdir -p "$OUTPUT_DIR"
           python scripts/run_keyword_discovery_lab.py \
             --output "$OUTPUT_DIR/keyword-lab-report.json" \
-            --keyword-limit "${{ inputs.keyword_limit }}" \
-            --results-per-keyword "${{ inputs.results_per_keyword }}" \
-            --freshness "${{ inputs.freshness }}"
+            --keyword-limit "${{ inputs.keyword_limit || '10' }}" \
+            --results-per-keyword "${{ inputs.results_per_keyword || '5' }}" \
+            --freshness "${{ inputs.freshness || 'none' }}"
 
       - name: Print ranked keyword summary
         shell: bash
