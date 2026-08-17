@@ -46,7 +46,7 @@ def _klaravik_hit(slug: str, title="Kläder och skor, parti"):
     )
 
 
-def test_current_first_builders_keep_eight_request_budget_and_use_retail_liquidation_language():
+def test_current_first_builders_keep_eight_request_budget_and_use_live_auction_cues():
     blinto = build_blinto_current_first_queries(8, now=_now())
     klaravik = build_klaravik_current_first_queries(8, now=_now())
 
@@ -57,19 +57,23 @@ def test_current_first_builders_keep_eight_request_budget_and_use_retail_liquida
 
     for query in (*blinto[:2], *klaravik[:2]):
         text = query.query.casefold()
-        assert "augusti 2026" in text
+        assert "augusti 2026" not in text
         assert "arbetskläder" not in text
-        assert "auktionen avslutas" not in text
-        assert "nuvarande bud" not in text
+        assert "kläder" in text or "mode" in text or "skor" in text
 
     assert "klädbutik" in blinto[0].query
     assert "modebutik" in blinto[0].query
     assert "butikslager" in blinto[0].query
+    assert "Auktionen avslutas" in blinto[0].query
+    assert "Högsta bud" in blinto[0].query
     assert "utförsäljning" in blinto[1].query
     assert "avveckling" in blinto[1].query
     assert "konkurs" in blinto[1].query
+
     assert "klädbutik" in klaravik[0].query
     assert "butikslager" in klaravik[0].query
+    assert "Auktionen avslutas" in klaravik[0].query
+    assert "Nuvarande bud" in klaravik[0].query
     assert "restlager" in klaravik[1].query
 
 
@@ -100,13 +104,15 @@ def test_blinto_current_occurrence_gets_priority_but_generic_fallback_is_preserv
     diagnostics = provider.diagnostics()
     assert len(raw.calls) == 8
     assert diagnostics["requests_made"] == 8
-    assert diagnostics["current_first_policy"] == "SWEDEN_CURRENT_FIRST_V2_VERIFY_BEFORE_SUPPRESS"
+    assert diagnostics["current_first_policy"] == "SWEDEN_CURRENT_FIRST_V3_ACTIVE_CUE_RETRIEVAL"
     assert diagnostics["current_window_priority_applied"] is True
     assert diagnostics["current_window_identities"] == ["99002"]
     assert diagnostics["generic_fallback_deferred_count"] == 0
     assert diagnostics["generic_fallback_preserved_count"] == 1
     assert diagnostics["current_window_is_active_proof"] is False
     assert diagnostics["fallback_suppression_requires_verified_active"] is True
+    assert diagnostics["current_query_literal_month_required"] is False
+    assert diagnostics["current_query_uses_live_auction_cues"] is True
 
 
 def test_blinto_relisting_identity_uses_occurrence_not_object_id():
