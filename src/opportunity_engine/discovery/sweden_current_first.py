@@ -2,7 +2,7 @@
 
 The policy changes retrieval priority only. It does not increase Brave requests,
 weaken exact-page ACTIVE/ENDED verification, or change commercial eligibility.
-Current-window search hits are hints, never ACTIVE proof, so unrelated fallback
+Current-intent search hits are hints, never ACTIVE proof, so unrelated fallback
 identities must remain available until exact source-page verification decides
 lifecycle state. Blinto keeps auction-occurrence identity and Klaravik keeps
 exact product-slug identity.
@@ -73,8 +73,16 @@ def build_blinto_current_first_queries(
     *,
     now: datetime | None = None,
 ) -> tuple[DiscoveryQuery, ...]:
-    """Lead with Swedish retail-liquidation language inside the same budget."""
-    window = _swedish_current_window(now)
+    """Lead with retail-liquidation intent plus live-auction language.
+
+    The previous V2 queries required a literal month/year phrase such as
+    ``"augusti 2026"``. The first live proof after PR #562 showed that both
+    current queries returned zero indexed hits, even though fallback queries
+    returned valid Blinto auction pages. V3 therefore removes the fragile month
+    literal and uses auction-state phrases as retrieval cues. Exact page
+    verification remains the only lifecycle authority.
+    """
+    _stockholm_now(now)  # normalize supplied datetimes for deterministic tests
     current = (
         DiscoveryQuery(
             "se-bl-current-01",
@@ -83,8 +91,9 @@ def build_blinto_current_first_queries(
             "CLOTHING_INVENTORY",
             (
                 "site:blinto.se/auction "
-                "(klädbutik OR modebutik OR butikslager) "
-                f"(kläder OR skor OR accessoarer) \"{window}\""
+                "(klädbutik OR modebutik OR butikslager OR restlager) "
+                "(kläder OR skor OR accessoarer) "
+                "(\"Auktionen avslutas\" OR \"Högsta bud\")"
             ),
         ),
         DiscoveryQuery(
@@ -95,7 +104,8 @@ def build_blinto_current_first_queries(
             (
                 "site:blinto.se/auction "
                 "(utförsäljning OR avveckling OR konkurs OR restlager) "
-                f"(kläder OR mode OR skor) \"{window}\""
+                "(kläder OR mode OR skor) "
+                "(\"Auktionen avslutas\" OR \"Högsta bud\")"
             ),
         ),
     )
@@ -107,8 +117,8 @@ def build_klaravik_current_first_queries(
     *,
     now: datetime | None = None,
 ) -> tuple[DiscoveryQuery, ...]:
-    """Lead with Swedish retail-liquidation language inside the same budget."""
-    window = _swedish_current_window(now)
+    """Lead with retail-liquidation intent plus live-auction language."""
+    _stockholm_now(now)
     current = (
         DiscoveryQuery(
             "se-kl-current-01",
@@ -117,8 +127,9 @@ def build_klaravik_current_first_queries(
             "CLOTHING_INVENTORY",
             (
                 "site:klaravik.se/auktion/produkt "
-                "(klädbutik OR modebutik OR butikslager) "
-                f"(kläder OR skor OR accessoarer) \"{window}\""
+                "(klädbutik OR modebutik OR butikslager OR restlager) "
+                "(kläder OR skor OR accessoarer) "
+                "(\"Auktionen avslutas\" OR \"Nuvarande bud\")"
             ),
         ),
         DiscoveryQuery(
@@ -129,7 +140,8 @@ def build_klaravik_current_first_queries(
             (
                 "site:klaravik.se/auktion/produkt "
                 "(utförsäljning OR avveckling OR konkurs OR restlager) "
-                f"(kläder OR mode OR skor) \"{window}\""
+                "(kläder OR mode OR skor) "
+                "(\"Auktionen avslutas\" OR \"Nuvarande bud\")"
             ),
         ),
     )
@@ -151,7 +163,7 @@ def _klaravik_identity(hit: SearchHit) -> str:
 
 
 class _CurrentFirstWrapper:
-    """Expose current-window identities first without hiding unverified fallback."""
+    """Expose current-intent identities first without hiding unverified fallback."""
 
     def __init__(
         self,
@@ -252,12 +264,12 @@ class _CurrentFirstWrapper:
         base = dict(diagnostics_method() if callable(diagnostics_method) else {})
         base.update(
             {
-                "current_first_policy": "SWEDEN_CURRENT_FIRST_V2_VERIFY_BEFORE_SUPPRESS",
+                "current_first_policy": "SWEDEN_CURRENT_FIRST_V3_ACTIVE_CUE_RETRIEVAL",
                 "current_first_source": self._source,
                 "current_window_identity_count": len(self._current_identities),
                 "current_window_identities": list(self._current_identities),
                 "current_window_priority_applied": self._current_priority_applied,
-                # Kept for report compatibility. V2 never defers unrelated fallback
+                # Kept for report compatibility. V3 never defers unrelated fallback
                 # on search-snippet evidence alone.
                 "generic_fallback_deferred_count": 0,
                 "generic_fallback_preserved_count": self._generic_preserved_count,
@@ -266,6 +278,8 @@ class _CurrentFirstWrapper:
                 "current_window_is_active_proof": False,
                 "active_state_still_requires_exact_page_verification": True,
                 "fallback_suppression_requires_verified_active": True,
+                "current_query_literal_month_required": False,
+                "current_query_uses_live_auction_cues": True,
             }
         )
         return base
