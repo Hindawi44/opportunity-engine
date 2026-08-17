@@ -12,6 +12,11 @@ on:
         required: false
         default: false
         type: boolean
+      keyword_shadow_verify:
+        description: Run frozen KEYWORD_SHADOW_VERIFICATION_V1 after tests pass
+        required: false
+        default: false
+        type: boolean
       keyword_limit:
         description: Number of Italian keyword candidates to test
         required: false
@@ -149,6 +154,84 @@ jobs:
         with:
           name: keyword-discovery-lab-v1
           path: artifacts/keyword-discovery-lab-v1/keyword-lab-report.json
+          if-no-files-found: error
+          retention-days: 30
+
+  keyword-shadow-verification-v1:
+    name: Italy keyword SHADOW page verification
+    needs: test
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.keyword_shadow_verify }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/keyword-shadow-verification-v1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify frozen stage-2 contracts
+        run: pytest tests/test_keyword_shadow_verification.py -q
+
+      - name: Confirm frozen verification budget
+        shell: bash
+        run: |
+          if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
+            echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
+            exit 1
+          fi
+          echo "Frozen budget: 3 Brave queries x 5 results; max 15 direct page fetches"
+
+      - name: Run bounded stage-2 verification
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_keyword_shadow_verification.py \
+            --output "$OUTPUT_DIR/keyword-shadow-verification-report.json" \
+            --freshness "${{ inputs.freshness }}"
+
+      - name: Print verified ranking
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("artifacts/keyword-shadow-verification-v1/keyword-shadow-verification-report.json").read_text())
+          print("status:", report.get("status"))
+          print("Brave queries:", report.get("stage1_query_count"))
+          print("pages:", report.get("page_fetches_succeeded"), "/", report.get("page_fetches_attempted"))
+          print("PROMOTE:", report.get("promote_count", 0))
+          print("SHADOW:", report.get("shadow_count", 0))
+          print("REJECT:", report.get("reject_count", 0))
+          print("\nVERIFIED RANKING")
+          for item in report.get("ranking", []):
+              metrics = item.get("metrics", {})
+              print(
+                  f"#{item['rank']:02d} {item['score']:6.2f} {item['decision']:7s} "
+                  f"coverage={item['verified_page_coverage']:.2f} "
+                  f"seller={metrics.get('seller_identity_ratio', 0):.2f} "
+                  f"commercial={metrics.get('quantity_or_price_ratio', 0):.2f} "
+                  f"{item['query']}"
+              )
+          PY
+
+      - name: Upload verified keyword artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyword-shadow-verification-v1
+          path: artifacts/keyword-shadow-verification-v1/keyword-shadow-verification-report.json
           if-no-files-found: error
           retention-days: 30
 
