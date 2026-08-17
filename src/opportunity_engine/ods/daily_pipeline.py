@@ -26,6 +26,7 @@ from .opportunity_discovery import OpportunityDiscoveryEngine
 from .opportunity_intelligence import OpportunityIntelligenceEngine
 from .opportunity_profit import OpportunityProfitDecisionEngine
 from .opportunity_scoring import OpportunityScoringEngine
+from .opportunity_value import OpportunityValueEngine
 from .price_history import HistoricalPriceDatabase
 from .real_cost import RealCostEngine, RealCostInputs
 from .seller_reliability import SellerReliabilityEngine
@@ -84,6 +85,7 @@ class AutomatedDailyPipeline:
         market_engine: MarketPriceComparisonEngine | None = None,
         market_verification_engine: MarketPriceVerificationEngine | None = None,
         cost_engine: RealCostEngine | None = None,
+        value_engine: OpportunityValueEngine | None = None,
         decision_engine: OpportunityProfitDecisionEngine | None = None,
         scoring_engine: OpportunityScoringEngine | None = None,
         seller_reliability_engine: SellerReliabilityEngine | None = None,
@@ -101,6 +103,7 @@ class AutomatedDailyPipeline:
         self.market_engine = market_engine or MarketPriceComparisonEngine()
         self.market_verification_engine = market_verification_engine or MarketPriceVerificationEngine()
         self.cost_engine = cost_engine or RealCostEngine()
+        self.value_engine = value_engine or OpportunityValueEngine()
         self.decision_engine = decision_engine or OpportunityProfitDecisionEngine()
         self.scoring_engine = scoring_engine or OpportunityScoringEngine()
         self.seller_reliability_engine = seller_reliability_engine or SellerReliabilityEngine()
@@ -181,7 +184,8 @@ class AutomatedDailyPipeline:
                     vat_status=opportunity.mva_status,
                 )
             costs = self.cost_engine.calculate(cost_inputs)
-            decision = self.decision_engine.decide(market, costs)
+            value = self.value_engine.evaluate(market, costs)
+            decision = self.decision_engine.decide(value)
             score = self.scoring_engine.score(opportunity, decision)
             intelligence = self.intelligence_engine.explain(
                 opportunity,
