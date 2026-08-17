@@ -21,7 +21,12 @@ from opportunity_engine.discovery.search_provider import SearchHit, SearchProvid
 
 
 SEN_SEN_HOST = "sen-sen.de"
-SEN_SEN_DETAIL_PATH = re.compile(r"^/php/t(?P<event_id>\d+)-[^/]+/?$", re.I)
+# Sen & Sen exposes both event pages (/php/t<ID>-...) and specific object/lot
+# pages (/php/o<ID>-...). Both are exact public sale-detail surfaces; generic
+# dilib.php, PDFs, indexes and other paths remain rejected.
+SEN_SEN_DETAIL_PATH = re.compile(
+    r"^/php/(?P<detail_kind>[to])(?P<detail_id>\d+)-[^/]+/?$", re.I
+)
 
 SEN_SEN_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
     DiscoveryQuery(
@@ -165,7 +170,12 @@ def canonicalize_sen_sen_detail_url(url: str) -> tuple[str, str] | None:
     match = SEN_SEN_DETAIL_PATH.fullmatch(parsed.path or "/")
     if match is None:
         return None
-    return canonical, match.group("event_id")
+    detail_kind = match.group("detail_kind").casefold()
+    detail_id = match.group("detail_id")
+    # Preserve the legacy numeric identity for t/event pages. Prefix object IDs
+    # so an o7580 object can never collide with a hypothetical t7580 event.
+    stable_id = detail_id if detail_kind == "t" else f"o{detail_id}"
+    return canonical, stable_id
 
 
 def sen_sen_gate_decision(hit: SearchHit) -> SenSenGateDecision:
