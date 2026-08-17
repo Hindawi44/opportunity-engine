@@ -6,7 +6,7 @@ import pytest
 
 from opportunity_engine.discovery.keyword_discovery_lab import (
     KeywordCandidate,
-    classify_hit,
+    _term_present,
     run_keyword_discovery_lab,
     score_keyword,
 )
@@ -63,15 +63,10 @@ def test_consumer_marketplace_result_is_rejected():
 
 
 def test_term_matching_does_not_use_substrings():
-    hit = SearchHit(
-        title="Vasta selezione moda",
-        url="https://example.it/catalogo",
-        description="Catalogo generico senza evidenza di liquidazione.",
-    )
-    record = classify_hit(hit, rank=1)
-
-    assert record["liquidation_or_closure"] is False
-    assert record["b2b"] is False
+    assert _term_present("vasta selezione moda", "asta") is False
+    assert _term_present("asta abbigliamento", "asta") is True
+    assert _term_present("modalità di vendita", "moda") is False
+    assert _term_present("moda italiana", "moda") is True
 
 
 def test_lab_is_bounded_and_does_not_enable_production_writes():
