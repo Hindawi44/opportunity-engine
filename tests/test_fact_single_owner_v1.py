@@ -113,3 +113,54 @@ def test_equivalent_city_formatting_is_not_a_fact_conflict() -> None:
     merged = UnifiedMultiSourceEngine().merge((first, second)).opportunities[0]
 
     assert merged.city.casefold().strip() == "trondheim"
+
+
+def test_canonical_fact_identity_does_not_depend_on_completeness_ranking() -> None:
+    sparse_a = _opportunity(
+        opportunity_id="z-source-id",
+        source_name="Auksjonen.no",
+        source_document_id="a",
+        description="Kort",
+        fee_text=None,
+        missing_fields=("fee_text",),
+    )
+    rich_b = _opportunity(
+        opportunity_id="a-source-id",
+        source_name="Konkurskupp",
+        source_document_id="b",
+        url="https://example.no/item/42",
+        description="Lang og komplett beskrivelse",
+        fee_text="Salær 10 %",
+        missing_fields=(),
+    )
+    first_merge = UnifiedMultiSourceEngine().merge((sparse_a, rich_b)).opportunities[0]
+
+    rich_a = _opportunity(
+        opportunity_id="z-source-id",
+        source_name="Auksjonen.no",
+        source_document_id="a",
+        description="Nå er A den mest komplette kilden",
+        fee_text="Salær 10 %",
+        missing_fields=(),
+    )
+    sparse_b = _opportunity(
+        opportunity_id="a-source-id",
+        source_name="Konkurskupp",
+        source_document_id="b",
+        url="https://example.no/item/42",
+        description="Kort",
+        fee_text=None,
+        missing_fields=("fee_text",),
+    )
+    second_merge = UnifiedMultiSourceEngine().merge((rich_a, sparse_b)).opportunities[0]
+
+    assert first_merge.opportunity_id == second_merge.opportunity_id == "a-source-id"
+    assert (
+        first_merge.raw_metadata["canonical_fact_identity"]
+        == second_merge.raw_metadata["canonical_fact_identity"]
+        == "url:https://example.no/item/42"
+    )
+    assert first_merge.raw_metadata["source_opportunity_ids"] == (
+        "a-source-id",
+        "z-source-id",
+    )
