@@ -3,6 +3,7 @@ from opportunity_engine.ods.opportunity_profit import (
     OpportunityDecisionPolicy,
     OpportunityProfitDecisionEngine,
 )
+from opportunity_engine.ods.opportunity_value import OpportunityValueEngine
 from opportunity_engine.ods.real_cost import RealCostReport
 
 
@@ -38,8 +39,13 @@ def _costs(**overrides):
     return RealCostReport(**values)
 
 
+def _decision(market=None, costs=None):
+    value = OpportunityValueEngine().evaluate(market or _market(), costs or _costs())
+    return OpportunityProfitDecisionEngine().decide(value)
+
+
 def test_strong_profitable_opportunity_is_buy() -> None:
-    result = OpportunityProfitDecisionEngine().decide(
+    result = _decision(
         _market(conservative_resale_nok=24000, confidence="high"),
         _costs(total_cost_nok=15000),
     )
@@ -52,7 +58,7 @@ def test_strong_profitable_opportunity_is_buy() -> None:
 
 
 def test_negative_profit_is_rejected() -> None:
-    result = OpportunityProfitDecisionEngine().decide(
+    result = _decision(
         _market(conservative_resale_nok=14000),
         _costs(total_cost_nok=15000),
     )
@@ -62,7 +68,7 @@ def test_negative_profit_is_rejected() -> None:
 
 
 def test_incomplete_inputs_are_monitor_only() -> None:
-    result = OpportunityProfitDecisionEngine().decide(
+    result = _decision(
         _market(conservative_resale_nok=None, confidence="insufficient"),
         _costs(total_cost_nok=None, missing_fields=("transport_nok",), is_complete=False),
     )
@@ -75,7 +81,7 @@ def test_incomplete_inputs_are_monitor_only() -> None:
 
 
 def test_maximum_purchase_price_excludes_known_non_purchase_costs() -> None:
-    result = OpportunityProfitDecisionEngine().decide(
+    result = _decision(
         _market(conservative_resale_nok=27000),
         _costs(purchase_price_nok=10000, total_cost_nok=15000),
     )
