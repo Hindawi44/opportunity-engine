@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Protocol
+from typing import Any, Iterable, Protocol
 
 from .models import ODSRequest, OpportunityCandidate
 
@@ -32,6 +32,36 @@ class SourceDocument:
         for field_name in ("document_id", "source_name", "source_type", "title", "text"):
             if not getattr(self, field_name).strip():
                 raise ValueError(f"{field_name} must not be empty")
+
+
+class SourceEvidenceConflictError(ValueError):
+    """Raised when one source identity supplies contradictory evidence payloads."""
+
+
+def source_document_identity(document: SourceDocument) -> tuple[str, str]:
+    """Return the canonical identity of one evidence item within its source."""
+    return document.source_name.strip().casefold(), document.document_id.strip()
+
+
+def deduplicate_source_documents(
+    documents: Iterable[SourceDocument],
+) -> tuple[SourceDocument, ...]:
+    """Collapse exact evidence duplicates without hiding cross-source or local conflicts."""
+    by_identity: dict[tuple[str, str], SourceDocument] = {}
+    ordered: list[SourceDocument] = []
+    for document in documents:
+        key = source_document_identity(document)
+        existing = by_identity.get(key)
+        if existing is None:
+            by_identity[key] = document
+            ordered.append(document)
+            continue
+        if existing != document:
+            raise SourceEvidenceConflictError(
+                "conflicting source evidence for "
+                f"{document.source_name}:{document.document_id}"
+            )
+    return tuple(ordered)
 
 
 class DataConnector(Protocol):
@@ -181,7 +211,7 @@ class LiveDataResult:
 
 
 class LiveDataPipeline:
-    """Collects documents, removes duplicates, and extracts opportunities."""
+    """Collect sources, preserve evidence identity, and extract opportunities."""
 
     def __init__(
         self,
@@ -194,12 +224,11 @@ class LiveDataPipeline:
         self.extractor = extractor or OpportunityExtractor()
 
     def run(self, request: ODSRequest) -> LiveDataResult:
-        documents_by_id: dict[str, SourceDocument] = {}
+        collected: list[SourceDocument] = []
         for connector in self.connectors:
-            for document in connector.fetch(request):
-                documents_by_id.setdefault(document.document_id, document)
+            collected.extend(connector.fetch(request))
 
-        documents = tuple(documents_by_id.values())
+        documents = deduplicate_source_documents(collected)
         opportunities = self.extractor.extract(documents, request)
         return LiveDataResult(
             documents=documents,
