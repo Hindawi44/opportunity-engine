@@ -9,7 +9,7 @@ on:
       - "mind-forge-live/phase1/**"
   pull_request:
     branches:
-      - agent/mind-forge-live-run-v1
+      - agent/mind-forge-v1-10-1-baseline
     paths:
       - ".github/workflows/mind-forge-live-run-v1.yaml"
       - "mind-forge-live/phase1/**"
