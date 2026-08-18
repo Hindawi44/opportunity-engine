@@ -64,12 +64,14 @@ jobs:
             "pydantic>=2.11.0,<3.0" \
             "pytest>=8.0,<9.0"
 
-      - name: Attach Phase 1 contracts without rewriting V1.10.1 engines
+      - name: Attach Phase 1 contracts and compatibility bridge
         run: |
           set -euo pipefail
           cp mind-forge-live/phase1/contracts_v1.py "$APP/mind_forge/contracts_v1.py"
+          cp mind-forge-live/phase1/bridge_v110.py "$APP/mind_forge/bridge_v110.py"
           python -m compileall -q "$APP/mind_forge"
           test -f "$APP/mind_forge/contracts_v1.py"
+          test -f "$APP/mind_forge/bridge_v110.py"
 
       - name: Inventory exact V1.10.1 compatibility boundary
         run: |
@@ -92,11 +94,13 @@ jobs:
           print(f"legacy_schema_models={data['model_count']} legacy_enums={data['enum_count']}")
           PY
 
-      - name: Run Phase 1 contract tests
+      - name: Run Phase 1 contract and bridge tests
         env:
           PYTHONPATH: ${{ env.APP }}
         run: |
-          pytest -q mind-forge-live/phase1/test_contracts_v1.py
+          pytest -q \
+            mind-forge-live/phase1/test_contracts_v1.py \
+            mind-forge-live/phase1/test_bridge_v110.py
 
       - name: Upload compatibility inventory
         if: always()
