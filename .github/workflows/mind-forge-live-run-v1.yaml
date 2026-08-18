@@ -6,12 +6,14 @@ on:
       - agent/mind-forge-phase1-contracts
     paths:
       - ".github/workflows/mind-forge-live-run-v1.yaml"
+      - ".github/workflows/mind-forge-live-model-v1.yaml"
       - "mind-forge-live/phase1/**"
   pull_request:
     branches:
       - agent/mind-forge-v1-10-1-baseline
     paths:
       - ".github/workflows/mind-forge-live-run-v1.yaml"
+      - ".github/workflows/mind-forge-live-model-v1.yaml"
       - "mind-forge-live/phase1/**"
   workflow_dispatch:
 
@@ -135,6 +137,7 @@ jobs:
             mind-forge-live/phase1/test_memory_engine_v1.py \
             mind-forge-live/phase1/test_pipeline_v1.py \
             mind-forge-live/phase1/test_live_model_adapter_v1.py \
+            mind-forge-live/phase1/test_live_workflow_v1.py \
             mind-forge-live/phase1/test_bridge_v110.py
 
       - name: Upload compatibility inventory
