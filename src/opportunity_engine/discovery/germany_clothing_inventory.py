@@ -11,6 +11,7 @@ from typing import Sequence
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     ACTIVE,
+    ARTICLE_OR_INFO,
     ENDED,
     ITEM_LISTING,
     DiscoveryQuery,
@@ -107,6 +108,7 @@ _GERMAN_SALE_TERMS = (
     "zu verkaufen", "liquidationsverkauf", "verkauf gegen gebot",
     "versteigerung", "auktion", "gebotsabgabe",
     "räumungsverkauf", "gesamtverkauf", "postenverkauf", "aktuelles gebot",
+    "komplett-verkauf", "komplettverkauf", "komplett verkauf",
     "jetzt bieten", "zuschläge ab",
 )
 _GERMAN_ENDED_TERMS = (
@@ -241,19 +243,45 @@ def _with_sen_sen_identity(
     verification: PageVerification,
     url: str,
 ) -> PageVerification:
-    """Attach stable source identity to exact Sen & Sen detail pages.
+    """Attach stable identity and preserve proven Sen & Sen inventory details.
 
-    Lifecycle classification remains unchanged. This only ensures the source
-    candidate and its canonical unified record use the same identity even when
-    the generic page-role classifier conservatively rejects the page content.
+    Only exact Sen & Sen detail URLs can enter this path. If generic page-role
+    classification called the page ARTICLE_OR_INFO, promote that role only when
+    the verified page text itself proves clothing + inventory + a sale/liquidation
+    context. Activity status is not guessed; UNKNOWN remains UNKNOWN so lifecycle
+    keeps the record in verification instead of treating it as active.
     """
     identity = canonicalize_sen_sen_detail_url(url)
     if identity is None:
         return verification
     canonical_url, detail_id = identity
+
+    page_role = verification.page_role
+    text = _normalized(
+        " ".join(
+            value
+            for value in (
+                verification.title,
+                verification.text,
+                verification.bounded_context,
+            )
+            if value
+        )
+    )
+    if page_role == ARTICLE_OR_INFO and verification.verified and text:
+        clothing = any(term in text for term in _GERMAN_CLOTHING_TERMS)
+        inventory = any(term in text for term in _GERMAN_INVENTORY_TERMS)
+        commercial_context = (
+            any(term in text for term in _GERMAN_SALE_TERMS)
+            or _german_scenario(text) is not None
+        )
+        if clothing and inventory and commercial_context:
+            page_role = ITEM_LISTING
+
     return replace(
         verification,
         url=canonical_url,
+        page_role=page_role,
         opportunity_identity=f"sen-sen:{detail_id}",
         identity_stable=True,
     )
