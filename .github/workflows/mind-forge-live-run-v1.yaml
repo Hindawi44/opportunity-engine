@@ -39,7 +39,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Rebuild MIND FORGE V1.10
+      - name: Rebuild MIND FORGE V1.10.1
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/mind-forge-runtime"
@@ -51,8 +51,11 @@ jobs:
           cat mind-forge-live/v1_10_overlay_0*.b64 | base64 --decode > "$RUNNER_TEMP/v1_10_overlay.tar.xz"
           xz -t "$RUNNER_TEMP/v1_10_overlay.tar.xz"
           tar -xJf "$RUNNER_TEMP/v1_10_overlay.tar.xz" -C "$APP"
+          python mind-forge-live/apply_patch_v1_10_1_decision.py "$APP"
+          python -m compileall -q "$APP/mind_forge"
           test -f "$APP/mind_forge/budget_forecast.py"
           grep -q 'version="0.10.0"' "$APP/main.py"
+          grep -q 'normalize_decision_against_logic' "$APP/mind_forge/orchestrator.py"
 
       - name: Install runtime dependencies
         working-directory: ${{ runner.temp }}/mind-forge-runtime/mind-forge
@@ -67,8 +70,9 @@ jobs:
           import agents
           import mind_forge
           from mind_forge.budget_forecast import build_budget_forecast
+          from mind_forge.orchestrator import normalize_decision_against_logic
           print("agents_sdk_import=ok")
-          print("mind_forge_v1_10_import=ok")
+          print("mind_forge_v1_10_1_import=ok")
           PY
 
       - name: Seed five successful live runs and verify calibrated forecast
@@ -162,7 +166,6 @@ jobs:
           assert forecast.get('live_runs_scanned') == 5
           assert sum(1 for s in forecast.get('stages', []) if s.get('applied')) >= 8
 
-          # Recreate the exact pre-devil decision point from actual Run 6 telemetry.
           before_devil = []
           for row in data['telemetry']['entries']:
               if row['status'] != 'SUCCESS':
@@ -186,6 +189,7 @@ jobs:
 
           proof = {
               'engine_version': data['engine_version'],
+              'runtime_patch': 'v1.10.1-decision-contract',
               'run_id': data.get('run_id'),
               'selected_idea': data['decision']['selected_idea'],
               'verdict': data['decision']['verdict'],
