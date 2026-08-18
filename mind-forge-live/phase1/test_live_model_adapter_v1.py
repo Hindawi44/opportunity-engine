@@ -130,9 +130,10 @@ def test_live_creative_rewrite_preserves_exact_ids_families_and_provenance():
 def test_live_creative_rewrite_fails_closed_on_changed_idea_universe():
     _, _, baseline = _baseline()
     payload = _creative_payload(baseline)
-    payload = LiveCreativePayload(ideas=payload.ideas[:-1] + [payload.ideas[-2].model_copy()])
-    with pytest.raises((ValidationError, ValueError)):
-        apply_live_creative_payload(baseline, payload)
+    foreign = payload.ideas[-1].model_copy(update={"idea_id": "idea-foreign"})
+    changed_universe = LiveCreativePayload(ideas=payload.ideas[:-1] + [foreign])
+    with pytest.raises(ValueError, match="exact baseline idea universe"):
+        apply_live_creative_payload(baseline, changed_universe)
 
 
 def test_live_expert_drafts_cover_exact_ten_minds_and_full_idea_universe():
