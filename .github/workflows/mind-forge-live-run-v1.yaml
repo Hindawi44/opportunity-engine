@@ -53,11 +53,15 @@ jobs:
           test -f "$RUNNER_TEMP/mind-forge-runtime/mind-forge/pyproject.toml"
           test -f "$RUNNER_TEMP/mind-forge-runtime/mind-forge/main.py"
 
-      - name: Install MIND FORGE and Agents SDK
+      - name: Install runtime dependencies and Agents SDK
         working-directory: ${{ runner.temp }}/mind-forge-runtime/mind-forge
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e .
+          python -m pip install \
+            "openai-agents>=0.14.0" \
+            "fastapi>=0.116.0" \
+            "uvicorn>=0.35.0" \
+            "pydantic>=2.11.0"
           python - <<'PY'
           import agents
           import mind_forge
