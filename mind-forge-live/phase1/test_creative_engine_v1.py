@@ -1,0 +1,92 @@
+from __future__ import annotations
+
+from mind_forge.contracts_v1 import Idea, QuestionKind, TopicInput
+from mind_forge.creative_engine_v1 import generate_ideas
+from mind_forge.question_generator_v1 import generate_questions
+
+
+def _benchmark() -> tuple[TopicInput, list]:
+    topic = TopicInput(topic="تصليح الملابس")
+    questions = generate_questions(topic)
+    return topic, questions
+
+
+def test_topic_only_generates_12_to_20_canonical_ideas() -> None:
+    topic, questions = _benchmark()
+
+    result = generate_ideas(topic, questions)
+
+    assert 12 <= len(result.ideas) <= 20
+    assert all(isinstance(idea, Idea) for idea in result.ideas)
+    assert len({idea.idea_id for idea in result.ideas}) == len(result.ideas)
+    assert len({idea.title for idea in result.ideas}) == len(result.ideas)
+    assert all(idea.core_mechanism for idea in result.ideas)
+    assert all(idea.business_value for idea in result.ideas)
+    assert all(idea.risks for idea in result.ideas)
+
+
+def test_creative_engine_uses_internal_questions_without_user_answer() -> None:
+    topic, questions = _benchmark()
+    internal_ids = {q.question_id for q in questions if q.kind is QuestionKind.INTERNAL}
+
+    result = generate_ideas(topic, questions)
+
+    assert result.user_answer_required is False
+    assert result.source_question_ids
+    assert set(result.source_question_ids).issubset(internal_ids)
+    assert all(idea.source_question_ids for idea in result.ideas)
+    assert all(set(idea.source_question_ids).issubset(internal_ids) for idea in result.ideas)
+
+
+def test_mechanism_diversity_is_structural_not_title_only() -> None:
+    topic, questions = _benchmark()
+
+    result = generate_ideas(topic, questions)
+
+    families = list(result.mechanism_family_by_idea_id.values())
+    assert len(set(families)) >= 12
+    assert result.mechanism_diversity_ratio >= 0.85
+
+    required_families = {
+        "bottleneck_redesign",
+        "standardization",
+        "premium_speed",
+        "recurring_membership",
+        "distribution_partnership",
+        "b2b_embedding",
+        "automation_intake",
+        "circular_recovery",
+        "replication_licensing",
+    }
+    assert required_families.issubset(set(families))
+
+
+def test_each_idea_explains_why_it_is_not_a_duplicate() -> None:
+    topic, questions = _benchmark()
+
+    result = generate_ideas(topic, questions)
+
+    assert all(idea.novelty_reason for idea in result.ideas)
+    assert all(len(idea.novelty_reason or "") >= 20 for idea in result.ideas)
+
+
+def test_generation_is_deterministic_for_same_topic_and_questions() -> None:
+    topic, questions = _benchmark()
+
+    first = generate_ideas(topic, questions)
+    second = generate_ideas(topic, questions)
+
+    assert [idea.model_dump(mode="json") for idea in first.ideas] == [
+        idea.model_dump(mode="json") for idea in second.ideas
+    ]
+    assert first.mechanism_family_by_idea_id == second.mechanism_family_by_idea_id
+
+
+def test_user_question_candidates_do_not_leak_into_idea_provenance() -> None:
+    topic, questions = _benchmark()
+    user_ids = {q.question_id for q in questions if q.kind is QuestionKind.USER}
+
+    result = generate_ideas(topic, questions)
+
+    used = {qid for idea in result.ideas for qid in idea.source_question_ids}
+    assert used.isdisjoint(user_ids)
