@@ -1,0 +1,130 @@
+name: MIND FORGE Live Run V1
+
+on:
+  push:
+    branches:
+      - agent/mind-forge-live-run-v1
+    paths:
+      - ".github/workflows/mind-forge-live-run-v1.yaml"
+      - "mind-forge-live/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mind-forge-live-run-v1
+  cancel-in-progress: true
+
+jobs:
+  live-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_AGENTS_DONT_LOG_MODEL_DATA: "1"
+      OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
+      OPENAI_AGENTS_TRACE_INCLUDE_SENSITIVE_DATA: "0"
+      MIND_FORGE_MAX_TURNS_PER_AGENT: "1"
+      MIND_FORGE_MAX_OUTPUT_TOKENS_PER_CALL: "1600"
+      MIND_FORGE_MIN_COUNCIL_EXPERTS: "4"
+      MIND_FORGE_ALLOW_DEGRADATION: "1"
+      QUESTION: "How can a professional clothing alteration shop in a small Norwegian city increase profit and become scalable without depending entirely on one tailor?"
+
+    steps:
+      - name: Check out isolated branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild MIND FORGE V1.9 runtime
+        run: |
+          mkdir -p "$RUNNER_TEMP/mind-forge-runtime"
+          cat mind-forge-live/runtime/chunk*.b64 | base64 --decode > "$RUNNER_TEMP/mind-forge-runtime.tar.xz"
+          tar -xJf "$RUNNER_TEMP/mind-forge-runtime.tar.xz" -C "$RUNNER_TEMP/mind-forge-runtime"
+          test -f "$RUNNER_TEMP/mind-forge-runtime/mind-forge/pyproject.toml"
+          test -f "$RUNNER_TEMP/mind-forge-runtime/mind-forge/main.py"
+
+      - name: Install MIND FORGE and Agents SDK
+        working-directory: ${{ runner.temp }}/mind-forge-runtime/mind-forge
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python - <<'PY'
+          import agents
+          import mind_forge
+          print("agents_sdk_import=ok")
+          print("mind_forge_import=ok")
+          PY
+
+      - name: Verify hidden API credential is available
+        run: test -n "$OPENAI_API_KEY"
+
+      - name: Run first bounded live council
+        working-directory: ${{ runner.temp }}/mind-forge-runtime/mind-forge
+        env:
+          MIND_FORGE_DB_PATH: ${{ runner.temp }}/mind-forge-live.sqlite3
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/artifacts/mind-forge-live"
+          set +e
+          python main.py "$QUESTION" \
+            --budget-usd 0.80 \
+            --budget-tokens 80000 \
+            --budget-requests 12 \
+            > "$GITHUB_WORKSPACE/artifacts/mind-forge-live/result.json" \
+            2> "$GITHUB_WORKSPACE/artifacts/mind-forge-live/stderr.log"
+          status=$?
+          echo "$status" > "$GITHUB_WORKSPACE/artifacts/mind-forge-live/exit-status.txt"
+          set -e
+          exit "$status"
+
+      - name: Validate live result contract
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("artifacts/mind-forge-live/result.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          if data.get("mode") != "live":
+              raise SystemExit("MIND FORGE did not return live mode")
+          telemetry = data.get("telemetry") or {}
+          entries = telemetry.get("entries") or []
+          live_entries = [row for row in entries if int(row.get("requests") or 0) > 0]
+          if not live_entries:
+              raise SystemExit("No real API request was recorded")
+          decision = data.get("decision") or {}
+          evidence = data.get("evidence") or {}
+          budget = data.get("budget") or {}
+          summary = {
+              "engine_version": data.get("engine_version"),
+              "mode": data.get("mode"),
+              "selected_idea": decision.get("selected_idea"),
+              "verdict": decision.get("verdict"),
+              "decision_score": decision.get("score"),
+              "evidence_confidence": evidence.get("confidence"),
+              "budget_mode": budget.get("mode"),
+              "observed_requests": budget.get("observed_requests"),
+              "observed_tokens": budget.get("observed_tokens"),
+              "observed_estimated_cost_usd": budget.get("observed_estimated_cost_usd"),
+              "active_council_experts": budget.get("active_council_experts"),
+              "skipped_council_experts": budget.get("skipped_council_experts"),
+              "fallback_stages": budget.get("fallback_stages"),
+              "trace_id": telemetry.get("trace_id"),
+          }
+          Path("artifacts/mind-forge-live/summary.json").write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+          )
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Upload live-run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-live-run-v1
+          path: artifacts/mind-forge-live/
+          if-no-files-found: warn
