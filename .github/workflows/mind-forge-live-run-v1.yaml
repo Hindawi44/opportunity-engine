@@ -1,12 +1,6 @@
 name: MIND FORGE Live Run V1
 
 on:
-  push:
-    branches:
-      - agent/mind-forge-live-run-v1
-    paths:
-      - ".github/workflows/mind-forge-live-run-v1.yaml"
-      - "mind-forge-live/**"
   pull_request:
     branches:
       - main
@@ -26,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       OPENAI_AGENTS_DONT_LOG_MODEL_DATA: "1"
       OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
       OPENAI_AGENTS_TRACE_INCLUDE_SENSITIVE_DATA: "0"
@@ -40,12 +33,25 @@ jobs:
       - name: Check out isolated branch
         uses: actions/checkout@v4
 
+      - name: Gate live API execution
+        id: gate
+        shell: bash
+        run: |
+          if [ -f mind-forge-live/ENABLE_LIVE_RUN ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Live API execution is disabled until a fresh key is installed."
+          fi
+
       - name: Set up Python
+        if: steps.gate.outputs.run == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Rebuild MIND FORGE V1.9 runtime
+        if: steps.gate.outputs.run == 'true'
         run: |
           mkdir -p "$RUNNER_TEMP/mind-forge-runtime"
           cat mind-forge-live/runtime/chunk*.b64 | base64 --decode > "$RUNNER_TEMP/mind-forge-runtime.tar.xz"
@@ -54,6 +60,7 @@ jobs:
           test -f "$RUNNER_TEMP/mind-forge-runtime/mind-forge/main.py"
 
       - name: Install runtime dependencies and Agents SDK
+        if: steps.gate.outputs.run == 'true'
         working-directory: ${{ runner.temp }}/mind-forge-runtime/mind-forge
         run: |
           python -m pip install --upgrade pip
@@ -69,29 +76,43 @@ jobs:
           print("mind_forge_import=ok")
           PY
 
-      - name: Verify hidden API credential is available
-        run: test -n "$OPENAI_API_KEY"
-
       - name: Run first bounded live council
+        if: steps.gate.outputs.run == 'true'
         working-directory: ${{ runner.temp }}/mind-forge-runtime/mind-forge
         env:
+          RAW_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           MIND_FORGE_DB_PATH: ${{ runner.temp }}/mind-forge-live.sqlite3
         run: |
           mkdir -p "$GITHUB_WORKSPACE/artifacts/mind-forge-live"
+          export OPENAI_API_KEY="$(printf '%s' "$RAW_OPENAI_API_KEY" | tr -d '\r\n')"
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is unavailable" >&2
+            exit 2
+          fi
+          raw_stderr="$RUNNER_TEMP/mind-forge-live-stderr.log"
           set +e
           python main.py "$QUESTION" \
             --budget-usd 0.80 \
             --budget-tokens 80000 \
             --budget-requests 12 \
             > "$GITHUB_WORKSPACE/artifacts/mind-forge-live/result.json" \
-            2> "$GITHUB_WORKSPACE/artifacts/mind-forge-live/stderr.log"
+            2> "$raw_stderr"
           status=$?
-          echo "$status" > "$GITHUB_WORKSPACE/artifacts/mind-forge-live/exit-status.txt"
           set -e
+          echo "$status" > "$GITHUB_WORKSPACE/artifacts/mind-forge-live/exit-status.txt"
+          python - "$raw_stderr" "$GITHUB_WORKSPACE/artifacts/mind-forge-live/stderr-redacted.log" <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+          src = Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
+          src = re.sub(r"sk-[A-Za-z0-9_-]+", "[REDACTED_OPENAI_KEY]", src)
+          Path(sys.argv[2]).write_text(src, encoding="utf-8")
+          PY
+          rm -f "$raw_stderr"
           exit "$status"
 
       - name: Validate live result contract
-        if: success()
+        if: steps.gate.outputs.run == 'true' && success()
         run: |
           python - <<'PY'
           import json
@@ -132,7 +153,7 @@ jobs:
           PY
 
       - name: Upload live-run evidence
-        if: always()
+        if: steps.gate.outputs.run == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
           name: mind-forge-live-run-v1
