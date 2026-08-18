@@ -1,9 +1,9 @@
 name: MIND FORGE Real Decision 001
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/mind-forge-real-decision-001
+      - main
     paths:
       - ".github/workflows/mind-forge-live-run-v1.yaml"
 
