@@ -1,0 +1,57 @@
+name: TEMP Observe Full Validation
+
+on:
+  push:
+    branches:
+      - agent/full-run-after-sen-sen-fix
+    paths:
+      - .github/workflows/temp-observe-full-validation.yaml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/full-run-after-sen-sen-fix
+      - name: Find and wait for the dispatched full checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          sleep 10
+          RUN_JSON=$(gh run list \
+            --repo "$GITHUB_REPOSITORY" \
+            --workflow multi-market-daily-operator-checkpoint.yaml \
+            --branch agent/full-run-after-sen-sen-fix \
+            --event workflow_dispatch \
+            --limit 1 \
+            --json databaseId,status,conclusion,headSha,createdAt,url)
+          echo "$RUN_JSON" > /tmp/run.json
+          RUN_ID=$(python - <<'PY'
+import json
+rows=json.load(open('/tmp/run.json'))
+print(rows[0]['databaseId'] if rows else '')
+PY
+          )
+          if [ -z "$RUN_ID" ]; then
+            printf '{"status":"NO_DISPATCHED_RUN_FOUND"}\n' > temp-full-validation-status.json
+          else
+            gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status || true
+            gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --json databaseId,status,conclusion,headSha,createdAt,updatedAt,url \
+              > temp-full-validation-status.json
+          fi
+      - name: Commit validation status to the isolated branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p artifacts/temp-validation
+          mv temp-full-validation-status.json artifacts/temp-validation/full-run-status.json
+          git add artifacts/temp-validation/full-run-status.json
+          git commit -m "temp: record full validation run status" || exit 0
+          git push origin HEAD:agent/full-run-after-sen-sen-fix
