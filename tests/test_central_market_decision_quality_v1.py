@@ -129,7 +129,7 @@ def test_above_market_single_candidate_is_deprioritized_not_presented_as_buy_sig
     assert result["automatic_purchase"] is False
 
 
-def test_report_shows_market_classification_next_to_title_and_link() -> None:
+def test_report_keeps_market_classification_internal_but_not_in_clean_delivery() -> None:
     first = _card("case:first", "Below-market Norwegian stock")
     result = apply_market_benchmark_to_brief(
         _brief(first),
@@ -137,12 +137,16 @@ def test_report_shows_market_classification_next_to_title_and_link() -> None:
         {"status": "SUCCESS", "target_benchmarks": [_benchmark("case:first", "CLEARLY_BELOW_MARKET", count=7)]},
     )
 
-    text = render_daily_central_report(result)
+    selected = result["top_actionable_opportunity"]
+    assert selected["market_benchmark"]["benchmark_classification"] == "CLEARLY_BELOW_MARKET"
+    assert selected["market_benchmark"]["comparable_count"] == 7
+    assert result["today_snapshot"]["market_decision_quality"] == "BENCHMARK_APPLIED"
 
+    text = render_daily_central_report(result)
     assert "العنوان: Below-market Norwegian stock" in text
     assert "الرابط: https://example.test/case:first" in text
-    assert "مقارنة السوق: CLEARLY_BELOW_MARKET | comparables=7" in text
-    assert "market_decision_quality: BENCHMARK_APPLIED" in text
+    assert "مقارنة السوق:" not in text
+    assert "market_decision_quality:" not in text
 
 
 def test_file_application_updates_central_and_existing_domain_attachment(tmp_path: Path) -> None:
