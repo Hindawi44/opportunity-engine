@@ -1,0 +1,90 @@
+name: TEMP Full Opportunity Engine Live Run
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/temp-full-project-live-run.yaml"
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-full-project:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Dispatch canonical full-project workflow on main
+        id: dispatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          before_ids="$(gh run list --workflow multi-market-daily-operator-checkpoint.yaml --event workflow_dispatch --limit 20 --json databaseId --jq 'map(.databaseId) | join(" ")')"
+          echo "Existing manual run IDs: ${before_ids:-none}"
+
+          gh workflow run multi-market-daily-operator-checkpoint.yaml --ref main
+
+          run_id=""
+          for attempt in $(seq 1 30); do
+            candidate="$(gh run list --workflow multi-market-daily-operator-checkpoint.yaml --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+            if [ -n "$candidate" ] && ! grep -qw "$candidate" <<<"$before_ids"; then
+              run_id="$candidate"
+              break
+            fi
+            sleep 2
+          done
+
+          if [ -z "$run_id" ]; then
+            echo "Could not resolve the dispatched full-project run ID" >&2
+            exit 1
+          fi
+
+          echo "full_run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "FULL_RUN_ID=$run_id" >> "$GITHUB_ENV"
+          echo "Dispatched canonical full-project run: $run_id"
+
+      - name: Wait for the canonical full-project run
+        shell: bash
+        run: |
+          set +e
+          gh run watch "$FULL_RUN_ID" --exit-status
+          watch_status=$?
+          gh run view "$FULL_RUN_ID" --json databaseId,status,conclusion,url,workflowName,createdAt,updatedAt > full-project-run-meta.json
+          cat full-project-run-meta.json
+          echo "WATCH_STATUS=$watch_status" >> "$GITHUB_ENV"
+          exit 0
+
+      - name: Download canonical project output
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p full-project-output
+          gh run download "$FULL_RUN_ID" -n multi-market-daily-operator-checkpoint -D full-project-output || true
+          echo "--- downloaded files ---"
+          find full-project-output -maxdepth 3 -type f -print | sort || true
+          echo "--- phone summary ---"
+          find full-project-output -name 'multi-market-phone-summary.txt' -type f -exec cat {} \; || true
+          echo "--- intelligence bulletin ---"
+          find full-project-output -name 'domain-market-intelligence-phone-summary.txt' -type f -exec cat {} \; || true
+
+      - name: Publish collected live-run output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: temp-full-project-live-run
+          path: |
+            full-project-run-meta.json
+            full-project-output
+          if-no-files-found: warn
+
+      - name: Preserve canonical run verdict
+        if: always()
+        shell: bash
+        run: |
+          if [ "${WATCH_STATUS:-1}" -ne 0 ]; then
+            echo "Canonical full-project workflow did not finish green." >&2
+            exit 1
+          fi
