@@ -41,7 +41,7 @@ _QUANTITY_UNKNOWN_RE = re.compile(
     re.I,
 )
 _CONDITION_RE = re.compile(
-    r"\b(?:Tilstand|Condition)\s*:?\s*(?P<value>Ny|Nytt|Ubrukt|Brukt|New|Used)\b",
+    r"\b(?:Tilstand|Condition)\s*:?\s*(?P<value>Ny|Nytt|Nye|Ubrukt|Uåpnet|Uåpnede|Brukt|New|Used)\b",
     re.I,
 )
 _POSTAL_CITY_RE = re.compile(r"\b(?P<postal>\d{4})\s+(?P<city>[A-ZÆØÅ][A-Za-zÆØÅæøå .'-]{1,80})")
@@ -137,7 +137,15 @@ def _normalize_condition(value: object) -> str | None:
     text = _compact(value).casefold()
     if not text:
         return None
-    if "newcondition" in text or text in {"ny", "nytt", "ubrukt", "new"}:
+    if "newcondition" in text or text in {
+        "ny",
+        "nytt",
+        "nye",
+        "ubrukt",
+        "uåpnet",
+        "uåpnede",
+        "new",
+    }:
         return "NEW_OR_UNUSED"
     if "usedcondition" in text or text in {"brukt", "used"}:
         return "USED"
