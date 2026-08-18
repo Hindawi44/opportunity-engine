@@ -1,0 +1,24 @@
+name: TEMP Launch Full Validation
+
+on:
+  push:
+    branches:
+      - agent/full-run-after-sen-sen-fix
+    paths:
+      - .github/workflows/temp-launch-full-validation.yaml
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-full-checkpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch the real full checkpoint on this validation branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run multi-market-daily-operator-checkpoint.yaml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$GITHUB_REF_NAME"
