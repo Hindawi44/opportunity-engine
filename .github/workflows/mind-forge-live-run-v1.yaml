@@ -64,7 +64,7 @@ jobs:
             "pydantic>=2.11.0,<3.0" \
             "pytest>=8.0,<9.0"
 
-      - name: Attach Phase 1 question, creative, expert, logic, critique, research, evidence, decision, experiment, memory, contract, and bridge layers
+      - name: Attach complete Phase 1 structural pipeline and frozen bridge
         run: |
           set -euo pipefail
           cp mind-forge-live/phase1/contracts_v1.py "$APP/mind_forge/contracts_v1.py"
@@ -77,6 +77,7 @@ jobs:
           cp mind-forge-live/phase1/decision_engine_v1.py "$APP/mind_forge/decision_engine_v1.py"
           cp mind-forge-live/phase1/experiment_engine_v1.py "$APP/mind_forge/experiment_engine_v1.py"
           cp mind-forge-live/phase1/memory_engine_v1.py "$APP/mind_forge/memory_engine_v1.py"
+          cp mind-forge-live/phase1/pipeline_v1.py "$APP/mind_forge/pipeline_v1.py"
           cp mind-forge-live/phase1/bridge_v110.py "$APP/mind_forge/bridge_v110.py"
           python -m compileall -q "$APP/mind_forge"
           test -f "$APP/mind_forge/contracts_v1.py"
@@ -89,6 +90,7 @@ jobs:
           test -f "$APP/mind_forge/decision_engine_v1.py"
           test -f "$APP/mind_forge/experiment_engine_v1.py"
           test -f "$APP/mind_forge/memory_engine_v1.py"
+          test -f "$APP/mind_forge/pipeline_v1.py"
           test -f "$APP/mind_forge/bridge_v110.py"
 
       - name: Inventory exact V1.10.1 compatibility boundary
@@ -112,7 +114,7 @@ jobs:
           print(f"legacy_schema_models={data['model_count']} legacy_enums={data['enum_count']}")
           PY
 
-      - name: Run full Phase 1 question-to-memory validation suite
+      - name: Run complete Phase 1 seed-to-memory validation suite
         env:
           PYTHONPATH: ${{ env.APP }}
         run: |
@@ -127,6 +129,7 @@ jobs:
             mind-forge-live/phase1/test_decision_engine_v1.py \
             mind-forge-live/phase1/test_experiment_engine_v1.py \
             mind-forge-live/phase1/test_memory_engine_v1.py \
+            mind-forge-live/phase1/test_pipeline_v1.py \
             mind-forge-live/phase1/test_bridge_v110.py
 
       - name: Upload compatibility inventory
