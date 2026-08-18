@@ -71,19 +71,25 @@ jobs:
           python -m compileall -q "$APP/mind_forge"
           test -f "$APP/mind_forge/contracts_v1.py"
 
-      - name: Inventory exact V1.10.1 schema boundary
+      - name: Inventory exact V1.10.1 compatibility boundary
         run: |
           set -euo pipefail
-          mkdir -p artifacts/mind-forge-phase1
+          mkdir -p artifacts/mind-forge-phase1/source-snapshot
           python mind-forge-live/phase1/probe_v110.py "$APP" \
             > artifacts/mind-forge-phase1/v1_10_1_schema_inventory.json
+          cp "$APP/mind_forge/schemas.py" artifacts/mind-forge-phase1/source-snapshot/schemas_v1_10_1.py
+          cp "$APP/mind_forge/orchestrator.py" artifacts/mind-forge-phase1/source-snapshot/orchestrator_v1_10_1.py
+          cp "$APP/mind_forge/agents.py" artifacts/mind-forge-phase1/source-snapshot/agents_v1_10_1.py
           python - <<'PY'
           import json
           data = json.load(open("artifacts/mind-forge-phase1/v1_10_1_schema_inventory.json", encoding="utf-8"))
           assert data["model_count"] > 0
+          assert data["enum_count"] > 0
           for required in ("IdeaSet", "LogicReview", "CouncilReport", "CrossCritique", "Decision"):
               assert required in data["models"], f"missing legacy schema: {required}"
-          print(f"legacy_schema_models={data['model_count']}")
+          for required in ("Verdict", "EvidenceClass"):
+              assert required in data["enums"], f"missing legacy enum: {required}"
+          print(f"legacy_schema_models={data['model_count']} legacy_enums={data['enum_count']}")
           PY
 
       - name: Run Phase 1 contract tests
