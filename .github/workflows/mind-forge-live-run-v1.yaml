@@ -64,19 +64,21 @@ jobs:
             "pydantic>=2.11.0,<3.0" \
             "pytest>=8.0,<9.0"
 
-      - name: Attach Phase 1 question, creative, expert-mind, contract, and bridge layers
+      - name: Attach Phase 1 question, creative, expert, logic, contract, and bridge layers
         run: |
           set -euo pipefail
           cp mind-forge-live/phase1/contracts_v1.py "$APP/mind_forge/contracts_v1.py"
           cp mind-forge-live/phase1/question_generator_v1.py "$APP/mind_forge/question_generator_v1.py"
           cp mind-forge-live/phase1/creative_engine_v1.py "$APP/mind_forge/creative_engine_v1.py"
           cp mind-forge-live/phase1/expert_minds_v1.py "$APP/mind_forge/expert_minds_v1.py"
+          cp mind-forge-live/phase1/logic_engine_v1.py "$APP/mind_forge/logic_engine_v1.py"
           cp mind-forge-live/phase1/bridge_v110.py "$APP/mind_forge/bridge_v110.py"
           python -m compileall -q "$APP/mind_forge"
           test -f "$APP/mind_forge/contracts_v1.py"
           test -f "$APP/mind_forge/question_generator_v1.py"
           test -f "$APP/mind_forge/creative_engine_v1.py"
           test -f "$APP/mind_forge/expert_minds_v1.py"
+          test -f "$APP/mind_forge/logic_engine_v1.py"
           test -f "$APP/mind_forge/bridge_v110.py"
 
       - name: Inventory exact V1.10.1 compatibility boundary
@@ -100,7 +102,7 @@ jobs:
           print(f"legacy_schema_models={data['model_count']} legacy_enums={data['enum_count']}")
           PY
 
-      - name: Run Phase 1 contract, question, creative, expert-mind, and bridge tests
+      - name: Run Phase 1 contract, question, creative, expert, logic, and bridge tests
         env:
           PYTHONPATH: ${{ env.APP }}
         run: |
@@ -109,6 +111,7 @@ jobs:
             mind-forge-live/phase1/test_question_generator_v1.py \
             mind-forge-live/phase1/test_creative_engine_v1.py \
             mind-forge-live/phase1/test_expert_minds_v1.py \
+            mind-forge-live/phase1/test_logic_engine_v1.py \
             mind-forge-live/phase1/test_bridge_v110.py
 
       - name: Upload compatibility inventory
