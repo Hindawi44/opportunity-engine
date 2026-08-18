@@ -41,7 +41,7 @@ jobs:
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Live API execution is disabled until a fresh key is installed."
+            echo "Live API execution is disabled."
           fi
 
       - name: Set up Python
@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Rebuild MIND FORGE V1.9 runtime
+      - name: Rebuild and patch MIND FORGE V1.9 runtime
         if: steps.gate.outputs.run == 'true'
         run: |
           mkdir -p "$RUNNER_TEMP/mind-forge-runtime"
@@ -58,6 +58,7 @@ jobs:
           tar -xJf "$RUNNER_TEMP/mind-forge-runtime.tar.xz" -C "$RUNNER_TEMP/mind-forge-runtime"
           test -f "$RUNNER_TEMP/mind-forge-runtime/mind-forge/pyproject.toml"
           test -f "$RUNNER_TEMP/mind-forge-runtime/mind-forge/main.py"
+          python mind-forge-live/apply_patch_v1_9_1.py "$RUNNER_TEMP/mind-forge-runtime/mind-forge"
 
       - name: Install runtime dependencies and Agents SDK
         if: steps.gate.outputs.run == 'true'
@@ -69,11 +70,14 @@ jobs:
             "fastapi>=0.116.0" \
             "uvicorn>=0.35.0" \
             "pydantic>=2.11.0"
+          python -m compileall -q mind_forge main.py
           python - <<'PY'
           import agents
           import mind_forge
+          from mind_forge.orchestrator import normalize_cross_critique_idea_references
           print("agents_sdk_import=ok")
           print("mind_forge_import=ok")
+          print("critique_normalizer=ok")
           PY
 
       - name: Run first bounded live council
