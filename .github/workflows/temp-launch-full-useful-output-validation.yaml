@@ -1,0 +1,41 @@
+name: TEMP Launch Full Useful Output Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/temp-launch-full-useful-output-validation.yaml
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-full-checkpoint:
+    if: ${{ github.head_ref == 'agent/full-run-after-useful-output-fix' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch and wait for the real full checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALIDATION_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          gh workflow run multi-market-daily-operator-checkpoint.yaml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$VALIDATION_REF"
+          sleep 10
+          RUN_ID=$(gh run list \
+            --repo "$GITHUB_REPOSITORY" \
+            --workflow multi-market-daily-operator-checkpoint.yaml \
+            --branch "$VALIDATION_REF" \
+            --event workflow_dispatch \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+          test -n "$RUN_ID"
+          echo "FULL_RUN_ID=$RUN_ID"
+          gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status
+          gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --json databaseId,status,conclusion,headSha,createdAt,updatedAt,url
