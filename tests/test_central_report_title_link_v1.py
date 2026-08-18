@@ -5,18 +5,18 @@ from opportunity_engine.discovery.central_intelligence_orchestrator_cli_hook imp
 )
 
 
-def test_daily_central_report_shows_title_and_source_link_for_each_top_item() -> None:
+def test_daily_central_report_shows_only_useful_opportunity_fields() -> None:
     brief = {
         "status": "SUCCESS",
         "market_visibility": ["NO", "SE", "DE", "IT"],
-        "today_snapshot": {
-            "actionable_now_count": 1,
-            "market_watch_count": 1,
-            "fabric_candidate_count": 1,
-            "fabric_ai_status": "SUCCESS",
-        },
         "top_actionable_opportunity": {
             "headline": "Current Norwegian clothing stock",
+            "source_name": "Auksjonen.no",
+            "source_country": "NO",
+            "location": "Oslo",
+            "quantity": 280,
+            "price_nok": 4200,
+            "why_useful": "Verified active inventory lot",
             "source_urls": ["https://example.test/opportunity"],
         },
         "top_market_signal": {
@@ -29,19 +29,29 @@ def test_daily_central_report_shows_title_and_source_link_for_each_top_item() ->
             "source_url": "https://fabric-house.example/item",
             "ai_review_priority": "HIGH",
         },
-        "primary_human_action": {
-            "action_type": "REVIEW_TOP_ACTIONABLE_OPPORTUNITY",
-            "target": "Current Norwegian clothing stock",
-            "reason": "Current commercial opportunity comes first.",
-        },
     }
 
     text = render_daily_central_report(brief)
 
     assert "العنوان: Current Norwegian clothing stock" in text
+    assert "المصدر: Auksjonen.no" in text
+    assert "البلد/الموقع: NO | Oslo" in text
+    assert "السعر: 4200 NOK" in text
+    assert "الكمية/المحتوى: 280" in text
+    assert "لماذا مفيدة: Verified active inventory lot" in text
     assert "الرابط: https://example.test/opportunity" in text
-    assert "العنوان: German retailer liquidation signal" in text
-    assert "الرابط: https://register.example/company" in text
-    assert "العنوان: Fabric House — Italian deadstock fabrics" in text
-    assert "الرابط: https://fabric-house.example/item" in text
-    assert "AI: HIGH" in text
+    assert "German retailer liquidation signal" not in text
+    assert "Fabric House" not in text
+    assert "AI: HIGH" not in text
+
+
+def test_daily_central_report_returns_truthful_zero_without_side_noise() -> None:
+    text = render_daily_central_report(
+        {
+            "top_actionable_opportunity": None,
+            "top_market_signal": {"headline": "Early signal noise"},
+            "top_fabric_supplier": {"source_name": "Bridal Fabrics"},
+        }
+    )
+
+    assert text == "0 فرص مفيدة اليوم.\n"
