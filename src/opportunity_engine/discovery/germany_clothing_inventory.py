@@ -17,6 +17,9 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     PageVerification,
     verify_public_page,
 )
+from opportunity_engine.discovery.germany_sen_sen import (
+    canonicalize_sen_sen_detail_url,
+)
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
 
 
@@ -234,6 +237,30 @@ def enrich_germany_page_verification(
     )
 
 
+def _with_sen_sen_identity(
+    verification: PageVerification,
+    url: str,
+) -> PageVerification:
+    """Attach stable source identity to exact Sen & Sen detail pages.
+
+    Lifecycle classification remains unchanged. This only ensures the source
+    candidate and its canonical unified record use the same identity even when
+    the generic page-role classifier conservatively rejects the page content.
+    """
+    identity = canonicalize_sen_sen_detail_url(url)
+    if identity is None:
+        return verification
+    canonical_url, detail_id = identity
+    return replace(
+        verification,
+        url=canonical_url,
+        opportunity_identity=f"sen-sen:{detail_id}",
+        identity_stable=True,
+    )
+
+
 def verify_germany_public_page(url: str) -> PageVerification:
     """Conservatively enrich an already verified specific German item page."""
-    return enrich_germany_page_verification(verify_public_page(url))
+    verification = verify_public_page(url)
+    verification = _with_sen_sen_identity(verification, url)
+    return enrich_germany_page_verification(verification)
