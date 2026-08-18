@@ -36,6 +36,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Confirm offline-only validation
+        run: echo "Phase 1 validation uses no OPENAI_API_KEY and performs no paid model calls."
+
       - name: Rebuild frozen MIND FORGE V1.10.1 baseline
         run: |
           set -euo pipefail
