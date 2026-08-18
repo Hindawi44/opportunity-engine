@@ -59,7 +59,7 @@ _TEST_SPECS: dict[str, tuple[str, str, str, float]] = {
         "A priority lane may cannibalize scarce capacity and reduce reliability or contribution from the standard queue.",
         "The mechanism is falsified if priority jobs reduce contribution per capacity-hour or materially worsen on-time performance for standard work.",
         "Run a tightly capped priority pilot on a few jobs and record premium paid, skilled minutes consumed, displacement, and both queues' on-time delivery.",
-        0.10,
+        0.15,
     ),
     "automation_intake": (
         "Pre-qualification may misclassify edge cases and push hidden complexity into later rework.",
@@ -77,7 +77,7 @@ _TEST_SPECS: dict[str, tuple[str, str, str, float]] = {
         "The adjacent need may be too weak or operationally distracting to justify a bundle around the core service.",
         "The mechanism is falsified if customers show low attach intent or the added coordination cost overwhelms the incremental value.",
         "Offer one narrowly defined adjacent bundle to a small customer sample and record attach rate, willingness-to-pay, extra handling time, and confusion points.",
-        0.08,
+        0.12,
     ),
 }
 
