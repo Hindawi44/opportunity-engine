@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from mind_forge.contracts_v1 import Idea, QuestionKind, TopicInput
+from mind_forge.contracts_v1 import Idea, QuestionKind, RunContract, TopicInput
 from mind_forge.creative_engine_v1 import generate_ideas
 from mind_forge.question_generator_v1 import generate_questions
 
@@ -25,6 +25,17 @@ def test_topic_only_generates_12_to_20_canonical_ideas() -> None:
     assert all(idea.risks for idea in result.ideas)
 
 
+def test_literal_seed_alone_invokes_internal_question_generation() -> None:
+    topic = TopicInput(topic="تصليح الملابس")
+
+    result = generate_ideas(topic)
+
+    assert len(result.ideas) == 14
+    assert result.user_answer_required is False
+    assert result.source_question_ids
+    assert result.mechanism_diversity_ratio == 1.0
+
+
 def test_creative_engine_uses_internal_questions_without_user_answer() -> None:
     topic, questions = _benchmark()
     internal_ids = {q.question_id for q in questions if q.kind is QuestionKind.INTERNAL}
@@ -36,6 +47,22 @@ def test_creative_engine_uses_internal_questions_without_user_answer() -> None:
     assert set(result.source_question_ids).issubset(internal_ids)
     assert all(idea.source_question_ids for idea in result.ideas)
     assert all(set(idea.source_question_ids).issubset(internal_ids) for idea in result.ideas)
+
+
+def test_topic_questions_and_ideas_form_a_valid_run_contract() -> None:
+    topic, questions = _benchmark()
+    result = generate_ideas(topic, questions)
+
+    run = RunContract(
+        run_id="benchmark-tailoring-creative-v1",
+        topic=topic,
+        questions=questions,
+        ideas=result.ideas,
+    )
+
+    assert run.topic.topic == "تصليح الملابس"
+    assert len(run.questions) >= 12
+    assert len(run.ideas) == 14
 
 
 def test_mechanism_diversity_is_structural_not_title_only() -> None:
