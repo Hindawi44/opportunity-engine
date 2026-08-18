@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import sys
 from typing import Any, Mapping
+from urllib.parse import urlparse
 
 from opportunity_engine.discovery.central_intelligence_orchestrator import (
     TEXT_FILENAME,
@@ -76,59 +77,225 @@ def _route_freight_lines(opportunity: Mapping[str, Any]) -> list[str]:
     return lines
 
 
+def _source_label(opportunity: Mapping[str, Any]) -> str:
+    direct = str(
+        opportunity.get("source_name")
+        or opportunity.get("source_provider")
+        or ""
+    ).strip()
+    if direct:
+        return direct
+    url = _first_url(opportunity)
+    host = (urlparse(url).hostname or "").casefold() if url else ""
+    known = {
+        "ny.auksjonen.no": "Auksjonen.no",
+        "auksjonen.no": "Auksjonen.no",
+        "psauction.se": "PS Auction",
+        "sen-sen.de": "Sen & Sen",
+    }
+    for suffix, label in known.items():
+        if host == suffix or host.endswith("." + suffix):
+            return label
+    return host or "غير متوفر"
+
+
+def _country_location(opportunity: Mapping[str, Any]) -> str:
+    country = str(
+        opportunity.get("market_code")
+        or opportunity.get("source_country")
+        or opportunity.get("country")
+        or ""
+    ).strip().upper()
+    location = str(
+        opportunity.get("location")
+        or opportunity.get("source_city")
+        or ""
+    ).strip()
+    if not country:
+        url = _first_url(opportunity)
+        host = (urlparse(url).hostname or "").casefold() if url else ""
+        for suffix, code in ((".no", "NO"), (".se", "SE"), (".de", "DE"), (".it", "IT")):
+            if host.endswith(suffix):
+                country = code
+                break
+    if country and location:
+        return f"{country} | {location}"
+    return country or location or "غير متوفر"
+
+
+def _display_number(value: object) -> str | None:
+    if isinstance(value, bool) or value in (None, ""):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        text = str(value).strip()
+        return text or None
+    if number <= 0:
+        return None
+    if number.is_integer():
+        return str(int(number))
+    return f"{number:.2f}".rstrip("0").rstrip(".")
+
+
+def _price_text(opportunity: Mapping[str, Any]) -> str:
+    for key, currency in (
+        ("price_nok", "NOK"),
+        ("bid_price_nok", "NOK"),
+        ("price", str(opportunity.get("currency") or "").strip().upper()),
+    ):
+        value = _display_number(opportunity.get(key))
+        if value:
+            return f"{value} {currency}".strip()
+    return "غير متوفر"
+
+
+def _quantity_content(opportunity: Mapping[str, Any]) -> str:
+    quantity = _display_number(opportunity.get("quantity"))
+    if quantity:
+        return quantity
+    inventory_type = str(opportunity.get("inventory_type") or "").strip()
+    if inventory_type:
+        return inventory_type
+    title = str(opportunity.get("title") or opportunity.get("headline") or "").strip()
+    return title or "غير متوفر"
+
+
+def _why_useful(opportunity: Mapping[str, Any]) -> str:
+    direct = str(
+        opportunity.get("why_useful")
+        or opportunity.get("reason")
+        or opportunity.get("recommended_next_action")
+        or ""
+    ).strip()
+    if direct:
+        return direct
+    if opportunity.get("analysis_eligible") is True:
+        return "فرصة مخزون نشطة اجتازت التحقق وأصبحت مؤهلة للتحليل التجاري"
+    return "فرصة مخزون تجارية موثقة"
+
+
+def _useful_rows(brief: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows = brief.get("useful_opportunities")
+    if isinstance(rows, list):
+        return [dict(row) for row in rows if isinstance(row, Mapping)]
+    opportunity = brief.get("top_actionable_opportunity")
+    if isinstance(opportunity, Mapping) and opportunity:
+        return [dict(opportunity)]
+    return []
+
+
 def render_daily_central_report(brief: Mapping[str, Any]) -> str:
-    """Render the operator report with title, source, market and logistics evidence."""
-    visibility = " | ".join(brief.get("market_visibility") or []) or "NONE"
-    snapshot = brief.get("today_snapshot") if isinstance(brief.get("today_snapshot"), Mapping) else {}
-    opportunity = brief.get("top_actionable_opportunity") if isinstance(brief.get("top_actionable_opportunity"), Mapping) else {}
-    watch = brief.get("top_market_signal") if isinstance(brief.get("top_market_signal"), Mapping) else {}
-    fabric = brief.get("top_fabric_supplier") if isinstance(brief.get("top_fabric_supplier"), Mapping) else {}
-    action = brief.get("primary_human_action") if isinstance(brief.get("primary_human_action"), Mapping) else {}
-    benchmark = opportunity.get("market_benchmark") if isinstance(opportunity.get("market_benchmark"), Mapping) else {}
+    """Render only useful commercial opportunities for the human operator."""
+    opportunities = _useful_rows(brief)
+    if not opportunities:
+        return "0 فرص مفيدة اليوم.\n"
 
-    opportunity_title = str(opportunity.get("headline") or "NONE")
-    watch_title = str(watch.get("headline") or "NONE")
-    fabric_title = _fabric_title(fabric) if fabric else "NONE"
-    opportunity_url = _first_url(opportunity) or "NONE"
-    watch_url = _first_url(watch) or "NONE"
-    fabric_url = _first_url(fabric) or "NONE"
-    benchmark_classification = str(benchmark.get("benchmark_classification") or "NOT_AVAILABLE")
-    comparable_count = int(benchmark.get("comparable_count") or 0)
-
-    lines = [
-        "CENTRAL INTELLIGENCE ORCHESTRATOR",
-        f"status: {brief.get('status')}",
-        f"daily_market_visibility: {visibility}",
-        f"actionable_now: {snapshot.get('actionable_now_count', 0)}",
-        f"market_watch: {snapshot.get('market_watch_count', 0)}",
-        f"fabric_candidates: {snapshot.get('fabric_candidate_count', 0)}",
-        f"fabric_ai_status: {snapshot.get('fabric_ai_status') or 'NOT_AVAILABLE'}",
-        f"market_decision_quality: {snapshot.get('market_decision_quality') or 'UNIFIED_PRIORITY_ONLY'}",
-        f"official_route_status: {snapshot.get('official_route_status') or 'NOT_AVAILABLE'}",
-        f"official_freight_status: {snapshot.get('official_freight_status') or 'NOT_AVAILABLE'}",
-        "",
-        "أهم فرصة قابلة للمراجعة الآن:",
-        f"- العنوان: {opportunity_title}",
-        f"  الرابط: {opportunity_url}",
-        f"  مقارنة السوق: {benchmark_classification} | comparables={comparable_count}",
-        *_route_freight_lines(opportunity),
-        "",
-        "أهم إشارة سوق للمراقبة:",
-        f"- العنوان: {watch_title}",
-        f"  الرابط: {watch_url}",
-        "",
-        "أفضل مورد أقمشة للمراجعة:",
-        f"- العنوان: {fabric_title}",
-        f"  الرابط: {fabric_url}",
-        (f"  AI: {fabric.get('ai_review_priority')}" if fabric.get("ai_review_priority") else "  AI: NOT_AVAILABLE"),
-        "",
-        "الإجراء البشري الوحيد:",
-        f"- {action.get('action_type')}: {action.get('target') or action.get('recommended_next_action')}",
-        f"reason: {action.get('reason')}",
-        "decision_owner: HUMAN_OPERATOR",
-        "automatic_purchase: false",
-    ]
+    lines = [f"فرص مفيدة اليوم: {len(opportunities)}"]
+    for index, opportunity in enumerate(opportunities, start=1):
+        title = str(opportunity.get("title") or opportunity.get("headline") or "غير متوفر").strip()
+        url = _first_url(opportunity) or "غير متوفر"
+        lines.append(
+            f"{index}. العنوان: {title}"
+            f" | المصدر: {_source_label(opportunity)}"
+            f" | البلد/الموقع: {_country_location(opportunity)}"
+            f" | السعر: {_price_text(opportunity)}"
+            f" | الكمية/المحتوى: {_quantity_content(opportunity)}"
+            f" | لماذا مفيدة: {_why_useful(opportunity)}"
+            f" | الرابط: {url}"
+        )
     return "\n".join(lines) + "\n"
+
+
+def _read_json_dict(path: Path) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _hydrate_delivery_opportunity(
+    output_dir: Path,
+    opportunity: Mapping[str, Any],
+) -> dict[str, Any]:
+    hydrated = dict(opportunity)
+    source_url = _first_url(hydrated)
+    identity = str(hydrated.get("opportunity_identity") or "").strip()
+    input_root = output_dir.parent / "multi-market-inputs"
+    if not input_root.exists():
+        return hydrated
+
+    for report_path in sorted(input_root.glob("*/unified-opportunity-report.json")):
+        report = _read_json_dict(report_path)
+        records = report.get("records")
+        if not isinstance(records, list):
+            continue
+        for raw in records:
+            if not isinstance(raw, Mapping):
+                continue
+            record = dict(raw)
+            record_url = str(record.get("source_url") or "").strip()
+            record_id = str(record.get("opportunity_id") or "").strip()
+            if source_url and record_url != source_url and record_id != source_url:
+                if not identity or record_id != identity:
+                    continue
+            elif not source_url and identity and record_id != identity:
+                continue
+            elif not source_url and not identity:
+                continue
+
+            for source_key, target_key in (
+                ("market_code", "market_code"),
+                ("location", "location"),
+                ("quantity", "quantity"),
+                ("inventory_type", "inventory_type"),
+                ("currency", "currency"),
+            ):
+                if hydrated.get(target_key) in (None, "", [], {}) and record.get(source_key) not in (None, "", [], {}):
+                    hydrated[target_key] = record.get(source_key)
+            if not hydrated.get("source_name") and record.get("source_provider"):
+                hydrated["source_name"] = record.get("source_provider")
+            if _display_number(hydrated.get("price")) is None and _display_number(record.get("price")) is not None:
+                hydrated["price"] = record.get("price")
+            return hydrated
+    return hydrated
+
+
+def _select_useful_delivery_opportunities(
+    output_dir: Path,
+    central_brief: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """Select only verified direct opportunities already cleared for analysis."""
+    domain = _read_json_dict(output_dir / "domain-market-intelligence-brief.json")
+    raw_rows = domain.get("current_direct_opportunities")
+    useful: list[dict[str, Any]] = []
+    if isinstance(raw_rows, list):
+        for raw in raw_rows:
+            if not isinstance(raw, Mapping):
+                continue
+            row = dict(raw)
+            if row.get("analysis_eligible") is not True:
+                continue
+            if str(row.get("listing_status") or "").strip().upper() != "ACTIVE":
+                continue
+            if row.get("top5_eligible") is not True:
+                continue
+            if not _first_url(row) or not str(row.get("title") or "").strip():
+                continue
+            row.setdefault(
+                "why_useful",
+                "فرصة مخزون نشطة اجتازت التحقق وأصبحت مؤهلة للتحليل التجاري",
+            )
+            useful.append(_hydrate_delivery_opportunity(output_dir, row))
+
+    if useful:
+        return useful
+
+    fallback = central_brief.get("top_actionable_opportunity")
+    if isinstance(fallback, Mapping) and fallback:
+        return [_hydrate_delivery_opportunity(output_dir, fallback)]
+    return []
 
 
 def _remove_legacy_human_action(text: str) -> str:
@@ -157,21 +324,15 @@ def _remove_legacy_human_action(text: str) -> str:
 
 
 def _rewrite_delivery_text(output_dir: Path, brief: Mapping[str, Any]) -> None:
-    rendered = render_daily_central_report(brief)
+    useful = _select_useful_delivery_opportunities(output_dir, brief)
+    rendered = render_daily_central_report({"useful_opportunities": useful})
     (output_dir / TEXT_FILENAME).write_text(rendered, encoding="utf-8")
 
+    # The delivery bulletin is intentionally a clean operator projection. Detailed
+    # early signals, fabric procurement and diagnostics remain available in JSON
+    # artifacts, but are not repeated in the final human-facing text.
     domain_text = output_dir / "domain-market-intelligence-brief.txt"
-    if not domain_text.exists():
-        return
-    existing = domain_text.read_text(encoding="utf-8")
-    marker = "CENTRAL INTELLIGENCE ORCHESTRATOR"
-    if marker in existing:
-        existing = existing.split(marker, 1)[0]
-    prefix = _remove_legacy_human_action(existing)
-    if prefix:
-        domain_text.write_text(prefix + "\n\n" + rendered, encoding="utf-8")
-    else:
-        domain_text.write_text(rendered, encoding="utf-8")
+    domain_text.write_text(rendered, encoding="utf-8")
 
 
 def install_central_intelligence_orchestrator_cli_hook() -> None:

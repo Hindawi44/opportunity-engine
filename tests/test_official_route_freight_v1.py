@@ -222,7 +222,7 @@ def test_missing_credentials_never_become_an_estimated_quote() -> None:
     assert "quote" not in freight
 
 
-def test_same_daily_report_shows_route_quote_and_missing_input_status() -> None:
+def test_route_quote_stays_internal_while_clean_report_remains_simple() -> None:
     items, cases, comparables = _reports({})
 
     def route_post(url: str, headers: dict, payload: dict) -> dict:
@@ -231,7 +231,7 @@ def test_same_daily_report_shows_route_quote_and_missing_input_status() -> None:
     def bring_post(url: str, headers: dict, payload: dict) -> dict:
         raise AssertionError("Bring must not be called")
 
-    _, brief = build_official_route_freight_intelligence(
+    report, brief = build_official_route_freight_intelligence(
         central_brief=_central(),
         items_report=items,
         cases_report=cases,
@@ -241,11 +241,17 @@ def test_same_daily_report_shows_route_quote_and_missing_input_status() -> None:
         route_post=route_post,
         bring_post=bring_post,
     )
-    text = render_daily_central_report(brief)
 
+    assert report["route"]["distance_km"] == 1812.5
+    assert report["route"]["route_precision"] == "CITY_LEVEL"
+    assert report["freight_quote"]["status"] == "SHIPMENT_INPUT_REQUIRED"
+    route_freight = brief["top_actionable_opportunity"]["route_freight"]
+    assert route_freight["route_status"] == "OFFICIAL_ROUTE_AVAILABLE"
+    assert route_freight["freight_status"] == "SHIPMENT_INPUT_REQUIRED"
+
+    text = render_daily_central_report(brief)
     assert "العنوان: German clothing stock" in text
     assert "الرابط: https://example.test/stock" in text
-    assert "الطريق: 1812.5 km | CITY_LEVEL | OFFICIAL_ROUTE_AVAILABLE" in text
-    assert "الشحن الرسمي: BRING_SHIPPING_GUIDE: SHIPMENT_INPUT_REQUIRED" in text
-    assert "بيانات الشحن الناقصة:" in text
-    assert "automatic_purchase: false" in text
+    assert "الطريق:" not in text
+    assert "الشحن الرسمي:" not in text
+    assert "بيانات الشحن الناقصة:" not in text

@@ -7,7 +7,7 @@ from opportunity_engine.discovery.central_intelligence_orchestrator_cli_hook imp
 )
 
 
-def test_central_rewrite_replaces_legacy_action_without_dropping_later_sections(
+def test_central_rewrite_replaces_legacy_sections_with_clean_useful_delivery(
     tmp_path: Path,
 ) -> None:
     domain_text = tmp_path / "domain-market-intelligence-brief.txt"
@@ -66,9 +66,13 @@ def test_central_rewrite_replaces_legacy_action_without_dropping_later_sections(
     _rewrite_delivery_text(tmp_path, brief)
 
     text = domain_text.read_text(encoding="utf-8")
-    assert text.count("الإجراء البشري الوحيد:") == 1
+    assert "فرص مفيدة اليوم: 1" in text
+    assert "العنوان: Example opportunity" in text
+    assert "الرابط: https://example.test/opportunity" in text
     assert "قرار أولي قبل العقل المركزي" not in text
-    assert "FABRIC PROCUREMENT WATCH" in text
-    assert "candidate_count: 7" in text
-    assert "PROVIDE_SHIPMENT_INPUTS_FOR_OFFICIAL_QUOTE" in text
-    assert text.count("CENTRAL INTELLIGENCE ORCHESTRATOR") == 1
+    assert "الإجراء البشري الوحيد:" not in text
+    assert "FABRIC PROCUREMENT WATCH" not in text
+    assert "candidate_count: 7" not in text
+    assert "Example market signal" not in text
+    assert "Example Fabrics" not in text
+    assert "PROVIDE_SHIPMENT_INPUTS_FOR_OFFICIAL_QUOTE" not in text

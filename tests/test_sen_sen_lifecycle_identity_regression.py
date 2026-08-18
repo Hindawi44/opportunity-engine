@@ -38,32 +38,35 @@ def test_sen_sen_exact_detail_keeps_one_identity_through_lifecycle_handoff(
 
     assert verified.opportunity_identity == "sen-sen:o7580"
     assert verified.identity_stable is True
-    assert verified.page_role == "ARTICLE_OR_INFO"
+    assert verified.page_role == "ITEM_LISTING"
     assert verified.listing_status == "UNKNOWN"
+    assert verified.clothing_inventory_evidence is True
+    assert verified.sale_evidence is True
+    assert verified.event_scenario == "COMPANY_BANKRUPTCY"
 
     candidate = {
         "title": base.title,
-        "scenario": "UNVERIFIED_EVENT",
-        "opportunity_state": "REJECTED_NOISE",
-        "reason": "article_or_info is not one specific inventory opportunity",
+        "scenario": verified.event_scenario,
+        "opportunity_state": "STRONG_LEAD_REQUIRES_VERIFICATION",
+        "reason": "verified Sen & Sen inventory detail has unknown active/ended status",
         "page_role": verified.page_role,
         "opportunity_identity": verified.opportunity_identity,
         "identity_stable": verified.identity_stable,
         "top5_eligible": False,
         "analysis_eligible": False,
-        "discovery_score": 15,
-        "discovery_band": "LOW",
+        "discovery_score": 55,
+        "discovery_band": "REVIEW",
         "location": None,
         "company_name": None,
-        "inventory_type": None,
+        "inventory_type": verified.inventory_type,
         "price_nok": None,
         "bid_price_nok": None,
         "quantity": None,
         "published_at": None,
         "listing_status": verified.listing_status,
         "source_urls": [SEN_SEN_URL],
-        "source_providers": ["Brave Search"],
-        "evidence_signals": ["tekstil", "varelager"],
+        "source_providers": ["Sen & Sen"],
+        "evidence_signals": ["textilien", "warenbestand", "insolvenz", "komplett-verkauf"],
         "missing_information": ["active/ended status"],
         "verification": [
             {
@@ -72,6 +75,7 @@ def test_sen_sen_exact_detail_keeps_one_identity_through_lifecycle_handoff(
                 "verified": True,
                 "listing_status": verified.listing_status,
                 "page_role": verified.page_role,
+                "event_scenario": verified.event_scenario,
             }
         ],
     }
@@ -85,6 +89,7 @@ def test_sen_sen_exact_detail_keeps_one_identity_through_lifecycle_handoff(
 
     assert unified["record_count"] == 1
     assert unified["records"][0]["opportunity_id"] == "sen-sen:o7580"
+    assert unified["records"][0]["workflow_status"] == "REQUIRES_VERIFICATION"
 
     checkpoint_records = [dict(candidate)]
     _apply_canonical_lifecycle(
@@ -94,4 +99,4 @@ def test_sen_sen_exact_detail_keeps_one_identity_through_lifecycle_handoff(
     )
 
     assert checkpoint_records[0]["_canonical_lifecycle_present"] is True
-    assert checkpoint_records[0]["workflow_status"] == "REJECTED"
+    assert checkpoint_records[0]["workflow_status"] == "REQUIRES_VERIFICATION"
