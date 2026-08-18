@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from hashlib import sha256
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .contracts_v1 import Idea, Question, QuestionKind, QuestionStatus, TopicInput
 from .question_generator_v1 import generate_questions
@@ -15,11 +15,26 @@ class CreativeEngineResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     topic: str = Field(min_length=1)
-    ideas: list[Idea] = Field(min_length=1)
+    ideas: list[Idea] = Field(min_length=1, max_length=20)
     mechanism_family_by_idea_id: dict[str, str]
     mechanism_diversity_ratio: float = Field(ge=0.0, le=1.0)
     source_question_ids: list[str] = Field(default_factory=list)
     user_answer_required: bool = False
+
+    @model_validator(mode="after")
+    def validate_creative_invariants(self) -> "CreativeEngineResult":
+        idea_ids = {idea.idea_id for idea in self.ideas}
+        if len(idea_ids) != len(self.ideas):
+            raise ValueError("creative idea IDs must be unique")
+        if set(self.mechanism_family_by_idea_id) != idea_ids:
+            raise ValueError("mechanism_family_by_idea_id must cover exactly the generated ideas")
+        unique_families = len(set(self.mechanism_family_by_idea_id.values()))
+        expected_ratio = unique_families / len(self.ideas)
+        if abs(self.mechanism_diversity_ratio - expected_ratio) > 1e-9:
+            raise ValueError("mechanism_diversity_ratio does not match generated mechanism families")
+        if self.user_answer_required:
+            raise ValueError("Phase 1 Creative Engine must not require a user answer during ideation")
+        return self
 
 
 class _Pattern(BaseModel):
@@ -41,9 +56,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="bottleneck_redesign",
         title="Bottleneck-first redesign for {topic}",
-        mechanism=(
-            "Map the highest-friction step in {topic}, remove or pre-resolve it, and reorganize the workflow around throughput rather than tradition."
-        ),
+        mechanism="Map the highest-friction step in {topic}, remove or pre-resolve it, and reorganize the workflow around throughput rather than tradition.",
         customer_value="Shorter waits, fewer handoffs, and a more predictable result.",
         business_value="Raises throughput and capacity before adding headcount or locations.",
         capabilities=("workflow measurement", "process redesign"),
@@ -55,9 +68,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="standardization",
         title="Productized standard offer for {topic}",
-        mechanism=(
-            "Convert the most repeatable work in {topic} into a small menu of standardized packages with explicit scope, turnaround, and acceptance criteria."
-        ),
+        mechanism="Convert the most repeatable work in {topic} into a small menu of standardized packages with explicit scope, turnaround, and acceptance criteria.",
         customer_value="Easier choice, clearer expectations, and less uncertainty about what will happen next.",
         business_value="Reduces quoting variance and enables repeatable execution, training, and margin control.",
         capabilities=("service design", "standard operating procedures"),
@@ -69,9 +80,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="premium_speed",
         title="Priority-speed tier for {topic}",
-        mechanism=(
-            "Create a deliberately capacity-limited priority lane for {topic} with a higher price, explicit deadline, and rules that protect normal-flow capacity."
-        ),
+        mechanism="Create a deliberately capacity-limited priority lane for {topic} with a higher price, explicit deadline, and rules that protect normal-flow capacity.",
         customer_value="A credible fast option when urgency matters more than lowest price.",
         business_value="Monetizes urgency while revealing the market value of time and queue position.",
         capabilities=("capacity reservation", "deadline control", "tiered pricing"),
@@ -83,9 +92,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="recurring_membership",
         title="Recurring membership around {topic}",
-        mechanism=(
-            "Bundle recurring access, periodic service credits, priority handling, or maintenance benefits around {topic} into a membership with clear usage rules."
-        ),
+        mechanism="Bundle recurring access, periodic service credits, priority handling, or maintenance benefits around {topic} into a membership with clear usage rules.",
         customer_value="Convenience and predictable access without restarting the buying process each time.",
         business_value="Creates repeat demand, smoother revenue, and better visibility into future workload.",
         capabilities=("membership rules", "customer tracking", "recurring billing"),
@@ -97,9 +104,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="outcome_guarantee",
         title="Outcome-guaranteed offer for {topic}",
-        mechanism=(
-            "Define one measurable customer outcome in {topic}, narrow eligibility, and attach a bounded guarantee or redo policy to that outcome."
-        ),
+        mechanism="Define one measurable customer outcome in {topic}, narrow eligibility, and attach a bounded guarantee or redo policy to that outcome.",
         customer_value="Lower perceived risk because success criteria and remediation are explicit before purchase.",
         business_value="Supports premium positioning and forces operational quality to become measurable.",
         capabilities=("quality criteria", "eligibility screening", "remediation policy"),
@@ -111,9 +116,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="distribution_partnership",
         title="Partner-distributed {topic}",
-        mechanism=(
-            "Place intake, referral, or fulfillment access for {topic} inside businesses that already serve the target customer, using a simple revenue-share or referral rule."
-        ),
+        mechanism="Place intake, referral, or fulfillment access for {topic} inside businesses that already serve the target customer, using a simple revenue-share or referral rule.",
         customer_value="Accesses the service through a place or provider they already use and trust.",
         business_value="Acquires demand through existing traffic instead of relying only on direct marketing.",
         capabilities=("partner onboarding", "referral tracking", "service-level agreement"),
@@ -125,9 +128,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="b2b_embedding",
         title="Embedded B2B workflow for {topic}",
-        mechanism=(
-            "Integrate {topic} as a recurring back-office capability for organizations whose own customer or employee workflow regularly creates the need."
-        ),
+        mechanism="Integrate {topic} as a recurring back-office capability for organizations whose own customer or employee workflow regularly creates the need.",
         customer_value="The end user gets the result as part of a larger service instead of arranging it separately.",
         business_value="Creates higher-volume contractual demand with lower acquisition cost per transaction.",
         capabilities=("account management", "batch workflow", "B2B invoicing"),
@@ -139,9 +140,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="automation_intake",
         title="Pre-qualified digital intake for {topic}",
-        mechanism=(
-            "Move repetitive diagnosis, information capture, photo/document collection, quoting inputs, and scheduling for {topic} before the human work begins."
-        ),
+        mechanism="Move repetitive diagnosis, information capture, photo/document collection, quoting inputs, and scheduling for {topic} before the human work begins.",
         customer_value="Less waiting and fewer repeated explanations during the service interaction.",
         business_value="Cuts non-value-added labor and increases the share of staff time spent on skilled work.",
         capabilities=("intake form", "routing rules", "scheduling integration"),
@@ -153,9 +152,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="mobile_access",
         title="Mobile or on-site access for {topic}",
-        mechanism=(
-            "Bring intake, measurement, pickup, assessment, or selected execution steps for {topic} to concentrated customer locations on scheduled routes or pop-up windows."
-        ),
+        mechanism="Bring intake, measurement, pickup, assessment, or selected execution steps for {topic} to concentrated customer locations on scheduled routes or pop-up windows.",
         customer_value="Removes travel and coordination friction for customers with limited time or mobility.",
         business_value="Unlocks underserved demand pockets without committing to another permanent location.",
         capabilities=("route planning", "portable workflow", "appointment clustering"),
@@ -167,9 +164,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="demand_aggregation",
         title="Demand-aggregation layer for {topic}",
-        mechanism=(
-            "Aggregate similar {topic} jobs into scheduled batches, neighborhood drops, workplace collections, or campaign windows before fulfillment."
-        ),
+        mechanism="Aggregate similar {topic} jobs into scheduled batches, neighborhood drops, workplace collections, or campaign windows before fulfillment.",
         customer_value="Convenient access and potentially better economics through coordinated demand.",
         business_value="Improves route, setup, purchasing, and labor efficiency by increasing batch density.",
         capabilities=("batch scheduling", "collection coordination", "demand forecasting"),
@@ -181,9 +176,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="circular_recovery",
         title="Recovery and reuse loop around {topic}",
-        mechanism=(
-            "Capture residual materials, rejected items, replaceable components, or post-service assets around {topic} and route them into repair, reuse, resale, donation, or material recovery."
-        ),
+        mechanism="Capture residual materials, rejected items, replaceable components, or post-service assets around {topic} and route them into repair, reuse, resale, donation, or material recovery.",
         customer_value="A lower-waste option and possible residual-value recovery from items that would otherwise be discarded.",
         business_value="Creates secondary value streams from material or assets already passing through the operation.",
         capabilities=("sorting criteria", "secondary-channel partners", "traceability"),
@@ -195,9 +188,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="replication_licensing",
         title="Train-and-license method for {topic}",
-        mechanism=(
-            "Codify the repeatable method, quality checks, pricing logic, and operating playbook for {topic}, then train independent operators or partner locations to execute it under a bounded standard."
-        ),
+        mechanism="Codify the repeatable method, quality checks, pricing logic, and operating playbook for {topic}, then train independent operators or partner locations to execute it under a bounded standard.",
         customer_value="More consistent access to a trusted method across more locations or operators.",
         business_value="Scales know-how and brand reach with less direct fixed-cost expansion.",
         capabilities=("training curriculum", "quality audits", "licensing terms"),
@@ -209,9 +200,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="data_feedback",
         title="Data-guided optimization for {topic}",
-        mechanism=(
-            "Capture a minimal dataset on job type, lead time, rework, margin proxy, demand source, and outcome in {topic}, then use it to change capacity, pricing, and offer design."
-        ),
+        mechanism="Capture a minimal dataset on job type, lead time, rework, margin proxy, demand source, and outcome in {topic}, then use it to change capacity, pricing, and offer design.",
         customer_value="More reliable turnaround and service design as recurring failure patterns are removed.",
         business_value="Replaces intuition-only decisions with feedback on which work, channels, and operating choices actually perform.",
         capabilities=("simple data capture", "metric review", "decision cadence"),
@@ -223,9 +212,7 @@ _PATTERNS: tuple[_Pattern, ...] = (
     _Pattern(
         family="adjacent_bundle",
         title="Adjacent-value bundle around {topic}",
-        mechanism=(
-            "Combine {topic} with one tightly adjacent service, product, preparation step, or aftercare need that the same customer already has before or after the core job."
-        ),
+        mechanism="Combine {topic} with one tightly adjacent service, product, preparation step, or aftercare need that the same customer already has before or after the core job.",
         customer_value="Solves a broader job-to-be-done with fewer vendors, trips, and coordination steps.",
         business_value="Raises value per customer while using the same acquisition event and trust relationship.",
         capabilities=("adjacent-offer design", "cross-sell workflow", "partner or supply coordination"),
@@ -259,25 +246,18 @@ def _source_ids(pattern: _Pattern, question_index: dict[str, Question]) -> list[
     matched = [question_index[key].question_id for key in pattern.question_keys if key in question_index]
     if matched:
         return matched
-    # Fail open for provenance only when the caller supplied non-standard internal
-    # question IDs. We still require at least one internal question and never use
-    # a user-facing candidate as creative evidence/provenance.
     if question_index:
         return [next(iter(question_index.values())).question_id]
     raise ValueError("Creative Engine requires at least one internal Question")
 
 
-def generate_ideas(
-    topic: TopicInput,
-    questions: Iterable[Question] | None = None,
-) -> CreativeEngineResult:
-    """Expand a raw topic into a structurally diverse canonical Idea set.
+def generate_ideas(topic: TopicInput, questions: Iterable[Question] | None = None) -> CreativeEngineResult:
+    """Expand TopicInput into diverse canonical Ideas without blocking on user input.
 
-    This Phase 1 implementation is deliberately deterministic and zero-cost. It
-    proves the orchestration contract: TopicInput -> internally generated Questions
-    -> diverse canonical Ideas, without requiring a user-supplied idea or a paid
-    model call. Later model-driven creativity can replace candidate generation while
-    retaining these diversity/provenance guardrails.
+    The generator is deterministic and zero-cost in Phase 1. This establishes the
+    orchestration and diversity contract before any paid/model-driven creative layer
+    is introduced. A later generator may replace the pattern expansion but must
+    preserve the same provenance and diversity invariants.
     """
 
     question_list = list(questions) if questions is not None else generate_questions(topic)
@@ -293,7 +273,6 @@ def generate_ideas(
         idea_id = _stable_id(topic.topic, pattern.family)
         source_ids = _source_ids(pattern, question_index)
         used_question_ids.update(source_ids)
-
         idea = Idea(
             idea_id=idea_id,
             title=pattern.title.format(topic=topic.topic),
@@ -310,13 +289,11 @@ def generate_ideas(
         families[idea_id] = pattern.family
 
     unique_families = len(set(families.values()))
-    diversity_ratio = unique_families / len(ideas)
-
     return CreativeEngineResult(
         topic=topic.topic,
         ideas=ideas,
         mechanism_family_by_idea_id=families,
-        mechanism_diversity_ratio=diversity_ratio,
+        mechanism_diversity_ratio=unique_families / len(ideas),
         source_question_ids=sorted(used_question_ids),
         user_answer_required=False,
     )
