@@ -7,13 +7,19 @@ on:
     paths:
       - ".github/workflows/mind-forge-live-run-v1.yaml"
       - "mind-forge-live/phase1/**"
+  pull_request:
+    branches:
+      - agent/mind-forge-live-run-v1
+    paths:
+      - ".github/workflows/mind-forge-live-run-v1.yaml"
+      - "mind-forge-live/phase1/**"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: mind-forge-phase1-contracts
+  group: mind-forge-phase1-contracts-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
