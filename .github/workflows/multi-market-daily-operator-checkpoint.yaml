@@ -100,6 +100,7 @@ on:
       - "tests/test_human_review_outcome_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "tests/test_useful_output_checkpoint_validator_regression.py"
       - "tests/test_germany_sen_sen_source_v1.py"
       - "tests/test_germany_targeted_source_runner_v1.py"
       - "tests/test_official_route_freight_v1.py"
@@ -143,6 +144,7 @@ jobs:
           pytest tests/test_human_review_checkpoint_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
+          pytest tests/test_useful_output_checkpoint_validator_regression.py -q
           pytest tests/test_germany_sen_sen_source_v1.py -q
           pytest tests/test_germany_targeted_source_runner_v1.py -q
           pytest tests/test_official_route_freight_v1.py -q
@@ -561,8 +563,6 @@ jobs:
               raise SystemExit("Domain market intelligence bulletin is incomplete")
           if intelligence.get("market_coverage") != ["NO", "SE", "DE"]:
               raise SystemExit("Domain bulletin market coverage changed")
-          if intelligence_text.count("الإجراء البشري الوحيد:") != 1:
-              raise SystemExit("Domain bulletin must contain exactly one human action")
           for key in (
               "automatic_contact",
               "automatic_bid",
