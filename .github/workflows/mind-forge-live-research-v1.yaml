@@ -95,7 +95,7 @@ jobs:
             "openai-agents>=0.14.0" \
             "pydantic>=2.11.0,<3.0"
 
-      - name: Attach Phase 1 guardrails and Live Research Adapter V1
+      - name: Attach Phase 1 guardrails, Live Research Adapter V1, and Runner V1
         run: |
           set -euo pipefail
           for file in \
@@ -110,7 +110,8 @@ jobs:
             experiment_engine_v1.py \
             memory_engine_v1.py \
             pipeline_v1.py \
-            live_research_adapter_v1.py
+            live_research_adapter_v1.py \
+            runner_v1.py
           do
             cp "mind-forge-live/phase1/$file" "$APP/mind_forge/$file"
           done
@@ -127,7 +128,7 @@ jobs:
           print("OPENAI_API_KEY availability: OK (value not displayed)")
           PY
 
-      - name: Execute Router-approved live research behind independent budget gate
+      - name: Run one-seed MIND FORGE Runner V1 with Router-approved live research
         env:
           PYTHONPATH: ${{ env.APP }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -138,107 +139,60 @@ jobs:
           MIND_FORGE_MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
         run: |
           set -euo pipefail
-          mkdir -p artifacts/mind-forge-live-research-v1
+          python -m mind_forge.runner_v1 \
+            "$MIND_FORGE_SEED" \
+            --live-research \
+            --confirm-paid-live-research YES \
+            --research-model "$MIND_FORGE_RESEARCH_MODEL" \
+            --max-search-operations "$MIND_FORGE_MAX_SEARCH_OPERATIONS" \
+            --max-research-cost-usd "$MIND_FORGE_MAX_RESEARCH_COST_USD" \
+            --output-dir artifacts/mind-forge-live-research-v1
+
+      - name: Validate Runner V1 result and independent research budget
+        env:
+          MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
+          MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
+        run: |
           python - <<'PY'
           import json
           import os
-          from collections import Counter
           from pathlib import Path
 
-          from mind_forge.contracts_v1 import EvidenceClassification
-          from mind_forge.decision_engine_v1 import decide
-          from mind_forge.live_research_adapter_v1 import (
-              ResearchPolicy,
-              execute_research_requests,
+          root = Path("artifacts/mind-forge-live-research-v1")
+          summary = json.loads(
+              (root / "mind-forge-runner-summary.json").read_text(encoding="utf-8")
           )
-          from mind_forge.pipeline_v1 import run_phase1_forge
-          from mind_forge.research_evidence_v1 import build_evidence
-
-          policy = ResearchPolicy(
-              enabled=True,
-              model=os.environ["MIND_FORGE_RESEARCH_MODEL"],
-              max_search_operations=int(os.environ["MIND_FORGE_MAX_SEARCH_OPERATIONS"]),
-              max_estimated_cost_usd=float(os.environ["MIND_FORGE_MAX_RESEARCH_COST_USD"]),
+          contract = json.loads(
+              (root / "mind-forge-run-contract.json").read_text(encoding="utf-8")
           )
 
-          baseline = run_phase1_forge(os.environ["MIND_FORGE_SEED"])
-          research = execute_research_requests(
-              baseline.research,
-              policy=policy,
-          )
-
-          # Research Adapter emits only EvidenceObservation objects with no final class.
-          if any(item.classification is not None for item in research.observations):
-              raise SystemExit("Research Adapter illegally assigned a final evidence class")
-
-          evidence = build_evidence(
-              baseline.research,
-              research.observations,
-          )
-          decision = decide(
-              baseline.creative,
-              baseline.logic,
-              baseline.critique,
-              baseline.research,
-              evidence,
-          )
-
-          live_evidence = [
-              item for item in evidence.evidence
-              if item.source_ref and not item.source_ref.startswith("research-request:")
-          ]
-          if any(
-              item.classification is EvidenceClassification.VERIFIED_FACT
-              for item in live_evidence
-          ):
-              raise SystemExit("Live Research was promoted directly to VERIFIED_FACT")
-          for item in live_evidence:
-              if item.classification is EvidenceClassification.STRONG_EVIDENCE:
-                  if not item.source or not item.source_type or not item.source_ref:
-                      raise SystemExit("STRONG_EVIDENCE is missing required provenance")
-
-          usage = research.usage.model_dump()
-          if int(usage["search_operations"]) > policy.max_search_operations:
+          if summary.get("status") != "MIND_FORGE_RUN_COMPLETE":
+              raise SystemExit("Runner V1 did not complete")
+          if summary.get("live_research_requested") is not True:
+              raise SystemExit("Runner V1 did not execute the explicit live-research path")
+          if int(summary["research_usage"]["search_operations"]) > int(os.environ["MAX_SEARCH_OPERATIONS"]):
               raise SystemExit("research search-operation cap exceeded")
-          if float(usage["estimated_cost_usd"]) > policy.max_estimated_cost_usd:
+          if float(summary["research_usage"]["estimated_cost_usd"]) > float(os.environ["MAX_RESEARCH_COST_USD"]):
               raise SystemExit("research estimated-cost cap exceeded")
 
-          summary = {
-              "status": "LIVE_RESEARCH_RUN_COMPLETE",
-              "seed": os.environ["MIND_FORGE_SEED"],
-              "router_external_request_count": len(baseline.research.external_request_ids),
-              "executed_request_ids": research.executed_request_ids,
-              "skipped_request_ids": research.skipped_request_ids,
-              "adapter_by_request": {
-                  key: value.value for key, value in research.adapter_by_request.items()
-              },
-              "observation_count": len(research.observations),
-              "evidence_classes": dict(
-                  Counter(item.classification.value for item in evidence.evidence)
-              ),
-              "conflicting_claim_ids": evidence.conflicting_claim_ids,
-              "decision_verdict": decision.decision.verdict.value,
-              "usage": usage,
-              "research_model": policy.model,
-              "max_search_operations": policy.max_search_operations,
-              "max_estimated_cost_usd": policy.max_estimated_cost_usd,
-              "live_research_enabled": True,
-              "live_model_budget_used": False,
+          live_refs = {
+              item["source_ref"]
+              for item in summary.get("live_sources", [])
+              if item.get("source_ref")
           }
+          for item in contract.get("evidence", []):
+              if item.get("source_ref") not in live_refs:
+                  continue
+              if item.get("classification") == "VERIFIED_FACT":
+                  raise SystemExit("Live Research was promoted directly to VERIFIED_FACT")
+              if item.get("classification") == "STRONG_EVIDENCE":
+                  if not item.get("source") or not item.get("source_type") or not item.get("source_ref"):
+                      raise SystemExit("STRONG_EVIDENCE is missing required provenance")
 
-          root = Path("artifacts/mind-forge-live-research-v1")
-          (root / "live-research-summary.json").write_text(
-              json.dumps(summary, indent=2, ensure_ascii=False),
-              encoding="utf-8",
-          )
-          (root / "evidence.json").write_text(
-              evidence.model_dump_json(indent=2),
-              encoding="utf-8",
-          )
           print(json.dumps(summary, ensure_ascii=False))
           PY
 
-      - name: Upload live research result
+      - name: Upload live MIND FORGE Runner result
         if: always()
         uses: actions/upload-artifact@v4
         with:
