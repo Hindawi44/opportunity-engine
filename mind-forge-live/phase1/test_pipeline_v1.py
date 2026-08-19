@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
+import mind_forge.live_research_adapter_v1 as live_adapter
 from mind_forge.contracts_v1 import DecisionVerdict, MemoryTruthStatus, QuestionKind, TopicInput
+from mind_forge.live_research_adapter_v1 import ResearchAdapterKind, ResearchPolicy
+from mind_forge.live_research_recovery_v1 import ResilientOpenAIWebSearchExecutor
 from mind_forge.pipeline_v1 import run_phase1_forge
-from mind_forge.research_evidence_v1 import ResearchRoute
+from mind_forge.research_evidence_v1 import ResearchRequest, ResearchRoute
 
 
 def test_raw_seed_runs_end_to_end_without_user_interruption() -> None:
@@ -69,6 +74,67 @@ def test_local_business_seed_prioritizes_demand_and_competition_research() -> No
     )
     first_two_claims = "\n".join(item.claim_text.casefold() for item in external)
     assert not any(fragment in first_two_claims for fragment in generic_fragments)
+
+
+def test_invalid_structured_research_output_falls_back_to_actual_web_sources(monkeypatch) -> None:
+    request = ResearchRequest(
+        request_id="research-json-recovery",
+        claim_id="claim-json-recovery",
+        idea_id="idea-json-recovery",
+        claim_text="Local demand exists for محل شاي في نامسوس.",
+        why_material="The result determines whether a local paid pilot is justified.",
+        route=ResearchRoute.WEB,
+        expected_decision_impact=0.95,
+        acceptable_source_types=["web/public source"],
+    )
+
+    def fake_run_sync(agent, prompt, *, max_turns, error_handlers):
+        assert agent.output_type is not None
+        assert max_turns == 2
+        assert "invalid_final_output" in error_handlers
+        fallback = error_handlers["invalid_final_output"](None)
+        assert fallback.observations == []
+        payload = {
+            "output": [
+                {
+                    "type": "web_search_call",
+                    "action": {
+                        "sources": [
+                            {
+                                "url": "https://example.test/namsos-tea-market",
+                                "title": "Namsos tea market source",
+                            }
+                        ]
+                    },
+                }
+            ]
+        }
+        return SimpleNamespace(
+            raw_responses=[payload],
+            new_items=[],
+            final_output=fallback,
+        )
+
+    monkeypatch.setattr(live_adapter.Runner, "run_sync", fake_run_sync)
+    executor = ResilientOpenAIWebSearchExecutor()
+    execution = executor.search(
+        request,
+        adapter_kind=ResearchAdapterKind.WEB_SEARCH,
+        policy=ResearchPolicy(
+            enabled=True,
+            max_search_operations=1,
+            max_operations_per_request=1,
+            max_results_per_request=1,
+            max_estimated_cost_usd=0.07,
+        ),
+    )
+
+    assert execution.search_operations == 1
+    assert len(execution.hits) == 1
+    hit = execution.hits[0]
+    assert hit.source_ref == "https://example.test/namsos-tea-market"
+    assert hit.source == "Namsos tea market source"
+    assert hit.confidence == 0.60
 
 
 def test_one_call_preserves_structural_diversity_and_full_expert_universe() -> None:
