@@ -26,6 +26,30 @@ _INTERNAL_SPECS = (
         0.82,
     ),
     (
+        "market_demand",
+        "What current observable demand evidence exists for {topic} in the target market, including customer volume, frequency, and willingness to pay?",
+        "Force market validation to start from observable local demand rather than generic business assumptions.",
+        0.96,
+    ),
+    (
+        "direct_competition",
+        "Which direct competitors and substitutes already serve customers for {topic}, and where is the measurable gap in product, price, convenience, or experience?",
+        "Anchor opportunity claims in current alternatives the customer can actually choose.",
+        0.95,
+    ),
+    (
+        "unit_economics",
+        "What unit economics would make {topic} viable: realistic price, gross margin, capacity, customer frequency, and break-even volume?",
+        "Connect the idea to an economically testable threshold before capital is committed.",
+        0.94,
+    ),
+    (
+        "regulatory_constraints",
+        "Which licenses, permits, safety rules, zoning constraints, taxes, or sector-specific requirements could block or delay {topic}?",
+        "Expose external constraints that can invalidate an otherwise attractive idea.",
+        0.90,
+    ),
+    (
         "bottlenecks",
         "Which bottlenecks most constrain quality, speed, capacity, or growth in {topic}?",
         "Expose constraints that dominate system performance.",
