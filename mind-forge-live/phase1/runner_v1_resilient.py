@@ -255,6 +255,130 @@ def build_live_evidence_with_quality_gate(
     return base.build_evidence(router, _quality_gate_live_observations(observations))
 
 
+def _ordered_live_request_ids(result) -> list[str]:
+    research = result.research
+    if research is None:
+        return []
+
+    target_count = len(research.executed_request_ids) + len(research.skipped_request_ids)
+    if target_count == 0:
+        return []
+
+    router = result.baseline.research
+    requests_by_id = {item.request_id: item for item in router.requests}
+    selected_ids: list[str] = []
+
+    for request_id in router.external_request_ids:
+        if request_id in requests_by_id and request_id not in selected_ids:
+            selected_ids.append(request_id)
+            if len(selected_ids) >= target_count:
+                return selected_ids
+
+    user_ids = set(router.user_request_ids)
+    for request in router.requests:
+        if request.request_id in selected_ids or request.request_id in user_ids:
+            continue
+        selected_ids.append(request.request_id)
+        if len(selected_ids) >= target_count:
+            break
+    return selected_ids
+
+
+def _live_request_metadata(result) -> dict[str, dict[str, str]]:
+    metadata: dict[str, dict[str, str]] = {}
+    for index, request_id in enumerate(_ordered_live_request_ids(result)):
+        if index >= len(_MARKET_RESEARCH_TEMPLATES):
+            break
+        label, claim_template, why_material, _source_types = _MARKET_RESEARCH_TEMPLATES[index]
+        metadata[request_id] = {
+            "label": label,
+            "claim": claim_template.format(seed=result.seed),
+            "why_material": why_material,
+        }
+    return metadata
+
+
+def _deduplicated_live_sources(
+    accepted: Iterable[EvidenceObservation],
+    request_metadata: dict[str, dict[str, str]],
+) -> list[dict[str, object]]:
+    grouped: dict[str, dict[str, object]] = {}
+    for observation in accepted:
+        key = observation.source_ref or f"{observation.source}|{observation.request_id}"
+        item = grouped.get(key)
+        label = request_metadata.get(observation.request_id, {}).get("label")
+        if item is None:
+            item = {
+                "source": observation.source,
+                "source_type": observation.source_type,
+                "source_ref": observation.source_ref,
+                "stance": observation.stance.value,
+                "confidence": observation.confidence,
+                "source_types": [],
+                "stances": [],
+                "request_ids": [],
+                "question_labels": [],
+            }
+            grouped[key] = item
+
+        source_types = item["source_types"]
+        stances = item["stances"]
+        request_ids = item["request_ids"]
+        question_labels = item["question_labels"]
+        assert isinstance(source_types, list)
+        assert isinstance(stances, list)
+        assert isinstance(request_ids, list)
+        assert isinstance(question_labels, list)
+
+        if observation.source_type not in source_types:
+            source_types.append(observation.source_type)
+        if observation.stance.value not in stances:
+            stances.append(observation.stance.value)
+        if observation.request_id not in request_ids:
+            request_ids.append(observation.request_id)
+        if label and label not in question_labels:
+            question_labels.append(label)
+        item["confidence"] = max(float(item["confidence"]), observation.confidence)
+
+    return list(grouped.values())
+
+
+def _research_question_coverage(
+    result,
+    accepted: Iterable[EvidenceObservation],
+    request_metadata: dict[str, dict[str, str]],
+) -> list[dict[str, object]]:
+    accepted_by_request: dict[str, set[str]] = {}
+    for observation in accepted:
+        accepted_by_request.setdefault(observation.request_id, set()).add(
+            observation.source_ref or observation.source
+        )
+
+    raw_by_request: dict[str, int] = {}
+    if result.research is not None:
+        for observation in result.research.observations:
+            raw_by_request[observation.request_id] = raw_by_request.get(observation.request_id, 0) + 1
+
+    coverage: list[dict[str, object]] = []
+    for request_id in _ordered_live_request_ids(result):
+        metadata = request_metadata.get(request_id, {})
+        refs = sorted(accepted_by_request.get(request_id, set()))
+        accepted_count = len(refs)
+        raw_count = raw_by_request.get(request_id, 0)
+        coverage.append(
+            {
+                "request_id": request_id,
+                "label": metadata.get("label", "unmapped research question"),
+                "claim": metadata.get("claim", ""),
+                "accepted_source_count": accepted_count,
+                "rejected_observation_count": max(0, raw_count - accepted_count),
+                "accepted_source_refs": refs,
+                "status": "COVERED" if accepted_count > 0 else "MISSING",
+            }
+        )
+    return coverage
+
+
 def resilient_run_mind_forge(
     seed: str,
     *,
@@ -343,21 +467,28 @@ def resilient_build_runner_summary(result) -> dict[str, object]:
 
     if research is not None:
         accepted = _source_quality_gate_live_observations(research.observations)
-        payload["live_sources"] = [
-            {
-                "source": item.source,
-                "source_type": item.source_type,
-                "source_ref": item.source_ref,
-                "stance": item.stance.value,
-                "confidence": item.confidence,
-            }
-            for item in accepted
-        ]
+        request_metadata = _live_request_metadata(result)
+        unique_sources = _deduplicated_live_sources(accepted, request_metadata)
+        coverage = _research_question_coverage(result, accepted, request_metadata)
+
+        payload["live_sources"] = unique_sources
         payload["source_quality_accepted_count"] = len(accepted)
+        payload["source_quality_unique_accepted_count"] = len(unique_sources)
         payload["source_quality_rejected_count"] = len(research.observations) - len(accepted)
+        payload["research_question_coverage"] = coverage
+        payload["research_coverage_covered_count"] = sum(
+            1 for item in coverage if item["status"] == "COVERED"
+        )
+        payload["research_coverage_missing_count"] = sum(
+            1 for item in coverage if item["status"] == "MISSING"
+        )
     else:
         payload["source_quality_accepted_count"] = 0
+        payload["source_quality_unique_accepted_count"] = 0
         payload["source_quality_rejected_count"] = 0
+        payload["research_question_coverage"] = []
+        payload["research_coverage_covered_count"] = 0
+        payload["research_coverage_missing_count"] = 0
     return payload
 
 
