@@ -83,8 +83,9 @@ def _ground_external_research(
     the two market questions that must precede mechanism-specific optimization:
     current target-market demand and current direct alternatives/competition.
 
-    Request IDs and idea ownership remain unchanged so the existing contracts,
-    Decision Engine, budgets, and evidence lineage stay backward compatible.
+    Request IDs, idea ownership, and the existing WEB/EXPERIMENT route boundary remain
+    unchanged so the V1 contracts, Decision Engine, budgets, and evidence lineage stay
+    backward compatible.
     """
 
     external_ids = set(router.external_request_ids)
@@ -108,11 +109,12 @@ def _ground_external_research(
                             f"A real-world demand floor for {topic.topic} is decision-critical; "
                             "without it, optimizing packaging, speed, or operations is premature."
                         ),
-                        "route": ResearchRoute.PUBLIC_DATA,
+                        "route": ResearchRoute.WEB,
                         "acceptable_source_types": [
                             "official statistics",
                             "primary public dataset",
-                            "public data source",
+                            "local market data",
+                            "web/public source",
                         ],
                     }
                 )
