@@ -12,7 +12,12 @@ from mind_forge.live_research_adapter_v1 import (
     ResearchPolicy,
 )
 from mind_forge.pipeline_v1 import run_phase1_forge
-from mind_forge.runner_v1 import build_runner_summary, main, run_mind_forge
+from mind_forge.runner_v1 import (
+    _cli_research_policy,
+    build_runner_summary,
+    main,
+    run_mind_forge,
+)
 
 
 def _fake_hits_for_external_requests(seed: str):
@@ -84,6 +89,40 @@ def test_runner_rebuilds_evidence_decision_experiment_memory_after_fake_research
     assert live_evidence
     assert all(item.classification is not EvidenceClassification.VERIFIED_FACT for item in live_evidence)
     assert all(item.source and item.source_type and item.source_ref for item in live_evidence)
+
+
+def test_two_search_budget_is_split_across_two_router_requests():
+    seed = "محل شاي في نامسوس"
+    baseline, hits = _fake_hits_for_external_requests(seed)
+    assert len(baseline.research.external_request_ids) == 2
+
+    policy = _cli_research_policy(
+        model="gpt-5.6-luna",
+        max_search_operations=2,
+        max_research_cost_usd=0.02,
+    )
+    assert policy.max_operations_per_request == 1
+
+    result = run_mind_forge(
+        seed,
+        live_research=True,
+        research_policy=policy,
+        research_executor=FakeResearchExecutor(hits),
+    )
+
+    assert result.research is not None
+    assert set(result.research.executed_request_ids) == set(baseline.research.external_request_ids)
+    assert result.research.usage.search_operations == 2
+    assert result.research.usage.estimated_cost_usd == 0.02
+
+
+def test_cli_four_search_budget_keeps_two_operations_per_request():
+    policy = _cli_research_policy(
+        model="gpt-5.6-luna",
+        max_search_operations=4,
+        max_research_cost_usd=0.05,
+    )
+    assert policy.max_operations_per_request == 2
 
 
 def test_runner_summary_exposes_research_budget_sources_and_final_decision():
