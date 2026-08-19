@@ -66,10 +66,11 @@ def resilient_cli_research_policy(
     max_search_operations: int,
     max_research_cost_usd: float,
 ) -> ResearchPolicy:
-    """Reserve one hosted search per market question so the full budget is usable.
+    """Build the bounded live policy used by the resilient manual launcher.
 
-    The resilient CLI intentionally spreads a six-search ceiling across six distinct
-    questions instead of reserving two search operations for one question.
+    One hosted search is reserved per market question. The structured research answer
+    gets a larger output ceiling so it can finish cleanly, while each request is kept
+    to at most two sourced observations to avoid unnecessary output growth.
     """
 
     return ResearchPolicy(
@@ -77,7 +78,9 @@ def resilient_cli_research_policy(
         model=model,
         max_search_operations=max_search_operations,
         max_operations_per_request=1,
+        max_results_per_request=2,
         max_estimated_cost_usd=max_research_cost_usd,
+        max_output_tokens=1600,
     )
 
 
