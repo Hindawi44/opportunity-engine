@@ -41,6 +41,23 @@ def _fake_hits_for_external_requests(seed: str):
     return baseline, hits
 
 
+def _fake_hits_for_all_router_requests(seed: str):
+    baseline = run_phase1_forge(seed)
+    hits = {}
+    for index, request in enumerate(baseline.research.requests, start=1):
+        hits[request.request_id] = [
+            RawResearchHit(
+                source=f"Local source {index}",
+                source_type="web/public source",
+                source_ref=f"https://example.test/live/{request.request_id}",
+                excerpt=f"Directly relevant sourced observation {index}.",
+                stance=EvidenceStance.SUPPORTS,
+                confidence=0.85,
+            )
+        ]
+    return baseline, hits
+
+
 def test_runner_starts_from_one_seed_and_is_zero_paid_call_by_default():
     result = run_mind_forge("محل شاي في نامسوس")
 
@@ -116,13 +133,46 @@ def test_two_search_budget_is_split_across_two_router_requests():
     assert result.research.usage.estimated_cost_usd == 0.02
 
 
-def test_cli_four_search_budget_keeps_two_operations_per_request():
+def test_cli_six_search_budget_uses_six_distinct_market_questions_with_one_search_each():
+    seed = "محل شاي في نامسوس"
+    baseline, hits = _fake_hits_for_all_router_requests(seed)
+    assert len(baseline.research.requests) == 6
+    assert len(baseline.research.external_request_ids) == 2
+
+    policy = _cli_research_policy(
+        model="gpt-5.6-luna",
+        max_search_operations=6,
+        max_research_cost_usd=0.07,
+    )
+    assert policy.max_operations_per_request == 1
+
+    result = run_mind_forge(
+        seed,
+        live_research=True,
+        research_policy=policy,
+        research_executor=FakeResearchExecutor(hits),
+    )
+
+    assert result.research is not None
+    assert len(result.research.executed_request_ids) == 6
+    assert len(set(result.research.executed_request_ids)) == 6
+    assert result.research.skipped_request_ids == []
+    assert result.research.usage.search_operations == 6
+    assert result.research.usage.estimated_cost_usd == 0.06
+    assert result.research.usage.estimated_cost_usd <= 0.07
+
+    summary = build_runner_summary(result)
+    assert summary["research_executed_request_count"] == 6
+    assert summary["research_usage"]["search_operations"] == 6
+
+
+def test_cli_four_search_budget_uses_one_operation_per_request():
     policy = _cli_research_policy(
         model="gpt-5.6-luna",
         max_search_operations=4,
         max_research_cost_usd=0.05,
     )
-    assert policy.max_operations_per_request == 2
+    assert policy.max_operations_per_request == 1
 
 
 def test_runner_summary_exposes_research_budget_sources_and_final_decision():
