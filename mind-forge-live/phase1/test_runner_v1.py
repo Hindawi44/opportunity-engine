@@ -172,6 +172,9 @@ def test_resilient_six_search_budget_uses_six_distinct_market_questions_with_one
     assert summary["research_executed_request_count"] == 6
     assert summary["live_external_request_count"] == 6
     assert summary["research_usage"]["search_operations"] == 6
+    assert len(summary["research_question_coverage"]) == 6
+    assert summary["research_coverage_covered_count"] == 6
+    assert summary["research_coverage_missing_count"] == 0
 
 
 def test_resilient_source_quality_gate_rejects_neutral_and_generic_market_sources():
@@ -244,10 +247,77 @@ def test_resilient_source_quality_gate_rejects_neutral_and_generic_market_source
     assert good_ssb_ref in accepted_refs
     assert good_local_ref in accepted_refs
     assert summary["source_quality_rejected_count"] == 2
-    assert summary["source_quality_accepted_count"] == len(summary["live_sources"])
+    assert summary["source_quality_unique_accepted_count"] == len(summary["live_sources"])
+    assert summary["source_quality_accepted_count"] >= len(summary["live_sources"])
     assert result.research is not None
     assert result.research.usage.search_operations == 6
     assert result.research.usage.estimated_cost_usd == 0.06
+
+
+def test_resilient_summary_deduplicates_sources_and_maps_question_coverage():
+    seed = "محل شاي في نامسوس"
+    baseline, hits = _fake_hits_for_all_router_requests(seed)
+    request_ids = [request.request_id for request in baseline.research.requests]
+
+    shared_ref = "https://thonsenter.no/namsos/mat-og-drikke/"
+    hits[request_ids[0]] = [
+        RawResearchHit(
+            source="Thon Senter Namsos",
+            source_type="local market data",
+            source_ref=shared_ref,
+            excerpt="Local food and drink activity relevant to demand.",
+            stance=EvidenceStance.SUPPORTS,
+            confidence=0.88,
+        )
+    ]
+    hits[request_ids[1]] = [
+        RawResearchHit(
+            source="Thon Senter Namsos",
+            source_type="local business listing",
+            source_ref=shared_ref,
+            excerpt="The same local source also identifies current alternatives.",
+            stance=EvidenceStance.MIXED,
+            confidence=0.86,
+        )
+    ]
+    hits[request_ids[2]] = [
+        RawResearchHit(
+            source="Namsos context only",
+            source_type="municipal/public data",
+            source_ref="https://namsos.kommune.no/context-only",
+            excerpt="Context that does not bear directionally on the customer-base claim.",
+            stance=EvidenceStance.NEUTRAL,
+            confidence=0.90,
+        )
+    ]
+
+    policy = resilient_cli_research_policy(
+        model="gpt-5.6-luna",
+        max_search_operations=6,
+        max_research_cost_usd=0.07,
+    )
+    result = resilient_run_mind_forge(
+        seed,
+        live_research=True,
+        research_policy=policy,
+        research_executor=FakeResearchExecutor(hits),
+    )
+    summary = resilient_build_runner_summary(result)
+
+    shared_entries = [item for item in summary["live_sources"] if item["source_ref"] == shared_ref]
+    assert len(shared_entries) == 1
+    assert set(shared_entries[0]["request_ids"]) == {request_ids[0], request_ids[1]}
+    assert set(shared_entries[0]["question_labels"]) == {"local demand", "competition"}
+
+    coverage = {item["label"]: item for item in summary["research_question_coverage"]}
+    assert len(coverage) == 6
+    assert coverage["local demand"]["status"] == "COVERED"
+    assert coverage["competition"]["status"] == "COVERED"
+    assert coverage["customer base"]["status"] == "MISSING"
+    assert coverage["customer base"]["accepted_source_count"] == 0
+    assert summary["research_coverage_covered_count"] == 5
+    assert summary["research_coverage_missing_count"] == 1
+    assert summary["source_quality_unique_accepted_count"] == len(summary["live_sources"])
 
 
 def test_resilient_cli_four_search_budget_uses_one_operation_per_request():
