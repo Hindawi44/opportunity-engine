@@ -18,6 +18,11 @@ from mind_forge.runner_v1 import (
     main,
     run_mind_forge,
 )
+from mind_forge.runner_v1_resilient import (
+    resilient_build_runner_summary,
+    resilient_cli_research_policy,
+    resilient_run_mind_forge,
+)
 
 
 def _fake_hits_for_external_requests(seed: str):
@@ -133,20 +138,20 @@ def test_two_search_budget_is_split_across_two_router_requests():
     assert result.research.usage.estimated_cost_usd == 0.02
 
 
-def test_cli_six_search_budget_uses_six_distinct_market_questions_with_one_search_each():
+def test_resilient_six_search_budget_uses_six_distinct_market_questions_with_one_search_each():
     seed = "محل شاي في نامسوس"
     baseline, hits = _fake_hits_for_all_router_requests(seed)
     assert len(baseline.research.requests) == 6
     assert len(baseline.research.external_request_ids) == 2
 
-    policy = _cli_research_policy(
+    policy = resilient_cli_research_policy(
         model="gpt-5.6-luna",
         max_search_operations=6,
         max_research_cost_usd=0.07,
     )
     assert policy.max_operations_per_request == 1
 
-    result = run_mind_forge(
+    result = resilient_run_mind_forge(
         seed,
         live_research=True,
         research_policy=policy,
@@ -161,13 +166,14 @@ def test_cli_six_search_budget_uses_six_distinct_market_questions_with_one_searc
     assert result.research.usage.estimated_cost_usd == 0.06
     assert result.research.usage.estimated_cost_usd <= 0.07
 
-    summary = build_runner_summary(result)
+    summary = resilient_build_runner_summary(result)
     assert summary["research_executed_request_count"] == 6
+    assert summary["live_external_request_count"] == 6
     assert summary["research_usage"]["search_operations"] == 6
 
 
-def test_cli_four_search_budget_uses_one_operation_per_request():
-    policy = _cli_research_policy(
+def test_resilient_cli_four_search_budget_uses_one_operation_per_request():
+    policy = resilient_cli_research_policy(
         model="gpt-5.6-luna",
         max_search_operations=4,
         max_research_cost_usd=0.05,
