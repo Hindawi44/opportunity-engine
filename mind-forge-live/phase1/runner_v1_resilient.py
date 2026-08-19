@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from math import floor
 from typing import Iterable
+from urllib.parse import urlparse
 
 from . import runner_v1 as base
 from .contracts_v1 import EvidenceStance
@@ -57,6 +58,17 @@ _MARKET_RESEARCH_TEMPLATES = (
         "Location and distribution determine whether the target customer can be reached cheaply enough for a meaningful pilot.",
         ["shopping-centre or public footfall data", "local business or place listing", "municipal planning/public data", "web/public source"],
     ),
+)
+
+
+_LOW_RELEVANCE_LOCAL_MARKET_DOMAINS = frozenset(
+    {
+        "areq.net",
+        "booking.com",
+        "reverso.net",
+        "searates.com",
+        "toasttab.com",
+    }
 )
 
 
@@ -173,30 +185,67 @@ def expand_live_research_router(
     )
 
 
+def _source_hostname(source_ref: str | None) -> str:
+    if not source_ref:
+        return ""
+    try:
+        return (urlparse(source_ref).hostname or "").casefold().removeprefix("www.")
+    except ValueError:
+        return ""
+
+
+def _is_low_relevance_local_market_domain(source_ref: str | None) -> bool:
+    host = _source_hostname(source_ref)
+    if not host:
+        return False
+    return any(
+        host == blocked or host.endswith(f".{blocked}")
+        for blocked in _LOW_RELEVANCE_LOCAL_MARKET_DOMAINS
+    )
+
+
+def _source_quality_gate_live_observations(
+    observations: Iterable[EvidenceObservation],
+) -> list[EvidenceObservation]:
+    """Keep only observations that can materially bear on a local-market claim.
+
+    NEUTRAL observations are context, not evidence, so they are excluded from the live
+    evidence path. A small fail-closed denylist also rejects generic cross-market sources
+    that repeatedly produced false locality matches in live runs. Search accounting is
+    unaffected: the hosted operation still happened, but rejected sources cannot affect
+    Evidence, Decision, or the user-facing accepted-source list.
+    """
+
+    accepted: list[EvidenceObservation] = []
+    for observation in observations:
+        if observation.origin is not EvidenceObservationOrigin.LIVE_RESEARCH:
+            accepted.append(observation)
+            continue
+        if observation.stance is EvidenceStance.NEUTRAL:
+            continue
+        if _is_low_relevance_local_market_domain(observation.source_ref):
+            continue
+        accepted.append(observation)
+    return accepted
+
+
 def _quality_gate_live_observations(
     observations: Iterable[EvidenceObservation],
 ) -> list[EvidenceObservation]:
-    """Prevent non-directional live sources from earning evidence strength.
+    """Apply source relevance before allowing live observations into Evidence."""
 
-    A NEUTRAL source does not support or refute the exact claim, so confidence in the
-    extraction cannot convert it into WEAK/STRONG evidence. Clamping to 0.50 makes the
-    existing Evidence Engine classify it UNKNOWN and keep the request unresolved.
-    """
-
-    gated: list[EvidenceObservation] = []
-    for observation in observations:
+    gated = _source_quality_gate_live_observations(observations)
+    return [
+        observation.model_copy(
+            update={"confidence": min(observation.confidence, 0.50)}
+        )
         if (
             observation.origin is EvidenceObservationOrigin.LIVE_RESEARCH
             and observation.stance is EvidenceStance.NEUTRAL
-        ):
-            gated.append(
-                observation.model_copy(
-                    update={"confidence": min(observation.confidence, 0.50)}
-                )
-            )
-        else:
-            gated.append(observation)
-    return gated
+        )
+        else observation
+        for observation in gated
+    ]
 
 
 def build_live_evidence_with_quality_gate(
@@ -291,6 +340,24 @@ def resilient_build_runner_summary(result) -> dict[str, object]:
     skipped_count = len(research.skipped_request_ids) if research is not None else 0
     payload["research_executed_request_count"] = executed_count
     payload["live_external_request_count"] = executed_count + skipped_count
+
+    if research is not None:
+        accepted = _source_quality_gate_live_observations(research.observations)
+        payload["live_sources"] = [
+            {
+                "source": item.source,
+                "source_type": item.source_type,
+                "source_ref": item.source_ref,
+                "stance": item.stance.value,
+                "confidence": item.confidence,
+            }
+            for item in accepted
+        ]
+        payload["source_quality_accepted_count"] = len(accepted)
+        payload["source_quality_rejected_count"] = len(research.observations) - len(accepted)
+    else:
+        payload["source_quality_accepted_count"] = 0
+        payload["source_quality_rejected_count"] = 0
     return payload
 
 
