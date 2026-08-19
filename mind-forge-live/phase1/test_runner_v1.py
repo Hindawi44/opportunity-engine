@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -125,3 +126,18 @@ def test_cli_refuses_paid_live_research_without_explicit_yes(monkeypatch):
     with pytest.raises(SystemExit) as exc:
         main(["محل شاي في نامسوس", "--live-research"])
     assert exc.value.code == 2
+
+
+def test_manual_live_research_workflow_runs_through_runner_v1_only_after_yes():
+    text = Path(".github/workflows/mind-forge-live-research-v1.yaml").read_text(encoding="utf-8")
+
+    assert "workflow_dispatch:" in text
+    assert 'default: "NO"' in text
+    assert "if: ${{ inputs.confirm_paid_live_research == 'YES' }}" in text
+    assert "runner_v1.py" in text
+    assert "python -m mind_forge.runner_v1" in text
+    assert "--live-research" in text
+    assert "--confirm-paid-live-research YES" in text
+    assert "\n  push:" not in text
+    assert "\n  pull_request:" not in text
+    assert "\n  schedule:" not in text
