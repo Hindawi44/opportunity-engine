@@ -5,6 +5,9 @@ from typing import Any
 from . import live_research_adapter_v1 as base
 
 
+_ORIGINAL_RESEARCH_PROMPT = base._research_prompt
+
+
 def _recover_invalid_final_output(_data: Any) -> base._ResearchDraft:
     """Return an empty valid draft without replaying web search side effects.
 
@@ -14,6 +17,20 @@ def _recover_invalid_final_output(_data: Any) -> base._ResearchDraft:
     """
 
     return base._ResearchDraft(observations=[])
+
+
+def _single_search_prompt(
+    request: base.ResearchRequest,
+    kind: base.ResearchAdapterKind,
+    max_results: int,
+) -> str:
+    prompt = _ORIGINAL_RESEARCH_PROMPT(request, kind, max_results)
+    return (
+        prompt
+        + "\nHARD SEARCH LIMIT: perform exactly one hosted web-search operation for this "
+        "research request. Do not perform a second search; use the sources returned by "
+        "that single search or fail closed."
+    )
 
 
 class ResilientOpenAIWebSearchExecutor(base.OpenAIWebSearchExecutor):
@@ -53,6 +70,7 @@ class ResilientOpenAIWebSearchExecutor(base.OpenAIWebSearchExecutor):
 
 
 def install_live_research_recovery() -> None:
-    """Install the resilient executor as the default live executor for this process."""
+    """Install malformed-output recovery plus a hard one-search prompt."""
 
+    base._research_prompt = _single_search_prompt
     base.OpenAIWebSearchExecutor = ResilientOpenAIWebSearchExecutor
