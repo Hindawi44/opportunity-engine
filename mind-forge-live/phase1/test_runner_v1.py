@@ -63,6 +63,16 @@ def _fake_hits_for_all_router_requests(seed: str):
     return baseline, hits
 
 
+def _expanded_request_order(baseline):
+    selected_ids = list(baseline.research.external_request_ids)
+    user_ids = set(baseline.research.user_request_ids)
+    for request in baseline.research.requests:
+        if request.request_id in selected_ids or request.request_id in user_ids:
+            continue
+        selected_ids.append(request.request_id)
+    return selected_ids
+
+
 def test_runner_starts_from_one_seed_and_is_zero_paid_call_by_default():
     result = run_mind_forge("محل شاي في نامسوس")
 
@@ -257,10 +267,11 @@ def test_resilient_source_quality_gate_rejects_neutral_and_generic_market_source
 def test_resilient_summary_deduplicates_sources_and_maps_question_coverage():
     seed = "محل شاي في نامسوس"
     baseline, hits = _fake_hits_for_all_router_requests(seed)
-    request_ids = [request.request_id for request in baseline.research.requests]
+    selected_ids = _expanded_request_order(baseline)
+    demand_id, competition_id, customer_base_id = selected_ids[:3]
 
     shared_ref = "https://thonsenter.no/namsos/mat-og-drikke/"
-    hits[request_ids[0]] = [
+    hits[demand_id] = [
         RawResearchHit(
             source="Thon Senter Namsos",
             source_type="local market data",
@@ -270,7 +281,7 @@ def test_resilient_summary_deduplicates_sources_and_maps_question_coverage():
             confidence=0.88,
         )
     ]
-    hits[request_ids[1]] = [
+    hits[competition_id] = [
         RawResearchHit(
             source="Thon Senter Namsos",
             source_type="local business listing",
@@ -280,7 +291,7 @@ def test_resilient_summary_deduplicates_sources_and_maps_question_coverage():
             confidence=0.86,
         )
     ]
-    hits[request_ids[2]] = [
+    hits[customer_base_id] = [
         RawResearchHit(
             source="Namsos context only",
             source_type="municipal/public data",
@@ -306,7 +317,7 @@ def test_resilient_summary_deduplicates_sources_and_maps_question_coverage():
 
     shared_entries = [item for item in summary["live_sources"] if item["source_ref"] == shared_ref]
     assert len(shared_entries) == 1
-    assert set(shared_entries[0]["request_ids"]) == {request_ids[0], request_ids[1]}
+    assert set(shared_entries[0]["request_ids"]) == {demand_id, competition_id}
     assert set(shared_entries[0]["question_labels"]) == {"local demand", "competition"}
 
     coverage = {item["label"]: item for item in summary["research_question_coverage"]}
