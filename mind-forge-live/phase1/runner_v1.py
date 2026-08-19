@@ -259,6 +259,24 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _cli_research_policy(
+    *,
+    model: str,
+    max_search_operations: int,
+    max_research_cost_usd: float,
+) -> ResearchPolicy:
+    """Build the bounded CLI policy without letting one request consume a 2-search run."""
+
+    max_operations_per_request = 1 if max_search_operations <= 2 else 2
+    return ResearchPolicy(
+        enabled=True,
+        model=model,
+        max_search_operations=max_search_operations,
+        max_operations_per_request=max_operations_per_request,
+        max_estimated_cost_usd=max_research_cost_usd,
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
@@ -269,11 +287,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "--live-research requires --confirm-paid-live-research YES; no paid call was made"
             )
         os.environ["MIND_FORGE_LIVE_RESEARCH_ENABLED"] = "1"
-        policy = ResearchPolicy(
-            enabled=True,
+        policy = _cli_research_policy(
             model=args.research_model,
             max_search_operations=args.max_search_operations,
-            max_estimated_cost_usd=args.max_research_cost_usd,
+            max_research_cost_usd=args.max_research_cost_usd,
         )
         result = run_mind_forge(
             args.seed,
