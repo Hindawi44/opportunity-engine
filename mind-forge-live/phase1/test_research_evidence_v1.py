@@ -20,6 +20,7 @@ from mind_forge.research_evidence_v1 import (
     build_evidence,
     route_research,
 )
+from mind_forge.runner_v1_resilient import build_live_evidence_with_quality_gate
 
 
 def _pipeline():
@@ -107,7 +108,7 @@ def test_live_neutral_observation_never_becomes_strong_even_with_high_confidence
         confidence=0.99,
     )
 
-    result = build_evidence(router, [observation])
+    result = build_live_evidence_with_quality_gate(router, [observation])
     evidence = next(item for item in result.evidence if item.claim_id == request.claim_id)
 
     assert evidence.classification is EvidenceClassification.UNKNOWN
@@ -131,7 +132,7 @@ def test_live_directional_observation_can_be_strong_only_when_source_fit_is_acce
         confidence=0.85,
     )
 
-    result = build_evidence(router, [observation])
+    result = build_live_evidence_with_quality_gate(router, [observation])
     evidence = next(item for item in result.evidence if item.claim_id == request.claim_id)
 
     assert evidence.classification is EvidenceClassification.STRONG_EVIDENCE
