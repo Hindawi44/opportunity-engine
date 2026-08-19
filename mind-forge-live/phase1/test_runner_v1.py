@@ -174,6 +174,82 @@ def test_resilient_six_search_budget_uses_six_distinct_market_questions_with_one
     assert summary["research_usage"]["search_operations"] == 6
 
 
+def test_resilient_source_quality_gate_rejects_neutral_and_generic_market_sources():
+    seed = "محل شاي في نامسوس"
+    baseline, hits = _fake_hits_for_all_router_requests(seed)
+    request_ids = [request.request_id for request in baseline.research.requests]
+
+    bad_neutral_ref = "https://www.booking.com/hotel/no/gullvikvegen-33.ar.html"
+    good_ssb_ref = "https://www.ssb.no/kommunefakta/namsos-naavmesjenjaelmie"
+    hits[request_ids[0]] = [
+        RawResearchHit(
+            source="Booking listing",
+            source_type="web/public source",
+            source_ref=bad_neutral_ref,
+            excerpt="A lodging page that does not establish tea-shop demand.",
+            stance=EvidenceStance.NEUTRAL,
+            confidence=0.90,
+        ),
+        RawResearchHit(
+            source="SSB Namsos",
+            source_type="web/public source",
+            source_ref=good_ssb_ref,
+            excerpt="Official Namsos municipality statistics relevant to the customer base.",
+            stance=EvidenceStance.MIXED,
+            confidence=0.90,
+        ),
+    ]
+
+    bad_aggregator_ref = "https://www.toasttab.com/local/order/example-tea"
+    good_local_ref = "https://thonsenter.no/namsos/butikker/mat-og-drikke/kafe/"
+    hits[request_ids[1]] = [
+        RawResearchHit(
+            source="Generic ordering page",
+            source_type="web/public source",
+            source_ref=bad_aggregator_ref,
+            excerpt="A tea ordering page outside the target market.",
+            stance=EvidenceStance.SUPPORTS,
+            confidence=0.90,
+        ),
+        RawResearchHit(
+            source="Thon Senter Namsos cafes",
+            source_type="local business listing",
+            source_ref=good_local_ref,
+            excerpt="Current local cafe alternatives in Namsos.",
+            stance=EvidenceStance.SUPPORTS,
+            confidence=0.88,
+        ),
+    ]
+
+    policy = resilient_cli_research_policy(
+        model="gpt-5.6-luna",
+        max_search_operations=6,
+        max_research_cost_usd=0.07,
+    )
+    result = resilient_run_mind_forge(
+        seed,
+        live_research=True,
+        research_policy=policy,
+        research_executor=FakeResearchExecutor(hits),
+    )
+
+    summary = resilient_build_runner_summary(result)
+    accepted_refs = {item["source_ref"] for item in summary["live_sources"]}
+    evidence_refs = {item.source_ref for item in result.run_contract.evidence if item.source_ref}
+
+    assert bad_neutral_ref not in accepted_refs
+    assert bad_aggregator_ref not in accepted_refs
+    assert bad_neutral_ref not in evidence_refs
+    assert bad_aggregator_ref not in evidence_refs
+    assert good_ssb_ref in accepted_refs
+    assert good_local_ref in accepted_refs
+    assert summary["source_quality_rejected_count"] == 2
+    assert summary["source_quality_accepted_count"] == len(summary["live_sources"])
+    assert result.research is not None
+    assert result.research.usage.search_operations == 6
+    assert result.research.usage.estimated_cost_usd == 0.06
+
+
 def test_resilient_cli_four_search_budget_uses_one_operation_per_request():
     policy = resilient_cli_research_policy(
         model="gpt-5.6-luna",
