@@ -150,6 +150,8 @@ def test_resilient_six_search_budget_uses_six_distinct_market_questions_with_one
         max_research_cost_usd=0.07,
     )
     assert policy.max_operations_per_request == 1
+    assert policy.max_output_tokens == 1600
+    assert policy.max_results_per_request == 2
 
     result = resilient_run_mind_forge(
         seed,
@@ -179,6 +181,8 @@ def test_resilient_cli_four_search_budget_uses_one_operation_per_request():
         max_research_cost_usd=0.05,
     )
     assert policy.max_operations_per_request == 1
+    assert policy.max_output_tokens == 1600
+    assert policy.max_results_per_request == 2
 
 
 def test_runner_summary_exposes_research_budget_sources_and_final_decision():
