@@ -41,8 +41,6 @@ on:
           - "0.02"
           - "0.05"
           - "0.10"
-  issue_comment:
-    types: [created]
 
 permissions:
   contents: read
@@ -51,24 +49,21 @@ concurrency:
   group: mind-forge-live-research-launcher-${{ github.run_id }}
   cancel-in-progress: false
 
+env:
+  OPENAI_AGENTS_DISABLE_TRACING: "1"
+  OPENAI_AGENTS_DONT_LOG_MODEL_DATA: "1"
+  OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
+
 jobs:
   authorization-notice:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_paid_live_research != 'YES' }}
+    if: ${{ inputs.confirm_paid_live_research != 'YES' }}
     runs-on: ubuntu-latest
     steps:
       - name: Refuse unconfirmed paid execution
         run: echo "Paid live research was not explicitly authorized; no API call was made."
 
   live-research-run:
-    if: >-
-      ${{
-        (github.event_name == 'workflow_dispatch' && inputs.confirm_paid_live_research == 'YES') ||
-        (github.event_name == 'issue_comment' &&
-         github.event.issue.number == 584 &&
-         github.event.issue.pull_request != null &&
-         github.actor == github.repository_owner &&
-         github.event.comment.body == '/mind-forge-live-research tea-shop-namsos')
-      }}
+    if: ${{ inputs.confirm_paid_live_research == 'YES' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -130,26 +125,95 @@ jobs:
           python -m compileall -q "$APP/mind_forge"
           test -f "$APP/mind_forge/runner_v1.py"
 
-      - name: Verify existing API secret without printing it
+      - name: Normalize API secret without printing it
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RAW_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python - <<'PY'
           import os
-          if not os.getenv("OPENAI_API_KEY"):
+
+          raw = os.getenv("RAW_OPENAI_API_KEY", "")
+          if not raw:
               raise SystemExit("OPENAI_API_KEY is not available to this workflow")
-          print("OPENAI_API_KEY availability: OK (value not displayed)")
+
+          clean = raw.strip()
+          if not clean:
+              raise SystemExit("OPENAI_API_KEY becomes empty after whitespace normalization")
+          if any(ch in clean for ch in "\r\n\t"):
+              raise SystemExit("OPENAI_API_KEY contains embedded whitespace; replace the GitHub secret")
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"OPENAI_API_KEY={clean}\n")
+
+          if clean != raw:
+              print("OPENAI_API_KEY normalized: leading/trailing whitespace removed")
+          else:
+              print("OPENAI_API_KEY format hygiene: OK")
+          print("OPENAI_API_KEY value was not displayed")
+          PY
+
+      - name: Preflight OpenAI transport and model access without paid generation
+        env:
+          MIND_FORGE_RESEARCH_MODEL: ${{ inputs.research_model }}
+        run: |
+          python - <<'PY'
+          import os
+          import socket
+          import ssl
+
+          import openai
+          from openai import OpenAI
+
+          host = "api.openai.com"
+          model = os.environ["MIND_FORGE_RESEARCH_MODEL"]
+
+          try:
+              addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
+          except Exception as exc:
+              raise SystemExit(f"OPENAI_PREFLIGHT_DNS_FAILED: {type(exc).__name__}: {exc}") from exc
+          if not addresses:
+              raise SystemExit("OPENAI_PREFLIGHT_DNS_FAILED: no addresses returned")
+          print("OPENAI_PREFLIGHT_DNS_OK")
+
+          try:
+              context = ssl.create_default_context()
+              with socket.create_connection((host, 443), timeout=10) as raw_socket:
+                  with context.wrap_socket(raw_socket, server_hostname=host) as tls_socket:
+                      tls_version = tls_socket.version()
+          except Exception as exc:
+              raise SystemExit(f"OPENAI_PREFLIGHT_TLS_FAILED: {type(exc).__name__}: {exc}") from exc
+          print(f"OPENAI_PREFLIGHT_TLS_OK: {tls_version}")
+
+          try:
+              client = OpenAI(api_key=os.environ["OPENAI_API_KEY"], timeout=20.0, max_retries=2)
+              resolved = client.models.retrieve(model)
+          except openai.APIConnectionError as exc:
+              cause = exc.__cause__
+              details = []
+              while cause is not None and len(details) < 4:
+                  details.append(f"{type(cause).__name__}: {cause}")
+                  cause = cause.__cause__
+              detail_text = " <- ".join(details) if details else "no underlying transport cause available"
+              raise SystemExit(f"OPENAI_PREFLIGHT_SDK_CONNECTION_FAILED: {detail_text}") from exc
+          except openai.APIStatusError as exc:
+              raise SystemExit(
+                  f"OPENAI_PREFLIGHT_API_STATUS_FAILED: HTTP {exc.status_code}; "
+                  f"model={model}; request_id={getattr(exc, 'request_id', None)}"
+              ) from exc
+
+          if getattr(resolved, "id", None) != model:
+              raise SystemExit(f"OPENAI_PREFLIGHT_MODEL_MISMATCH: requested={model}")
+          print(f"OPENAI_PREFLIGHT_SDK_AND_MODEL_OK: {model}")
           PY
 
       - name: Run MIND FORGE from one seed with bounded live research
         env:
           PYTHONPATH: ${{ env.APP }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           MIND_FORGE_LIVE_RESEARCH_ENABLED: "1"
-          MIND_FORGE_SEED: ${{ github.event_name == 'workflow_dispatch' && inputs.seed || 'محل شاي في نامسوس' }}
-          MIND_FORGE_RESEARCH_MODEL: ${{ github.event_name == 'workflow_dispatch' && inputs.research_model || 'gpt-5.6-luna' }}
-          MIND_FORGE_MAX_SEARCH_OPERATIONS: ${{ github.event_name == 'workflow_dispatch' && inputs.max_search_operations || '2' }}
-          MIND_FORGE_MAX_RESEARCH_COST_USD: ${{ github.event_name == 'workflow_dispatch' && inputs.max_research_cost_usd || '0.02' }}
+          MIND_FORGE_SEED: ${{ inputs.seed }}
+          MIND_FORGE_RESEARCH_MODEL: ${{ inputs.research_model }}
+          MIND_FORGE_MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
+          MIND_FORGE_MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
         run: |
           set -euo pipefail
           mkdir -p artifacts/mind-forge-live-research-launcher
@@ -165,8 +229,8 @@ jobs:
 
       - name: Validate Runner output and budget gates
         env:
-          MAX_SEARCH_OPERATIONS: ${{ github.event_name == 'workflow_dispatch' && inputs.max_search_operations || '2' }}
-          MAX_RESEARCH_COST_USD: ${{ github.event_name == 'workflow_dispatch' && inputs.max_research_cost_usd || '0.02' }}
+          MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
+          MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
         run: |
           python - <<'PY'
           import json
