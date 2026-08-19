@@ -86,24 +86,49 @@ class ResearchRouterResult(BaseModel):
         return self
 
 
-class EvidenceObservation(BaseModel):
-    """Normalized observation returned by a future tool/research adapter.
+class EvidenceObservationOrigin(str, Enum):
+    MANUAL = "MANUAL"
+    LIVE_RESEARCH = "LIVE_RESEARCH"
 
-    The Evidence Engine does not fetch in Phase 1 CI. It validates whatever a future
-    web/public-data/calculator adapter returns and refuses to upgrade unsupported
-    claims into sourced evidence.
+
+class EvidenceObservation(BaseModel):
+    """Normalized observation supplied to the Evidence Engine.
+
+    Backward-compatible MANUAL observations may carry a proposed classification.
+    LIVE_RESEARCH observations are deliberately weaker contracts: they contain only
+    sourced observations plus stance/confidence. They are forbidden from assigning
+    any final EvidenceClassification; the Evidence Engine owns that decision.
     """
 
     model_config = ConfigDict(extra="forbid")
 
     request_id: str = Field(min_length=1)
+    origin: EvidenceObservationOrigin = EvidenceObservationOrigin.MANUAL
     source: str | None = None
     source_type: str | None = None
     source_ref: str | None = None
-    classification: EvidenceClassification
+    observation_text: str | None = None
+    classification: EvidenceClassification | None = None
     stance: EvidenceStance = EvidenceStance.NEUTRAL
     confidence: float = Field(ge=0.0, le=1.0)
     contradiction_notes: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def enforce_origin_boundary(self) -> "EvidenceObservation":
+        if self.origin is EvidenceObservationOrigin.LIVE_RESEARCH:
+            if self.classification is not None:
+                raise ValueError(
+                    "LIVE_RESEARCH observations cannot assign final evidence classification"
+                )
+            if not self.source or not self.source_type or not self.source_ref:
+                raise ValueError(
+                    "LIVE_RESEARCH observations require source, source_type, and source_ref"
+                )
+            if not self.observation_text or not self.observation_text.strip():
+                raise ValueError("LIVE_RESEARCH observations require observation_text")
+        elif self.classification is None:
+            raise ValueError("MANUAL observations require an explicit classification")
+        return self
 
 
 class EvidenceEngineResult(BaseModel):
@@ -120,13 +145,9 @@ class EvidenceEngineResult(BaseModel):
         unresolved = set(self.unresolved_request_ids)
         if resolved & unresolved:
             raise ValueError("a research request cannot be both resolved and unresolved")
-        evidence_request_ids = {
-            item.source_ref.removeprefix("research-request:")
-            for item in self.evidence
-            if item.source_ref and item.source_ref.startswith("research-request:")
-        }
-        if not evidence_request_ids.issubset(resolved | unresolved):
-            raise ValueError("evidence references a research request absent from resolution partitions")
+        evidence_ids = [item.evidence_id for item in self.evidence]
+        if len(evidence_ids) != len(set(evidence_ids)):
+            raise ValueError("evidence IDs must be unique")
         return self
 
 
@@ -262,25 +283,123 @@ def _placeholder_evidence(request: ResearchRequest) -> Evidence:
     )
 
 
+def _normalized_source_type(value: str) -> str:
+    return " ".join(value.strip().casefold().replace("_", " ").replace("-", " ").split())
+
+
+def _source_type_is_acceptable(request: ResearchRequest, observation: EvidenceObservation) -> bool:
+    if not observation.source_type:
+        return False
+    observed = _normalized_source_type(observation.source_type)
+    for acceptable in request.acceptable_source_types:
+        expected = _normalized_source_type(acceptable)
+        if expected and (expected in observed or observed in expected):
+            return True
+    return False
+
+
+def _classify_live_observation(
+    request: ResearchRequest,
+    observation: EvidenceObservation,
+) -> EvidenceClassification:
+    """Evidence Engine-owned classification for sourced live observations.
+
+    The live adapter is never allowed to emit VERIFIED_FACT. Strong evidence requires
+    complete provenance, adequate confidence, and a source type compatible with the
+    Research Router request. Lower-confidence or mismatched sources degrade rather
+    than being promoted.
+    """
+
+    if observation.origin is not EvidenceObservationOrigin.LIVE_RESEARCH:
+        raise ValueError("_classify_live_observation accepts LIVE_RESEARCH observations only")
+    if observation.stance is EvidenceStance.MIXED or observation.contradiction_notes:
+        return EvidenceClassification.CONFLICTING_EVIDENCE
+    if not observation.source or not observation.source_type or not observation.source_ref:
+        return EvidenceClassification.UNKNOWN
+    if observation.confidence >= 0.80 and _source_type_is_acceptable(request, observation):
+        return EvidenceClassification.STRONG_EVIDENCE
+    if observation.confidence >= 0.55:
+        return EvidenceClassification.WEAK_EVIDENCE
+    return EvidenceClassification.UNKNOWN
+
+
+def _canonical_manual_evidence(
+    request: ResearchRequest,
+    observation: EvidenceObservation,
+) -> Evidence:
+    assert observation.classification is not None
+    # Preserve backward compatibility for existing manual test fixtures that predate
+    # an explicit source_ref. The canonical object still receives a source reference.
+    source_ref = observation.source_ref or f"research-request:{request.request_id}"
+    return Evidence(
+        evidence_id=f"evidence-{request.request_id}",
+        claim_id=request.claim_id,
+        claim_text=request.claim_text,
+        idea_id=request.idea_id,
+        classification=observation.classification,
+        stance=observation.stance,
+        source=observation.source,
+        source_type=observation.source_type,
+        source_ref=source_ref,
+        confidence=observation.confidence,
+        contradiction_notes=list(observation.contradiction_notes),
+    )
+
+
+def _canonical_live_evidence(
+    request: ResearchRequest,
+    observation: EvidenceObservation,
+    *,
+    index: int,
+    force_conflict: bool,
+    conflict_notes: list[str],
+) -> Evidence:
+    classification = (
+        EvidenceClassification.CONFLICTING_EVIDENCE
+        if force_conflict
+        else _classify_live_observation(request, observation)
+    )
+    notes = list(observation.contradiction_notes)
+    if force_conflict:
+        for note in conflict_notes:
+            if note not in notes:
+                notes.append(note)
+    confidence = observation.confidence
+    if classification is EvidenceClassification.UNKNOWN:
+        confidence = min(confidence, 0.50)
+    return Evidence(
+        evidence_id=f"evidence-{request.request_id}-live-{index:02d}",
+        claim_id=request.claim_id,
+        claim_text=request.claim_text,
+        idea_id=request.idea_id,
+        classification=classification,
+        stance=EvidenceStance.MIXED if force_conflict else observation.stance,
+        source=observation.source,
+        source_type=observation.source_type,
+        source_ref=observation.source_ref,
+        confidence=confidence,
+        contradiction_notes=notes,
+    )
+
+
 def build_evidence(
     router: ResearchRouterResult,
     observations: Iterable[EvidenceObservation] = (),
 ) -> EvidenceEngineResult:
     """Convert research observations into canonical Evidence, fail-closed.
 
-    Missing observations remain ASSUMPTION/UNKNOWN. Sourced classifications still
-    pass through the canonical Evidence provenance validator, so VERIFIED/STRONG/
-    WEAK/CONFLICTING cannot be created without source + source_type.
+    MANUAL observations retain the Phase 1 compatibility path. LIVE_RESEARCH results
+    may be numerous for one request, but each result remains an EvidenceObservation
+    first and carries no final classification. Only this Evidence Engine classifies
+    those observations. It never upgrades a live result directly to VERIFIED_FACT.
     """
 
     requests = {item.request_id: item for item in router.requests}
-    obs_by_request: dict[str, EvidenceObservation] = {}
+    obs_by_request: dict[str, list[EvidenceObservation]] = {}
     for observation in observations:
         if observation.request_id not in requests:
             raise ValueError(f"observation references unknown research request {observation.request_id}")
-        if observation.request_id in obs_by_request:
-            raise ValueError(f"duplicate observation for research request {observation.request_id}")
-        obs_by_request[observation.request_id] = observation
+        obs_by_request.setdefault(observation.request_id, []).append(observation)
 
     evidence: list[Evidence] = []
     resolved: list[str] = []
@@ -288,32 +407,101 @@ def build_evidence(
     conflicting_claim_ids: list[str] = []
 
     for request in router.requests:
-        observation = obs_by_request.get(request.request_id)
-        if observation is None:
+        request_observations = obs_by_request.get(request.request_id, [])
+        if not request_observations:
             evidence.append(_placeholder_evidence(request))
             unresolved.append(request.request_id)
             continue
 
-        item = Evidence(
-            evidence_id=f"evidence-{request.request_id}",
-            claim_id=request.claim_id,
-            claim_text=request.claim_text,
-            idea_id=request.idea_id,
-            classification=observation.classification,
-            stance=observation.stance,
-            source=observation.source,
-            source_type=observation.source_type,
-            source_ref=f"research-request:{request.request_id}",
-            confidence=observation.confidence,
-            contradiction_notes=list(observation.contradiction_notes),
+        origins = {item.origin for item in request_observations}
+        if len(origins) != 1:
+            raise ValueError(
+                f"research request {request.request_id} cannot mix MANUAL and LIVE_RESEARCH observations"
+            )
+
+        origin = next(iter(origins))
+        if origin is EvidenceObservationOrigin.MANUAL:
+            if len(request_observations) != 1:
+                raise ValueError(f"duplicate manual observation for research request {request.request_id}")
+            item = _canonical_manual_evidence(request, request_observations[0])
+            evidence.append(item)
+            if item.classification in {
+                EvidenceClassification.UNKNOWN,
+                EvidenceClassification.ASSUMPTION,
+                EvidenceClassification.CONFLICTING_EVIDENCE,
+            }:
+                unresolved.append(request.request_id)
+            else:
+                resolved.append(request.request_id)
+            if item.classification is EvidenceClassification.CONFLICTING_EVIDENCE:
+                conflicting_claim_ids.append(item.claim_id)
+            continue
+
+        stances = {
+            item.stance
+            for item in request_observations
+            if item.stance in {EvidenceStance.SUPPORTS, EvidenceStance.REFUTES}
+        }
+        direct_conflict = (
+            EvidenceStance.SUPPORTS in stances and EvidenceStance.REFUTES in stances
         )
-        evidence.append(item)
-        if item.classification in {EvidenceClassification.UNKNOWN, EvidenceClassification.ASSUMPTION}:
+        explicit_conflict = any(
+            item.stance is EvidenceStance.MIXED or item.contradiction_notes
+            for item in request_observations
+        )
+        force_conflict = direct_conflict or explicit_conflict
+        conflict_notes: list[str] = []
+        if direct_conflict:
+            supporting = [
+                item.source_ref for item in request_observations if item.stance is EvidenceStance.SUPPORTS
+            ]
+            refuting = [
+                item.source_ref for item in request_observations if item.stance is EvidenceStance.REFUTES
+            ]
+            conflict_notes.append(
+                "Sourced observations disagree: supports="
+                + ", ".join(str(value) for value in supporting)
+                + "; refutes="
+                + ", ".join(str(value) for value in refuting)
+            )
+
+        live_items = [
+            _canonical_live_evidence(
+                request,
+                observation,
+                index=index,
+                force_conflict=force_conflict,
+                conflict_notes=conflict_notes,
+            )
+            for index, observation in enumerate(request_observations, start=1)
+        ]
+        evidence.extend(live_items)
+
+        if force_conflict:
             unresolved.append(request.request_id)
-        else:
+            conflicting_claim_ids.append(request.claim_id)
+        elif any(
+            item.classification in {
+                EvidenceClassification.STRONG_EVIDENCE,
+                EvidenceClassification.WEAK_EVIDENCE,
+            }
+            for item in live_items
+        ):
             resolved.append(request.request_id)
-        if item.classification is EvidenceClassification.CONFLICTING_EVIDENCE:
-            conflicting_claim_ids.append(item.claim_id)
+        else:
+            unresolved.append(request.request_id)
+
+        if any(
+            item.classification is EvidenceClassification.VERIFIED_FACT
+            for item in live_items
+        ):
+            raise RuntimeError("Evidence Engine must never promote live research directly to VERIFIED_FACT")
+        for item in live_items:
+            if item.classification is EvidenceClassification.STRONG_EVIDENCE:
+                if not item.source or not item.source_type or not item.source_ref:
+                    raise RuntimeError(
+                        "STRONG_EVIDENCE from live research requires source, source_type, and source_ref"
+                    )
 
     return EvidenceEngineResult(
         evidence=evidence,
