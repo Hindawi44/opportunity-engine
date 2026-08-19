@@ -41,6 +41,8 @@ on:
           - "0.02"
           - "0.05"
           - "0.10"
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: read
@@ -51,14 +53,22 @@ concurrency:
 
 jobs:
   authorization-notice:
-    if: ${{ inputs.confirm_paid_live_research != 'YES' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_paid_live_research != 'YES' }}
     runs-on: ubuntu-latest
     steps:
       - name: Refuse unconfirmed paid execution
         run: echo "Paid live research was not explicitly authorized; no API call was made."
 
   live-research-run:
-    if: ${{ inputs.confirm_paid_live_research == 'YES' }}
+    if: >-
+      ${{
+        (github.event_name == 'workflow_dispatch' && inputs.confirm_paid_live_research == 'YES') ||
+        (github.event_name == 'issue_comment' &&
+         github.event.issue.number == 584 &&
+         github.event.issue.pull_request != null &&
+         github.actor == github.repository_owner &&
+         github.event.comment.body == '/mind-forge-live-research tea-shop-namsos')
+      }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -136,10 +146,10 @@ jobs:
           PYTHONPATH: ${{ env.APP }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           MIND_FORGE_LIVE_RESEARCH_ENABLED: "1"
-          MIND_FORGE_SEED: ${{ inputs.seed }}
-          MIND_FORGE_RESEARCH_MODEL: ${{ inputs.research_model }}
-          MIND_FORGE_MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
-          MIND_FORGE_MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
+          MIND_FORGE_SEED: ${{ github.event_name == 'workflow_dispatch' && inputs.seed || 'محل شاي في نامسوس' }}
+          MIND_FORGE_RESEARCH_MODEL: ${{ github.event_name == 'workflow_dispatch' && inputs.research_model || 'gpt-5.6-luna' }}
+          MIND_FORGE_MAX_SEARCH_OPERATIONS: ${{ github.event_name == 'workflow_dispatch' && inputs.max_search_operations || '2' }}
+          MIND_FORGE_MAX_RESEARCH_COST_USD: ${{ github.event_name == 'workflow_dispatch' && inputs.max_research_cost_usd || '0.02' }}
         run: |
           set -euo pipefail
           mkdir -p artifacts/mind-forge-live-research-launcher
@@ -155,8 +165,8 @@ jobs:
 
       - name: Validate Runner output and budget gates
         env:
-          MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
-          MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
+          MAX_SEARCH_OPERATIONS: ${{ github.event_name == 'workflow_dispatch' && inputs.max_search_operations || '2' }}
+          MAX_RESEARCH_COST_USD: ${{ github.event_name == 'workflow_dispatch' && inputs.max_research_cost_usd || '0.02' }}
         run: |
           python - <<'PY'
           import json
