@@ -15,6 +15,7 @@ from mind_forge.logic_engine_v1 import evaluate_logic
 from mind_forge.question_generator_v1 import generate_questions
 from mind_forge.research_evidence_v1 import (
     EvidenceObservation,
+    EvidenceObservationOrigin,
     ResearchRoute,
     build_evidence,
     route_research,
@@ -90,6 +91,51 @@ def test_sourced_strong_evidence_resolves_one_request() -> None:
     assert evidence.classification is EvidenceClassification.STRONG_EVIDENCE
     assert evidence.source == "Public source example"
     assert evidence.source_type == "primary market data"
+
+
+def test_live_neutral_observation_never_becomes_strong_even_with_high_confidence() -> None:
+    _, _, _, _, _, _, router = _pipeline()
+    request = next(item for item in router.requests if item.route is ResearchRoute.WEB)
+    observation = EvidenceObservation(
+        request_id=request.request_id,
+        origin=EvidenceObservationOrigin.LIVE_RESEARCH,
+        source="Irrelevant but well-formed source",
+        source_type=request.acceptable_source_types[0],
+        source_ref="https://example.invalid/neutral",
+        observation_text="The page exists but does not support or refute the exact claim.",
+        stance=EvidenceStance.NEUTRAL,
+        confidence=0.99,
+    )
+
+    result = build_evidence(router, [observation])
+    evidence = next(item for item in result.evidence if item.claim_id == request.claim_id)
+
+    assert evidence.classification is EvidenceClassification.UNKNOWN
+    assert evidence.stance is EvidenceStance.NEUTRAL
+    assert evidence.confidence <= 0.50
+    assert request.request_id in result.unresolved_request_ids
+    assert request.request_id not in result.resolved_request_ids
+
+
+def test_live_directional_observation_can_be_strong_only_when_source_fit_is_acceptable() -> None:
+    _, _, _, _, _, _, router = _pipeline()
+    request = next(item for item in router.requests if item.route is ResearchRoute.WEB)
+    observation = EvidenceObservation(
+        request_id=request.request_id,
+        origin=EvidenceObservationOrigin.LIVE_RESEARCH,
+        source="Primary market source",
+        source_type=request.acceptable_source_types[0],
+        source_ref="https://example.invalid/support",
+        observation_text="This source directly supports the material claim.",
+        stance=EvidenceStance.SUPPORTS,
+        confidence=0.85,
+    )
+
+    result = build_evidence(router, [observation])
+    evidence = next(item for item in result.evidence if item.claim_id == request.claim_id)
+
+    assert evidence.classification is EvidenceClassification.STRONG_EVIDENCE
+    assert request.request_id in result.resolved_request_ids
 
 
 def test_strong_evidence_without_provenance_is_rejected_fail_closed() -> None:
