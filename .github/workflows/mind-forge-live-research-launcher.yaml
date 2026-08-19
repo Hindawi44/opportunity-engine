@@ -1,11 +1,6 @@
 name: MIND FORGE Live Research Launcher
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/mind-forge-live-research-launcher.yaml"
   workflow_dispatch:
     inputs:
       seed:
@@ -51,8 +46,6 @@ on:
 
 permissions:
   contents: read
-  actions: read
-  issues: write
 
 concurrency:
   group: mind-forge-live-research-launcher-${{ github.run_id }}
@@ -213,54 +206,3 @@ jobs:
           name: mind-forge-live-research-launcher
           path: artifacts/mind-forge-live-research-launcher/
           if-no-files-found: warn
-
-  status-report:
-    if: >-
-      ${{
-        github.event_name == 'push' ||
-        (github.event_name == 'issue_comment' &&
-         github.event.issue.number == 584 &&
-         github.event.issue.pull_request != null &&
-         github.actor == github.repository_owner &&
-         github.event.comment.body == '/mind-forge-status')
-      }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Report most recent actual live launcher run to PR
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          RUN_ID=""
-          for CANDIDATE in $(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/mind-forge-live-research-launcher.yaml/runs?per_page=20" \
-            --jq '.workflow_runs[] | select(.event == "issue_comment" or .event == "workflow_dispatch") | .id'); do
-            JOB_STATE="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CANDIDATE/jobs" \
-              --jq '[.jobs[] | select(.name == "live-research-run")][0] | if . == null then "missing" else (.conclusion // .status) end' 2>/dev/null || true)"
-            if [ -n "$JOB_STATE" ] && [ "$JOB_STATE" != "missing" ] && [ "$JOB_STATE" != "skipped" ]; then
-              RUN_ID="$CANDIDATE"
-              break
-            fi
-          done
-
-          if [ -z "$RUN_ID" ]; then
-            BODY="MIND FORGE status: no actual live launcher run found yet."
-          else
-            STATUS="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq '.status')"
-            CONCLUSION="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq '.conclusion // "pending"')"
-            URL="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq '.html_url')"
-            SUMMARY=""
-            FAILURE=""
-            if [ "$STATUS" = "completed" ]; then
-              LOGS="$(gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --log 2>/dev/null || true)"
-              SUMMARY="$(printf '%s\n' "$LOGS" | grep 'MIND_FORGE_RUN_COMPLETE' | tail -n 1 | sed 's/^[^{}]*//' | head -c 6000 || true)"
-              FAILURE="$(printf '%s\n' "$LOGS" | grep -E 'Error|ERROR|Traceback|SystemExit|RuntimeError|BadRequest|not available|unsupported|invalid' | tail -n 12 | head -c 4000 || true)"
-            fi
-            BODY=$(printf 'MIND FORGE status\n\nRun: %s\nStatus: %s\nConclusion: %s\n%s' "$RUN_ID" "$STATUS" "$CONCLUSION" "$URL")
-            if [ -n "$SUMMARY" ]; then
-              BODY=$(printf '%s\n\n```json\n%s\n```' "$BODY" "$SUMMARY")
-            elif [ -n "$FAILURE" ]; then
-              BODY=$(printf '%s\n\n```text\n%s\n```' "$BODY" "$FAILURE")
-            fi
-          fi
-
-          gh api "repos/$GITHUB_REPOSITORY/issues/584/comments" -f body="$BODY" >/dev/null
