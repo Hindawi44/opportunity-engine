@@ -17,6 +17,7 @@ from .question_generator_v1 import QuestionStage, build_adaptive_question_set
 from .research_evidence_v1 import (
     EvidenceEngineResult,
     EvidenceObservation,
+    ResearchRoute,
     ResearchRouterResult,
     build_evidence,
     route_research,
@@ -71,6 +72,80 @@ def _run_id(topic: TopicInput) -> str:
     return f"phase1-{digest}"
 
 
+def _ground_external_research(
+    topic: TopicInput,
+    router: ResearchRouterResult,
+) -> ResearchRouterResult:
+    """Make the first paid searches validate the seed's real target market.
+
+    Phase 1 ideas are deliberately mechanism-diverse, but their first assumptions can
+    be too generic for live search. The first two external requests therefore answer
+    the two market questions that must precede mechanism-specific optimization:
+    current target-market demand and current direct alternatives/competition.
+
+    Request IDs and idea ownership remain unchanged so the existing contracts,
+    Decision Engine, budgets, and evidence lineage stay backward compatible.
+    """
+
+    external_ids = set(router.external_request_ids)
+    external_rank = 0
+    grounded_requests = []
+
+    for request in router.requests:
+        if request.request_id not in external_ids:
+            grounded_requests.append(request)
+            continue
+
+        if external_rank == 0:
+            grounded_requests.append(
+                request.model_copy(
+                    update={
+                        "claim_text": (
+                            f"The target market for {topic.topic} has enough current local demand "
+                            "and customer activity to justify a low-cost paid pilot before larger capital is committed."
+                        ),
+                        "why_material": (
+                            f"A real-world demand floor for {topic.topic} is decision-critical; "
+                            "without it, optimizing packaging, speed, or operations is premature."
+                        ),
+                        "route": ResearchRoute.PUBLIC_DATA,
+                        "acceptable_source_types": [
+                            "official statistics",
+                            "primary public dataset",
+                            "public data source",
+                        ],
+                    }
+                )
+            )
+        elif external_rank == 1:
+            grounded_requests.append(
+                request.model_copy(
+                    update={
+                        "claim_text": (
+                            f"Direct competitors and substitutes serving customers for {topic.topic} "
+                            "leave a meaningful local gap in product, price, convenience, availability, or experience."
+                        ),
+                        "why_material": (
+                            f"The opportunity in {topic.topic} depends on what customers can already buy locally; "
+                            "a competitor gap can change whether to test, rework, or reject the concept."
+                        ),
+                        "route": ResearchRoute.WEB,
+                        "acceptable_source_types": [
+                            "direct competitor/public offer",
+                            "local business listing",
+                            "web/public source",
+                        ],
+                    }
+                )
+            )
+        else:
+            grounded_requests.append(request)
+
+        external_rank += 1
+
+    return router.model_copy(update={"requests": grounded_requests})
+
+
 def run_phase1_forge(
     seed: str | TopicInput,
     *,
@@ -98,7 +173,10 @@ def run_phase1_forge(
     experts = evaluate_with_expert_minds(creative)
     logic = evaluate_logic(topic, creative, experts)
     critique = critique_survivors(creative, logic)
-    research = route_research(creative, logic, critique)
+    research = _ground_external_research(
+        topic,
+        route_research(creative, logic, critique),
+    )
     evidence_engine = build_evidence(research, evidence_observations)
     decision_engine = decide(
         creative,
