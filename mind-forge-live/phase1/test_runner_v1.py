@@ -1,0 +1,127 @@
+from __future__ import annotations
+
+import json
+
+import pytest
+
+from mind_forge.contracts_v1 import EvidenceClassification, EvidenceStance
+from mind_forge.live_research_adapter_v1 import (
+    FakeResearchExecutor,
+    RawResearchHit,
+    ResearchPolicy,
+)
+from mind_forge.pipeline_v1 import run_phase1_forge
+from mind_forge.runner_v1 import build_runner_summary, main, run_mind_forge
+
+
+def _fake_hits_for_external_requests(seed: str):
+    baseline = run_phase1_forge(seed)
+    external_ids = set(baseline.research.external_request_ids)
+    hits = {}
+    for index, request in enumerate(baseline.research.requests, start=1):
+        if request.request_id not in external_ids:
+            continue
+        source_type = request.acceptable_source_types[0]
+        hits[request.request_id] = [
+            RawResearchHit(
+                source=f"Source {index}",
+                source_type=source_type,
+                source_ref=f"https://example.test/{request.request_id}",
+                excerpt=f"Sourced observation for {request.claim_id}.",
+                stance=EvidenceStance.SUPPORTS,
+                confidence=0.85,
+            )
+        ]
+    return baseline, hits
+
+
+def test_runner_starts_from_one_seed_and_is_zero_paid_call_by_default():
+    result = run_mind_forge("محل شاي في نامسوس")
+
+    assert result.seed == "محل شاي في نامسوس"
+    assert result.live_research_requested is False
+    assert result.research is None
+    assert result.run_contract == result.baseline.run_contract
+    assert len(result.run_contract.ideas) == 14
+    assert len(result.run_contract.expert_outputs) == 10
+
+
+def test_runner_live_research_requires_explicit_enabled_policy():
+    with pytest.raises(RuntimeError, match="explicitly enabled ResearchPolicy"):
+        run_mind_forge(
+            "محل شاي في نامسوس",
+            live_research=True,
+            research_executor=FakeResearchExecutor(),
+        )
+
+
+def test_runner_rebuilds_evidence_decision_experiment_memory_after_fake_research():
+    seed = "محل شاي في نامسوس"
+    baseline, hits = _fake_hits_for_external_requests(seed)
+    result = run_mind_forge(
+        seed,
+        live_research=True,
+        research_policy=ResearchPolicy(
+            enabled=True,
+            max_search_operations=4,
+            max_estimated_cost_usd=0.05,
+        ),
+        research_executor=FakeResearchExecutor(hits),
+    )
+
+    assert result.research is not None
+    assert result.research.live_executor_used is False
+    assert set(result.research.executed_request_ids) == set(baseline.research.external_request_ids)
+    assert result.research.usage.search_operations == len(baseline.research.external_request_ids)
+    assert result.run_contract.evidence == result.evidence_engine.evidence
+    assert result.run_contract.decision == result.decision_engine.decision
+    assert result.run_contract.experiments == result.experiment_engine.experiments
+    assert result.run_contract.memory_records == result.memory_engine.records
+
+    live_refs = {item.source_ref for item in result.research.observations}
+    live_evidence = [item for item in result.run_contract.evidence if item.source_ref in live_refs]
+    assert live_evidence
+    assert all(item.classification is not EvidenceClassification.VERIFIED_FACT for item in live_evidence)
+    assert all(item.source and item.source_type and item.source_ref for item in live_evidence)
+
+
+def test_runner_summary_exposes_research_budget_sources_and_final_decision():
+    seed = "محل شاي في نامسوس"
+    _, hits = _fake_hits_for_external_requests(seed)
+    result = run_mind_forge(
+        seed,
+        live_research=True,
+        research_policy=ResearchPolicy(
+            enabled=True,
+            max_search_operations=4,
+            max_estimated_cost_usd=0.05,
+        ),
+        research_executor=FakeResearchExecutor(hits),
+    )
+    summary = build_runner_summary(result)
+
+    assert summary["status"] == "MIND_FORGE_RUN_COMPLETE"
+    assert summary["seed"] == seed
+    assert summary["idea_count"] == 14
+    assert summary["expert_mind_count"] == 10
+    assert summary["live_research_requested"] is True
+    assert summary["research_usage"]["search_operations"] > 0
+    assert summary["research_usage"]["estimated_cost_usd"] <= 0.05
+    assert summary["live_sources"]
+    assert summary["decision_verdict"] == result.decision_engine.decision.verdict.value
+
+
+def test_cli_free_mode_accepts_only_the_seed_and_prints_summary(capsys):
+    assert main(["محل شاي في نامسوس"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["seed"] == "محل شاي في نامسوس"
+    assert payload["live_research_requested"] is False
+    assert payload["research_usage"]["search_operations"] == 0
+
+
+def test_cli_refuses_paid_live_research_without_explicit_yes(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    with pytest.raises(SystemExit) as exc:
+        main(["محل شاي في نامسوس", "--live-research"])
+    assert exc.value.code == 2
