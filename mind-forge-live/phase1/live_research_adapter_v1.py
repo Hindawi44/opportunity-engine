@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Mapping
+from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import Any, Protocol
 from urllib.parse import urlparse
@@ -197,6 +198,11 @@ def _as_jsonish(value: Any) -> Any:
         return {str(key): _as_jsonish(item) for key, item in value.items()}
     if isinstance(value, (list, tuple)):
         return [_as_jsonish(item) for item in value]
+    if is_dataclass(value) and not isinstance(value, type):
+        return {
+            field.name: _as_jsonish(getattr(value, field.name))
+            for field in fields(value)
+        }
     if hasattr(value, "model_dump"):
         try:
             return _as_jsonish(value.model_dump(mode="json"))
@@ -240,8 +246,6 @@ def _extract_sources(payloads: list[Any]) -> dict[str, str]:
 
 def _source_type_for_kind(kind: ResearchAdapterKind) -> str:
     if kind is ResearchAdapterKind.PUBLIC_DATA:
-        # Deliberately generic: Evidence Engine will not upgrade this to STRONG merely
-        # because the research prompt requested official data.
         return "public data source"
     if kind is ResearchAdapterKind.MAPS_PLACES:
         return "maps/place listing"
@@ -317,11 +321,28 @@ class OpenAIWebSearchExecutor:
             max_turns=2,
         )
 
-        payloads = [_as_jsonish(item) for item in getattr(result, "raw_responses", [])]
-        actual_operations = _count_web_search_calls(payloads)
-        sources = _extract_sources(payloads)
+        raw_payloads = [
+            _as_jsonish(item) for item in getattr(result, "raw_responses", [])
+        ]
+        new_item_payloads = [
+            _as_jsonish(raw_item)
+            for item in getattr(result, "new_items", [])
+            if (raw_item := getattr(item, "raw_item", None)) is not None
+        ]
+
+        actual_operations = max(
+            _count_web_search_calls(raw_payloads),
+            _count_web_search_calls(new_item_payloads),
+        )
+        sources = _extract_sources(raw_payloads)
+        if not sources:
+            sources = _extract_sources(new_item_payloads)
         if not sources:
             raise RuntimeError("live web research returned no source URLs; fail closed")
+
+        # A returned web-search source proves at least one hosted search occurred even
+        # if a future SDK representation omits the call item from one inspection surface.
+        actual_operations = max(actual_operations, 1)
 
         draft = result.final_output
         if not isinstance(draft, _ResearchDraft):
@@ -347,8 +368,6 @@ class OpenAIWebSearchExecutor:
             if len(hits) >= policy.max_results_per_request:
                 break
 
-        # If the structured draft failed to bind to the exact returned URLs, keep
-        # actual URLs as neutral observations rather than inventing provenance.
         if not hits:
             summary = str(getattr(result, "final_output", "Sourced web result"))
             if len(summary) > 1_200:
@@ -504,8 +523,6 @@ def execute_research_requests(
     if active_executor.is_live:
         assert_live_research_access(active_policy)
     elif not active_policy.enabled:
-        # Even fake execution must be explicitly enabled by the caller so tests prove
-        # the same budget behavior without silently changing the default boundary.
         raise RuntimeError("research policy is disabled")
 
     gate = ResearchBudgetGate(active_policy)
