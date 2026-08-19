@@ -30,6 +30,47 @@ def test_raw_seed_runs_end_to_end_without_user_interruption() -> None:
     assert all(item.truth_status is MemoryTruthStatus.INFERRED for item in contract.memory_records)
 
 
+def test_local_business_seed_prioritizes_demand_and_competition_research() -> None:
+    seed = "محل شاي في نامسوس"
+    result = run_phase1_forge(seed)
+
+    internal_questions = [
+        item.text.casefold()
+        for item in result.run_contract.questions
+        if item.kind is QuestionKind.INTERNAL
+    ]
+    joined = "\n".join(internal_questions)
+    assert "observable demand" in joined
+    assert "direct competitors" in joined
+    assert "unit economics" in joined
+    assert "licenses" in joined
+
+    external_ids = set(result.research.external_request_ids)
+    external = [
+        item for item in result.research.requests
+        if item.request_id in external_ids
+    ]
+    assert len(external) == 2
+
+    demand, competition = external
+    assert demand.route is ResearchRoute.WEB
+    assert seed in demand.claim_text
+    assert "local demand" in demand.claim_text.casefold()
+    assert "official statistics" in demand.acceptable_source_types
+
+    assert competition.route is ResearchRoute.WEB
+    assert seed in competition.claim_text
+    assert "direct competitors" in competition.claim_text.casefold()
+    assert "direct competitor/public offer" in competition.acceptable_source_types
+
+    generic_fragments = (
+        "subset of customers values speed",
+        "adjacent need is common enough",
+    )
+    first_two_claims = "\n".join(item.claim_text.casefold() for item in external)
+    assert not any(fragment in first_two_claims for fragment in generic_fragments)
+
+
 def test_one_call_preserves_structural_diversity_and_full_expert_universe() -> None:
     result = run_phase1_forge("تصليح الملابس")
     contract = result.run_contract
