@@ -30,6 +30,13 @@ def _single_search_prompt(
         + "\nHARD SEARCH LIMIT: perform exactly one hosted web-search operation for this "
         "research request. Do not perform a second search; use the sources returned by "
         "that single search or fail closed."
+        + "\nSOURCE RELEVANCE RULE: use only sources that materially bear on the exact claim "
+        "and target market. For local-market questions, the source must be explicitly local "
+        "to the target geography or be an authoritative official/regulatory source directly "
+        "applicable to that jurisdiction. Do not use generic international booking pages, "
+        "translation sites, shipping directories, or third-party ordering pages as evidence "
+        "for local demand, competition, pricing, or customer flow. If the available source "
+        "does not meet this rule, return no observation for it."
     )
 
 
