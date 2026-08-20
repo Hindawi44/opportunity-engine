@@ -75,9 +75,47 @@ jobs:
               raise SystemExit("expected eight Norway commerce cases")
           if data.get("idea_box_count") != 20:
               raise SystemExit("expected twenty Norway commerce idea-box seeds")
+          if data.get("discovery_candidate_count") != 20:
+              raise SystemExit("generic discovery seed must expand to twenty candidates")
           if data.get("lens_count") != 6:
               raise SystemExit("expected six NORWAY_COMMERCE research lenses")
           print("NORWAY_COMMERCE contract: PASS")
+          PY
+
+      - name: Dry-run real Norway commerce discovery seed
+        shell: bash
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+
+          seed = "ابحث عن تجارة مربحة في النرويج"
+          path = Path("mind-forge-live/phase1/norway_commerce_v1.py")
+          spec = importlib.util.spec_from_file_location("norway_commerce_v1", path)
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+
+          profile = "NORWAY_COMMERCE" if module.is_norway_commerce_seed(seed) else "OTHER"
+          candidates = module.candidate_seeds_for_seed(seed, limit=20)
+          if profile != "NORWAY_COMMERCE":
+              raise SystemExit("real seed did not select NORWAY_COMMERCE")
+          if len(candidates) != 20:
+              raise SystemExit(f"expected 20 candidates, got {len(candidates)}")
+
+          payload = {
+              "status": "NORWAY_COMMERCE_DRY_RUN_PASS",
+              "seed": seed,
+              "profile": profile,
+              "candidate_count": len(candidates),
+              "network_calls": 0,
+              "paid_api_calls": 0,
+              "candidates": candidates,
+          }
+          Path("mind-forge-norway-commerce-dry-run.json").write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+          )
+          print(json.dumps(payload, ensure_ascii=False, indent=2))
           PY
 
       - name: Upload generalization reports
@@ -88,5 +126,6 @@ jobs:
           path: |
             mind-forge-generalization-contract.json
             mind-forge-norway-commerce-contract.json
+            mind-forge-norway-commerce-dry-run.json
           if-no-files-found: error
           retention-days: 30
