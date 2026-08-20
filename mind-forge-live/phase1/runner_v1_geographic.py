@@ -135,6 +135,129 @@ _SEMANTIC_MARKERS = {
         "lokasjon",
         "passasjer",
     ),
+    "observable reality": (
+        "evidence",
+        "data",
+        "measurement",
+        "measured",
+        "observed",
+        "current state",
+        "incident",
+        "issue",
+        "problem",
+        "usage",
+        "rate",
+        "frequency",
+        "result",
+        "report",
+        "record",
+        "metric",
+        "benchmark",
+        "test",
+        "error",
+        "failure",
+        "performance",
+    ),
+    "alternatives and benchmarks": (
+        "alternative",
+        "alternatives",
+        "benchmark",
+        "comparison",
+        "comparable",
+        "approach",
+        "method",
+        "solution",
+        "option",
+        "implementation",
+        "competitor",
+        "prior",
+        "reference",
+        "best practice",
+    ),
+    "people and context": (
+        "user",
+        "users",
+        "customer",
+        "customers",
+        "stakeholder",
+        "stakeholders",
+        "affected",
+        "population",
+        "audience",
+        "participant",
+        "environment",
+        "context",
+        "workflow",
+        "usage",
+        "device",
+        "organization",
+        "team",
+    ),
+    "resources and economics": (
+        "cost",
+        "costs",
+        "price",
+        "budget",
+        "resource",
+        "resources",
+        "time",
+        "capacity",
+        "memory",
+        "cpu",
+        "latency",
+        "throughput",
+        "energy",
+        "power",
+        "battery",
+        "performance",
+        "effort",
+        "staff",
+        "revenue",
+        "margin",
+    ),
+    "rules risks and dependencies": (
+        "risk",
+        "risks",
+        "dependency",
+        "dependencies",
+        "requirement",
+        "requirements",
+        "standard",
+        "policy",
+        "regulation",
+        "safety",
+        "security",
+        "compatibility",
+        "constraint",
+        "constraints",
+        "limitation",
+        "failure mode",
+        "vulnerability",
+        "permission",
+    ),
+    "implementation and access": (
+        "implementation",
+        "implement",
+        "setup",
+        "install",
+        "deploy",
+        "deployment",
+        "integrate",
+        "integration",
+        "workflow",
+        "access",
+        "availability",
+        "available",
+        "api",
+        "configuration",
+        "migration",
+        "rollout",
+        "test",
+        "steps",
+        "procedure",
+        "channel",
+        "location",
+    ),
 }
 
 _PRICING_MARKERS = (
@@ -191,12 +314,13 @@ def _country_code_tld(host: str) -> str | None:
     return None
 
 
-def _request_labels(router: ResearchRouterResult) -> dict[str, str]:
+def _request_labels(router: ResearchRouterResult, *, seed: str) -> dict[str, str]:
     labels: dict[str, str] = {}
+    templates = resilient.research_templates_for_seed(seed)
     for index, request_id in enumerate(router.external_request_ids):
-        if index >= len(resilient._MARKET_RESEARCH_TEMPLATES):
+        if index >= len(templates):
             break
-        labels[request_id] = resilient._MARKET_RESEARCH_TEMPLATES[index][0]
+        labels[request_id] = templates[index][0]
     return labels
 
 
@@ -230,14 +354,16 @@ def _is_geographically_relevant(
     seed: str,
     question_label: str | None,
 ) -> bool:
-    """Fail closed on sources that clearly belong to the wrong jurisdiction.
+    """Fail closed on wrong jurisdictions only for local-market research.
 
-    The first production profile is the current Namsos/Norway market. Unknown seeds keep
-    the resilient V1 behavior unchanged. Reserved .test domains remain allowed for
-    deterministic offline regression tests only.
+    Geography rules are a specialization, not a global MIND FORGE assumption. A technical,
+    scientific, personal, administrative, or other GENERAL seed may legitimately use global
+    primary evidence even when the seed happens to mention Norway.
     """
 
     if observation.origin is not EvidenceObservationOrigin.LIVE_RESEARCH:
+        return True
+    if resilient.research_profile_for_seed(seed) != "LOCAL_MARKET":
         return True
 
     country_code = _target_country_code(seed)
@@ -272,13 +398,7 @@ def _is_semantically_relevant(
     *,
     question_label: str | None,
 ) -> bool:
-    """Require the source content to bear on the exact market question.
-
-    Geographic match alone is insufficient. Each known live market question must expose
-    evidence-bearing terms in the source/title/URL/excerpt. Pricing/economics is stricter:
-    a pricing/cost/margin term must be accompanied by a numeric measure, so an unrelated
-    local community page cannot become strong pricing evidence merely because it is local.
-    """
+    """Require the source content to bear on the exact selected research lens."""
 
     if observation.origin is not EvidenceObservationOrigin.LIVE_RESEARCH:
         return True
@@ -306,8 +426,11 @@ def _geographic_quality_gate(
     *,
     seed: str,
 ) -> list[EvidenceObservation]:
-    accepted = resilient._source_quality_gate_live_observations(observations)
-    labels = _request_labels(router)
+    accepted = resilient._source_quality_gate_live_observations(
+        observations,
+        seed=seed,
+    )
+    labels = _request_labels(router, seed=seed)
     return [
         observation
         for observation in accepted
@@ -322,8 +445,10 @@ def _geographic_quality_gate(
 def _semantic_quality_gate(
     router: ResearchRouterResult,
     observations: Iterable[EvidenceObservation],
+    *,
+    seed: str,
 ) -> list[EvidenceObservation]:
-    labels = _request_labels(router)
+    labels = _request_labels(router, seed=seed)
     return [
         observation
         for observation in observations
@@ -342,7 +467,7 @@ def geographic_run_mind_forge(
     research_executor=None,
     max_selected: int = 3,
 ):
-    """Resilient Runner V1 plus target-jurisdiction and semantic validation."""
+    """Adaptive Runner V1 plus profile-aware geographic and semantic validation."""
 
     if not live_research:
         return resilient._ORIGINAL_RUN_MIND_FORGE(
@@ -374,7 +499,11 @@ def geographic_run_mind_forge(
         research.observations,
         seed=baseline.run_contract.topic.topic,
     )
-    accepted_observations = _semantic_quality_gate(live_router, geographically_accepted)
+    accepted_observations = _semantic_quality_gate(
+        live_router,
+        geographically_accepted,
+        seed=baseline.run_contract.topic.topic,
+    )
     evidence_engine = base.build_evidence(live_router, accepted_observations)
     decision_engine = base.decide(
         baseline.creative,
@@ -417,6 +546,7 @@ def geographic_run_mind_forge(
 
 def geographic_build_runner_summary(result) -> dict[str, object]:
     payload = resilient._ORIGINAL_BUILD_RUNNER_SUMMARY(result)
+    payload["research_profile"] = resilient.research_profile_for_seed(result.seed)
     research = result.research
     executed_count = len(research.executed_request_ids) if research is not None else 0
     skipped_count = len(research.skipped_request_ids) if research is not None else 0
@@ -425,7 +555,10 @@ def geographic_build_runner_summary(result) -> dict[str, object]:
 
     if research is not None:
         request_metadata = resilient._live_request_metadata(result)
-        base_accepted = resilient._source_quality_gate_live_observations(research.observations)
+        base_accepted = resilient._source_quality_gate_live_observations(
+            research.observations,
+            seed=result.seed,
+        )
         request_labels = {
             request_id: metadata.get("label", "")
             for request_id, metadata in request_metadata.items()
