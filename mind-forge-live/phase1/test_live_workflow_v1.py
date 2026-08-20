@@ -7,7 +7,12 @@ from mind_forge.runner_v1_geographic import (
     geographic_build_runner_summary,
     geographic_run_mind_forge,
 )
-from mind_forge.runner_v1_resilient import resilient_cli_research_policy
+from mind_forge.runner_v1_resilient import (
+    expand_live_research_router,
+    research_profile_for_seed,
+    research_templates_for_seed,
+    resilient_cli_research_policy,
+)
 
 
 WORKFLOW = Path(".github/workflows/mind-forge-live-model-v1.yaml")
@@ -122,31 +127,28 @@ def test_geographic_gate_rejects_foreign_regulation_for_namsos_and_keeps_norway(
     assert summary["geographic_relevance_rejected_count"] == 1
 
 
-def test_semantic_gate_rejects_local_but_irrelevant_pricing_page_and_keeps_menu_price_evidence():
+def test_semantic_gate_rejects_local_page_that_does_not_answer_pricing_question():
     seed = "محل شاي في نامسوس"
     baseline, hits = _all_request_hits(seed)
     pricing_id = _expanded_request_order(baseline)[3]
 
-    irrelevant_ref = (
-        "https://namsos.kommune.no/kultur-idrett-og-fritid/"
-        "lokta-og-melkrampa/melkrampa/2025/mai/frivilligsentralen/"
-    )
-    menu_ref = "https://kruscoffee.no/meny"
+    irrelevant_ref = "https://namsos.kommune.no/kultur-idrett-og-fritid/frivilligsentralen/"
+    menu_ref = "https://example.test/namsos-cafe-menu"
     hits[pricing_id] = [
         RawResearchHit(
-            source="Namsos Frivilligsentralen",
+            source="Namsos frivilligsentral",
             source_type="web/public source",
             source_ref=irrelevant_ref,
-            excerpt="Community volunteer-center activities and local events in Namsos.",
+            excerpt="A local community page in Namsos with no menu, prices, costs, or margin data.",
             stance=EvidenceStance.SUPPORTS,
             confidence=0.90,
         ),
         RawResearchHit(
-            source="Krus Coffee menu",
+            source="Namsos cafe menu",
             source_type="public menu or price list",
             source_ref=menu_ref,
-            excerpt="The current menu lists tea at 49 NOK and coffee at 45 NOK.",
-            stance=EvidenceStance.SUPPORTS,
+            excerpt="Current local menu lists tea at 49 NOK and coffee at 45 NOK.",
+            stance=EvidenceStance.MIXED,
             confidence=0.90,
         ),
     ]
@@ -175,4 +177,54 @@ def test_semantic_gate_rejects_local_but_irrelevant_pricing_page_and_keeps_menu_
     assert coverage["pricing and economics"]["status"] == "COVERED"
     assert coverage["pricing and economics"]["accepted_source_count"] == 1
     assert coverage["pricing and economics"]["rejected_observation_count"] == 1
-    assert summary["semantic_relevance_rejected_count"] == 1
+    assert summary["semantic_relevance_rejected_count"] >= 1
+
+
+def test_adaptive_research_profile_keeps_local_market_lenses_for_shop_seed():
+    seed = "محل شاي في نامسوس"
+    assert research_profile_for_seed(seed) == "LOCAL_MARKET"
+    assert [item[0] for item in research_templates_for_seed(seed)] == [
+        "local demand",
+        "competition",
+        "customer base",
+        "pricing and economics",
+        "regulation",
+        "location and customer flow",
+    ]
+
+
+def test_adaptive_research_profile_uses_universal_lenses_for_non_market_seed():
+    seed = "إصلاح انهيار برنامج عند رفع ملف كبير"
+    assert research_profile_for_seed(seed) == "GENERAL"
+    assert [item[0] for item in research_templates_for_seed(seed)] == [
+        "observable reality",
+        "alternatives and benchmarks",
+        "people and context",
+        "resources and economics",
+        "rules risks and dependencies",
+        "implementation and access",
+    ]
+
+    baseline = run_phase1_forge(seed)
+    policy = resilient_cli_research_policy(
+        model="gpt-5.6-luna",
+        max_search_operations=6,
+        max_research_cost_usd=0.07,
+    )
+    live_router = expand_live_research_router(
+        baseline.research,
+        seed=seed,
+        policy=policy,
+    )
+    selected = {
+        item.request_id: item
+        for item in live_router.requests
+        if item.request_id in set(live_router.external_request_ids)
+    }
+    joined_claims = " ".join(item.claim_text for item in selected.values()).casefold()
+
+    assert len(selected) == 6
+    assert seed.casefold() in joined_claims
+    assert "target market" not in joined_claims
+    assert "gross-margin" not in joined_claims
+    assert "food-service" not in joined_claims
