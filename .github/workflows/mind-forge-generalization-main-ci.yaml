@@ -30,8 +30,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python mind-forge-live/phase1/generalization_contract_v1.py \
-            | tee mind-forge-generalization-contract.json
+          python mind-forge-live/phase1/generalization_contract_v1.py | tee mind-forge-generalization-contract.json
 
       - name: Validate generalization contract result
         shell: bash
@@ -40,12 +39,9 @@ jobs:
           import json
           from pathlib import Path
           data = json.loads(Path("mind-forge-generalization-contract.json").read_text(encoding="utf-8"))
-          if data.get("status") != "MIND_FORGE_GENERALIZATION_CONTRACT_PASS":
-              raise SystemExit("generalization contract did not pass")
-          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0:
-              raise SystemExit("generalization contract must remain fully offline")
-          if data.get("case_count") != 8:
-              raise SystemExit("expected eight generalization cases")
+          if data.get("status") != "MIND_FORGE_GENERALIZATION_CONTRACT_PASS": raise SystemExit("generalization contract did not pass")
+          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0: raise SystemExit("generalization contract must remain fully offline")
+          if data.get("case_count") != 8: raise SystemExit("expected eight generalization cases")
           print("MIND FORGE generalization contract: PASS")
           PY
 
@@ -53,8 +49,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python mind-forge-live/phase1/norway_commerce_contract_v1.py \
-            | tee mind-forge-norway-commerce-contract.json
+          python mind-forge-live/phase1/norway_commerce_contract_v1.py | tee mind-forge-norway-commerce-contract.json
 
       - name: Validate NORWAY_COMMERCE contract result
         shell: bash
@@ -63,16 +58,11 @@ jobs:
           import json
           from pathlib import Path
           data = json.loads(Path("mind-forge-norway-commerce-contract.json").read_text(encoding="utf-8"))
-          if data.get("status") != "NORWAY_COMMERCE_CONTRACT_PASS":
-              raise SystemExit("NORWAY_COMMERCE contract did not pass")
-          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0:
-              raise SystemExit("NORWAY_COMMERCE contract must remain fully offline")
-          if data.get("commerce_case_count") != 8:
-              raise SystemExit("expected eight Norway commerce cases")
-          if data.get("idea_box_count") != 20 or data.get("discovery_candidate_count") != 20:
-              raise SystemExit("expected twenty Norway commerce candidates")
-          if data.get("lens_count") != 6:
-              raise SystemExit("expected six NORWAY_COMMERCE research lenses")
+          if data.get("status") != "NORWAY_COMMERCE_CONTRACT_PASS": raise SystemExit("NORWAY_COMMERCE contract did not pass")
+          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0: raise SystemExit("NORWAY_COMMERCE contract must remain fully offline")
+          if data.get("commerce_case_count") != 8: raise SystemExit("expected eight Norway commerce cases")
+          if data.get("idea_box_count") != 20 or data.get("discovery_candidate_count") != 20: raise SystemExit("expected twenty Norway commerce candidates")
+          if data.get("lens_count") != 6: raise SystemExit("expected six NORWAY_COMMERCE research lenses")
           print("NORWAY_COMMERCE contract: PASS")
           PY
 
@@ -80,30 +70,17 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import importlib.util
-          import json
+          import importlib.util, json
           from pathlib import Path
           seed = "ابحث عن تجارة مربحة في النرويج"
           path = Path("mind-forge-live/phase1/norway_commerce_v1.py")
           spec = importlib.util.spec_from_file_location("norway_commerce_v1", path)
-          module = importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(module)
+          module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
           profile = "NORWAY_COMMERCE" if module.is_norway_commerce_seed(seed) else "OTHER"
           candidates = module.candidate_seeds_for_seed(seed, limit=20)
-          if profile != "NORWAY_COMMERCE" or len(candidates) != 20:
-              raise SystemExit("Norway commerce dry run did not expand correctly")
-          payload = {
-              "status": "NORWAY_COMMERCE_DRY_RUN_PASS",
-              "seed": seed,
-              "profile": profile,
-              "candidate_count": len(candidates),
-              "network_calls": 0,
-              "paid_api_calls": 0,
-              "candidates": candidates,
-          }
-          Path("mind-forge-norway-commerce-dry-run.json").write_text(
-              json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
-          )
+          if profile != "NORWAY_COMMERCE" or len(candidates) != 20: raise SystemExit("Norway commerce dry run did not expand correctly")
+          payload = {"status":"NORWAY_COMMERCE_DRY_RUN_PASS","seed":seed,"profile":profile,"candidate_count":len(candidates),"network_calls":0,"paid_api_calls":0,"candidates":candidates}
+          Path("mind-forge-norway-commerce-dry-run.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
           print(json.dumps(payload, ensure_ascii=False, indent=2))
           PY
 
@@ -111,8 +88,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python mind-forge-live/phase1/creative_v2_open_contract.py \
-            | tee mind-forge-creative-v2-open-contract.json
+          python mind-forge-live/phase1/creative_v2_open_contract.py | tee mind-forge-creative-v2-open-contract.json
 
       - name: Validate Creative Engine V2 open contract
         shell: bash
@@ -121,16 +97,11 @@ jobs:
           import json
           from pathlib import Path
           data = json.loads(Path("mind-forge-creative-v2-open-contract.json").read_text(encoding="utf-8"))
-          if data.get("status") != "CREATIVE_V2_OPEN_CONTRACT_PASS":
-              raise SystemExit("Creative Engine V2 open contract did not pass")
-          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0:
-              raise SystemExit("Creative Engine V2 contract must remain fully offline")
-          if data.get("v1_preserved") is not True:
-              raise SystemExit("V1 must remain preserved as fallback/benchmark")
-          if data.get("v2_uses_predefined_pattern_frames") is not False:
-              raise SystemExit("V2 must not use predefined V1 pattern frames")
-          if data.get("v2_min_required_family_diversity") != 8:
-              raise SystemExit("V2 must require at least eight discovered families")
+          if data.get("status") != "CREATIVE_V2_OPEN_CONTRACT_PASS": raise SystemExit("Creative Engine V2 open contract did not pass")
+          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0: raise SystemExit("Creative Engine V2 contract must remain fully offline")
+          if data.get("v1_preserved") is not True: raise SystemExit("V1 must remain preserved as fallback/benchmark")
+          if data.get("v2_uses_predefined_pattern_frames") is not False: raise SystemExit("V2 must not use predefined V1 pattern frames")
+          if data.get("v2_min_required_family_diversity") != 8: raise SystemExit("V2 must require at least eight discovered families")
           print("Creative Engine V2 open contract: PASS")
           PY
 
