@@ -19,6 +19,14 @@ def _functions(tree: ast.Module) -> set[str]:
     }
 
 
+def _string_literals(tree: ast.AST) -> str:
+    parts: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            parts.append(node.value)
+    return "\n".join(parts)
+
+
 def run_contract() -> dict[str, object]:
     engine_source = ENGINE.read_text(encoding="utf-8")
     live_source = LIVE.read_text(encoding="utf-8")
@@ -26,6 +34,8 @@ def run_contract() -> dict[str, object]:
 
     engine_tree = ast.parse(engine_source, filename=str(ENGINE))
     live_tree = ast.parse(live_source, filename=str(LIVE))
+    engine_literals = _string_literals(engine_tree)
+    live_literals = _string_literals(live_tree)
 
     required_engine = {
         "open_creative_prompt",
@@ -46,7 +56,7 @@ def run_contract() -> dict[str, object]:
         "stay inside its stated mechanism family",
     )
     for token in forbidden_open_tokens:
-        if token in engine_source or token in live_source:
+        if token in engine_source or token in live_source or token in engine_literals or token in live_literals:
             raise AssertionError(f"V2 is contaminated by V1 frame constraint: {token}")
 
     required_prompt_meaning = (
@@ -56,17 +66,14 @@ def run_contract() -> dict[str, object]:
         "at least eight distinct mechanism families",
     )
     for text in required_prompt_meaning:
-        if text not in engine_source:
+        if text not in engine_literals:
             raise AssertionError(f"V2 open prompt lost required instruction: {text}")
 
     if "generate_v1_ideas(topic, questions)" not in engine_source:
         raise AssertionError("V1 benchmark/fallback hook is missing")
 
-    if "baseline = generate_ideas(topic, questions)" not in v1_source:
-        # V1 itself need not contain this exact live line; this guard merely ensures
-        # the old deterministic module still exists and was not replaced in-place.
-        if "def generate_ideas(" not in v1_source:
-            raise AssertionError("V1 deterministic generator was unexpectedly removed")
+    if "def generate_ideas(" not in v1_source:
+        raise AssertionError("V1 deterministic generator was unexpectedly removed")
 
     if "OpenCreativePayload" not in live_source or "apply_open_payload" not in live_source:
         raise AssertionError("live V2 does not use the open output contract")
