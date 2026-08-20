@@ -41,6 +41,16 @@ def _single_search_prompt(
         "regulatory claims, never substitute guidance from another country, region, or "
         "municipality. A source is usable only when it directly applies to the target "
         "jurisdiction named in the seed; otherwise return no observation for that source."
+        + "\nSEMANTIC EVIDENCE RULE: geographic match alone is never sufficient. The cited "
+        "source and extracted observation must directly answer the research question. For "
+        "pricing/economics, require observable prices, a menu/price list with numeric values, "
+        "cost inputs, margins, revenue, or break-even inputs. For competition, require a "
+        "direct competitor/substitute offer or business listing. For customer base, require "
+        "population, visitor, tourism, passenger, or demographic evidence. For local demand, "
+        "require observable customer activity, footfall, sales, orders, or equivalent demand "
+        "signals. For location/customer flow, require traffic, footfall, visitor-flow, shopping-"
+        "centre, transport, or channel evidence. A local community/news page that merely names "
+        "the target place does not qualify for an unrelated market claim; return no observation."
     )
 
 
