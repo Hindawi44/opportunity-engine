@@ -5,6 +5,14 @@
 **Workflow files represented:** 38  
 **Change note:** adds the dedicated manual One Opportunity Commercial Analysis workflow; no existing workflow was deleted or disabled.
 
+## Current-surface addendum — 2026-08-20
+
+The historical v1.3 snapshot below remains at 38 represented workflows. The current live Actions surface additionally contains the manual-only MIND FORGE launcher:
+
+- `.github/workflows/mind-forge-live-research-launcher.yaml`
+
+This launcher has no automatic schedule and does not change ownership of the Multi-Market Daily Operator Checkpoint schedule.
+
 ## Operator surface
 
 The principal general discovery workflow remains:
@@ -91,4 +99,4 @@ The Germany workflows continue to enforce market identity `DE`, source and repor
 
 ## Integrity statement
 
-This report represents all 38 workflow files. The Sweden and Germany open-web workflows, the multi-market checkpoint, and the one-opportunity commercial analysis remain manually dispatchable where specified. Existing eligibility gates, source-access statuses, financial formulas, lifecycle state, and automatic-action prohibitions remain unchanged.
+This report preserves the historical 38-workflow snapshot and records the current manual-only MIND FORGE launcher in the addendum above. The Sweden and Germany open-web workflows, the multi-market checkpoint, and the one-opportunity commercial analysis remain manually dispatchable where specified. Existing eligibility gates, source-access statuses, financial formulas, lifecycle state, and automatic-action prohibitions remain unchanged.

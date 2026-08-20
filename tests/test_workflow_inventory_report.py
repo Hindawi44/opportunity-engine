@@ -10,11 +10,11 @@ def test_workflow_inventory_report_represents_every_current_workflow_file() -> N
     workflow_paths = sorted(WORKFLOW_DIR.glob("*.yml")) + sorted(WORKFLOW_DIR.glob("*.yaml"))
 
     assert workflow_paths, "No GitHub Actions workflows were found"
-    assert len(workflow_paths) == 5
+    assert len(workflow_paths) == 6
 
     # v1.3 remains the historical 38-workflow inventory. Every workflow still
-    # present today must be represented by that snapshot; archived entries may
-    # remain in the report for audit/history.
+    # present today must be represented by that snapshot or its current-surface
+    # addendum; archived entries may remain in the report for audit/history.
     missing = [path.as_posix() for path in workflow_paths if f"`{path.as_posix()}`" not in report]
     assert missing == []
 

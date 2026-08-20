@@ -6,9 +6,9 @@ CHECKPOINT = WORKFLOWS / "multi-market-daily-operator-checkpoint.yaml"
 TESTS_WORKFLOW = WORKFLOWS / "tests.yml"
 
 
-def test_france_reuses_existing_schedule_and_does_not_add_workflow() -> None:
+def test_france_reuses_existing_schedule_and_does_not_add_scheduler() -> None:
     workflow_files = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
-    assert len(workflow_files) == 5
+    assert len(workflow_files) == 6
     scheduled = []
     for path in workflow_files:
         live_lines = [
