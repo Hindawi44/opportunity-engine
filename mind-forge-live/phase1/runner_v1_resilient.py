@@ -25,39 +25,103 @@ _MARKET_RESEARCH_TEMPLATES = (
     (
         "local demand",
         "The target market for {seed} has enough current observable local demand and customer activity to justify a low-cost paid pilot before larger capital is committed.",
-        "A real demand floor must be established before operational optimization can justify investment.",
-        ["official statistics", "local market data", "web/public source"],
+        "A real demand floor must be established before operational optimization can justify investment. Search for direct local demand signals rather than generic market commentary.",
+        ["official statistics", "local footfall or sales data", "local market data", "web/public source"],
     ),
     (
         "competition",
         "Direct competitors and substitutes serving customers for {seed} leave a meaningful local gap in product, price, convenience, availability, or experience.",
-        "The opportunity depends on what customers can already buy locally and where a measurable gap remains.",
-        ["direct competitor/public offer", "local business listing", "web/public source"],
+        "The opportunity depends on what customers can already buy locally and where a measurable gap remains. Search direct local competitor offers or current business listings.",
+        ["direct competitor/public offer", "local business listing", "direct business page", "web/public source"],
     ),
     (
         "customer base",
         "The addressable resident, visitor, and seasonal customer base around {seed} is large and active enough to support repeat demand.",
-        "Population, visitor flow, and seasonality determine whether apparent demand can support recurring sales.",
+        "Population, visitor flow, and seasonality determine whether apparent demand can support recurring sales. Prefer official population, tourism, passenger, or visitor data.",
         ["official statistics", "municipal/public data", "tourism or transport public data", "web/public source"],
     ),
     (
         "pricing and economics",
         "Current local prices and realistic gross-margin inputs for {seed} can support a viable break-even customer volume.",
-        "Observed prices and cost/margin inputs are required to test whether the concept can reach break-even at plausible volume.",
+        "Observed prices and cost/margin inputs are required to test whether the concept can reach break-even at plausible volume. Search direct menus, price lists, or measurable cost inputs.",
         ["direct competitor/public offer", "public menu or price list", "local business listing", "web/public source"],
     ),
     (
         "regulation",
         "Current licenses, food-service rules, permits, and local operating requirements for {seed} are feasible for a low-cost pilot and later commercial operation.",
-        "Regulatory blockers can invalidate the opportunity even when demand and competition look attractive.",
+        "Regulatory blockers can invalidate the opportunity even when demand and competition look attractive. Prefer the exact regulator or municipality that governs the target location.",
         ["government publication", "official regulator guidance", "municipality requirements", "web/public source"],
     ),
     (
         "location and customer flow",
         "There are accessible locations or sales channels for {seed} with enough relevant customer flow to test demand without committing to a full permanent shop.",
-        "Location and distribution determine whether the target customer can be reached cheaply enough for a meaningful pilot.",
+        "Location and distribution determine whether the target customer can be reached cheaply enough for a meaningful pilot. Search measurable footfall, transport, shopping-centre, or channel evidence.",
         ["shopping-centre or public footfall data", "local business or place listing", "municipal planning/public data", "web/public source"],
     ),
+)
+
+
+_UNIVERSAL_RESEARCH_TEMPLATES = (
+    (
+        "observable reality",
+        "Current observable evidence materially establishes the real-world state, problem, need, or opportunity described by {seed}, rather than relying on assumption alone.",
+        "MIND FORGE must verify what is actually happening now before choosing a solution. Search direct measurements, primary records, current data, or authoritative descriptions of the exact issue.",
+        ["primary source", "official/public data", "direct measurement", "credible web/public source"],
+    ),
+    (
+        "alternatives and benchmarks",
+        "Existing alternatives, comparable approaches, prior solutions, or benchmarks relevant to {seed} show what already works, fails, or remains unresolved.",
+        "A decision is stronger when it is compared with real alternatives and measurable reference points rather than evaluated in isolation.",
+        ["primary documentation", "direct alternative or comparable source", "benchmark data", "credible web/public source"],
+    ),
+    (
+        "people and context",
+        "The users, stakeholders, affected groups, operating environment, and contextual conditions relevant to {seed} are understood well enough to judge the problem or opportunity correctly.",
+        "Who is affected and under what conditions can materially change both the reasoning and the best solution.",
+        ["official/public data", "primary user or stakeholder source", "credible survey or study", "credible web/public source"],
+    ),
+    (
+        "resources and economics",
+        "The measurable resources, costs, time, capacity, performance, or economic constraints around {seed} are known well enough to compare feasible options.",
+        "A promising idea can fail when its resource, cost, time, capacity, or performance requirements are unrealistic.",
+        ["primary specification or price", "benchmark or performance data", "official/public data", "credible web/public source"],
+    ),
+    (
+        "rules risks and dependencies",
+        "The material rules, risks, dependencies, standards, safety constraints, compatibility limits, or failure modes affecting {seed} are identified and supported by evidence.",
+        "Hidden constraints or dependencies can invalidate an otherwise attractive solution, so they must be verified before commitment.",
+        ["official rule or standard", "primary documentation", "security/safety guidance", "credible web/public source"],
+    ),
+    (
+        "implementation and access",
+        "There is a practical implementation, access, integration, workflow, delivery, or testing path for {seed} that can be executed without assuming unavailable capabilities.",
+        "A decision is not actionable unless the required implementation path, access conditions, dependencies, and test route are real.",
+        ["primary implementation documentation", "official availability/source", "direct operational evidence", "credible web/public source"],
+    ),
+)
+
+
+_LOCAL_MARKET_SEED_MARKERS = (
+    "محل",
+    "متجر",
+    "مقهى",
+    "كافيه",
+    "مطعم",
+    "صالون",
+    "سوبرماركت",
+    "مشروع تجاري",
+    "shop",
+    "store",
+    "cafe",
+    "café",
+    "restaurant",
+    "retail",
+    "salon",
+    "butikk",
+    "kafe",
+    "kafé",
+    "restaurant",
+    "butikkdrift",
 )
 
 
@@ -72,6 +136,26 @@ _LOW_RELEVANCE_LOCAL_MARKET_DOMAINS = frozenset(
 )
 
 
+def research_profile_for_seed(seed: str) -> str:
+    """Select a bounded research profile without making MIND FORGE domain-specific.
+
+    LOCAL_MARKET is a specialization for obvious physical/local ventures. Everything else
+    falls back to GENERAL, whose six lenses are deliberately domain-neutral. Future profiles
+    can be added without changing the Phase 1 contract or the six-search budget model.
+    """
+
+    text = seed.casefold()
+    if any(marker.casefold() in text for marker in _LOCAL_MARKET_SEED_MARKERS):
+        return "LOCAL_MARKET"
+    return "GENERAL"
+
+
+def research_templates_for_seed(seed: str):
+    if research_profile_for_seed(seed) == "LOCAL_MARKET":
+        return _MARKET_RESEARCH_TEMPLATES
+    return _UNIVERSAL_RESEARCH_TEMPLATES
+
+
 def resilient_cli_research_policy(
     *,
     model: str,
@@ -80,7 +164,7 @@ def resilient_cli_research_policy(
 ) -> ResearchPolicy:
     """Build the bounded live policy used by the resilient manual launcher.
 
-    One hosted search is reserved per market question. The structured research answer
+    One hosted search is reserved per research question. The structured research answer
     gets a larger output ceiling so it can finish cleanly, while each request is kept
     to at most two sourced observations to avoid unnecessary output growth.
     """
@@ -113,14 +197,15 @@ def expand_live_research_router(
     seed: str,
     policy: ResearchPolicy,
 ) -> ResearchRouterResult:
-    """Use available live-search budget on distinct seed-grounded market questions.
+    """Use available live-search budget on distinct seed-grounded research lenses.
 
     No new Phase 1 request objects or idea ownership are created. Existing request IDs
     are re-routed only for the live execution copy, preserving the frozen structural
-    router while allowing the manual live runner to validate more of the real market.
+    router while selecting either a local-market specialization or domain-general lenses.
     """
 
-    target_count = min(_live_request_capacity(policy, router), len(_MARKET_RESEARCH_TEMPLATES))
+    templates = research_templates_for_seed(seed)
+    target_count = min(_live_request_capacity(policy, router), len(templates))
     requests_by_id = {item.request_id: item for item in router.requests}
 
     selected_ids: list[str] = []
@@ -142,7 +227,7 @@ def expand_live_research_router(
 
     selected_set = set(selected_ids)
     template_by_id = {
-        request_id: _MARKET_RESEARCH_TEMPLATES[index]
+        request_id: templates[index]
         for index, request_id in enumerate(selected_ids)
     }
 
@@ -206,16 +291,18 @@ def _is_low_relevance_local_market_domain(source_ref: str | None) -> bool:
 
 def _source_quality_gate_live_observations(
     observations: Iterable[EvidenceObservation],
+    *,
+    seed: str | None = None,
 ) -> list[EvidenceObservation]:
-    """Keep only observations that can materially bear on a local-market claim.
+    """Keep only observations that can materially bear on the selected research claim.
 
     NEUTRAL observations are context, not evidence, so they are excluded from the live
-    evidence path. A small fail-closed denylist also rejects generic cross-market sources
-    that repeatedly produced false locality matches in live runs. Search accounting is
-    unaffected: the hosted operation still happened, but rejected sources cannot affect
-    Evidence, Decision, or the user-facing accepted-source list.
+    evidence path. The historical local-market denylist is applied only to LOCAL_MARKET
+    runs (or legacy callers that do not provide a seed), so a general topic is not forced
+    through assumptions created for the Namsos market experiment.
     """
 
+    apply_local_market_denylist = seed is None or research_profile_for_seed(seed) == "LOCAL_MARKET"
     accepted: list[EvidenceObservation] = []
     for observation in observations:
         if observation.origin is not EvidenceObservationOrigin.LIVE_RESEARCH:
@@ -223,7 +310,7 @@ def _source_quality_gate_live_observations(
             continue
         if observation.stance is EvidenceStance.NEUTRAL:
             continue
-        if _is_low_relevance_local_market_domain(observation.source_ref):
+        if apply_local_market_denylist and _is_low_relevance_local_market_domain(observation.source_ref):
             continue
         accepted.append(observation)
     return accepted
@@ -231,10 +318,12 @@ def _source_quality_gate_live_observations(
 
 def _quality_gate_live_observations(
     observations: Iterable[EvidenceObservation],
+    *,
+    seed: str | None = None,
 ) -> list[EvidenceObservation]:
     """Apply source relevance before allowing live observations into Evidence."""
 
-    gated = _source_quality_gate_live_observations(observations)
+    gated = _source_quality_gate_live_observations(observations, seed=seed)
     return [
         observation.model_copy(
             update={"confidence": min(observation.confidence, 0.50)}
@@ -251,8 +340,13 @@ def _quality_gate_live_observations(
 def build_live_evidence_with_quality_gate(
     router: ResearchRouterResult,
     observations: Iterable[EvidenceObservation],
+    *,
+    seed: str | None = None,
 ):
-    return base.build_evidence(router, _quality_gate_live_observations(observations))
+    return base.build_evidence(
+        router,
+        _quality_gate_live_observations(observations, seed=seed),
+    )
 
 
 def _ordered_live_request_ids(result) -> list[str]:
@@ -286,10 +380,11 @@ def _ordered_live_request_ids(result) -> list[str]:
 
 def _live_request_metadata(result) -> dict[str, dict[str, str]]:
     metadata: dict[str, dict[str, str]] = {}
+    templates = research_templates_for_seed(result.seed)
     for index, request_id in enumerate(_ordered_live_request_ids(result)):
-        if index >= len(_MARKET_RESEARCH_TEMPLATES):
+        if index >= len(templates):
             break
-        label, claim_template, why_material, _source_types = _MARKET_RESEARCH_TEMPLATES[index]
+        label, claim_template, why_material, _source_types = templates[index]
         metadata[request_id] = {
             "label": label,
             "claim": claim_template.format(seed=result.seed),
@@ -387,7 +482,7 @@ def resilient_run_mind_forge(
     research_executor=None,
     max_selected: int = 3,
 ):
-    """Production live path with market expansion and evidence-quality guardrail."""
+    """Production live path with adaptive research expansion and evidence guardrails."""
 
     if not live_research:
         return _ORIGINAL_RUN_MIND_FORGE(
@@ -417,6 +512,7 @@ def resilient_run_mind_forge(
     evidence_engine = build_live_evidence_with_quality_gate(
         live_router,
         research.observations,
+        seed=baseline.run_contract.topic.topic,
     )
     decision_engine = base.decide(
         baseline.creative,
@@ -459,6 +555,7 @@ def resilient_run_mind_forge(
 
 def resilient_build_runner_summary(result) -> dict[str, object]:
     payload = _ORIGINAL_BUILD_RUNNER_SUMMARY(result)
+    payload["research_profile"] = research_profile_for_seed(result.seed)
     research = result.research
     executed_count = len(research.executed_request_ids) if research is not None else 0
     skipped_count = len(research.skipped_request_ids) if research is not None else 0
@@ -466,7 +563,10 @@ def resilient_build_runner_summary(result) -> dict[str, object]:
     payload["live_external_request_count"] = executed_count + skipped_count
 
     if research is not None:
-        accepted = _source_quality_gate_live_observations(research.observations)
+        accepted = _source_quality_gate_live_observations(
+            research.observations,
+            seed=result.seed,
+        )
         request_metadata = _live_request_metadata(result)
         unique_sources = _deduplicated_live_sources(accepted, request_metadata)
         coverage = _research_question_coverage(result, accepted, request_metadata)
