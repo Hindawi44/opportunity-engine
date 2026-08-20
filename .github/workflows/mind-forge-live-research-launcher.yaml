@@ -122,13 +122,15 @@ jobs:
             live_research_adapter_v1.py \
             live_research_recovery_v1.py \
             runner_v1.py \
-            runner_v1_resilient.py
+            runner_v1_resilient.py \
+            runner_v1_geographic.py
           do
             cp "mind-forge-live/phase1/$file" "$APP/mind_forge/$file"
           done
           python -m compileall -q "$APP/mind_forge"
           test -f "$APP/mind_forge/live_research_recovery_v1.py"
           test -f "$APP/mind_forge/runner_v1_resilient.py"
+          test -f "$APP/mind_forge/runner_v1_geographic.py"
 
       - name: Normalize API secret without printing it
         env:
@@ -222,7 +224,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts/mind-forge-live-research-launcher
-          python -m mind_forge.runner_v1_resilient \
+          python -m mind_forge.runner_v1_geographic \
             "$MIND_FORGE_SEED" \
             --live-research \
             --confirm-paid-live-research YES \
