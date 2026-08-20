@@ -16,6 +16,7 @@ env:
   OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
   MIND_FORGE_LIVE_ENABLED: "1"
 
+# one-shot trigger: 2026-08-20-v2-open-live
 jobs:
   creative-v2-open-live:
     runs-on: ubuntu-latest
