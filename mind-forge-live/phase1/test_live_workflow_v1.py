@@ -1,7 +1,43 @@
 from pathlib import Path
 
+from mind_forge.contracts_v1 import EvidenceStance
+from mind_forge.live_research_adapter_v1 import FakeResearchExecutor, RawResearchHit
+from mind_forge.pipeline_v1 import run_phase1_forge
+from mind_forge.runner_v1_geographic import (
+    geographic_build_runner_summary,
+    geographic_run_mind_forge,
+)
+from mind_forge.runner_v1_resilient import resilient_cli_research_policy
+
 
 WORKFLOW = Path(".github/workflows/mind-forge-live-model-v1.yaml")
+
+
+def _expanded_request_order(baseline):
+    selected_ids = list(baseline.research.external_request_ids)
+    user_ids = set(baseline.research.user_request_ids)
+    for request in baseline.research.requests:
+        if request.request_id in selected_ids or request.request_id in user_ids:
+            continue
+        selected_ids.append(request.request_id)
+    return selected_ids
+
+
+def _all_request_hits(seed: str):
+    baseline = run_phase1_forge(seed)
+    hits = {}
+    for index, request in enumerate(baseline.research.requests, start=1):
+        hits[request.request_id] = [
+            RawResearchHit(
+                source=f"Local source {index}",
+                source_type="web/public source",
+                source_ref=f"https://example.test/live/{request.request_id}",
+                excerpt=f"Directly relevant sourced observation {index}.",
+                stance=EvidenceStance.SUPPORTS,
+                confidence=0.85,
+            )
+        ]
+    return baseline, hits
 
 
 def test_live_model_workflow_is_manual_only_and_explicitly_authorized():
@@ -31,3 +67,66 @@ def test_live_model_workflow_has_budget_and_model_gates():
     assert "gpt-5.6-terra" in text
     assert "gpt-5.6-luna" in text
     assert "live_research_enabled\"] is not False" in text
+
+
+def test_geographic_gate_rejects_foreign_regulation_for_namsos_and_keeps_norway():
+    seed = "محل شاي في نامسوس"
+    baseline, hits = _all_request_hits(seed)
+    regulation_id = _expanded_request_order(baseline)[4]
+
+    wallonie_ref = "https://www.wallonie.be/en/demarches/horeca-certificate"
+    namur_ref = "https://www.namur.be/fr/ma-ville/permis-durbanisme"
+    mattilsynet_ref = "https://www.mattilsynet.no/mat-og-drikke/matservering"
+    hits[regulation_id] = [
+        RawResearchHit(
+            source="Wallonia HORECA rules",
+            source_type="government publication",
+            source_ref=wallonie_ref,
+            excerpt="Belgian regional HORECA requirements.",
+            stance=EvidenceStance.MIXED,
+            confidence=0.90,
+        ),
+        RawResearchHit(
+            source="Namur permits",
+            source_type="municipality requirements",
+            source_ref=namur_ref,
+            excerpt="Municipal permit rules in Namur, Belgium.",
+            stance=EvidenceStance.MIXED,
+            confidence=0.90,
+        ),
+        RawResearchHit(
+            source="Mattilsynet food service guidance",
+            source_type="official regulator guidance",
+            source_ref=mattilsynet_ref,
+            excerpt="Norwegian food-service requirements applicable to a Namsos pilot.",
+            stance=EvidenceStance.SUPPORTS,
+            confidence=0.92,
+        ),
+    ]
+
+    policy = resilient_cli_research_policy(
+        model="gpt-5.6-luna",
+        max_search_operations=6,
+        max_research_cost_usd=0.07,
+    )
+    result = geographic_run_mind_forge(
+        seed,
+        live_research=True,
+        research_policy=policy,
+        research_executor=FakeResearchExecutor(hits),
+    )
+    summary = geographic_build_runner_summary(result)
+
+    accepted_refs = {item["source_ref"] for item in summary["live_sources"]}
+    evidence_refs = {item.source_ref for item in result.run_contract.evidence if item.source_ref}
+    coverage = {item["label"]: item for item in summary["research_question_coverage"]}
+
+    assert wallonie_ref not in accepted_refs
+    assert namur_ref not in accepted_refs
+    assert wallonie_ref not in evidence_refs
+    assert namur_ref not in evidence_refs
+    assert mattilsynet_ref in accepted_refs
+    assert mattilsynet_ref in evidence_refs
+    assert coverage["regulation"]["status"] == "COVERED"
+    assert coverage["regulation"]["accepted_source_count"] == 1
+    assert coverage["regulation"]["rejected_observation_count"] == 2
