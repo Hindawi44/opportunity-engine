@@ -19,6 +19,7 @@ from .auksjonen_public_api_adapter import AuksjonenLiveClothingListing
 
 DEFAULT_ITEM_VERIFICATION_LIMIT = 5
 DEFAULT_MAX_RESPONSE_BYTES = 3_000_000
+_AUKSJONEN_ITEM_HOSTS = frozenset({"ny.auksjonen.no", "www.auksjonen.no", "auksjonen.no"})
 
 _SCRIPT_RE = re.compile(r"<(script|style|noscript)\b[^>]*>.*?</\1>", re.I | re.S)
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -258,9 +259,9 @@ def parse_auksjonen_item_page(html: str, *, fallback_title: str = "") -> dict[st
 
     image_urls = []
     for match in _IMG_RE.finditer(html):
-        url = html_module.unescape(match.group("url"))
-        if url not in image_urls:
-            image_urls.append(url)
+        image_url = html_module.unescape(match.group("url"))
+        if image_url not in image_urls:
+            image_urls.append(image_url)
         if len(image_urls) >= 20:
             break
 
@@ -294,7 +295,11 @@ def fetch_auksjonen_item_page(
 ) -> tuple[str, str, int, str]:
     """Fetch one exact public Auksjonen item page and fail closed on redirect drift."""
     parsed = urlparse(_compact(url))
-    if parsed.scheme != "https" or parsed.hostname != "ny.auksjonen.no" or "/auksjon/" not in parsed.path:
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname not in _AUKSJONEN_ITEM_HOSTS
+        or "/auksjon/" not in parsed.path
+    ):
         raise ValueError("url must be an exact public Auksjonen item page")
     if timeout <= 0 or max_response_bytes <= 0:
         raise ValueError("timeout and max_response_bytes must be positive")
@@ -310,7 +315,11 @@ def fetch_auksjonen_item_page(
     with urlopen(request, timeout=timeout) as response:  # noqa: S310 - bounded public HTTPS source
         final_url = str(response.geturl())
         final = urlparse(final_url)
-        if final.hostname != "ny.auksjonen.no" or "/auksjon/" not in final.path:
+        if (
+            final.scheme != "https"
+            or final.hostname not in _AUKSJONEN_ITEM_HOSTS
+            or "/auksjon/" not in final.path
+        ):
             raise RuntimeError("Auksjonen item redirect left the exact public item scope")
         if parsed.path.rstrip("/").split("/")[-1] != final.path.rstrip("/").split("/")[-1]:
             raise RuntimeError("Auksjonen item redirect changed object identity")
