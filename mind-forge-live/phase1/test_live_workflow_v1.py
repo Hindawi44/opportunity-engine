@@ -120,3 +120,59 @@ def test_geographic_gate_rejects_foreign_regulation_for_namsos_and_keeps_norway(
     assert coverage["regulation"]["accepted_source_count"] == 1
     assert coverage["regulation"]["rejected_observation_count"] == 1
     assert summary["geographic_relevance_rejected_count"] == 1
+
+
+def test_semantic_gate_rejects_local_but_irrelevant_pricing_page_and_keeps_menu_price_evidence():
+    seed = "محل شاي في نامسوس"
+    baseline, hits = _all_request_hits(seed)
+    pricing_id = _expanded_request_order(baseline)[3]
+
+    irrelevant_ref = (
+        "https://namsos.kommune.no/kultur-idrett-og-fritid/"
+        "lokta-og-melkrampa/melkrampa/2025/mai/frivilligsentralen/"
+    )
+    menu_ref = "https://kruscoffee.no/meny"
+    hits[pricing_id] = [
+        RawResearchHit(
+            source="Namsos Frivilligsentralen",
+            source_type="web/public source",
+            source_ref=irrelevant_ref,
+            excerpt="Community volunteer-center activities and local events in Namsos.",
+            stance=EvidenceStance.SUPPORTS,
+            confidence=0.90,
+        ),
+        RawResearchHit(
+            source="Krus Coffee menu",
+            source_type="public menu or price list",
+            source_ref=menu_ref,
+            excerpt="The current menu lists tea at 49 NOK and coffee at 45 NOK.",
+            stance=EvidenceStance.SUPPORTS,
+            confidence=0.90,
+        ),
+    ]
+
+    policy = resilient_cli_research_policy(
+        model="gpt-5.6-luna",
+        max_search_operations=6,
+        max_research_cost_usd=0.07,
+    )
+    result = geographic_run_mind_forge(
+        seed,
+        live_research=True,
+        research_policy=policy,
+        research_executor=FakeResearchExecutor(hits),
+    )
+    summary = geographic_build_runner_summary(result)
+
+    accepted_refs = {item["source_ref"] for item in summary["live_sources"]}
+    evidence_refs = {item.source_ref for item in result.run_contract.evidence if item.source_ref}
+    coverage = {item["label"]: item for item in summary["research_question_coverage"]}
+
+    assert irrelevant_ref not in accepted_refs
+    assert irrelevant_ref not in evidence_refs
+    assert menu_ref in accepted_refs
+    assert menu_ref in evidence_refs
+    assert coverage["pricing and economics"]["status"] == "COVERED"
+    assert coverage["pricing and economics"]["accepted_source_count"] == 1
+    assert coverage["pricing and economics"]["rejected_observation_count"] == 1
+    assert summary["semantic_relevance_rejected_count"] == 1
