@@ -25,6 +25,7 @@ capabilities that fill a current production gap.
 
 | Workflow | Classification | Decision |
 | --- | --- | --- |
+| `mind-forge-live-research-launcher.yaml` | KEEP_MANUAL | Manual-only MIND FORGE research launcher; no automatic schedule and no ownership of the daily opportunity checkpoint. |
 | `one-opportunity-commercial-analysis.yaml` | KEEP_MANUAL | Human-supplied commercial inputs; intentionally downstream of discovery. |
 | `sweden-clothing-inventory-live.yaml` | KEEP_MANUAL | Country/source pilot and diagnostics; do not duplicate Blinto in daily runtime. |
 | `germany-clothing-inventory-live.yaml` | KEEP_MANUAL | German pilot/open-web diagnostics; daily checkpoint already owns German production sources. |
@@ -113,4 +114,4 @@ incompatible artifact shape.
 - no automatic contact, bid, reservation, purchase, or payment;
 - OpenAI remains bounded and advisory;
 - optional procurement/B2B lanes do not silently consume the daily search budget;
-- country/source pilots remain manual unless explicitly promoted through a tested adapter.
+- country/source pilots and the MIND FORGE launcher remain manual unless explicitly promoted through a tested adapter.
