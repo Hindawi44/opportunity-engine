@@ -21,6 +21,8 @@ COMMERCE_CASES = (
     "تجارة معدات ورش مستعملة في النرويج",
 )
 
+DISCOVERY_CASE = "ابحث عن تجارة مربحة في النرويج"
+
 NON_COMMERCE_CASES = (
     "debug API timeout in Norway deployment",
     "تحليل استهلاك الطاقة في النرويج",
@@ -85,6 +87,9 @@ def run_contract() -> dict[str, object]:
         if not module.is_norway_commerce_seed(seed):
             raise AssertionError(f"commerce seed was not recognized: {seed}")
 
+    if not module.is_norway_commerce_discovery_seed(DISCOVERY_CASE):
+        raise AssertionError("generic Norway commerce discovery seed was not recognized")
+
     for seed in NON_COMMERCE_CASES:
         if module.is_norway_commerce_seed(seed):
             raise AssertionError(f"non-commerce seed was misclassified: {seed}")
@@ -111,6 +116,14 @@ def run_contract() -> dict[str, object]:
         if not module.is_norway_commerce_seed(idea):
             raise AssertionError(f"idea escaped Norway commerce scope: {idea}")
 
+    expanded = module.candidate_seeds_for_seed(DISCOVERY_CASE, limit=20)
+    if expanded != ideas:
+        raise AssertionError("generic discovery seed did not expand into the full Idea Box")
+
+    specific = COMMERCE_CASES[0]
+    if module.candidate_seeds_for_seed(specific, limit=20) != [specific]:
+        raise AssertionError("specific commerce seed must not be replaced by the Idea Box")
+
     if not _runner_structure_ok():
         raise AssertionError("NORWAY_COMMERCE runner integration structure is incomplete")
 
@@ -122,6 +135,8 @@ def run_contract() -> dict[str, object]:
         "non_commerce_case_count": len(NON_COMMERCE_CASES),
         "lens_count": len(labels),
         "idea_box_count": len(ideas),
+        "discovery_seed": DISCOVERY_CASE,
+        "discovery_candidate_count": len(expanded),
         "idea_box": ideas,
     }
 
