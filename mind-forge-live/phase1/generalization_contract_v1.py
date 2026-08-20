@@ -101,6 +101,53 @@ def _labels(templates) -> tuple[str, ...]:
     return tuple(item[0] for item in templates)
 
 
+def _geographic_gate_is_local_only() -> bool:
+    source = GEOGRAPHIC_RUNNER.read_text(encoding="utf-8")
+    tree = ast.parse(source, filename=str(GEOGRAPHIC_RUNNER))
+    functions = _extract_functions(tree, {"_is_geographically_relevant"})
+    function = functions[0]
+
+    profile_call_seen = False
+    local_market_compare_seen = False
+    general_early_return_seen = False
+
+    for node in ast.walk(function):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if (
+                isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "resilient"
+                and node.func.attr == "research_profile_for_seed"
+            ):
+                profile_call_seen = True
+
+        if isinstance(node, ast.Compare):
+            values = [node.left, *node.comparators]
+            if any(
+                isinstance(value, ast.Constant) and value.value == "LOCAL_MARKET"
+                for value in values
+            ):
+                local_market_compare_seen = True
+
+    for node in function.body:
+        if not isinstance(node, ast.If):
+            continue
+        test_text = ast.unparse(node.test)
+        if (
+            "research_profile_for_seed(seed)" in test_text
+            and "LOCAL_MARKET" in test_text
+            and any(
+                isinstance(statement, ast.Return)
+                and isinstance(statement.value, ast.Constant)
+                and statement.value.value is True
+                for statement in node.body
+            )
+        ):
+            general_early_return_seen = True
+            break
+
+    return profile_call_seen and local_market_compare_seen and general_early_return_seen
+
+
 def run_contract() -> dict[str, object]:
     namespace = _load_profile_logic()
     profile = namespace["research_profile_for_seed"]
@@ -152,11 +199,9 @@ def run_contract() -> dict[str, object]:
     if general_labels.intersection(local_only):
         raise AssertionError("GENERAL profile is contaminated by local-market lenses")
 
-    geographic_source = GEOGRAPHIC_RUNNER.read_text(encoding="utf-8")
-    local_gate = 'research_profile_for_seed(seed) == "LOCAL_MARKET"'
-    if local_gate not in geographic_source:
+    if not _geographic_gate_is_local_only():
         raise AssertionError(
-            "geographic filtering is not explicitly gated by LOCAL_MARKET"
+            "geographic filtering is not structurally gated away from GENERAL"
         )
 
     return {
