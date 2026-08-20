@@ -33,6 +33,7 @@ ARCHIVED = {
 
 EXPECTED_LIVE = {
     "germany-clothing-inventory-live.yaml",
+    "mind-forge-live-research-launcher.yaml",
     "multi-market-daily-operator-checkpoint.yaml",
     "one-opportunity-commercial-analysis.yaml",
     "sweden-clothing-inventory-live.yaml",
@@ -46,7 +47,7 @@ def test_acceptance_workflows_are_archived_not_runnable() -> None:
         assert (ARCHIVE / name).exists(), name
 
 
-def test_actions_surface_is_reduced_to_five_current_workflows() -> None:
+def test_actions_surface_matches_current_workflows() -> None:
     current = {
         path.name
         for path in WORKFLOWS.iterdir()
