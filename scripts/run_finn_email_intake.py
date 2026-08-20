@@ -31,6 +31,7 @@ DEFAULT_GMAIL_QUERY = 'from:agent@finn.no subject:"Nye annonser:" newer_than:7d'
 DEFAULT_MAX_MESSAGES = 20
 MAX_GMAIL_MESSAGES = 50
 DEFAULT_TIMEOUT_SECONDS = 20.0
+GMAIL_TRANSIENT_GET_ATTEMPTS = 2
 _AUKSJONEN_SELLER_RE = re.compile(r"\bauksjonen(?:\.no)?\s+as\b", re.IGNORECASE)
 _SAFE_ERROR_CODE_RE = re.compile(r"[^a-zA-Z0-9_.-]+")
 
@@ -97,6 +98,21 @@ def _decode_gmail_raw(value: object) -> bytes:
         raise RuntimeError("Gmail message response contained invalid raw data") from exc
 
 
+def _gmail_get_with_transient_retry(
+    http: requests.Session,
+    url: str,
+    **kwargs: Any,
+) -> requests.Response:
+    """Retry one bounded read-only Gmail GET after a transient connection failure."""
+    for attempt in range(GMAIL_TRANSIENT_GET_ATTEMPTS):
+        try:
+            return http.get(url, **kwargs)
+        except (requests.ConnectionError, requests.Timeout):
+            if attempt + 1 >= GMAIL_TRANSIENT_GET_ATTEMPTS:
+                raise
+    raise RuntimeError("unreachable Gmail retry state")
+
+
 def fetch_finn_messages_from_gmail(
     client_id: str,
     client_secret: str,
@@ -139,7 +155,8 @@ def fetch_finn_messages_from_gmail(
         "Authorization": f"Bearer {access_token}",
     }
     listing = _json_object(
-        http.get(
+        _gmail_get_with_transient_retry(
+            http,
             GMAIL_MESSAGES_URL,
             params={"q": query, "maxResults": max_messages},
             headers=headers,
@@ -159,7 +176,8 @@ def fetch_finn_messages_from_gmail(
         if not message_id:
             continue
         payload = _json_object(
-            http.get(
+            _gmail_get_with_transient_retry(
+                http,
                 f"{GMAIL_MESSAGES_URL}/{quote(message_id, safe='')}",
                 params={"format": "raw"},
                 headers=headers,
