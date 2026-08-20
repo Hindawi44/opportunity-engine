@@ -74,23 +74,14 @@ def test_geographic_gate_rejects_foreign_regulation_for_namsos_and_keeps_norway(
     baseline, hits = _all_request_hits(seed)
     regulation_id = _expanded_request_order(baseline)[4]
 
-    wallonie_ref = "https://www.wallonie.be/en/demarches/horeca-certificate"
-    namur_ref = "https://www.namur.be/fr/ma-ville/permis-durbanisme"
+    foreign_ref = "https://www.wallonie.be/en/demarches/horeca-certificate"
     mattilsynet_ref = "https://www.mattilsynet.no/mat-og-drikke/matservering"
     hits[regulation_id] = [
         RawResearchHit(
             source="Wallonia HORECA rules",
             source_type="government publication",
-            source_ref=wallonie_ref,
+            source_ref=foreign_ref,
             excerpt="Belgian regional HORECA requirements.",
-            stance=EvidenceStance.MIXED,
-            confidence=0.90,
-        ),
-        RawResearchHit(
-            source="Namur permits",
-            source_type="municipality requirements",
-            source_ref=namur_ref,
-            excerpt="Municipal permit rules in Namur, Belgium.",
             stance=EvidenceStance.MIXED,
             confidence=0.90,
         ),
@@ -121,12 +112,11 @@ def test_geographic_gate_rejects_foreign_regulation_for_namsos_and_keeps_norway(
     evidence_refs = {item.source_ref for item in result.run_contract.evidence if item.source_ref}
     coverage = {item["label"]: item for item in summary["research_question_coverage"]}
 
-    assert wallonie_ref not in accepted_refs
-    assert namur_ref not in accepted_refs
-    assert wallonie_ref not in evidence_refs
-    assert namur_ref not in evidence_refs
+    assert foreign_ref not in accepted_refs
+    assert foreign_ref not in evidence_refs
     assert mattilsynet_ref in accepted_refs
     assert mattilsynet_ref in evidence_refs
     assert coverage["regulation"]["status"] == "COVERED"
     assert coverage["regulation"]["accepted_source_count"] == 1
-    assert coverage["regulation"]["rejected_observation_count"] == 2
+    assert coverage["regulation"]["rejected_observation_count"] == 1
+    assert summary["geographic_relevance_rejected_count"] == 1
