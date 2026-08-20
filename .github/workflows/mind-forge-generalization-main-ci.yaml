@@ -33,7 +33,7 @@ jobs:
           python mind-forge-live/phase1/generalization_contract_v1.py \
             | tee mind-forge-generalization-contract.json
 
-      - name: Validate contract result
+      - name: Validate generalization contract result
         shell: bash
         run: |
           python - <<'PY'
@@ -52,11 +52,41 @@ jobs:
           print("MIND FORGE generalization contract: PASS")
           PY
 
-      - name: Upload generalization report
+      - name: Run zero-cost NORWAY_COMMERCE contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python mind-forge-live/phase1/norway_commerce_contract_v1.py \
+            | tee mind-forge-norway-commerce-contract.json
+
+      - name: Validate NORWAY_COMMERCE contract result
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path("mind-forge-norway-commerce-contract.json").read_text(encoding="utf-8"))
+          if data.get("status") != "NORWAY_COMMERCE_CONTRACT_PASS":
+              raise SystemExit("NORWAY_COMMERCE contract did not pass")
+          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0:
+              raise SystemExit("NORWAY_COMMERCE contract must remain fully offline")
+          if data.get("commerce_case_count") != 8:
+              raise SystemExit("expected eight Norway commerce cases")
+          if data.get("idea_box_count") != 20:
+              raise SystemExit("expected twenty Norway commerce idea-box seeds")
+          if data.get("lens_count") != 6:
+              raise SystemExit("expected six NORWAY_COMMERCE research lenses")
+          print("NORWAY_COMMERCE contract: PASS")
+          PY
+
+      - name: Upload generalization reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mind-forge-generalization-contract
-          path: mind-forge-generalization-contract.json
+          name: mind-forge-generalization-contracts
+          path: |
+            mind-forge-generalization-contract.json
+            mind-forge-norway-commerce-contract.json
           if-no-files-found: error
           retention-days: 30
