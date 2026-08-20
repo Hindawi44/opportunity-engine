@@ -8,7 +8,7 @@ on:
       - .github/workflows/mind-forge-creative-v2-open-live-once.yaml
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   OPENAI_AGENTS_DISABLE_TRACING: "1"
@@ -16,7 +16,7 @@ env:
   OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
   MIND_FORGE_LIVE_ENABLED: "1"
 
-# one-shot trigger: 2026-08-20-v2-open-live
+# one-shot trigger: 2026-08-20-v2-open-live-persist-result
 jobs:
   creative-v2-open-live:
     runs-on: ubuntu-latest
@@ -103,8 +103,10 @@ jobs:
               "usage": gate.usage.model_dump(),
               "ideas": [idea.model_dump(mode="json") for idea in creative.ideas],
           }
-          out = Path("artifacts/mind-forge-creative-v2-open-live/result.json")
-          out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          artifact = Path("artifacts/mind-forge-creative-v2-open-live/result.json")
+          artifact.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          persistent = Path("mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_RESULT.json")
+          persistent.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
           print(json.dumps(payload, ensure_ascii=False, indent=2))
           PY
 
@@ -127,6 +129,20 @@ jobs:
               raise SystemExit("creative live budget exceeded")
           print("CREATIVE V2 OPEN LIVE: PASS")
           PY
+
+      - name: Persist successful V2 result on test branch
+        if: success()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_RESULT.json
+          if git diff --cached --quiet; then
+            echo "Result already persisted"
+          else
+            git commit -m "test(mind-forge): persist Creative V2 open live result"
+            git push origin HEAD:agent/mind-forge-generalization-tests
+          fi
 
       - name: Upload V2 live result
         if: always()
