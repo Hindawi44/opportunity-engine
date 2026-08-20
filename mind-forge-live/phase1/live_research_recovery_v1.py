@@ -37,6 +37,10 @@ def _single_search_prompt(
         "translation sites, shipping directories, or third-party ordering pages as evidence "
         "for local demand, competition, pricing, or customer flow. If the available source "
         "does not meet this rule, return no observation for it."
+        + "\nJURISDICTION RULE: for licenses, permits, food-service rules, taxation, or other "
+        "regulatory claims, never substitute guidance from another country, region, or "
+        "municipality. A source is usable only when it directly applies to the target "
+        "jurisdiction named in the seed; otherwise return no observation for that source."
     )
 
 
@@ -77,7 +81,7 @@ class ResilientOpenAIWebSearchExecutor(base.OpenAIWebSearchExecutor):
 
 
 def install_live_research_recovery() -> None:
-    """Install malformed-output recovery plus a hard one-search prompt."""
+    """Install malformed-output recovery plus hard search and relevance constraints."""
 
     base._research_prompt = _single_search_prompt
     base.OpenAIWebSearchExecutor = ResilientOpenAIWebSearchExecutor
