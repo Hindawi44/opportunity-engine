@@ -87,6 +87,7 @@ jobs:
           cp mind-forge-live/phase1/live_research_recovery_v1.py "$APP/mind_forge/live_research_recovery_v1.py"
           cp mind-forge-live/phase1/runner_v1.py "$APP/mind_forge/runner_v1.py"
           cp mind-forge-live/phase1/runner_v1_resilient.py "$APP/mind_forge/runner_v1_resilient.py"
+          cp mind-forge-live/phase1/runner_v1_geographic.py "$APP/mind_forge/runner_v1_geographic.py"
           cp mind-forge-live/phase1/live_pipeline_v1.py "$APP/mind_forge/live_pipeline_v1.py"
           cp mind-forge-live/phase1/bridge_v110.py "$APP/mind_forge/bridge_v110.py"
           python -m compileall -q "$APP/mind_forge"
@@ -106,6 +107,7 @@ jobs:
           test -f "$APP/mind_forge/live_research_recovery_v1.py"
           test -f "$APP/mind_forge/runner_v1.py"
           test -f "$APP/mind_forge/runner_v1_resilient.py"
+          test -f "$APP/mind_forge/runner_v1_geographic.py"
           test -f "$APP/mind_forge/live_pipeline_v1.py"
           test -f "$APP/mind_forge/bridge_v110.py"
 
