@@ -1,0 +1,62 @@
+name: MIND FORGE Generalization Main CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mind-forge-generalization:
+    name: MIND FORGE zero-cost generalization contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out MIND FORGE target ref
+        uses: actions/checkout@v4
+        with:
+          ref: agent/mind-forge-generalization-tests
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run zero-cost generalization contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python mind-forge-live/phase1/generalization_contract_v1.py \
+            | tee mind-forge-generalization-contract.json
+
+      - name: Validate contract result
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path("mind-forge-generalization-contract.json").read_text(encoding="utf-8"))
+          if data.get("status") != "MIND_FORGE_GENERALIZATION_CONTRACT_PASS":
+              raise SystemExit("generalization contract did not pass")
+          if data.get("network_calls") != 0:
+              raise SystemExit("network_calls must remain zero")
+          if data.get("paid_api_calls") != 0:
+              raise SystemExit("paid_api_calls must remain zero")
+          if data.get("case_count") != 8:
+              raise SystemExit("expected eight generalization cases")
+          print("MIND FORGE generalization contract: PASS")
+          PY
+
+      - name: Upload generalization report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-generalization-contract
+          path: mind-forge-generalization-contract.json
+          if-no-files-found: error
+          retention-days: 30
