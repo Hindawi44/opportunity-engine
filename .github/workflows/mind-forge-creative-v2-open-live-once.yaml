@@ -16,7 +16,7 @@ env:
   OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
   MIND_FORGE_LIVE_ENABLED: "1"
 
-# one-shot trigger: 2026-08-20-v2-open-live-persist-result
+# one-shot diagnostic trigger: 2026-08-20-v2-open-live
 jobs:
   creative-v2-open-live:
     runs-on: ubuntu-latest
@@ -57,14 +57,17 @@ jobs:
           python -m compileall -q "$APP/mind_forge"
           echo "APP=$APP" >> "$GITHUB_ENV"
 
-      - name: Run one paid open-creative generation
+      - name: Run one bounded paid open-creative generation
+        id: live
+        continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PYTHONPATH: ${{ env.APP }}
         run: |
-          set -euo pipefail
-          python - <<'PY' | tee artifacts/mind-forge-creative-v2-open-live/stdout.json
+          set +e
+          python - <<'PY' > artifacts/mind-forge-creative-v2-open-live/stdout.log 2> artifacts/mind-forge-creative-v2-open-live/stderr.log
           import json
+          import os
           from pathlib import Path
 
           from mind_forge.contracts_v1 import TopicInput
@@ -72,7 +75,7 @@ jobs:
           from mind_forge.live_model_adapter_v1 import LiveBudgetGate, LiveModelPolicy
           from mind_forge.live_creative_v2_open import generate_live_open_ideas
 
-          if not __import__('os').environ.get('OPENAI_API_KEY'):
+          if not os.environ.get('OPENAI_API_KEY'):
               raise SystemExit('OPENAI_API_KEY is unavailable')
 
           seed = "التجارة في النرويج"
@@ -85,7 +88,7 @@ jobs:
               max_requests=1,
               max_input_tokens=20_000,
               max_output_tokens=12_500,
-              max_estimated_cost_usd=0.02,
+              max_estimated_cost_usd=0.01,
               creative_max_output_tokens=3_500,
               expert_max_output_tokens=900,
               creative_reasoning_effort="medium",
@@ -93,7 +96,6 @@ jobs:
           )
           gate = LiveBudgetGate(policy)
           creative = generate_live_open_ideas(topic, questions, policy, gate)
-
           payload = {
               "status": "CREATIVE_V2_OPEN_LIVE_COMPLETE",
               "seed": seed,
@@ -103,46 +105,71 @@ jobs:
               "usage": gate.usage.model_dump(),
               "ideas": [idea.model_dump(mode="json") for idea in creative.ideas],
           }
-          artifact = Path("artifacts/mind-forge-creative-v2-open-live/result.json")
-          artifact.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-          persistent = Path("mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_RESULT.json")
-          persistent.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          Path("artifacts/mind-forge-creative-v2-open-live/result.json").write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+          )
+          Path("mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_RESULT.json").write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+          )
           print(json.dumps(payload, ensure_ascii=False, indent=2))
           PY
+          rc=$?
+          echo "exit_code=$rc" >> "$GITHUB_OUTPUT"
+          exit $rc
 
-      - name: Validate V2 result
+      - name: Persist diagnostic status on test branch
+        if: always()
+        env:
+          LIVE_OUTCOME: ${{ steps.live.outcome }}
         run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          base = Path("artifacts/mind-forge-creative-v2-open-live")
+          stderr = (base / "stderr.log").read_text(encoding="utf-8", errors="replace") if (base / "stderr.log").exists() else ""
+          stdout = (base / "stdout.log").read_text(encoding="utf-8", errors="replace") if (base / "stdout.log").exists() else ""
+          status = {
+              "workflow_status": os.environ.get("LIVE_OUTCOME", "unknown"),
+              "result_exists": (base / "result.json").exists(),
+              "stderr_tail": stderr[-4000:],
+              "stdout_tail": stdout[-4000:],
+          }
+          Path("mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_STATUS.json").write_text(
+              json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8"
+          )
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_STATUS.json
+          if [ -f mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_RESULT.json ]; then
+            git add -- mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_RESULT.json
+          fi
+          if ! git diff --cached --quiet; then
+            git commit -m "test(mind-forge): persist Creative V2 live diagnostic"
+            git push origin HEAD:agent/mind-forge-generalization-tests
+          fi
+
+      - name: Enforce successful live result
+        if: always()
+        env:
+          LIVE_OUTCOME: ${{ steps.live.outcome }}
+        run: |
+          test "$LIVE_OUTCOME" = "success"
           python - <<'PY'
           import json
           from pathlib import Path
-          data = json.loads(Path("artifacts/mind-forge-creative-v2-open-live/result.json").read_text(encoding="utf-8"))
-          if data.get("status") != "CREATIVE_V2_OPEN_LIVE_COMPLETE":
-              raise SystemExit("V2 live creative did not complete")
+          data = json.loads(Path("mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_RESULT.json").read_text(encoding="utf-8"))
           if data.get("idea_count") != 14:
-              raise SystemExit(f"expected 14 ideas, got {data.get('idea_count')}")
+              raise SystemExit("expected 14 ideas")
           if data.get("mechanism_diversity_ratio", 0) < (8 / 14):
-              raise SystemExit("V2 mechanism diversity fell below 8/14")
-          usage = data["usage"]
-          if int(usage["requests"]) > 1:
-              raise SystemExit("more than one model request was used")
-          if float(usage["estimated_cost_usd"]) > 0.02:
-              raise SystemExit("creative live budget exceeded")
+              raise SystemExit("V2 diversity below 8/14")
+          if int(data["usage"]["requests"]) > 1:
+              raise SystemExit("more than one request used")
+          if float(data["usage"]["estimated_cost_usd"]) > 0.01:
+              raise SystemExit("budget exceeded")
           print("CREATIVE V2 OPEN LIVE: PASS")
           PY
-
-      - name: Persist successful V2 result on test branch
-        if: success()
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- mind-forge-live/phase1/CREATIVE_V2_OPEN_LIVE_RESULT.json
-          if git diff --cached --quiet; then
-            echo "Result already persisted"
-          else
-            git commit -m "test(mind-forge): persist Creative V2 open live result"
-            git push origin HEAD:agent/mind-forge-generalization-tests
-          fi
 
       - name: Upload V2 live result
         if: always()
