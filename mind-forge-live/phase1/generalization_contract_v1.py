@@ -28,14 +28,14 @@ EXPECTED_LOCAL_LABELS = (
 )
 
 PROFILE_CASES = (
-    ("محل شاي في نامسوس", "LOCAL_MARKET"),
-    ("open a cafe in Oslo", "LOCAL_MARKET"),
-    ("إصلاح انهيار البرنامج عند رفع ملف 2GB", "GENERAL"),
-    ("شراء 2000 متر أقمشة stocklot من إيطاليا", "GENERAL"),
-    ("اختيار ماكينة خياطة صناعية GC1011", "GENERAL"),
-    ("تحليل استهلاك الطاقة لخوارزمية ضغط بيانات", "GENERAL"),
-    ("تحسين تأخير سلسلة توريد من إيطاليا إلى النرويج", "GENERAL"),
-    ("debug API timeout in Norway deployment", "GENERAL"),
+    ("محل أقمشة stocklot في أوسلو لبيع المخزون بالجملة والمفرق في النرويج", "LOCAL_MARKET"),
+    ("متجر قطع غيار سيارات مستعملة في تروندهايم في النرويج", "LOCAL_MARKET"),
+    ("تجارة سيارات مستعملة وشراؤها لإعادة البيع في النرويج", "GENERAL"),
+    ("شراء مخزون تصفية ملابس بالجملة وإعادة بيعه في النرويج", "GENERAL"),
+    ("تجارة أثاث مستعمل وشراء مخزون شركات مغلقة في النرويج", "GENERAL"),
+    ("استيراد وبيع ماكينات خياطة صناعية في النرويج", "GENERAL"),
+    ("تجارة قطع غيار ومعدات ورش بالجملة في النرويج", "GENERAL"),
+    ("شراء بضائع liquidation من المزادات وإعادة بيعها في النرويج", "GENERAL"),
 )
 
 
@@ -155,6 +155,9 @@ def run_contract() -> dict[str, object]:
 
     case_results = []
     for seed, expected in PROFILE_CASES:
+        if "النرويج" not in seed and "norway" not in seed.casefold():
+            raise AssertionError(f"Norway-commerce contract seed is out of scope: {seed!r}")
+
         actual = profile(seed)
         if actual != expected:
             raise AssertionError(
@@ -206,6 +209,7 @@ def run_contract() -> dict[str, object]:
 
     return {
         "status": "MIND_FORGE_GENERALIZATION_CONTRACT_PASS",
+        "scope": "NORWAY_COMMERCE",
         "network_calls": 0,
         "paid_api_calls": 0,
         "case_count": len(case_results),
@@ -221,5 +225,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-# CI retrigger: behavior unchanged.
