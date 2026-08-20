@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - agent/mind-forge-phase1-contracts
+    types: [opened, reopened, synchronize]
   workflow_dispatch:
 
 permissions:
