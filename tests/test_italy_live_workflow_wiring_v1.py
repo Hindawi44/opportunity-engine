@@ -19,6 +19,6 @@ def test_italy_live_validation_reuses_existing_workflow() -> None:
     assert "contains(github.event.head_commit.message, 'Italy')" in text
 
 
-def test_italy_live_validation_does_not_add_a_sixth_workflow() -> None:
+def test_italy_live_validation_does_not_add_a_seventh_workflow() -> None:
     workflows = list((ROOT / ".github/workflows").glob("*.y*ml"))
-    assert len(workflows) == 5
+    assert len(workflows) == 6
