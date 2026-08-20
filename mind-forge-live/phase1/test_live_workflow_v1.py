@@ -100,7 +100,7 @@ def test_geographic_gate_rejects_foreign_regulation_for_namsos_and_keeps_norway(
             source_ref=mattilsynet_ref,
             excerpt="Norwegian food-service requirements applicable to a Namsos pilot.",
             stance=EvidenceStance.SUPPORTS,
-            confidence=0.92,
+            confidence=0.90,
         ),
     ]
 
