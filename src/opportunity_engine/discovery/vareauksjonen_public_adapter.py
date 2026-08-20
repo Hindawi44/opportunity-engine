@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Callable, Sequence
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 BASE_URL = "https://www.vareauksjonen.no"
@@ -85,6 +85,13 @@ def _number(value: object) -> float | None:
         return float(text)
     except ValueError:
         return None
+
+
+def _request_url(url: str) -> str:
+    """Return an ASCII-safe request URL without changing source identity."""
+    parsed = urlparse(str(url or "").strip())
+    encoded_path = quote(parsed.path, safe="/%:@")
+    return parsed._replace(path=encoded_path).geturl()
 
 
 def is_approved_public_page(url: str) -> bool:
@@ -497,7 +504,7 @@ class VareauksjonenPublicCollector:
         ):
             raise ValueError("URL is outside the approved Vareauksjonen scope")
         request = Request(
-            url,
+            _request_url(url),
             headers={
                 "Accept": "text/plain,*/*;q=0.1" if url == ROBOTS_URL else "text/html,application/xhtml+xml",
                 "User-Agent": "OpportunityEngine/Vareauksjonen-Clothing-Adapter-1.0",
