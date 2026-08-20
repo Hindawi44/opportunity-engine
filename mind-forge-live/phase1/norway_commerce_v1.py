@@ -71,6 +71,24 @@ COMMERCE_MARKERS = (
     "reservedeler",
 )
 
+DISCOVERY_MARKERS = (
+    "ابحث عن تجارة",
+    "ابحث عن فرص",
+    "تجارة مربحة",
+    "فرص تجارية",
+    "فرصة تجارية",
+    "اقترح تجارة",
+    "اقترح فرص",
+    "business opportunities",
+    "profitable business",
+    "profitable trade",
+    "find business",
+    "find trade",
+    "forretningsmuligheter",
+    "lønnsom handel",
+    "lonnsom handel",
+)
+
 
 NORWAY_COMMERCE_RESEARCH_TEMPLATES = (
     (
@@ -185,6 +203,13 @@ def is_norway_commerce_seed(seed: str) -> bool:
     )
 
 
+def is_norway_commerce_discovery_seed(seed: str) -> bool:
+    text = seed.casefold()
+    return is_norway_commerce_seed(seed) and any(
+        marker.casefold() in text for marker in DISCOVERY_MARKERS
+    )
+
+
 def norway_commerce_templates():
     return NORWAY_COMMERCE_RESEARCH_TEMPLATES
 
@@ -193,3 +218,15 @@ def norway_commerce_idea_box(*, limit: int = 20) -> list[str]:
     if limit < 1:
         return []
     return list(IDEA_BOX_SEEDS[: min(limit, len(IDEA_BOX_SEEDS))])
+
+
+def candidate_seeds_for_seed(seed: str, *, limit: int = 20) -> list[str]:
+    """Expand a generic Norway-commerce discovery request into concrete trade candidates.
+
+    Specific trade seeds remain untouched. Generic discovery seeds such as
+    'ابحث عن تجارة مربحة في النرويج' expand into the bounded Idea Box.
+    """
+
+    if is_norway_commerce_discovery_seed(seed):
+        return norway_commerce_idea_box(limit=limit)
+    return [seed]
