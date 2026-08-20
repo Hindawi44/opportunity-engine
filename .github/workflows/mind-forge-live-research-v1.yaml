@@ -1,0 +1,201 @@
+name: MIND FORGE Live Research V1
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: Raw business seed for MIND FORGE research routing
+        required: true
+        type: string
+        default: "تصليح الملابس"
+      confirm_paid_live_research:
+        description: Explicitly authorize this paid live-research run
+        required: true
+        type: choice
+        default: "NO"
+        options:
+          - "NO"
+          - "YES"
+      research_model:
+        description: Model used only inside the research adapter
+        required: true
+        type: choice
+        default: gpt-5.6-luna
+        options:
+          - gpt-5.6-luna
+          - gpt-5.6-terra
+      max_search_operations:
+        description: Hard cap on hosted web-search operations
+        required: true
+        type: choice
+        default: "4"
+        options:
+          - "2"
+          - "4"
+      max_research_cost_usd:
+        description: Separate estimated research-cost ceiling
+        required: true
+        type: choice
+        default: "0.05"
+        options:
+          - "0.02"
+          - "0.05"
+          - "0.10"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mind-forge-live-research-v1-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  authorization-notice:
+    if: ${{ inputs.confirm_paid_live_research != 'YES' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse unconfirmed paid research
+        run: echo "Paid live research was not explicitly authorized; no search or API call was made."
+
+  live-research-run:
+    if: ${{ inputs.confirm_paid_live_research == 'YES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out selected ref
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild frozen MIND FORGE V1.10.1 runtime
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mind-forge-runtime"
+          cat mind-forge-live/runtime/chunk*.b64 | base64 --decode > "$RUNNER_TEMP/runtime.tar.xz"
+          xz -t "$RUNNER_TEMP/runtime.tar.xz"
+          tar -xJf "$RUNNER_TEMP/runtime.tar.xz" -C "$RUNNER_TEMP/mind-forge-runtime"
+          APP="$RUNNER_TEMP/mind-forge-runtime/mind-forge"
+          python mind-forge-live/apply_patch_v1_9_1.py "$APP"
+          cat mind-forge-live/v1_10_overlay_0*.b64 | base64 --decode > "$RUNNER_TEMP/v1_10_overlay.tar.xz"
+          xz -t "$RUNNER_TEMP/v1_10_overlay.tar.xz"
+          tar -xJf "$RUNNER_TEMP/v1_10_overlay.tar.xz" -C "$APP"
+          python mind-forge-live/apply_patch_v1_10_1_decision.py "$APP"
+          grep -q 'version="0.10.0"' "$APP/main.py"
+          grep -q 'normalize_decision_against_logic' "$APP/mind_forge/orchestrator.py"
+          echo "APP=$APP" >> "$GITHUB_ENV"
+
+      - name: Install live research dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "openai-agents>=0.14.0" \
+            "pydantic>=2.11.0,<3.0"
+
+      - name: Attach Phase 1 guardrails, Live Research Adapter V1, and Runner V1
+        run: |
+          set -euo pipefail
+          for file in \
+            contracts_v1.py \
+            question_generator_v1.py \
+            creative_engine_v1.py \
+            expert_minds_v1.py \
+            logic_engine_v1.py \
+            critique_engine_v1.py \
+            research_evidence_v1.py \
+            decision_engine_v1.py \
+            experiment_engine_v1.py \
+            memory_engine_v1.py \
+            pipeline_v1.py \
+            live_research_adapter_v1.py \
+            runner_v1.py
+          do
+            cp "mind-forge-live/phase1/$file" "$APP/mind_forge/$file"
+          done
+          python -m compileall -q "$APP/mind_forge"
+
+      - name: Verify existing API secret is available without printing it
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          if not os.getenv("OPENAI_API_KEY"):
+              raise SystemExit("OPENAI_API_KEY is not available to this workflow")
+          print("OPENAI_API_KEY availability: OK (value not displayed)")
+          PY
+
+      - name: Run one-seed MIND FORGE Runner V1 with Router-approved live research
+        env:
+          PYTHONPATH: ${{ env.APP }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          MIND_FORGE_LIVE_RESEARCH_ENABLED: "1"
+          MIND_FORGE_SEED: ${{ inputs.seed }}
+          MIND_FORGE_RESEARCH_MODEL: ${{ inputs.research_model }}
+          MIND_FORGE_MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
+          MIND_FORGE_MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
+        run: |
+          set -euo pipefail
+          python -m mind_forge.runner_v1 \
+            "$MIND_FORGE_SEED" \
+            --live-research \
+            --confirm-paid-live-research YES \
+            --research-model "$MIND_FORGE_RESEARCH_MODEL" \
+            --max-search-operations "$MIND_FORGE_MAX_SEARCH_OPERATIONS" \
+            --max-research-cost-usd "$MIND_FORGE_MAX_RESEARCH_COST_USD" \
+            --output-dir artifacts/mind-forge-live-research-v1
+
+      - name: Validate Runner V1 result and independent research budget
+        env:
+          MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
+          MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("artifacts/mind-forge-live-research-v1")
+          summary = json.loads(
+              (root / "mind-forge-runner-summary.json").read_text(encoding="utf-8")
+          )
+          contract = json.loads(
+              (root / "mind-forge-run-contract.json").read_text(encoding="utf-8")
+          )
+
+          if summary.get("status") != "MIND_FORGE_RUN_COMPLETE":
+              raise SystemExit("Runner V1 did not complete")
+          if summary.get("live_research_requested") is not True:
+              raise SystemExit("Runner V1 did not execute the explicit live-research path")
+          if int(summary["research_usage"]["search_operations"]) > int(os.environ["MAX_SEARCH_OPERATIONS"]):
+              raise SystemExit("research search-operation cap exceeded")
+          if float(summary["research_usage"]["estimated_cost_usd"]) > float(os.environ["MAX_RESEARCH_COST_USD"]):
+              raise SystemExit("research estimated-cost cap exceeded")
+
+          live_refs = {
+              item["source_ref"]
+              for item in summary.get("live_sources", [])
+              if item.get("source_ref")
+          }
+          for item in contract.get("evidence", []):
+              if item.get("source_ref") not in live_refs:
+                  continue
+              if item.get("classification") == "VERIFIED_FACT":
+                  raise SystemExit("Live Research was promoted directly to VERIFIED_FACT")
+              if item.get("classification") == "STRONG_EVIDENCE":
+                  if not item.get("source") or not item.get("source_type") or not item.get("source_ref"):
+                      raise SystemExit("STRONG_EVIDENCE is missing required provenance")
+
+          print(json.dumps(summary, ensure_ascii=False))
+          PY
+
+      - name: Upload live MIND FORGE Runner result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-live-research-v1
+          path: artifacts/mind-forge-live-research-v1/
+          if-no-files-found: warn

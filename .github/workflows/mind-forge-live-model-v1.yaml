@@ -1,0 +1,221 @@
+name: MIND FORGE Live Model V1
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: Raw business seed for MIND FORGE
+        required: true
+        type: string
+        default: "تصليح الملابس"
+      confirm_paid_live_run:
+        description: Explicitly authorize this paid live-model run
+        required: true
+        type: choice
+        default: "NO"
+        options:
+          - "NO"
+          - "YES"
+      creative_model:
+        description: Model for the single live Creative Engine call
+        required: true
+        type: choice
+        default: gpt-5.6-terra
+        options:
+          - gpt-5.6-terra
+          - gpt-5.6-luna
+          - gpt-5.6-sol
+      expert_model:
+        description: Model used independently by each of the ten expert lenses
+        required: true
+        type: choice
+        default: gpt-5.6-luna
+        options:
+          - gpt-5.6-luna
+          - gpt-5.6-terra
+      max_estimated_cost_usd:
+        description: Hard estimated-cost ceiling for the whole run
+        required: true
+        type: choice
+        default: "0.10"
+        options:
+          - "0.05"
+          - "0.10"
+          - "0.15"
+          - "0.25"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mind-forge-live-model-v1-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  authorization-notice:
+    if: ${{ inputs.confirm_paid_live_run != 'YES' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse unconfirmed paid execution
+        run: echo "Paid live-model execution was not explicitly authorized; no API call was made."
+
+  live-model-run:
+    if: ${{ inputs.confirm_paid_live_run == 'YES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out selected ref
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild frozen MIND FORGE V1.10.1 runtime
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mind-forge-runtime"
+          cat mind-forge-live/runtime/chunk*.b64 | base64 --decode > "$RUNNER_TEMP/runtime.tar.xz"
+          xz -t "$RUNNER_TEMP/runtime.tar.xz"
+          tar -xJf "$RUNNER_TEMP/runtime.tar.xz" -C "$RUNNER_TEMP/mind-forge-runtime"
+          APP="$RUNNER_TEMP/mind-forge-runtime/mind-forge"
+          python mind-forge-live/apply_patch_v1_9_1.py "$APP"
+          cat mind-forge-live/v1_10_overlay_0*.b64 | base64 --decode > "$RUNNER_TEMP/v1_10_overlay.tar.xz"
+          xz -t "$RUNNER_TEMP/v1_10_overlay.tar.xz"
+          tar -xJf "$RUNNER_TEMP/v1_10_overlay.tar.xz" -C "$APP"
+          python mind-forge-live/apply_patch_v1_10_1_decision.py "$APP"
+          grep -q 'version="0.10.0"' "$APP/main.py"
+          grep -q 'normalize_decision_against_logic' "$APP/mind_forge/orchestrator.py"
+          echo "APP=$APP" >> "$GITHUB_ENV"
+
+      - name: Install live runtime dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "openai-agents>=0.14.0" \
+            "pydantic>=2.11.0,<3.0"
+
+      - name: Attach Phase 1 guardrails and live-model adapter
+        run: |
+          set -euo pipefail
+          for file in \
+            contracts_v1.py \
+            question_generator_v1.py \
+            creative_engine_v1.py \
+            expert_minds_v1.py \
+            logic_engine_v1.py \
+            critique_engine_v1.py \
+            research_evidence_v1.py \
+            decision_engine_v1.py \
+            experiment_engine_v1.py \
+            memory_engine_v1.py \
+            live_model_adapter_v1.py \
+            live_pipeline_v1.py
+          do
+            cp "mind-forge-live/phase1/$file" "$APP/mind_forge/$file"
+          done
+          python -m compileall -q "$APP/mind_forge"
+
+      - name: Verify existing API secret is available without printing it
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          if not os.getenv("OPENAI_API_KEY"):
+              raise SystemExit("OPENAI_API_KEY is not available to this workflow")
+          print("OPENAI_API_KEY availability: OK (value not displayed)")
+          PY
+
+      - name: Run paid live Creative Engine plus ten independent expert lenses
+        env:
+          PYTHONPATH: ${{ env.APP }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          MIND_FORGE_LIVE_ENABLED: "1"
+          MIND_FORGE_SEED: ${{ inputs.seed }}
+          MIND_FORGE_CREATIVE_MODEL: ${{ inputs.creative_model }}
+          MIND_FORGE_EXPERT_MODEL: ${{ inputs.expert_model }}
+          MIND_FORGE_MAX_COST_USD: ${{ inputs.max_estimated_cost_usd }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/mind-forge-live-model-v1
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from mind_forge.live_model_adapter_v1 import LiveModelPolicy
+          from mind_forge.live_pipeline_v1 import run_live_model_forge
+
+          policy = LiveModelPolicy(
+              enabled=True,
+              creative_model=os.environ["MIND_FORGE_CREATIVE_MODEL"],
+              expert_model=os.environ["MIND_FORGE_EXPERT_MODEL"],
+              max_estimated_cost_usd=float(os.environ["MIND_FORGE_MAX_COST_USD"]),
+          )
+          result = run_live_model_forge(os.environ["MIND_FORGE_SEED"], policy=policy)
+
+          root = Path("artifacts/mind-forge-live-model-v1")
+          (root / "live-model-result.json").write_text(
+              result.model_dump_json(indent=2), encoding="utf-8"
+          )
+          summary = {
+              "status": "LIVE_MODEL_RUN_COMPLETE",
+              "run_id": result.run_contract.run_id,
+              "idea_count": len(result.run_contract.ideas),
+              "expert_count": len(result.run_contract.expert_outputs),
+              "logic_survivor_count": len(result.logic.survivor_idea_ids),
+              "critique_survivor_count": len(result.critique.survived_idea_ids),
+              "decision_verdict": result.decision_engine.decision.verdict.value,
+              "selected_idea_count": len(result.decision_engine.decision.selected_idea_ids),
+              "experiment_count": len(result.experiment_engine.experiments),
+              "live_research_enabled": result.live_research_enabled,
+              "usage": result.usage.model_dump(),
+              "creative_model": policy.creative_model,
+              "expert_model": policy.expert_model,
+              "max_estimated_cost_usd": policy.max_estimated_cost_usd,
+          }
+          (root / "live-model-summary.json").write_text(
+              json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8"
+          )
+          print(json.dumps(summary, ensure_ascii=False))
+          PY
+
+      - name: Validate live result and budget gates
+        env:
+          MAX_COST_USD: ${{ inputs.max_estimated_cost_usd }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          summary = json.loads(
+              Path("artifacts/mind-forge-live-model-v1/live-model-summary.json")
+              .read_text(encoding="utf-8")
+          )
+          usage = summary["usage"]
+          if summary["status"] != "LIVE_MODEL_RUN_COMPLETE":
+              raise SystemExit("live model run did not complete")
+          if summary["idea_count"] != 14:
+              raise SystemExit("live Creative Engine changed the canonical 14-idea universe")
+          if summary["expert_count"] != 10:
+              raise SystemExit("live expert council did not contain exactly ten minds")
+          if summary["live_research_enabled"] is not False:
+              raise SystemExit("live research was enabled before its separate gate exists")
+          if int(usage["requests"]) > 11:
+              raise SystemExit("live request count exceeded 11")
+          if float(usage["estimated_cost_usd"]) > float(os.environ["MAX_COST_USD"]):
+              raise SystemExit("live estimated cost exceeded the explicit ceiling")
+          print("live-model gates: PASS")
+          PY
+
+      - name: Upload live MIND FORGE result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-live-model-v1
+          path: artifacts/mind-forge-live-model-v1/
+          if-no-files-found: warn

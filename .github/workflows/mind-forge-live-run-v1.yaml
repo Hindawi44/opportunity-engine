@@ -1,14 +1,163 @@
-name: MIND FORGE V1.10 Live Run 6 Forecast Proof
+name: MIND FORGE Phase 1 Contracts
 
 on:
+  push:
+    branches:
+      - agent/mind-forge-phase1-contracts
+    paths:
+      - ".github/workflows/mind-forge-live-run-v1.yaml"
+      - ".github/workflows/mind-forge-live-model-v1.yaml"
+      - ".github/workflows/mind-forge-live-research-v1.yaml"
+      - "mind-forge-live/phase1/**"
+  pull_request:
+    branches:
+      - agent/mind-forge-v1-10-1-baseline
+    paths:
+      - ".github/workflows/mind-forge-live-run-v1.yaml"
+      - ".github/workflows/mind-forge-live-model-v1.yaml"
+      - ".github/workflows/mind-forge-live-research-v1.yaml"
+      - "mind-forge-live/phase1/**"
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: mind-forge-phase1-contracts-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  validation-complete:
+  phase1-contracts:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
-      - name: Live Run 6 validation complete
-        run: echo "MIND FORGE V1.10.1 Live Run 6 forecast proof completed successfully; paid live execution is disabled by default."
+      - name: Check out Phase 1 branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Confirm offline-only validation
+        run: echo "Phase 1, live-model contracts, Live Research Adapter V1, and Runner V1 use no OPENAI_API_KEY in CI; research tests use FakeResearchExecutor only."
+
+      - name: Rebuild frozen MIND FORGE V1.10.1 baseline
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mind-forge-runtime"
+          cat mind-forge-live/runtime/chunk*.b64 | base64 --decode > "$RUNNER_TEMP/runtime.tar.xz"
+          xz -t "$RUNNER_TEMP/runtime.tar.xz"
+          tar -xJf "$RUNNER_TEMP/runtime.tar.xz" -C "$RUNNER_TEMP/mind-forge-runtime"
+          APP="$RUNNER_TEMP/mind-forge-runtime/mind-forge"
+          python mind-forge-live/apply_patch_v1_9_1.py "$APP"
+          cat mind-forge-live/v1_10_overlay_0*.b64 | base64 --decode > "$RUNNER_TEMP/v1_10_overlay.tar.xz"
+          xz -t "$RUNNER_TEMP/v1_10_overlay.tar.xz"
+          tar -xJf "$RUNNER_TEMP/v1_10_overlay.tar.xz" -C "$APP"
+          python mind-forge-live/apply_patch_v1_10_1_decision.py "$APP"
+          grep -q 'version="0.10.0"' "$APP/main.py"
+          grep -q 'normalize_decision_against_logic' "$APP/mind_forge/orchestrator.py"
+          echo "APP=$APP" >> "$GITHUB_ENV"
+
+      - name: Install offline validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "openai-agents>=0.14.0" \
+            "pydantic>=2.11.0,<3.0" \
+            "pytest>=8.0,<9.0"
+
+      - name: Attach complete Phase 1 pipeline, gated live adapters, Runner V1, and frozen bridge
+        run: |
+          set -euo pipefail
+          cp mind-forge-live/phase1/contracts_v1.py "$APP/mind_forge/contracts_v1.py"
+          cp mind-forge-live/phase1/question_generator_v1.py "$APP/mind_forge/question_generator_v1.py"
+          cp mind-forge-live/phase1/creative_engine_v1.py "$APP/mind_forge/creative_engine_v1.py"
+          cp mind-forge-live/phase1/expert_minds_v1.py "$APP/mind_forge/expert_minds_v1.py"
+          cp mind-forge-live/phase1/logic_engine_v1.py "$APP/mind_forge/logic_engine_v1.py"
+          cp mind-forge-live/phase1/critique_engine_v1.py "$APP/mind_forge/critique_engine_v1.py"
+          cp mind-forge-live/phase1/research_evidence_v1.py "$APP/mind_forge/research_evidence_v1.py"
+          cp mind-forge-live/phase1/decision_engine_v1.py "$APP/mind_forge/decision_engine_v1.py"
+          cp mind-forge-live/phase1/experiment_engine_v1.py "$APP/mind_forge/experiment_engine_v1.py"
+          cp mind-forge-live/phase1/memory_engine_v1.py "$APP/mind_forge/memory_engine_v1.py"
+          cp mind-forge-live/phase1/pipeline_v1.py "$APP/mind_forge/pipeline_v1.py"
+          cp mind-forge-live/phase1/live_model_adapter_v1.py "$APP/mind_forge/live_model_adapter_v1.py"
+          cp mind-forge-live/phase1/live_research_adapter_v1.py "$APP/mind_forge/live_research_adapter_v1.py"
+          cp mind-forge-live/phase1/live_research_recovery_v1.py "$APP/mind_forge/live_research_recovery_v1.py"
+          cp mind-forge-live/phase1/runner_v1.py "$APP/mind_forge/runner_v1.py"
+          cp mind-forge-live/phase1/runner_v1_resilient.py "$APP/mind_forge/runner_v1_resilient.py"
+          cp mind-forge-live/phase1/runner_v1_geographic.py "$APP/mind_forge/runner_v1_geographic.py"
+          cp mind-forge-live/phase1/live_pipeline_v1.py "$APP/mind_forge/live_pipeline_v1.py"
+          cp mind-forge-live/phase1/bridge_v110.py "$APP/mind_forge/bridge_v110.py"
+          python -m compileall -q "$APP/mind_forge"
+          test -f "$APP/mind_forge/contracts_v1.py"
+          test -f "$APP/mind_forge/question_generator_v1.py"
+          test -f "$APP/mind_forge/creative_engine_v1.py"
+          test -f "$APP/mind_forge/expert_minds_v1.py"
+          test -f "$APP/mind_forge/logic_engine_v1.py"
+          test -f "$APP/mind_forge/critique_engine_v1.py"
+          test -f "$APP/mind_forge/research_evidence_v1.py"
+          test -f "$APP/mind_forge/decision_engine_v1.py"
+          test -f "$APP/mind_forge/experiment_engine_v1.py"
+          test -f "$APP/mind_forge/memory_engine_v1.py"
+          test -f "$APP/mind_forge/pipeline_v1.py"
+          test -f "$APP/mind_forge/live_model_adapter_v1.py"
+          test -f "$APP/mind_forge/live_research_adapter_v1.py"
+          test -f "$APP/mind_forge/live_research_recovery_v1.py"
+          test -f "$APP/mind_forge/runner_v1.py"
+          test -f "$APP/mind_forge/runner_v1_resilient.py"
+          test -f "$APP/mind_forge/runner_v1_geographic.py"
+          test -f "$APP/mind_forge/live_pipeline_v1.py"
+          test -f "$APP/mind_forge/bridge_v110.py"
+
+      - name: Inventory exact V1.10.1 compatibility boundary
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/mind-forge-phase1/source-snapshot
+          python mind-forge-live/phase1/probe_v110.py "$APP" \
+            > artifacts/mind-forge-phase1/v1_10_1_schema_inventory.json
+          cp "$APP/mind_forge/schemas.py" artifacts/mind-forge-phase1/source-snapshot/schemas_v1_10_1.py
+          cp "$APP/mind_forge/orchestrator.py" artifacts/mind-forge-phase1/source-snapshot/orchestrator_v1_10_1.py
+          cp "$APP/mind_forge/agents.py" artifacts/mind-forge-phase1/source-snapshot/agents_v1_10_1.py
+          python - <<'PY'
+          import json
+          data = json.load(open("artifacts/mind-forge-phase1/v1_10_1_schema_inventory.json", encoding="utf-8"))
+          assert data["model_count"] > 0
+          assert data["enum_count"] > 0
+          for required in ("IdeaSet", "LogicReview", "CouncilReport", "CrossCritique", "Decision"):
+              assert required in data["models"], f"missing legacy schema: {required}"
+          for required in ("Verdict", "EvidenceClass"):
+              assert required in data["enums"], f"missing legacy enum: {required}"
+          print(f"legacy_schema_models={data['model_count']} legacy_enums={data['enum_count']}")
+          PY
+
+      - name: Run complete Phase 1 plus gated live-adapter and Runner V1 validation suite
+        env:
+          PYTHONPATH: ${{ env.APP }}
+        run: |
+          pytest -q \
+            mind-forge-live/phase1/test_contracts_v1.py \
+            mind-forge-live/phase1/test_question_generator_v1.py \
+            mind-forge-live/phase1/test_creative_engine_v1.py \
+            mind-forge-live/phase1/test_expert_minds_v1.py \
+            mind-forge-live/phase1/test_logic_engine_v1.py \
+            mind-forge-live/phase1/test_critique_engine_v1.py \
+            mind-forge-live/phase1/test_research_evidence_v1.py \
+            mind-forge-live/phase1/test_decision_engine_v1.py \
+            mind-forge-live/phase1/test_experiment_engine_v1.py \
+            mind-forge-live/phase1/test_memory_engine_v1.py \
+            mind-forge-live/phase1/test_pipeline_v1.py \
+            mind-forge-live/phase1/test_live_model_adapter_v1.py \
+            mind-forge-live/phase1/test_live_research_adapter_v1.py \
+            mind-forge-live/phase1/test_runner_v1.py \
+            mind-forge-live/phase1/test_live_workflow_v1.py \
+            mind-forge-live/phase1/test_bridge_v110.py
+
+      - name: Upload compatibility inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-phase1-contract-inventory
+          path: artifacts/mind-forge-phase1/
+          if-no-files-found: warn
