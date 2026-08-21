@@ -47,13 +47,13 @@ MARKET_QUERIES: dict[str, tuple[MarketRadarQuery, ...]] = {
     "NO": (
         MarketRadarQuery(
             "no-closure-insolvency",
-            '("opphørssalg" OR "avviklingssalg" OR konkurs OR nedleggelse) '
-            '(klær OR klesbutikk OR tekstil OR arbeidsklær)',
+            '("opphørssalg" OR "avviklingssalg" OR "konkurssalg" OR konkurs OR nedleggelse) '
+            '(klær OR klesbutikk OR tekstil OR arbeidsklær OR vernesko)',
         ),
         MarketRadarQuery(
             "no-surplus-auction",
-            '("restlager" OR "varelager" OR "parti klær" OR lageroverskudd) '
-            '(selges OR auksjon OR avvikling)',
+            '("restlager" OR "varelager" OR "parti klær" OR lageroverskudd OR "lagersalg") '
+            '(selges OR salg OR auksjon OR avvikling OR konkurs)',
         ),
     ),
     "SE": (
@@ -91,6 +91,8 @@ _CLOTHING_TERMS: dict[str, tuple[str, ...]] = {
         "tekstil",
         "arbeidsklær",
         "arbeidsklaer",
+        "vernesko",
+        "sikkerhetssko",
         "bekledning",
         "mote",
     ),
@@ -117,12 +119,26 @@ _CLOTHING_TERMS: dict[str, tuple[str, ...]] = {
 }
 
 _INSOLVENCY_TERMS: dict[str, tuple[str, ...]] = {
-    "NO": ("konkurs", "insolvens", "tvangsavvikling", "likvidasjon"),
+    "NO": (
+        "konkurs",
+        "konkursbo",
+        "konkurssalg",
+        "insolvens",
+        "tvangsavvikling",
+        "likvidasjon",
+    ),
     "SE": ("konkurs", "insolvens", "likvidation", "rekonstruktion"),
     "DE": ("insolvenz", "insolvenzverfahren", "liquidation", "konkurs"),
 }
 _CLOSURE_TERMS: dict[str, tuple[str, ...]] = {
-    "NO": ("opphørssalg", "avviklingssalg", "nedleggelse", "avvikling"),
+    "NO": (
+        "opphørssalg",
+        "avviklingssalg",
+        "lagersalg",
+        "tømmesalg",
+        "nedleggelse",
+        "avvikling",
+    ),
     "SE": (
         "utförsäljning",
         "utforsaljning",
@@ -144,7 +160,14 @@ _CLOSURE_TERMS: dict[str, tuple[str, ...]] = {
     ),
 }
 _SURPLUS_TERMS: dict[str, tuple[str, ...]] = {
-    "NO": ("restlager", "varelager", "parti klær", "lageroverskudd"),
+    "NO": (
+        "restlager",
+        "varelager",
+        "lagerbeholdning",
+        "parti klær",
+        "lageroverskudd",
+        "lagersalg",
+    ),
     "SE": ("restlager", "varulager", "parti kläder", "lageröverskott"),
     "DE": (
         "restposten",
@@ -177,7 +200,6 @@ def _compact(value: object) -> str:
 
 def _fold(value: object) -> str:
     return _compact(value).casefold()
-
 
 def _iso_utc(value: datetime) -> str:
     normalized = value
