@@ -67,6 +67,25 @@ def test_strong_lead_requires_verification():
     assert decision.analysis_eligible is False
 
 
+def test_non_active_strong_lead_cannot_remain_top5_eligible():
+    """Regression for FINN url-id:469363853 from scheduled run 32451818613."""
+    decision = classify_opportunity_lifecycle(
+        _candidate(
+            opportunity_state="STRONG_LEAD_REQUIRES_VERIFICATION",
+            listing_status="UNKNOWN",
+            top5_eligible=True,
+            analysis_eligible=False,
+        )
+    )
+
+    assert decision.listing_status == ListingStatus.UNKNOWN
+    assert decision.workflow_status == WorkflowStatus.REQUIRES_VERIFICATION
+    assert decision.evaluation_status == EvaluationStatus.REQUIRES_VERIFICATION
+    assert decision.top5_eligible is False
+    assert decision.analysis_eligible is False
+    assert decision.reason_code == LifecycleReasonCode.MISSING_REQUIRED_VERIFICATION
+
+
 def test_unverified_confirmed_sale_cannot_become_qualified():
     decision = classify_opportunity_lifecycle(
         _candidate(
