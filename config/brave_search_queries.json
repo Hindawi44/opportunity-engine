@@ -1,17 +1,17 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "country": "NO",
   "search_lang": "nb",
   "results_per_query": 10,
   "max_queries_per_run": 8,
   "queries": [
-    "konkurslager tekstil Norge",
-    "butikk inventar opphørssalg Norge",
+    "konkurssalg varelager tekstil Norge",
+    "konkurssalg lagersalg Norge",
     "varelager konkursbo Norge",
-    "butikkinnredning selges Norge",
-    "butikkinnredning klesbutikk Norge",
-    "klesstativ utstillingsdukker selges Norge",
-    "industrisymaskin brukt Norge",
-    "lagerreoler selges Norge"
+    "lagersalg arbeidsklær vernesko Norge",
+    "konkurssalg arbeidsklær vernesko Norge",
+    "opphørssalg arbeidsklær sikkerhetssko Norge",
+    "butikkinnredning klesbutikk tekstil Norge",
+    "klesstativ utstillingsdukker selges Norge"
   ]
 }
