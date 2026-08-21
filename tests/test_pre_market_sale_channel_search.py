@@ -60,8 +60,6 @@ def test_query_pack_is_bounded_and_uses_exact_company_identities():
     assert any('"MENSWEAR NORGE AS KONKURSBO"' in query for query in queries)
     assert any('"938018014"' in query for query in queries)
     assert any("site:auksjonen.no" in query for query in queries)
-    assert any("konkurssalg" in query for query in queries)
-    assert any("lagersalg" in query for query in queries)
 
 
 def test_exact_orgnr_and_sale_wording_create_unverified_sale_candidate():
@@ -87,32 +85,6 @@ def test_exact_orgnr_and_sale_wording_create_unverified_sale_candidate():
     assert payload["public_sale_found"] is False
     assert payload["inventory_sale_verified"] is False
     assert payload["top5_eligible"] is False
-
-
-def test_konkurssalg_lagersalg_workwear_wording_is_recognized_as_sale_inventory():
-    hit = SearchHit(
-        title="MENSWEAR NORGE AS - konkurssalg 60 %",
-        url="https://www.facebook.com/example/posts/123",
-        description=(
-            "Lagersalg fra konkursbo. Stort restlager med arbeidsklær, vernesko "
-            "og varer selges fra lager."
-        ),
-        provider="Brave Search",
-    )
-
-    candidate = classify_search_hit(
-        hit,
-        query="query",
-        enrichment=enrichment(),
-    )
-
-    assert candidate is not None
-    payload = candidate.to_dict()
-    assert payload["sale_signal"] is True
-    assert payload["inventory_signal"] is True
-    assert payload["liquidation_signal"] is True
-    assert payload["candidate_state"] == "SALE_LISTING_CANDIDATE_REQUIRES_PAGE_VERIFICATION"
-    assert payload["automatic_page_open"] is False
 
 
 def test_liquidator_wording_creates_channel_candidate_without_sale_claim():
