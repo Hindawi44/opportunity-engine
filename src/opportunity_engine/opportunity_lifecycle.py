@@ -192,7 +192,9 @@ def classify_opportunity_lifecycle(
             evaluation_status=EvaluationStatus.REQUIRES_VERIFICATION,
             workflow_status=WorkflowStatus.REQUIRES_VERIFICATION,
             verified=verified_value,
-            top5_eligible=requested_top5,
+            top5_eligible=(
+                requested_top5 and listing_status == ListingStatus.ACTIVE
+            ),
             analysis_eligible=False,
             reason_code=LifecycleReasonCode.MISSING_REQUIRED_VERIFICATION,
         )
