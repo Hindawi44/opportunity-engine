@@ -29,6 +29,7 @@ def test_checkpoint_workflow_covers_only_completed_markets() -> None:
     assert '"market_code": "DK"' not in text
     assert "run_auksjonen_live_clothing.py" in text
     assert "run_finn_email_intake.py" in text
+    assert "run_pre_market_daily_monitor.py" in text
     assert "--market SE" in text
     assert "--source blinto" in text
     assert "--source klaravik" in text
@@ -52,9 +53,10 @@ def test_checkpoint_reads_finn_gmail_after_auksjonen() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     auksjonen = text.index("- name: Run Norway Auksjonen public clothing path")
     finn = text.index("- name: Read FINN saved-search alerts from Gmail")
+    pre_market = text.index("- name: Run Norway bankruptcy sale-channel monitor")
     sweden = text.index("- name: Run Sweden Blinto bounded pilot")
 
-    assert auksjonen < finn < sweden
+    assert auksjonen < finn < pre_market < sweden
     assert "GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}" in text
     assert "GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}" in text
     assert "GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}" in text
@@ -63,7 +65,20 @@ def test_checkpoint_reads_finn_gmail_after_auksjonen() -> None:
     assert 'from:agent@finn.no subject:"Nye annonser:" newer_than:7d' in text
     assert "--auksjonen-report" in text
     assert '"source_name": "FINN saved-search email"' in text
-    assert "all six bounded source paths" in text
+
+
+def test_norway_checkpoint_runs_targeted_bankruptcy_sale_channel_monitor() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    start = text.index("- name: Run Norway bankruptcy sale-channel monitor")
+    end = text.index("- name: Run Sweden Blinto bounded pilot", start)
+    step = text[start:end]
+
+    assert "scripts/run_pre_market_daily_monitor.py" in step
+    assert '--output-dir "$INPUT_ROOT/no-konkurs-sale-monitor"' in step
+    assert "--case-limit 10" in step
+    assert "--results-per-query 10" in step
+    assert "--freshness pm" in step
+    assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in text
 
 
 def test_sweden_daily_checkpoint_runs_three_direct_source_packs_before_germany() -> None:
