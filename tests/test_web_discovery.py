@@ -64,6 +64,31 @@ def test_build_discovery_leads_classifies_clothing_shop_fixtures():
     assert leads[0].priority_score >= 30
 
 
+def test_konkurssalg_lagersalg_workwear_result_is_kept_and_ranked():
+    leads = build_discovery_leads((
+        WebSearchResult(
+            title="Konkurssalg - 60 % rabatt",
+            url="https://www.facebook.com/example/posts/123",
+            snippet=(
+                "Lagersalg med stort restlager. Arbeidsklær, vernesko og varer "
+                "fra konkursbo selges fra lager."
+            ),
+            city="Ytre Enebakk",
+            published_at="2026-08-21T08:00:00Z",
+            image_count=6,
+        ),
+    ))
+
+    assert len(leads) == 1
+    lead = leads[0]
+    assert lead.source == "Facebook"
+    assert "bankruptcy" in lead.categories
+    assert "liquidation" in lead.categories
+    assert "inventory" in lead.categories
+    assert "sale_listing" in lead.categories
+    assert lead.priority_score >= 50
+
+
 def test_missing_values_remain_none():
     lead = build_discovery_leads((
         WebSearchResult(
