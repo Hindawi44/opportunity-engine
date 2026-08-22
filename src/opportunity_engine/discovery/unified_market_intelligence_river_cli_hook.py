@@ -7,6 +7,9 @@ import os
 from pathlib import Path
 import sys
 
+from opportunity_engine.automatic_missed_opportunity_capture import (
+    write_automatic_missed_opportunity_capture,
+)
 from opportunity_engine.discovery.signal_follow_up_continuity import (
     write_signal_follow_up_engine_with_continuity,
 )
@@ -27,10 +30,11 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
     only when that command has produced its base domain brief. The unified river
     is written first; then the signal follow-up continuity layer searches durable
     entity scents before filling any remaining budget with current early-signal
-    cases. Finally, supported exact public item URLs are routed into the existing
-    source-specific VENTA/Auksjonen verifiers so explicit price, quantity,
-    weight, dimensions, pallet, location and fee facts can be exposed. Generic
-    search hits remain unverified and are never guessed into item URLs.
+    cases. Supported exact public item URLs are then routed into existing
+    source-specific VENTA/Auksjonen verifiers. Finally, source-verified bulk
+    clothing lots absent from the canonical checkpoint are captured into durable
+    missed-opportunity memory with a deterministic pipeline root-cause trace.
+    Generic search hits remain unverified and are never treated as ground truth.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -112,6 +116,34 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                     "verified_with_pallet_count": source_verification.get(
                         "verified_with_pallet_count"
                     ),
+                },
+                sort_keys=True,
+            ),
+        )
+
+        input_root = Path(
+            str(os.environ.get("INPUT_ROOT") or "").strip()
+            or (output_dir.parent / "multi-market-inputs").as_posix()
+        )
+        miss_capture = write_automatic_missed_opportunity_capture(
+            output_dir,
+            input_root=input_root,
+            root=".",
+        )
+        print(
+            "automatic_missed_opportunity_capture:",
+            json.dumps(
+                {
+                    "status": miss_capture.get("status"),
+                    "verified_candidate_count": miss_capture.get(
+                        "verified_candidate_count"
+                    ),
+                    "detected_miss_count": miss_capture.get("detected_miss_count"),
+                    "new_case_count": miss_capture.get("new_case_count"),
+                    "repeat_miss_count_this_run": miss_capture.get(
+                        "repeat_miss_count_this_run"
+                    ),
+                    "root_cause_counts": miss_capture.get("root_cause_counts"),
                 },
                 sort_keys=True,
             ),
