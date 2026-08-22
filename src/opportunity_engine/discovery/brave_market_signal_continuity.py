@@ -5,9 +5,14 @@ values must not create a changed SQLite observation when the underlying public
 page title, snippet, URL, classification, or status did not change.
 
 A proven learned-query overlay may extend the existing radar OR groups and
-classification vocabulary for one collection call.  The overlay is temporary,
+classification vocabulary for one collection call. The overlay is temporary,
 bounded, and restored in ``finally`` so learned runtime state cannot leak into
-unrelated tests or collectors.  It never adds an extra Brave request.
+unrelated tests or collectors.
+
+When the scheduled pre-checkpoint promoted-learning source already consumed a
+Norway Brave request, this wrapper displaces the same number of overlapping NO
+radar requests (bounded by the normal NO radar budget). The combined learned +
+radar request budget therefore does not increase.
 """
 from __future__ import annotations
 
@@ -38,6 +43,12 @@ _VOLATILE_SIGNAL_METADATA = {"query_id", "query", "source_rank"}
 _VOLATILE_EVIDENCE_METADATA = {"query_id", "source_rank"}
 _OVERLAY_ENV = "OPPORTUNITY_LEARNED_QUERY_OVERLAY_PATH"
 _DEFAULT_OVERLAY_RELATIVE_PATH = Path("learning") / "active-keyword-overlay.json"
+_PRECHECKPOINT_LEARNED_REPORT = (
+    Path("artifacts")
+    / "multi-market-inputs"
+    / "no-learned-core"
+    / "search-run-report.json"
+)
 
 
 def stabilize_brave_signal(signal: Mapping[str, Any]) -> dict[str, Any]:
@@ -114,9 +125,9 @@ def learned_radar_overlay(
 ) -> Iterator[dict[str, dict[str, MarketSignalType]]]:
     """Temporarily apply proven learned terms to the existing radar.
 
-    Existing query count and provider-call count are unchanged.  Learned terms
-    are appended to the first OR group of each existing query and to the
-    corresponding event-classification vocabulary.  All mutable globals are
+    Existing query count and provider-call count are unchanged here. Learned
+    terms are appended to the first OR group of each existing query and to the
+    corresponding event-classification vocabulary. All mutable globals are
     restored exactly after the collection call.
     """
 
@@ -160,6 +171,38 @@ def learned_radar_overlay(
                 table[market] = terms
 
 
+@contextmanager
+def _displace_no_radar_queries(count: int) -> Iterator[int]:
+    """Temporarily remove NO radar slots already spent by promoted Core search."""
+    original = tuple(_radar.MARKET_QUERIES["NO"])
+    displaced = min(max(0, int(count)), len(original))
+    try:
+        if displaced:
+            _radar.MARKET_QUERIES["NO"] = original[displaced:]
+        yield displaced
+    finally:
+        _radar.MARKET_QUERIES["NO"] = original
+
+
+def _precheckpoint_learned_request_count(root: str | Path) -> tuple[int, Path, str | None]:
+    path = Path(root) / _PRECHECKPOINT_LEARNED_REPORT
+    if not path.exists():
+        return 0, path, None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return 0, path, f"{type(exc).__name__}: {exc}"
+    if not isinstance(payload, Mapping):
+        return 0, path, "PRECHECKPOINT_LEARNED_REPORT_NOT_OBJECT"
+    try:
+        request_count = int(payload.get("request_count") or 0)
+    except (TypeError, ValueError):
+        return 0, path, "PRECHECKPOINT_LEARNED_REQUEST_COUNT_INVALID"
+    if request_count < 0:
+        return 0, path, "PRECHECKPOINT_LEARNED_REQUEST_COUNT_INVALID"
+    return request_count, path, None
+
+
 def _runtime_overlay(
     root: str | Path,
     environment: Mapping[str, str] | None,
@@ -170,7 +213,7 @@ def _runtime_overlay(
     try:
         return load_learned_query_overlay(path), path, None
     except (OSError, ValueError, json.JSONDecodeError) as exc:
-        # A corrupt learning overlay must never take the core radar down.  Fail
+        # A corrupt learning overlay must never take the core radar down. Fail
         # closed to the static query pack and surface the reason in diagnostics.
         return {"schema_version": "learned-query-overlay-1.0", "markets": {}}, path, (
             f"{type(exc).__name__}: {exc}"
@@ -267,6 +310,12 @@ def collect_manifest_brave_market_signals(
         )
 
     overlay, overlay_path, overlay_error = _runtime_overlay(root, environment)
+    prelearned_requests, prelearned_path, prelearned_error = (
+        _precheckpoint_learned_request_count(root)
+    )
+    baseline_radar_budget = len(SUPPORTED_MARKETS) * queries_per_market
+    no_displacement_requested = min(max(0, prelearned_requests), queries_per_market)
+
     kwargs: dict[str, Any] = {
         "root": root,
         "observed_at": observed_at,
@@ -279,8 +328,27 @@ def collect_manifest_brave_market_signals(
         kwargs["provider_factory"] = provider_factory
 
     with learned_radar_overlay(overlay) as learned_by_market:
-        report = _collect_raw_brave_market_signals(manifest, **kwargs)
+        with _displace_no_radar_queries(no_displacement_requested) as displaced:
+            report = _collect_raw_brave_market_signals(manifest, **kwargs)
 
+    # Raw radar metadata describes its configured per-market cap. Once one or
+    # more NO slots were intentionally displaced, expose the actual bounded
+    # request budget so operators can reconcile the combined spend exactly.
+    if displaced:
+        for source in report.get("sources") or []:
+            if not isinstance(source, dict):
+                continue
+            attempted = source.get("queries_attempted")
+            if isinstance(attempted, int) and attempted >= 0:
+                source["query_budget"] = attempted
+        report["query_budget_total"] = sum(
+            int(source.get("query_budget") or 0)
+            for source in report.get("sources") or []
+            if isinstance(source, Mapping)
+        )
+
+    radar_requests = int(report.get("requests_made") or 0)
+    combined_requests = prelearned_requests + radar_requests
     report["learned_query_overlay"] = {
         "path": overlay_path.as_posix(),
         "load_error": overlay_error,
@@ -290,6 +358,14 @@ def collect_manifest_brave_market_signals(
         },
         "extra_search_requests": 0,
         "query_budget_unchanged": True,
+        "precheckpoint_learned_report_path": prelearned_path.as_posix(),
+        "precheckpoint_learned_report_error": prelearned_error,
+        "precheckpoint_learned_request_count": prelearned_requests,
+        "radar_requests_displaced": displaced,
+        "baseline_radar_request_budget": baseline_radar_budget,
+        "radar_request_count_after_displacement": radar_requests,
+        "combined_learned_plus_radar_request_count": combined_requests,
+        "combined_request_budget_unchanged": combined_requests <= baseline_radar_budget,
     }
 
     root_path = Path(root)
