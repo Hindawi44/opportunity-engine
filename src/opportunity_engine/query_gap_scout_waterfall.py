@@ -310,6 +310,7 @@ def _new_gap_case(
     proof: Mapping[str, Any],
     *,
     observed_at: datetime,
+    diagnosed_query_gap_terms: Sequence[str] = (),
 ) -> MissedOpportunityCase:
     final_url = str(proof["canonical_url"])
     return MissedOpportunityCase(
@@ -323,6 +324,7 @@ def _new_gap_case(
         ground_truth_url=final_url,
         trace=DiscoveryTrace(query_generated=False),
         learning_evidence_text=str(proof["evidence_text"]),
+        diagnosed_query_gap_terms=tuple(diagnosed_query_gap_terms),
     ).with_diagnosis()
 
 
@@ -567,7 +569,11 @@ def discover_query_gap_misses(
                 core_known += 1
                 continue
 
-            case = _new_gap_case(proof, observed_at=now)
+            case = _new_gap_case(
+                proof,
+                observed_at=now,
+                diagnosed_query_gap_terms=(term,),
+            )
             cases.append(case)
             stage_misses += 1
             metadata.append(
@@ -749,7 +755,11 @@ def discover_query_gap_misses(
                     core_known += 1
                     continue
 
-                case = _new_gap_case(proof, observed_at=now)
+                case = _new_gap_case(
+                    proof,
+                    observed_at=now,
+                    diagnosed_query_gap_terms=(term,),
+                )
                 cases.append(case)
                 metadata.append(
                     {
