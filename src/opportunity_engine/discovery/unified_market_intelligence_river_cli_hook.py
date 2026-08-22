@@ -19,6 +19,9 @@ from opportunity_engine.discovery.signal_follow_up_source_verification import (
 from opportunity_engine.discovery.unified_market_intelligence_river import (
     write_unified_market_intelligence_river,
 )
+from opportunity_engine.root_cause_feedback_router import (
+    write_root_cause_feedback_router,
+)
 
 _INSTALLED = False
 
@@ -30,11 +33,12 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
     only when that command has produced its base domain brief. The unified river
     is written first; then the signal follow-up continuity layer searches durable
     entity scents before filling any remaining budget with current early-signal
-    cases. Supported exact public item URLs are then routed into existing
-    source-specific VENTA/Auksjonen verifiers. Finally, source-verified bulk
-    clothing lots absent from the canonical checkpoint are captured into durable
-    missed-opportunity memory with a deterministic pipeline root-cause trace.
-    Generic search hits remain unverified and are never treated as ground truth.
+    cases. Supported exact public item URLs are routed into existing
+    source-specific VENTA/Auksjonen verifiers. Source-verified bulk clothing lots
+    absent from the canonical checkpoint are then captured into durable missed-
+    opportunity memory. Finally the root-cause feedback router assigns each miss
+    to its correct adaptation mechanism, so source/parser/verifier/reporting
+    failures never accidentally become keyword-learning changes.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -144,6 +148,27 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                         "repeat_miss_count_this_run"
                     ),
                     "root_cause_counts": miss_capture.get("root_cause_counts"),
+                },
+                sort_keys=True,
+            ),
+        )
+
+        feedback = write_root_cause_feedback_router(
+            output_dir,
+            input_root=input_root,
+        )
+        print(
+            "root_cause_feedback_router:",
+            json.dumps(
+                {
+                    "status": feedback.get("status"),
+                    "active_route_count": feedback.get("active_route_count"),
+                    "critical_route_count": feedback.get("critical_route_count"),
+                    "keyword_learning_route_count": feedback.get(
+                        "keyword_learning_route_count"
+                    ),
+                    "mechanism_counts": feedback.get("mechanism_counts"),
+                    "root_cause_counts": feedback.get("root_cause_counts"),
                 },
                 sort_keys=True,
             ),
