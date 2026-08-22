@@ -63,6 +63,8 @@ def build_learned_query_overlay(
                 "raw_hit_count": item.raw_hit_count,
                 "verified_relevant_count": item.verified_relevant_count,
                 "recovered_case_ids": list(item.recovered_case_ids),
+                "support_case_ids": list(item.support_case_ids),
+                "evaluation_scope": item.evaluation_scope,
                 "source_verdict": item.status,
             }
             for item in ranked[:max_terms_per_market]
