@@ -27,6 +27,7 @@ from opportunity_engine.discovery.auksjonen_unified_lifecycle import (
     write_auksjonen_unified_artifacts,
 )
 from opportunity_engine.parser_gap_rescue import (
+    OVERLAY_FILENAME as PARSER_RESCUE_OVERLAY_FILENAME,
     SUPPORTED_SOURCE as PARSER_RESCUE_SOURCE,
     apply_auksjonen_parser_rescue,
     load_parser_rescue_terms,
@@ -105,6 +106,13 @@ def main() -> int:
     base_collection = result.combined
 
     overlay_path_text = str(args.parser_rescue_overlay or "").strip()
+    if not overlay_path_text:
+        input_root_text = str(os.environ.get("INPUT_ROOT") or "").strip()
+        if input_root_text:
+            overlay_path_text = (
+                Path(input_root_text) / "learning" / PARSER_RESCUE_OVERLAY_FILENAME
+            ).as_posix()
+
     learned_terms: tuple[str, ...] = ()
     if overlay_path_text:
         overlay_path = Path(overlay_path_text)
