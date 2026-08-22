@@ -3,7 +3,8 @@
 The operator joins durable missed-opportunity memory with a curated inbox,
 proposes search terms only for diagnosed QUERY_GAP cases, shadow-evaluates a
 small bounded number of candidates, retains previously proven shadow skills,
-and marks cases recovered when hidden-ground-truth replay succeeds.
+and records whether proof came from direct replay or an independent hidden
+holdout transfer case.
 
 PROVEN is not production-active. An exact explicit promotion decision is
 required before a proven shadow term can enter the active runtime overlay.
@@ -101,29 +102,44 @@ def _existing_overlay_terms(overlay: Mapping[str, Any] | None) -> list[str]:
     return terms
 
 
-def _apply_recoveries(
+def _apply_learning_results(
     cases: Sequence[MissedOpportunityCase],
     evaluations: Sequence[KeywordEvaluationResult],
 ) -> list[MissedOpportunityCase]:
-    recovered_terms: dict[str, list[str]] = {}
+    """Apply proof to source misses without mixing holdouts into durable memory.
+
+    Direct replay marks the exact missed case RECOVERED. Holdout transfer proof
+    instead marks the source miss TRANSFER_PROVEN: the original historical page
+    was not necessarily rediscovered, but a pattern learned from it independently
+    recovered a hidden relevant case that was not used to generate the pattern.
+    """
+    direct_terms: dict[str, list[str]] = {}
+    transfer_terms: dict[str, list[str]] = {}
     for evaluation in evaluations:
         if evaluation.status != "PROVEN":
             continue
-        for case_id in evaluation.recovered_case_ids:
-            recovered_terms.setdefault(case_id, []).append(evaluation.term)
+        if evaluation.evaluation_scope == "HOLDOUT_TRANSFER":
+            for case_id in evaluation.support_case_ids:
+                transfer_terms.setdefault(case_id, []).append(evaluation.term)
+        else:
+            for case_id in evaluation.recovered_case_ids:
+                direct_terms.setdefault(case_id, []).append(evaluation.term)
 
     updated: list[MissedOpportunityCase] = []
     for case in cases:
-        terms = recovered_terms.get(case.case_id) or []
+        direct = direct_terms.get(case.case_id) or []
+        transfer = transfer_terms.get(case.case_id) or []
+        terms = [*direct, *transfer]
         if not terms:
             updated.append(case)
             continue
         patterns = tuple(dict.fromkeys((*case.learned_patterns, *terms)))
+        status = "RECOVERED" if direct else "TRANSFER_PROVEN"
         updated.append(
             replace(
                 case,
                 learned_patterns=patterns,
-                learning_status="RECOVERED",
+                learning_status=status,
                 repeat_miss=False,
             )
         )
@@ -136,6 +152,7 @@ def run_daily_learning_cycle(
     inbox_cases: Sequence[MissedOpportunityCase],
     active_queries: Sequence[str],
     search: LearningSearch,
+    validation_cases: Sequence[MissedOpportunityCase] | None = None,
     existing_overlay: Mapping[str, Any] | None = None,
     existing_shadow_overlay: Mapping[str, Any] | None = None,
     promotion_decisions: PromotionDecisions | None = None,
@@ -145,12 +162,19 @@ def run_daily_learning_cycle(
 ) -> DailyLearningOutcome:
     """Run one bounded learning iteration and return state for persistence.
 
+    Candidate generation always uses the real missed-opportunity memory. If
+    ``validation_cases`` are supplied, they are a hidden holdout set used only
+    for evaluation; they never enter candidate generation or durable miss memory.
+    This prevents a candidate from being rewarded for merely memorizing the case
+    that generated it.
+
     ``existing_overlay`` is treated as legacy learned state and migrated into
     shadow knowledge. It is never trusted as production-active unless the exact
     term is present in ``promotion_decisions`` with status PROMOTED.
     """
     active_policy = policy or DailyLearningPolicy()
     cases = _diagnose_cases(merge_case_memory(existing_cases, inbox_cases))
+    holdouts = list(validation_cases or [])
 
     # Migrate any pre-gate active overlay into shadow evidence. This is fail-safe:
     # legacy auto-activated terms stop influencing production until explicitly
@@ -169,6 +193,8 @@ def run_daily_learning_cycle(
         active_queries=effective_active_queries,
     )
 
+    evaluation_targets = holdouts if holdouts else cases
+    evaluation_scope = "HOLDOUT_TRANSFER" if holdouts else "SOURCE_CASE_REPLAY"
     evaluations: list[KeywordEvaluationResult] = []
     errors: list[dict[str, str]] = []
     search_requests = 0
@@ -179,10 +205,11 @@ def run_daily_learning_cycle(
                 evaluations.append(
                     evaluate_keyword_candidate(
                         candidate,
-                        cases,
+                        evaluation_targets,
                         search,
                         min_recovered_cases=active_policy.min_recovered_cases,
                         min_precision=active_policy.min_precision,
+                        evaluation_scope=evaluation_scope,
                     )
                 )
             except Exception as exc:  # provider boundary; preserve next-day learning
@@ -209,7 +236,7 @@ def run_daily_learning_cycle(
         promotion_decisions,
         max_terms_per_market=active_policy.max_terms_per_market,
     )
-    cases = _apply_recoveries(cases, evaluations)
+    cases = _apply_learning_results(cases, evaluations)
 
     if not search_enabled:
         search_status = search_skip_reason or "DISABLED"
@@ -231,6 +258,8 @@ def run_daily_learning_cycle(
         "schema_version": "daily-learning-operator-1.1",
         "known_missed_opportunity_count": len(cases),
         "inbox_case_count": len(inbox_cases),
+        "validation_case_count": len(holdouts),
+        "evaluation_scope": evaluation_scope,
         "candidate_count": len(candidates),
         "evaluated_candidate_count": len(evaluations),
         "learning_search_requests": search_requests,
@@ -246,6 +275,9 @@ def run_daily_learning_cycle(
         "promotion_decision_count": len(promotion_decisions or {}),
         "recovered_case_count": sum(
             1 for case in cases if case.learning_status == "RECOVERED"
+        ),
+        "transfer_proven_case_count": sum(
+            1 for case in cases if case.learning_status == "TRANSFER_PROVEN"
         ),
         "keyword_learning": keyword_report,
         "promotion_gate_enforced": True,
