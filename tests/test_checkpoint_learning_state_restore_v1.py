@@ -50,6 +50,34 @@ def test_restores_only_allowlisted_learning_state_into_input_root(tmp_path) -> N
     assert not (target / "not-allowlisted.json").exists()
 
 
+def test_restores_shadow_overlay_for_cross_run_replication(tmp_path) -> None:
+    shadow = {
+        "schema_version": "learned-query-overlay-1.0",
+        "markets": {
+            "NO": [
+                {
+                    "term": "avviklingssalg",
+                    "source_verdict": "PROVEN",
+                    "evaluation_scope": "HOLDOUT_TRANSFER",
+                    "transfer_validation_case_ids": ["HOLDOUT-NO-SENZE-OF-JOY"],
+                    "independent_transfer_case_count": 1,
+                }
+            ]
+        },
+    }
+    archive = archive_bytes(
+        {
+            "artifacts/multi-market-inputs/learning/shadow-keyword-overlay.json": json.dumps(shadow).encode(),
+        }
+    )
+
+    restored = extract_previous_learning_state(archive, tmp_path)
+
+    assert {item["filename"] for item in restored} == {"shadow-keyword-overlay.json"}
+    target = tmp_path / "learning" / "shadow-keyword-overlay.json"
+    assert json.loads(target.read_text()) == shadow
+
+
 def test_learning_restore_accepts_artifact_flattened_prefix(tmp_path) -> None:
     overlay = {"schema_version": "learned-query-overlay-1.0", "markets": {}}
     archive = archive_bytes(
