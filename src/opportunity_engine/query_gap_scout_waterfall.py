@@ -86,7 +86,7 @@ def build_entity_source_followup_query(company: str) -> str:
 
     query = (
         f'"{compact}" '
-        '("legger ned" OR "legges ned" OR "stenger for godt") '
+        '("legger ned" OR "legges ned" OR "stenger for godt" OR avvikler OR avvikles) '
         '(varer OR sortiment OR varelager OR lagerbeholdning)'
     )
     query_folded = query.casefold()
