@@ -15,7 +15,9 @@ from pathlib import Path
 
 from opportunity_engine.discovery import checkpoint_state_restore
 from opportunity_engine.learned_query_overlay import (
+    build_learned_query_overlay,
     load_learned_query_overlay,
+    merge_learned_query_overlays,
     save_learned_query_overlay,
 )
 from opportunity_engine.learning_promotion_gate import (
@@ -29,6 +31,9 @@ NETHERLANDS_MEMORY_RELATIVE_PATH = "nl-market/opportunity_engine.db"
 FRANCE_MEMORY_RELATIVE_PATH = "fr-market/opportunity_engine.db"
 SHADOW_KEYWORD_OVERLAY_FILENAME = "shadow-keyword-overlay.json"
 DEFAULT_PROMOTION_CONFIG_PATH = Path("config/learning/query_promotions.json")
+DEFAULT_SHADOW_BOOTSTRAP_PATH = Path(
+    "config/learning/promoted_query_shadow_bootstrap.json"
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -58,32 +63,46 @@ def _write_status(path: Path, status: dict) -> None:
     )
 
 
+def _load_optional_overlay(path: Path) -> dict:
+    if not path.exists():
+        return build_learned_query_overlay([])
+    return load_learned_query_overlay(path)
+
+
 def _prepare_previous_runtime_overlay(
     input_root: Path,
     runtime_overlay: Path,
     *,
     promotion_config_path: str | Path = DEFAULT_PROMOTION_CONFIG_PATH,
+    bootstrap_shadow_path: str | Path = DEFAULT_SHADOW_BOOTSTRAP_PATH,
 ) -> None:
-    """Rebuild the current active overlay from restored proof + current decisions.
+    """Rebuild current Production overlay from durable proof + current decisions.
 
-    The previous active overlay is not authoritative by itself: a promotion may
-    have been added or disabled in repository config after the previous run. The
-    restored Shadow overlay is therefore re-evaluated through the same explicit
-    promotion gate before any current-run discovery starts. If Shadow is absent,
-    the prior active overlay is accepted only as evidence and is still filtered
-    through today's promotion decisions.
+    Restored Shadow evidence is authoritative learning memory. The prior active
+    overlay may contribute compatible proof metadata, but can never activate a
+    term by itself. A small repository bootstrap preserves the already-audited
+    V15C repeated-transfer proof across the migration into the scheduled runtime.
+    The bootstrap is Shadow evidence only: the explicit promotion gate still
+    decides whether any term becomes active.
     """
     learning_dir = input_root / "learning"
-    shadow_overlay = learning_dir / SHADOW_KEYWORD_OVERLAY_FILENAME
-    previous_active = learning_dir / "active-keyword-overlay.json"
-    evidence_path = shadow_overlay if shadow_overlay.exists() else previous_active
+    shadow_path = learning_dir / SHADOW_KEYWORD_OVERLAY_FILENAME
+    previous_active_path = learning_dir / "active-keyword-overlay.json"
+    bootstrap_path = Path(bootstrap_shadow_path)
 
-    if not evidence_path.exists():
-        if runtime_overlay.exists():
-            runtime_overlay.unlink()
-        return
+    restored_shadow = _load_optional_overlay(shadow_path)
+    previous_active = _load_optional_overlay(previous_active_path)
+    bootstrap_shadow = _load_optional_overlay(bootstrap_path)
 
-    evidence = load_learned_query_overlay(evidence_path)
+    evidence = merge_learned_query_overlays(
+        merge_learned_query_overlays(restored_shadow, previous_active),
+        bootstrap_shadow,
+    )
+
+    # Persist the merged Shadow proof into this run's durable input state so the
+    # normal post-capture learner and the next checkpoint inherit the same proof.
+    save_learned_query_overlay(shadow_path, evidence)
+
     decisions = load_query_promotion_decisions(promotion_config_path)
     active = select_promoted_query_overlay(evidence, decisions)
 
