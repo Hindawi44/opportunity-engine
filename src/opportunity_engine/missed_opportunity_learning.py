@@ -113,6 +113,7 @@ class MissedOpportunityCase:
     ground_truth_company: str
     ground_truth_url: str
     trace: DiscoveryTrace
+    learning_evidence_text: str = ""
     learned_patterns: tuple[str, ...] = ()
     root_cause: str | None = None
     learning_status: str = "PENDING"
@@ -130,8 +131,8 @@ class MissedOpportunityCase:
         """Return discovery-safe context with all answers withheld.
 
         The callback receives the market, time, opportunity family and learned
-        patterns.  It never receives the known company or URL that replay is
-        supposed to rediscover.
+        patterns.  It never receives the known company, URL, or the evidence
+        text used to propose a learning candidate.
         """
 
         return {
@@ -157,6 +158,7 @@ class MissedOpportunityCase:
                 "url": self.ground_truth_url,
             },
             "trace": self.trace.to_dict(),
+            "learning_evidence_text": self.learning_evidence_text,
             "learned_patterns": list(self.learned_patterns),
             "root_cause": self.root_cause,
             "learning_status": self.learning_status,
@@ -182,7 +184,12 @@ class MissedOpportunityCase:
             ground_truth_company=str(truth.get("company") or "").strip(),
             ground_truth_url=str(truth.get("url") or "").strip(),
             trace=DiscoveryTrace.from_dict(trace),
-            learned_patterns=tuple(str(item).strip() for item in learned if str(item).strip()),
+            learning_evidence_text=str(
+                payload.get("learning_evidence_text") or ""
+            ).strip(),
+            learned_patterns=tuple(
+                str(item).strip() for item in learned if str(item).strip()
+            ),
             root_cause=(
                 str(payload.get("root_cause")).strip()
                 if payload.get("root_cause")
@@ -253,6 +260,7 @@ def run_replay(
         "ground_truth",
         "ground_truth_company",
         "ground_truth_url",
+        "learning_evidence_text",
         "company",
         "url",
     }
