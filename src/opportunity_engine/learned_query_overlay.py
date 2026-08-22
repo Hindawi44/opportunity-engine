@@ -60,6 +60,8 @@ def build_learned_query_overlay(
                 "term": item.term,
                 "signal_type": infer_signal_type(item.term).value,
                 "precision": item.precision,
+                "raw_hit_count": item.raw_hit_count,
+                "verified_relevant_count": item.verified_relevant_count,
                 "recovered_case_ids": list(item.recovered_case_ids),
                 "source_verdict": item.status,
             }

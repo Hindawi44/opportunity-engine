@@ -25,6 +25,7 @@ from opportunity_engine.missed_opportunity_learning import (
     load_missed_opportunity_memory,
     save_missed_opportunity_memory,
 )
+from opportunity_engine.safe_learning_proof import build_query_gap_safe_learning_proof
 
 HISTORY_SCHEMA = "keyword-learning-history-1.1"
 INBOX_SCHEMA = "missed-opportunity-inbox-1.0"
@@ -105,6 +106,7 @@ def append_learning_history(
         "recovered_case_count": report.get("recovered_case_count", 0),
         "search_status": report.get("search_status"),
         "promotion_gate_enforced": report.get("promotion_gate_enforced", False),
+        "safe_learning_proof_status": report.get("safe_learning_proof_status"),
     }
     runs.append(entry)
     _write_object(
@@ -179,6 +181,8 @@ def run_daily_learning_runtime(
     Proven learning is stored in ``shadow-keyword-overlay.json``. Only exact
     terms explicitly PROMOTED by ``promotion_config_path`` are written to the
     production ``active-keyword-overlay.json`` and optional runtime copy.
+    A read-only ``safe-learning-proof.json`` is also written so operators can
+    see whether a real QUERY_GAP miss was recovered in shadow before promotion.
     """
     if not 1 <= results_per_candidate <= 10:
         raise ValueError("results_per_candidate must be between 1 and 10")
@@ -188,6 +192,7 @@ def run_daily_learning_runtime(
     memory_path = root / "missed-opportunities.json"
     active_overlay_path = root / "active-keyword-overlay.json"
     shadow_overlay_path = root / "shadow-keyword-overlay.json"
+    proof_path = root / "safe-learning-proof.json"
     history_path = root / "keyword-learning-history.json"
 
     existing_cases = load_missed_opportunity_memory(memory_path)
@@ -246,6 +251,16 @@ def run_daily_learning_runtime(
     if now.tzinfo is None or now.utcoffset() is None:
         now = now.replace(tzinfo=timezone.utc)
     generated_at = now.astimezone(timezone.utc).isoformat()
+
+    proof = build_query_gap_safe_learning_proof(
+        outcome.cases,
+        shadow_overlay=outcome.shadow_overlay,
+        active_overlay=outcome.overlay,
+        min_precision=active_policy.min_precision,
+    )
+    proof["generated_at"] = generated_at
+    _write_object(proof_path, proof)
+
     report = dict(outcome.report)
     report.update(
         {
@@ -255,6 +270,14 @@ def run_daily_learning_runtime(
             "overlay_path": active_overlay_path.as_posix(),
             "shadow_overlay_path": shadow_overlay_path.as_posix(),
             "promotion_config_path": Path(promotion_config_path).as_posix(),
+            "safe_learning_proof_path": proof_path.as_posix(),
+            "safe_learning_proof_status": proof.get("status"),
+            "safe_learning_shadow_recovered_case_count": proof.get(
+                "shadow_recovered_case_count", 0
+            ),
+            "safe_learning_promotion_eligible_count": proof.get(
+                "promotion_eligible_count", 0
+            ),
             "history_path": history_path.as_posix(),
             "results_per_candidate": results_per_candidate,
             "max_possible_learning_search_requests": active_policy.max_candidates_per_run,
