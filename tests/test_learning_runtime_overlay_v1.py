@@ -3,6 +3,9 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from opportunity_engine.adaptive_keyword_learning import KeywordEvaluationResult
+from opportunity_engine.discovery.brave_market_signal_continuity import (
+    learned_radar_overlay,
+)
 from opportunity_engine.discovery.brave_market_signal_radar import (
     MARKET_QUERIES,
     MarketRadarQuery,
@@ -67,28 +70,40 @@ def test_query_augmentation_expands_existing_or_group_without_extra_query() -> N
     assert augmented.query.count(")") == base.query.count(")")
 
 
-def test_learned_term_can_classify_signal_that_static_vocabulary_misses() -> None:
+def test_learned_term_classifies_only_while_overlay_is_active() -> None:
     hit = SearchHit(
         title="Sluttlager med arbeidsklær",
         url="https://example.no/sluttlager",
         description="Hele beholdningen av arbeidsklær selges denne uken.",
         provider="Brave Search",
     )
-    query = augment_market_query(MARKET_QUERIES["NO"][1], ["sluttlager"])
+    original_query = MARKET_QUERIES["NO"][1]
 
-    signal = market_signal_from_brave_hit(
+    before = market_signal_from_brave_hit(
         hit,
         market_code="NO",
-        query=query,
+        query=original_query,
         rank=1,
         observed_at=datetime(2026, 8, 22, tzinfo=timezone.utc),
-        learned_event_terms={"sluttlager": MarketSignalType.WAREHOUSE_SURPLUS},
     )
+    assert before is None
+
+    overlay = build_learned_query_overlay([evaluation("sluttlager", "PROVEN")])
+    with learned_radar_overlay(overlay):
+        runtime_query = MARKET_QUERIES["NO"][1]
+        assert '"sluttlager"' in runtime_query.query
+        signal = market_signal_from_brave_hit(
+            hit,
+            market_code="NO",
+            query=runtime_query,
+            rank=1,
+            observed_at=datetime(2026, 8, 22, tzinfo=timezone.utc),
+        )
 
     assert signal is not None
     assert signal.signal_type == MarketSignalType.WAREHOUSE_SURPLUS
     assert "sluttlager" in signal.metadata["event_terms"]
-    assert signal.metadata["learned_term_match"] is True
+    assert MARKET_QUERIES["NO"][1] == original_query
 
 
 def test_no_overlay_keeps_original_query_unchanged() -> None:
