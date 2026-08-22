@@ -81,6 +81,68 @@ def build_learned_query_overlay(
     }
 
 
+def merge_learned_query_overlays(
+    existing: Mapping[str, Any] | None,
+    learned: Mapping[str, Any] | None,
+    *,
+    max_terms_per_market: int = 5,
+) -> dict[str, Any]:
+    """Merge new proven learning without forgetting stronger prior terms."""
+    if max_terms_per_market < 1:
+        raise ValueError("max_terms_per_market must be >= 1")
+
+    by_market: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)
+    for overlay in (existing, learned):
+        if not isinstance(overlay, Mapping):
+            continue
+        markets = overlay.get("markets")
+        if not isinstance(markets, Mapping):
+            continue
+        for raw_market, raw_rows in markets.items():
+            market = str(raw_market or "").strip().upper()
+            if not market or not isinstance(raw_rows, list):
+                continue
+            for raw in raw_rows:
+                if not isinstance(raw, Mapping):
+                    continue
+                term = " ".join(str(raw.get("term") or "").casefold().split()).strip()
+                if not term:
+                    continue
+                row = dict(raw)
+                row["term"] = term
+                row["signal_type"] = str(
+                    row.get("signal_type") or infer_signal_type(term).value
+                )
+                row["precision"] = float(row.get("precision") or 0.0)
+                row["source_verdict"] = str(row.get("source_verdict") or "PROVEN")
+                current = by_market[market].get(term)
+                if current is None or float(row["precision"]) > float(
+                    current.get("precision") or 0.0
+                ):
+                    by_market[market][term] = row
+
+    markets: dict[str, list[dict[str, Any]]] = {}
+    for market, rows_by_term in sorted(by_market.items()):
+        rows = sorted(
+            rows_by_term.values(),
+            key=lambda item: (-float(item.get("precision") or 0.0), str(item["term"])),
+        )[:max_terms_per_market]
+        markets[market] = rows
+
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "markets": markets,
+        "max_terms_per_market": max_terms_per_market,
+        "active_term_count": sum(len(rows) for rows in markets.values()),
+        "automatic_query_activation": True,
+        "automatic_financial_action": False,
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase": False,
+        "automatic_payment": False,
+    }
+
+
 def save_learned_query_overlay(path: str | Path, overlay: Mapping[str, Any]) -> None:
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
