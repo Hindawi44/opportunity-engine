@@ -140,12 +140,25 @@ def _active_query_text(active_queries: Sequence[str]) -> str:
 
 
 def _candidate_terms(text: str) -> set[str]:
-    tokens = [token for token in _tokens(text) if len(token) >= 4 and token not in _STOPWORDS]
+    raw_tokens = _tokens(text)
+    eligible_tokens = [
+        token
+        for token in raw_tokens
+        if len(token) >= 4 and token not in _STOPWORDS
+    ]
     terms: set[str] = set()
-    for token in tokens:
+    for token in eligible_tokens:
         if _commercial(token):
             terms.add(token)
-    for left, right in zip(tokens, tokens[1:]):
+
+    # Build phrases only from tokens that were truly adjacent in the evidence.
+    # Filtering first can invent adjacency (for example "avslutningssalg på alle"
+    # becoming the false phrase "avslutningssalg alle").
+    for left, right in zip(raw_tokens, raw_tokens[1:]):
+        if len(left) < 4 or len(right) < 4:
+            continue
+        if left in _STOPWORDS or right in _STOPWORDS:
+            continue
         phrase = f"{left} {right}"
         if len(phrase) <= 64 and _commercial(phrase):
             terms.add(phrase)
