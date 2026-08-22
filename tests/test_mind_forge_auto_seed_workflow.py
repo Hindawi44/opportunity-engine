@@ -73,3 +73,11 @@ def test_isolated_runtime_copies_all_import_dependencies():
     # live_model_adapter_v1 imports expert_minds_v1 indirectly; it must be copied too.
     assert 'expert_minds_v1.py' in build_block
     assert 'live_model_adapter_v1.py' in build_block
+
+
+def test_paid_live_job_sets_explicit_runtime_enable_guard():
+    text = WORKFLOW.read_text(encoding='utf-8')
+    paid_job = text.split('creative-v2-open-live:', 1)[1]
+
+    assert text.count('MIND_FORGE_LIVE_ENABLED: "1"') == 1
+    assert 'MIND_FORGE_LIVE_ENABLED: "1"' in paid_job
