@@ -10,11 +10,11 @@ import sys
 from opportunity_engine.automatic_missed_opportunity_capture import (
     write_automatic_missed_opportunity_capture,
 )
-from opportunity_engine.discovery.signal_follow_up_continuity import (
-    write_signal_follow_up_engine_with_continuity,
-)
 from opportunity_engine.discovery.signal_follow_up_source_verification import (
     write_signal_follow_up_source_verification,
+)
+from opportunity_engine.discovery.source_gap_adaptive_followup import (
+    write_source_gap_adaptive_followup_with_continuity,
 )
 from opportunity_engine.discovery.unified_market_intelligence_river import (
     write_unified_market_intelligence_river,
@@ -31,14 +31,13 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
 
     The hook activates only for ``build_domain_market_intelligence_feed.py`` and
     only when that command has produced its base domain brief. The unified river
-    is written first; then the signal follow-up continuity layer searches durable
-    entity scents before filling any remaining budget with current early-signal
-    cases. Supported exact public item URLs are routed into existing
-    source-specific VENTA/Auksjonen verifiers. Source-verified bulk clothing lots
-    absent from the canonical checkpoint are then captured into durable missed-
-    opportunity memory. Finally the root-cause feedback router assigns each miss
-    to its correct adaptation mechanism, so source/parser/verifier/reporting
-    failures never accidentally become keyword-learning changes.
+    is written first; then proven SOURCE_GAP memory receives first priority
+    inside the existing follow-up case budget. Any remaining budget flows to the
+    established persistent-entity/current-signal follow-up. Supported exact
+    public item URLs are routed into existing VENTA/Auksjonen verifiers. Source-
+    verified bulk clothing lots absent from the canonical checkpoint are then
+    captured into durable missed-opportunity memory, and the root-cause feedback
+    router assigns each miss to its correct adaptation mechanism.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -64,7 +63,7 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                 sort_keys=True,
             ),
         )
-        follow_up = write_signal_follow_up_engine_with_continuity(
+        follow_up = write_source_gap_adaptive_followup_with_continuity(
             output_dir,
             environment=os.environ,
         )
@@ -73,10 +72,24 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
             json.dumps(
                 {
                     "status": follow_up.get("status"),
-                    "eligible_follow_up_case_count": follow_up.get("eligible_follow_up_case_count"),
+                    "follow_up_case_budget": follow_up.get("follow_up_case_budget"),
+                    "source_gap_case_count": follow_up.get("source_gap_case_count"),
+                    "source_gap_selected_count": follow_up.get(
+                        "source_gap_selected_count"
+                    ),
+                    "source_gap_search_request_count": follow_up.get(
+                        "source_gap_search_request_count"
+                    ),
+                    "eligible_follow_up_case_count": follow_up.get(
+                        "eligible_follow_up_case_count"
+                    ),
                     "selected_case_count": follow_up.get("selected_case_count"),
-                    "persistent_entity_case_count": follow_up.get("persistent_entity_case_count"),
-                    "persistent_entity_selected_count": follow_up.get("persistent_entity_selected_count"),
+                    "persistent_entity_case_count": follow_up.get(
+                        "persistent_entity_case_count"
+                    ),
+                    "persistent_entity_selected_count": follow_up.get(
+                        "persistent_entity_selected_count"
+                    ),
                     "search_request_count": follow_up.get("search_request_count"),
                     "commercial_lead_count": follow_up.get("commercial_lead_count"),
                     "explicit_commercial_case_link_count": follow_up.get(
