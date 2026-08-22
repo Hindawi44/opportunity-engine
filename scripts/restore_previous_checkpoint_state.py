@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Restore durable checkpoint state and prepare bounded learning for this run."""
+"""Restore durable checkpoint state before discovery.
+
+This phase restores prior SQLite/learning continuity and exposes only explicitly
+promoted query terms to the current discovery run. New learning is intentionally
+deferred until the post-bulletin capture stage so a missed opportunity found
+today can enter the learning cycle today rather than waiting for tomorrow.
+"""
 from __future__ import annotations
 
 import argparse
@@ -7,8 +13,6 @@ import json
 import os
 from pathlib import Path
 
-from opportunity_engine.daily_learning_operator import DailyLearningPolicy
-from opportunity_engine.daily_learning_runtime import run_daily_learning_runtime
 from opportunity_engine.discovery import checkpoint_state_restore
 from opportunity_engine.learned_query_overlay import (
     load_learned_query_overlay,
@@ -53,8 +57,8 @@ def _prepare_previous_runtime_overlay(input_root: Path, runtime_overlay: Path) -
     """Expose yesterday's overlay only when it already passed the promotion gate.
 
     Legacy auto-activated overlays fail closed during migration: they remain
-    available to the learning runtime as shadow evidence, but never reach the
-    current production search before explicit promotion is re-established.
+    durable shadow evidence, but never reach the current production search before
+    explicit promotion is re-established.
     """
     durable_overlay = input_root / "learning" / "active-keyword-overlay.json"
     if not durable_overlay.exists():
@@ -115,7 +119,6 @@ def main() -> int:
     )
 
     input_root = Path(args.input_root)
-    learning_dir = Path(args.input_root) / "learning"
     runtime_overlay = Path("learning") / "active-keyword-overlay.json"
     learning_report_path = Path(args.status_path).parent / "daily-learning-cycle.json"
 
@@ -127,59 +130,19 @@ def main() -> int:
             "error": str(exc)[:500],
         }
 
-    try:
-        learning_report = run_daily_learning_runtime(
-            learning_dir=learning_dir,
-            inbox_path="config/learning/missed_opportunity_inbox.json",
-            active_query_config="config/brave_search_queries.json",
-            promotion_config_path="config/learning/query_promotions.json",
-            report_path=learning_report_path,
-            runtime_overlay_path=runtime_overlay,
-            environment=os.environ,
-            policy=DailyLearningPolicy(
-                max_candidates_per_run=2,
-                min_recovered_cases=1,
-                min_precision=0.20,
-                max_terms_per_market=5,
-            ),
-            results_per_candidate=5,
-        )
-        status["daily_learning_cycle"] = {
-            "status": learning_report.get("search_status"),
-            "known_missed_opportunity_count": learning_report.get(
-                "known_missed_opportunity_count", 0
-            ),
-            "candidate_count": learning_report.get("candidate_count", 0),
-            "learning_search_requests": learning_report.get(
-                "learning_search_requests", 0
-            ),
-            "proven_term_count_this_run": learning_report.get(
-                "proven_term_count_this_run", 0
-            ),
-            "shadow_proven_term_count": learning_report.get(
-                "shadow_proven_term_count", 0
-            ),
-            "active_learned_term_count": learning_report.get(
-                "active_learned_term_count", 0
-            ),
-            "promotion_gate_enforced": learning_report.get(
-                "promotion_gate_enforced", False
-            ),
-            "report_path": learning_report_path.as_posix(),
-            "runtime_overlay_path": runtime_overlay.as_posix(),
-        }
-    except Exception as exc:
-        # Core discovery must continue if today's learning iteration cannot run.
-        # The learned runtime overlay fails closed unless yesterday's copy already
-        # carried explicit promotion metadata validated above.
-        status["daily_learning_cycle"] = {
-            "status": "FAILED",
-            "error_type": type(exc).__name__,
-            "error": str(exc)[:500],
-            "learning_search_requests": 0,
-            "report_path": learning_report_path.as_posix(),
-            "runtime_overlay_path": runtime_overlay.as_posix(),
-        }
+    status["daily_learning_cycle"] = {
+        "status": "DEFERRED_UNTIL_POST_CAPTURE",
+        "reason": (
+            "learning runs after source verification and automatic miss capture "
+            "so today's verified miss can be consumed in the same daily run"
+        ),
+        "consumer": "daily_auto_miss_learning_cli_hook",
+        "learning_search_requests": 0,
+        "report_path": learning_report_path.as_posix(),
+        "runtime_overlay_path": runtime_overlay.as_posix(),
+        "automatic_query_activation": False,
+        "promotion_gate_enforced": True,
+    }
 
     _write_status(Path(args.status_path), status)
     print(json.dumps(status, ensure_ascii=False, sort_keys=True))
