@@ -1,0 +1,91 @@
+{
+  "schema_version": "external-ground-truth-benchmark-1.0",
+  "captured_at": "2026-08-22T11:12:00Z",
+  "purpose": "DATE_STAMPED_READ_ONLY_GROUND_TRUTH_FOR_SAFE_LEARNING_PROOF",
+  "opportunities": [
+    {
+      "case_id": "ext-20260822-worldwise-athleisure-29000",
+      "source_name": "WorldWiseUSA",
+      "source_url": "https://www.worldwiseusa.com/ready-to-profit-athleisure-load-ready-we-have-your-inventory-report-29000-units/",
+      "evidence_url": "https://www.worldwiseusa.com/latest-stock-lot-offers/",
+      "title": "Athleisure load ready - 29,000 units",
+      "listed_at": "2026-08-03",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "quantity_units": 29000,
+        "stock_language": "load ready / inventory report",
+        "category": "APPAREL"
+      }
+    },
+    {
+      "case_id": "ext-20260822-worldwise-mens-shirts-049",
+      "source_name": "WorldWiseUSA",
+      "source_url": "https://www.worldwiseusa.com/ready-to-profit-mens-dress-shirts-0-49-each/",
+      "evidence_url": "https://www.worldwiseusa.com/latest-stock-lot-offers/",
+      "title": "Men's Dress Shirts - approximately USD 0.49 each",
+      "listed_at": "2026-08-03",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "approx_price_usd_each": 0.49,
+        "average_pieces_per_kg": 5,
+        "packaging": "hanger and bag / folded in gaylord boxes",
+        "category": "APPAREL"
+      }
+    },
+    {
+      "case_id": "ext-20260822-worldwise-flooring-2x40ft",
+      "source_name": "WorldWiseUSA",
+      "source_url": "https://www.worldwiseusa.com/flooring-liquidation-for-your-market-can-you-believe-the-price/",
+      "evidence_url": "https://www.worldwiseusa.com/latest-stock-lot-offers/",
+      "title": "Flooring liquidation - 2 x 40ft containers ready to load",
+      "listed_at": "2026-07-28",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "container_count": 2,
+        "container_size_ft": 40,
+        "stock_language": "liquidation / ready to load",
+        "category": "BUILDING_MATERIALS"
+      }
+    },
+    {
+      "case_id": "ext-20260822-stocklear-21762",
+      "source_name": "Stocklear",
+      "source_url": "https://joblot.stocklear.eu/auction/21762",
+      "evidence_url": "https://joblot.stocklear.eu/",
+      "title": "GiFi truckload - 29 pallets - 34,542 units",
+      "listed_at": "2026-08-22",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "quantity_units": 34542,
+        "pallet_count": 29,
+        "quality": "NEW_WITH_ORIGINAL_PACKAGING",
+        "observed_bid_eur": 3800.0,
+        "rrp_eur": 77701.39,
+        "observed_cost_per_unit_eur": 0.11,
+        "category": "GENERAL_MERCHANDISE"
+      }
+    },
+    {
+      "case_id": "ext-20260822-stocklear-21748",
+      "source_name": "Stocklear",
+      "source_url": "https://joblot.stocklear.eu/auction/21748",
+      "evidence_url": "https://joblot.stocklear.eu/",
+      "title": "Tomado, Bosch, Siemens appliance lot - 111 units",
+      "listed_at": "2026-08-22",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "quantity_units": 111,
+        "quality": "FUNCTIONAL_CUSTOMER_RETURNS",
+        "observed_price_eur": 2000.0,
+        "rrp_eur": 14922.32,
+        "observed_cost_per_unit_eur": 18.02,
+        "category": "APPLIANCES"
+      }
+    }
+  ]
+}
