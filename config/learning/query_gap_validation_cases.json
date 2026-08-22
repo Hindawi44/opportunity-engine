@@ -29,6 +29,120 @@
       "root_cause": "VALIDATION_HOLDOUT",
       "learning_status": "HOLDOUT",
       "repeat_miss": false
+    },
+    {
+      "case_id": "HOLDOUT-NO-MARNBURG-2008",
+      "market_code": "NO",
+      "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+      "observed_at": "2008-10-29T00:00:00+00:00",
+      "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+      "stock_proven": true,
+      "ground_truth": {
+        "company": "Marnburg Interiør AS",
+        "url": "https://www.dagsavisen.no/nyheter/marnburg-legger-ned-ostehuset-flytter-inn/6791594"
+      },
+      "trace": {},
+      "learning_evidence_text": "",
+      "diagnosed_query_gap_terms": [],
+      "learned_patterns": [],
+      "root_cause": "VALIDATION_HOLDOUT",
+      "learning_status": "HOLDOUT",
+      "repeat_miss": false
+    },
+    {
+      "case_id": "HOLDOUT-NO-FAGHANDEL-SURNADAL-2024",
+      "market_code": "NO",
+      "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+      "observed_at": "2024-05-22T00:00:00+00:00",
+      "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+      "stock_proven": true,
+      "ground_truth": {
+        "company": "Coop Faghandel Surnadal",
+        "url": "https://www.trollheimsporten.no/coop-surnadal-sport1-surnadal-surnadalsnytt/avviklingssalg-pa-faghandel-surnadal/288445"
+      },
+      "trace": {},
+      "learning_evidence_text": "",
+      "diagnosed_query_gap_terms": [],
+      "learned_patterns": [],
+      "root_cause": "VALIDATION_HOLDOUT",
+      "learning_status": "HOLDOUT",
+      "repeat_miss": false
+    },
+    {
+      "case_id": "HOLDOUT-NO-SPAR-RJUKAN-2025",
+      "market_code": "NO",
+      "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+      "observed_at": "2025-01-09T00:00:00+00:00",
+      "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+      "stock_proven": true,
+      "ground_truth": {
+        "company": "Spar Rjukan",
+        "url": "https://radiorjukan.no/aktuelt-lokalt/lordag-er-siste-apningsdag/"
+      },
+      "trace": {},
+      "learning_evidence_text": "",
+      "diagnosed_query_gap_terms": [],
+      "learned_patterns": [],
+      "root_cause": "VALIDATION_HOLDOUT",
+      "learning_status": "HOLDOUT",
+      "repeat_miss": false
+    },
+    {
+      "case_id": "HOLDOUT-NO-SENZE-OF-JOY",
+      "market_code": "NO",
+      "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+      "observed_at": "2026-08-22T19:20:00+00:00",
+      "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+      "stock_proven": true,
+      "ground_truth": {
+        "company": "Senze of Joy",
+        "url": "https://www.lagersalg.no/lagersalg/avviklingssalg-senze-of-joy-2"
+      },
+      "trace": {},
+      "learning_evidence_text": "",
+      "diagnosed_query_gap_terms": [],
+      "learned_patterns": [],
+      "root_cause": "VALIDATION_HOLDOUT",
+      "learning_status": "HOLDOUT",
+      "repeat_miss": false
+    },
+    {
+      "case_id": "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER",
+      "market_code": "NO",
+      "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+      "observed_at": "2026-08-22T19:20:00+00:00",
+      "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+      "stock_proven": true,
+      "ground_truth": {
+        "company": "Tøff og Liten",
+        "url": "https://www.steinkjer-avisa.no/amfi-butikk-stenger-dorene/s/5-117-364719"
+      },
+      "trace": {},
+      "learning_evidence_text": "",
+      "diagnosed_query_gap_terms": [],
+      "learned_patterns": [],
+      "root_cause": "VALIDATION_HOLDOUT",
+      "learning_status": "HOLDOUT",
+      "repeat_miss": false
+    },
+    {
+      "case_id": "HOLDOUT-NO-GAULA-NATURSENTER",
+      "market_code": "NO",
+      "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+      "observed_at": "2026-08-22T19:20:00+00:00",
+      "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+      "stock_proven": true,
+      "ground_truth": {
+        "company": "Gaula Natursenter AS",
+        "url": "https://www.mgk.no/avviklingssalg"
+      },
+      "trace": {},
+      "learning_evidence_text": "",
+      "diagnosed_query_gap_terms": [],
+      "learned_patterns": [],
+      "root_cause": "VALIDATION_HOLDOUT",
+      "learning_status": "HOLDOUT",
+      "repeat_miss": false
     }
   ]
 }
