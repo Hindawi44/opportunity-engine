@@ -163,6 +163,9 @@ def propose_query_gap_keywords(
     Company names and arbitrary one-off prose are not candidates merely because
     they appear in a missed listing.  V1 proposes either commercially shaped
     terms/phrases or, in future versions, terms with repeated cross-case support.
+    When evidence supports both an atomic commercial term and a phrase containing
+    it, the atomic term gets a small generalizability advantage so the bounded
+    daily budget tests the reusable market pattern before one-off wording.
     """
 
     if max_candidates < 1:
@@ -194,12 +197,12 @@ def propose_query_gap_keywords(
         if len(case_ids) < 2 and not _commercial(term):
             continue
         specificity_bonus = 3.0 if _commercial(term) else 0.0
-        phrase_bonus = 1.0 if " " in term else 0.0
+        generalizability_bonus = 1.0 if " " not in term else 0.0
         score = round(
             len(case_ids) * 10.0
             + min(occurrences[(market_code, term)], 5)
             + specificity_bonus
-            + phrase_bonus,
+            + generalizability_bonus,
             3,
         )
         candidates.append(
