@@ -14,7 +14,9 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+import re
 from typing import Any, Callable, Mapping, Sequence
+from urllib.parse import urlparse
 
 from opportunity_engine.automatic_query_gap_miss_scout import (
     PublicPage,
@@ -155,6 +157,56 @@ def _default_search(api_key: str, *, results_per_query: int) -> SearchCallback:
     return search
 
 
+def _clean_verified_company_name(value: object) -> str:
+    """Remove commerce-template UI noise from an already verified identity.
+
+    This function never creates company evidence. It only cleans the company
+    string after the strict source-page verifier has already proved a concrete
+    identity. Shopify-style pages can flatten headings into visible text and
+    yield values such as ``Stengt BEDRIFTSDETALJER ... Senna Mode``.
+    """
+    company = _compact(value).strip(" -–—|:,.;")
+    if not company:
+        return ""
+    parts = re.split(r"(?i)\bbedriftsdetaljer\b", company)
+    if len(parts) > 1:
+        company = _compact(parts[-1])
+    company = re.sub(r"(?i)^(?:stengt\s+)+", "", company)
+    return _compact(company).strip(" -–—|:,.;")
+
+
+def _event_context(proof: Mapping[str, Any], term: str) -> str:
+    """Return the stable sale-event portion of verified evidence text."""
+    text = _fold(proof.get("evidence_text"))
+    learned = _fold(term)
+    index = text.find(learned) if learned else -1
+    if index >= 0:
+        text = text[index:]
+    return text[:900]
+
+
+def _liquidation_event_key(proof: Mapping[str, Any], term: str) -> str:
+    """Identify one company-level liquidation event without collapsing peers.
+
+    Multiple product pages can repeat the same site-wide closure banner. They
+    are supporting pages for one opportunity, not separate opportunities. The
+    key therefore combines verified company identity, host, learned term and a
+    fingerprint of the verified event text beginning at the sale term. Separate
+    companies or materially different closure text remain separate.
+    """
+    canonical_url = _compact(proof.get("canonical_url"))
+    parsed = urlparse(canonical_url)
+    host = (parsed.hostname or "").casefold()
+    if host.startswith("www."):
+        host = host[4:]
+    company = _fold(_clean_verified_company_name(proof.get("company")))
+    context = _event_context(proof, term)
+    if not canonical_url or not host or not company or not context:
+        return f"url:{canonical_url}"
+    context_digest = sha256(context.encode("utf-8")).hexdigest()[:24]
+    return "|".join((MARKET_CODE, host, company, _fold(term), context_digest))
+
+
 def _record_from_verified_page(
     *,
     hit: SearchHit,
@@ -163,12 +215,17 @@ def _record_from_verified_page(
     query: str,
     rank: int,
     observed_at: datetime,
+    event_key: str,
 ) -> OpportunityRecord:
     canonical_url = _compact(proof.get("canonical_url"))
-    company = _compact(proof.get("company"))
-    digest = sha256(canonical_url.encode("utf-8")).hexdigest()[:24]
+    company = _clean_verified_company_name(proof.get("company"))
+    digest = sha256(event_key.encode("utf-8")).hexdigest()[:24]
     opportunity_id = f"learned-core:no:{digest}"
-    title = _compact(hit.title) or f"{company} inventory liquidation"
+    title = (
+        f"{company} inventory liquidation"
+        if company
+        else (_compact(hit.title) or "Verified inventory liquidation")
+    )
     evidence_text = _compact(proof.get("evidence_text"))
     closure_markers = list(proof.get("closure_markers") or [])
     liquidation_markers = list(proof.get("liquidation_markers") or [])
@@ -275,6 +332,9 @@ def _record_from_verified_page(
             "inventory_liquidation_verified": True,
             "closure_markers": closure_markers,
             "liquidation_markers": liquidation_markers,
+            "verified_source_page_count": 1,
+            "additional_verified_source_urls": [],
+            "liquidation_event_fingerprint": digest,
             "automatic_query_activation": False,
             "automatic_contact": False,
             "automatic_bid": False,
@@ -282,6 +342,55 @@ def _record_from_verified_page(
             "automatic_payment": False,
         },
     )
+
+
+def _merge_duplicate_verified_page(
+    existing: OpportunityRecord,
+    *,
+    hit: SearchHit,
+    proof: Mapping[str, Any],
+    term: str,
+    query: str,
+    rank: int,
+    observed_at: datetime,
+) -> OpportunityRecord:
+    """Attach a second verified page to one already-created liquidation event."""
+    canonical_url = _compact(proof.get("canonical_url"))
+    metadata = dict(existing.metadata)
+    primary_url = str(existing.source_url)
+    additional_urls = [
+        _compact(item)
+        for item in metadata.get("additional_verified_source_urls") or []
+        if _compact(item)
+    ]
+    if canonical_url and canonical_url != primary_url and canonical_url not in additional_urls:
+        additional_urls.append(canonical_url)
+
+    metadata["additional_verified_source_urls"] = additional_urls
+    metadata["verified_source_page_count"] = 1 + len(additional_urls)
+
+    evidence = list(existing.evidence)
+    evidence.append(
+        Evidence(
+            evidence_type="ADDITIONAL_VERIFIED_PUBLIC_CLOSURE_LIQUIDATION_PAGE",
+            value=_compact(proof.get("evidence_text")) or existing.title,
+            source_url=canonical_url,
+            captured_at=observed_at,
+            verified=True,
+            metadata={
+                "query": query,
+                "learned_term": term,
+                "source_rank": rank,
+                "provider": _compact(hit.provider) or "Brave Search",
+                "closure_markers": list(proof.get("closure_markers") or []),
+                "liquidation_markers": list(proof.get("liquidation_markers") or []),
+                "source_page_verified": True,
+                "closure_verified": True,
+                "inventory_liquidation_verified": True,
+            },
+        )
+    )
+    return existing.model_copy(update={"metadata": metadata, "evidence": evidence})
 
 
 def _write_source_artifacts(
@@ -344,7 +453,9 @@ def collect_promoted_learned_core_opportunities(
     request_count = 0
     page_request_count = 0
     raw_hit_count = 0
-    records_by_url: dict[str, OpportunityRecord] = {}
+    verified_page_count = 0
+    records_by_event: dict[str, OpportunityRecord] = {}
+    seen_verified_urls: set[str] = set()
     errors: list[dict[str, str]] = []
     applied_terms: list[str] = []
 
@@ -398,20 +509,37 @@ def collect_promoted_learned_core_opportunities(
                 if _fold(term) not in proof_terms:
                     continue
                 canonical_url = _compact(proof.get("canonical_url"))
-                if not canonical_url:
+                if not canonical_url or canonical_url in seen_verified_urls:
                     continue
-                records_by_url[canonical_url] = _record_from_verified_page(
-                    hit=hit,
-                    proof=proof,
-                    term=term,
-                    query=query,
-                    rank=rank,
-                    observed_at=now,
-                )
-        if errors and not records_by_url and request_count:
+                seen_verified_urls.add(canonical_url)
+                verified_page_count += 1
+
+                event_key = _liquidation_event_key(proof, term)
+                existing = records_by_event.get(event_key)
+                if existing is None:
+                    records_by_event[event_key] = _record_from_verified_page(
+                        hit=hit,
+                        proof=proof,
+                        term=term,
+                        query=query,
+                        rank=rank,
+                        observed_at=now,
+                        event_key=event_key,
+                    )
+                else:
+                    records_by_event[event_key] = _merge_duplicate_verified_page(
+                        existing,
+                        hit=hit,
+                        proof=proof,
+                        term=term,
+                        query=query,
+                        rank=rank,
+                        observed_at=now,
+                    )
+        if errors and not records_by_event and request_count:
             status = "PARTIAL_RETRIEVAL"
 
-    records = [records_by_url[key] for key in sorted(records_by_url)]
+    records = [records_by_event[key] for key in sorted(records_by_event)]
     if not selected_terms and not overlay_error:
         status = "VALID_ZERO"
     report: dict[str, Any] = {
@@ -429,7 +557,10 @@ def collect_promoted_learned_core_opportunities(
         "request_count": request_count,
         "raw_hit_count": raw_hit_count,
         "page_request_count": page_request_count,
+        "verified_page_count": verified_page_count,
         "verified_opportunity_count": len(records),
+        "duplicate_verified_page_count": max(0, verified_page_count - len(records)),
+        "dedupe_strategy": "VERIFIED_COMPANY_HOST_EVENT_CONTEXT",
         "errors": errors,
         "cost_guard_reason": cost_block,
         "currency_conversion_performed": False,
