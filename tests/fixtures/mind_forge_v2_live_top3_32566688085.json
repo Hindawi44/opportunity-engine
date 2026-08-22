@@ -1,0 +1,30 @@
+{
+  "source_run_id": 32566688085,
+  "source_artifact_id": 9474264157,
+  "source_artifact_digest": "sha256:96e05e3e74b4ed3fb6e3b58b65ee4849321cb00cfc463bd15b23df9e0b136775",
+  "selected_idea_ids": [
+    "idea-open-b233585360fd0d7e",
+    "idea-open-7a69872336d74c47",
+    "idea-open-2fcf1740d464b86a"
+  ],
+  "assessments": [
+    {
+      "idea_id": "idea-open-b233585360fd0d7e",
+      "title": "Verified Local Supplier Desk",
+      "mechanism_family": "supplier_verification",
+      "composite_score": 0.3631
+    },
+    {
+      "idea_id": "idea-open-7a69872336d74c47",
+      "title": "Cold-Chain Route Orchestrator",
+      "mechanism_family": "cold_chain_logistics",
+      "composite_score": 0.3574
+    },
+    {
+      "idea_id": "idea-open-2fcf1740d464b86a",
+      "title": "Multilingual Microbusiness Back Office",
+      "mechanism_family": "multilingual_backoffice",
+      "composite_score": 0.346
+    }
+  ]
+}
