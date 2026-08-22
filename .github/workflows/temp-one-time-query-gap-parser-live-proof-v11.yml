@@ -1,0 +1,160 @@
+name: TEMP One-Time Query-Gap Parser Live Proof V11
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/temp-one-time-query-gap-parser-live-proof-v11.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  live-proof:
+    if: ${{ github.head_ref == 'agent/one-time-query-gap-parser-live-proof-v11' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OPPORTUNITY_ALLOW_PAID_BRAVE_MANUAL: "true"
+      LIVE_PROOF_OUTPUT: artifacts/query-gap-parser-live-proof-v11/output
+      LIVE_PROOF_INPUT: artifacts/query-gap-parser-live-proof-v11/input
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Restore latest scheduled core checkpoint only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$LIVE_PROOF_OUTPUT" "$LIVE_PROOF_INPUT" baseline
+          RUN_ID="$(gh run list --workflow 'Multi-Market Daily Operator Checkpoint' --branch main --event schedule --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+          if [ -n "$RUN_ID" ]; then
+            gh run download "$RUN_ID" -n multi-market-daily-operator-checkpoint -D baseline || true
+          fi
+          CHECKPOINT="$(find baseline -type f -name 'multi-market-daily-checkpoint.json' | head -n 1 || true)"
+          if [ -n "$CHECKPOINT" ]; then
+            cp "$CHECKPOINT" "$LIVE_PROOF_OUTPUT/multi-market-daily-checkpoint.json"
+            echo "baseline_run_id=$RUN_ID" > "$LIVE_PROOF_OUTPUT/baseline.txt"
+          else
+            printf '%s\n' '{"deduplicated_opportunities":[]}' > "$LIVE_PROOF_OUTPUT/multi-market-daily-checkpoint.json"
+            echo "baseline_run_id=UNAVAILABLE" > "$LIVE_PROOF_OUTPUT/baseline.txt"
+          fi
+          printf '%s\n' '{"schema_version":"missed-opportunity-inbox-1.0","cases":[]}' > "$LIVE_PROOF_OUTPUT/empty-inbox.json"
+          printf '%s\n' '{"schema_version":"query-gap-validation-cases-1.0","cases":[]}' > "$LIVE_PROOF_OUTPUT/empty-validation.json"
+      - name: Run bounded parser-fixed waterfall and same-run learner
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from opportunity_engine.query_gap_scout_waterfall import write_automatic_query_gap_miss_scout
+          from opportunity_engine.daily_learning_operator import DailyLearningPolicy
+          from opportunity_engine.daily_learning_runtime import run_daily_learning_runtime
+
+          output = Path(os.environ["LIVE_PROOF_OUTPUT"])
+          input_root = Path(os.environ["LIVE_PROOF_INPUT"])
+          learning_dir = input_root / "learning"
+          learning_dir.mkdir(parents=True, exist_ok=True)
+
+          scout = write_automatic_query_gap_miss_scout(
+              output,
+              input_root=input_root,
+              environment=os.environ,
+              max_pages=3,
+          )
+          learning = run_daily_learning_runtime(
+              learning_dir=learning_dir,
+              inbox_path=output / "empty-inbox.json",
+              validation_cases_path=output / "empty-validation.json",
+              active_query_config="config/brave_search_queries.json",
+              promotion_config_path="config/learning/query_promotions.json",
+              report_path=output / "daily-learning-cycle.json",
+              environment=os.environ,
+              policy=DailyLearningPolicy(max_candidates_per_run=1),
+              results_per_candidate=5,
+          )
+
+          summary = {
+              "status": "COMPLETED",
+              "baseline": (output / "baseline.txt").read_text(encoding="utf-8").strip(),
+              "implementation_head": "0cb6fe48c03c4f5e2a86d327420650be5cfea88a",
+              "user_authorized_paid_live_proof": True,
+              "scout": {
+                  "status": scout.get("status"),
+                  "schema_version": scout.get("schema_version"),
+                  "waterfall_enabled": scout.get("waterfall_enabled"),
+                  "waterfall_stopped_reason": scout.get("waterfall_stopped_reason"),
+                  "entity_source_followup_used": scout.get("entity_source_followup_used"),
+                  "entity_source_followup_company": scout.get("entity_source_followup_company"),
+                  "entity_domain_probe_used": scout.get("entity_domain_probe_used"),
+                  "entity_domain_probe_count": scout.get("entity_domain_probe_count"),
+                  "entity_internal_followup_used": scout.get("entity_internal_followup_used"),
+                  "entity_internal_followup_count": scout.get("entity_internal_followup_count"),
+                  "executed_queries": scout.get("executed_queries", []),
+                  "search_request_count": scout.get("search_request_count"),
+                  "search_hit_count": scout.get("search_hit_count"),
+                  "search_stages": scout.get("search_stages", []),
+                  "page_request_count": scout.get("page_request_count"),
+                  "verification_attempts": scout.get("verification_attempts", []),
+                  "verified_page_count": scout.get("verified_page_count"),
+                  "detected_miss_count": scout.get("detected_miss_count"),
+                  "new_case_count": scout.get("new_case_count"),
+                  "repeat_miss_count_this_run": scout.get("repeat_miss_count_this_run"),
+                  "known_case_count_after": scout.get("known_case_count_after"),
+                  "cases_metadata": scout.get("cases_metadata", []),
+                  "detected_cases": scout.get("detected_cases", []),
+                  "automatic_query_activation": scout.get("automatic_query_activation"),
+              },
+              "learning": {
+                  "search_status": learning.get("search_status"),
+                  "candidate_count": learning.get("candidate_count"),
+                  "learning_search_requests": learning.get("learning_search_requests"),
+                  "proven_term_count_this_run": learning.get("proven_term_count_this_run"),
+                  "shadow_proven_term_count": learning.get("shadow_proven_term_count"),
+                  "active_learned_term_count": learning.get("active_learned_term_count"),
+                  "safe_learning_proof_status": learning.get("safe_learning_proof_status"),
+                  "automatic_query_activation": learning.get("automatic_query_activation"),
+              },
+              "limits": {
+                  "scout_brave_requests_max": 2,
+                  "scout_public_pages_max": 3,
+                  "learner_brave_requests_max": 1,
+                  "total_brave_requests_max": 3,
+              },
+              "authoritative_verifier_relaxed": False,
+              "automatic_contact": False,
+              "automatic_bid": False,
+              "automatic_purchase": False,
+              "automatic_payment": False,
+          }
+          (output / "live-proof-summary.json").write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
+
+          assert scout.get("schema_version") == "automatic-query-gap-miss-scout-waterfall-1.2"
+          assert scout.get("waterfall_enabled") is True
+          assert int(scout.get("search_request_count") or 0) <= 2
+          assert int(scout.get("page_request_count") or 0) <= 3
+          assert len(scout.get("verification_attempts") or []) <= 3
+          assert int(learning.get("learning_search_requests") or 0) <= 1
+          assert scout.get("automatic_query_activation") is False
+          assert learning.get("automatic_query_activation") is False
+          assert int(learning.get("active_learned_term_count") or 0) == 0
+          PY
+      - name: Upload proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: one-time-query-gap-parser-live-proof-v11
+          path: artifacts/query-gap-parser-live-proof-v11/
+          if-no-files-found: error
