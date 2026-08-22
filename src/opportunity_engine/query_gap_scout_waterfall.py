@@ -4,6 +4,11 @@ The waterfall reuses the original scout's authoritative exact-page verifier,
 durable memory merge, cost guard, and safety semantics. It also records bounded
 read-only diagnostics for each page that actually consumed verification budget,
 so operators can see *why* a page was rejected without relaxing the gate.
+
+Stage 2 may become an entity-source follow-up when Stage 1 proves a permanent
+closure and a concrete company identity but does not prove liquidation. This
+changes recall orchestration only: the same exact-page verifier remains the
+single authority for ground truth.
 """
 from __future__ import annotations
 
@@ -51,7 +56,7 @@ from opportunity_engine.missed_opportunity_learning import (
     save_missed_opportunity_memory,
 )
 
-SCHEMA_VERSION = "automatic-query-gap-miss-scout-waterfall-1.1"
+SCHEMA_VERSION = "automatic-query-gap-miss-scout-waterfall-1.2"
 MAX_SEARCH_REQUESTS = 2
 
 SCOUT_QUERIES_NO: tuple[str, ...] = (
@@ -68,6 +73,26 @@ SCOUT_QUERIES_NO: tuple[str, ...] = (
 SCOUT_QUERY_NO = SCOUT_QUERIES_NO[0]
 
 SearchCallback = Callable[[str], Sequence[SearchHit]]
+
+
+def build_entity_source_followup_query(company: str) -> str:
+    """Build a company-targeted query without leaking candidate sale terms."""
+    compact = " ".join(str(company or "").replace('"', " ").split()).strip()
+    if not compact:
+        raise ValueError("Entity-source follow-up requires a company identity")
+    folded = compact.casefold()
+    if any(term in folded for term in _GAP_TERMS):
+        raise ValueError("Company identity contains a forbidden learning term")
+
+    query = (
+        f'"{compact}" '
+        '("legger ned" OR "legges ned" OR "stenger for godt") '
+        '(varer OR sortiment OR varelager OR lagerbeholdning)'
+    )
+    query_folded = query.casefold()
+    if any(term in query_folded for term in _GAP_TERMS):
+        raise AssertionError("Entity-source follow-up leaked a learning term")
+    return query
 
 
 def diagnose_public_page(page: PublicPage) -> dict[str, Any]:
@@ -160,6 +185,28 @@ def _new_gap_case(
     ).with_diagnosis()
 
 
+def _entity_followup_company_from_diagnostic(
+    diagnostic: Mapping[str, Any],
+) -> str | None:
+    """Return a safe entity cue from a rejected closure page, if one exists."""
+    if diagnostic.get("verifier_status") != "REJECTED":
+        return None
+    flags = diagnostic.get("evidence_flags")
+    flags = dict(flags) if isinstance(flags, Mapping) else {}
+    if not flags.get("closure_marker") or not flags.get("company_identity"):
+        return None
+    if flags.get("temporary_closure"):
+        return None
+    if flags.get("sale_term") and flags.get("liquidation_marker"):
+        return None
+    company = " ".join(str(diagnostic.get("company") or "").split()).strip()
+    if not company:
+        return None
+    if any(term in company.casefold() for term in _GAP_TERMS):
+        return None
+    return company
+
+
 def discover_query_gap_misses(
     checkpoint: Mapping[str, Any],
     *,
@@ -182,6 +229,7 @@ def discover_query_gap_misses(
     metadata: list[dict[str, Any]] = []
     search_stages: list[dict[str, Any]] = []
     verification_attempts: list[dict[str, Any]] = []
+    executed_queries: list[str] = []
 
     search_requests = 0
     total_hits = 0
@@ -189,11 +237,30 @@ def discover_query_gap_misses(
     verified_pages = 0
     core_known = 0
     no_new_term = 0
+    entity_followup_company: str | None = None
+    entity_followup_used = False
 
-    for stage_index, query in enumerate(SCOUT_QUERIES_NO[:MAX_SEARCH_REQUESTS]):
+    for stage_index in range(MAX_SEARCH_REQUESTS):
         if page_requests >= bounded_pages:
             break
 
+        if stage_index == 0:
+            query = SCOUT_QUERIES_NO[0]
+            query_kind = "GENERIC_STRICT"
+        elif entity_followup_company:
+            try:
+                query = build_entity_source_followup_query(entity_followup_company)
+                query_kind = "ENTITY_SOURCE_FOLLOW_UP"
+                entity_followup_used = True
+            except ValueError:
+                query = SCOUT_QUERIES_NO[1]
+                query_kind = "GENERIC_BROAD"
+                entity_followup_company = None
+        else:
+            query = SCOUT_QUERIES_NO[1]
+            query_kind = "GENERIC_BROAD"
+
+        executed_queries.append(query)
         raw_hits = [item for item in search(query) if isinstance(item, SearchHit)]
         search_requests += 1
         total_hits += len(raw_hits)
@@ -204,7 +271,7 @@ def discover_query_gap_misses(
         stage_unique_hits = 0
         stage_page_budget = (
             min(1, bounded_pages - page_requests)
-            if stage_index < len(SCOUT_QUERIES_NO) - 1
+            if stage_index < MAX_SEARCH_REQUESTS - 1
             else bounded_pages - page_requests
         )
 
@@ -225,6 +292,7 @@ def discover_query_gap_misses(
             stage_pages += 1
             base_diagnostic = {
                 "stage": stage_index + 1,
+                "query_kind": query_kind,
                 "requested_url": url,
                 "search_hit_title": str(hit.title or "")[:500],
                 "search_hit_description": str(hit.description or "")[:1000],
@@ -253,6 +321,11 @@ def discover_query_gap_misses(
             diagnostic = {**base_diagnostic, **diagnose_public_page(page)}
             verification_attempts.append(diagnostic)
 
+            if stage_index == 0 and entity_followup_company is None:
+                entity_followup_company = _entity_followup_company_from_diagnostic(
+                    diagnostic
+                )
+
             proof = _verify_closure_liquidation_page(page)
             if proof is None:
                 continue
@@ -262,7 +335,10 @@ def discover_query_gap_misses(
             available_terms = [
                 term
                 for term in proof["query_gap_terms"]
-                if all(term.casefold() not in item.casefold() for item in SCOUT_QUERIES_NO)
+                if all(
+                    term.casefold() not in executed_query.casefold()
+                    for executed_query in executed_queries
+                )
                 and not _query_contains_term(active_queries, term)
             ]
             if not available_terms:
@@ -284,6 +360,8 @@ def discover_query_gap_misses(
                     "canonical_url": final_url,
                     "company": case.ground_truth_company,
                     "query_gap_term": term,
+                    "root_cause": case.root_cause,
+                    "root_cause_basis": "MISSING_TERM_FROM_ACTIVE_QUERY_PACK",
                     "source_page_verified": True,
                     "closure_verified": True,
                     "inventory_liquidation_verified": True,
@@ -292,6 +370,7 @@ def discover_query_gap_misses(
                     "search_hit_alone_is_ground_truth": False,
                     "scout_query_contains_gap_term": False,
                     "waterfall_stage": stage_index + 1,
+                    "discovery_path": query_kind,
                 }
             )
             break
@@ -300,6 +379,7 @@ def discover_query_gap_misses(
             {
                 "stage": stage_index + 1,
                 "query": query,
+                "query_kind": query_kind,
                 "hit_count": len(raw_hits),
                 "unique_hit_count": stage_unique_hits,
                 "page_request_count": stage_pages,
@@ -323,8 +403,13 @@ def discover_query_gap_misses(
         "market_code": "NO",
         "scout_query": SCOUT_QUERY_NO,
         "scout_queries": list(SCOUT_QUERIES_NO),
+        "executed_queries": executed_queries,
         "waterfall_enabled": True,
         "waterfall_stopped_reason": stopped_reason,
+        "entity_source_followup_used": entity_followup_used,
+        "entity_source_followup_company": (
+            entity_followup_company if entity_followup_used else None
+        ),
         "max_search_requests": MAX_SEARCH_REQUESTS,
         "search_request_count": search_requests,
         "search_hit_count": total_hits,
@@ -356,9 +441,12 @@ def _safe_waterfall_report(status: str, **extra: Any) -> dict[str, Any]:
             "waterfall_enabled": True,
             "max_search_requests": MAX_SEARCH_REQUESTS,
             "scout_queries": list(SCOUT_QUERIES_NO),
+            "executed_queries": [],
             "search_stages": [],
             "verification_attempts": [],
             "verification_diagnostics_are_read_only": True,
+            "entity_source_followup_used": False,
+            "entity_source_followup_company": None,
         }
     )
     return report
