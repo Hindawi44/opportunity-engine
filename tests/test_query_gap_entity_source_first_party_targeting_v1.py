@@ -12,21 +12,23 @@ def _hit(url: str, title: str) -> SearchHit:
     )
 
 
-def test_entity_query_targets_official_site_navigation_without_sale_terms() -> None:
+def test_entity_query_is_minimal_navigation_without_sale_terms() -> None:
     from opportunity_engine.query_gap_scout_waterfall import (
         build_entity_source_followup_query,
     )
 
-    query = build_entity_source_followup_query("Bauhaus").casefold()
+    query = build_entity_source_followup_query("Bauhaus")
+    folded = query.casefold()
 
-    assert "offisiell" in query
-    assert "nettside" in query
-    assert "hjemmeside" in query
-    assert "kundeservice" in query
-    assert "informasjon" in query
-    assert "legger ned" not in query
-    assert "avvikler" not in query
-    assert "sortiment" not in query
+    assert query == '"Bauhaus" Norge'
+    assert "offisiell" not in folded
+    assert "nettside" not in folded
+    assert "hjemmeside" not in folded
+    assert "kundeservice" not in folded
+    assert "informasjon" not in folded
+    assert "legger ned" not in folded
+    assert "avvikler" not in folded
+    assert "sortiment" not in folded
 
     forbidden = {
         "sluttsalg",
@@ -35,7 +37,7 @@ def test_entity_query_targets_official_site_navigation_without_sale_terms() -> N
         "avviklingssalg",
         "tømmesalg",
     }
-    assert not any(term in query for term in forbidden)
+    assert not any(term in folded for term in forbidden)
 
 
 def test_entity_source_hits_prioritize_company_domain_and_information_path() -> None:
