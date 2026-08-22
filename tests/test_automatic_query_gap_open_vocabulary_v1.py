@@ -47,11 +47,13 @@ def _hit() -> SearchHit:
 
 
 def test_verified_closure_can_discover_sale_term_not_present_in_static_gap_list() -> None:
+    from opportunity_engine.adaptive_keyword_learning import propose_query_gap_keywords
     from opportunity_engine.query_gap_scout_waterfall import discover_query_gap_misses
 
+    active_queries = ['("opphørssalg" OR "avviklingssalg") butikk']
     outcome = discover_query_gap_misses(
         {"deduplicated_opportunities": []},
-        active_queries=['("opphørssalg" OR "avviklingssalg") butikk'],
+        active_queries=active_queries,
         search=lambda query: [_hit()],
         fetch_page=lambda url: _page(HTML),
     )
@@ -66,6 +68,16 @@ def test_verified_closure_can_discover_sale_term_not_present_in_static_gap_list(
     assert outcome["cases_metadata"][0]["query_gap_term"] == NEW_TERM
     assert outcome["cases_metadata"][0]["source_page_verified"] is True
     assert all(NEW_TERM not in query.casefold() for query in outcome["executed_queries"])
+
+    candidates = propose_query_gap_keywords(
+        [case],
+        active_queries=active_queries,
+        max_candidates=1,
+    )
+    assert len(candidates) == 1
+    assert candidates[0].term == NEW_TERM
+    assert candidates[0].support_case_ids == (case.case_id,)
+
     assert outcome["automatic_query_activation"] is False
     assert outcome["automatic_contact"] is False
     assert outcome["automatic_bid"] is False
