@@ -1,0 +1,96 @@
+name: TEMP Real Miss Learning Proof
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/temp-real-miss-learning-proof.yml"
+      - "config/learning/missed_opportunity_inbox.json"
+      - "src/opportunity_engine/adaptive_keyword_learning.py"
+      - "src/opportunity_engine/daily_learning_runtime.py"
+      - "tests/test_real_missed_opportunity_learning_v1.py"
+
+permissions:
+  contents: read
+
+jobs:
+  live-shadow-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run one-request live shadow learning proof
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          from opportunity_engine.daily_learning_operator import DailyLearningPolicy
+          from opportunity_engine.daily_learning_runtime import run_daily_learning_runtime
+          from opportunity_engine.learned_query_overlay import learned_terms_for_market
+
+          root = Path("artifacts/real-miss-learning-proof")
+          learning = root / "learning"
+          report_path = root / "daily-learning-cycle.json"
+
+          report = run_daily_learning_runtime(
+              learning_dir=learning,
+              inbox_path="config/learning/missed_opportunity_inbox.json",
+              active_query_config="config/brave_search_queries.json",
+              promotion_config_path="config/learning/query_promotions.json",
+              report_path=report_path,
+              policy=DailyLearningPolicy(max_candidates_per_run=1),
+              results_per_candidate=5,
+          )
+
+          shadow = json.loads((learning / "shadow-keyword-overlay.json").read_text(encoding="utf-8"))
+          active = json.loads((learning / "active-keyword-overlay.json").read_text(encoding="utf-8"))
+          proof = json.loads((learning / "safe-learning-proof.json").read_text(encoding="utf-8"))
+          memory = json.loads((learning / "missed-opportunities.json").read_text(encoding="utf-8"))
+
+          shadow_terms = learned_terms_for_market(shadow, "NO")
+          active_terms = learned_terms_for_market(active, "NO")
+
+          assert report["known_missed_opportunity_count"] == 1, report
+          assert report["learning_search_requests"] == 1, report
+          assert report["search_status"] == "SUCCESS", report
+          assert report["proven_term_count_this_run"] == 1, report
+          assert report["recovered_case_count"] == 1, report
+          assert "avslutningssalg" in shadow_terms, shadow
+          assert "avslutningssalg" not in active_terms, active
+          assert report["active_learned_term_count"] == 0, report
+          assert report["automatic_query_activation"] is False, report
+          assert report["promotion_gate_enforced"] is True, report
+          assert memory["cases"][0]["learning_status"] == "RECOVERED", memory
+          assert proof["status"] == "SHADOW_PASSED", proof
+          assert proof["shadow_recovered_case_count"] == 1, proof
+          assert proof["promotion_eligible_count"] == 1, proof
+          assert proof["promoted_proof_count"] == 0, proof
+          assert proof["automatic_promotion"] is False, proof
+
+          print(json.dumps({
+              "status": "LIVE_SHADOW_PASSED",
+              "learned_term": "avslutningssalg",
+              "root_cause": "QUERY_GAP",
+              "learning_search_requests": report["learning_search_requests"],
+              "proven_term_count_this_run": report["proven_term_count_this_run"],
+              "recovered_case_count": report["recovered_case_count"],
+              "shadow_proven_term_count": report["shadow_proven_term_count"],
+              "active_learned_term_count": report["active_learned_term_count"],
+              "safe_learning_proof_status": proof["status"],
+              "automatic_promotion": proof["automatic_promotion"],
+          }, ensure_ascii=False, sort_keys=True))
+          PY
+      - name: Upload live proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-miss-learning-live-proof
+          path: artifacts/real-miss-learning-proof/
+          if-no-files-found: error
