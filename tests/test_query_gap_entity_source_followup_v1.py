@@ -4,6 +4,7 @@ from opportunity_engine.discovery.search_provider import SearchHit
 
 
 NEWS_URL = "https://www.nrk.no/nyheter/bauhaus-legger-ned-i-norge-1.17996380"
+HOME_URL = "https://www.bauhaus.no/"
 OFFICIAL_URL = "https://www.bauhaus.no/pressemelding-bauhaus-legger-ned-i-norge"
 
 NEWS_HTML = """
@@ -80,6 +81,10 @@ def test_entity_source_followup_uses_company_without_leaking_learning_term() -> 
     def fetch_page(url: str):
         if url == NEWS_URL:
             return _page(url, NEWS_HTML)
+        # This fixture intentionally makes the direct homepage probe fail,
+        # proving the bounded Brave fallback still works afterward.
+        if url == HOME_URL:
+            raise OSError("probe unavailable")
         if url == OFFICIAL_URL:
             return _page(url, OFFICIAL_HTML)
         raise AssertionError(url)
@@ -104,7 +109,9 @@ def test_entity_source_followup_uses_company_without_leaking_learning_term() -> 
     assert not any(term in calls[1].casefold() for term in forbidden)
 
     assert outcome["search_request_count"] == 2
-    assert outcome["page_request_count"] == 2
+    assert outcome["page_request_count"] == 3
+    assert outcome["entity_domain_probe_used"] is True
+    assert outcome["entity_domain_probe_count"] == 1
     assert outcome["verified_page_count"] == 1
     assert outcome["detected_miss_count"] == 1
     assert outcome["waterfall_stopped_reason"] == "FIRST_VERIFIED_MISS"
@@ -149,6 +156,7 @@ def test_entity_followup_falls_back_to_broad_query_without_closure_identity_cue(
     assert calls == list(SCOUT_QUERIES_NO)
     assert outcome["entity_source_followup_used"] is False
     assert outcome["entity_source_followup_company"] is None
+    assert outcome["entity_domain_probe_used"] is False
     assert outcome["search_stages"][1]["query_kind"] == "GENERIC_BROAD"
     assert outcome["detected_miss_count"] == 0
 
@@ -169,20 +177,26 @@ def test_entity_followup_does_not_relax_authoritative_page_verifier() -> None:
         assert query == build_entity_source_followup_query("Bauhaus")
         return [_hit(OFFICIAL_URL, "BAUHAUS informasjon")]
 
+    def fetch_page(url: str):
+        if url == NEWS_URL:
+            return _page(url, NEWS_HTML)
+        if url == HOME_URL:
+            raise OSError("probe unavailable")
+        return _page(
+            url,
+            "<html><body><h1>BAUHAUS legger ned i Norge</h1><p>BAUHAUS legger ned.</p></body></html>",
+        )
+
     outcome = discover_query_gap_misses(
         _checkpoint(),
         active_queries=[],
         search=search,
-        fetch_page=lambda url: _page(
-            url,
-            NEWS_HTML
-            if url == NEWS_URL
-            else "<html><body><h1>BAUHAUS legger ned i Norge</h1><p>BAUHAUS legger ned.</p></body></html>",
-        ),
+        fetch_page=fetch_page,
     )
 
     assert outcome["search_request_count"] == 2
-    assert outcome["page_request_count"] == 2
+    assert outcome["page_request_count"] == 3
+    assert outcome["entity_domain_probe_used"] is True
     assert outcome["verified_page_count"] == 0
     assert outcome["detected_miss_count"] == 0
     assert outcome["verification_attempts"][-1]["verifier_status"] == "REJECTED"
@@ -212,14 +226,18 @@ def test_entity_followup_respects_existing_two_search_three_page_caps() -> None:
             _hit(official_noise_3, "BAUHAUS info 3"),
         ]
 
+    def fetch_page(url: str):
+        if url == NEWS_URL:
+            return _page(url, NEWS_HTML)
+        if url == HOME_URL:
+            raise OSError("probe unavailable")
+        return _page(url, "<html><body>Ingen dokumentert lagertømming.</body></html>")
+
     outcome = discover_query_gap_misses(
         _checkpoint(),
         active_queries=[],
         search=search,
-        fetch_page=lambda url: _page(
-            url,
-            NEWS_HTML if url == NEWS_URL else "<html><body>Ingen dokumentert lagertømming.</body></html>",
-        ),
+        fetch_page=fetch_page,
         max_pages=3,
     )
 
@@ -228,4 +246,5 @@ def test_entity_followup_respects_existing_two_search_three_page_caps() -> None:
     assert outcome["search_request_count"] == 2
     assert outcome["page_request_count"] == 3
     assert len(outcome["verification_attempts"]) == 3
+    assert outcome["entity_domain_probe_used"] is True
     assert outcome["automatic_query_activation"] is False
