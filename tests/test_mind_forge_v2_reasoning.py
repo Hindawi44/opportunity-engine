@@ -1,4 +1,6 @@
 from copy import deepcopy
+import json
+from pathlib import Path
 
 from scripts.mind_forge_v2_reasoning import evaluate_payload
 
@@ -88,3 +90,27 @@ def test_all_ideas_receive_logic_and_devils_advocate():
         assert 0 <= row["expert_support_mean"] <= 1
         assert row["critique"]["disposition"] in {"SURVIVES", "NEEDS_EVIDENCE", "REWORK"}
         assert row["critique"]["falsification_test"]
+
+
+def test_live_creative_v2_run_32555691182_selects_stable_top_three():
+    fixture_path = Path("tests/fixtures/mind_forge_v2_live_run_32555691182.json")
+    payload = json.loads(fixture_path.read_text(encoding="utf-8"))
+    result = evaluate_payload(payload)
+
+    assert payload["fixture_source"]["run_id"] == 32555691182
+    assert payload["fixture_source"]["artifact_id"] == 9471344273
+    assert result["idea_count"] == 14
+    assert result["expert_mind_count"] == 10
+    assert result["uses_mechanism_family_for_scoring"] is False
+    assert result["selected_idea_ids"] == [
+        "idea-open-c99ef11df42f259b",
+        "idea-open-adc0e939beba1e85",
+        "idea-open-b7e3e27666346cfe",
+    ]
+
+    top_titles = [row["title"] for row in result["assessments"][:3]]
+    assert top_titles == [
+        "Merchant-in-a-Box Operating Standard",
+        "Rural Merchant Shared Fulfillment",
+        "B2B Replenishment Route",
+    ]
