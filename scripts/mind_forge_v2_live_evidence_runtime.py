@@ -22,6 +22,12 @@ _SOURCE_WEIGHTS = {
     "unknown": 0.35,
 }
 _STANCE_SIGN = {"SUPPORTS": 1.0, "CONTRADICTS": -1.0, "MIXED": -0.25, "NEUTRAL": 0.0}
+_RELEVANCE_WEIGHTS = {
+    "DIRECT": 1.00,
+    "ADJACENT": 0.35,
+    "GENERIC": 0.00,
+    "OFF_DOMAIN": 0.00,
+}
 _OFFICIAL_HOSTS = {
     "brreg.no",
     "www.brreg.no",
@@ -48,6 +54,8 @@ class _ObservationDraft(BaseModel):
     observation_text: str = Field(min_length=1, max_length=360)
     stance: str = Field(pattern="^(SUPPORTS|CONTRADICTS|MIXED|NEUTRAL)$")
     confidence: float = Field(ge=0.0, le=0.90)
+    relevance: str = Field(pattern="^(DIRECT|ADJACENT|GENERIC|OFF_DOMAIN)$")
+    relevance_reason: str = Field(min_length=1, max_length=240)
 
 
 class _ResearchDraft(BaseModel):
@@ -119,6 +127,10 @@ def _build_plan(reasoning: dict[str, Any]) -> list[dict[str, Any]]:
     assessments = {str(row["idea_id"]): row for row in reasoning.get("assessments", []) or []}
     if len(selected) != 3:
         raise ValueError(f"live evidence requires exactly three selected ideas, got {len(selected)}")
+    topic = str(reasoning.get("seed") or "").strip()
+    if not topic:
+        raise ValueError("live evidence requires the original topic/seed for relevance checking")
+
     plan: list[dict[str, Any]] = []
     for rank, idea_id in enumerate(selected, start=1):
         idea_id = str(idea_id)
@@ -134,6 +146,7 @@ def _build_plan(reasoning: dict[str, Any]) -> list[dict[str, Any]]:
             "idea_id": idea_id,
             "title": str(row.get("title") or idea_id),
             "claim_text": claim,
+            "topic": topic,
         })
     return plan
 
@@ -145,14 +158,29 @@ def _prompt(request: dict[str, Any]) -> str:
         "Keep every observation_text under 240 characters. Every source_ref must be an exact URL from web-search sources. "
         "Do not explain your process and do not make the final business decision. Stance must be SUPPORTS, CONTRADICTS, "
         "MIXED, or NEUTRAL relative to the exact claim.\n\n"
-        f"IDEA: {request['title']}\nCLAIM: {request['claim_text']}\nMARKET: Norway"
+        "For every observation, classify evidence relevance conservatively:\n"
+        "- DIRECT: same real-world topic/domain as TOPIC and materially tests the exact CLAIM.\n"
+        "- ADJACENT: same topic/domain but only an indirect proxy for the CLAIM.\n"
+        "- GENERIC: broad statistics, policy, right-to-repair, or general business/repair material that does not establish "
+        "the claim in this topic.\n"
+        "- OFF_DOMAIN: evidence about a different product, service, or industry.\n"
+        "Do not label evidence DIRECT merely because the source is official or contains a generic word such as repair. "
+        "If the search finds only generic or off-domain evidence, return it with that relevance label rather than forcing "
+        "a supportive conclusion. Give a short relevance_reason explaining the domain match or mismatch.\n\n"
+        f"TOPIC: {request['topic']}\n"
+        f"IDEA: {request['title']}\n"
+        f"CLAIM: {request['claim_text']}\n"
+        "MARKET: Norway"
     )
 
 
 def _research_one(request: dict[str, Any], *, model: str) -> tuple[list[dict[str, Any]], int]:
     agent = Agent(
         name=f"MIND FORGE V2 Evidence {request['request_id']}",
-        instructions="Collect concise sourced observations only; preserve exact source URLs; no prose outside the schema.",
+        instructions=(
+            "Collect concise sourced observations only; preserve exact source URLs; classify domain relevance "
+            "conservatively; no prose outside the schema."
+        ),
         model=model,
         tools=[WebSearchTool(search_context_size="low")],
         model_settings=ModelSettings(
@@ -192,6 +220,8 @@ def _research_one(request: dict[str, Any], *, model: str) -> tuple[list[dict[str
             "idea_id": request["idea_id"],
             "stance": item.stance,
             "confidence": item.confidence,
+            "relevance": item.relevance,
+            "relevance_reason": item.relevance_reason,
             "source_type": _source_type(item.source_ref),
             "source_ref": item.source_ref,
             "source": sources[item.source_ref],
@@ -221,36 +251,68 @@ def _rerank(reasoning: dict[str, Any], observations: list[dict[str, Any]]) -> di
         base = float(assessments[idea_id].get("composite_score", 0.0))
         weighted_sum = 0.0
         weight_total = 0.0
-        stances: set[str] = set()
+        relevant_stances: set[str] = set()
         refs: list[str] = []
+        relevant_refs: list[str] = []
+        relevant_count = 0
+        rejected_relevance_count = 0
+
         for obs in by_idea[idea_id]:
             stance = str(obs["stance"]).upper()
             confidence = float(obs["confidence"])
             quality = _SOURCE_WEIGHTS.get(str(obs.get("source_type", "unknown")), 0.35)
-            weight = quality * confidence
+            relevance = str(obs.get("relevance") or "GENERIC").upper()
+            relevance_weight = _RELEVANCE_WEIGHTS.get(relevance, 0.0)
+            source_ref = str(obs["source_ref"])
+            refs.append(source_ref)
+
+            if relevance_weight <= 0.0:
+                rejected_relevance_count += 1
+                continue
+
+            relevant_count += 1
+            relevant_refs.append(source_ref)
+            relevant_stances.add(stance)
+            weight = quality * confidence * relevance_weight
             weighted_sum += _STANCE_SIGN[stance] * weight
             weight_total += weight
-            stances.add(stance)
-            refs.append(str(obs["source_ref"]))
+
         signal = max(-1.0, min(1.0, weighted_sum / weight_total)) if weight_total else 0.0
-        evidence_score = _bounded((signal + 1.0) / 2.0)
-        conflict = "SUPPORTS" in stances and "CONTRADICTS" in stances
-        final_score = _bounded(0.70 * base + 0.30 * evidence_score - (0.08 if conflict else 0.0))
+        evidence_strength = min(1.0, weight_total)
+        evidence_score = _bounded(0.5 + 0.5 * signal * evidence_strength)
+        evidence_status = (
+            "SUFFICIENT_RELEVANT_EVIDENCE" if relevant_count > 0 and weight_total > 0.0
+            else "INSUFFICIENT_EVIDENCE"
+        )
+        conflict = "SUPPORTS" in relevant_stances and "CONTRADICTS" in relevant_stances
+
+        if evidence_status == "INSUFFICIENT_EVIDENCE":
+            final_score = _bounded(base)
+        else:
+            final_score = _bounded(0.70 * base + 0.30 * evidence_score - (0.08 if conflict else 0.0))
+
         rows.append({
             "idea_id": idea_id,
             "title": assessments[idea_id].get("title"),
             "reasoning_score": round(base, 4),
+            "evidence_status": evidence_status,
             "evidence_score": evidence_score,
             "evidence_signal": round(signal, 4),
+            "evidence_strength": round(evidence_strength, 4),
             "evidence_count": len(by_idea[idea_id]),
+            "relevant_evidence_count": relevant_count,
+            "rejected_relevance_count": rejected_relevance_count,
             "conflicting_evidence": conflict,
             "final_score": final_score,
             "source_refs": refs,
+            "relevant_source_refs": relevant_refs,
         })
+
     ranked = sorted(rows, key=lambda row: (row["final_score"], row["reasoning_score"], row["idea_id"]), reverse=True)
     return {
         "status": "MIND_FORGE_V2_FINAL_RANK_COMPLETE",
         "uses_mechanism_family_for_scoring": False,
+        "evidence_relevance_gate": "ENFORCED",
         "ranking": ranked,
         "selected_idea_ids": [row["idea_id"] for row in ranked],
         "selected_titles": [row["title"] for row in ranked],
