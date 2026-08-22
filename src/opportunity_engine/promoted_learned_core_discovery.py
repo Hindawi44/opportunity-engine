@@ -1,6 +1,6 @@
 """Scheduled direct discovery driven only by explicitly promoted learned queries.
 
-This module closes the learning loop for the canonical daily operator.  A term
+This module closes the learning loop for the canonical daily operator. A term
 may reach this collector only through the active runtime overlay, which itself is
 produced by the explicit promotion gate. Search results are not opportunities:
 each candidate public page must independently prove a concrete company closure
@@ -17,8 +17,6 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from opportunity_engine.automatic_query_gap_miss_scout import (
-    DEFAULT_MAX_PAGES,
-    MAX_PAGES,
     PublicPage,
     _verify_closure_liquidation_page,
     fetch_public_page,
@@ -42,6 +40,12 @@ SOURCE_NAME = "Promoted learned Core discovery"
 MARKET_CODE = "NO"
 DEFAULT_RESULTS_PER_QUERY = 10
 MAX_RESULTS_PER_QUERY = 10
+# The paid Brave budget remains one request per promoted term. Exact-page GETs
+# are a separate verification budget and may inspect the complete returned hit
+# window so duplicate/noisy early ranks cannot hide independently verifiable
+# liquidation pages at later ranks.
+DEFAULT_MAX_PAGES = 10
+MAX_PAGES = 10
 DEFAULT_MAX_TERMS = 1
 MAX_TERMS = 2
 _OVERLAY_ENV = "OPPORTUNITY_LEARNED_QUERY_OVERLAY_PATH"
