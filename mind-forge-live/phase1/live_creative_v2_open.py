@@ -213,7 +213,7 @@ def _evaluate_family_agnostic_reasoning(
 
 
 def _write_live_reasoning_artifact(topic: TopicInput, creative: CreativeEngineResult) -> None:
-    """Attach deterministic reasoning only to the explicit Creative V2 GitHub job."""
+    """Attach reasoning and bounded live evidence only to the explicit Creative V2 GitHub job."""
 
     if not (
         os.getenv("GITHUB_ACTIONS") == "true"
@@ -238,6 +238,24 @@ def _write_live_reasoning_artifact(topic: TopicInput, creative: CreativeEngineRe
             indent=2,
         ),
         encoding="utf-8",
+    )
+
+    from scripts.mind_forge_v2_live_evidence_runtime import run_live_top3_evidence
+
+    live_result = run_live_top3_evidence(
+        result,
+        model=os.getenv("MIND_FORGE_RESEARCH_MODEL", "gpt-5.6-luna"),
+    )
+    print(
+        json.dumps(
+            {
+                "status": "MIND_FORGE_V2_TOP3_LIVE_EVIDENCE_COMPLETE",
+                "search_operations": live_result["usage"]["search_operations"],
+                "estimated_research_cost_usd": live_result["usage"]["estimated_research_cost_usd"],
+                "selected_titles": live_result["final_rank"]["selected_titles"],
+            },
+            ensure_ascii=False,
+        )
     )
 
 
