@@ -17,10 +17,8 @@ HTML = """
 
 
 def test_verified_closure_can_discover_sale_term_not_present_in_static_gap_list() -> None:
-    from opportunity_engine.automatic_query_gap_miss_scout import (
-        PublicPage,
-        discover_query_gap_misses,
-    )
+    from opportunity_engine.automatic_query_gap_miss_scout import PublicPage
+    from opportunity_engine.query_gap_scout_waterfall import discover_query_gap_misses
 
     hit = SearchHit(
         title="Nordlys Mote legger ned",
@@ -47,9 +45,11 @@ def test_verified_closure_can_discover_sale_term_not_present_in_static_gap_list(
     [case] = outcome["cases"]
     assert case.root_cause == "QUERY_GAP"
     assert case.ground_truth_company == "Nordlys Mote"
+    assert case.diagnosed_query_gap_terms == (NEW_TERM,)
     assert NEW_TERM in case.learning_evidence_text.casefold()
     assert outcome["cases_metadata"][0]["query_gap_term"] == NEW_TERM
     assert outcome["cases_metadata"][0]["source_page_verified"] is True
+    assert all(NEW_TERM not in query.casefold() for query in outcome["executed_queries"])
     assert outcome["automatic_query_activation"] is False
     assert outcome["automatic_contact"] is False
     assert outcome["automatic_bid"] is False
