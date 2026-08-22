@@ -107,7 +107,7 @@ def test_promoted_stocklear_feed_is_exact_page_verified_and_bounded() -> None:
     assert first["total_price"] == 2000.0
     assert first["currency"] == "EUR"
     assert first["estimated_retail_value"] == 14922.0
-    assert first["condition_terms"] == ["Functional customer returns. RRP € 14,922."]
+    assert first["condition_terms"] == ["Functional customer returns"]
     assert "display:flex" not in first["description"]
     assert "999999" not in report["candidates"][1]["description"]
 
