@@ -1,8 +1,13 @@
 from copy import deepcopy
+import json
+from pathlib import Path
 
 import pytest
 
 from scripts.mind_forge_v2_evidence_rerank import rerank_with_evidence
+
+
+FIXTURE = Path(__file__).parent / "fixtures" / "mind_forge_v2_live_top3_32566688085.json"
 
 
 def _reasoning():
@@ -75,3 +80,30 @@ def test_mechanism_family_labels_do_not_change_result():
     second = rerank_with_evidence(renamed, evidence)
     assert first["ranking"] == second["ranking"]
     assert first["uses_mechanism_family_for_scoring"] is False
+
+
+def test_live_top3_fixture_preserves_real_reasoning_order_without_evidence():
+    live = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    result = rerank_with_evidence(live, [])
+    assert live["source_run_id"] == 32566688085
+    assert live["source_artifact_id"] == 9474264157
+    assert result["selected_titles"] == [
+        "Verified Local Supplier Desk",
+        "Cold-Chain Route Orchestrator",
+        "Multilingual Microbusiness Back Office",
+    ]
+
+
+def test_live_top3_fixture_allows_sourced_evidence_to_change_real_order():
+    live = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    supplier, cold_chain, backoffice = live["selected_idea_ids"]
+    result = rerank_with_evidence(
+        live,
+        [
+            _obs(supplier, "SUPPORTS", 0.95, "official", "https://official.example/supplier"),
+            _obs(cold_chain, "CONTRADICTS", 0.90, "official", "https://official.example/cold-chain"),
+            _obs(backoffice, "SUPPORTS", 0.90, "primary", "https://primary.example/backoffice"),
+        ],
+    )
+    assert result["selected_idea_ids"][0] == supplier
+    assert result["selected_idea_ids"][-1] == cold_chain
