@@ -20,7 +20,6 @@ import sys
 from typing import Any, Mapping
 
 from opportunity_engine.daily_learning_operator import DailyLearningPolicy
-from opportunity_engine.daily_learning_runtime import run_daily_learning_runtime
 
 
 _INSTALLED = False
@@ -102,6 +101,10 @@ def run_daily_auto_miss_learning(
             "automatic_purchase": False,
             "automatic_payment": False,
         }
+
+    # Import lazily so importing the independent QUERY_GAP scout in a clean
+    # interpreter cannot cycle through discovery.__init__ back into this hook.
+    from opportunity_engine.daily_learning_runtime import run_daily_learning_runtime
 
     report = run_daily_learning_runtime(
         learning_dir=root / "learning",
