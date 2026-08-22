@@ -1,0 +1,51 @@
+{
+  "schema_version": "source-discovery-shadow-candidates-1.0",
+  "measured_at": "2026-08-22T11:20:00Z",
+  "input_benchmark": "config/learning/external_ground_truth_benchmark_2026-08-22.json",
+  "input_benchmark_result": "docs/benchmarks/external-ground-truth-2026-08-22-result.json",
+  "source_candidate_count": 2,
+  "validated_source_count": 2,
+  "shadow_eligible_source_count": 2,
+  "source_candidates": [
+    {
+      "candidate_id": "source-candidate:dc086efb0c6d7ea296c6",
+      "source_domain": "joblot.stocklear.eu",
+      "source_name": "Stocklear",
+      "verified_opportunity_count": 2,
+      "evidence_case_ids": [
+        "ext-20260822-stocklear-21748",
+        "ext-20260822-stocklear-21762"
+      ],
+      "categories": [
+        "APPLIANCES",
+        "GENERAL_MERCHANDISE"
+      ],
+      "status": "VALIDATED_SOURCE",
+      "shadow_eligible": true,
+      "production_active": false
+    },
+    {
+      "candidate_id": "source-candidate:f2be727d787d78925fbd",
+      "source_domain": "www.worldwiseusa.com",
+      "source_name": "WorldWiseUSA",
+      "verified_opportunity_count": 3,
+      "evidence_case_ids": [
+        "ext-20260822-worldwise-athleisure-29000",
+        "ext-20260822-worldwise-flooring-2x40ft",
+        "ext-20260822-worldwise-mens-shirts-049"
+      ],
+      "categories": [
+        "APPAREL",
+        "BUILDING_MATERIALS"
+      ],
+      "status": "VALIDATED_SOURCE",
+      "shadow_eligible": true,
+      "production_active": false
+    }
+  ],
+  "verdict": "TWO_SOURCES_VALIDATED_FOR_SHADOW_EVALUATION",
+  "automatic_source_addition": false,
+  "automatic_promotion": false,
+  "production_mutation": false,
+  "network_requests": 0
+}
