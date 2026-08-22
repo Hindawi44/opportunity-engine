@@ -33,6 +33,12 @@ VALIDATION_SCHEMA = "query-gap-validation-cases-1.0"
 RuntimeSearch = Callable[[str, str], Sequence[Mapping[str, Any]]]
 
 
+class _SignalOnlyQuery(str):
+    """String-compatible query provenance for radar-only discovery coverage."""
+
+    query_scope = "SIGNAL_ONLY"
+
+
 def _read_object(path: Path) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
@@ -76,16 +82,22 @@ def load_query_gap_validation_cases(path: str | Path) -> list[MissedOpportunityC
     return _load_case_rows(path, schema=VALIDATION_SCHEMA, label="query-gap validation")
 
 
-def load_active_learning_queries(path: str | Path) -> list[str]:
+def load_core_opportunity_queries(path: str | Path) -> list[str]:
+    """Load only queries that participate in the Core opportunity-discovery pack."""
     target = Path(path)
-    queries: list[str] = []
-    if target.exists():
-        payload = _read_object(target)
-        rows = payload.get("queries") or []
-        if isinstance(rows, list):
-            queries.extend(str(row).strip() for row in rows if str(row).strip())
+    if not target.exists():
+        return []
+    payload = _read_object(target)
+    rows = payload.get("queries") or []
+    if not isinstance(rows, list):
+        return []
+    return [str(row).strip() for row in rows if str(row).strip()]
+
+
+def load_active_learning_queries(path: str | Path) -> list[str]:
+    queries: list[str] = list(load_core_opportunity_queries(path))
     for market_rows in MARKET_QUERIES.values():
-        queries.extend(item.query for item in market_rows)
+        queries.extend(_SignalOnlyQuery(item.query) for item in market_rows)
     return queries
 
 
