@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import json
+from pathlib import Path
 
 from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.missed_opportunity_learning import load_missed_opportunity_memory
@@ -20,6 +21,14 @@ RITA_HTML = """
 <p>I vinduet kan forbigående nå lese ordene «Sluttsalg» og «Alt skal ut».</p>
 <p>Rita Korsettsalong legges ned. Alle varer skal ut av butikken.</p>
 <p>Siste åpningsdag blir 1. oktober.</p>
+</body></html>
+"""
+
+GENERIC_ONLY_HTML = """
+<html><body>
+<h1>Butikken legger ned etter 40 år</h1>
+<p>Butikken stenger for godt. Sluttsalg. Alt skal ut.</p>
+<p>Alle varer skal ut av butikken.</p>
 </body></html>
 """
 
@@ -96,12 +105,38 @@ def test_verified_independent_page_becomes_query_gap_when_term_is_absent_from_co
     assert case.trace.query_generated is False
     assert case.stock_proven is True
     assert case.ground_truth_url == RITA_URL
+    assert case.ground_truth_company == "Rita Korsettsalong"
     assert case.discovered_by == "AUTOMATIC_INDEPENDENT_QUERY_GAP_SCOUT"
     assert case.opportunity_type == "VERIFIED_STORE_CLOSURE_INVENTORY_LIQUIDATION"
     assert "sluttsalg" in case.learning_evidence_text.casefold()
     assert outcome["cases_metadata"][0]["query_gap_term"] == "sluttsalg"
     assert outcome["cases_metadata"][0]["source_page_verified"] is True
     assert outcome["cases_metadata"][0]["search_hit_alone_is_ground_truth"] is False
+
+
+def test_generic_store_word_is_not_accepted_as_company_identity() -> None:
+    from opportunity_engine.automatic_query_gap_miss_scout import (
+        PublicPage,
+        discover_query_gap_misses,
+    )
+
+    generic_url = "https://example.no/butikken-legger-ned"
+    outcome = discover_query_gap_misses(
+        _checkpoint(),
+        active_queries=[],
+        search=lambda query: [_hit(generic_url)],
+        fetch_page=lambda url: PublicPage(
+            requested_url=url,
+            final_url=url,
+            status_code=200,
+            content_type="text/html",
+            html=GENERIC_ONLY_HTML,
+        ),
+    )
+
+    assert outcome["verified_page_count"] == 0
+    assert outcome["detected_miss_count"] == 0
+    assert outcome["cases"] == []
 
 
 def test_search_hit_without_verified_page_is_never_ground_truth() -> None:
@@ -257,4 +292,25 @@ def test_verified_query_gap_is_merged_into_durable_miss_memory(tmp_path) -> None
     assert len(memory) == 1
     assert memory[0].root_cause == "QUERY_GAP"
     assert memory[0].learning_status == "DIAGNOSED"
+    assert memory[0].ground_truth_company == "Rita Korsettsalong"
     assert "sluttsalg" in memory[0].learning_evidence_text.casefold()
+
+
+def test_scout_hook_order_is_stocklear_then_scout_then_river_then_learner_at_exit() -> None:
+    init = Path("src/opportunity_engine/discovery/__init__.py").read_text(encoding="utf-8")
+
+    learner = init.index("install_daily_auto_miss_learning_cli_hook()")
+    river = init.index("install_unified_market_intelligence_river_cli_hook()")
+    scout = init.index("install_automatic_query_gap_miss_scout_cli_hook()")
+    stocklear = init.index("install_promoted_stocklear_cli_hook()")
+
+    # atexit is LIFO, so registration order is the reverse of execution order.
+    assert learner < river < scout < stocklear
+
+    hook_path = Path(
+        "src/opportunity_engine/discovery/automatic_query_gap_miss_scout_cli_hook.py"
+    )
+    hook = hook_path.read_text(encoding="utf-8")
+    assert 'Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py"' in hook
+    assert "write_automatic_query_gap_miss_scout(" in hook
+    assert "automatic_query_gap_miss_scout:" in hook
