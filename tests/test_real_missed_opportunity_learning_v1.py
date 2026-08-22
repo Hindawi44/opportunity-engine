@@ -254,12 +254,16 @@ def test_real_miss_runs_end_to_end_through_persistent_holdout_runtime(tmp_path) 
     assert "stort avslutningssalg" in learned_terms_for_market(shadow_payload, "NO")
     assert learned_terms_for_market(active_payload, "NO") == {}
     assert memory_payload["cases"][0]["learning_status"] == "TRANSFER_PROVEN"
-    assert proof["status"] == "SHADOW_PASSED"
+    assert proof["status"] == "SHADOW_TRANSFER_PENDING_REPLICATION"
     assert proof["shadow_recovered_case_count"] == 0
     assert proof["shadow_transfer_proven_case_count"] == 1
-    assert proof["promotion_eligible_count"] == 1
+    assert proof["repeated_transfer_proven_case_count"] == 0
+    assert proof["promotion_eligible_count"] == 0
     assert proof["promoted_proof_count"] == 0
     assert proof["automatic_promotion"] is False
+    assert proof["min_independent_transfer_cases"] == 2
     proof_case = proof["cases"][0]
     assert proof_case["shadow_transfer_proven"] is True
     assert proof_case["shadow_validation_case_ids"] == ["HOLDOUT-NO-NOREM-BAADE-2010"]
+    assert proof_case["independent_transfer_case_count"] == 1
+    assert proof_case["repeated_transfer_proven"] is False
