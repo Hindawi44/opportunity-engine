@@ -68,13 +68,15 @@ def test_real_miss_proposes_avslutningssalg_as_query_gap() -> None:
     assert by_term["avslutningssalg"].support_case_ids == (case.case_id,)
 
 
-def test_generalizable_atomic_term_is_prioritized_inside_daily_budget() -> None:
+def test_generalizable_atomic_term_is_prioritized_without_invented_adjacency() -> None:
     candidates = propose_query_gap_keywords(
         [_real_lene_interior_miss()],
         active_queries=_baseline_queries(),
     )
+    terms = [candidate.term for candidate in candidates]
 
-    assert candidates[0].term == "avslutningssalg"
+    assert terms[:2] == ["avslutningssalg", "stort avslutningssalg"]
+    assert "avslutningssalg alle" not in terms
 
 
 def test_real_miss_can_be_recovered_in_shadow_without_production_activation() -> None:
@@ -100,7 +102,7 @@ def test_real_miss_can_be_recovered_in_shadow_without_production_activation() ->
 
 
 def test_learning_search_replays_term_without_product_or_company_leakage() -> None:
-    query = _learning_query('avslutningssalg')
+    query = _learning_query("avslutningssalg")
 
     assert query == '"avslutningssalg"'
     assert "lene" not in query.casefold()
