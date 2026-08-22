@@ -4,15 +4,22 @@ The waterfall reuses the original scout's authoritative exact-page verifier,
 durable memory merge, cost guard, and safety semantics. It also records bounded
 read-only diagnostics for each page that actually consumed verification budget,
 so operators can see *why* a page was rejected without relaxing the gate.
+
+Stage 2 may become an entity-source follow-up when Stage 1 proves a permanent
+closure and a concrete company identity but does not prove liquidation. This
+changes recall orchestration only: the same exact-page verifier remains the
+single authority for ground truth.
 """
 from __future__ import annotations
 
 from datetime import datetime, timezone
 from hashlib import sha256
+from html.parser import HTMLParser
 import os
 from pathlib import Path
+import re
 from typing import Any, Callable, Mapping, Sequence
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 from opportunity_engine.automatic_query_gap_miss_scout import (
     DEFAULT_ACTIVE_QUERY_CONFIG,
@@ -51,7 +58,7 @@ from opportunity_engine.missed_opportunity_learning import (
     save_missed_opportunity_memory,
 )
 
-SCHEMA_VERSION = "automatic-query-gap-miss-scout-waterfall-1.1"
+SCHEMA_VERSION = "automatic-query-gap-miss-scout-waterfall-1.2"
 MAX_SEARCH_REQUESTS = 2
 
 SCOUT_QUERIES_NO: tuple[str, ...] = (
@@ -68,6 +75,165 @@ SCOUT_QUERIES_NO: tuple[str, ...] = (
 SCOUT_QUERY_NO = SCOUT_QUERIES_NO[0]
 
 SearchCallback = Callable[[str], Sequence[SearchHit]]
+
+_SOURCE_PATH_HINTS = (
+    "informasjon",
+    "pressemelding",
+    "kundeservice",
+    "nyheter",
+    "news",
+    "faq",
+    "sporsmal",
+    "spørsmål",
+)
+_INTERNAL_SOURCE_HINTS = (
+    "informasjon",
+    "pressemelding",
+    "kundeservice",
+    "nyheter",
+    "news",
+    "avvikl",
+    "steng",
+    "nedlegg",
+)
+_GENERIC_ENTITY_TOKENS = frozenset(
+    {
+        "norge",
+        "butikk",
+        "butikken",
+        "bedrift",
+        "selskap",
+        "forretning",
+        "virksomhet",
+        "virksomheten",
+    }
+)
+
+
+class _HrefCollector(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.hrefs: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.casefold() != "a":
+            return
+        for name, value in attrs:
+            if name.casefold() == "href" and value:
+                self.hrefs.append(value.strip())
+
+
+def build_entity_source_followup_query(company: str) -> str:
+    """Find the entity's own web presence without leaking event or sale terms."""
+    compact = " ".join(str(company or "").replace('"', " ").split()).strip()
+    if not compact:
+        raise ValueError("Entity-source follow-up requires a company identity")
+    folded = compact.casefold()
+    if any(term in folded for term in _GAP_TERMS):
+        raise ValueError("Company identity contains a forbidden learning term")
+
+    query = f'"{compact}" Norge'
+    query_folded = query.casefold()
+    if any(term in query_folded for term in _GAP_TERMS):
+        raise AssertionError("Entity-source follow-up leaked a learning term")
+    return query
+
+
+def _entity_domain_tokens(company: str) -> tuple[str, ...]:
+    tokens = [
+        token
+        for token in re.findall(r"[a-z0-9æøå]+", str(company or "").casefold())
+        if len(token) >= 4 and token not in _GENERIC_ENTITY_TOKENS
+    ]
+    return tuple(dict.fromkeys(tokens))
+
+
+def build_entity_first_party_probe_urls(company: str) -> list[str]:
+    """Infer one conservative Norwegian first-party homepage candidate."""
+    tokens = _entity_domain_tokens(company)
+    if not tokens:
+        return []
+    slug = "".join(tokens)
+    if not 4 <= len(slug) <= 63:
+        return []
+    if not re.fullmatch(r"[a-z0-9]+", slug):
+        return []
+    return [f"https://www.{slug}.no/"]
+
+
+def _normalized_host(url: str) -> str:
+    host = (urlparse(url).hostname or "").casefold().strip(".")
+    return host[4:] if host.startswith("www.") else host
+
+
+def _is_plausible_first_party_url(url: str, company: str) -> bool:
+    tokens = _entity_domain_tokens(company)
+    host = _normalized_host(url)
+    return bool(host and tokens and any(token in host for token in tokens))
+
+
+def prioritize_entity_source_hits(
+    hits: Sequence[SearchHit],
+    *,
+    company: str,
+) -> list[SearchHit]:
+    """Prefer plausible first-party information pages without treating them as proof."""
+    indexed = list(enumerate(hits))
+
+    def score(item: tuple[int, SearchHit]) -> tuple[int, int, int]:
+        index, hit = item
+        url = _canonical(hit.url) or str(hit.url or "")
+        parsed = urlparse(url)
+        source_text = f"{parsed.path} {hit.title or ''}".casefold()
+        company_domain = _is_plausible_first_party_url(url, company)
+        source_hint = any(hint in source_text for hint in _SOURCE_PATH_HINTS)
+        return (int(company_domain), int(source_hint), -index)
+
+    return [hit for _, hit in sorted(indexed, key=score, reverse=True)]
+
+
+def extract_entity_internal_source_links(
+    page: PublicPage,
+    *,
+    company: str,
+) -> list[str]:
+    """Return same-domain first-party information links without using learned sale terms."""
+    base_url = _canonical(page.final_url) or page.final_url
+    if not base_url or not _is_plausible_first_party_url(base_url, company):
+        return []
+    base_host = _normalized_host(base_url)
+
+    collector = _HrefCollector()
+    try:
+        collector.feed(page.html or "")
+    except Exception:
+        return []
+
+    ranked: list[tuple[int, int, str]] = []
+    seen: set[str] = set()
+    for index, href in enumerate(collector.hrefs):
+        lowered = href.casefold()
+        if not href or lowered.startswith(("mailto:", "tel:", "javascript:", "#")):
+            continue
+        resolved = _canonical(urljoin(base_url, href))
+        if not resolved or resolved in seen or resolved == base_url:
+            continue
+        if urlparse(resolved).scheme != "https":
+            continue
+        if _normalized_host(resolved) != base_host:
+            continue
+        signal = f"{urlparse(resolved).path} {urlparse(resolved).query}".casefold()
+        matched = [hint for hint in _INTERNAL_SOURCE_HINTS if hint in signal]
+        if not matched:
+            continue
+        if any(term in signal for term in _GAP_TERMS):
+            continue
+        seen.add(resolved)
+        priority = 2 if any(hint in signal for hint in _SOURCE_PATH_HINTS) else 1
+        ranked.append((priority, -index, resolved))
+
+    ranked.sort(reverse=True)
+    return [url for _, _, url in ranked]
 
 
 def diagnose_public_page(page: PublicPage) -> dict[str, Any]:
@@ -160,6 +326,28 @@ def _new_gap_case(
     ).with_diagnosis()
 
 
+def _entity_followup_company_from_diagnostic(
+    diagnostic: Mapping[str, Any],
+) -> str | None:
+    """Return a safe entity cue from a rejected closure page, if one exists."""
+    if diagnostic.get("verifier_status") != "REJECTED":
+        return None
+    flags = diagnostic.get("evidence_flags")
+    flags = dict(flags) if isinstance(flags, Mapping) else {}
+    if not flags.get("closure_marker") or not flags.get("company_identity"):
+        return None
+    if flags.get("temporary_closure"):
+        return None
+    if flags.get("sale_term") and flags.get("liquidation_marker"):
+        return None
+    company = " ".join(str(diagnostic.get("company") or "").split()).strip()
+    if not company:
+        return None
+    if any(term in company.casefold() for term in _GAP_TERMS):
+        return None
+    return company
+
+
 def discover_query_gap_misses(
     checkpoint: Mapping[str, Any],
     *,
@@ -182,6 +370,7 @@ def discover_query_gap_misses(
     metadata: list[dict[str, Any]] = []
     search_stages: list[dict[str, Any]] = []
     verification_attempts: list[dict[str, Any]] = []
+    executed_queries: list[str] = []
 
     search_requests = 0
     total_hits = 0
@@ -189,12 +378,40 @@ def discover_query_gap_misses(
     verified_pages = 0
     core_known = 0
     no_new_term = 0
+    entity_followup_company: str | None = None
+    entity_followup_used = False
+    entity_domain_probe_used = False
+    entity_domain_probe_count = 0
+    entity_internal_followup_used = False
+    entity_internal_followup_count = 0
 
-    for stage_index, query in enumerate(SCOUT_QUERIES_NO[:MAX_SEARCH_REQUESTS]):
+    for stage_index in range(MAX_SEARCH_REQUESTS):
         if page_requests >= bounded_pages:
             break
 
+        if stage_index == 0:
+            query = SCOUT_QUERIES_NO[0]
+            query_kind = "GENERIC_STRICT"
+        elif entity_followup_company:
+            try:
+                query = build_entity_source_followup_query(entity_followup_company)
+                query_kind = "ENTITY_SOURCE_FOLLOW_UP"
+                entity_followup_used = True
+            except ValueError:
+                query = SCOUT_QUERIES_NO[1]
+                query_kind = "GENERIC_BROAD"
+                entity_followup_company = None
+        else:
+            query = SCOUT_QUERIES_NO[1]
+            query_kind = "GENERIC_BROAD"
+
+        executed_queries.append(query)
         raw_hits = [item for item in search(query) if isinstance(item, SearchHit)]
+        if query_kind == "ENTITY_SOURCE_FOLLOW_UP" and entity_followup_company:
+            raw_hits = prioritize_entity_source_hits(
+                raw_hits,
+                company=entity_followup_company,
+            )
         search_requests += 1
         total_hits += len(raw_hits)
 
@@ -204,7 +421,7 @@ def discover_query_gap_misses(
         stage_unique_hits = 0
         stage_page_budget = (
             min(1, bounded_pages - page_requests)
-            if stage_index < len(SCOUT_QUERIES_NO) - 1
+            if stage_index < MAX_SEARCH_REQUESTS - 1
             else bounded_pages - page_requests
         )
 
@@ -225,6 +442,7 @@ def discover_query_gap_misses(
             stage_pages += 1
             base_diagnostic = {
                 "stage": stage_index + 1,
+                "query_kind": query_kind,
                 "requested_url": url,
                 "search_hit_title": str(hit.title or "")[:500],
                 "search_hit_description": str(hit.description or "")[:1000],
@@ -253,7 +471,78 @@ def discover_query_gap_misses(
             diagnostic = {**base_diagnostic, **diagnose_public_page(page)}
             verification_attempts.append(diagnostic)
 
+            if stage_index == 0 and entity_followup_company is None:
+                entity_followup_company = _entity_followup_company_from_diagnostic(
+                    diagnostic
+                )
+
             proof = _verify_closure_liquidation_page(page)
+            discovery_path = query_kind
+
+            if (
+                proof is None
+                and query_kind == "ENTITY_SOURCE_FOLLOW_UP"
+                and entity_followup_company
+                and _is_plausible_first_party_url(page.final_url, entity_followup_company)
+            ):
+                internal_links = extract_entity_internal_source_links(
+                    page,
+                    company=entity_followup_company,
+                )
+                for internal_url in internal_links:
+                    if page_requests >= bounded_pages or stage_pages >= stage_page_budget:
+                        break
+                    if internal_url in seen_urls:
+                        continue
+                    seen_urls.add(internal_url)
+                    if internal_url in core_urls:
+                        core_known += 1
+                        continue
+
+                    entity_internal_followup_used = True
+                    entity_internal_followup_count += 1
+                    page_requests += 1
+                    stage_pages += 1
+                    internal_base = {
+                        "stage": stage_index + 1,
+                        "query_kind": "ENTITY_INTERNAL_SOURCE_FOLLOW_UP",
+                        "requested_url": internal_url,
+                        "parent_url": _canonical(page.final_url) or page.final_url,
+                        "search_hit_title": "",
+                        "search_hit_description": "",
+                        "search_hit_provider": "INTERNAL_LINK",
+                        "search_hit_alone_is_ground_truth": False,
+                        "automatic_query_activation": False,
+                    }
+                    try:
+                        internal_page: PublicPage = fetch_page(internal_url)
+                    except Exception as exc:
+                        verification_attempts.append(
+                            {
+                                **internal_base,
+                                "final_url": None,
+                                "status_code": None,
+                                "content_type": None,
+                                "verifier_status": "FETCH_FAILED",
+                                "rejection_reasons": ["PAGE_FETCH_FAILED"],
+                                "evidence_flags": {},
+                                "error_type": type(exc).__name__,
+                                "error": " ".join(str(exc).split())[:500],
+                            }
+                        )
+                        continue
+
+                    internal_diagnostic = {
+                        **internal_base,
+                        **diagnose_public_page(internal_page),
+                    }
+                    verification_attempts.append(internal_diagnostic)
+                    internal_proof = _verify_closure_liquidation_page(internal_page)
+                    if internal_proof is not None:
+                        proof = internal_proof
+                        discovery_path = "ENTITY_INTERNAL_SOURCE_FOLLOW_UP"
+                        break
+
             if proof is None:
                 continue
             verified_pages += 1
@@ -262,7 +551,10 @@ def discover_query_gap_misses(
             available_terms = [
                 term
                 for term in proof["query_gap_terms"]
-                if all(term.casefold() not in item.casefold() for item in SCOUT_QUERIES_NO)
+                if all(
+                    term.casefold() not in executed_query.casefold()
+                    for executed_query in executed_queries
+                )
                 and not _query_contains_term(active_queries, term)
             ]
             if not available_terms:
@@ -284,6 +576,8 @@ def discover_query_gap_misses(
                     "canonical_url": final_url,
                     "company": case.ground_truth_company,
                     "query_gap_term": term,
+                    "root_cause": case.root_cause,
+                    "root_cause_basis": "MISSING_TERM_FROM_ACTIVE_QUERY_PACK",
                     "source_page_verified": True,
                     "closure_verified": True,
                     "inventory_liquidation_verified": True,
@@ -292,6 +586,7 @@ def discover_query_gap_misses(
                     "search_hit_alone_is_ground_truth": False,
                     "scout_query_contains_gap_term": False,
                     "waterfall_stage": stage_index + 1,
+                    "discovery_path": discovery_path,
                 }
             )
             break
@@ -300,6 +595,7 @@ def discover_query_gap_misses(
             {
                 "stage": stage_index + 1,
                 "query": query,
+                "query_kind": query_kind,
                 "hit_count": len(raw_hits),
                 "unique_hit_count": stage_unique_hits,
                 "page_request_count": stage_pages,
@@ -307,6 +603,175 @@ def discover_query_gap_misses(
                 "detected_miss_count": stage_misses,
             }
         )
+
+        if (
+            stage_index == 0
+            and not cases
+            and entity_followup_company
+            and page_requests < bounded_pages
+        ):
+            for probe_url in build_entity_first_party_probe_urls(entity_followup_company):
+                if page_requests >= bounded_pages:
+                    break
+                canonical_probe = _canonical(probe_url) or probe_url
+                if canonical_probe in seen_urls:
+                    continue
+                seen_urls.add(canonical_probe)
+                if canonical_probe in core_urls:
+                    core_known += 1
+                    continue
+
+                entity_source_followup_used = True
+                entity_domain_probe_used = True
+                entity_domain_probe_count += 1
+                page_requests += 1
+                probe_base = {
+                    "stage": 2,
+                    "query_kind": "ENTITY_DOMAIN_PROBE",
+                    "requested_url": probe_url,
+                    "search_hit_title": "",
+                    "search_hit_description": "",
+                    "search_hit_provider": "DIRECT_DOMAIN_PROBE",
+                    "search_hit_alone_is_ground_truth": False,
+                    "automatic_query_activation": False,
+                }
+                try:
+                    probe_page: PublicPage = fetch_page(probe_url)
+                except Exception as exc:
+                    verification_attempts.append(
+                        {
+                            **probe_base,
+                            "final_url": None,
+                            "status_code": None,
+                            "content_type": None,
+                            "verifier_status": "FETCH_FAILED",
+                            "rejection_reasons": ["PAGE_FETCH_FAILED"],
+                            "evidence_flags": {},
+                            "error_type": type(exc).__name__,
+                            "error": " ".join(str(exc).split())[:500],
+                        }
+                    )
+                    continue
+
+                probe_diagnostic = {
+                    **probe_base,
+                    **diagnose_public_page(probe_page),
+                }
+                verification_attempts.append(probe_diagnostic)
+                proof = _verify_closure_liquidation_page(probe_page)
+                discovery_path = "ENTITY_DOMAIN_PROBE"
+
+                if (
+                    proof is None
+                    and _is_plausible_first_party_url(
+                        probe_page.final_url,
+                        entity_followup_company,
+                    )
+                ):
+                    internal_links = extract_entity_internal_source_links(
+                        probe_page,
+                        company=entity_followup_company,
+                    )
+                    for internal_url in internal_links:
+                        if page_requests >= bounded_pages:
+                            break
+                        if internal_url in seen_urls:
+                            continue
+                        seen_urls.add(internal_url)
+                        if internal_url in core_urls:
+                            core_known += 1
+                            continue
+
+                        entity_internal_followup_used = True
+                        entity_internal_followup_count += 1
+                        page_requests += 1
+                        internal_base = {
+                            "stage": 2,
+                            "query_kind": "ENTITY_INTERNAL_SOURCE_FOLLOW_UP",
+                            "requested_url": internal_url,
+                            "parent_url": _canonical(probe_page.final_url)
+                            or probe_page.final_url,
+                            "search_hit_title": "",
+                            "search_hit_description": "",
+                            "search_hit_provider": "INTERNAL_LINK",
+                            "search_hit_alone_is_ground_truth": False,
+                            "automatic_query_activation": False,
+                        }
+                        try:
+                            internal_page: PublicPage = fetch_page(internal_url)
+                        except Exception as exc:
+                            verification_attempts.append(
+                                {
+                                    **internal_base,
+                                    "final_url": None,
+                                    "status_code": None,
+                                    "content_type": None,
+                                    "verifier_status": "FETCH_FAILED",
+                                    "rejection_reasons": ["PAGE_FETCH_FAILED"],
+                                    "evidence_flags": {},
+                                    "error_type": type(exc).__name__,
+                                    "error": " ".join(str(exc).split())[:500],
+                                }
+                            )
+                            continue
+
+                        internal_diagnostic = {
+                            **internal_base,
+                            **diagnose_public_page(internal_page),
+                        }
+                        verification_attempts.append(internal_diagnostic)
+                        internal_proof = _verify_closure_liquidation_page(internal_page)
+                        if internal_proof is not None:
+                            proof = internal_proof
+                            discovery_path = "ENTITY_INTERNAL_SOURCE_FOLLOW_UP"
+                            break
+
+                if proof is None:
+                    continue
+
+                verified_pages += 1
+                available_terms = [
+                    term
+                    for term in proof["query_gap_terms"]
+                    if all(
+                        term.casefold() not in executed_query.casefold()
+                        for executed_query in executed_queries
+                    )
+                    and not _query_contains_term(active_queries, term)
+                ]
+                if not available_terms:
+                    no_new_term += 1
+                    continue
+
+                term = available_terms[0]
+                final_url = str(proof["canonical_url"])
+                if final_url in core_urls:
+                    core_known += 1
+                    continue
+
+                case = _new_gap_case(proof, observed_at=now)
+                cases.append(case)
+                metadata.append(
+                    {
+                        "case_id": case.case_id,
+                        "canonical_url": final_url,
+                        "company": case.ground_truth_company,
+                        "query_gap_term": term,
+                        "root_cause": case.root_cause,
+                        "root_cause_basis": "MISSING_TERM_FROM_ACTIVE_QUERY_PACK",
+                        "source_page_verified": True,
+                        "closure_verified": True,
+                        "inventory_liquidation_verified": True,
+                        "closure_markers": list(proof["closure_markers"]),
+                        "liquidation_markers": list(proof["liquidation_markers"]),
+                        "search_hit_alone_is_ground_truth": False,
+                        "scout_query_contains_gap_term": False,
+                        "waterfall_stage": 2,
+                        "discovery_path": discovery_path,
+                    }
+                )
+                break
+
         if cases:
             break
 
@@ -323,8 +788,17 @@ def discover_query_gap_misses(
         "market_code": "NO",
         "scout_query": SCOUT_QUERY_NO,
         "scout_queries": list(SCOUT_QUERIES_NO),
+        "executed_queries": executed_queries,
         "waterfall_enabled": True,
         "waterfall_stopped_reason": stopped_reason,
+        "entity_source_followup_used": entity_followup_used,
+        "entity_source_followup_company": (
+            entity_followup_company if entity_followup_used else None
+        ),
+        "entity_domain_probe_used": entity_domain_probe_used,
+        "entity_domain_probe_count": entity_domain_probe_count,
+        "entity_internal_followup_used": entity_internal_followup_used,
+        "entity_internal_followup_count": entity_internal_followup_count,
         "max_search_requests": MAX_SEARCH_REQUESTS,
         "search_request_count": search_requests,
         "search_hit_count": total_hits,
@@ -356,9 +830,16 @@ def _safe_waterfall_report(status: str, **extra: Any) -> dict[str, Any]:
             "waterfall_enabled": True,
             "max_search_requests": MAX_SEARCH_REQUESTS,
             "scout_queries": list(SCOUT_QUERIES_NO),
+            "executed_queries": [],
             "search_stages": [],
             "verification_attempts": [],
             "verification_diagnostics_are_read_only": True,
+            "entity_source_followup_used": False,
+            "entity_source_followup_company": None,
+            "entity_domain_probe_used": False,
+            "entity_domain_probe_count": 0,
+            "entity_internal_followup_used": False,
+            "entity_internal_followup_count": 0,
         }
     )
     return report
