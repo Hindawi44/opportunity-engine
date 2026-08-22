@@ -26,6 +26,14 @@ def decide_and_design_experiment(
     evidence_count = int(top.get("evidence_count", 0))
     conflict = bool(top.get("conflicting_evidence", False))
 
+    relevance_gate_enforced = final_rank.get("evidence_relevance_gate") == "ENFORCED"
+    if relevance_gate_enforced:
+        evidence_status = str(top.get("evidence_status") or "INSUFFICIENT_EVIDENCE")
+        relevant_evidence_count = int(top.get("relevant_evidence_count", 0))
+    else:
+        evidence_status = str(top.get("evidence_status") or "LEGACY_EVIDENCE")
+        relevant_evidence_count = int(top.get("relevant_evidence_count", evidence_count))
+
     assessments = {str(row["idea_id"]): row for row in reasoning.get("assessments", []) or []}
     if idea_id not in assessments:
         raise ValueError("top-ranked idea missing from reasoning assessments")
@@ -51,9 +59,19 @@ def decide_and_design_experiment(
     if final_score < 0.45 or evidence_signal < -0.35:
         verdict = "REJECT"
         reason = "Top idea is too weak after evidence to justify even a market experiment."
-    elif final_score >= 0.58 and evidence_count >= 1 and evidence_signal > 0 and not conflict:
+    elif relevance_gate_enforced and (
+        evidence_status != "SUFFICIENT_RELEVANT_EVIDENCE" or relevant_evidence_count < 1
+    ):
+        verdict = "HOLD"
+        reason = "Relevant evidence is insufficient; generic or off-domain evidence cannot authorize an experiment."
+    elif (
+        final_score >= 0.58
+        and relevant_evidence_count >= 1
+        and evidence_signal > 0
+        and not conflict
+    ):
         verdict = "EXPERIMENT"
-        reason = "Top idea is strong enough after evidence for a small reversible test, not full execution."
+        reason = "Top idea is strong enough after relevant evidence for a small reversible test, not full execution."
     else:
         verdict = "HOLD"
         reason = "Evidence is not yet strong or clean enough to justify a market experiment."
@@ -93,8 +111,11 @@ def decide_and_design_experiment(
         "decision": verdict,
         "decision_reason": reason,
         "final_score": round(final_score, 4),
+        "evidence_status": evidence_status,
         "evidence_signal": round(evidence_signal, 4),
         "evidence_count": evidence_count,
+        "relevant_evidence_count": relevant_evidence_count,
+        "evidence_relevance_gate_enforced": relevance_gate_enforced,
         "conflicting_evidence": conflict,
         "uses_mechanism_family_for_decision": False,
         "experiment": experiment,
