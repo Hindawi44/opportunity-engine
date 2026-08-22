@@ -1,0 +1,37 @@
+name: TEMP Open Vocabulary Context Diagnostic
+
+on:
+  pull_request:
+    branches:
+      - agent/open-vocabulary-query-gap-learning-v1
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inspect exact live page term context
+        run: |
+          python - <<'PY'
+          from opportunity_engine.automatic_query_gap_miss_scout import fetch_public_page, _visible_text
+
+          url = 'https://www.ringsaker-blad.no/legger-ned-og-stenger-dora-ble-ikke-god-nok-butikk/s/5-79-820282'
+          page = fetch_public_page(url)
+          text = _visible_text(page.html)
+          folded = text.casefold()
+          for term in ('løssalg', 'opphørssalg'):
+              pos = folded.find(term)
+              print(f'TERM={term} POS={pos}')
+              if pos >= 0:
+                  start = max(0, pos - 300)
+                  end = min(len(text), pos + len(term) + 300)
+                  print('CONTEXT=' + text[start:end].replace('\n', ' '))
+          PY
