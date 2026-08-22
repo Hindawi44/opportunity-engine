@@ -115,6 +115,16 @@ _SALE_TERM_BLOCKLIST = frozenset(
         "overlevelsessalg",
     }
 )
+_DYNAMIC_CLOSURE_SALE_ROOTS = (
+    "nedlegg",
+    "avvikl",
+    "avslut",
+    "opphør",
+    "slutt",
+    "steng",
+    "tøm",
+    "konkurs",
+)
 
 
 def _extract_sale_terms(text: str) -> list[str]:
@@ -140,6 +150,8 @@ def _extract_sale_terms(text: str) -> list[str]:
     for match in _SALE_COMPOUND_RE.finditer(folded):
         term = match.group("term").casefold()
         if term in _SALE_TERM_BLOCKLIST:
+            continue
+        if not any(root in term for root in _DYNAMIC_CLOSURE_SALE_ROOTS):
             continue
         start = max(0, match.start() - _SALE_TERM_CONTEXT_RADIUS)
         end = min(len(folded), match.end() + _SALE_TERM_CONTEXT_RADIUS)
