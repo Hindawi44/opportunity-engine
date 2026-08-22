@@ -45,14 +45,18 @@ _MONEY_RE = re.compile(
     rf"(?P<currency_after>{_CURRENCY_TOKEN})?",
     re.IGNORECASE,
 )
-_RRP_RE = re.compile(
+_RRP_LABEL_FIRST_RE = re.compile(
     rf"\bRRP\s*[:\-]?\s*(?:(?P<currency_before>{_CURRENCY_TOKEN})\s*)?"
     rf"(?P<amount>{_AMOUNT_TOKEN})\s*(?P<currency_after>{_CURRENCY_TOKEN})?",
     re.IGNORECASE,
 )
+_RRP_TOTAL_RE = re.compile(
+    rf"(?P<amount>{_AMOUNT_TOKEN})\s*(?P<currency>{_CURRENCY_TOKEN})\s*RRP\s+Total\b",
+    re.IGNORECASE,
+)
 _UNITS_RE = re.compile(r"\b(?P<amount>\d[\d\s.,]*)\s+units?\b", re.IGNORECASE)
 _PALLETS_RE = re.compile(r"number\s+of\s+pallets?\s*[:\-]?\s*(?P<amount>\d[\d\s.,]*)", re.IGNORECASE)
-_QUALITY_RE = re.compile(r"quality\s*[:\-]?\s*(?P<value>[^|\n]{3,120})", re.IGNORECASE)
+_PALLETS_ANY_RE = re.compile(r"\b(?P<amount>\d[\d\s.,]*)\s+pallets?\b", re.IGNORECASE)
 _TITLE_RE = re.compile(r"<title[^>]*>(?P<title>.*?)</title>", re.IGNORECASE | re.DOTALL)
 _SCRIPT_STYLE_RE = re.compile(
     r"<(?:script|style)\b[^>]*>.*?</(?:script|style)>",
@@ -60,6 +64,13 @@ _SCRIPT_STYLE_RE = re.compile(
 )
 _TAG_RE = re.compile(r"<[^>]+>")
 _SPACE_RE = re.compile(r"\s+")
+_CONDITION_PHRASES = (
+    "Functional customer returns",
+    "New in original packaging",
+    "Refurbished Grade B",
+    "Non functional",
+    "Not tested",
+)
 
 
 def _compact(value: object) -> str:
@@ -162,8 +173,20 @@ def _money(pattern: re.Pattern[str], text: str) -> tuple[float | None, str | Non
     match = pattern.search(text)
     if not match:
         return None, None
-    currency = match.groupdict().get("currency_before") or match.groupdict().get("currency_after")
+    currency = (
+        match.groupdict().get("currency_before")
+        or match.groupdict().get("currency_after")
+        or match.groupdict().get("currency")
+    )
     return _number(match.group("amount")), _currency(currency)
+
+
+def _condition(text: str) -> str | None:
+    folded = text.casefold()
+    for phrase in _CONDITION_PHRASES:
+        if phrase.casefold() in folded:
+            return phrase
+    return None
 
 
 def _candidate_from_detail(url: str, html: str, title_hint: str, observed_at: str) -> dict[str, Any] | None:
@@ -171,13 +194,14 @@ def _candidate_from_detail(url: str, html: str, title_hint: str, observed_at: st
         return None
     text = _plain_text(html)
     total_price, currency = _money(_MONEY_RE, text)
-    rrp, rrp_currency = _money(_RRP_RE, text)
+    rrp, rrp_currency = _money(_RRP_TOTAL_RE, text)
+    if rrp is None:
+        rrp, rrp_currency = _money(_RRP_LABEL_FIRST_RE, text)
     units_match = _UNITS_RE.search(text)
-    pallets_match = _PALLETS_RE.search(text)
-    quality_match = _QUALITY_RE.search(text)
+    pallets_match = _PALLETS_RE.search(text) or _PALLETS_ANY_RE.search(text)
     quantity = _number(units_match.group("amount")) if units_match else None
     pallets = _number(pallets_match.group("amount")) if pallets_match else None
-    condition = _compact(quality_match.group("value"))[:160] if quality_match else None
+    condition = _condition(text)
     reference = urlsplit(url).path.rstrip("/").rsplit("/", 1)[-1]
     title = _title(html, title_hint or f"Stocklear auction {reference}")
     candidate_id = "stocklear-promoted:" + sha256(url.encode("utf-8")).hexdigest()[:24]
