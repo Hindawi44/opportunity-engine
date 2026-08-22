@@ -114,6 +114,7 @@ class MissedOpportunityCase:
     ground_truth_url: str
     trace: DiscoveryTrace
     learning_evidence_text: str = ""
+    diagnosed_query_gap_terms: tuple[str, ...] = ()
     learned_patterns: tuple[str, ...] = ()
     root_cause: str | None = None
     learning_status: str = "PENDING"
@@ -159,6 +160,7 @@ class MissedOpportunityCase:
             },
             "trace": self.trace.to_dict(),
             "learning_evidence_text": self.learning_evidence_text,
+            "diagnosed_query_gap_terms": list(self.diagnosed_query_gap_terms),
             "learned_patterns": list(self.learned_patterns),
             "root_cause": self.root_cause,
             "learning_status": self.learning_status,
@@ -171,6 +173,9 @@ class MissedOpportunityCase:
         truth = dict(truth) if isinstance(truth, Mapping) else {}
         trace = payload.get("trace")
         trace = dict(trace) if isinstance(trace, Mapping) else {}
+        diagnosed = payload.get("diagnosed_query_gap_terms")
+        if not isinstance(diagnosed, list):
+            diagnosed = []
         learned = payload.get("learned_patterns")
         if not isinstance(learned, list):
             learned = []
@@ -187,6 +192,9 @@ class MissedOpportunityCase:
             learning_evidence_text=str(
                 payload.get("learning_evidence_text") or ""
             ).strip(),
+            diagnosed_query_gap_terms=tuple(
+                str(item).strip() for item in diagnosed if str(item).strip()
+            ),
             learned_patterns=tuple(
                 str(item).strip() for item in learned if str(item).strip()
             ),

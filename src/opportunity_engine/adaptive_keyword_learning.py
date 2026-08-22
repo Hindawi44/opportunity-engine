@@ -139,7 +139,12 @@ def _commercial(term: str) -> bool:
 
 
 def _active_query_text(active_queries: Sequence[str]) -> str:
-    return "\n".join(_fold(query) for query in active_queries)
+    return "\n".join(
+        _fold(query)
+        for query in active_queries
+        if str(getattr(query, "query_scope", "") or "").strip().upper()
+        != "SIGNAL_ONLY"
+    )
 
 
 def _candidate_terms(text: str) -> set[str]:
@@ -176,12 +181,9 @@ def propose_query_gap_keywords(
 ) -> list[KeywordLearningCandidate]:
     """Propose bounded patterns only from diagnosed QUERY_GAP evidence.
 
-    Company names and arbitrary one-off prose are not candidates merely because
-    they appear in a missed listing. V1 proposes either commercially shaped
-    terms/phrases or, in future versions, terms with repeated cross-case support.
-    When evidence supports both an atomic commercial term and a phrase containing
-    it, the atomic term gets a small generalizability advantage so the bounded
-    daily budget tests the reusable market pattern before one-off wording.
+    Exact terms already diagnosed by the Scout are proposed before noisier
+    evidence-derived phrases, but they still go through the normal replay/shadow
+    proof path. Signal-only Market Radar queries do not suppress a Core gap.
     """
 
     if max_candidates < 1:
@@ -190,11 +192,22 @@ def propose_query_gap_keywords(
     active = _active_query_text(active_queries)
     support: dict[tuple[str, str], set[str]] = defaultdict(set)
     occurrences: Counter[tuple[str, str]] = Counter()
+    diagnosed_keys: set[tuple[str, str]] = set()
 
     for raw_case in cases:
         case = raw_case if raw_case.root_cause else raw_case.with_diagnosis()
         if case.root_cause != "QUERY_GAP":
             continue
+
+        for term in case.diagnosed_query_gap_terms:
+            folded = _fold(term)
+            if not folded or folded in active:
+                continue
+            key = (case.market_code.upper(), folded)
+            support[key].add(case.case_id)
+            occurrences[key] += 1
+            diagnosed_keys.add(key)
+
         text = case.learning_evidence_text.strip()
         if not text:
             continue
@@ -214,8 +227,10 @@ def propose_query_gap_keywords(
             continue
         specificity_bonus = 3.0 if _commercial(term) else 0.0
         generalizability_bonus = 1.0 if " " not in term else 0.0
+        diagnosed_bonus = 100.0 if (market_code, term) in diagnosed_keys else 0.0
         score = round(
             len(case_ids) * 10.0
+            + diagnosed_bonus
             + min(occurrences[(market_code, term)], 5)
             + specificity_bonus
             + generalizability_bonus,
