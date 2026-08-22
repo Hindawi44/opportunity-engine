@@ -107,7 +107,8 @@ def test_official_homepage_can_follow_one_internal_page_to_verified_query_gap() 
     assert outcome["verified_page_count"] == 1
     assert outcome["detected_miss_count"] == 1
     assert outcome["waterfall_stopped_reason"] == "FIRST_VERIFIED_MISS"
-    assert outcome["entity_source_followup_used"] is True
+    # No entity Brave search was needed because the direct domain probe succeeded.
+    assert outcome["entity_source_followup_used"] is False
     assert outcome["entity_domain_probe_used"] is True
     assert outcome["entity_domain_probe_count"] == 1
     assert outcome["entity_internal_followup_used"] is True
