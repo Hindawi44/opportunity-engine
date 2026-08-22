@@ -43,6 +43,7 @@ def test_auto_learning_hook_runs_after_unified_capture_by_atexit_order() -> None
     assert "run_daily_learning_runtime(" in hook
     assert 'learning_dir=root / "learning"' in hook
     assert 'report_path=output / REPORT_FILENAME' in hook
+    assert "run_daily_auto_miss_learning_fail_closed(" in hook
 
 
 def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
@@ -114,6 +115,54 @@ def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
     ]
     assert summary["automatic_query_activation"] is False
     assert summary["promotion_gate_enforced"] is True
+
+
+def test_auto_learning_failure_is_structured_and_fail_closed(tmp_path: Path) -> None:
+    from opportunity_engine.discovery.daily_auto_miss_learning_cli_hook import (
+        run_daily_auto_miss_learning_fail_closed,
+    )
+
+    input_root = tmp_path / "multi-market-inputs"
+    output_dir = tmp_path / "checkpoint"
+    output_dir.mkdir(parents=True)
+    (output_dir / "automatic-missed-opportunity-capture.json").write_text(
+        json.dumps({"status": "SUCCESS", "new_case_count": 1}),
+        encoding="utf-8",
+    )
+    (output_dir / "domain-market-intelligence-brief.json").write_text(
+        json.dumps({"schema_version": "test", "current_direct_opportunities": ["kept"]}),
+        encoding="utf-8",
+    )
+    learning_dir = input_root / "learning"
+    learning_dir.mkdir(parents=True)
+    (learning_dir / "shadow-keyword-overlay.json").write_text(
+        json.dumps({"schema_version": "unsupported", "markets": {}}),
+        encoding="utf-8",
+    )
+
+    report = run_daily_auto_miss_learning_fail_closed(
+        output_dir,
+        input_root=input_root,
+        environment={"GITHUB_EVENT_NAME": "workflow_dispatch"},
+    )
+
+    assert report["status"] == "FAILED"
+    assert report["error_type"] == "ValueError"
+    assert report["learning_search_requests"] == 0
+    assert report["active_learned_term_count"] == 0
+    assert report["automatic_query_activation"] is False
+    assert report["promotion_gate_enforced"] is True
+    assert report["automatic_purchase"] is False
+    assert (output_dir / "daily-learning-cycle.json").exists()
+
+    brief = json.loads(
+        (output_dir / "domain-market-intelligence-brief.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert brief["current_direct_opportunities"] == ["kept"]
+    assert brief["daily_auto_miss_learning"]["status"] == "FAILED"
+    assert brief["daily_auto_miss_learning"]["automatic_query_activation"] is False
 
 
 def test_auto_learning_hook_skips_when_capture_stage_did_not_finish(tmp_path: Path) -> None:
