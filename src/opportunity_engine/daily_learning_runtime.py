@@ -29,6 +29,7 @@ from opportunity_engine.safe_learning_proof import build_query_gap_safe_learning
 
 HISTORY_SCHEMA = "keyword-learning-history-1.1"
 INBOX_SCHEMA = "missed-opportunity-inbox-1.0"
+VALIDATION_SCHEMA = "query-gap-validation-cases-1.0"
 RuntimeSearch = Callable[[str, str], Sequence[Mapping[str, Any]]]
 
 
@@ -49,21 +50,30 @@ def _write_object(path: Path, payload: Mapping[str, Any]) -> None:
     temporary.replace(path)
 
 
-def load_missed_opportunity_inbox(path: str | Path) -> list[MissedOpportunityCase]:
+def _load_case_rows(path: str | Path, *, schema: str, label: str) -> list[MissedOpportunityCase]:
     target = Path(path)
     if not target.exists():
         return []
     payload = _read_object(target)
-    if payload.get("schema_version") not in {None, INBOX_SCHEMA}:
-        raise ValueError("unsupported missed-opportunity inbox schema")
+    if payload.get("schema_version") not in {None, schema}:
+        raise ValueError(f"unsupported {label} schema")
     rows = payload.get("cases") or []
     if not isinstance(rows, list):
-        raise ValueError("missed-opportunity inbox cases must be a list")
+        raise ValueError(f"{label} cases must be a list")
     return [
         MissedOpportunityCase.from_dict(row)
         for row in rows
         if isinstance(row, Mapping)
     ]
+
+
+def load_missed_opportunity_inbox(path: str | Path) -> list[MissedOpportunityCase]:
+    return _load_case_rows(path, schema=INBOX_SCHEMA, label="missed-opportunity inbox")
+
+
+def load_query_gap_validation_cases(path: str | Path) -> list[MissedOpportunityCase]:
+    """Load hidden holdouts used only for transfer evaluation, never generation."""
+    return _load_case_rows(path, schema=VALIDATION_SCHEMA, label="query-gap validation")
 
 
 def load_active_learning_queries(path: str | Path) -> list[str]:
@@ -96,6 +106,7 @@ def append_learning_history(
     entry = {
         "generated_at": report.get("generated_at"),
         "known_missed_opportunity_count": report.get("known_missed_opportunity_count", 0),
+        "validation_case_count": report.get("validation_case_count", 0),
         "candidate_count": report.get("candidate_count", 0),
         "evaluated_candidate_count": report.get("evaluated_candidate_count", 0),
         "learning_search_requests": report.get("learning_search_requests", 0),
@@ -104,7 +115,9 @@ def append_learning_history(
         "active_learned_term_count": report.get("active_learned_term_count", 0),
         "promoted_term_count": report.get("promoted_term_count", 0),
         "recovered_case_count": report.get("recovered_case_count", 0),
+        "transfer_proven_case_count": report.get("transfer_proven_case_count", 0),
         "search_status": report.get("search_status"),
+        "evaluation_scope": report.get("evaluation_scope"),
         "promotion_gate_enforced": report.get("promotion_gate_enforced", False),
         "safe_learning_proof_status": report.get("safe_learning_proof_status"),
     }
@@ -119,12 +132,16 @@ def append_learning_history(
     )
 
 
-def _market_anchor(market_code: str) -> str:
-    return {
-        "NO": "(klær OR klesbutikk OR tekstil OR arbeidsklær OR vernesko)",
-        "SE": "(kläder OR klädbutik OR textil OR arbetskläder)",
-        "DE": "(Bekleidung OR Modegeschäft OR Textilien OR Arbeitskleidung)",
-    }.get(market_code.upper(), "(clothing OR textile OR inventory)")
+def _learning_query(term: str) -> str:
+    """Replay the learned commercial pattern itself, without vertical leakage.
+
+    Candidate extraction already requires a commercial signal. Adding clothing,
+    product-category, or closure anchors can distort ranking. Hidden source-case
+    replay or independent holdout transfer remains the safety gate for rejecting
+    noisy terms.
+    """
+    safe_term = term.replace('"', "").strip()
+    return f'"{safe_term}"'
 
 
 def build_learning_search(
@@ -145,8 +162,7 @@ def build_learning_search(
                 extra_snippets=True,
             )
             providers[market] = provider
-        safe_term = term.replace('"', "").strip()
-        query = f'"{safe_term}" {_market_anchor(market)}'
+        query = _learning_query(term)
         hits = provider.search(query, count=results_per_candidate)
         return [
             {
@@ -166,6 +182,7 @@ def run_daily_learning_runtime(
     *,
     learning_dir: str | Path,
     inbox_path: str | Path = "config/learning/missed_opportunity_inbox.json",
+    validation_cases_path: str | Path | None = None,
     active_query_config: str | Path = "config/brave_search_queries.json",
     promotion_config_path: str | Path = "config/learning/query_promotions.json",
     report_path: str | Path | None = None,
@@ -178,11 +195,11 @@ def run_daily_learning_runtime(
 ) -> dict[str, Any]:
     """Load durable state, run one bounded cycle, and persist the next state.
 
-    Proven learning is stored in ``shadow-keyword-overlay.json``. Only exact
-    terms explicitly PROMOTED by ``promotion_config_path`` are written to the
-    production ``active-keyword-overlay.json`` and optional runtime copy.
-    A read-only ``safe-learning-proof.json`` is also written so operators can
-    see whether a real QUERY_GAP miss was recovered in shadow before promotion.
+    Miss cases generate candidate patterns. Validation cases are an optional,
+    explicitly selected hidden holdout set used only for transfer/generalization
+    proof. Omitting ``validation_cases_path`` preserves direct source-case replay.
+    Proven learning is stored only in ``shadow-keyword-overlay.json`` until an
+    explicit promotion decision.
     """
     if not 1 <= results_per_candidate <= 10:
         raise ValueError("results_per_candidate must be between 1 and 10")
@@ -197,6 +214,11 @@ def run_daily_learning_runtime(
 
     existing_cases = load_missed_opportunity_memory(memory_path)
     inbox_cases = load_missed_opportunity_inbox(inbox_path)
+    validation_cases = (
+        load_query_gap_validation_cases(validation_cases_path)
+        if validation_cases_path is not None
+        else []
+    )
     active_queries = load_active_learning_queries(active_query_config)
     existing_active_overlay = (
         load_learned_query_overlay(active_overlay_path)
@@ -237,6 +259,7 @@ def run_daily_learning_runtime(
     outcome = run_daily_learning_cycle(
         existing_cases=existing_cases,
         inbox_cases=inbox_cases,
+        validation_cases=validation_cases,
         active_queries=active_queries,
         search=search,
         existing_overlay=existing_active_overlay,
@@ -266,6 +289,11 @@ def run_daily_learning_runtime(
         {
             "generated_at": generated_at,
             "inbox_path": Path(inbox_path).as_posix(),
+            "validation_cases_path": (
+                Path(validation_cases_path).as_posix()
+                if validation_cases_path is not None
+                else None
+            ),
             "memory_path": memory_path.as_posix(),
             "overlay_path": active_overlay_path.as_posix(),
             "shadow_overlay_path": shadow_overlay_path.as_posix(),
@@ -274,6 +302,9 @@ def run_daily_learning_runtime(
             "safe_learning_proof_status": proof.get("status"),
             "safe_learning_shadow_recovered_case_count": proof.get(
                 "shadow_recovered_case_count", 0
+            ),
+            "safe_learning_shadow_transfer_proven_case_count": proof.get(
+                "shadow_transfer_proven_case_count", 0
             ),
             "safe_learning_promotion_eligible_count": proof.get(
                 "promotion_eligible_count", 0

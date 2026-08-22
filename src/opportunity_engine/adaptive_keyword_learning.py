@@ -1,7 +1,7 @@
 """Conservative keyword learning from proven missed opportunities.
 
 The module turns QUERY_GAP cases into candidate search patterns, then evaluates
-those patterns against hidden ground-truth replay cases.  V1 never edits live
+those patterns against hidden ground-truth replay cases. V1 never edits live
 query packs automatically: a candidate may become PROVEN, but activation still
 requires an explicit later integration/review step.
 """
@@ -17,11 +17,12 @@ from opportunity_engine.missed_opportunity_learning import (
     run_replay,
 )
 
-SCHEMA_VERSION = "adaptive-keyword-learning-1.0"
+SCHEMA_VERSION = "adaptive-keyword-learning-1.1"
+EVALUATION_SCOPES = {"SOURCE_CASE_REPLAY", "HOLDOUT_TRANSFER"}
 
 # Cross-market commercial fragments are intentionally broad enough to detect
 # compounds such as avviklingssalg, lagersalg, restlager, Insolvenzverkauf,
-# utförsäljning, liquidation, etc.  Frequency support is still required for
+# utförsäljning, liquidation, etc. Frequency support is still required for
 # ordinary vocabulary that does not contain one of these fragments.
 _COMMERCIAL_FRAGMENTS = (
     "avvikling",
@@ -114,6 +115,8 @@ class KeywordEvaluationResult:
     min_recovered_cases: int
     min_precision: float
     automatic_activation: bool = False
+    support_case_ids: tuple[str, ...] = ()
+    evaluation_scope: str = "SOURCE_CASE_REPLAY"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -140,12 +143,25 @@ def _active_query_text(active_queries: Sequence[str]) -> str:
 
 
 def _candidate_terms(text: str) -> set[str]:
-    tokens = [token for token in _tokens(text) if len(token) >= 4 and token not in _STOPWORDS]
+    raw_tokens = _tokens(text)
+    eligible_tokens = [
+        token
+        for token in raw_tokens
+        if len(token) >= 4 and token not in _STOPWORDS
+    ]
     terms: set[str] = set()
-    for token in tokens:
+    for token in eligible_tokens:
         if _commercial(token):
             terms.add(token)
-    for left, right in zip(tokens, tokens[1:]):
+
+    # Build phrases only from tokens that were truly adjacent in the evidence.
+    # Filtering first can invent adjacency (for example "avslutningssalg på alle"
+    # becoming the false phrase "avslutningssalg alle").
+    for left, right in zip(raw_tokens, raw_tokens[1:]):
+        if len(left) < 4 or len(right) < 4:
+            continue
+        if left in _STOPWORDS or right in _STOPWORDS:
+            continue
         phrase = f"{left} {right}"
         if len(phrase) <= 64 and _commercial(phrase):
             terms.add(phrase)
@@ -161,8 +177,11 @@ def propose_query_gap_keywords(
     """Propose bounded patterns only from diagnosed QUERY_GAP evidence.
 
     Company names and arbitrary one-off prose are not candidates merely because
-    they appear in a missed listing.  V1 proposes either commercially shaped
+    they appear in a missed listing. V1 proposes either commercially shaped
     terms/phrases or, in future versions, terms with repeated cross-case support.
+    When evidence supports both an atomic commercial term and a phrase containing
+    it, the atomic term gets a small generalizability advantage so the bounded
+    daily budget tests the reusable market pattern before one-off wording.
     """
 
     if max_candidates < 1:
@@ -190,16 +209,16 @@ def propose_query_gap_keywords(
     candidates: list[KeywordLearningCandidate] = []
     for (market_code, term), case_ids in support.items():
         # A one-case candidate is allowed only when it carries a recognizable
-        # commercial signal.  This keeps proper names and generic prose out.
+        # commercial signal. This keeps proper names and generic prose out.
         if len(case_ids) < 2 and not _commercial(term):
             continue
         specificity_bonus = 3.0 if _commercial(term) else 0.0
-        phrase_bonus = 1.0 if " " in term else 0.0
+        generalizability_bonus = 1.0 if " " not in term else 0.0
         score = round(
             len(case_ids) * 10.0
             + min(occurrences[(market_code, term)], 5)
             + specificity_bonus
-            + phrase_bonus,
+            + generalizability_bonus,
             3,
         )
         candidates.append(
@@ -233,20 +252,39 @@ def evaluate_keyword_candidate(
     *,
     min_recovered_cases: int = 1,
     min_precision: float = 0.20,
+    evaluation_scope: str = "SOURCE_CASE_REPLAY",
 ) -> KeywordEvaluationResult:
-    """Shadow-test one keyword against real hidden missed-opportunity cases."""
+    """Shadow-test one keyword against hidden replay or holdout cases.
+
+    SOURCE_CASE_REPLAY asks whether the pattern rediscovers the original miss.
+    HOLDOUT_TRANSFER asks the harder generalization question: can a term learned
+    from one miss discover an independent hidden opportunity that was not used
+    to generate the term?
+    """
 
     if min_recovered_cases < 1:
         raise ValueError("min_recovered_cases must be >= 1")
     if not 0.0 <= min_precision <= 1.0:
         raise ValueError("min_precision must be between 0 and 1")
+    scope = str(evaluation_scope or "").strip().upper()
+    if scope not in EVALUATION_SCOPES:
+        raise ValueError(f"unsupported evaluation_scope: {evaluation_scope}")
 
-    market_cases = [
-        case
-        for case in cases
-        if case.market_code.upper() == candidate.market_code.upper()
-        and (case.root_cause or case.with_diagnosis().root_cause) == "QUERY_GAP"
-    ]
+    if scope == "HOLDOUT_TRANSFER":
+        market_cases = [
+            case
+            for case in cases
+            if case.market_code.upper() == candidate.market_code.upper()
+            and case.stock_proven
+        ]
+    else:
+        market_cases = [
+            case
+            for case in cases
+            if case.market_code.upper() == candidate.market_code.upper()
+            and (case.root_cause or case.with_diagnosis().root_cause) == "QUERY_GAP"
+        ]
+
     raw = search(candidate.term, candidate.market_code.upper())
     hits = [item for item in raw if isinstance(item, Mapping)]
 
@@ -291,6 +329,8 @@ def evaluate_keyword_candidate(
         min_recovered_cases=min_recovered_cases,
         min_precision=min_precision,
         automatic_activation=False,
+        support_case_ids=candidate.support_case_ids,
+        evaluation_scope=scope,
     )
 
 
