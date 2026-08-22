@@ -4,6 +4,7 @@ from pathlib import Path
 WORKFLOW = Path('.github/workflows/mind-forge-live-research-launcher.yaml')
 RUNTIME = Path('mind-forge-live/phase1')
 LIVE_EVIDENCE_RUNTIME = Path('scripts/mind_forge_v2_live_evidence_runtime.py')
+DECISION_RUNTIME = Path('scripts/mind_forge_v2_decision_experiment.py')
 
 
 def _dispatch_block(text: str) -> str:
@@ -89,3 +90,13 @@ def test_live_reasoning_hook_dependency_is_present_on_main_line():
 
     assert 'scripts.mind_forge_v2_live_evidence_runtime' in live_creative
     assert LIVE_EVIDENCE_RUNTIME.is_file()
+
+
+def test_live_launcher_continues_from_final_rank_into_decision_experiment():
+    text = WORKFLOW.read_text(encoding='utf-8')
+
+    assert DECISION_RUNTIME.is_file()
+    assert 'mind_forge_v2_decision_experiment.py' in text
+    assert 'decision.json' in text
+    assert 'MIND_FORGE_V2_DECISION_EXPERIMENT_COMPLETE' in text
+    assert 'SMALLEST_REVERSIBLE_MARKET_TEST' in text

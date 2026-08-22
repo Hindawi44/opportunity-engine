@@ -105,3 +105,27 @@ def test_family_label_cannot_change_decision():
     second = _reasoning()
     second["assessments"][0]["mechanism_family"] = "completely-random-family"
     assert decide_and_design_experiment(final_rank, first, _evidence()) == decide_and_design_experiment(final_rank, second, _evidence())
+
+
+def test_relevance_gate_insufficient_evidence_cannot_trigger_experiment():
+    final_rank = {
+        "evidence_relevance_gate": "ENFORCED",
+        "ranking": [
+            {
+                "idea_id": "a",
+                "title": "A",
+                "final_score": 0.66,
+                "evidence_signal": 0.8,
+                "evidence_count": 1,
+                "relevant_evidence_count": 0,
+                "evidence_status": "INSUFFICIENT_EVIDENCE",
+                "conflicting_evidence": False,
+            }
+        ],
+    }
+    result = decide_and_design_experiment(final_rank, _reasoning(), _evidence())
+
+    assert result["decision"] == "HOLD"
+    assert result["experiment"] is None
+    assert result["evidence_status"] == "INSUFFICIENT_EVIDENCE"
+    assert result["relevant_evidence_count"] == 0

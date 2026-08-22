@@ -147,6 +147,16 @@ jobs:
           print(json.dumps(payload, ensure_ascii=False, indent=2))
           PY
 
+      - name: Decide and design smallest reversible experiment
+        run: |
+          set -euo pipefail
+          ROOT="artifacts/mind-forge-creative-v2-open-live"
+          python scripts/mind_forge_v2_decision_experiment.py \
+            "$ROOT/final_rank.json" \
+            "$ROOT/reasoning.json" \
+            "$ROOT/evidence.json" \
+            --output "$ROOT/decision.json"
+
       - name: Validate autonomous V2 result and hard budgets
         run: |
           python - <<'PY'
@@ -174,6 +184,7 @@ jobs:
               "evidence.json",
               "final_rank.json",
               "live_evidence_usage.json",
+              "decision.json",
           ]
           missing = [name for name in required if not (root / name).exists()]
           if missing:
@@ -185,7 +196,36 @@ jobs:
           if float(research_usage["estimated_research_cost_usd"]) > 0.03:
               raise SystemExit("Evidence research estimated cost exceeded $0.03")
 
-          print("MIND FORGE SEED-ONLY AUTO V2: PASS")
+          final_rank = json.loads((root / "final_rank.json").read_text(encoding="utf-8"))
+          if final_rank.get("evidence_relevance_gate") != "ENFORCED":
+              raise SystemExit("evidence relevance gate is not enforced")
+          for row in final_rank.get("ranking", []):
+              if int(row.get("relevant_evidence_count", 0)) == 0:
+                  if row.get("evidence_status") != "INSUFFICIENT_EVIDENCE":
+                      raise SystemExit("irrelevant-only evidence was not marked insufficient")
+                  if abs(float(row["final_score"]) - float(row["reasoning_score"])) > 0.0001:
+                      raise SystemExit("irrelevant-only evidence changed final score")
+
+          decision = json.loads((root / "decision.json").read_text(encoding="utf-8"))
+          if decision.get("status") != "MIND_FORGE_V2_DECISION_EXPERIMENT_COMPLETE":
+              raise SystemExit("decision/experiment stage did not complete")
+          if decision.get("decision") not in {"REJECT", "HOLD", "EXPERIMENT"}:
+              raise SystemExit("invalid MIND FORGE decision")
+          if decision.get("evidence_relevance_gate_enforced") is not True:
+              raise SystemExit("decision stage did not preserve the evidence relevance gate")
+          if decision.get("evidence_status") == "INSUFFICIENT_EVIDENCE" and decision.get("decision") == "EXPERIMENT":
+              raise SystemExit("insufficient relevant evidence authorized an experiment")
+
+          if decision.get("decision") == "EXPERIMENT":
+              experiment = decision.get("experiment") or {}
+              if experiment.get("experiment_type") != "SMALLEST_REVERSIBLE_MARKET_TEST":
+                  raise SystemExit("experiment is not the smallest reversible market test")
+              if int(experiment.get("duration_days", 999)) > 7:
+                  raise SystemExit("experiment duration exceeded seven days")
+              if float(experiment.get("max_cash_commitment_nok", 999999)) > 1000:
+                  raise SystemExit("experiment cash cap exceeded 1000 NOK")
+
+          print("MIND FORGE SEED-ONLY AUTO V2 + DECISION/EXPERIMENT: PASS")
           PY
 
       - name: Upload autonomous MIND FORGE result
