@@ -1,3 +1,4 @@
+# Temporary branch-only patch runner; delete before merge.
 name: Temporary query gap handoff patch
 
 on:
