@@ -20,7 +20,7 @@
           "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER"
         ],
         "support_case_ids": [
-          "AUTO-MISS-NO-BAUHAUS"
+          "auto-query-gap:no:a1d0426721ee47e868026b31"
         ],
         "evaluation_scope": "HOLDOUT_TRANSFER",
         "evaluation_scopes": [
