@@ -111,6 +111,8 @@ _SALE_TERM_BLOCKLIST = frozenset(
         "nettsalg",
         "forhåndssalg",
         "forhandsalg",
+        "flyttesalg",
+        "overlevelsessalg",
     }
 )
 
