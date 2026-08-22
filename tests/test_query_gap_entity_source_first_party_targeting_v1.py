@@ -12,18 +12,21 @@ def _hit(url: str, title: str) -> SearchHit:
     )
 
 
-def test_entity_query_biases_toward_first_party_information_pages_without_sale_terms() -> None:
+def test_entity_query_targets_official_site_navigation_without_sale_terms() -> None:
     from opportunity_engine.query_gap_scout_waterfall import (
         build_entity_source_followup_query,
     )
 
     query = build_entity_source_followup_query("Bauhaus").casefold()
 
-    assert "avvikler" in query or "avvikles" in query
-    assert "sortiment" in query
-    assert "informasjon" in query
-    assert "pressemelding" in query
+    assert "offisiell" in query
+    assert "nettside" in query
+    assert "hjemmeside" in query
     assert "kundeservice" in query
+    assert "informasjon" in query
+    assert "legger ned" not in query
+    assert "avvikler" not in query
+    assert "sortiment" not in query
 
     forbidden = {
         "sluttsalg",
