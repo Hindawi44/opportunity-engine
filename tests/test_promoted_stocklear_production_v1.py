@@ -61,13 +61,15 @@ def _promoted_feed() -> dict:
     </body></html>
     """
     detail1 = """
-    <html><head><title>111 Bosch Siemens appliances</title></head><body>
-    Starting price 2,000 EUR. Number of pallets 2. 111 units.
-    Quality: Functional customer returns. RRP 14,922 EUR.
+    <html><head><title>111 Bosch Siemens appliances</title>
+    <style>.quality{display:flex}.rrp781{color:red}</style></head><body>
+    Starting price € 2,000. Number of pallets 2. 111 units.
+    Quality: Functional customer returns. RRP € 14,922.
     </body></html>
     """
     detail2 = """
-    <html><head><title>Mixed household stock</title></head><body>
+    <html><head><title>Mixed household stock</title>
+    <script>const quality = 'fake'; const RRP = 999999;</script></head><body>
     Last bid 1,250 EUR. Number of pallets 4. 699 units.
     Quality: New in original packaging.
     </body></html>
@@ -101,6 +103,13 @@ def test_promoted_stocklear_feed_is_exact_page_verified_and_bounded() -> None:
     assert report["explicit_promotion_required"] is True
     assert all(row["source_page_verified"] is True for row in report["candidates"])
     assert all(row["feed_family"] == "STOCKLEAR_PROMOTED_AUCTION_FEED_V1" for row in report["candidates"])
+    first = report["candidates"][0]
+    assert first["total_price"] == 2000.0
+    assert first["currency"] == "EUR"
+    assert first["estimated_retail_value"] == 14922.0
+    assert first["condition_terms"] == ["Functional customer returns. RRP € 14,922."]
+    assert "display:flex" not in first["description"]
+    assert "999999" not in report["candidates"][1]["description"]
 
 
 def test_promoted_feed_enters_unified_river_as_auction_inventory() -> None:
