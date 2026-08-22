@@ -36,19 +36,28 @@ DEFAULT_MAX_CANDIDATES = 8
 
 FetchText = Callable[[str], str]
 
+_CURRENCY_TOKEN = r"(?:EUR|€|GBP|£|USD|\$)"
+_AMOUNT_TOKEN = r"\d[\d\s.,]*"
 _MONEY_RE = re.compile(
-    r"(?:starting\s+price|last\s+bid|current\s+bid)\s*[:\-]?\s*"
-    r"(?P<amount>\d[\d\s.,]*)\s*(?P<currency>EUR|€|GBP|£|USD|\$)?",
+    rf"(?:starting\s+price|last\s+bid|current\s+bid)\s*[:\-]?\s*"
+    rf"(?:(?P<currency_before>{_CURRENCY_TOKEN})\s*)?"
+    rf"(?P<amount>{_AMOUNT_TOKEN})\s*"
+    rf"(?P<currency_after>{_CURRENCY_TOKEN})?",
     re.IGNORECASE,
 )
 _RRP_RE = re.compile(
-    r"\bRRP\s*[:\-]?\s*(?P<amount>\d[\d\s.,]*)\s*(?P<currency>EUR|€|GBP|£|USD|\$)?",
+    rf"\bRRP\s*[:\-]?\s*(?:(?P<currency_before>{_CURRENCY_TOKEN})\s*)?"
+    rf"(?P<amount>{_AMOUNT_TOKEN})\s*(?P<currency_after>{_CURRENCY_TOKEN})?",
     re.IGNORECASE,
 )
 _UNITS_RE = re.compile(r"\b(?P<amount>\d[\d\s.,]*)\s+units?\b", re.IGNORECASE)
 _PALLETS_RE = re.compile(r"number\s+of\s+pallets?\s*[:\-]?\s*(?P<amount>\d[\d\s.,]*)", re.IGNORECASE)
 _QUALITY_RE = re.compile(r"quality\s*[:\-]?\s*(?P<value>[^|\n]{3,120})", re.IGNORECASE)
 _TITLE_RE = re.compile(r"<title[^>]*>(?P<title>.*?)</title>", re.IGNORECASE | re.DOTALL)
+_SCRIPT_STYLE_RE = re.compile(
+    r"<(?:script|style)\b[^>]*>.*?</(?:script|style)>",
+    re.IGNORECASE | re.DOTALL,
+)
 _TAG_RE = re.compile(r"<[^>]+>")
 _SPACE_RE = re.compile(r"\s+")
 
@@ -81,7 +90,8 @@ def _currency(value: str | None) -> str | None:
 
 
 def _plain_text(html: str) -> str:
-    return _compact(html_module.unescape(_TAG_RE.sub(" ", str(html or ""))))
+    cleaned = _SCRIPT_STYLE_RE.sub(" ", str(html or ""))
+    return _compact(html_module.unescape(_TAG_RE.sub(" ", cleaned)))
 
 
 def _title(html: str, fallback: str) -> str:
@@ -152,7 +162,8 @@ def _money(pattern: re.Pattern[str], text: str) -> tuple[float | None, str | Non
     match = pattern.search(text)
     if not match:
         return None, None
-    return _number(match.group("amount")), _currency(match.groupdict().get("currency"))
+    currency = match.groupdict().get("currency_before") or match.groupdict().get("currency_after")
+    return _number(match.group("amount")), _currency(currency)
 
 
 def _candidate_from_detail(url: str, html: str, title_hint: str, observed_at: str) -> dict[str, Any] | None:
