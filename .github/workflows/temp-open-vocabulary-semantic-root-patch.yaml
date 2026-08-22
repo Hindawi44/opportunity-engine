@@ -1,0 +1,48 @@
+name: TEMP Open Vocabulary Semantic Root Patch
+
+on:
+  push:
+    branches:
+      - agent/open-vocabulary-query-gap-learning-v1
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/open-vocabulary-query-gap-learning-v1
+          fetch-depth: 0
+      - name: Apply semantic closure-root guard
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/opportunity_engine/automatic_query_gap_miss_scout.py')
+          text = path.read_text(encoding='utf-8')
+
+          block_anchor = '''_SALE_TERM_BLOCKLIST = frozenset(\n    {\n        "sommersalg",\n        "vintersalg",\n        "januarsalg",\n        "romjulssalg",\n        "helgesalg",\n        "nettsalg",\n        "forhåndssalg",\n        "forhandsalg",\n        "flyttesalg",\n        "overlevelsessalg",\n    }\n)\n'''
+          addition = block_anchor + '''_DYNAMIC_CLOSURE_SALE_ROOTS = (\n    "nedlegg",\n    "avvikl",\n    "avslut",\n    "opphør",\n    "slutt",\n    "steng",\n    "tøm",\n    "konkurs",\n)\n'''
+          if text.count(block_anchor) != 1:
+              raise SystemExit('sale-term blocklist anchor changed')
+          text = text.replace(block_anchor, addition, 1)
+
+          loop_anchor = '''        term = match.group("term").casefold()\n        if term in _SALE_TERM_BLOCKLIST:\n            continue\n'''
+          loop_replacement = loop_anchor + '''        if not any(root in term for root in _DYNAMIC_CLOSURE_SALE_ROOTS):\n            continue\n'''
+          if text.count(loop_anchor) != 1:
+              raise SystemExit('dynamic sale-term loop anchor changed')
+          text = text.replace(loop_anchor, loop_replacement, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/opportunity_engine/automatic_query_gap_miss_scout.py
+          git diff --cached --check
+          git commit -m 'Require closure semantics in learned sale compounds'
+          git push origin HEAD:agent/open-vocabulary-query-gap-learning-v1
