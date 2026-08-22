@@ -1,0 +1,128 @@
+name: TEMP Strict Promoted Core Live Proof After 666
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/temp-strict-promoted-core-live-proof-after-666.yaml"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONPATH: src:.
+
+jobs:
+  strict-production-proof:
+    if: ${{ github.head_ref == 'agent/strict-promoted-core-live-proof-after-666' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+      - name: Run strict production collector proof
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+          import json
+          import os
+          from pathlib import Path
+
+          from opportunity_engine.adaptive_keyword_learning import KeywordEvaluationResult
+          from opportunity_engine.learned_query_overlay import (
+              build_learned_query_overlay,
+              save_learned_query_overlay,
+          )
+          from opportunity_engine.learning_promotion_gate import select_promoted_query_overlay
+          from opportunity_engine.promoted_learned_core_discovery import (
+              collect_promoted_learned_core_opportunities,
+          )
+
+          term = "avviklingssalg"
+          holdouts = (
+              "HOLDOUT-NO-SENZE-OF-JOY",
+              "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER",
+              "HOLDOUT-NO-GAULA-NATURSENTER",
+          )
+          evaluation = KeywordEvaluationResult(
+              term=term,
+              market_code="NO",
+              status="PROVEN",
+              recovered_case_ids=holdouts,
+              raw_hit_count=9,
+              verified_relevant_count=3,
+              precision=1 / 3,
+              min_recovered_cases=1,
+              min_precision=0.20,
+              automatic_activation=False,
+              support_case_ids=("AUTO-MISS-NO-BAUHAUS",),
+              evaluation_scope="HOLDOUT_TRANSFER",
+          )
+          shadow = build_learned_query_overlay([evaluation])
+          active = select_promoted_query_overlay(shadow, {("NO", term): "PROMOTED"})
+
+          root = Path("artifacts/strict-promoted-core-live-proof-after-666")
+          overlay_path = root / "active-keyword-overlay.json"
+          source_dir = root / "source"
+          root.mkdir(parents=True, exist_ok=True)
+          save_learned_query_overlay(overlay_path, active)
+
+          env = dict(os.environ)
+          env["OPPORTUNITY_LEARNED_QUERY_OVERLAY_PATH"] = str(overlay_path)
+          report = collect_promoted_learned_core_opportunities(
+              source_dir,
+              environment=env,
+              results_per_query=10,
+              max_pages=10,
+              max_terms=1,
+          )
+
+          summary = {
+              "status": report.get("status"),
+              "active_terms": report.get("active_terms"),
+              "applied_terms": report.get("applied_terms"),
+              "request_count": report.get("request_count"),
+              "raw_hit_count": report.get("raw_hit_count"),
+              "page_request_count": report.get("page_request_count"),
+              "verified_opportunity_count": report.get("verified_opportunity_count"),
+              "errors": report.get("errors"),
+              "promotion_gate_enforced": report.get("promotion_gate_enforced"),
+              "automatic_query_activation": report.get("automatic_query_activation"),
+              "automatic_contact": report.get("automatic_contact"),
+              "automatic_bid": report.get("automatic_bid"),
+              "automatic_purchase": report.get("automatic_purchase"),
+              "automatic_payment": report.get("automatic_payment"),
+          }
+          (root / "strict-summary.json").write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(summary, ensure_ascii=False))
+
+          candidates = json.loads((source_dir / "all-discovered-candidates.json").read_text(encoding="utf-8"))
+          assert report["request_count"] == 1, report
+          assert report["raw_hit_count"] > 0, report
+          assert report["page_request_count"] > 0, report
+          assert report["applied_terms"] == [term], report
+          assert report["promotion_gate_enforced"] is True, report
+          assert report["automatic_query_activation"] is False, report
+          assert report["automatic_contact"] is False, report
+          assert report["automatic_bid"] is False, report
+          assert report["automatic_purchase"] is False, report
+          assert report["automatic_payment"] is False, report
+          assert report["verified_opportunity_count"] >= 1, report
+          assert len(candidates) >= 1, candidates
+          assert all(item.get("metadata", {}).get("source_page_verified") is True for item in candidates), candidates
+          assert all(item.get("metadata", {}).get("closure_verified") is True for item in candidates), candidates
+          assert all(item.get("metadata", {}).get("inventory_liquidation_verified") is True for item in candidates), candidates
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: strict-promoted-core-live-proof-after-666
+          path: artifacts/strict-promoted-core-live-proof-after-666
+          if-no-files-found: error
