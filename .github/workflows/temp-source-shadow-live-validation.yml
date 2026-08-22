@@ -1,0 +1,67 @@
+name: TEMP Source Shadow Live Validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  live-shadow-source-proof:
+    if: ${{ github.head_ref == 'agent/source-shadow-live-validation-v1' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      OUTPUT_DIR: artifacts/source-shadow-live-validation-v1
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify shadow contracts
+        run: pytest tests/test_source_shadow_live_validation_v1.py -q
+
+      - name: Run live learned-source shadow validation
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_source_shadow_live_validation.py \
+            --report "$OUTPUT_DIR/source-shadow-live-validation.json" \
+            --max-candidates-per-source 5 \
+            --max-detail-requests 6 \
+            --timeout-seconds 20
+
+      - name: Print proof verdict
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('artifacts/source-shadow-live-validation-v1/source-shadow-live-validation.json').read_text())
+          print('verdict:', report.get('verdict'))
+          print('eligible sources:', report.get('eligible_source_count'))
+          print('novel candidates:', report.get('novel_candidate_count'))
+          print('verified new opportunities:', report.get('verified_new_opportunity_count'))
+          print('teaching URL recoveries:', report.get('teaching_url_recovery_count'))
+          print('network requests:', report.get('network_request_count'))
+          print('production mutation:', report.get('production_mutation'))
+          for row in report.get('verified_new_opportunities', []):
+              print('-', row.get('source_name'), row.get('title'), row.get('source_url'))
+          PY
+
+      - name: Upload live proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-shadow-live-validation-v1
+          path: artifacts/source-shadow-live-validation-v1/source-shadow-live-validation.json
+          if-no-files-found: error
+          retention-days: 30
