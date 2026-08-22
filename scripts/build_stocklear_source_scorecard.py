@@ -16,19 +16,38 @@ def _load(path: str) -> dict:
     return payload
 
 
+def _merge_live_proofs(paths: list[str]) -> dict:
+    verified: list[dict] = []
+    production_mutation = False
+    automatic_promotion = False
+    for path in paths:
+        proof = _load(path)
+        production_mutation = production_mutation or proof.get("production_mutation") is True
+        automatic_promotion = automatic_promotion or proof.get("automatic_promotion") is True
+        for row in proof.get("verified_new_opportunities") or []:
+            if isinstance(row, dict):
+                verified.append(dict(row))
+    return {
+        "verified_new_opportunities": verified,
+        "production_mutation": production_mutation,
+        "automatic_promotion": automatic_promotion,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-candidates", default="docs/benchmarks/source-discovery-shadow-2026-08-22-result.json")
-    parser.add_argument("--live-proof", default="docs/benchmarks/source-shadow-live-validation-2026-08-22-result.json")
+    parser.add_argument("--live-proof", action="append", required=True)
     parser.add_argument("--access-proof", default="docs/benchmarks/stocklear-access-stability-2026-08-22-result.json")
     parser.add_argument("--independent-live-discovery-rounds", type=int, required=True)
     parser.add_argument("--live-source-candidate-count", type=int, required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
+    live_proof = _merge_live_proofs(args.live_proof)
     report = build_source_promotion_scorecard(
         _load(args.source_candidates),
-        _load(args.live_proof),
+        live_proof,
         _load(args.access_proof),
         source_domain="joblot.stocklear.eu",
         independent_live_discovery_rounds=args.independent_live_discovery_rounds,
@@ -36,7 +55,7 @@ def main() -> int:
     )
     report["evidence"] = {
         "source_candidates_path": args.source_candidates,
-        "live_proof_path": args.live_proof,
+        "live_proof_paths": args.live_proof,
         "access_proof_path": args.access_proof,
     }
     target = Path(args.output)
