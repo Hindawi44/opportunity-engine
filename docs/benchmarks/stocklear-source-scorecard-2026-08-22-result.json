@@ -1,0 +1,61 @@
+{
+  "schema_version": "source-promotion-scorecard-result-1.0",
+  "measured_at": "2026-08-22T13:40:10Z",
+  "repository": "Hindawi44/opportunity-engine",
+  "pull_request": 615,
+  "workflow_run_id": 32576395807,
+  "artifact_id": 9476658329,
+  "artifact_name": "stocklear-source-scorecard-v1",
+  "source_name": "Stocklear",
+  "source_domain": "joblot.stocklear.eu",
+  "score_before_second_round": 95.0,
+  "decision_before_second_round": "KEEP_SHADOW",
+  "pre_round_blocking_reasons": [
+    "NEEDS_SECOND_INDEPENDENT_LIVE_DISCOVERY_ROUND"
+  ],
+  "promotion_readiness_score": 100.0,
+  "minimum_promotion_score": 85.0,
+  "decision": "PROMOTE_CANDIDATE",
+  "blocking_reasons": [],
+  "dimensions": {
+    "ground_truth_evidence": 100.0,
+    "live_recovery": 100.0,
+    "verification_quality": 100.0,
+    "access_stability": 100.0,
+    "repeatability": 100.0
+  },
+  "metrics": {
+    "initial_verified_opportunity_count": 2,
+    "independent_live_discovery_rounds": 2,
+    "live_source_candidate_count": 10,
+    "verified_new_opportunity_count": 10,
+    "verification_yield": 1.0,
+    "false_positive_count": 0,
+    "false_positive_rate": 0.0,
+    "teaching_url_recovery_count": 0,
+    "access_round_count": 3,
+    "access_usable_public_ratio": 1.0,
+    "access_blocker_event_count": 0
+  },
+  "round_1": {
+    "candidate_count": 5,
+    "verified_count": 5,
+    "prior_recoveries_excluded": 0
+  },
+  "round_2": {
+    "candidate_count": 5,
+    "verified_count": 5,
+    "prior_recoveries_excluded": 5,
+    "proof_path": "docs/benchmarks/stocklear-shadow-round2-2026-08-22-result.json"
+  },
+  "access_proof_path": "docs/benchmarks/stocklear-access-stability-2026-08-22-result.json",
+  "first_live_proof_path": "docs/benchmarks/source-shadow-live-validation-2026-08-22-result.json",
+  "source_validation_path": "docs/benchmarks/source-discovery-shadow-2026-08-22-result.json",
+  "promotion_requires_explicit_approval": true,
+  "production_active": false,
+  "production_mutation": false,
+  "automatic_source_addition": false,
+  "automatic_promotion": false,
+  "verdict": "PROMOTE_CANDIDATE_ONLY_NOT_ACTIVATED",
+  "proof_statement": "Stocklear passed two independent live Shadow discovery rounds with ten exact-page-verified opportunities out of ten source-specific candidates, zero teaching URL recovery, zero measured false positives, and three stable public-access rounds totaling 18/18 usable responses. The scorecard recommends explicit promotion candidacy only; production remains unchanged."
+}
