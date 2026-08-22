@@ -41,6 +41,8 @@ jobs:
     if: ${{ inputs.confirm_paid_live_research == 'YES' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      MIND_FORGE_LIVE_ENABLED: "1"
 
     steps:
       - name: Check out current main-line V2 implementation
