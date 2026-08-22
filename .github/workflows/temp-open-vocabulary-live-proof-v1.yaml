@@ -1,9 +1,9 @@
 name: TEMP Open Vocabulary QUERY_GAP Live Proof V1
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/temp-open-vocabulary-live-proof-v1
+      - agent/open-vocabulary-query-gap-learning-v1
 
 permissions:
   contents: read
@@ -64,11 +64,12 @@ jobs:
           )
 
           metadata = list(outcome.get('cases_metadata') or [])
+          legacy_terms = set(_GAP_TERMS)
           dynamic_terms = [
               str(row.get('query_gap_term') or '').casefold()
               for row in metadata
               if str(row.get('query_gap_term') or '').casefold()
-              and str(row.get('query_gap_term') or '').casefold() not in set(_GAP_TERMS)
+              and str(row.get('query_gap_term') or '').casefold() not in legacy_terms
           ]
           result = {
               'status': outcome.get('status'),
