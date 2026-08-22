@@ -132,10 +132,7 @@ def build_entity_source_followup_query(company: str) -> str:
     if any(term in folded for term in _GAP_TERMS):
         raise ValueError("Company identity contains a forbidden learning term")
 
-    query = (
-        f'"{compact}" '
-        '(offisiell OR nettside OR hjemmeside OR kundeservice OR informasjon) Norge'
-    )
+    query = f'"{compact}" Norge'
     query_folded = query.casefold()
     if any(term in query_folded for term in _GAP_TERMS):
         raise AssertionError("Entity-source follow-up leaked a learning term")
