@@ -49,7 +49,7 @@ def _collection(*titles: str) -> AuksjonenLiveClothingCollection:
 def test_rescue_promotes_only_exact_learned_token_after_clothing_gate() -> None:
     collection = _collection(
         "Sluttlager med arbeidsjakker",
-        "Sluttlageret med arbeidsbukser",
+        "Sluttlageret med bukser",
         "Arbeidsjakke modell 2026",
     )
 
