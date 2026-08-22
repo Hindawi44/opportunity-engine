@@ -1,14 +1,13 @@
 """Bounded live shadow validation for learned source candidates.
 
-This module is deliberately outside production discovery. It may inspect a source
-only after repeated external SOURCE_GAP evidence validated that source for
-shadow evaluation. Teaching URLs are excluded before candidate verification, and
-an exact candidate page must independently prove a stock/lot opportunity before
-the run can claim recovery.
+A source reaches this module only after repeated confirmed external SOURCE_GAP
+misses validated it for shadow evaluation. Teaching URLs are excluded before
+candidate verification, and an exact candidate page must independently prove a
+stock/lot opportunity before recovery can be claimed.
 
-V1 supports only the two source shapes proven by the first real benchmark:
-WorldWiseUSA's stock-offer feed and Stocklear's auction catalog. Unknown learned
-sources remain unsupported rather than silently receiving a generic crawler.
+V1 supports only WorldWiseUSA's latest-offers feed and Stocklear's auction
+catalog. Unknown learned sources remain unsupported rather than silently
+receiving a generic crawler.
 """
 from __future__ import annotations
 
@@ -19,21 +18,13 @@ from typing import Any, Callable, Mapping, Sequence
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
 SCHEMA_VERSION = "source-shadow-live-validation-1.0"
-
 FetchText = Callable[[str], str]
 
 _SOURCE_ENTRYPOINTS = {
     "www.worldwiseusa.com": "https://www.worldwiseusa.com/latest-stock-lot-offers/",
     "joblot.stocklear.eu": "https://joblot.stocklear.eu/",
 }
-
-_WORLDWISE_BLOCKED_PREFIXES = (
-    "/category/",
-    "/tag/",
-    "/author/",
-    "/wp-",
-    "/feed",
-)
+_WORLDWISE_BLOCKED_PREFIXES = ("/category/", "/tag/", "/author/", "/wp-", "/feed")
 _WORLDWISE_BLOCKED_PATHS = {
     "/",
     "/latest-stock-lot-offers/",
@@ -44,6 +35,7 @@ _WORLDWISE_BLOCKED_PATHS = {
     "/terms-and-conditions/",
 }
 _STOCKLEAR_AUCTION_PATH_RE = re.compile(r"^/auction/\d+/?$")
+_WORLDWISE_H4_RE = re.compile(r"<h4\b[^>]*>(.*?)</h4>", re.I | re.S)
 _SPACE_RE = re.compile(r"\s+")
 
 
@@ -69,8 +61,7 @@ class _AnchorParser(HTMLParser):
     def handle_endtag(self, tag: str) -> None:
         if tag.casefold() != "a" or self._href is None:
             return
-        text = _compact(" ".join(self._text))
-        self.anchors.append((self._href, text))
+        self.anchors.append((self._href, _compact(" ".join(self._text))))
         self._href = None
         self._text = []
 
@@ -108,6 +99,23 @@ def _path(value: str) -> str:
     return path.rstrip("/") + "/" if path != "/" else "/"
 
 
+def _parse_anchors(html: str) -> list[tuple[str, str]]:
+    parser = _AnchorParser()
+    parser.feed(str(html or ""))
+    return parser.anchors
+
+
+def _anchors_for_source(source_domain: str, html: str) -> list[tuple[str, str]]:
+    """Use the source's actual offer structure instead of generic site navigation."""
+    if source_domain != "www.worldwiseusa.com":
+        return _parse_anchors(html)
+    heading_anchors: list[tuple[str, str]] = []
+    for fragment in _WORLDWISE_H4_RE.findall(str(html or "")):
+        heading_anchors.extend(_parse_anchors(fragment))
+    # Small fixtures may omit WordPress heading markup; live pages do not.
+    return heading_anchors if heading_anchors else _parse_anchors(html)
+
+
 def _eligible_source_rows(source_candidates: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     rows = source_candidates.get("source_candidates") or []
     if not isinstance(rows, list):
@@ -118,14 +126,11 @@ def _eligible_source_rows(source_candidates: Mapping[str, Any]) -> list[Mapping[
             continue
         if _compact(row.get("status")) != "VALIDATED_SOURCE":
             continue
-        if row.get("shadow_eligible") is not True:
-            continue
-        if row.get("production_active") is not False:
+        if row.get("shadow_eligible") is not True or row.get("production_active") is not False:
             continue
         domain = _compact(row.get("source_domain")).casefold().rstrip(".")
-        if domain not in _SOURCE_ENTRYPOINTS:
-            continue
-        eligible.append(row)
+        if domain in _SOURCE_ENTRYPOINTS:
+            eligible.append(row)
     return eligible
 
 
@@ -156,11 +161,8 @@ def extract_shadow_candidates(
     if domain not in _SOURCE_ENTRYPOINTS:
         return []
     blocked = {_canonical_url(url) for url in teaching_urls if _canonical_url(url)}
-    parser = _AnchorParser()
-    parser.feed(str(html or ""))
-
     by_url: dict[str, dict[str, Any]] = {}
-    for href, title in parser.anchors:
+    for href, title in _anchors_for_source(domain, html):
         absolute = _canonical_url(urljoin(page_url, href))
         if not absolute or _domain(absolute) != domain:
             continue
@@ -191,13 +193,12 @@ def validate_shadow_sources(
     fetcher: FetchText,
     max_candidates_per_source: int = 5,
 ) -> dict[str, Any]:
-    """Fetch only validated shadow source entrypoints and extract novel links."""
+    """Fetch validated shadow source entrypoints and extract bounded novel links."""
     if not 1 <= max_candidates_per_source <= 20:
         raise ValueError("max_candidates_per_source must be between 1 and 20")
     eligible = _eligible_source_rows(source_candidates)
     source_results: list[dict[str, Any]] = []
     network_requests = 0
-
     for row in eligible:
         domain = _compact(row.get("source_domain")).casefold().rstrip(".")
         name = _compact(row.get("source_name")) or domain
@@ -217,13 +218,11 @@ def validate_shadow_sources(
                 html=page,
                 teaching_urls=teaching_urls,
             )[:max_candidates_per_source]
-            status = "SUCCESS"
-            error = None
-        except Exception as exc:  # isolated source failure must remain visible
+            status, error = "SUCCESS", None
+        except Exception as exc:
             network_requests += 1
             candidates = []
-            status = "FAILED"
-            error = f"{type(exc).__name__}: {exc}"
+            status, error = "FAILED", f"{type(exc).__name__}: {exc}"
         source_results.append(
             {
                 "source_name": name,
@@ -238,7 +237,6 @@ def validate_shadow_sources(
                 "production_active": False,
             }
         )
-
     return {
         "schema_version": SCHEMA_VERSION,
         "phase": "DISCOVERY",
@@ -268,14 +266,21 @@ def _detail_page_proves_opportunity(source_domain: str, html: str) -> bool:
     if source_domain == "joblot.stocklear.eu":
         commercial = any(term in text for term in ("starting price", "last bid", "end of the auction"))
         lot = any(term in text for term in ("number of pallets", " units", "weight ", "lot of "))
-        condition = any(term in text for term in ("quality", "customer return", "new in original packaging", "non functional", "not tested"))
-        return commercial and lot and condition
-    if source_domain == "www.worldwiseusa.com":
-        availability = any(
+        condition = any(
             term in text
             for term in (
-                "stock lot",
-                "stocklot",
+                "quality",
+                "customer return",
+                "new in original packaging",
+                "non functional",
+                "not tested",
+            )
+        )
+        return commercial and lot and condition
+    if source_domain == "www.worldwiseusa.com":
+        strong_availability = any(
+            term in text
+            for term in (
                 "load now",
                 "ready to load",
                 "available now",
@@ -293,11 +298,10 @@ def _detail_page_proves_opportunity(source_domain: str, html: str) -> bool:
                 "units",
                 "rolls",
                 "truckload",
-                "load",
                 "ft lengths",
             )
         )
-        return availability and scale
+        return strong_availability and scale
     return False
 
 
@@ -307,13 +311,12 @@ def verify_shadow_candidates(
     fetcher: FetchText,
     max_detail_requests: int = 6,
 ) -> dict[str, Any]:
-    """Verify novel shadow links on their exact source pages under a hard request cap."""
+    """Verify novel links on exact source pages under a hard request cap."""
     if not 0 <= max_detail_requests <= 20:
         raise ValueError("max_detail_requests must be between 0 and 20")
     verified: list[dict[str, Any]] = []
     attempted = 0
     failed = 0
-
     source_results = discovery_report.get("source_results") or []
     if not isinstance(source_results, list):
         source_results = []
@@ -356,7 +359,6 @@ def verify_shadow_candidates(
             )
         if attempted >= max_detail_requests:
             break
-
     return {
         "schema_version": SCHEMA_VERSION,
         "phase": "EXACT_PAGE_VERIFICATION",
@@ -396,11 +398,7 @@ def run_shadow_source_validation(
     )
     return {
         "schema_version": SCHEMA_VERSION,
-        "verdict": (
-            "SHADOW_RECOVERED_NEW_OPPORTUNITIES"
-            if verified
-            else "NO_VERIFIED_NEW_SHADOW_OPPORTUNITY"
-        ),
+        "verdict": "SHADOW_RECOVERED_NEW_OPPORTUNITIES" if verified else "NO_VERIFIED_NEW_SHADOW_OPPORTUNITY",
         "eligible_source_count": discovery["eligible_source_count"],
         "novel_candidate_count": discovery["novel_candidate_count"],
         "verified_new_opportunity_count": len(verified),
