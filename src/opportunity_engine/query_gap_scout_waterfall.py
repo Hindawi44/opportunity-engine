@@ -148,6 +148,19 @@ def _entity_domain_tokens(company: str) -> tuple[str, ...]:
     return tuple(dict.fromkeys(tokens))
 
 
+def build_entity_first_party_probe_urls(company: str) -> list[str]:
+    """Infer one conservative Norwegian first-party homepage candidate."""
+    tokens = _entity_domain_tokens(company)
+    if not tokens:
+        return []
+    slug = "".join(tokens)
+    if not 4 <= len(slug) <= 63:
+        return []
+    if not re.fullmatch(r"[a-z0-9]+", slug):
+        return []
+    return [f"https://www.{slug}.no/"]
+
+
 def _normalized_host(url: str) -> str:
     host = (urlparse(url).hostname or "").casefold().strip(".")
     return host[4:] if host.startswith("www.") else host
@@ -367,6 +380,8 @@ def discover_query_gap_misses(
     no_new_term = 0
     entity_followup_company: str | None = None
     entity_followup_used = False
+    entity_domain_probe_used = False
+    entity_domain_probe_count = 0
     entity_internal_followup_used = False
     entity_internal_followup_count = 0
 
@@ -588,6 +603,175 @@ def discover_query_gap_misses(
                 "detected_miss_count": stage_misses,
             }
         )
+
+        if (
+            stage_index == 0
+            and not cases
+            and entity_followup_company
+            and page_requests < bounded_pages
+        ):
+            for probe_url in build_entity_first_party_probe_urls(entity_followup_company):
+                if page_requests >= bounded_pages:
+                    break
+                canonical_probe = _canonical(probe_url) or probe_url
+                if canonical_probe in seen_urls:
+                    continue
+                seen_urls.add(canonical_probe)
+                if canonical_probe in core_urls:
+                    core_known += 1
+                    continue
+
+                entity_source_followup_used = True
+                entity_domain_probe_used = True
+                entity_domain_probe_count += 1
+                page_requests += 1
+                probe_base = {
+                    "stage": 2,
+                    "query_kind": "ENTITY_DOMAIN_PROBE",
+                    "requested_url": probe_url,
+                    "search_hit_title": "",
+                    "search_hit_description": "",
+                    "search_hit_provider": "DIRECT_DOMAIN_PROBE",
+                    "search_hit_alone_is_ground_truth": False,
+                    "automatic_query_activation": False,
+                }
+                try:
+                    probe_page: PublicPage = fetch_page(probe_url)
+                except Exception as exc:
+                    verification_attempts.append(
+                        {
+                            **probe_base,
+                            "final_url": None,
+                            "status_code": None,
+                            "content_type": None,
+                            "verifier_status": "FETCH_FAILED",
+                            "rejection_reasons": ["PAGE_FETCH_FAILED"],
+                            "evidence_flags": {},
+                            "error_type": type(exc).__name__,
+                            "error": " ".join(str(exc).split())[:500],
+                        }
+                    )
+                    continue
+
+                probe_diagnostic = {
+                    **probe_base,
+                    **diagnose_public_page(probe_page),
+                }
+                verification_attempts.append(probe_diagnostic)
+                proof = _verify_closure_liquidation_page(probe_page)
+                discovery_path = "ENTITY_DOMAIN_PROBE"
+
+                if (
+                    proof is None
+                    and _is_plausible_first_party_url(
+                        probe_page.final_url,
+                        entity_followup_company,
+                    )
+                ):
+                    internal_links = extract_entity_internal_source_links(
+                        probe_page,
+                        company=entity_followup_company,
+                    )
+                    for internal_url in internal_links:
+                        if page_requests >= bounded_pages:
+                            break
+                        if internal_url in seen_urls:
+                            continue
+                        seen_urls.add(internal_url)
+                        if internal_url in core_urls:
+                            core_known += 1
+                            continue
+
+                        entity_internal_followup_used = True
+                        entity_internal_followup_count += 1
+                        page_requests += 1
+                        internal_base = {
+                            "stage": 2,
+                            "query_kind": "ENTITY_INTERNAL_SOURCE_FOLLOW_UP",
+                            "requested_url": internal_url,
+                            "parent_url": _canonical(probe_page.final_url)
+                            or probe_page.final_url,
+                            "search_hit_title": "",
+                            "search_hit_description": "",
+                            "search_hit_provider": "INTERNAL_LINK",
+                            "search_hit_alone_is_ground_truth": False,
+                            "automatic_query_activation": False,
+                        }
+                        try:
+                            internal_page: PublicPage = fetch_page(internal_url)
+                        except Exception as exc:
+                            verification_attempts.append(
+                                {
+                                    **internal_base,
+                                    "final_url": None,
+                                    "status_code": None,
+                                    "content_type": None,
+                                    "verifier_status": "FETCH_FAILED",
+                                    "rejection_reasons": ["PAGE_FETCH_FAILED"],
+                                    "evidence_flags": {},
+                                    "error_type": type(exc).__name__,
+                                    "error": " ".join(str(exc).split())[:500],
+                                }
+                            )
+                            continue
+
+                        internal_diagnostic = {
+                            **internal_base,
+                            **diagnose_public_page(internal_page),
+                        }
+                        verification_attempts.append(internal_diagnostic)
+                        internal_proof = _verify_closure_liquidation_page(internal_page)
+                        if internal_proof is not None:
+                            proof = internal_proof
+                            discovery_path = "ENTITY_INTERNAL_SOURCE_FOLLOW_UP"
+                            break
+
+                if proof is None:
+                    continue
+
+                verified_pages += 1
+                available_terms = [
+                    term
+                    for term in proof["query_gap_terms"]
+                    if all(
+                        term.casefold() not in executed_query.casefold()
+                        for executed_query in executed_queries
+                    )
+                    and not _query_contains_term(active_queries, term)
+                ]
+                if not available_terms:
+                    no_new_term += 1
+                    continue
+
+                term = available_terms[0]
+                final_url = str(proof["canonical_url"])
+                if final_url in core_urls:
+                    core_known += 1
+                    continue
+
+                case = _new_gap_case(proof, observed_at=now)
+                cases.append(case)
+                metadata.append(
+                    {
+                        "case_id": case.case_id,
+                        "canonical_url": final_url,
+                        "company": case.ground_truth_company,
+                        "query_gap_term": term,
+                        "root_cause": case.root_cause,
+                        "root_cause_basis": "MISSING_TERM_FROM_ACTIVE_QUERY_PACK",
+                        "source_page_verified": True,
+                        "closure_verified": True,
+                        "inventory_liquidation_verified": True,
+                        "closure_markers": list(proof["closure_markers"]),
+                        "liquidation_markers": list(proof["liquidation_markers"]),
+                        "search_hit_alone_is_ground_truth": False,
+                        "scout_query_contains_gap_term": False,
+                        "waterfall_stage": 2,
+                        "discovery_path": discovery_path,
+                    }
+                )
+                break
+
         if cases:
             break
 
@@ -611,6 +795,8 @@ def discover_query_gap_misses(
         "entity_source_followup_company": (
             entity_followup_company if entity_followup_used else None
         ),
+        "entity_domain_probe_used": entity_domain_probe_used,
+        "entity_domain_probe_count": entity_domain_probe_count,
         "entity_internal_followup_used": entity_internal_followup_used,
         "entity_internal_followup_count": entity_internal_followup_count,
         "max_search_requests": MAX_SEARCH_REQUESTS,
@@ -650,6 +836,8 @@ def _safe_waterfall_report(status: str, **extra: Any) -> dict[str, Any]:
             "verification_diagnostics_are_read_only": True,
             "entity_source_followup_used": False,
             "entity_source_followup_company": None,
+            "entity_domain_probe_used": False,
+            "entity_domain_probe_count": 0,
             "entity_internal_followup_used": False,
             "entity_internal_followup_count": 0,
         }
