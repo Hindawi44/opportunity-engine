@@ -1,0 +1,51 @@
+{
+  "schema_version": "learned-query-overlay-1.0",
+  "markets": {
+    "NO": [
+      {
+        "term": "avviklingssalg",
+        "signal_type": "BUSINESS_CLOSURE",
+        "precision": 0.333333,
+        "raw_hit_count": 9,
+        "verified_relevant_count": 3,
+        "recovered_case_ids": [
+          "HOLDOUT-NO-GAULA-NATURSENTER",
+          "HOLDOUT-NO-SENZE-OF-JOY",
+          "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER"
+        ],
+        "source_replay_case_ids": [],
+        "transfer_validation_case_ids": [
+          "HOLDOUT-NO-GAULA-NATURSENTER",
+          "HOLDOUT-NO-SENZE-OF-JOY",
+          "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER"
+        ],
+        "support_case_ids": [
+          "AUTO-MISS-NO-BAUHAUS"
+        ],
+        "evaluation_scope": "HOLDOUT_TRANSFER",
+        "evaluation_scopes": [
+          "HOLDOUT_TRANSFER"
+        ],
+        "independent_transfer_case_count": 3,
+        "source_verdict": "PROVEN",
+        "proof_provenance": {
+          "live_proof": "V15C",
+          "workflow_run_id": 32593694641,
+          "artifact_id": 9480995521,
+          "artifact_digest": "sha256:5776e5ae",
+          "implementation_head": "4a9ff3ddc84ef65bf822067166d0aad66d77e0a7",
+          "verified_relevant_count": 3,
+          "minimum_independent_transfer_cases": 2
+        }
+      }
+    ]
+  },
+  "max_terms_per_market": 5,
+  "active_term_count": 1,
+  "automatic_query_activation": false,
+  "automatic_financial_action": false,
+  "automatic_contact": false,
+  "automatic_bid": false,
+  "automatic_purchase": false,
+  "automatic_payment": false
+}
