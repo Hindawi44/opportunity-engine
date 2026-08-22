@@ -66,6 +66,7 @@ _CLOSURE_MARKERS = (
     "stenger for godt",
     "stenger etter",
     "siste åpningsdag",
+    "avvikler",
     "avvikles",
     "opphører",
 )
@@ -108,7 +109,7 @@ _COMPANY_PATTERNS = (
     # Fallback: a concrete title/name immediately followed by a closure verb.
     re.compile(
         r"\b([A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?)\s+"
-        r"(?i:legger ned|legges ned|stenger for godt|stenger etter|avvikles|opphører)\b"
+        r"(?i:legger ned|legges ned|stenger for godt|stenger etter|avvikler|avvikles|opphører)\b"
     ),
 )
 
