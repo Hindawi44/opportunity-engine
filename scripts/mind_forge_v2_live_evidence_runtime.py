@@ -163,7 +163,7 @@ def _research_one(request: dict[str, Any], *, model: str) -> tuple[list[dict[str
         ),
         output_type=_ResearchDraft,
     )
-    result = Runner.run_sync(agent, _prompt(request), max_turns=2)
+    result = Runner.run_sync(agent, _prompt(request), max_turns=1)
     raw_payloads = [_jsonish(item) for item in getattr(result, "raw_responses", [])]
     item_payloads = [
         _jsonish(raw_item)
