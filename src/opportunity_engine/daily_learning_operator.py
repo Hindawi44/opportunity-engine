@@ -30,6 +30,9 @@ from opportunity_engine.learned_query_overlay import (
 )
 from opportunity_engine.learning_promotion_gate import select_promoted_query_overlay
 from opportunity_engine.missed_opportunity_learning import MissedOpportunityCase
+from opportunity_engine.safe_learning_proof import (
+    DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES,
+)
 
 
 LearningSearch = Callable[[str, str], Sequence[Mapping[str, Any]]]
@@ -84,6 +87,14 @@ def _diagnose_cases(cases: Sequence[MissedOpportunityCase]) -> list[MissedOpport
 
 
 def _existing_overlay_terms(overlay: Mapping[str, Any] | None) -> list[str]:
+    """Return Shadow terms that should block fresh candidate generation.
+
+    A transfer-proven term with fewer than the required number of unique hidden
+    holdouts is intentionally *not* treated as active coverage yet. That lets a
+    later bounded run gather independent replication. Once the threshold is met
+    (or the term is explicitly promoted), it blocks re-proposal and stops
+    consuming learning budget.
+    """
     if not isinstance(overlay, Mapping):
         return []
     markets = overlay.get("markets")
@@ -97,8 +108,46 @@ def _existing_overlay_terms(overlay: Mapping[str, Any] | None) -> list[str]:
             if not isinstance(row, Mapping):
                 continue
             term = " ".join(str(row.get("term") or "").casefold().split()).strip()
-            if term:
+            if not term:
+                continue
+
+            promoted = (
+                str(row.get("promotion_status") or "").strip().upper() == "PROMOTED"
+                or str(row.get("activation_source") or "").strip().upper()
+                == "EXPLICIT_PROMOTION"
+            )
+            if promoted:
                 terms.append(term)
+                continue
+
+            raw_transfer_ids = row.get("transfer_validation_case_ids")
+            transfer_ids = {
+                str(item).strip()
+                for item in raw_transfer_ids
+                if str(item).strip()
+            } if isinstance(raw_transfer_ids, (list, tuple, set, frozenset)) else set()
+
+            scopes = {
+                str(item).strip().upper()
+                for item in (row.get("evaluation_scopes") or [])
+                if str(item).strip()
+            } if isinstance(row.get("evaluation_scopes"), (list, tuple, set, frozenset)) else set()
+            scope = str(row.get("evaluation_scope") or "").strip().upper()
+            if scope:
+                scopes.add(scope)
+            if transfer_ids:
+                scopes.add("HOLDOUT_TRANSFER")
+
+            count_value = row.get("independent_transfer_case_count")
+            stored_count = count_value if isinstance(count_value, int) else 0
+            transfer_count = max(len(transfer_ids), stored_count)
+            pending_transfer_replication = (
+                "HOLDOUT_TRANSFER" in scopes
+                and transfer_count < DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES
+            )
+            if pending_transfer_replication:
+                continue
+            terms.append(term)
     return terms
 
 

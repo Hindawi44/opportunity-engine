@@ -208,6 +208,13 @@ def propose_query_gap_keywords(
             occurrences[key] += 1
             diagnosed_keys.add(key)
 
+        # Once a source miss has already been recovered or transfer-proven,
+        # keep only its exact diagnosed terms available for any required
+        # replication. Do not spend later budgets mining new evidence phrases
+        # from a case whose learning objective has already been satisfied.
+        if case.learning_status in {"RECOVERED", "TRANSFER_PROVEN"}:
+            continue
+
         text = case.learning_evidence_text.strip()
         if not text:
             continue
