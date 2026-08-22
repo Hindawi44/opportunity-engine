@@ -128,7 +128,7 @@ def _default_search(api_key: str, *, results_per_query: int) -> SearchCallback:
     provider = BraveSearchProvider(
         api_key,
         country=MARKET_CODE,
-        freshness="pm",
+        freshness=None,
         extra_snippets=True,
         operators=True,
     )
