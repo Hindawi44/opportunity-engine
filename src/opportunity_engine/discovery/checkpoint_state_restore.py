@@ -36,6 +36,7 @@ LEARNING_STATE_FILENAMES = (
     "missed-opportunities.json",
     "active-keyword-overlay.json",
     "keyword-learning-history.json",
+    "parser-rescue-overlay.json",
 )
 
 
@@ -256,9 +257,6 @@ def restore_previous_checkpoint_databases(
         return status
 
     try:
-        # GitHub's workflow-run API accepts only one event filter. Omitting the
-        # event filter lets scheduled runs participate in continuity; we then
-        # explicitly allow only the two checkpoint-producing events below.
         query = urlencode(
             {
                 "branch": branch,

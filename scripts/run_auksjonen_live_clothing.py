@@ -26,6 +26,12 @@ from opportunity_engine.discovery.auksjonen_public_api_adapter import (
 from opportunity_engine.discovery.auksjonen_unified_lifecycle import (
     write_auksjonen_unified_artifacts,
 )
+from opportunity_engine.parser_gap_rescue import (
+    OVERLAY_FILENAME as PARSER_RESCUE_OVERLAY_FILENAME,
+    SUPPORTED_SOURCE as PARSER_RESCUE_SOURCE,
+    apply_auksjonen_parser_rescue,
+    load_parser_rescue_terms,
+)
 
 
 def _write_fallback_persistence_error(
@@ -55,6 +61,22 @@ def _write_fallback_persistence_error(
     return path
 
 
+def _parser_rescue_terms(overlay_argument: object) -> tuple[str, ...]:
+    overlay_path_text = str(overlay_argument or "").strip()
+    if not overlay_path_text:
+        input_root_text = str(os.environ.get("INPUT_ROOT") or "").strip()
+        if input_root_text:
+            overlay_path_text = (
+                Path(input_root_text) / "learning" / PARSER_RESCUE_OVERLAY_FILENAME
+            ).as_posix()
+    if not overlay_path_text:
+        return ()
+    overlay_path = Path(overlay_path_text)
+    if not overlay_path.exists():
+        return ()
+    return load_parser_rescue_terms(overlay_path, PARSER_RESCUE_SOURCE)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -69,6 +91,11 @@ def main() -> int:
         type=int,
         default=DEFAULT_ITEM_VERIFICATION_LIMIT,
         help="Maximum active inventory lots whose exact public item pages are verified.",
+    )
+    parser.add_argument(
+        "--parser-rescue-overlay",
+        default=os.environ.get("PARSER_RESCUE_OVERLAY_PATH", ""),
+        help="Optional durable parser-rescue overlay learned from verified prior PARSER_GAP cases.",
     )
     parser.add_argument("--persist-unified", action="store_true")
     parser.add_argument(
@@ -87,12 +114,19 @@ def main() -> int:
         raise SystemExit("--item-verification-limit must be non-negative")
 
     output_dir = Path(args.output_dir)
+    learned_terms = _parser_rescue_terms(args.parser_rescue_overlay)
+
     result = AuksjonenMultiCategoryCollector(
         max_listings=args.max_listings,
         page_size=args.page_size,
         max_pages=args.max_pages,
     ).collect()
-    collection = result.combined
+    base_collection = result.combined
+    collection = apply_auksjonen_parser_rescue(base_collection, learned_terms)
+    rescued_count = (
+        len(collection.inventory_opportunities)
+        - len(base_collection.inventory_opportunities)
+    )
 
     exact_item_evidence = verify_auksjonen_inventory_lots(
         collection.inventory_opportunities,
@@ -155,6 +189,8 @@ def main() -> int:
     print(f"Items received across categories: {collection.items_received}")
     print(f"Full multi-category scan complete: {result.scan_complete}")
     print(f"Active clothing items: {len(collection.listings)}")
+    print(f"Parser rescue terms loaded: {len(learned_terms)}")
+    print(f"Parser rescue promotions: {rescued_count}")
     print(f"Valid inventory opportunities: {len(opportunities)}")
     print(f"Exact item pages attempted: {len(exact_item_evidence)}")
     print(f"Exact item pages verified: {verified_count}")
