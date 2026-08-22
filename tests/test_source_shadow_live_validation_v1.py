@@ -75,8 +75,8 @@ def test_stocklear_shadow_extracts_new_auction_and_blocks_teaching_urls() -> Non
     )
 
     assert [row["source_url"] for row in rows] == [
-        "https://joblot.stocklear.eu/auction/21746",
-        "https://joblot.stocklear.eu/auction/21756",
+        "https://joblot.stocklear.eu/auction/21746/",
+        "https://joblot.stocklear.eu/auction/21756/",
     ]
 
 
@@ -212,7 +212,7 @@ def test_end_to_end_shadow_recovers_unseen_opportunity_without_production_change
         "https://www.worldwiseusa.com/latest-stock-lot-offers/": '<a href="/epdm-roofing-rolls/">EPDM Roofing Rolls</a>',
         "https://joblot.stocklear.eu/": '<a href="/auction/21746">Lot of 699 units</a>',
         "https://www.worldwiseusa.com/epdm-roofing-rolls/": "EPDM Roofing Rolls 10 & 12ft widths 50 to 200ft lengths. Stock lot available. Load now.",
-        "https://joblot.stocklear.eu/auction/21746": "Lot of 699 units. Number of pallets 5. Quality Functional customer returns. Last bid 1 400 EUR.",
+        "https://joblot.stocklear.eu/auction/21746/": "Lot of 699 units. Number of pallets 5. Quality Functional customer returns. Last bid 1 400 EUR.",
     }
 
     report = run_shadow_source_validation(
