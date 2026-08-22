@@ -3,6 +3,7 @@ from pathlib import Path
 
 WORKFLOW = Path('.github/workflows/mind-forge-live-research-launcher.yaml')
 RUNTIME = Path('mind-forge-live/phase1')
+LIVE_EVIDENCE_RUNTIME = Path('scripts/mind_forge_v2_live_evidence_runtime.py')
 
 
 def _dispatch_block(text: str) -> str:
@@ -81,3 +82,10 @@ def test_paid_live_job_sets_explicit_runtime_enable_guard():
 
     assert text.count('MIND_FORGE_LIVE_ENABLED: "1"') == 1
     assert 'MIND_FORGE_LIVE_ENABLED: "1"' in paid_job
+
+
+def test_live_reasoning_hook_dependency_is_present_on_main_line():
+    live_creative = (RUNTIME / 'live_creative_v2_open.py').read_text(encoding='utf-8')
+
+    assert 'scripts.mind_forge_v2_live_evidence_runtime' in live_creative
+    assert LIVE_EVIDENCE_RUNTIME.is_file()
