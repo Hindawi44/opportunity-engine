@@ -1,0 +1,186 @@
+name: TEMP One-Time MIND FORGE Tailoring Live Proof V5
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/temp-one-time-mind-forge-tailoring-live-proof-v5.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  creative-v2-open-live:
+    if: ${{ github.head_ref == 'agent/temp-mind-forge-tailoring-live-proof-v5' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MIND_FORGE_LIVE_ENABLED: "1"
+      OPENAI_AGENTS_DISABLE_TRACING: "1"
+      OPENAI_AGENTS_DONT_LOG_MODEL_DATA: "1"
+      OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
+    steps:
+      - name: Check out merged main-line implementation plus temp proof
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install bounded Creative V2 dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "openai-agents>=0.14.0" "pydantic>=2.11.0,<3.0"
+
+      - name: Build isolated Creative V2 runtime
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/mind-forge-v2"
+          mkdir -p "$APP/mind_forge" artifacts/mind-forge-creative-v2-open-live
+          touch "$APP/mind_forge/__init__.py"
+          for file in \
+            contracts_v1.py \
+            question_generator_v1.py \
+            creative_engine_v1.py \
+            creative_engine_v2_open.py \
+            expert_minds_v1.py \
+            live_model_adapter_v1.py \
+            live_creative_v2_open.py
+          do
+            cp "mind-forge-live/phase1/$file" "$APP/mind_forge/$file"
+          done
+          python -m compileall -q "$APP/mind_forge"
+          echo "APP=$APP" >> "$GITHUB_ENV"
+
+      - name: Normalize API secret without printing it
+        env:
+          RAW_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          raw = os.getenv("RAW_OPENAI_API_KEY", "")
+          if not raw:
+              raise SystemExit("OPENAI_API_KEY is not available to this workflow")
+          clean = raw.strip()
+          if not clean:
+              raise SystemExit("OPENAI_API_KEY becomes empty after normalization")
+          if any(ch in clean for ch in "\r\n\t"):
+              raise SystemExit("OPENAI_API_KEY contains embedded whitespace")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"OPENAI_API_KEY={clean}\n")
+          print("OPENAI_API_KEY hygiene: OK; value not displayed")
+          PY
+
+      - name: Run one autonomous MIND FORGE V2 cycle from tailoring seed
+        env:
+          PYTHONPATH: ${{ env.APP }}
+          MIND_FORGE_SEED: "تصليح الملابس"
+        run: |
+          set -euo pipefail
+          python - <<'PY' | tee artifacts/mind-forge-creative-v2-open-live/stdout.json
+          import json
+          import os
+          from pathlib import Path
+          from mind_forge.contracts_v1 import TopicInput
+          from mind_forge.question_generator_v1 import generate_questions
+          from mind_forge.live_model_adapter_v1 import LiveBudgetGate, LiveModelPolicy
+          from mind_forge.live_creative_v2_open import generate_live_open_ideas
+
+          seed = os.environ["MIND_FORGE_SEED"]
+          topic = TopicInput(topic=seed)
+          questions = generate_questions(topic)
+          policy = LiveModelPolicy(
+              enabled=True,
+              creative_model="gpt-5.6-luna",
+              expert_model="gpt-5.6-luna",
+              max_requests=1,
+              max_input_tokens=20_000,
+              max_output_tokens=12_500,
+              max_estimated_cost_usd=0.01,
+              creative_max_output_tokens=3_500,
+              expert_max_output_tokens=900,
+              creative_reasoning_effort="medium",
+              expert_reasoning_effort="low",
+          )
+          gate = LiveBudgetGate(policy)
+          creative = generate_live_open_ideas(topic, questions, policy, gate)
+
+          payload = {
+              "status": "CREATIVE_V2_OPEN_LIVE_COMPLETE",
+              "seed": seed,
+              "idea_count": len(creative.ideas),
+              "mechanism_diversity_ratio": creative.mechanism_diversity_ratio,
+              "mechanism_families": creative.mechanism_family_by_idea_id,
+              "usage": gate.usage.model_dump(),
+              "ideas": [idea.model_dump(mode="json") for idea in creative.ideas],
+          }
+          out = Path("artifacts/mind-forge-creative-v2-open-live/result.json")
+          out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(json.dumps(payload, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Validate autonomous V2 result, relevance gate, and hard budgets
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("artifacts/mind-forge-creative-v2-open-live")
+          data = json.loads((root / "result.json").read_text(encoding="utf-8"))
+          if data.get("status") != "CREATIVE_V2_OPEN_LIVE_COMPLETE":
+              raise SystemExit("Creative V2 did not complete")
+          if data.get("seed") != "تصليح الملابس":
+              raise SystemExit("unexpected live-proof seed")
+          if data.get("idea_count") != 14:
+              raise SystemExit(f"expected 14 ideas, got {data.get('idea_count')}")
+          if data.get("mechanism_diversity_ratio", 0) < (8 / 14):
+              raise SystemExit("mechanism diversity fell below 8/14")
+          usage = data["usage"]
+          if int(usage["requests"]) != 1:
+              raise SystemExit(f"expected exactly one model request, got {usage['requests']}")
+          if float(usage["estimated_cost_usd"]) > 0.01:
+              raise SystemExit("Creative V2 estimated cost exceeded $0.01")
+
+          required = ["reasoning.json", "top3.json", "evidence.json", "final_rank.json", "live_evidence_usage.json"]
+          missing = [name for name in required if not (root / name).exists()]
+          if missing:
+              raise SystemExit(f"autonomous V2 artifact is incomplete: {missing}")
+
+          research_usage = json.loads((root / "live_evidence_usage.json").read_text(encoding="utf-8"))
+          if int(research_usage["search_operations"]) != 3:
+              raise SystemExit("expected exactly three bounded evidence searches")
+          if float(research_usage["estimated_research_cost_usd"]) > 0.03:
+              raise SystemExit("Evidence research estimated cost exceeded $0.03")
+
+          evidence = json.loads((root / "evidence.json").read_text(encoding="utf-8"))
+          observations = list(evidence.get("observations", []) or [])
+          allowed_relevance = {"DIRECT", "ADJACENT", "GENERIC", "OFF_DOMAIN"}
+          if not observations:
+              raise SystemExit("expected grounded evidence observations")
+          for obs in observations:
+              if obs.get("relevance") not in allowed_relevance:
+                  raise SystemExit(f"invalid or missing relevance label: {obs.get('relevance')}")
+              if not str(obs.get("relevance_reason") or "").strip():
+                  raise SystemExit("evidence observation missing relevance_reason")
+
+          final_rank = json.loads((root / "final_rank.json").read_text(encoding="utf-8"))
+          if final_rank.get("evidence_relevance_gate") != "ENFORCED":
+              raise SystemExit("evidence relevance gate is not enforced")
+          for row in final_rank.get("ranking", []):
+              if int(row.get("relevant_evidence_count", 0)) == 0:
+                  if row.get("evidence_status") != "INSUFFICIENT_EVIDENCE":
+                      raise SystemExit("irrelevant-only evidence was not marked insufficient")
+                  if abs(float(row["final_score"]) - float(row["reasoning_score"])) > 0.0001:
+                      raise SystemExit("irrelevant-only evidence changed final score")
+
+          print("MIND FORGE TAILORING EVIDENCE RELEVANCE V5: PASS")
+          PY
+
+      - name: Upload one-time tailoring proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-tailoring-live-proof-v5
+          path: artifacts/mind-forge-creative-v2-open-live/
+          if-no-files-found: warn
+          retention-days: 30
