@@ -7,6 +7,7 @@ from pathlib import Path
 from opportunity_engine.missed_opportunity_learning import (
     DiscoveryTrace,
     MissedOpportunityCase,
+    load_missed_opportunity_memory,
     save_missed_opportunity_memory,
 )
 
@@ -40,8 +41,8 @@ def test_auto_learning_hook_runs_after_unified_capture_by_atexit_order() -> None
     hook = HOOK.read_text(encoding="utf-8")
     assert "automatic-missed-opportunity-capture.json" in hook
     assert "run_daily_learning_runtime(" in hook
-    assert 'learning_dir=input_root / "learning"' in hook
-    assert 'report_path=output_dir / "daily-learning-cycle.json"' in hook
+    assert 'learning_dir=root / "learning"' in hook
+    assert 'report_path=output / REPORT_FILENAME' in hook
 
 
 def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
@@ -77,10 +78,8 @@ def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
         root_cause="QUERY_GAP",
         learning_status="DIAGNOSED",
     )
-    save_missed_opportunity_memory(
-        input_root / "learning" / "missed-opportunities.json",
-        [case],
-    )
+    memory_path = input_root / "learning" / "missed-opportunities.json"
+    save_missed_opportunity_memory(memory_path, [case])
 
     report = run_daily_auto_miss_learning(
         output_dir,
@@ -88,7 +87,12 @@ def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
         environment={"GITHUB_EVENT_NAME": "workflow_dispatch"},
     )
 
-    assert report["known_missed_opportunity_count"] == 1
+    # The repository may also contain curated real inbox cases (for example the
+    # first Lene Interiør proof). The post-capture cycle must merge rather than
+    # erase either source of memory.
+    assert report["known_missed_opportunity_count"] >= 1
+    persisted_ids = {item.case_id for item in load_missed_opportunity_memory(memory_path)}
+    assert "AUTO-QUERY-GAP-1" in persisted_ids
     assert report["candidate_count"] >= 1
     assert report["learning_search_requests"] == 0
     assert report["search_status"] == "SKIPPED_COST_GUARD"
@@ -105,7 +109,9 @@ def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
         )
     )
     summary = brief["daily_auto_miss_learning"]
-    assert summary["known_missed_opportunity_count"] == 1
+    assert summary["known_missed_opportunity_count"] == report[
+        "known_missed_opportunity_count"
+    ]
     assert summary["automatic_query_activation"] is False
     assert summary["promotion_gate_enforced"] is True
 
