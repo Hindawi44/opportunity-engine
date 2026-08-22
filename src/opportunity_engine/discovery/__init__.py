@@ -88,6 +88,9 @@ from opportunity_engine.discovery.openai_fabric_procurement_cli_hook import (
 from opportunity_engine.discovery.fabric_procurement_watch_cli_hook import (
     install_fabric_procurement_watch_cli_hook,
 )
+from opportunity_engine.discovery.scheduled_promoted_core_cli_hook import (
+    install_scheduled_promoted_core_cli_hook,
+)
 
 install_openai_hunt_case_schema_compat()
 install_bilingual_bridal_search()
@@ -98,6 +101,9 @@ install_stockhurt_redirect_partial_recovery()
 install_stockhurt_sale_mode_brand_cleanup()
 install_unified_decision_priority()
 install_one_decision_consistency()
+# This synchronous hook runs only for the real daily checkpoint CLI, before its
+# source artifacts are consolidated. It is not an atexit handler.
+install_scheduled_promoted_core_cli_hook()
 install_central_intelligence_orchestrator_cli_hook()
 install_market_comparables_benchmark_cli_hook()
 install_market_comparables_brand_cleanup()
