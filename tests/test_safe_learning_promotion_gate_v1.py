@@ -129,6 +129,21 @@ def test_explicit_promotion_cannot_activate_single_holdout_transfer_proof() -> N
     assert active["active_term_count"] == 0
 
 
+def test_stored_transfer_count_cannot_replace_unique_holdout_identities() -> None:
+    shadow = build_learned_query_overlay(
+        [_transfer_evaluation(("HOLDOUT-NO-SENZE-OF-JOY",))]
+    )
+    shadow["markets"]["NO"][0]["independent_transfer_case_count"] = 99
+
+    active = select_promoted_query_overlay(
+        shadow,
+        {("NO", "avviklingssalg"): "PROMOTED"},
+    )
+
+    assert learned_terms_for_market(active, "NO") == {}
+    assert active["active_term_count"] == 0
+
+
 def test_explicit_promotion_can_activate_repeated_independent_transfer_proof() -> None:
     shadow = build_learned_query_overlay(
         [
