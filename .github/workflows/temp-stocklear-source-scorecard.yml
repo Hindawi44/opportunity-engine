@@ -1,0 +1,119 @@
+name: TEMP Stocklear Source Scorecard
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  stocklear-source-scorecard:
+    if: ${{ github.head_ref == 'agent/stocklear-source-scorecard-v1' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      OUTPUT_DIR: artifacts/stocklear-source-scorecard-v1
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify scorecard contracts
+        run: pytest tests/test_source_promotion_scorecard_v1.py -q
+
+      - name: Build pre-round scorecard
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/build_stocklear_source_scorecard.py \
+            --live-proof docs/benchmarks/source-shadow-live-validation-2026-08-22-result.json \
+            --independent-live-discovery-rounds 1 \
+            --live-source-candidate-count 5 \
+            --output "$OUTPUT_DIR/scorecard-before-round2.json"
+
+      - name: Confirm first-round gate stays closed
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('artifacts/stocklear-source-scorecard-v1/scorecard-before-round2.json').read_text())
+          assert d['decision'] == 'KEEP_SHADOW', d
+          assert 'NEEDS_SECOND_INDEPENDENT_LIVE_DISCOVERY_ROUND' in d['blocking_reasons'], d
+          assert d['automatic_promotion'] is False
+          print('pre-score:', d['promotion_readiness_score'], d['decision'], d['blocking_reasons'])
+          PY
+
+      - name: Run independent second Stocklear shadow round
+        run: |
+          python scripts/run_stocklear_second_shadow_round.py \
+            --output "$OUTPUT_DIR/stocklear-shadow-round2.json" \
+            --max-candidates 5 \
+            --max-detail-requests 5 \
+            --timeout-seconds 20
+
+      - name: Build final scorecard from both rounds
+        run: |
+          SECOND_CANDIDATES=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('artifacts/stocklear-source-scorecard-v1/stocklear-shadow-round2.json').read_text())
+          print(int(d.get('novel_candidate_count', 0)))
+          PY
+          )
+          SECOND_VERIFIED=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('artifacts/stocklear-source-scorecard-v1/stocklear-shadow-round2.json').read_text())
+          print(int(d.get('verified_new_opportunity_count', 0)))
+          PY
+          )
+          if [ "$SECOND_VERIFIED" -gt 0 ]; then
+            SUCCESSFUL_ROUNDS=2
+          else
+            SUCCESSFUL_ROUNDS=1
+          fi
+          TOTAL_CANDIDATES=$((5 + SECOND_CANDIDATES))
+          python scripts/build_stocklear_source_scorecard.py \
+            --live-proof docs/benchmarks/source-shadow-live-validation-2026-08-22-result.json \
+            --live-proof "$OUTPUT_DIR/stocklear-shadow-round2.json" \
+            --independent-live-discovery-rounds "$SUCCESSFUL_ROUNDS" \
+            --live-source-candidate-count "$TOTAL_CANDIDATES" \
+            --output "$OUTPUT_DIR/stocklear-source-scorecard-final.json"
+
+      - name: Print final verdict
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r2=json.loads(Path('artifacts/stocklear-source-scorecard-v1/stocklear-shadow-round2.json').read_text())
+          s=json.loads(Path('artifacts/stocklear-source-scorecard-v1/stocklear-source-scorecard-final.json').read_text())
+          print('round2 candidates:', r2.get('novel_candidate_count'))
+          print('round2 verified:', r2.get('verified_new_opportunity_count'))
+          print('round2 prior excluded:', r2.get('prior_recovery_url_exclusion_count'))
+          print('score:', s.get('promotion_readiness_score'))
+          print('decision:', s.get('decision'))
+          print('blocking:', s.get('blocking_reasons'))
+          print('false positive rate:', s.get('metrics', {}).get('false_positive_rate'))
+          print('production active:', s.get('production_active'))
+          print('automatic promotion:', s.get('automatic_promotion'))
+          for row in r2.get('verified_new_opportunities', []):
+              print('-', row.get('source_url'))
+          PY
+
+      - name: Upload scorecard proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stocklear-source-scorecard-v1
+          path: artifacts/stocklear-source-scorecard-v1/
+          if-no-files-found: error
+          retention-days: 30
