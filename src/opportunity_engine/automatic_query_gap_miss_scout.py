@@ -65,6 +65,8 @@ _CLOSURE_MARKERS = (
     "legges ned",
     "stenger for godt",
     "stenger etter",
+    "stenge butikken",
+    "stenger butikken",
     "siste åpningsdag",
     "avvikler",
     "avvikles",
@@ -84,6 +86,9 @@ _TEMPORARY_MARKERS = (
     "stengt for oppussing",
     "stenger for oppussing",
     "stengt på grunn av ferie",
+    "stenge butikken midlertidig",
+    "stenger butikken midlertidig",
+    "midlertidig stenge butikken",
 )
 _GENERIC_COMPANY_LABELS = frozenset(
     {
@@ -100,6 +105,14 @@ _GENERIC_COMPANY_LABELS = frozenset(
     }
 )
 _COMPANY_PATTERNS = (
+    # A public operating-identity statement is strong company evidence, e.g.
+    # "Senna Mode drives av Senna Mode B.V.". Some commerce templates place a
+    # BEDRIFTSDETALJER heading immediately before the displayed trading name.
+    re.compile(
+        r"\b(?:(?i:bedriftsdetaljer)\s+)?"
+        r"([A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?)\s+"
+        r"(?i:drives av)\b"
+    ),
     # Prefer a role-labelled identity, e.g. "Klesbutikken Rita Korsettsalong i ...".
     re.compile(
         r"\b(?i:klesbutikken|butikken|bedriften|selskapet|forretningen)\s+"
@@ -109,7 +122,7 @@ _COMPANY_PATTERNS = (
     # Fallback: a concrete title/name immediately followed by a closure verb.
     re.compile(
         r"\b([A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?)\s+"
-        r"(?i:legger ned|legges ned|stenger for godt|stenger etter|avvikler|avvikles|opphører)\b"
+        r"(?i:legger ned|legges ned|stenger for godt|stenger etter|stenge butikken|stenger butikken|avvikler|avvikles|opphører)\b"
     ),
 )
 
