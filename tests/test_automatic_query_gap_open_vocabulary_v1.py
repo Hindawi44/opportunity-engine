@@ -24,6 +24,15 @@ SEASONAL_ONLY_HTML = """
 </body></html>
 """
 
+RELOCATION_ONLY_HTML = """
+<html><body>
+<h1>Nordlys Mote flytter butikken</h1>
+<p>Klesbutikken Nordlys Mote i Tromsø har siste åpningsdag her på lørdag.</p>
+<p>Nå starter Flyttesalget.</p>
+<p>Hele varelageret skal selges ut før vi åpner i nye lokaler.</p>
+</body></html>
+"""
+
 
 def _page(html: str):
     from opportunity_engine.automatic_query_gap_miss_scout import PublicPage
@@ -93,6 +102,21 @@ def test_seasonal_sale_word_does_not_become_query_gap_language() -> None:
         active_queries=[],
         search=lambda query: [_hit()],
         fetch_page=lambda url: _page(SEASONAL_ONLY_HTML),
+    )
+
+    assert outcome["detected_miss_count"] == 0
+    assert outcome["verified_page_count"] == 0
+    assert outcome["automatic_query_activation"] is False
+
+
+def test_relocation_sale_word_does_not_become_closure_query_gap_language() -> None:
+    from opportunity_engine.query_gap_scout_waterfall import discover_query_gap_misses
+
+    outcome = discover_query_gap_misses(
+        {"deduplicated_opportunities": []},
+        active_queries=[],
+        search=lambda query: [_hit()],
+        fetch_page=lambda url: _page(RELOCATION_ONLY_HTML),
     )
 
     assert outcome["detected_miss_count"] == 0
