@@ -14,7 +14,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--results-per-query", type=int, default=10)
-    parser.add_argument("--max-pages", type=int, default=3)
+    parser.add_argument("--max-pages", type=int, default=10)
     parser.add_argument("--max-terms", type=int, default=1)
     args = parser.parse_args()
 
