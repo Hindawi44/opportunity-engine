@@ -1,0 +1,107 @@
+name: Temporary repeated transfer retrieval window patch
+
+on:
+  push:
+    branches:
+      - agent/repeated-holdout-transfer-v1-work
+    paths:
+      - .github/workflows/temp-repeated-transfer-window-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply deterministic retrieval-window patch
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+
+          hook = Path("src/opportunity_engine/discovery/daily_auto_miss_learning_cli_hook.py")
+          text = hook.read_text(encoding="utf-8")
+          old = "        results_per_candidate=5,\n"
+          new = "        results_per_candidate=10,\n"
+          if text.count(old) != 1:
+              raise SystemExit(f"expected one results_per_candidate=5, got {text.count(old)}")
+          hook.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          config = Path("config/learning/query_gap_validation_cases.json")
+          payload = json.loads(config.read_text(encoding="utf-8"))
+          rows = payload.setdefault("cases", [])
+          existing = {str(row.get("case_id")) for row in rows if isinstance(row, dict)}
+          additions = [
+              {
+                  "case_id": "HOLDOUT-NO-SENZE-OF-JOY",
+                  "market_code": "NO",
+                  "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+                  "observed_at": "2026-08-22T19:20:00+00:00",
+                  "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+                  "stock_proven": True,
+                  "ground_truth": {
+                      "company": "Senze of Joy",
+                      "url": "https://www.lagersalg.no/lagersalg/avviklingssalg-senze-of-joy-2"
+                  },
+                  "trace": {},
+                  "learning_evidence_text": "",
+                  "diagnosed_query_gap_terms": [],
+                  "learned_patterns": [],
+                  "root_cause": "VALIDATION_HOLDOUT",
+                  "learning_status": "HOLDOUT",
+                  "repeat_miss": False
+              },
+              {
+                  "case_id": "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER",
+                  "market_code": "NO",
+                  "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+                  "observed_at": "2026-08-22T19:20:00+00:00",
+                  "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+                  "stock_proven": True,
+                  "ground_truth": {
+                      "company": "Tøff og Liten",
+                      "url": "https://www.steinkjer-avisa.no/amfi-butikk-stenger-dorene/s/5-117-364719"
+                  },
+                  "trace": {},
+                  "learning_evidence_text": "",
+                  "diagnosed_query_gap_terms": [],
+                  "learned_patterns": [],
+                  "root_cause": "VALIDATION_HOLDOUT",
+                  "learning_status": "HOLDOUT",
+                  "repeat_miss": False
+              },
+              {
+                  "case_id": "HOLDOUT-NO-GAULA-NATURSENTER",
+                  "market_code": "NO",
+                  "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+                  "observed_at": "2026-08-22T19:20:00+00:00",
+                  "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+                  "stock_proven": True,
+                  "ground_truth": {
+                      "company": "Gaula Natursenter AS",
+                      "url": "https://www.mgk.no/avviklingssalg"
+                  },
+                  "trace": {},
+                  "learning_evidence_text": "",
+                  "diagnosed_query_gap_terms": [],
+                  "learned_patterns": [],
+                  "root_cause": "VALIDATION_HOLDOUT",
+                  "learning_status": "HOLDOUT",
+                  "repeat_miss": False
+              }
+          ]
+          for row in additions:
+              if row["case_id"] not in existing:
+                  rows.append(row)
+          config.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+      - name: Commit implementation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/opportunity_engine/discovery/daily_auto_miss_learning_cli_hook.py config/learning/query_gap_validation_cases.json
+          git commit -m "fix: widen repeated-transfer result window"
+          git push
