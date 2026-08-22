@@ -55,7 +55,7 @@ def install_scheduled_promoted_core_cli_hook() -> None:
             learned_dir,
             environment=os.environ,
             results_per_query=10,
-            max_pages=3,
+            max_pages=10,
             max_terms=1,
         )
         if int(discovery.get("verified_opportunity_count") or 0) > 0:
