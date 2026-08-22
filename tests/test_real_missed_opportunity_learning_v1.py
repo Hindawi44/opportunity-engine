@@ -99,13 +99,17 @@ def test_real_miss_can_be_recovered_in_shadow_without_production_activation() ->
     assert outcome.report["promotion_gate_enforced"] is True
 
 
-def test_learning_search_anchor_covers_broad_inventory_not_only_clothing() -> None:
+def test_learning_search_anchor_tracks_opportunity_intent_not_product_vertical() -> None:
     anchor = _market_anchor("NO").casefold()
 
+    assert "legger ned" in anchor
+    assert "nedleggelse" in anchor
+    assert "stenger" in anchor
+    assert "avvikling" in anchor
     assert "varelager" in anchor
-    assert "interiør" in anchor
-    assert "elektronikk" in anchor
-    assert "byggevarer" in anchor
+    assert "restlager" in anchor
+    assert "klær" not in anchor
+    assert "elektronikk" not in anchor
 
 
 def test_real_miss_runs_end_to_end_through_persistent_runtime(tmp_path) -> None:
