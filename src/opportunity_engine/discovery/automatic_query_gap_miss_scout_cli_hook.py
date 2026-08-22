@@ -72,9 +72,9 @@ def install_automatic_query_gap_miss_scout_cli_hook() -> None:
 
     def _run_before_river() -> None:
         try:
-            # Lazy import avoids a package-initialization cycle because the scout
-            # itself imports discovery search-provider modules.
-            from opportunity_engine.automatic_query_gap_miss_scout import (
+            # Lazy import avoids package-initialization cycles. The waterfall
+            # reuses the original exact-page verifier and memory semantics.
+            from opportunity_engine.query_gap_scout_waterfall import (
                 write_automatic_query_gap_miss_scout,
             )
 
@@ -92,6 +92,7 @@ def install_automatic_query_gap_miss_scout_cli_hook() -> None:
             json.dumps(
                 {
                     "status": report.get("status"),
+                    "waterfall_enabled": report.get("waterfall_enabled", False),
                     "search_request_count": report.get("search_request_count", 0),
                     "page_request_count": report.get("page_request_count", 0),
                     "verified_page_count": report.get("verified_page_count", 0),
