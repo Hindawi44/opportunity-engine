@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from opportunity_engine.discovery.search_provider import SearchHit
-from opportunity_engine.missed_opportunity_learning import DiscoveryTrace, diagnose_root_cause
 
 
 NRK_URL = (
@@ -58,29 +57,21 @@ def _restricted_queries() -> list[str]:
     ]
 
 
-def test_trace_can_diagnose_query_scope_gap_before_source_gap() -> None:
-    trace = DiscoveryTrace(
-        query_generated=True,
-        query_scope_covered=False,
-        search_hit=False,
+def test_scope_state_and_root_cause_distinguish_absent_restricted_and_broad() -> None:
+    from opportunity_engine.query_gap_scout_waterfall import (
+        query_term_root_cause,
+        query_term_scope_state,
     )
-
-    assert diagnose_root_cause(trace) == "QUERY_SCOPE_GAP"
-    assert trace.to_dict()["query_scope_covered"] is False
-
-
-def test_scope_state_distinguishes_absent_restricted_and_broad_queries() -> None:
-    from opportunity_engine.query_gap_scout_waterfall import query_term_scope_state
 
     assert query_term_scope_state("sluttsalg", _restricted_queries()) == "ABSENT"
+    assert query_term_root_cause("sluttsalg", _restricted_queries()) == "QUERY_GAP"
+
     assert query_term_scope_state("opphørssalg", _restricted_queries()) == "VERTICAL_RESTRICTED"
-    assert (
-        query_term_scope_state(
-            "opphørssalg",
-            [*_restricted_queries(), "opphørssalg varelager sortiment Norge"],
-        )
-        == "BROAD"
-    )
+    assert query_term_root_cause("opphørssalg", _restricted_queries()) == "QUERY_SCOPE_GAP"
+
+    broad = [*_restricted_queries(), "opphørssalg varelager sortiment Norge"]
+    assert query_term_scope_state("opphørssalg", broad) == "BROAD"
+    assert query_term_root_cause("opphørssalg", broad) is None
 
 
 def test_entity_follow_up_query_does_not_leak_gap_terms() -> None:
@@ -102,13 +93,11 @@ def test_entity_follow_up_query_does_not_leak_gap_terms() -> None:
 
 
 def test_official_bauhaus_page_is_verified_without_relaxing_stock_gate() -> None:
-    from opportunity_engine.automatic_query_gap_miss_scout import (
-        _verify_closure_liquidation_page,
-    )
+    from opportunity_engine.query_gap_page_verifier_v2 import verify_query_gap_page_v2
     from opportunity_engine.query_gap_scout_waterfall import diagnose_public_page
 
     diagnostic = diagnose_public_page(_page(OFFICIAL_URL, OFFICIAL_HTML))
-    proof = _verify_closure_liquidation_page(_page(OFFICIAL_URL, OFFICIAL_HTML))
+    proof = verify_query_gap_page_v2(_page(OFFICIAL_URL, OFFICIAL_HTML))
 
     assert diagnostic["verifier_status"] == "VERIFIED"
     assert diagnostic["company"] == "BAUHAUS"
@@ -166,13 +155,14 @@ def test_partial_closure_entity_routes_second_request_to_entity_follow_up() -> N
     assert outcome["verified_page_count"] == 1
     assert outcome["detected_miss_count"] == 1
     assert outcome["entity_follow_up_used"] is True
+    assert outcome["entity_follow_up_company"].casefold() == "bauhaus"
 
     [case] = outcome["cases"]
     assert case.ground_truth_company == "BAUHAUS"
     assert case.ground_truth_url == OFFICIAL_URL
     assert case.root_cause == "QUERY_SCOPE_GAP"
     assert case.trace.query_generated is True
-    assert case.trace.query_scope_covered is False
+    assert case.learning_status == "DIAGNOSED"
 
     [metadata] = outcome["cases_metadata"]
     assert metadata["query_gap_term"] == "opphørssalg"
