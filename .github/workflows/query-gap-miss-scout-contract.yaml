@@ -1,0 +1,35 @@
+name: Query Gap Miss Scout Contract
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/query-gap-miss-scout-contract.yaml"
+      - "src/opportunity_engine/automatic_query_gap_miss_scout.py"
+      - "src/opportunity_engine/discovery/automatic_query_gap_miss_scout_cli_hook.py"
+      - "src/opportunity_engine/discovery/__init__.py"
+      - "src/opportunity_engine/discovery/unified_market_intelligence_river_cli_hook.py"
+      - "src/opportunity_engine/discovery/daily_auto_miss_learning_cli_hook.py"
+      - "src/opportunity_engine/daily_learning_runtime.py"
+      - "src/opportunity_engine/automatic_missed_opportunity_capture.py"
+      - "tests/test_automatic_query_gap_miss_scout_v1.py"
+      - "tests/test_daily_auto_miss_learning_wiring_v1.py"
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Verify query-gap scout and same-run learning contract
+        env:
+          PYTHONPATH: src:.
+        run: |
+          pytest tests/test_automatic_query_gap_miss_scout_v1.py -q
+          pytest tests/test_daily_auto_miss_learning_wiring_v1.py -q
