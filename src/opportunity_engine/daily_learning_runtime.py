@@ -119,30 +119,16 @@ def append_learning_history(
     )
 
 
-def _market_anchor(market_code: str) -> str:
-    """Anchor learning on opportunity intent, not one product vertical.
+def _learning_query(term: str) -> str:
+    """Replay the learned commercial pattern itself, without vertical leakage.
 
-    Learned terms are replayed against closure, liquidation, insolvency, and
-    inventory-disposal language. This preserves broad commercial recall without
-    leaking a missed company's identity or trapping learning inside clothing.
+    Candidate extraction already requires a commercial signal. Adding clothing,
+    product-category, or closure anchors can distort ranking and hide the exact
+    historical miss. Precision and hidden-ground-truth replay remain the safety
+    gates for rejecting noisy terms.
     """
-    return {
-        "NO": (
-            '("legger ned" OR nedleggelse OR stenger OR avvikling OR konkurs OR '
-            'varelager OR restlager OR lagerbeholdning OR vareparti OR lageroverskudd)'
-        ),
-        "SE": (
-            '("lägger ner" OR nedläggning OR stänger OR avveckling OR konkurs OR '
-            'varulager OR restlager OR lageröverskott OR varuparti)'
-        ),
-        "DE": (
-            '(schließt OR Schließung OR Geschäftsaufgabe OR Geschäftsauflösung OR '
-            'Insolvenz OR Warenbestand OR Restposten OR Lagerbestand OR Warenposten)'
-        ),
-    }.get(
-        market_code.upper(),
-        "(closing OR closure OR liquidation OR insolvency OR inventory OR stock OR surplus)",
-    )
+    safe_term = term.replace('"', "").strip()
+    return f'"{safe_term}"'
 
 
 def build_learning_search(
@@ -163,8 +149,7 @@ def build_learning_search(
                 extra_snippets=True,
             )
             providers[market] = provider
-        safe_term = term.replace('"', "").strip()
-        query = f'"{safe_term}" {_market_anchor(market)}'
+        query = _learning_query(term)
         hits = provider.search(query, count=results_per_candidate)
         return [
             {
