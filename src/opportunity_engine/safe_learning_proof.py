@@ -38,12 +38,8 @@ def _matching_shadow_row(
         if str(row.get("source_verdict") or "").strip().upper() != "PROVEN":
             continue
         scope = str(row.get("evaluation_scope") or "SOURCE_CASE_REPLAY").strip().upper()
-        recovered_ids = {
-            str(item) for item in (row.get("recovered_case_ids") or [])
-        }
-        support_ids = {
-            str(item) for item in (row.get("support_case_ids") or [])
-        }
+        recovered_ids = {str(item) for item in (row.get("recovered_case_ids") or [])}
+        support_ids = {str(item) for item in (row.get("support_case_ids") or [])}
         if scope == "HOLDOUT_TRANSFER" and case.case_id in support_ids:
             return row, "HOLDOUT_TRANSFER"
         if case.case_id in recovered_ids:
@@ -87,9 +83,7 @@ def _proof_row_for_case(
     raw_count_value = shadow_match.get("raw_hit_count")
     relevant_count_value = shadow_match.get("verified_relevant_count")
     raw_count = int(raw_count_value) if isinstance(raw_count_value, int) else None
-    relevant_count = (
-        int(relevant_count_value) if isinstance(relevant_count_value, int) else None
-    )
+    relevant_count = int(relevant_count_value) if isinstance(relevant_count_value, int) else None
     false_positive_count = (
         max(0, raw_count - relevant_count)
         if raw_count is not None and relevant_count is not None
@@ -100,9 +94,11 @@ def _proof_row_for_case(
         if false_positive_count is not None and raw_count and raw_count > 0
         else (0.0 if false_positive_count == 0 and raw_count == 0 else None)
     )
-    validation_case_ids = [
-        str(item) for item in (shadow_match.get("recovered_case_ids") or [])
-    ] if proof_mode == "HOLDOUT_TRANSFER" else []
+    validation_case_ids = (
+        [str(item) for item in (shadow_match.get("recovered_case_ids") or [])]
+        if proof_mode == "HOLDOUT_TRANSFER"
+        else []
+    )
 
     production_active = False
     for row in _rows_for_market(active_overlay, case.market_code):
@@ -111,8 +107,7 @@ def _proof_row_for_case(
             continue
         if (
             str(row.get("promotion_status") or "").strip().upper() == "PROMOTED"
-            and str(row.get("activation_source") or "").strip().upper()
-            == "EXPLICIT_PROMOTION"
+            and str(row.get("activation_source") or "").strip().upper() == "EXPLICIT_PROMOTION"
         ):
             production_active = True
             break
@@ -185,9 +180,17 @@ def build_query_gap_safe_learning_proof(
     elif eligible:
         status = "SHADOW_PASSED"
     elif proven and len(noisy) == len(proven):
-        status = "SHADOW_PROVEN_BUT_NOISY"
+        status = (
+            "SHADOW_TRANSFER_PROVEN_BUT_NOISY"
+            if transfer_proven and not recovered
+            else "SHADOW_RECOVERED_BUT_NOISY"
+        )
     elif proven:
-        status = "SHADOW_PROVEN_NOT_ELIGIBLE"
+        status = (
+            "SHADOW_TRANSFER_PROVEN_NOT_ELIGIBLE"
+            if transfer_proven and not recovered
+            else "SHADOW_RECOVERED_NOT_ELIGIBLE"
+        )
     else:
         status = "NO_SHADOW_RECOVERY_YET"
 
