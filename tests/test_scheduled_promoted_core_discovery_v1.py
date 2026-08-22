@@ -185,10 +185,7 @@ def test_scheduled_promoted_core_search_creates_verified_direct_candidate(
         max_pages=3,
     )
 
-    assert len(queries) == 1
-    assert queries[0].startswith(f'"{TERM}" ')
-    assert '"avvikler"' in queries[0]
-    assert '"lagerbeholdning"' in queries[0]
+    assert queries == [f'"{TERM}" "stenge butikken"']
     assert report["status"] == "SUCCESS"
     assert report["request_count"] == 1
     assert report["verified_opportunity_count"] == 1
