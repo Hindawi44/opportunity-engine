@@ -1,0 +1,47 @@
+{
+  "schema_version": "stocklear-access-stability-result-1.0",
+  "measured_at": "2026-08-22T12:18:43Z",
+  "repository": "Hindawi44/opportunity-engine",
+  "pull_request": 613,
+  "workflow_run_id": 32572592530,
+  "artifact_id": 9475718614,
+  "artifact_name": "stocklear-access-stability-v1",
+  "source_name": "Stocklear",
+  "source_domain": "joblot.stocklear.eu",
+  "round_count": 3,
+  "samples_per_round": 6,
+  "total_public_get_requests": 18,
+  "total_usable_public_samples": 18,
+  "usable_public_ratio": 1.0,
+  "http_200_count": 18,
+  "blocked_403_count": 0,
+  "rate_limited_429_count": 0,
+  "challenge_count": 0,
+  "login_redirect_count": 0,
+  "html_drift_count": 0,
+  "round_verdicts": [
+    "PUBLIC_ACCESS_STABLE_PARTIAL",
+    "PUBLIC_ACCESS_STABLE_PARTIAL",
+    "PUBLIC_ACCESS_STABLE_PARTIAL"
+  ],
+  "public_surface": {
+    "homepage": "PUBLIC_ACCESS",
+    "verified_auction_pages": "PUBLIC_PARTIAL_LOGIN_WALL",
+    "auction_page_sample_count_per_round": 5,
+    "public_opportunity_markers_available": true,
+    "deeper_listing_data_requires_login": true
+  },
+  "safety": {
+    "public_only": true,
+    "credentials_supplied": false,
+    "cookies_supplied": false,
+    "authentication_attempted": false,
+    "captcha_bypass_attempted": false,
+    "proxy_rotation_attempted": false,
+    "production_mutation": false,
+    "automatic_promotion": false
+  },
+  "verdict": "PUBLIC_ACCESS_STABLE_PARTIAL",
+  "production_promotion_recommended": false,
+  "proof_statement": "Across three bounded rounds from GitHub Actions, the Stocklear homepage and five previously verified public auction pages returned 18/18 usable HTTP 200 responses with no 403, 429, CAPTCHA/challenge, login redirect, or HTML drift. Auction pages expose enough public lot data for opportunity verification while deeper listing data remains login-gated."
+}
