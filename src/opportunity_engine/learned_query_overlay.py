@@ -8,6 +8,8 @@ creating extra search requests.
 from __future__ import annotations
 
 from collections import defaultdict
+import json
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from opportunity_engine.adaptive_keyword_learning import KeywordEvaluationResult
@@ -77,6 +79,34 @@ def build_learned_query_overlay(
         "automatic_purchase": False,
         "automatic_payment": False,
     }
+
+
+def save_learned_query_overlay(path: str | Path, overlay: Mapping[str, Any]) -> None:
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    payload = dict(overlay)
+    payload["schema_version"] = SCHEMA_VERSION
+    temporary = target.with_suffix(target.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(target)
+
+
+def load_learned_query_overlay(path: str | Path) -> dict[str, Any]:
+    target = Path(path)
+    if not target.exists():
+        return build_learned_query_overlay([])
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    if not isinstance(payload, Mapping):
+        raise ValueError("learned query overlay must be a JSON object")
+    if payload.get("schema_version") != SCHEMA_VERSION:
+        raise ValueError("unsupported learned query overlay schema")
+    markets = payload.get("markets")
+    if not isinstance(markets, Mapping):
+        raise ValueError("learned query overlay markets must be an object")
+    return dict(payload)
 
 
 def learned_terms_for_market(
