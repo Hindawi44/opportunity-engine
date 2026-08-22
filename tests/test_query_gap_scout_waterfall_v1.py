@@ -44,7 +44,7 @@ def _page(url: str, html: str):
 
 
 def test_waterfall_queries_are_distinct_and_do_not_leak_learning_terms() -> None:
-    from opportunity_engine.automatic_query_gap_miss_scout import (
+    from opportunity_engine.query_gap_scout_waterfall import (
         MAX_SEARCH_REQUESTS,
         SCOUT_QUERIES_NO,
     )
@@ -65,7 +65,7 @@ def test_waterfall_queries_are_distinct_and_do_not_leak_learning_terms() -> None
 
 
 def test_waterfall_uses_second_query_when_first_path_has_no_hits() -> None:
-    from opportunity_engine.automatic_query_gap_miss_scout import (
+    from opportunity_engine.query_gap_scout_waterfall import (
         SCOUT_QUERIES_NO,
         discover_query_gap_misses,
     )
@@ -94,7 +94,7 @@ def test_waterfall_uses_second_query_when_first_path_has_no_hits() -> None:
 
 
 def test_waterfall_stops_after_first_verified_miss_to_save_cost() -> None:
-    from opportunity_engine.automatic_query_gap_miss_scout import (
+    from opportunity_engine.query_gap_scout_waterfall import (
         SCOUT_QUERIES_NO,
         discover_query_gap_misses,
     )
@@ -119,19 +119,18 @@ def test_waterfall_stops_after_first_verified_miss_to_save_cost() -> None:
 
 
 def test_waterfall_reserves_recall_for_fallback_and_shares_global_page_budget() -> None:
-    from opportunity_engine.automatic_query_gap_miss_scout import (
+    from opportunity_engine.query_gap_scout_waterfall import (
         SCOUT_QUERIES_NO,
         discover_query_gap_misses,
     )
 
     noise_url = "https://example.no/closure-story"
-    duplicate_url = noise_url
     fetched: list[str] = []
 
     def search(query: str):
         if query == SCOUT_QUERIES_NO[0]:
             return [_hit(noise_url), _hit("https://example.no/second-strict-hit")]
-        return [_hit(duplicate_url), _hit(RITA_URL), _hit("https://example.no/fallback-noise")]
+        return [_hit(noise_url), _hit(RITA_URL), _hit("https://example.no/fallback-noise")]
 
     def fetch_page(url: str):
         fetched.append(url)
@@ -155,13 +154,12 @@ def test_waterfall_reserves_recall_for_fallback_and_shares_global_page_budget() 
     assert outcome["search_request_count"] == 2
     assert outcome["page_request_count"] == 2
     assert outcome["detected_miss_count"] == 1
-    assert outcome["max_pages"] if "max_pages" in outcome else True
     assert outcome["search_stages"][0]["page_request_count"] == 1
     assert outcome["search_stages"][1]["page_request_count"] == 1
 
 
 def test_waterfall_deduplicates_urls_across_search_stages() -> None:
-    from opportunity_engine.automatic_query_gap_miss_scout import (
+    from opportunity_engine.query_gap_scout_waterfall import (
         SCOUT_QUERIES_NO,
         discover_query_gap_misses,
     )
