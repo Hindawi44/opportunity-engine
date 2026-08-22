@@ -2,6 +2,7 @@ from pathlib import Path
 
 
 WORKFLOW = Path('.github/workflows/mind-forge-live-research-launcher.yaml')
+RUNTIME = Path('mind-forge-live/phase1')
 
 
 def _dispatch_block(text: str) -> str:
@@ -45,3 +46,20 @@ def test_auto_routing_does_not_expand_workflow_inventory():
         if path.suffix in {'.yml', '.yaml'}
     ]
     assert len(workflows) == 6
+
+
+def test_v2_runtime_is_local_to_main_line_and_not_checked_out_from_legacy_branch():
+    text = WORKFLOW.read_text(encoding='utf-8')
+
+    assert 'agent/mind-forge-generalization-tests' not in text
+    assert 'ref:' not in text.split('Check out current main-line V2 implementation', 1)[1].split('Set up Python', 1)[0]
+
+    required_runtime = {
+        'contracts_v1.py',
+        'question_generator_v1.py',
+        'creative_engine_v1.py',
+        'creative_engine_v2_open.py',
+        'live_model_adapter_v1.py',
+        'live_creative_v2_open.py',
+    }
+    assert required_runtime.issubset({path.name for path in RUNTIME.iterdir() if path.is_file()})

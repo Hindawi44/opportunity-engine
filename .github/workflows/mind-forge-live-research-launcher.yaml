@@ -43,10 +43,8 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Check out current Creative V2 implementation
+      - name: Check out current main-line V2 implementation
         uses: actions/checkout@v4
-        with:
-          ref: agent/mind-forge-generalization-tests
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -69,7 +67,6 @@ jobs:
             question_generator_v1.py \
             creative_engine_v1.py \
             creative_engine_v2_open.py \
-            expert_minds_v1.py \
             live_model_adapter_v1.py \
             live_creative_v2_open.py
           do
