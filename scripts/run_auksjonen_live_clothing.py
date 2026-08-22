@@ -30,8 +30,15 @@ from opportunity_engine.parser_gap_rescue import (
     OVERLAY_FILENAME as PARSER_RESCUE_OVERLAY_FILENAME,
     SUPPORTED_SOURCE as PARSER_RESCUE_SOURCE,
     apply_auksjonen_parser_rescue,
+    load_parser_rescue_overlay,
     load_parser_rescue_terms,
 )
+from opportunity_engine.parser_learning_promotion_gate import (
+    load_parser_promotion_decisions,
+    select_promoted_parser_terms,
+)
+
+DEFAULT_PARSER_PROMOTIONS = "config/learning/parser_promotions.json"
 
 
 def _write_fallback_persistence_error(
@@ -61,7 +68,11 @@ def _write_fallback_persistence_error(
     return path
 
 
-def _parser_rescue_terms(overlay_argument: object) -> tuple[str, ...]:
+def _parser_rescue_terms(
+    overlay_argument: object,
+    promotions_argument: object,
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Return (shadow proven terms, explicitly promoted runtime terms)."""
     overlay_path_text = str(overlay_argument or "").strip()
     if not overlay_path_text:
         input_root_text = str(os.environ.get("INPUT_ROOT") or "").strip()
@@ -70,11 +81,25 @@ def _parser_rescue_terms(overlay_argument: object) -> tuple[str, ...]:
                 Path(input_root_text) / "learning" / PARSER_RESCUE_OVERLAY_FILENAME
             ).as_posix()
     if not overlay_path_text:
-        return ()
+        return (), ()
+
     overlay_path = Path(overlay_path_text)
     if not overlay_path.exists():
-        return ()
-    return load_parser_rescue_terms(overlay_path, PARSER_RESCUE_SOURCE)
+        return (), ()
+
+    overlay = load_parser_rescue_overlay(overlay_path)
+    shadow_terms = load_parser_rescue_terms(overlay_path, PARSER_RESCUE_SOURCE)
+
+    promotions_path_text = str(promotions_argument or "").strip()
+    if not promotions_path_text:
+        promotions_path_text = DEFAULT_PARSER_PROMOTIONS
+    decisions = load_parser_promotion_decisions(Path(promotions_path_text))
+    promoted_terms = select_promoted_parser_terms(
+        overlay,
+        decisions,
+        PARSER_RESCUE_SOURCE,
+    )
+    return shadow_terms, promoted_terms
 
 
 def main() -> int:
@@ -95,7 +120,18 @@ def main() -> int:
     parser.add_argument(
         "--parser-rescue-overlay",
         default=os.environ.get("PARSER_RESCUE_OVERLAY_PATH", ""),
-        help="Optional durable parser-rescue overlay learned from verified prior PARSER_GAP cases.",
+        help=(
+            "Optional durable parser-rescue shadow overlay learned from verified "
+            "prior PARSER_GAP cases."
+        ),
+    )
+    parser.add_argument(
+        "--parser-rescue-promotions",
+        default=os.environ.get(
+            "PARSER_RESCUE_PROMOTIONS_PATH",
+            DEFAULT_PARSER_PROMOTIONS,
+        ),
+        help="Explicit promotion/rollback decisions for learned parser rescue terms.",
     )
     parser.add_argument("--persist-unified", action="store_true")
     parser.add_argument(
@@ -114,7 +150,10 @@ def main() -> int:
         raise SystemExit("--item-verification-limit must be non-negative")
 
     output_dir = Path(args.output_dir)
-    learned_terms = _parser_rescue_terms(args.parser_rescue_overlay)
+    shadow_terms, learned_terms = _parser_rescue_terms(
+        args.parser_rescue_overlay,
+        args.parser_rescue_promotions,
+    )
 
     result = AuksjonenMultiCategoryCollector(
         max_listings=args.max_listings,
@@ -189,7 +228,8 @@ def main() -> int:
     print(f"Items received across categories: {collection.items_received}")
     print(f"Full multi-category scan complete: {result.scan_complete}")
     print(f"Active clothing items: {len(collection.listings)}")
-    print(f"Parser rescue terms loaded: {len(learned_terms)}")
+    print(f"Parser shadow terms available: {len(shadow_terms)}")
+    print(f"Parser promoted terms loaded: {len(learned_terms)}")
     print(f"Parser rescue promotions: {rescued_count}")
     print(f"Valid inventory opportunities: {len(opportunities)}")
     print(f"Exact item pages attempted: {len(exact_item_evidence)}")
