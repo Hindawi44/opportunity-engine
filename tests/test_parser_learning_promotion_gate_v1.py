@@ -3,10 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from opportunity_engine.parser_gap_rescue import save_parser_rescue_overlay
 from opportunity_engine.parser_learning_promotion_gate import (
     load_parser_promotion_decisions,
     select_promoted_parser_terms,
 )
+from scripts.run_auksjonen_live_clothing import _parser_rescue_terms
 
 
 SHADOW_OVERLAY = {
@@ -77,6 +79,47 @@ def test_parser_promotion_config_requires_auditable_decision(tmp_path: Path) -> 
     assert load_parser_promotion_decisions(path) == {
         ("Auksjonen.no", "sluttlager"): "PROMOTED"
     }
+
+
+def test_runtime_helper_keeps_proven_term_out_until_promoted(tmp_path: Path) -> None:
+    overlay_path = tmp_path / "parser-rescue-overlay.json"
+    save_parser_rescue_overlay(overlay_path, SHADOW_OVERLAY)
+    missing_promotions = tmp_path / "missing-parser-promotions.json"
+
+    shadow_terms, promoted_terms = _parser_rescue_terms(
+        overlay_path,
+        missing_promotions,
+    )
+
+    assert shadow_terms == ("sluttlager",)
+    assert promoted_terms == ()
+
+    promotion_path = tmp_path / "parser-promotions.json"
+    promotion_path.write_text(
+        json.dumps(
+            {
+                "schema_version": "parser-promotion-gate-1.0",
+                "decisions": [
+                    {
+                        "source": "Auksjonen.no",
+                        "term": "sluttlager",
+                        "status": "PROMOTED",
+                        "reason": "Verified shadow parser proof passed.",
+                        "approved_at": "2026-08-22T10:30:00Z",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    shadow_terms, promoted_terms = _parser_rescue_terms(
+        overlay_path,
+        promotion_path,
+    )
+
+    assert shadow_terms == ("sluttlager",)
+    assert promoted_terms == ("sluttlager",)
 
 
 def test_auksjonen_runtime_requires_parser_promotion_gate() -> None:
