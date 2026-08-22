@@ -1,4 +1,34 @@
 {
   "schema_version": "missed-opportunity-inbox-1.0",
-  "cases": []
+  "cases": [
+    {
+      "case_id": "REAL-MISS-NO-LENE-INTERIOR-2025-08",
+      "market_code": "NO",
+      "discovered_by": "HUMAN_VERIFIED_PUBLIC_SOURCE",
+      "observed_at": "2025-08-28T00:00:00+00:00",
+      "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+      "stock_proven": true,
+      "ground_truth": {
+        "company": "Lene Interiør",
+        "url": "https://www.stavangersentrum.no/nyheter/15-fantastiske-ar-og-en-varm-takk-til-stavanger"
+      },
+      "trace": {
+        "query_generated": false,
+        "search_hit": null,
+        "retrieved": null,
+        "parsed": null,
+        "entity_linked": null,
+        "classified_relevant": null,
+        "verified": null,
+        "ranked": null,
+        "reported": null,
+        "timely_discovery": null
+      },
+      "learning_evidence_text": "Lene Interiør legges ned. Stort avslutningssalg på alle varer i butikken.",
+      "learned_patterns": [],
+      "root_cause": "QUERY_GAP",
+      "learning_status": "DIAGNOSED",
+      "repeat_miss": false
+    }
+  ]
 }
