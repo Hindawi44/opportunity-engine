@@ -5,6 +5,8 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
 RECONCILE = ROOT / "scripts/reconcile_checkpoint_human_reviews.py"
 BUILD_INTELLIGENCE = ROOT / "scripts/build_domain_market_intelligence_feed.py"
+DISCOVERY_INIT = ROOT / "src/opportunity_engine/discovery/__init__.py"
+SCOUT_HOOK = ROOT / "src/opportunity_engine/discovery/automatic_query_gap_miss_scout_cli_hook.py"
 
 
 def test_checkpoint_workflow_is_daily_and_read_only() -> None:
@@ -166,3 +168,20 @@ def test_brave_market_signal_radar_runs_before_official_status_check() -> None:
     assert radar < official
     assert "brave-market-signal-radar.json" in text
     assert '"market_coverage": ["NO", "SE", "DE"]' in text
+
+
+def test_query_gap_scout_runs_before_river_and_same_run_learner_at_exit() -> None:
+    init = DISCOVERY_INIT.read_text(encoding="utf-8")
+    learner = init.index("install_daily_auto_miss_learning_cli_hook()")
+    river = init.index("install_unified_market_intelligence_river_cli_hook()")
+    scout = init.index("install_automatic_query_gap_miss_scout_cli_hook()")
+    stocklear = init.index("install_promoted_stocklear_cli_hook()")
+
+    # Python atexit is LIFO, so registration order is reverse execution order.
+    assert learner < river < scout < stocklear
+
+    hook = SCOUT_HOOK.read_text(encoding="utf-8")
+    assert 'Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py"' in hook
+    assert "write_automatic_query_gap_miss_scout(" in hook
+    assert "automatic_query_gap_miss_scout:" in hook
+    assert '"automatic_query_activation": False' in hook
