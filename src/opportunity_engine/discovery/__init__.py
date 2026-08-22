@@ -73,6 +73,9 @@ from opportunity_engine.discovery.mathematical_logic_shadow_cli_hook import (
 from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook import (
     install_unified_market_intelligence_river_cli_hook,
 )
+from opportunity_engine.discovery.promoted_stocklear_cli_hook import (
+    install_promoted_stocklear_cli_hook,
+)
 from opportunity_engine.discovery.openai_fabric_procurement_cli_hook import (
     install_openai_fabric_procurement_cli_hook,
 )
@@ -96,6 +99,9 @@ install_market_comparables_brand_cleanup()
 # river writes unified-market-cases.json first, then Math V1 observes it.
 install_mathematical_logic_shadow_cli_hook()
 install_unified_market_intelligence_river_cli_hook()
+# Registered after the river because atexit handlers run LIFO: promoted
+# Stocklear writes its production feed first, then the river consumes it.
+install_promoted_stocklear_cli_hook()
 install_openai_fabric_procurement_cli_hook()
 install_fabric_procurement_watch_cli_hook()
 
