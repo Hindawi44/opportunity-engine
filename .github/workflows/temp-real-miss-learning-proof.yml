@@ -46,9 +46,6 @@ jobs:
           learning = root / "learning"
           report_path = root / "daily-learning-cycle.json"
 
-          # These are the two candidates generated only from the Lene Interiør miss.
-          # The hidden Norem Baade identity is loaded separately by the runtime and
-          # is never added to either search query.
           terms = ["avslutningssalg", "stort avslutningssalg"]
           live_search = build_learning_search(
               os.environ["BRAVE_SEARCH_API_KEY"],
@@ -131,8 +128,8 @@ jobs:
           assert report["transfer_proven_case_count"] == 1, report
           assert any(
               row["term"] == "stort avslutningssalg"
-              and row["recovered_case_ids"] == ["HOLDOUT-NO-NOREM-BAADE-2010"]
-              and row["support_case_ids"] == ["REAL-MISS-NO-LENE-INTERIOR-2025-08"]
+              and tuple(row["recovered_case_ids"]) == ("HOLDOUT-NO-NOREM-BAADE-2010",)
+              and tuple(row["support_case_ids"]) == ("REAL-MISS-NO-LENE-INTERIOR-2025-08",)
               and row["precision"] >= 0.20
               for row in transfer
           ), transfer
