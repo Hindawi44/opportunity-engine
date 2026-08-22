@@ -33,6 +33,18 @@ RELOCATION_ONLY_HTML = """
 </body></html>
 """
 
+NEWSPAPER_NAV_HTML = """
+<html><body>
+<nav>Eiendom Stilling Bolig til salgs Løssalg Nyheter Sport Tips oss</nav>
+<article>
+<h1>Nordlys Mote legger ned og stenger døra</h1>
+<p>Klesbutikken Nordlys Mote i Tromsø har opphørssalg med store rabatter.</p>
+<p>Hele varelageret skal selges ut.</p>
+<p>Siste åpningsdag er 30. september.</p>
+</article>
+</body></html>
+"""
+
 
 def _page(html: str):
     from opportunity_engine.automatic_query_gap_miss_scout import PublicPage
@@ -121,4 +133,20 @@ def test_relocation_sale_word_does_not_become_closure_query_gap_language() -> No
 
     assert outcome["detected_miss_count"] == 0
     assert outcome["verified_page_count"] == 0
+    assert outcome["automatic_query_activation"] is False
+
+
+def test_newspaper_navigation_sale_word_does_not_become_query_gap_language() -> None:
+    from opportunity_engine.query_gap_scout_waterfall import discover_query_gap_misses
+
+    outcome = discover_query_gap_misses(
+        {"deduplicated_opportunities": []},
+        active_queries=['"opphørssalg"'],
+        search=lambda query: [_hit()],
+        fetch_page=lambda url: _page(NEWSPAPER_NAV_HTML),
+    )
+
+    assert outcome["verified_page_count"] == 1
+    assert outcome["detected_miss_count"] == 0
+    assert outcome["cases_metadata"] == []
     assert outcome["automatic_query_activation"] is False
