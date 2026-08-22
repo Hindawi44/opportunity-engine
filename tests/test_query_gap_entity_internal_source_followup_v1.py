@@ -70,7 +70,6 @@ def test_extract_internal_source_links_keeps_same_domain_information_links_only(
 def test_official_homepage_can_follow_one_internal_page_to_verified_query_gap() -> None:
     from opportunity_engine.query_gap_scout_waterfall import (
         SCOUT_QUERIES_NO,
-        build_entity_source_followup_query,
         discover_query_gap_misses,
     )
 
@@ -79,10 +78,8 @@ def test_official_homepage_can_follow_one_internal_page_to_verified_query_gap() 
 
     def search(query: str):
         calls.append(query)
-        if query == SCOUT_QUERIES_NO[0]:
-            return [_hit(NEWS_URL, "Bauhaus legger ned i Norge")]
-        assert query == build_entity_source_followup_query("Bauhaus")
-        return [_hit(HOME_URL, "BAUHAUS - Når det må bli bra")]
+        assert query == SCOUT_QUERIES_NO[0]
+        return [_hit(NEWS_URL, "Bauhaus legger ned i Norge")]
 
     def fetch_page(url: str):
         fetched.append(url)
@@ -102,15 +99,19 @@ def test_official_homepage_can_follow_one_internal_page_to_verified_query_gap() 
         max_pages=3,
     )
 
-    assert len(calls) == 2
+    # V10 probes the plausible first-party homepage before spending Brave #2.
+    assert calls == [SCOUT_QUERIES_NO[0]]
     assert fetched == [NEWS_URL, HOME_URL, INFO_URL]
-    assert outcome["search_request_count"] == 2
+    assert outcome["search_request_count"] == 1
     assert outcome["page_request_count"] == 3
     assert outcome["verified_page_count"] == 1
     assert outcome["detected_miss_count"] == 1
     assert outcome["waterfall_stopped_reason"] == "FIRST_VERIFIED_MISS"
     assert outcome["entity_source_followup_used"] is True
+    assert outcome["entity_domain_probe_used"] is True
+    assert outcome["entity_domain_probe_count"] == 1
     assert outcome["entity_internal_followup_used"] is True
+    assert outcome["entity_internal_followup_count"] == 1
     assert outcome["verification_attempts"][-1]["query_kind"] == "ENTITY_INTERNAL_SOURCE_FOLLOW_UP"
     assert outcome["cases_metadata"][0]["discovery_path"] == "ENTITY_INTERNAL_SOURCE_FOLLOW_UP"
     assert outcome["cases_metadata"][0]["query_gap_term"] == "opphørssalg"
