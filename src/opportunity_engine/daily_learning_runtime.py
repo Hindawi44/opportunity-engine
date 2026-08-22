@@ -182,7 +182,7 @@ def run_daily_learning_runtime(
     *,
     learning_dir: str | Path,
     inbox_path: str | Path = "config/learning/missed_opportunity_inbox.json",
-    validation_cases_path: str | Path = "config/learning/query_gap_validation_cases.json",
+    validation_cases_path: str | Path | None = None,
     active_query_config: str | Path = "config/brave_search_queries.json",
     promotion_config_path: str | Path = "config/learning/query_promotions.json",
     report_path: str | Path | None = None,
@@ -195,10 +195,11 @@ def run_daily_learning_runtime(
 ) -> dict[str, Any]:
     """Load durable state, run one bounded cycle, and persist the next state.
 
-    Miss cases generate candidate patterns. Validation cases are a separate
-    hidden holdout set and can prove transfer/generalization without leaking their
-    identity into candidate generation or search. Proven learning is stored only
-    in ``shadow-keyword-overlay.json`` until an explicit promotion decision.
+    Miss cases generate candidate patterns. Validation cases are an optional,
+    explicitly selected hidden holdout set used only for transfer/generalization
+    proof. Omitting ``validation_cases_path`` preserves direct source-case replay.
+    Proven learning is stored only in ``shadow-keyword-overlay.json`` until an
+    explicit promotion decision.
     """
     if not 1 <= results_per_candidate <= 10:
         raise ValueError("results_per_candidate must be between 1 and 10")
@@ -213,7 +214,11 @@ def run_daily_learning_runtime(
 
     existing_cases = load_missed_opportunity_memory(memory_path)
     inbox_cases = load_missed_opportunity_inbox(inbox_path)
-    validation_cases = load_query_gap_validation_cases(validation_cases_path)
+    validation_cases = (
+        load_query_gap_validation_cases(validation_cases_path)
+        if validation_cases_path is not None
+        else []
+    )
     active_queries = load_active_learning_queries(active_query_config)
     existing_active_overlay = (
         load_learned_query_overlay(active_overlay_path)
@@ -284,7 +289,11 @@ def run_daily_learning_runtime(
         {
             "generated_at": generated_at,
             "inbox_path": Path(inbox_path).as_posix(),
-            "validation_cases_path": Path(validation_cases_path).as_posix(),
+            "validation_cases_path": (
+                Path(validation_cases_path).as_posix()
+                if validation_cases_path is not None
+                else None
+            ),
             "memory_path": memory_path.as_posix(),
             "overlay_path": active_overlay_path.as_posix(),
             "shadow_overlay_path": shadow_overlay_path.as_posix(),
