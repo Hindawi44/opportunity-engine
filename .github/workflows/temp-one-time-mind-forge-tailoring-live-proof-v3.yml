@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  live-proof:
+  creative-v2-open-live:
     if: ${{ github.head_ref == 'agent/temp-mind-forge-tailoring-live-proof-v3' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           APP="$RUNNER_TEMP/mind-forge-v2"
-          mkdir -p "$APP/mind_forge" artifacts/mind-forge-tailoring-live-proof-v3
+          mkdir -p "$APP/mind_forge" artifacts/mind-forge-creative-v2-open-live
           touch "$APP/mind_forge/__init__.py"
           for file in \
             contracts_v1.py \
@@ -78,7 +78,7 @@ jobs:
           MIND_FORGE_SEED: "تصليح الملابس"
         run: |
           set -euo pipefail
-          python - <<'PY' | tee artifacts/mind-forge-tailoring-live-proof-v3/stdout.json
+          python - <<'PY' | tee artifacts/mind-forge-creative-v2-open-live/stdout.json
           import json
           import os
           from pathlib import Path
@@ -115,7 +115,7 @@ jobs:
               "usage": gate.usage.model_dump(),
               "ideas": [idea.model_dump(mode="json") for idea in creative.ideas],
           }
-          out = Path("artifacts/mind-forge-tailoring-live-proof-v3/result.json")
+          out = Path("artifacts/mind-forge-creative-v2-open-live/result.json")
           out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
           print(json.dumps(payload, ensure_ascii=False, indent=2))
           PY
@@ -125,7 +125,7 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          root = Path("artifacts/mind-forge-tailoring-live-proof-v3")
+          root = Path("artifacts/mind-forge-creative-v2-open-live")
           data = json.loads((root / "result.json").read_text(encoding="utf-8"))
           if data.get("status") != "CREATIVE_V2_OPEN_LIVE_COMPLETE":
               raise SystemExit("Creative V2 did not complete")
@@ -157,6 +157,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mind-forge-tailoring-live-proof-v3
-          path: artifacts/mind-forge-tailoring-live-proof-v3/
+          path: artifacts/mind-forge-creative-v2-open-live/
           if-no-files-found: warn
           retention-days: 30
