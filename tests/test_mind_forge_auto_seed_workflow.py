@@ -59,7 +59,17 @@ def test_v2_runtime_is_local_to_main_line_and_not_checked_out_from_legacy_branch
         'question_generator_v1.py',
         'creative_engine_v1.py',
         'creative_engine_v2_open.py',
+        'expert_minds_v1.py',
         'live_model_adapter_v1.py',
         'live_creative_v2_open.py',
     }
     assert required_runtime.issubset({path.name for path in RUNTIME.iterdir() if path.is_file()})
+
+
+def test_isolated_runtime_copies_all_import_dependencies():
+    text = WORKFLOW.read_text(encoding='utf-8')
+    build_block = text.split('Build isolated Creative V2 runtime', 1)[1].split('Normalize API secret', 1)[0]
+
+    # live_model_adapter_v1 imports expert_minds_v1 indirectly; it must be copied too.
+    assert 'expert_minds_v1.py' in build_block
+    assert 'live_model_adapter_v1.py' in build_block

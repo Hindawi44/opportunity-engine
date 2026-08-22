@@ -67,6 +67,7 @@ jobs:
             question_generator_v1.py \
             creative_engine_v1.py \
             creative_engine_v2_open.py \
+            expert_minds_v1.py \
             live_model_adapter_v1.py \
             live_creative_v2_open.py
           do
