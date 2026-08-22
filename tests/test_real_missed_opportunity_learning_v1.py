@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 from opportunity_engine.adaptive_keyword_learning import propose_query_gap_keywords
 from opportunity_engine.daily_learning_operator import run_daily_learning_cycle
-from opportunity_engine.daily_learning_runtime import _market_anchor, run_daily_learning_runtime
+from opportunity_engine.daily_learning_runtime import _learning_query, run_daily_learning_runtime
 from opportunity_engine.learned_query_overlay import learned_terms_for_market
 from opportunity_engine.missed_opportunity_learning import DiscoveryTrace, MissedOpportunityCase
 
@@ -99,17 +99,14 @@ def test_real_miss_can_be_recovered_in_shadow_without_production_activation() ->
     assert outcome.report["promotion_gate_enforced"] is True
 
 
-def test_learning_search_anchor_tracks_opportunity_intent_not_product_vertical() -> None:
-    anchor = _market_anchor("NO").casefold()
+def test_learning_search_replays_term_without_product_or_company_leakage() -> None:
+    query = _learning_query('avslutningssalg')
 
-    assert "legger ned" in anchor
-    assert "nedleggelse" in anchor
-    assert "stenger" in anchor
-    assert "avvikling" in anchor
-    assert "varelager" in anchor
-    assert "restlager" in anchor
-    assert "klær" not in anchor
-    assert "elektronikk" not in anchor
+    assert query == '"avslutningssalg"'
+    assert "lene" not in query.casefold()
+    assert "klær" not in query.casefold()
+    assert "elektronikk" not in query.casefold()
+    assert "interiør" not in query.casefold()
 
 
 def test_real_miss_runs_end_to_end_through_persistent_runtime(tmp_path) -> None:
