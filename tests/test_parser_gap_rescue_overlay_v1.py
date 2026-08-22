@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from opportunity_engine.discovery.auksjonen_public_api_adapter import (
+    AuksjonenLiveClothingCollection,
     has_inventory_lot_signal,
     normalize_public_api_item,
 )
@@ -14,6 +15,7 @@ from opportunity_engine.missed_opportunity_learning import (
     save_missed_opportunity_memory,
 )
 from opportunity_engine.parser_gap_rescue import (
+    apply_auksjonen_parser_rescue,
     build_parser_rescue_overlay,
     load_parser_rescue_terms,
     write_parser_gap_rescue_overlay,
@@ -79,6 +81,21 @@ def _active_item(title: str) -> dict:
     }
 
 
+def _collection_for(title: str) -> AuksjonenLiveClothingCollection:
+    listing = normalize_public_api_item(_active_item(title))
+    assert listing is not None
+    return AuksjonenLiveClothingCollection(
+        captured_at=datetime.now(timezone.utc).isoformat(),
+        endpoint="test",
+        reported_size=1,
+        items_received=1,
+        listings=(listing,),
+        pages_fetched=1,
+        page_size=30,
+        errors=(),
+    )
+
+
 def test_verified_parser_gap_can_prove_strong_new_lot_term() -> None:
     overlay = build_parser_rescue_overlay(
         [_case()],
@@ -124,25 +141,27 @@ def test_noisy_term_is_rejected_when_it_matches_too_many_raw_titles() -> None:
     assert overlay["rejected_noisy_terms"] == ["sluttlager"]
 
 
-def test_learned_term_only_rescues_lot_signal_after_clothing_gate() -> None:
+def test_learned_term_only_rescues_already_normalized_clothing_listing() -> None:
     assert has_inventory_lot_signal("Sluttlager med arbeidsjakker") is False
-    assert has_inventory_lot_signal(
-        "Sluttlager med arbeidsjakker",
-        learned_terms=("sluttlager",),
-    ) is True
+    collection = _collection_for("Sluttlager med arbeidsjakker")
+    assert collection.listings[0].inventory_lot_signal is False
 
-    clothing = normalize_public_api_item(
-        _active_item("Sluttlager med arbeidsjakker"),
-        learned_lot_terms=("sluttlager",),
-    )
-    non_clothing = normalize_public_api_item(
-        _active_item("Sluttlager med gravemaskiner"),
-        learned_lot_terms=("sluttlager",),
-    )
+    rescued = apply_auksjonen_parser_rescue(collection, ("sluttlager",))
 
-    assert clothing is not None
-    assert clothing.inventory_lot_signal is True
-    assert non_clothing is None
+    assert rescued.listings[0].inventory_lot_signal is True
+    assert len(rescued.inventory_opportunities) == 1
+
+    # The static clothing gate remains authoritative: this title never enters
+    # the collection, so the rescue layer cannot promote it.
+    assert normalize_public_api_item(_active_item("Sluttlager med gravemaskiner")) is None
+
+
+def test_empty_overlay_changes_nothing() -> None:
+    collection = _collection_for("Sluttlager med arbeidsjakker")
+    rescued = apply_auksjonen_parser_rescue(collection, ())
+
+    assert rescued == collection
+    assert rescued.listings[0].inventory_lot_signal is False
 
 
 def test_existing_static_lot_pattern_does_not_need_rescue_term() -> None:
