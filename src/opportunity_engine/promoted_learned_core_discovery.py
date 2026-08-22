@@ -18,6 +18,8 @@ from typing import Any, Callable, Mapping, Sequence
 
 from opportunity_engine.automatic_query_gap_miss_scout import (
     PublicPage,
+    _CLOSURE_MARKERS,
+    _LIQUIDATION_MARKERS,
     _verify_closure_liquidation_page,
     fetch_public_page,
 )
@@ -123,9 +125,31 @@ def _promoted_terms(
     return terms, None
 
 
+def _quoted_or_group(values: Sequence[str]) -> str:
+    quoted: list[str] = []
+    for value in values:
+        cleaned = _compact(value).replace('"', "")
+        if cleaned:
+            quoted.append(f'"{cleaned}"')
+    return "(" + " OR ".join(quoted) + ")"
+
+
 def _exact_query(term: str) -> str:
+    """Build one verifier-aligned query for an explicitly promoted learned term.
+
+    The learned vocabulary must not be sent as a broad standalone search. The
+    same stable closure and inventory semantics required by the authoritative
+    exact-page verifier are added as OR groups. This raises retrieval precision
+    without weakening the verifier or increasing the one-request Brave budget.
+    """
     safe = _compact(term).replace('"', "")
-    return f'"{safe}"' if safe else ""
+    if not safe:
+        return ""
+    return (
+        f'"{safe}" '
+        f"{_quoted_or_group(_CLOSURE_MARKERS)} "
+        f"{_quoted_or_group(_LIQUIDATION_MARKERS)}"
+    )
 
 
 def _default_search(api_key: str, *, results_per_query: int) -> SearchCallback:
