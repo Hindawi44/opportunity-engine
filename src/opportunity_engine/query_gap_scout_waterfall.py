@@ -1,10 +1,9 @@
 """Bounded two-stage recall waterfall for the verified QUERY_GAP scout.
 
-This module deliberately reuses the original scout's page verifier, durable
-memory merge, cost guard, and safety semantics. Only search orchestration changes:
-a strict closure+inventory query gets the first page attempt; if it does not
-produce a verified miss, a broader closure query gets the remaining shared page
-budget. Neither query contains candidate learning sale terms.
+The waterfall reuses the original scout's authoritative exact-page verifier,
+durable memory merge, cost guard, and safety semantics. It also records bounded
+read-only diagnostics for each page that actually consumed verification budget,
+so operators can see *why* a page was rejected without relaxing the gate.
 """
 from __future__ import annotations
 
@@ -13,6 +12,7 @@ from hashlib import sha256
 import os
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
+from urllib.parse import urlparse
 
 from opportunity_engine.automatic_query_gap_miss_scout import (
     DEFAULT_ACTIVE_QUERY_CONFIG,
@@ -23,14 +23,20 @@ from opportunity_engine.automatic_query_gap_miss_scout import (
     OUTPUT_FILENAME,
     PageFetcher,
     PublicPage,
+    _CLOSURE_MARKERS,
+    _GAP_TERMS,
+    _LIQUIDATION_MARKERS,
+    _TEMPORARY_MARKERS,
     _attach_to_brief,
     _canonical,
     _checkpoint_urls,
+    _extract_company,
     _merge_memory,
     _query_contains_term,
     _read_object,
     _safe_empty_report,
     _verify_closure_liquidation_page,
+    _visible_text,
     _write_object,
     fetch_public_page,
 )
@@ -45,7 +51,7 @@ from opportunity_engine.missed_opportunity_learning import (
     save_missed_opportunity_memory,
 )
 
-SCHEMA_VERSION = "automatic-query-gap-miss-scout-waterfall-1.0"
+SCHEMA_VERSION = "automatic-query-gap-miss-scout-waterfall-1.1"
 MAX_SEARCH_REQUESTS = 2
 
 SCOUT_QUERIES_NO: tuple[str, ...] = (
@@ -62,6 +68,76 @@ SCOUT_QUERIES_NO: tuple[str, ...] = (
 SCOUT_QUERY_NO = SCOUT_QUERIES_NO[0]
 
 SearchCallback = Callable[[str], Sequence[SearchHit]]
+
+
+def diagnose_public_page(page: PublicPage) -> dict[str, Any]:
+    """Explain the authoritative verifier result without changing that result."""
+    canonical_final = _canonical(page.final_url)
+    html_ok = page.status_code == 200 and "text/html" in page.content_type.casefold()
+    https_ok = bool(canonical_final and urlparse(canonical_final).scheme == "https")
+
+    text = _visible_text(page.html) if html_ok else ""
+    folded = text.casefold()
+    temporary = bool(text and any(marker in folded for marker in _TEMPORARY_MARKERS))
+    closure_markers = [marker for marker in _CLOSURE_MARKERS if marker in folded]
+    sale_terms = [term for term in _GAP_TERMS if term in folded]
+    liquidation_markers = [marker for marker in _LIQUIDATION_MARKERS if marker in folded]
+    company = _extract_company(text) if text else None
+
+    evidence_flags = {
+        "http_status_ok": page.status_code == 200,
+        "html_ok": html_ok,
+        "https_ok": https_ok,
+        "visible_text": bool(text),
+        "temporary_closure": temporary,
+        "closure_marker": bool(closure_markers),
+        "sale_term": bool(sale_terms),
+        "liquidation_marker": bool(liquidation_markers),
+        "company_identity": bool(company),
+    }
+
+    rejection_reasons: list[str] = []
+    if page.status_code != 200:
+        rejection_reasons.append("HTTP_STATUS_NOT_OK")
+    if not html_ok:
+        rejection_reasons.append("HTML_REQUIRED")
+    if not https_ok:
+        rejection_reasons.append("HTTPS_REQUIRED")
+    if temporary:
+        rejection_reasons.append("TEMPORARY_CLOSURE_SIGNAL")
+    if html_ok and not text:
+        rejection_reasons.append("EMPTY_VISIBLE_TEXT")
+    if not closure_markers:
+        rejection_reasons.append("CLOSURE_MARKER_MISSING")
+    if not sale_terms:
+        rejection_reasons.append("SALE_TERM_MISSING")
+    if not liquidation_markers:
+        rejection_reasons.append("INVENTORY_LIQUIDATION_MISSING")
+    if not company:
+        rejection_reasons.append("COMPANY_IDENTITY_MISSING")
+
+    authoritative_proof = _verify_closure_liquidation_page(page)
+    if authoritative_proof is not None:
+        verifier_status = "VERIFIED"
+        rejection_reasons = []
+    else:
+        verifier_status = "REJECTED"
+        if not rejection_reasons:
+            rejection_reasons.append("AUTHORITATIVE_VERIFIER_REJECTED")
+
+    return {
+        "verifier_status": verifier_status,
+        "requested_url": _canonical(page.requested_url) or page.requested_url,
+        "final_url": canonical_final or page.final_url,
+        "status_code": page.status_code,
+        "content_type": page.content_type,
+        "company": company,
+        "closure_markers": closure_markers,
+        "sale_terms": sale_terms,
+        "liquidation_markers": liquidation_markers,
+        "evidence_flags": evidence_flags,
+        "rejection_reasons": rejection_reasons,
+    }
 
 
 def _new_gap_case(
@@ -93,7 +169,7 @@ def discover_query_gap_misses(
     observed_at: datetime | None = None,
     max_pages: int = DEFAULT_MAX_PAGES,
 ) -> dict[str, Any]:
-    """Run a two-stage recall waterfall with one shared verification budget."""
+    """Run the two-stage recall waterfall with one shared verification budget."""
     bounded_pages = max(0, min(MAX_PAGES, int(max_pages)))
     now = observed_at or datetime.now(timezone.utc)
     if now.tzinfo is None or now.utcoffset() is None:
@@ -105,6 +181,7 @@ def discover_query_gap_misses(
     cases: list[MissedOpportunityCase] = []
     metadata: list[dict[str, Any]] = []
     search_stages: list[dict[str, Any]] = []
+    verification_attempts: list[dict[str, Any]] = []
 
     search_requests = 0
     total_hits = 0
@@ -125,8 +202,6 @@ def discover_query_gap_misses(
         stage_verified = 0
         stage_misses = 0
         stage_unique_hits = 0
-        # Reserve fallback recall: the strict stage gets one exact-page attempt.
-        # The final stage may use all remaining shared page budget.
         stage_page_budget = (
             min(1, bounded_pages - page_requests)
             if stage_index < len(SCOUT_QUERIES_NO) - 1
@@ -148,10 +223,35 @@ def discover_query_gap_misses(
 
             page_requests += 1
             stage_pages += 1
+            base_diagnostic = {
+                "stage": stage_index + 1,
+                "requested_url": url,
+                "search_hit_title": str(hit.title or "")[:500],
+                "search_hit_description": str(hit.description or "")[:1000],
+                "search_hit_provider": str(hit.provider or ""),
+                "search_hit_alone_is_ground_truth": False,
+                "automatic_query_activation": False,
+            }
             try:
                 page: PublicPage = fetch_page(url)
-            except Exception:
+            except Exception as exc:
+                verification_attempts.append(
+                    {
+                        **base_diagnostic,
+                        "final_url": None,
+                        "status_code": None,
+                        "content_type": None,
+                        "verifier_status": "FETCH_FAILED",
+                        "rejection_reasons": ["PAGE_FETCH_FAILED"],
+                        "evidence_flags": {},
+                        "error_type": type(exc).__name__,
+                        "error": " ".join(str(exc).split())[:500],
+                    }
+                )
                 continue
+
+            diagnostic = {**base_diagnostic, **diagnose_public_page(page)}
+            verification_attempts.append(diagnostic)
 
             proof = _verify_closure_liquidation_page(page)
             if proof is None:
@@ -230,6 +330,7 @@ def discover_query_gap_misses(
         "search_hit_count": total_hits,
         "search_stages": search_stages,
         "page_request_count": page_requests,
+        "verification_attempts": verification_attempts,
         "verified_page_count": verified_pages,
         "detected_miss_count": len(cases),
         "core_already_knew_count": core_known,
@@ -238,6 +339,7 @@ def discover_query_gap_misses(
         "cases_metadata": metadata,
         "search_hit_alone_is_never_ground_truth": True,
         "source_page_verification_required": True,
+        "verification_diagnostics_are_read_only": True,
         "automatic_query_activation": False,
         "automatic_contact": False,
         "automatic_bid": False,
@@ -255,6 +357,8 @@ def _safe_waterfall_report(status: str, **extra: Any) -> dict[str, Any]:
             "max_search_requests": MAX_SEARCH_REQUESTS,
             "scout_queries": list(SCOUT_QUERIES_NO),
             "search_stages": [],
+            "verification_attempts": [],
+            "verification_diagnostics_are_read_only": True,
         }
     )
     return report
