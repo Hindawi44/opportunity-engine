@@ -120,11 +120,28 @@ def append_learning_history(
 
 
 def _market_anchor(market_code: str) -> str:
+    """Keep learning discovery broad enough for the full commercial engine scope.
+
+    Candidate precision is still enforced downstream. The anchor only prevents a
+    learned commercial term from being trapped inside the old clothing-only domain.
+    """
     return {
-        "NO": "(klær OR klesbutikk OR tekstil OR arbeidsklær OR vernesko)",
-        "SE": "(kläder OR klädbutik OR textil OR arbetskläder)",
-        "DE": "(Bekleidung OR Modegeschäft OR Textilien OR Arbeitskleidung)",
-    }.get(market_code.upper(), "(clothing OR textile OR inventory)")
+        "NO": (
+            "(varelager OR restlager OR lager OR butikk OR grossist OR parti OR "
+            "interiør OR møbler OR elektronikk OR verktøy OR byggevarer OR klær OR tekstil)"
+        ),
+        "SE": (
+            "(varulager OR restlager OR lager OR butik OR grossist OR parti OR "
+            "inredning OR möbler OR elektronik OR verktyg OR byggvaror OR kläder OR textil)"
+        ),
+        "DE": (
+            "(Warenbestand OR Restposten OR Lager OR Geschäft OR Großhandel OR Posten OR "
+            "Einrichtung OR Möbel OR Elektronik OR Werkzeug OR Baustoffe OR Bekleidung OR Textilien)"
+        ),
+    }.get(
+        market_code.upper(),
+        "(inventory OR stock OR warehouse OR store OR wholesale OR lot OR goods)",
+    )
 
 
 def build_learning_search(
