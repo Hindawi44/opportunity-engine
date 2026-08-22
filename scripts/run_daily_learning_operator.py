@@ -20,6 +20,10 @@ def parse_args() -> argparse.Namespace:
         "--active-query-config",
         default="config/brave_search_queries.json",
     )
+    parser.add_argument(
+        "--promotion-config",
+        default="config/learning/query_promotions.json",
+    )
     parser.add_argument("--report", required=True)
     parser.add_argument("--runtime-overlay")
     parser.add_argument("--max-candidates", type=int, default=2)
@@ -35,6 +39,7 @@ def main() -> int:
         learning_dir=args.learning_dir,
         inbox_path=args.inbox,
         active_query_config=args.active_query_config,
+        promotion_config_path=args.promotion_config,
         report_path=args.report,
         runtime_overlay_path=args.runtime_overlay,
         policy=DailyLearningPolicy(

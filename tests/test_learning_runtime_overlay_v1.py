@@ -49,7 +49,7 @@ def test_overlay_contains_only_proven_terms() -> None:
     terms = learned_terms_for_market(overlay, "NO")
     assert set(terms) == {"sluttlager"}
     assert terms["sluttlager"] == MarketSignalType.WAREHOUSE_SURPLUS
-    assert overlay["automatic_query_activation"] is True
+    assert overlay["automatic_query_activation"] is False
     assert overlay["automatic_financial_action"] is False
 
 

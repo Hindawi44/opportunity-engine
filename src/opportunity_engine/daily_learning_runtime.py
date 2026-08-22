@@ -14,6 +14,7 @@ from opportunity_engine.daily_learning_operator import (
 )
 from opportunity_engine.discovery.brave_market_signal_radar import MARKET_QUERIES
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
+from opportunity_engine.learning_promotion_gate import load_query_promotion_decisions
 from opportunity_engine.learned_query_overlay import (
     build_learned_query_overlay,
     load_learned_query_overlay,
@@ -25,7 +26,7 @@ from opportunity_engine.missed_opportunity_learning import (
     save_missed_opportunity_memory,
 )
 
-HISTORY_SCHEMA = "keyword-learning-history-1.0"
+HISTORY_SCHEMA = "keyword-learning-history-1.1"
 INBOX_SCHEMA = "missed-opportunity-inbox-1.0"
 RuntimeSearch = Callable[[str, str], Sequence[Mapping[str, Any]]]
 
@@ -98,9 +99,12 @@ def append_learning_history(
         "evaluated_candidate_count": report.get("evaluated_candidate_count", 0),
         "learning_search_requests": report.get("learning_search_requests", 0),
         "proven_term_count_this_run": report.get("proven_term_count_this_run", 0),
+        "shadow_proven_term_count": report.get("shadow_proven_term_count", 0),
         "active_learned_term_count": report.get("active_learned_term_count", 0),
+        "promoted_term_count": report.get("promoted_term_count", 0),
         "recovered_case_count": report.get("recovered_case_count", 0),
         "search_status": report.get("search_status"),
+        "promotion_gate_enforced": report.get("promotion_gate_enforced", False),
     }
     runs.append(entry)
     _write_object(
@@ -161,6 +165,7 @@ def run_daily_learning_runtime(
     learning_dir: str | Path,
     inbox_path: str | Path = "config/learning/missed_opportunity_inbox.json",
     active_query_config: str | Path = "config/brave_search_queries.json",
+    promotion_config_path: str | Path = "config/learning/query_promotions.json",
     report_path: str | Path | None = None,
     runtime_overlay_path: str | Path | None = None,
     environment: Mapping[str, str] | None = None,
@@ -169,24 +174,36 @@ def run_daily_learning_runtime(
     search_override: RuntimeSearch | None = None,
     observed_at: datetime | None = None,
 ) -> dict[str, Any]:
-    """Load durable state, run one bounded cycle, and persist the next state."""
+    """Load durable state, run one bounded cycle, and persist the next state.
+
+    Proven learning is stored in ``shadow-keyword-overlay.json``. Only exact
+    terms explicitly PROMOTED by ``promotion_config_path`` are written to the
+    production ``active-keyword-overlay.json`` and optional runtime copy.
+    """
     if not 1 <= results_per_candidate <= 10:
         raise ValueError("results_per_candidate must be between 1 and 10")
     env = environment if environment is not None else os.environ
     active_policy = policy or DailyLearningPolicy()
     root = Path(learning_dir)
     memory_path = root / "missed-opportunities.json"
-    overlay_path = root / "active-keyword-overlay.json"
+    active_overlay_path = root / "active-keyword-overlay.json"
+    shadow_overlay_path = root / "shadow-keyword-overlay.json"
     history_path = root / "keyword-learning-history.json"
 
     existing_cases = load_missed_opportunity_memory(memory_path)
     inbox_cases = load_missed_opportunity_inbox(inbox_path)
     active_queries = load_active_learning_queries(active_query_config)
-    existing_overlay = (
-        load_learned_query_overlay(overlay_path)
-        if overlay_path.exists()
+    existing_active_overlay = (
+        load_learned_query_overlay(active_overlay_path)
+        if active_overlay_path.exists()
         else build_learned_query_overlay([])
     )
+    existing_shadow_overlay = (
+        load_learned_query_overlay(shadow_overlay_path)
+        if shadow_overlay_path.exists()
+        else build_learned_query_overlay([])
+    )
+    promotion_decisions = load_query_promotion_decisions(promotion_config_path)
 
     api_key = str(
         env.get("BRAVE_SEARCH_API_KEY") or env.get("BRAVE_API_KEY") or ""
@@ -217,7 +234,9 @@ def run_daily_learning_runtime(
         inbox_cases=inbox_cases,
         active_queries=active_queries,
         search=search,
-        existing_overlay=existing_overlay,
+        existing_overlay=existing_active_overlay,
+        existing_shadow_overlay=existing_shadow_overlay,
+        promotion_decisions=promotion_decisions,
         policy=active_policy,
         search_enabled=search_enabled,
         search_skip_reason=skip_reason,
@@ -233,7 +252,9 @@ def run_daily_learning_runtime(
             "generated_at": generated_at,
             "inbox_path": Path(inbox_path).as_posix(),
             "memory_path": memory_path.as_posix(),
-            "overlay_path": overlay_path.as_posix(),
+            "overlay_path": active_overlay_path.as_posix(),
+            "shadow_overlay_path": shadow_overlay_path.as_posix(),
+            "promotion_config_path": Path(promotion_config_path).as_posix(),
             "history_path": history_path.as_posix(),
             "results_per_candidate": results_per_candidate,
             "max_possible_learning_search_requests": active_policy.max_candidates_per_run,
@@ -242,7 +263,8 @@ def run_daily_learning_runtime(
     )
 
     save_missed_opportunity_memory(memory_path, outcome.cases)
-    save_learned_query_overlay(overlay_path, outcome.overlay)
+    save_learned_query_overlay(shadow_overlay_path, outcome.shadow_overlay)
+    save_learned_query_overlay(active_overlay_path, outcome.overlay)
     append_learning_history(history_path, report)
     if runtime_overlay_path is not None:
         save_learned_query_overlay(runtime_overlay_path, outcome.overlay)

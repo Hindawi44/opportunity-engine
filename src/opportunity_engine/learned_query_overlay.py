@@ -1,9 +1,8 @@
-"""Runtime overlay for search terms proven by missed-opportunity replay.
+"""Overlay helpers for learned query terms.
 
-This module is the bridge between offline learning and live discovery.  It
-accepts only keyword evaluations whose verdict is PROVEN, bounds the number of
-active learned terms per market, and augments an existing OR group instead of
-creating extra search requests.
+A PROVEN evaluation is shadow evidence, not a production authorization. These
+helpers retain and rank proven terms but mark automatic activation false. The
+explicit promotion gate is responsible for selecting production-active terms.
 """
 from __future__ import annotations
 
@@ -43,7 +42,7 @@ def build_learned_query_overlay(
     *,
     max_terms_per_market: int = 5,
 ) -> dict[str, Any]:
-    """Build a bounded activation overlay from PROVEN evaluations only."""
+    """Build a bounded shadow overlay from PROVEN evaluations only."""
     if max_terms_per_market < 1:
         raise ValueError("max_terms_per_market must be >= 1")
 
@@ -72,7 +71,7 @@ def build_learned_query_overlay(
         "markets": markets,
         "max_terms_per_market": max_terms_per_market,
         "active_term_count": sum(len(items) for items in markets.values()),
-        "automatic_query_activation": True,
+        "automatic_query_activation": False,
         "automatic_financial_action": False,
         "automatic_contact": False,
         "automatic_bid": False,
@@ -87,7 +86,7 @@ def merge_learned_query_overlays(
     *,
     max_terms_per_market: int = 5,
 ) -> dict[str, Any]:
-    """Merge new proven learning without forgetting stronger prior terms."""
+    """Merge proven shadow learning without forgetting stronger prior terms."""
     if max_terms_per_market < 1:
         raise ValueError("max_terms_per_market must be >= 1")
 
@@ -134,7 +133,7 @@ def merge_learned_query_overlays(
         "markets": markets,
         "max_terms_per_market": max_terms_per_market,
         "active_term_count": sum(len(rows) for rows in markets.values()),
-        "automatic_query_activation": True,
+        "automatic_query_activation": False,
         "automatic_financial_action": False,
         "automatic_contact": False,
         "automatic_bid": False,
@@ -201,7 +200,7 @@ def learned_terms_for_market(
 
 
 def augment_market_query(query: Any, terms: Sequence[str]) -> Any:
-    """Insert learned terms into the first OR group without adding a request."""
+    """Insert explicitly selected terms into the first OR group without adding a request."""
     cleaned = sorted(
         {
             " ".join(str(term or "").casefold().split()).strip()

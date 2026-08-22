@@ -125,7 +125,7 @@ def test_learning_cycle_never_evaluates_more_than_policy_budget() -> None:
     assert outcome.report["evaluated_candidate_count"] == 2
 
 
-def test_proven_keyword_is_added_without_dropping_previous_overlay() -> None:
+def test_proven_keyword_is_shadowed_without_auto_activation_and_preserves_history() -> None:
     old_overlay = build_learned_query_overlay([evaluation("restlager", 0.8)])
     learning_case = case("MISS-NEW", "Sluttlager med arbeidsklær.")
 
@@ -149,9 +149,12 @@ def test_proven_keyword_is_added_without_dropping_previous_overlay() -> None:
         policy=DailyLearningPolicy(max_candidates_per_run=5),
     )
 
-    terms = learned_terms_for_market(outcome.overlay, "NO")
-    assert "restlager" in terms
-    assert "sluttlager" in terms
+    shadow_terms = learned_terms_for_market(outcome.shadow_overlay, "NO")
+    assert "restlager" in shadow_terms
+    assert "sluttlager" in shadow_terms
+    assert learned_terms_for_market(outcome.overlay, "NO") == {}
+    assert outcome.report["automatic_query_activation"] is False
+    assert outcome.report["promotion_gate_enforced"] is True
     learned_case = next(item for item in outcome.cases if item.case_id == "MISS-NEW")
     assert "sluttlager" in learned_case.learned_patterns
     assert learned_case.learning_status == "RECOVERED"
