@@ -60,7 +60,7 @@ def test_shadow_overlay_accumulates_unique_holdout_ids_across_runs() -> None:
     row = merged["markets"]["NO"][0]
 
     assert row["term"] == TERM
-    assert row["recovered_case_ids"] == [HOLDOUT_A, HOLDOUT_B]
+    assert row["recovered_case_ids"] == sorted([HOLDOUT_A, HOLDOUT_B])
     assert row["support_case_ids"] == [MISS_ID]
     assert row["independent_transfer_case_count"] == 2
 
