@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from opportunity_engine.source_shadow_live_validation import (
     extract_shadow_candidates,
+    run_shadow_source_validation,
     validate_shadow_sources,
+    verify_shadow_candidates,
 )
 
 
@@ -142,3 +144,87 @@ def test_shadow_validation_is_bounded_per_source() -> None:
 
     assert report["novel_candidate_count"] == 3
     assert report["max_candidates_per_source"] == 3
+
+
+def test_exact_detail_page_is_required_before_shadow_recovery() -> None:
+    discovery = {
+        "source_results": [
+            {
+                "source_domain": "joblot.stocklear.eu",
+                "source_name": "Stocklear",
+                "novel_candidates": [
+                    {
+                        "source_url": "https://joblot.stocklear.eu/auction/21746",
+                        "title": "Lot of 699 units of assorted products",
+                        "shadow_only": True,
+                        "production_active": False,
+                    }
+                ],
+            }
+        ]
+    }
+    page = """
+    Lot of 699 units of assorted products
+    Number of pallets Equivalent to 5 standard pallets
+    Quality Functional customer returns
+    Starting date Tue, August 18, 2026
+    Last bid 1 400,00 € VAT excluded
+    """
+
+    report = verify_shadow_candidates(discovery, fetcher=lambda url: page)
+
+    assert report["detail_verification_request_count"] == 1
+    assert report["verified_new_opportunity_count"] == 1
+    [row] = report["verified_new_opportunities"]
+    assert row["verification_status"] == "SHADOW_RECOVERED_OPPORTUNITY"
+    assert row["source_page_verified"] is True
+    assert row["production_active"] is False
+
+
+def test_unproven_detail_page_never_becomes_recovered_opportunity() -> None:
+    discovery = {
+        "source_results": [
+            {
+                "source_domain": "www.worldwiseusa.com",
+                "source_name": "WorldWiseUSA",
+                "novel_candidates": [
+                    {
+                        "source_url": "https://www.worldwiseusa.com/about-us/",
+                        "title": "About us",
+                        "shadow_only": True,
+                        "production_active": False,
+                    }
+                ],
+            }
+        ]
+    }
+
+    report = verify_shadow_candidates(
+        discovery,
+        fetcher=lambda url: "We are an international trading company.",
+    )
+
+    assert report["verified_new_opportunity_count"] == 0
+
+
+def test_end_to_end_shadow_recovers_unseen_opportunity_without_production_change() -> None:
+    pages = {
+        "https://www.worldwiseusa.com/latest-stock-lot-offers/": '<a href="/epdm-roofing-rolls/">EPDM Roofing Rolls</a>',
+        "https://joblot.stocklear.eu/": '<a href="/auction/21746">Lot of 699 units</a>',
+        "https://www.worldwiseusa.com/epdm-roofing-rolls/": "EPDM Roofing Rolls 10 & 12ft widths 50 to 200ft lengths. Stock lot available. Load now.",
+        "https://joblot.stocklear.eu/auction/21746": "Lot of 699 units. Number of pallets 5. Quality Functional customer returns. Last bid 1 400 EUR.",
+    }
+
+    report = run_shadow_source_validation(
+        VALIDATED_SOURCES,
+        fetcher=lambda url: pages[url],
+        max_candidates_per_source=3,
+        max_detail_requests=4,
+    )
+
+    assert report["verdict"] == "SHADOW_RECOVERED_NEW_OPPORTUNITIES"
+    assert report["verified_new_opportunity_count"] == 2
+    assert report["teaching_url_recovery_count"] == 0
+    assert report["production_mutation"] is False
+    assert report["automatic_promotion"] is False
+    assert report["production_active_source_count"] == 0
