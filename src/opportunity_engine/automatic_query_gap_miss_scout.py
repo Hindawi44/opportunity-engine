@@ -1,10 +1,10 @@
 """Independent, source-verified QUERY_GAP miss scout.
 
-This scout is deliberately separate from the canonical query pack. It asks one
-bounded Norway search using closure/inventory semantics without embedding the
-candidate sale words that learning is expected to discover. A search hit is
+The scout is deliberately separate from the canonical query pack. It performs
+one bounded Norway search using closure/inventory semantics without embedding
+the candidate sale words that learning is expected to discover. A search hit is
 never ground truth: an exact public HTML page must independently prove a real
-store/business closure and an all-goods/inventory liquidation event.
+business closure, inventory liquidation, and a concrete company identity.
 
 Only then, if the exact page is absent from the canonical checkpoint and the
 page contains a commercially meaningful sale term absent from active queries,
@@ -21,7 +21,7 @@ import json
 import os
 from pathlib import Path
 import re
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
@@ -46,8 +46,8 @@ MAX_PAGES = 3
 DEFAULT_SEARCH_RESULTS = 8
 MAX_PAGE_BYTES = 1_500_000
 
-# No candidate learning term may appear here. The query describes the event,
-# while candidate lexical knowledge must be discovered only after page fetch.
+# No candidate learning term may appear here. The query describes the event;
+# lexical knowledge must be discovered only after an exact page is fetched.
 SCOUT_QUERY_NO = (
     '("legger ned" OR "legges ned" OR "stenger for godt" OR "siste åpningsdag") '
     '(butikk OR bedrift OR selskap) (varer OR varelager OR lagerbeholdning)'
@@ -84,15 +84,31 @@ _TEMPORARY_MARKERS = (
     "stenger for oppussing",
     "stengt på grunn av ferie",
 )
+_GENERIC_COMPANY_LABELS = frozenset(
+    {
+        "butikk",
+        "butikken",
+        "klesbutikk",
+        "klesbutikken",
+        "bedrift",
+        "bedriften",
+        "selskap",
+        "selskapet",
+        "forretning",
+        "forretningen",
+    }
+)
 _COMPANY_PATTERNS = (
+    # Prefer a role-labelled identity, e.g. "Klesbutikken Rita Korsettsalong i ...".
     re.compile(
-        r"\b(?:klesbutikken|butikken|bedriften|selskapet|forretningen)\s+"
+        r"\b(?i:klesbutikken|butikken|bedriften|selskapet|forretningen)\s+"
         r"([A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?)\s+"
-        r"(?:i|på|stenger|legger|legges|skal|har|vil)\b"
+        r"(?i:i|på|stenger|legger|legges|skal|har|vil)\b"
     ),
+    # Fallback: a concrete title/name immediately followed by a closure verb.
     re.compile(
         r"\b([A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?)\s+"
-        r"(?:legger ned|legges ned|stenger for godt|stenger etter)\b"
+        r"(?i:legger ned|legges ned|stenger for godt|stenger etter)\b"
     ),
 )
 
@@ -164,7 +180,7 @@ def _write_object(path: Path, payload: Mapping[str, Any]) -> None:
     temporary.replace(path)
 
 
-def _walk_strings(value: object):
+def _walk_strings(value: object) -> Iterable[str]:
     if isinstance(value, str):
         yield value
     elif isinstance(value, Mapping):
@@ -194,14 +210,26 @@ def _query_contains_term(active_queries: Sequence[str], term: str) -> bool:
     return any(pattern.search(str(query).casefold()) for query in active_queries)
 
 
+def _valid_company_label(value: str) -> bool:
+    compact = _compact(value).strip(" -–—|:,.;")
+    if not 2 <= len(compact) <= 100:
+        return False
+    folded = compact.casefold()
+    if folded in _GENERIC_COMPANY_LABELS:
+        return False
+    if all(token in _GENERIC_COMPANY_LABELS for token in folded.split()):
+        return False
+    return bool(re.search(r"[A-Za-zÆØÅæøå]", compact))
+
+
 def _extract_company(text: str) -> str | None:
+    # Use finditer, not search, so a generic headline such as "Butikken legger
+    # ned" cannot prevent a later concrete identity from being considered.
     for pattern in _COMPANY_PATTERNS:
-        match = pattern.search(text)
-        if not match:
-            continue
-        value = _compact(match.group(1)).strip(" -–—|:,.;")
-        if 2 <= len(value) <= 100:
-            return value
+        for match in pattern.finditer(text):
+            value = _compact(match.group(1)).strip(" -–—|:,.;")
+            if _valid_company_label(value):
+                return value
     return None
 
 
@@ -216,9 +244,7 @@ def _bounded_context(text: str, term: str, *, radius: int = 360) -> str:
 
 
 def _verify_closure_liquidation_page(page: PublicPage) -> dict[str, Any] | None:
-    if page.status_code != 200:
-        return None
-    if "text/html" not in page.content_type.casefold():
+    if page.status_code != 200 or "text/html" not in page.content_type.casefold():
         return None
     final = _canonical(page.final_url)
     if not final or urlparse(final).scheme != "https":
@@ -263,7 +289,7 @@ def fetch_public_page(url: str, *, timeout: float = 15.0) -> PublicPage:
             "Accept": "text/html,application/xhtml+xml",
         },
     )
-    with urlopen(request, timeout=timeout) as response:  # noqa: S310 - verified HTTPS input
+    with urlopen(request, timeout=timeout) as response:  # noqa: S310 - public HTTPS search result
         status = int(getattr(response, "status", 200) or 200)
         final_url = str(response.geturl() or canonical)
         content_type = str(response.headers.get("Content-Type") or "")
@@ -272,13 +298,12 @@ def fetch_public_page(url: str, *, timeout: float = 15.0) -> PublicPage:
         raise ValueError("public page exceeded bounded byte limit")
     charset_match = re.search(r"charset=([A-Za-z0-9._-]+)", content_type, flags=re.I)
     charset = charset_match.group(1) if charset_match else "utf-8"
-    html = raw.decode(charset, errors="replace")
     return PublicPage(
         requested_url=canonical,
         final_url=final_url,
         status_code=status,
         content_type=content_type,
-        html=html,
+        html=raw.decode(charset, errors="replace"),
     )
 
 
@@ -300,7 +325,6 @@ def discover_query_gap_misses(
 
     core_urls = _checkpoint_urls(checkpoint)
     raw_hits = [item for item in search(SCOUT_QUERY_NO) if isinstance(item, SearchHit)]
-    search_request_count = 1
     page_requests = verified_pages = core_known = no_new_term = 0
     cases: list[MissedOpportunityCase] = []
     metadata: list[dict[str, Any]] = []
@@ -343,10 +367,7 @@ def discover_query_gap_misses(
             continue
 
         case = MissedOpportunityCase(
-            case_id=(
-                "auto-query-gap:no:"
-                + sha256(final_url.encode("utf-8")).hexdigest()[:24]
-            ),
+            case_id="auto-query-gap:no:" + sha256(final_url.encode("utf-8")).hexdigest()[:24],
             market_code="NO",
             discovered_by="AUTOMATIC_INDEPENDENT_QUERY_GAP_SCOUT",
             observed_at=now,
@@ -379,7 +400,7 @@ def discover_query_gap_misses(
         "status": "SUCCESS" if cases else "VALID_ZERO",
         "market_code": "NO",
         "scout_query": SCOUT_QUERY_NO,
-        "search_request_count": search_request_count,
+        "search_request_count": 1,
         "search_hit_count": len(raw_hits),
         "page_request_count": page_requests,
         "verified_page_count": verified_pages,
@@ -442,6 +463,26 @@ def _attach_to_brief(output_dir: Path, report: Mapping[str, Any]) -> None:
     _write_object(brief_path, brief)
 
 
+def _safe_empty_report(status: str, **extra: Any) -> dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "status": status,
+        "search_request_count": 0,
+        "search_hit_count": 0,
+        "page_request_count": 0,
+        "verified_page_count": 0,
+        "detected_miss_count": 0,
+        "new_case_count": 0,
+        "repeat_miss_count_this_run": 0,
+        "automatic_query_activation": False,
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_purchase": False,
+        "automatic_payment": False,
+        **extra,
+    }
+
+
 def write_automatic_query_gap_miss_scout(
     output_dir: str | Path,
     *,
@@ -457,44 +498,18 @@ def write_automatic_query_gap_miss_scout(
     env = environment if environment is not None else os.environ
     output = Path(output_dir)
     root = Path(input_root)
-    cost_block = manual_paid_brave_block_reason(env)
     report_path = output / OUTPUT_FILENAME
+
+    cost_block = manual_paid_brave_block_reason(env)
     if cost_block:
-        report = {
-            "schema_version": SCHEMA_VERSION,
-            "status": "SKIPPED_COST_GUARD",
-            "cost_guard_reason": cost_block,
-            "search_request_count": 0,
-            "search_hit_count": 0,
-            "page_request_count": 0,
-            "verified_page_count": 0,
-            "detected_miss_count": 0,
-            "new_case_count": 0,
-            "repeat_miss_count_this_run": 0,
-            "automatic_query_activation": False,
-            "automatic_contact": False,
-            "automatic_bid": False,
-            "automatic_purchase": False,
-            "automatic_payment": False,
-        }
+        report = _safe_empty_report("SKIPPED_COST_GUARD", cost_guard_reason=cost_block)
         _write_object(report_path, report)
         _attach_to_brief(output, report)
         return report
 
     api_key = _compact(env.get("BRAVE_SEARCH_API_KEY") or env.get("BRAVE_API_KEY"))
     if search_override is None and not api_key:
-        report = {
-            "schema_version": SCHEMA_VERSION,
-            "status": "SKIPPED_NO_API_KEY",
-            "search_request_count": 0,
-            "page_request_count": 0,
-            "detected_miss_count": 0,
-            "automatic_query_activation": False,
-            "automatic_contact": False,
-            "automatic_bid": False,
-            "automatic_purchase": False,
-            "automatic_payment": False,
-        }
+        report = _safe_empty_report("SKIPPED_NO_API_KEY")
         _write_object(report_path, report)
         _attach_to_brief(output, report)
         return report
@@ -507,7 +522,7 @@ def write_automatic_query_gap_miss_scout(
             extra_snippets=True,
         )
 
-        def search(query: str):
+        def search(query: str) -> Sequence[SearchHit]:
             return provider.search(query, count=DEFAULT_SEARCH_RESULTS)
     else:
         search = search_override
