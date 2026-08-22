@@ -2,8 +2,11 @@
 
 The operator joins durable missed-opportunity memory with a curated inbox,
 proposes search terms only for diagnosed QUERY_GAP cases, shadow-evaluates a
-small bounded number of candidates, retains previously proven skills, and marks
-cases recovered when hidden-ground-truth replay succeeds.
+small bounded number of candidates, retains previously proven shadow skills,
+and marks cases recovered when hidden-ground-truth replay succeeds.
+
+PROVEN is not production-active. An exact explicit promotion decision is
+required before a proven shadow term can enter the active runtime overlay.
 
 Network access is injected through a callback. This keeps the learning policy
 fully testable and lets the CLI enforce paid-search guards independently.
@@ -24,10 +27,12 @@ from opportunity_engine.learned_query_overlay import (
     build_learned_query_overlay,
     merge_learned_query_overlays,
 )
+from opportunity_engine.learning_promotion_gate import select_promoted_query_overlay
 from opportunity_engine.missed_opportunity_learning import MissedOpportunityCase
 
 
 LearningSearch = Callable[[str, str], Sequence[Mapping[str, Any]]]
+PromotionDecisions = Mapping[tuple[str, str], str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,6 +58,7 @@ class DailyLearningOutcome:
     cases: tuple[MissedOpportunityCase, ...]
     candidates: tuple[KeywordLearningCandidate, ...]
     evaluations: tuple[KeywordEvaluationResult, ...]
+    shadow_overlay: dict[str, Any]
     overlay: dict[str, Any]
     report: dict[str, Any]
 
@@ -131,15 +137,33 @@ def run_daily_learning_cycle(
     active_queries: Sequence[str],
     search: LearningSearch,
     existing_overlay: Mapping[str, Any] | None = None,
+    existing_shadow_overlay: Mapping[str, Any] | None = None,
+    promotion_decisions: PromotionDecisions | None = None,
     policy: DailyLearningPolicy | None = None,
     search_enabled: bool = True,
     search_skip_reason: str | None = None,
 ) -> DailyLearningOutcome:
-    """Run one bounded learning iteration and return state for persistence."""
+    """Run one bounded learning iteration and return state for persistence.
+
+    ``existing_overlay`` is treated as legacy learned state and migrated into
+    shadow knowledge. It is never trusted as production-active unless the exact
+    term is present in ``promotion_decisions`` with status PROMOTED.
+    """
     active_policy = policy or DailyLearningPolicy()
     cases = _diagnose_cases(merge_case_memory(existing_cases, inbox_cases))
 
-    effective_active_queries = [*active_queries, *_existing_overlay_terms(existing_overlay)]
+    # Migrate any pre-gate active overlay into shadow evidence. This is fail-safe:
+    # legacy auto-activated terms stop influencing production until explicitly
+    # promoted, but their evidence is retained and not re-learned every day.
+    known_shadow_overlay = merge_learned_query_overlays(
+        existing_shadow_overlay,
+        existing_overlay,
+        max_terms_per_market=active_policy.max_terms_per_market,
+    )
+    effective_active_queries = [
+        *active_queries,
+        *_existing_overlay_terms(known_shadow_overlay),
+    ]
     candidates = propose_query_gap_keywords(
         cases,
         active_queries=effective_active_queries,
@@ -171,13 +195,18 @@ def run_daily_learning_cycle(
                     }
                 )
 
-    new_overlay = build_learned_query_overlay(
+    new_shadow_overlay = build_learned_query_overlay(
         evaluations,
         max_terms_per_market=active_policy.max_terms_per_market,
     )
-    overlay = merge_learned_query_overlays(
-        existing_overlay,
-        new_overlay,
+    shadow_overlay = merge_learned_query_overlays(
+        known_shadow_overlay,
+        new_shadow_overlay,
+        max_terms_per_market=active_policy.max_terms_per_market,
+    )
+    overlay = select_promoted_query_overlay(
+        shadow_overlay,
+        promotion_decisions,
         max_terms_per_market=active_policy.max_terms_per_market,
     )
     cases = _apply_recoveries(cases, evaluations)
@@ -196,8 +225,10 @@ def run_daily_learning_cycle(
         search_status = "SUCCESS"
 
     keyword_report = build_keyword_learning_report(candidates, evaluations)
+    active_count = int(overlay.get("active_term_count") or 0)
+    shadow_count = int(shadow_overlay.get("active_term_count") or 0)
     report = {
-        "schema_version": "daily-learning-operator-1.0",
+        "schema_version": "daily-learning-operator-1.1",
         "known_missed_opportunity_count": len(cases),
         "inbox_case_count": len(inbox_cases),
         "candidate_count": len(candidates),
@@ -209,12 +240,17 @@ def run_daily_learning_cycle(
         "proven_term_count_this_run": sum(
             1 for item in evaluations if item.status == "PROVEN"
         ),
-        "active_learned_term_count": int(overlay.get("active_term_count") or 0),
+        "shadow_proven_term_count": shadow_count,
+        "active_learned_term_count": active_count,
+        "promoted_term_count": active_count,
+        "promotion_decision_count": len(promotion_decisions or {}),
         "recovered_case_count": sum(
             1 for case in cases if case.learning_status == "RECOVERED"
         ),
         "keyword_learning": keyword_report,
-        "automatic_query_activation": True,
+        "promotion_gate_enforced": True,
+        "automatic_query_activation": False,
+        "production_query_activation_requires_explicit_promotion": True,
         "automatic_contact": False,
         "automatic_bid": False,
         "automatic_purchase": False,
@@ -225,6 +261,7 @@ def run_daily_learning_cycle(
         cases=tuple(cases),
         candidates=tuple(candidates),
         evaluations=tuple(evaluations),
+        shadow_overlay=shadow_overlay,
         overlay=overlay,
         report=report,
     )
