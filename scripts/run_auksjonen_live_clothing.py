@@ -61,6 +61,22 @@ def _write_fallback_persistence_error(
     return path
 
 
+def _parser_rescue_terms(overlay_argument: object) -> tuple[str, ...]:
+    overlay_path_text = str(overlay_argument or "").strip()
+    if not overlay_path_text:
+        input_root_text = str(os.environ.get("INPUT_ROOT") or "").strip()
+        if input_root_text:
+            overlay_path_text = (
+                Path(input_root_text) / "learning" / PARSER_RESCUE_OVERLAY_FILENAME
+            ).as_posix()
+    if not overlay_path_text:
+        return ()
+    overlay_path = Path(overlay_path_text)
+    if not overlay_path.exists():
+        return ()
+    return load_parser_rescue_terms(overlay_path, PARSER_RESCUE_SOURCE)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -98,29 +114,14 @@ def main() -> int:
         raise SystemExit("--item-verification-limit must be non-negative")
 
     output_dir = Path(args.output_dir)
+    learned_terms = _parser_rescue_terms(args.parser_rescue_overlay)
+
     result = AuksjonenMultiCategoryCollector(
         max_listings=args.max_listings,
         page_size=args.page_size,
         max_pages=args.max_pages,
     ).collect()
     base_collection = result.combined
-
-    overlay_path_text = str(args.parser_rescue_overlay or "").strip()
-    if not overlay_path_text:
-        input_root_text = str(os.environ.get("INPUT_ROOT") or "").strip()
-        if input_root_text:
-            overlay_path_text = (
-                Path(input_root_text) / "learning" / PARSER_RESCUE_OVERLAY_FILENAME
-            ).as_posix()
-
-    learned_terms: tuple[str, ...] = ()
-    if overlay_path_text:
-        overlay_path = Path(overlay_path_text)
-        if overlay_path.exists():
-            learned_terms = load_parser_rescue_terms(
-                overlay_path,
-                PARSER_RESCUE_SOURCE,
-            )
     collection = apply_auksjonen_parser_rescue(base_collection, learned_terms)
     rescued_count = (
         len(collection.inventory_opportunities)
