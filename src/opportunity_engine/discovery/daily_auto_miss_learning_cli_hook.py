@@ -1,13 +1,14 @@
 """Run bounded missed-opportunity learning after the daily capture stage.
 
 The existing unified-river hook verifies and persists missed opportunities near
-process exit.  This hook is intentionally registered *before* that hook because
+process exit. This hook is intentionally registered *before* that hook because
 ``atexit`` handlers run LIFO: capture/routing executes first, then this consumer
 reads the newly durable miss memory in the same daily run.
 
-Learning remains shadow-first and promotion-gated.  Manual GitHub runs inherit
+Learning remains shadow-first and promotion-gated. Manual GitHub runs inherit
 the existing paid-Brave cost guard; scheduled runs may evaluate at most two
-candidate patterns with five results each.
+candidate patterns with five results each. Learning failure is fail-closed and
+must never invalidate the already-produced discovery checkpoint.
 """
 from __future__ import annotations
 
@@ -55,6 +56,7 @@ def _attach_to_brief(output_dir: Path, report: Mapping[str, Any]) -> None:
     brief["daily_auto_miss_learning"] = {
         key: report.get(key)
         for key in (
+            "status",
             "generated_at",
             "search_status",
             "known_missed_opportunity_count",
@@ -72,6 +74,9 @@ def _attach_to_brief(output_dir: Path, report: Mapping[str, Any]) -> None:
             "safe_learning_promotion_eligible_count",
             "promotion_gate_enforced",
             "automatic_query_activation",
+            "learning_timing",
+            "error_type",
+            "error",
         )
     }
     _write_object(brief_path, brief)
@@ -130,6 +135,42 @@ def run_daily_auto_miss_learning(
     return report
 
 
+def run_daily_auto_miss_learning_fail_closed(
+    output_dir: str | Path,
+    *,
+    input_root: str | Path,
+    environment: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Run post-capture learning without allowing it to break discovery output."""
+    output = Path(output_dir)
+    try:
+        return run_daily_auto_miss_learning(
+            output,
+            input_root=input_root,
+            environment=environment,
+        )
+    except Exception as exc:
+        report = {
+            "status": "FAILED",
+            "search_status": "FAILED",
+            "error_type": type(exc).__name__,
+            "error": str(exc)[:500],
+            "learning_timing": "POST_CAPTURE_SAME_RUN",
+            "learning_search_requests": 0,
+            "proven_term_count_this_run": 0,
+            "active_learned_term_count": 0,
+            "promotion_gate_enforced": True,
+            "automatic_query_activation": False,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+        _write_object(output / REPORT_FILENAME, report)
+        _attach_to_brief(output, report)
+        return report
+
+
 def install_daily_auto_miss_learning_cli_hook() -> None:
     """Register the post-capture learner only for the daily bulletin CLI."""
     global _INSTALLED
@@ -147,7 +188,7 @@ def install_daily_auto_miss_learning_cli_hook() -> None:
     )
 
     def _run_after_capture() -> None:
-        report = run_daily_auto_miss_learning(
+        report = run_daily_auto_miss_learning_fail_closed(
             output_dir,
             input_root=input_root,
             environment=os.environ,
@@ -180,6 +221,7 @@ def install_daily_auto_miss_learning_cli_hook() -> None:
                         "automatic_query_activation", False
                     ),
                     "learning_timing": report.get("learning_timing"),
+                    "error_type": report.get("error_type"),
                 },
                 sort_keys=True,
             ),
