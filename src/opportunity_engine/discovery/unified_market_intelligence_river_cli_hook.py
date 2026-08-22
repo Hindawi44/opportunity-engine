@@ -13,8 +13,8 @@ from opportunity_engine.automatic_missed_opportunity_capture import (
 from opportunity_engine.discovery.signal_follow_up_source_verification import (
     write_signal_follow_up_source_verification,
 )
-from opportunity_engine.discovery.source_gap_adaptive_followup import (
-    write_source_gap_adaptive_followup_with_continuity,
+from opportunity_engine.discovery.source_gap_safe_followup import (
+    write_safe_source_gap_adaptive_followup_with_continuity,
 )
 from opportunity_engine.discovery.unified_market_intelligence_river import (
     write_unified_market_intelligence_river,
@@ -32,14 +32,16 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
 
     The hook activates only for ``build_domain_market_intelligence_feed.py`` and
     only when that command has produced its base domain brief. The unified river
-    is written first; then proven SOURCE_GAP memory receives first priority
-    inside the existing follow-up case budget. Any remaining budget flows to the
-    established persistent-entity/current-signal follow-up. Supported exact
-    public item URLs are routed into existing VENTA/Auksjonen verifiers. Source-
-    verified bulk clothing lots absent from the canonical checkpoint are then
-    captured into durable missed-opportunity memory, the root-cause feedback
-    router assigns each miss to its correct adaptation mechanism, and verified
-    PARSER_GAP cases may add bounded lot-language terms for the next run.
+    is written first. SOURCE_GAP memory remains shadow-only unless the exact case
+    has an explicit promotion decision; only promoted cases may receive first
+    priority inside the existing follow-up case budget. Any remaining budget
+    flows to the established persistent-entity/current-signal follow-up.
+    Supported exact public item URLs are routed into existing VENTA/Auksjonen
+    verifiers. Source-verified bulk clothing lots absent from the canonical
+    checkpoint are then captured into durable missed-opportunity memory, the
+    root-cause feedback router assigns each miss to its correct adaptation
+    mechanism, and verified PARSER_GAP cases may add bounded shadow lot-language
+    terms for later explicit promotion.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -65,7 +67,7 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                 sort_keys=True,
             ),
         )
-        follow_up = write_source_gap_adaptive_followup_with_continuity(
+        follow_up = write_safe_source_gap_adaptive_followup_with_continuity(
             output_dir,
             environment=os.environ,
         )
@@ -76,11 +78,20 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                     "status": follow_up.get("status"),
                     "follow_up_case_budget": follow_up.get("follow_up_case_budget"),
                     "source_gap_case_count": follow_up.get("source_gap_case_count"),
+                    "source_gap_shadow_case_count": follow_up.get(
+                        "source_gap_shadow_case_count"
+                    ),
+                    "source_gap_promoted_case_count": follow_up.get(
+                        "source_gap_promoted_case_count"
+                    ),
                     "source_gap_selected_count": follow_up.get(
                         "source_gap_selected_count"
                     ),
                     "source_gap_search_request_count": follow_up.get(
                         "source_gap_search_request_count"
+                    ),
+                    "promotion_gate_enforced": follow_up.get(
+                        "promotion_gate_enforced"
                     ),
                     "eligible_follow_up_case_count": follow_up.get(
                         "eligible_follow_up_case_count"
