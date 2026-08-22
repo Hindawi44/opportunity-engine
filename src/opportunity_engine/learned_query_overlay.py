@@ -3,6 +3,10 @@
 A PROVEN evaluation is shadow evidence, not a production authorization. These
 helpers retain and rank proven terms but mark automatic activation false. The
 explicit promotion gate is responsible for selecting production-active terms.
+
+Shadow evidence is cumulative: independent holdout recoveries for the same term
+must survive later runs instead of being replaced by whichever run had the best
+precision score.
 """
 from __future__ import annotations
 
@@ -37,6 +41,77 @@ def infer_signal_type(term: str) -> MarketSignalType:
     return MarketSignalType.BUSINESS_CLOSURE
 
 
+def _string_ids(value: object) -> list[str]:
+    if not isinstance(value, (list, tuple, set, frozenset)):
+        return []
+    return sorted(
+        {
+            str(item).strip()
+            for item in value
+            if str(item).strip()
+        }
+    )
+
+
+def _normalized_row(raw: Mapping[str, Any], term: str) -> dict[str, Any]:
+    """Normalize old/new overlay rows into cumulative evidence fields."""
+    row = dict(raw)
+    row["term"] = term
+    row["signal_type"] = str(row.get("signal_type") or infer_signal_type(term).value)
+    row["precision"] = float(row.get("precision") or 0.0)
+    row["source_verdict"] = str(row.get("source_verdict") or "PROVEN")
+
+    scope = str(row.get("evaluation_scope") or "SOURCE_CASE_REPLAY").strip().upper()
+    recovered = _string_ids(row.get("recovered_case_ids"))
+    source_replay = _string_ids(row.get("source_replay_case_ids"))
+    transfer_validation = _string_ids(row.get("transfer_validation_case_ids"))
+
+    # Backward compatibility for rows written before cumulative evidence fields.
+    if not source_replay and not transfer_validation:
+        if scope == "HOLDOUT_TRANSFER":
+            transfer_validation = list(recovered)
+        else:
+            source_replay = list(recovered)
+
+    scopes = _string_ids(row.get("evaluation_scopes"))
+    if scope and scope not in scopes:
+        scopes.append(scope)
+        scopes.sort()
+
+    row["recovered_case_ids"] = sorted(
+        set(recovered) | set(source_replay) | set(transfer_validation)
+    )
+    row["source_replay_case_ids"] = source_replay
+    row["transfer_validation_case_ids"] = transfer_validation
+    row["support_case_ids"] = _string_ids(row.get("support_case_ids"))
+    row["evaluation_scope"] = scope
+    row["evaluation_scopes"] = scopes
+    row["independent_transfer_case_count"] = len(transfer_validation)
+    return row
+
+
+def _row_from_evaluation(item: KeywordEvaluationResult) -> dict[str, Any]:
+    scope = str(item.evaluation_scope or "SOURCE_CASE_REPLAY").strip().upper()
+    recovered = sorted(set(item.recovered_case_ids))
+    source_replay = recovered if scope != "HOLDOUT_TRANSFER" else []
+    transfer_validation = recovered if scope == "HOLDOUT_TRANSFER" else []
+    return {
+        "term": item.term,
+        "signal_type": infer_signal_type(item.term).value,
+        "precision": item.precision,
+        "raw_hit_count": item.raw_hit_count,
+        "verified_relevant_count": item.verified_relevant_count,
+        "recovered_case_ids": recovered,
+        "source_replay_case_ids": source_replay,
+        "transfer_validation_case_ids": transfer_validation,
+        "support_case_ids": sorted(set(item.support_case_ids)),
+        "evaluation_scope": scope,
+        "evaluation_scopes": [scope],
+        "independent_transfer_case_count": len(transfer_validation),
+        "source_verdict": item.status,
+    }
+
+
 def build_learned_query_overlay(
     evaluations: Sequence[KeywordEvaluationResult],
     *,
@@ -56,17 +131,7 @@ def build_learned_query_overlay(
     for market_code, rows in sorted(by_market.items()):
         ranked = sorted(rows, key=lambda item: (-item.precision, item.term))
         markets[market_code] = [
-            {
-                "term": item.term,
-                "signal_type": infer_signal_type(item.term).value,
-                "precision": item.precision,
-                "raw_hit_count": item.raw_hit_count,
-                "verified_relevant_count": item.verified_relevant_count,
-                "recovered_case_ids": list(item.recovered_case_ids),
-                "support_case_ids": list(item.support_case_ids),
-                "evaluation_scope": item.evaluation_scope,
-                "source_verdict": item.status,
-            }
+            _row_from_evaluation(item)
             for item in ranked[:max_terms_per_market]
         ]
 
@@ -90,7 +155,14 @@ def merge_learned_query_overlays(
     *,
     max_terms_per_market: int = 5,
 ) -> dict[str, Any]:
-    """Merge proven shadow learning without forgetting stronger prior terms."""
+    """Merge proven shadow learning without forgetting independent evidence.
+
+    Ranking metrics still come from the strongest-precision observation to
+    preserve previous behavior. Evidence identity is cumulative: source replay
+    IDs, hidden transfer IDs, support IDs, and evaluation scopes are unioned.
+    Re-observing the same holdout therefore cannot impersonate independent
+    replication.
+    """
     if max_terms_per_market < 1:
         raise ValueError("max_terms_per_market must be >= 1")
 
@@ -111,18 +183,44 @@ def merge_learned_query_overlays(
                 term = " ".join(str(raw.get("term") or "").casefold().split()).strip()
                 if not term:
                     continue
-                row = dict(raw)
-                row["term"] = term
-                row["signal_type"] = str(
-                    row.get("signal_type") or infer_signal_type(term).value
-                )
-                row["precision"] = float(row.get("precision") or 0.0)
-                row["source_verdict"] = str(row.get("source_verdict") or "PROVEN")
+                row = _normalized_row(raw, term)
                 current = by_market[market].get(term)
-                if current is None or float(row["precision"]) > float(
-                    current.get("precision") or 0.0
-                ):
+                if current is None:
                     by_market[market][term] = row
+                    continue
+
+                current = _normalized_row(current, term)
+                stronger = (
+                    row
+                    if float(row.get("precision") or 0.0)
+                    > float(current.get("precision") or 0.0)
+                    else current
+                )
+                merged = dict(stronger)
+                merged["recovered_case_ids"] = sorted(
+                    set(current.get("recovered_case_ids") or [])
+                    | set(row.get("recovered_case_ids") or [])
+                )
+                merged["source_replay_case_ids"] = sorted(
+                    set(current.get("source_replay_case_ids") or [])
+                    | set(row.get("source_replay_case_ids") or [])
+                )
+                merged["transfer_validation_case_ids"] = sorted(
+                    set(current.get("transfer_validation_case_ids") or [])
+                    | set(row.get("transfer_validation_case_ids") or [])
+                )
+                merged["support_case_ids"] = sorted(
+                    set(current.get("support_case_ids") or [])
+                    | set(row.get("support_case_ids") or [])
+                )
+                merged["evaluation_scopes"] = sorted(
+                    set(current.get("evaluation_scopes") or [])
+                    | set(row.get("evaluation_scopes") or [])
+                )
+                merged["independent_transfer_case_count"] = len(
+                    merged["transfer_validation_case_ids"]
+                )
+                by_market[market][term] = merged
 
     markets: dict[str, list[dict[str, Any]]] = {}
     for market, rows_by_term in sorted(by_market.items()):
