@@ -35,12 +35,7 @@ jobs:
           )
           from opportunity_engine.promoted_learned_core_discovery import _default_search
 
-          query = (
-              'inpage:"avviklingssalg" AND inpage:avvikler OR '
-              'inpage:"avviklingssalg" AND inpage:"legger ned" OR '
-              'inpage:"avviklingssalg" AND inpage:lagerbeholdning OR '
-              'inpage:"avviklingssalg" AND inpage:"hele lageret"'
-          )
+          query = '"avviklingssalg" varelager'
           search = _default_search(os.environ["BRAVE_SEARCH_API_KEY"], results_per_query=10)
           hits = list(search(query))[:10]
           rows = []
