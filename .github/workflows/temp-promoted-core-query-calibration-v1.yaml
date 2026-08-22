@@ -35,18 +35,21 @@ jobs:
           )
           from opportunity_engine.promoted_learned_core_discovery import _default_search
 
-          query = '"avviklingssalg" varelager'
+          query = '"avviklingssalg" "siste varelager"'
           search = _default_search(os.environ["BRAVE_SEARCH_API_KEY"], results_per_query=10)
           hits = list(search(query))[:10]
           rows = []
           for rank, hit in enumerate(hits, 1):
               row = {"rank": rank, "title": hit.title, "url": hit.url, "description": hit.description}
               try:
-                  proof = _verify_closure_liquidation_page(fetch_public_page(hit.url))
+                  page = fetch_public_page(hit.url)
+                  proof = _verify_closure_liquidation_page(page)
               except Exception as exc:
                   row.update({"result": "FETCH_ERROR", "error": f"{type(exc).__name__}: {exc}"[:500]})
               else:
                   row["result"] = "VERIFIED" if proof else "REJECTED"
+                  text = page.html.casefold()
+                  row["has_stenge_butikken"] = "stenge butikken" in text or "stenger butikken" in text
                   if proof:
                       row["company"] = proof.get("company")
                       row["canonical_url"] = proof.get("canonical_url")
