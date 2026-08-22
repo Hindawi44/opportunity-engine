@@ -3,54 +3,19 @@ name: MIND FORGE Live Research Launcher
 on:
   workflow_dispatch:
     inputs:
-      mode:
-        description: MIND FORGE execution mode
-        required: true
-        type: choice
-        default: LIVE_RESEARCH
-        options:
-          - LIVE_RESEARCH
-          - CREATIVE_V2_OPEN
       seed:
-        description: Raw seed for MIND FORGE
+        description: Raw seed only; MIND FORGE chooses the execution path
         required: true
         type: string
-        default: "محل شاي في نامسوس"
+        default: "التجارة في النرويج"
       confirm_paid_live_research:
-        description: Explicitly authorize the selected paid execution
+        description: Explicitly authorize the bounded paid execution
         required: true
         type: choice
         default: "NO"
         options:
           - "NO"
           - "YES"
-      research_model:
-        description: Model used only by the research adapter
-        required: true
-        type: choice
-        default: gpt-5.6-luna
-        options:
-          - gpt-5.6-luna
-          - gpt-5.6-terra
-      max_search_operations:
-        description: Hard search-operation ceiling
-        required: true
-        type: choice
-        default: "6"
-        options:
-          - "2"
-          - "4"
-          - "6"
-      max_research_cost_usd:
-        description: Separate estimated research-cost ceiling
-        required: true
-        type: choice
-        default: "0.07"
-        options:
-          - "0.02"
-          - "0.05"
-          - "0.07"
-          - "0.10"
 
 permissions:
   contents: read
@@ -72,227 +37,13 @@ jobs:
       - name: Refuse unconfirmed paid execution
         run: echo "Paid execution was not explicitly authorized; no API call was made."
 
-  live-research-run:
-    if: ${{ inputs.mode == 'LIVE_RESEARCH' && inputs.confirm_paid_live_research == 'YES' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - name: Check out MIND FORGE PR branch only
-        uses: actions/checkout@v4
-        with:
-          ref: agent/mind-forge-phase1-contracts
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Rebuild frozen MIND FORGE V1.10.1 runtime
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/mind-forge-runtime"
-          cat mind-forge-live/runtime/chunk*.b64 | base64 --decode > "$RUNNER_TEMP/runtime.tar.xz"
-          xz -t "$RUNNER_TEMP/runtime.tar.xz"
-          tar -xJf "$RUNNER_TEMP/runtime.tar.xz" -C "$RUNNER_TEMP/mind-forge-runtime"
-          APP="$RUNNER_TEMP/mind-forge-runtime/mind-forge"
-          python mind-forge-live/apply_patch_v1_9_1.py "$APP"
-          cat mind-forge-live/v1_10_overlay_0*.b64 | base64 --decode > "$RUNNER_TEMP/v1_10_overlay.tar.xz"
-          xz -t "$RUNNER_TEMP/v1_10_overlay.tar.xz"
-          tar -xJf "$RUNNER_TEMP/v1_10_overlay.tar.xz" -C "$APP"
-          python mind-forge-live/apply_patch_v1_10_1_decision.py "$APP"
-          grep -q 'version="0.10.0"' "$APP/main.py"
-          grep -q 'normalize_decision_against_logic' "$APP/mind_forge/orchestrator.py"
-          echo "APP=$APP" >> "$GITHUB_ENV"
-
-      - name: Install live research dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install \
-            "openai-agents>=0.14.0" \
-            "pydantic>=2.11.0,<3.0"
-
-      - name: Attach MIND FORGE Runner V1 and guardrails
-        run: |
-          set -euo pipefail
-          for file in \
-            contracts_v1.py \
-            question_generator_v1.py \
-            creative_engine_v1.py \
-            expert_minds_v1.py \
-            logic_engine_v1.py \
-            critique_engine_v1.py \
-            research_evidence_v1.py \
-            decision_engine_v1.py \
-            experiment_engine_v1.py \
-            memory_engine_v1.py \
-            pipeline_v1.py \
-            live_research_adapter_v1.py \
-            live_research_recovery_v1.py \
-            runner_v1.py \
-            runner_v1_resilient.py \
-            runner_v1_geographic.py
-          do
-            cp "mind-forge-live/phase1/$file" "$APP/mind_forge/$file"
-          done
-          python -m compileall -q "$APP/mind_forge"
-          test -f "$APP/mind_forge/live_research_recovery_v1.py"
-          test -f "$APP/mind_forge/runner_v1_resilient.py"
-          test -f "$APP/mind_forge/runner_v1_geographic.py"
-
-      - name: Normalize API secret without printing it
-        env:
-          RAW_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          python - <<'PY'
-          import os
-
-          raw = os.getenv("RAW_OPENAI_API_KEY", "")
-          if not raw:
-              raise SystemExit("OPENAI_API_KEY is not available to this workflow")
-
-          clean = raw.strip()
-          if not clean:
-              raise SystemExit("OPENAI_API_KEY becomes empty after whitespace normalization")
-          if any(ch in clean for ch in "\r\n\t"):
-              raise SystemExit("OPENAI_API_KEY contains embedded whitespace; replace the GitHub secret")
-
-          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
-              handle.write(f"OPENAI_API_KEY={clean}\n")
-
-          if clean != raw:
-              print("OPENAI_API_KEY normalized: leading/trailing whitespace removed")
-          else:
-              print("OPENAI_API_KEY format hygiene: OK")
-          print("OPENAI_API_KEY value was not displayed")
-          PY
-
-      - name: Preflight OpenAI transport and model access without paid generation
-        env:
-          MIND_FORGE_RESEARCH_MODEL: ${{ inputs.research_model }}
-        run: |
-          python - <<'PY'
-          import os
-          import socket
-          import ssl
-
-          import openai
-          from openai import OpenAI
-
-          host = "api.openai.com"
-          model = os.environ["MIND_FORGE_RESEARCH_MODEL"]
-
-          try:
-              addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
-          except Exception as exc:
-              raise SystemExit(f"OPENAI_PREFLIGHT_DNS_FAILED: {type(exc).__name__}: {exc}") from exc
-          if not addresses:
-              raise SystemExit("OPENAI_PREFLIGHT_DNS_FAILED: no addresses returned")
-          print("OPENAI_PREFLIGHT_DNS_OK")
-
-          try:
-              context = ssl.create_default_context()
-              with socket.create_connection((host, 443), timeout=10) as raw_socket:
-                  with context.wrap_socket(raw_socket, server_hostname=host) as tls_socket:
-                      tls_version = tls_socket.version()
-          except Exception as exc:
-              raise SystemExit(f"OPENAI_PREFLIGHT_TLS_FAILED: {type(exc).__name__}: {exc}") from exc
-          print(f"OPENAI_PREFLIGHT_TLS_OK: {tls_version}")
-
-          try:
-              client = OpenAI(api_key=os.environ["OPENAI_API_KEY"], timeout=20.0, max_retries=2)
-              resolved = client.models.retrieve(model)
-          except openai.APIConnectionError as exc:
-              cause = exc.__cause__
-              details = []
-              while cause is not None and len(details) < 4:
-                  details.append(f"{type(cause).__name__}: {cause}")
-                  cause = cause.__cause__
-              detail_text = " <- ".join(details) if details else "no underlying transport cause available"
-              raise SystemExit(f"OPENAI_PREFLIGHT_SDK_CONNECTION_FAILED: {detail_text}") from exc
-          except openai.APIStatusError as exc:
-              raise SystemExit(
-                  f"OPENAI_PREFLIGHT_API_STATUS_FAILED: HTTP {exc.status_code}; "
-                  f"model={model}; request_id={getattr(exc, 'request_id', None)}"
-              ) from exc
-
-          if getattr(resolved, "id", None) != model:
-              raise SystemExit(f"OPENAI_PREFLIGHT_MODEL_MISMATCH: requested={model}")
-          print(f"OPENAI_PREFLIGHT_SDK_AND_MODEL_OK: {model}")
-          PY
-
-      - name: Run MIND FORGE from one seed with bounded live research
-        env:
-          PYTHONPATH: ${{ env.APP }}
-          MIND_FORGE_LIVE_RESEARCH_ENABLED: "1"
-          MIND_FORGE_SEED: ${{ inputs.seed }}
-          MIND_FORGE_RESEARCH_MODEL: ${{ inputs.research_model }}
-          MIND_FORGE_MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
-          MIND_FORGE_MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/mind-forge-live-research-launcher
-          python -m mind_forge.runner_v1_geographic \
-            "$MIND_FORGE_SEED" \
-            --live-research \
-            --confirm-paid-live-research YES \
-            --research-model "$MIND_FORGE_RESEARCH_MODEL" \
-            --max-search-operations "$MIND_FORGE_MAX_SEARCH_OPERATIONS" \
-            --max-research-cost-usd "$MIND_FORGE_MAX_RESEARCH_COST_USD" \
-            --output-dir artifacts/mind-forge-live-research-launcher \
-            | tee artifacts/mind-forge-live-research-launcher/stdout.json
-
-      - name: Validate Runner output and budget gates
-        env:
-          MAX_SEARCH_OPERATIONS: ${{ inputs.max_search_operations }}
-          MAX_RESEARCH_COST_USD: ${{ inputs.max_research_cost_usd }}
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          path = Path("artifacts/mind-forge-live-research-launcher/mind-forge-runner-summary.json")
-          data = json.loads(path.read_text(encoding="utf-8"))
-
-          if data["status"] != "MIND_FORGE_RUN_COMPLETE":
-              raise SystemExit("Runner did not complete")
-          if data["live_research_requested"] is not True:
-              raise SystemExit("Live Research was not requested")
-
-          usage = data["research_usage"]
-          if int(usage["search_operations"]) > int(os.environ["MAX_SEARCH_OPERATIONS"]):
-              raise SystemExit("search-operation budget exceeded")
-          if float(usage["estimated_cost_usd"]) > float(os.environ["MAX_RESEARCH_COST_USD"]):
-              raise SystemExit("estimated research-cost budget exceeded")
-
-          print(json.dumps({
-              "status": data["status"],
-              "seed": data["seed"],
-              "search_operations": usage["search_operations"],
-              "estimated_cost_usd": usage["estimated_cost_usd"],
-              "evidence_classes": data["evidence_classes"],
-              "decision_verdict": data["decision_verdict"],
-              "selected_idea_ids": data["selected_idea_ids"],
-              "live_source_count": len(data["live_sources"]),
-          }, ensure_ascii=False))
-          PY
-
-      - name: Upload MIND FORGE live result
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: mind-forge-live-research-launcher
-          path: artifacts/mind-forge-live-research-launcher/
-          if-no-files-found: warn
-
   creative-v2-open-live:
-    if: ${{ inputs.mode == 'CREATIVE_V2_OPEN' && inputs.confirm_paid_live_research == 'YES' }}
+    if: ${{ inputs.confirm_paid_live_research == 'YES' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Check out Creative V2 implementation branch
+      - name: Check out current Creative V2 implementation
         uses: actions/checkout@v4
         with:
           ref: agent/mind-forge-generalization-tests
@@ -333,6 +84,7 @@ jobs:
         run: |
           python - <<'PY'
           import os
+
           raw = os.getenv("RAW_OPENAI_API_KEY", "")
           if not raw:
               raise SystemExit("OPENAI_API_KEY is not available to this workflow")
@@ -346,7 +98,7 @@ jobs:
           print("OPENAI_API_KEY hygiene: OK; value not displayed")
           PY
 
-      - name: Run one paid Creative V2 open generation
+      - name: Run one autonomous MIND FORGE V2 cycle from the raw seed
         env:
           PYTHONPATH: ${{ env.APP }}
           MIND_FORGE_SEED: ${{ inputs.seed }}
@@ -395,27 +147,48 @@ jobs:
           print(json.dumps(payload, ensure_ascii=False, indent=2))
           PY
 
-      - name: Validate Creative V2 result and hard budget
+      - name: Validate autonomous V2 result and hard budgets
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          data = json.loads(Path("artifacts/mind-forge-creative-v2-open-live/result.json").read_text(encoding="utf-8"))
+
+          root = Path("artifacts/mind-forge-creative-v2-open-live")
+          data = json.loads((root / "result.json").read_text(encoding="utf-8"))
           if data.get("status") != "CREATIVE_V2_OPEN_LIVE_COMPLETE":
               raise SystemExit("Creative V2 did not complete")
           if data.get("idea_count") != 14:
               raise SystemExit(f"expected 14 ideas, got {data.get('idea_count')}")
           if data.get("mechanism_diversity_ratio", 0) < (8 / 14):
               raise SystemExit("mechanism diversity fell below 8/14")
+
           usage = data["usage"]
           if int(usage["requests"]) != 1:
               raise SystemExit(f"expected exactly one model request, got {usage['requests']}")
           if float(usage["estimated_cost_usd"]) > 0.01:
               raise SystemExit("Creative V2 estimated cost exceeded $0.01")
-          print("CREATIVE V2 OPEN LIVE: PASS")
+
+          required = [
+              "reasoning.json",
+              "top3.json",
+              "evidence.json",
+              "final_rank.json",
+              "live_evidence_usage.json",
+          ]
+          missing = [name for name in required if not (root / name).exists()]
+          if missing:
+              raise SystemExit(f"autonomous V2 artifact is incomplete: {missing}")
+
+          research_usage = json.loads((root / "live_evidence_usage.json").read_text(encoding="utf-8"))
+          if int(research_usage["search_operations"]) != 3:
+              raise SystemExit("expected exactly three bounded evidence searches")
+          if float(research_usage["estimated_research_cost_usd"]) > 0.03:
+              raise SystemExit("Evidence research estimated cost exceeded $0.03")
+
+          print("MIND FORGE SEED-ONLY AUTO V2: PASS")
           PY
 
-      - name: Upload Creative V2 live result
+      - name: Upload autonomous MIND FORGE result
         if: always()
         uses: actions/upload-artifact@v4
         with:
