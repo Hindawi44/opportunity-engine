@@ -1,0 +1,39 @@
+name: TEMP Open Vocabulary Noise Guard Patch
+
+on:
+  push:
+    branches:
+      - agent/open-vocabulary-query-gap-learning-v1
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/open-vocabulary-query-gap-learning-v1
+          fetch-depth: 0
+      - name: Add non-closure sale exclusions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/opportunity_engine/automatic_query_gap_miss_scout.py')
+          text = path.read_text(encoding='utf-8')
+          anchor = '        "forhandsalg",\n'
+          replacement = anchor + '        "flyttesalg",\n        "overlevelsessalg",\n'
+          if text.count(anchor) != 1:
+              raise SystemExit('sale blocklist anchor changed')
+          text = text.replace(anchor, replacement, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/opportunity_engine/automatic_query_gap_miss_scout.py
+          git diff --cached --check
+          git commit -m 'Reject relocation and survival sale noise'
+          git push origin HEAD:agent/open-vocabulary-query-gap-learning-v1
