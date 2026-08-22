@@ -1,0 +1,83 @@
+{
+  "schema_version": "source-shadow-live-validation-result-1.0",
+  "measured_at": "2026-08-22T11:52:28Z",
+  "repository": "Hindawi44/opportunity-engine",
+  "pull_request": 612,
+  "branch_head_sha": "7fb22f6fd94eab803985996d6253cd68e306b87a",
+  "workflow_run_id": 32571426493,
+  "artifact_id": 9475418065,
+  "artifact_name": "source-shadow-live-validation-v1",
+  "teaching_benchmark_count": 5,
+  "learned_validated_source_count": 2,
+  "eligible_shadow_source_count": 2,
+  "source_discovery_request_count": 2,
+  "novel_candidate_count": 10,
+  "detail_verification_request_count": 6,
+  "network_request_count": 8,
+  "verified_new_opportunity_count": 5,
+  "teaching_url_recovery_count": 0,
+  "production_active_source_count": 0,
+  "production_mutation": false,
+  "automatic_source_addition": false,
+  "automatic_promotion": false,
+  "verdict": "SHADOW_RECOVERED_NEW_OPPORTUNITIES",
+  "verified_new_opportunities": [
+    {
+      "source_name": "Stocklear",
+      "source_domain": "joblot.stocklear.eu",
+      "source_url": "https://joblot.stocklear.eu/auction/21656/",
+      "verification_status": "SHADOW_RECOVERED_OPPORTUNITY",
+      "source_page_verified": true,
+      "teaching_url": false,
+      "shadow_only": true,
+      "production_active": false
+    },
+    {
+      "source_name": "Stocklear",
+      "source_domain": "joblot.stocklear.eu",
+      "source_url": "https://joblot.stocklear.eu/auction/21777/",
+      "verification_status": "SHADOW_RECOVERED_OPPORTUNITY",
+      "source_page_verified": true,
+      "teaching_url": false,
+      "shadow_only": true,
+      "production_active": false
+    },
+    {
+      "source_name": "Stocklear",
+      "source_domain": "joblot.stocklear.eu",
+      "source_url": "https://joblot.stocklear.eu/auction/21780/",
+      "verification_status": "SHADOW_RECOVERED_OPPORTUNITY",
+      "source_page_verified": true,
+      "teaching_url": false,
+      "shadow_only": true,
+      "production_active": false
+    },
+    {
+      "source_name": "Stocklear",
+      "source_domain": "joblot.stocklear.eu",
+      "source_url": "https://joblot.stocklear.eu/auction/21786/",
+      "verification_status": "SHADOW_RECOVERED_OPPORTUNITY",
+      "source_page_verified": true,
+      "teaching_url": false,
+      "shadow_only": true,
+      "production_active": false
+    },
+    {
+      "source_name": "Stocklear",
+      "source_domain": "joblot.stocklear.eu",
+      "source_url": "https://joblot.stocklear.eu/auction/21820/",
+      "verification_status": "SHADOW_RECOVERED_OPPORTUNITY",
+      "source_page_verified": true,
+      "teaching_url": false,
+      "shadow_only": true,
+      "production_active": false
+    }
+  ],
+  "worldwise_shadow_observation": {
+    "novel_candidates_detected": 5,
+    "verified_within_request_cap": 0,
+    "counted_as_recovered_opportunities": 0,
+    "note": "WorldWise candidates were retained as shadow candidates only; none were counted without exact-page proof in the bounded verification window."
+  },
+  "proof_statement": "Five confirmed external misses validated two shadow sources. A subsequent live shadow run excluded all five teaching URLs and exact-page verified five new Stocklear opportunities while leaving production unchanged."
+}
