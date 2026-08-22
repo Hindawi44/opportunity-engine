@@ -41,7 +41,7 @@ jobs:
           provider = BraveSearchProvider(
               api_key,
               country='NO',
-              freshness='pm',
+              freshness=None,
               extra_snippets=True,
           )
           search_requests = 0
@@ -51,8 +51,9 @@ jobs:
               search_requests += 1
               return provider.search(query, count=10)
 
-          # Suppress vocabulary the old fixed scout already knew. The live proof
-          # may pass only by discovering a term outside that legacy vocabulary.
+          # Suppress vocabulary the old fixed scout already knew. The proof query
+          # itself stays term-blind; success requires discovering a different term
+          # from an exact fetched HTTPS source page.
           active_queries = list(load_active_learning_queries('config/brave_search_queries.json'))
           active_queries.extend(_GAP_TERMS)
 
