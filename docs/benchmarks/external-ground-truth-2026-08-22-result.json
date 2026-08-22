@@ -1,0 +1,64 @@
+{
+  "schema_version": "external-ground-truth-benchmark-result-1.0",
+  "measured_at": "2026-08-22T11:12:00Z",
+  "baseline": {
+    "repository": "Hindawi44/opportunity-engine",
+    "workflow_run_id": 32554960972,
+    "artifact_name": "multi-market-daily-operator-checkpoint",
+    "head_sha": "52b1a52804c9b325c55d370f5d98af0b1833d94c",
+    "observed_url_count": 447
+  },
+  "benchmark_path": "config/learning/external_ground_truth_benchmark_2026-08-22.json",
+  "benchmark_count": 5,
+  "baseline_found_count": 0,
+  "confirmed_miss_count": 5,
+  "coverage_rate": 0.0,
+  "root_cause_counts": {
+    "SOURCE_GAP": 5
+  },
+  "source_domain_presence": {
+    "worldwiseusa.com": false,
+    "joblot.stocklear.eu": false
+  },
+  "cases": [
+    {
+      "case_id": "ext-20260822-worldwise-athleisure-29000",
+      "baseline_found": false,
+      "source_domain_seen_by_baseline": false,
+      "confirmed_miss": true,
+      "root_cause": "SOURCE_GAP"
+    },
+    {
+      "case_id": "ext-20260822-worldwise-mens-shirts-049",
+      "baseline_found": false,
+      "source_domain_seen_by_baseline": false,
+      "confirmed_miss": true,
+      "root_cause": "SOURCE_GAP"
+    },
+    {
+      "case_id": "ext-20260822-worldwise-flooring-2x40ft",
+      "baseline_found": false,
+      "source_domain_seen_by_baseline": false,
+      "confirmed_miss": true,
+      "root_cause": "SOURCE_GAP"
+    },
+    {
+      "case_id": "ext-20260822-stocklear-21762",
+      "baseline_found": false,
+      "source_domain_seen_by_baseline": false,
+      "confirmed_miss": true,
+      "root_cause": "SOURCE_GAP"
+    },
+    {
+      "case_id": "ext-20260822-stocklear-21748",
+      "baseline_found": false,
+      "source_domain_seen_by_baseline": false,
+      "confirmed_miss": true,
+      "root_cause": "SOURCE_GAP"
+    }
+  ],
+  "verdict": "CONFIRMED_SOURCE_COVERAGE_BLIND_SPOT",
+  "production_mutation": false,
+  "automatic_promotion": false,
+  "automatic_source_addition": false
+}
