@@ -120,7 +120,7 @@ def run_daily_auto_miss_learning(
             min_precision=0.20,
             max_terms_per_market=5,
         ),
-        results_per_candidate=5,
+        results_per_candidate=10,
     )
     report["capture_status"] = capture.get("status")
     report["captured_new_case_count"] = int(capture.get("new_case_count") or 0)
