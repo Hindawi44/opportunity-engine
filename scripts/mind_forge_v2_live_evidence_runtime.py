@@ -45,14 +45,14 @@ class _ObservationDraft(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     source_ref: str = Field(min_length=1)
-    observation_text: str = Field(min_length=1, max_length=1500)
+    observation_text: str = Field(min_length=1, max_length=360)
     stance: str = Field(pattern="^(SUPPORTS|CONTRADICTS|MIXED|NEUTRAL)$")
     confidence: float = Field(ge=0.0, le=0.90)
 
 
 class _ResearchDraft(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    observations: list[_ObservationDraft] = Field(default_factory=list, max_length=3)
+    observations: list[_ObservationDraft] = Field(default_factory=list, max_length=2)
 
 
 def _jsonish(value: Any) -> Any:
@@ -140,10 +140,11 @@ def _build_plan(reasoning: dict[str, Any]) -> list[dict[str, Any]]:
 
 def _prompt(request: dict[str, Any]) -> str:
     return (
-        "You are the bounded Evidence collector for MIND FORGE Creative V2. Perform one web search only. "
-        "Prefer Norwegian official/public/primary sources when available. Return at most three observations, "
-        "and every source_ref must be an exact URL from the web-search sources. Do not make the final business "
-        "decision. Stance must be SUPPORTS, CONTRADICTS, MIXED, or NEUTRAL relative to the exact claim.\n\n"
+        "You are the bounded Evidence collector for MIND FORGE Creative V2. Perform exactly one web search. "
+        "Prefer Norwegian official/public/primary sources. Return only one or two grounded observations in the schema. "
+        "Keep every observation_text under 240 characters. Every source_ref must be an exact URL from web-search sources. "
+        "Do not explain your process and do not make the final business decision. Stance must be SUPPORTS, CONTRADICTS, "
+        "MIXED, or NEUTRAL relative to the exact claim.\n\n"
         f"IDEA: {request['title']}\nCLAIM: {request['claim_text']}\nMARKET: Norway"
     )
 
@@ -151,13 +152,13 @@ def _prompt(request: dict[str, Any]) -> str:
 def _research_one(request: dict[str, Any], *, model: str) -> tuple[list[dict[str, Any]], int]:
     agent = Agent(
         name=f"MIND FORGE V2 Evidence {request['request_id']}",
-        instructions="Collect sourced observations only and preserve exact source URLs.",
+        instructions="Collect concise sourced observations only; preserve exact source URLs; no prose outside the schema.",
         model=model,
         tools=[WebSearchTool(search_context_size="low")],
         model_settings=ModelSettings(
             tool_choice="required",
             parallel_tool_calls=False,
-            max_tokens=700,
+            max_tokens=1200,
             verbosity="low",
             response_include=["web_search_call.action.sources"],
         ),
