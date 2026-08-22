@@ -1,0 +1,11 @@
+{
+  "schema_version": "source-promotion-gate-1.0",
+  "decisions": [
+    {
+      "source_domain": "joblot.stocklear.eu",
+      "status": "PROMOTED",
+      "reason": "Explicit operator approval after two independent 5/5 exact-page-verified shadow rounds, 10/10 combined verification yield, 0 measured false positives, and 18/18 stable public-access checks.",
+      "approved_at": "2026-08-22T15:48:00+02:00"
+    }
+  ]
+}
