@@ -7,6 +7,9 @@ from opportunity_engine.discovery.auksjonen_public_api_adapter import (
     AuksjonenLiveClothingCollection,
     normalize_public_api_item,
 )
+from opportunity_engine.discovery.auksjonen_unified_lifecycle import (
+    auksjonen_listing_to_discovery_candidate,
+)
 from opportunity_engine.discovery.checkpoint_state_restore import LEARNING_STATE_FILENAMES
 from opportunity_engine.parser_gap_rescue import apply_auksjonen_parser_rescue
 
@@ -69,6 +72,23 @@ def test_static_inventory_lot_and_unmatched_individuals_keep_normal_semantics() 
     assert len(rescued.inventory_opportunities) == 1
     assert rescued.inventory_opportunities[0].title == "Varelager med arbeidsjakker"
     assert len(rescued.individual_clothing_items) == 1
+
+
+def test_rescued_listing_still_requires_exact_item_verification() -> None:
+    collection = _collection("Sluttlager med arbeidsjakker")
+    rescued = apply_auksjonen_parser_rescue(collection, ("sluttlager",))
+    listing = rescued.inventory_opportunities[0]
+
+    candidate = auksjonen_listing_to_discovery_candidate(
+        listing,
+        top5_eligible=True,
+        exact_item_evidence=None,
+    )
+
+    assert candidate["verified"] is False
+    assert candidate["analysis_eligible"] is False
+    assert candidate["opportunity_state"] == "STRONG_LEAD_REQUIRES_VERIFICATION"
+    assert "verified exact item-page evidence" in candidate["verification_blockers"]
 
 
 def test_daily_auksjonen_runtime_applies_overlay_before_exact_item_verification() -> None:
