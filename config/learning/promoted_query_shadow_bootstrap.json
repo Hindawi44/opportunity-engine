@@ -32,7 +32,8 @@
           "live_proof": "V15C",
           "workflow_run_id": 32593694641,
           "artifact_id": 9480995521,
-          "artifact_digest": "sha256:5776e5ae",
+          "artifact_digest": "sha256:5776e5ae7738e1b70476f65f4fd35743bb55106e888b0e42cab180bd18a1bfc3",
+          "proof_head": "a2a0f48967d1e7c2cc8dd68ebd1c0a04283194a5",
           "implementation_head": "4a9ff3ddc84ef65bf822067166d0aad66d77e0a7",
           "verified_relevant_count": 3,
           "minimum_independent_transfer_cases": 2
