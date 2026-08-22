@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
-"""Restore lifecycle SQLite files from the previous successful checkpoint run."""
+"""Restore durable checkpoint state and prepare bounded learning for this run."""
 from __future__ import annotations
 
 import argparse
 import json
 import os
+from pathlib import Path
 
+from opportunity_engine.daily_learning_operator import DailyLearningPolicy
+from opportunity_engine.daily_learning_runtime import run_daily_learning_runtime
 from opportunity_engine.discovery import checkpoint_state_restore
+from opportunity_engine.learned_query_overlay import (
+    load_learned_query_overlay,
+    save_learned_query_overlay,
+)
 
 
 ITALY_MEMORY_RELATIVE_PATH = "it-market/opportunity_engine.db"
@@ -33,6 +40,25 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _write_status(path: Path, status: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(status, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _prepare_previous_runtime_overlay(input_root: Path, runtime_overlay: Path) -> None:
+    """Expose yesterday's proven overlay even if today's learning step fails."""
+    durable_overlay = input_root / "learning" / "active-keyword-overlay.json"
+    if not durable_overlay.exists():
+        if runtime_overlay.exists():
+            runtime_overlay.unlink()
+        return
+    overlay = load_learned_query_overlay(durable_overlay)
+    save_learned_query_overlay(runtime_overlay, overlay)
+
+
 def main() -> int:
     args = parse_args()
     extra_paths = (
@@ -55,6 +81,68 @@ def main() -> int:
         workflow_file=args.workflow_file,
         branch=args.branch,
     )
+
+    input_root = Path(args.input_root)
+    learning_dir = Path(args.input_root) / "learning"
+    runtime_overlay = Path("learning") / "active-keyword-overlay.json"
+    learning_report_path = Path(args.status_path).parent / "daily-learning-cycle.json"
+
+    try:
+        _prepare_previous_runtime_overlay(input_root, runtime_overlay)
+    except Exception as exc:
+        status["previous_learning_overlay_prepare_error"] = {
+            "error_type": type(exc).__name__,
+            "error": str(exc)[:500],
+        }
+
+    try:
+        learning_report = run_daily_learning_runtime(
+            learning_dir=learning_dir,
+            inbox_path="config/learning/missed_opportunity_inbox.json",
+            active_query_config="config/brave_search_queries.json",
+            report_path=learning_report_path,
+            runtime_overlay_path=runtime_overlay,
+            environment=os.environ,
+            policy=DailyLearningPolicy(
+                max_candidates_per_run=2,
+                min_recovered_cases=1,
+                min_precision=0.20,
+                max_terms_per_market=5,
+            ),
+            results_per_candidate=5,
+        )
+        status["daily_learning_cycle"] = {
+            "status": learning_report.get("search_status"),
+            "known_missed_opportunity_count": learning_report.get(
+                "known_missed_opportunity_count", 0
+            ),
+            "candidate_count": learning_report.get("candidate_count", 0),
+            "learning_search_requests": learning_report.get(
+                "learning_search_requests", 0
+            ),
+            "proven_term_count_this_run": learning_report.get(
+                "proven_term_count_this_run", 0
+            ),
+            "active_learned_term_count": learning_report.get(
+                "active_learned_term_count", 0
+            ),
+            "report_path": learning_report_path.as_posix(),
+            "runtime_overlay_path": runtime_overlay.as_posix(),
+        }
+    except Exception as exc:
+        # The project must keep yesterday's proven skills and core discovery even
+        # if today's learning iteration cannot run. Learning failure is visible,
+        # never silently converted to an empty success.
+        status["daily_learning_cycle"] = {
+            "status": "FAILED",
+            "error_type": type(exc).__name__,
+            "error": str(exc)[:500],
+            "learning_search_requests": 0,
+            "report_path": learning_report_path.as_posix(),
+            "runtime_overlay_path": runtime_overlay.as_posix(),
+        }
+
+    _write_status(Path(args.status_path), status)
     print(json.dumps(status, ensure_ascii=False, sort_keys=True))
     return 0
 
