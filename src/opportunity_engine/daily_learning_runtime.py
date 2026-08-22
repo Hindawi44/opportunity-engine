@@ -120,27 +120,28 @@ def append_learning_history(
 
 
 def _market_anchor(market_code: str) -> str:
-    """Keep learning discovery broad enough for the full commercial engine scope.
+    """Anchor learning on opportunity intent, not one product vertical.
 
-    Candidate precision is still enforced downstream. The anchor only prevents a
-    learned commercial term from being trapped inside the old clothing-only domain.
+    Learned terms are replayed against closure, liquidation, insolvency, and
+    inventory-disposal language. This preserves broad commercial recall without
+    leaking a missed company's identity or trapping learning inside clothing.
     """
     return {
         "NO": (
-            "(varelager OR restlager OR lager OR butikk OR grossist OR parti OR "
-            "interiør OR møbler OR elektronikk OR verktøy OR byggevarer OR klær OR tekstil)"
+            '("legger ned" OR nedleggelse OR stenger OR avvikling OR konkurs OR '
+            'varelager OR restlager OR lagerbeholdning OR vareparti OR lageroverskudd)'
         ),
         "SE": (
-            "(varulager OR restlager OR lager OR butik OR grossist OR parti OR "
-            "inredning OR möbler OR elektronik OR verktyg OR byggvaror OR kläder OR textil)"
+            '("lägger ner" OR nedläggning OR stänger OR avveckling OR konkurs OR '
+            'varulager OR restlager OR lageröverskott OR varuparti)'
         ),
         "DE": (
-            "(Warenbestand OR Restposten OR Lager OR Geschäft OR Großhandel OR Posten OR "
-            "Einrichtung OR Möbel OR Elektronik OR Werkzeug OR Baustoffe OR Bekleidung OR Textilien)"
+            '(schließt OR Schließung OR Geschäftsaufgabe OR Geschäftsauflösung OR '
+            'Insolvenz OR Warenbestand OR Restposten OR Lagerbestand OR Warenposten)'
         ),
     }.get(
         market_code.upper(),
-        "(inventory OR stock OR warehouse OR store OR wholesale OR lot OR goods)",
+        "(closing OR closure OR liquidation OR insolvency OR inventory OR stock OR surplus)",
     )
 
 
