@@ -5,8 +5,12 @@ on:
     paths:
       - ".github/workflows/temp-real-miss-learning-proof.yml"
       - "config/learning/missed_opportunity_inbox.json"
+      - "config/learning/query_gap_validation_cases.json"
       - "src/opportunity_engine/adaptive_keyword_learning.py"
+      - "src/opportunity_engine/daily_learning_operator.py"
       - "src/opportunity_engine/daily_learning_runtime.py"
+      - "src/opportunity_engine/learned_query_overlay.py"
+      - "src/opportunity_engine/safe_learning_proof.py"
       - "tests/test_real_missed_opportunity_learning_v1.py"
 
 permissions:
@@ -26,7 +30,7 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
-      - name: Run two-request live shadow learning proof
+      - name: Run hidden-holdout live transfer proof
         run: |
           python - <<'PY'
           import json
@@ -42,6 +46,9 @@ jobs:
           learning = root / "learning"
           report_path = root / "daily-learning-cycle.json"
 
+          # These are the two candidates generated only from the Lene Interiør miss.
+          # The hidden Norem Baade identity is loaded separately by the runtime and
+          # is never added to either search query.
           terms = ["avslutningssalg", "stort avslutningssalg"]
           live_search = build_learning_search(
               os.environ["BRAVE_SEARCH_API_KEY"],
@@ -53,6 +60,7 @@ jobs:
                   {
                       "market_code": "NO",
                       "network_request_count": len(terms),
+                      "queries": {term: f'"{term}"' for term in terms},
                       "terms": {
                           term: {"hit_count": len(hits), "hits": hits}
                           for term, hits in hits_by_term.items()
@@ -73,6 +81,7 @@ jobs:
           report = run_daily_learning_runtime(
               learning_dir=learning,
               inbox_path="config/learning/missed_opportunity_inbox.json",
+              validation_cases_path="config/learning/query_gap_validation_cases.json",
               active_query_config="config/brave_search_queries.json",
               promotion_config_path="config/learning/query_promotions.json",
               report_path=report_path,
@@ -89,18 +98,21 @@ jobs:
           shadow_terms = learned_terms_for_market(shadow, "NO")
           active_terms = learned_terms_for_market(active, "NO")
           evaluations = report["keyword_learning"]["evaluations"]
+          transfer = [row for row in evaluations if row.get("evaluation_scope") == "HOLDOUT_TRANSFER" and row.get("status") == "PROVEN"]
 
           summary = {
               "status": proof["status"],
               "root_cause": "QUERY_GAP",
+              "evaluation_scope": report["evaluation_scope"],
               "network_request_count": len(terms),
               "live_hit_counts": {term: len(hits) for term, hits in hits_by_term.items()},
               "learning_search_requests": report["learning_search_requests"],
               "evaluations": evaluations,
               "proven_term_count_this_run": report["proven_term_count_this_run"],
               "recovered_case_count": report["recovered_case_count"],
-              "shadow_terms": shadow_terms,
-              "active_terms": active_terms,
+              "transfer_proven_case_count": report["transfer_proven_case_count"],
+              "shadow_terms": sorted(shadow_terms),
+              "active_terms": sorted(active_terms),
               "automatic_promotion": proof["automatic_promotion"],
           }
           (root / "live-proof-summary.json").write_text(
@@ -110,21 +122,34 @@ jobs:
           print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
 
           assert report["known_missed_opportunity_count"] == 1, report
+          assert report["validation_case_count"] == 1, report
+          assert report["evaluation_scope"] == "HOLDOUT_TRANSFER", report
           assert report["learning_search_requests"] == 2, report
           assert report["search_status"] == "SUCCESS", report
           assert report["proven_term_count_this_run"] >= 1, report
-          assert report["recovered_case_count"] == 1, report
+          assert report["recovered_case_count"] == 0, report
+          assert report["transfer_proven_case_count"] == 1, report
+          assert any(
+              row["term"] == "stort avslutningssalg"
+              and row["recovered_case_ids"] == ["HOLDOUT-NO-NOREM-BAADE-2010"]
+              and row["support_case_ids"] == ["REAL-MISS-NO-LENE-INTERIOR-2025-08"]
+              and row["precision"] >= 0.20
+              for row in transfer
+          ), transfer
           assert "stort avslutningssalg" in shadow_terms, shadow
-          assert active_terms == [], active
+          assert active_terms == {}, active
           assert report["active_learned_term_count"] == 0, report
           assert report["automatic_query_activation"] is False, report
           assert report["promotion_gate_enforced"] is True, report
-          assert memory["cases"][0]["learning_status"] == "RECOVERED", memory
+          assert memory["cases"][0]["learning_status"] == "TRANSFER_PROVEN", memory
           assert proof["status"] == "SHADOW_PASSED", proof
-          assert proof["shadow_recovered_case_count"] == 1, proof
+          assert proof["shadow_recovered_case_count"] == 0, proof
+          assert proof["shadow_transfer_proven_case_count"] == 1, proof
           assert proof["promotion_eligible_count"] == 1, proof
           assert proof["promoted_proof_count"] == 0, proof
           assert proof["automatic_promotion"] is False, proof
+          assert proof["cases"][0]["shadow_transfer_proven"] is True, proof
+          assert proof["cases"][0]["shadow_validation_case_ids"] == ["HOLDOUT-NO-NOREM-BAADE-2010"], proof
           PY
       - name: Upload live proof
         if: always()
