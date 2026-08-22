@@ -90,6 +90,70 @@ _TEMPORARY_MARKERS = (
     "stenger butikken midlertidig",
     "midlertidig stenge butikken",
 )
+
+# Open-vocabulary sale-language extraction runs only after exact-page event
+# evidence is present. A lexical match never proves closure or liquidation by
+# itself; it only supplies a candidate term for the normal Shadow proof path.
+_SALE_COMPOUND_RE = re.compile(
+    r"(?<![A-Za-zÆØÅæøå0-9-])"
+    r"(?P<term>[A-Za-zÆØÅæøå][A-Za-zÆØÅæøå0-9-]{2,40}salg)"
+    r"(?:et|en)?(?![A-Za-zÆØÅæøå0-9-])",
+    re.IGNORECASE,
+)
+_SALE_TERM_CONTEXT_RADIUS = 360
+_SALE_TERM_BLOCKLIST = frozenset(
+    {
+        "sommersalg",
+        "vintersalg",
+        "januarsalg",
+        "romjulssalg",
+        "helgesalg",
+        "nettsalg",
+        "forhåndssalg",
+        "forhandsalg",
+    }
+)
+
+
+def _extract_sale_terms(text: str) -> list[str]:
+    """Extract event-local sale compounds without requiring a fixed vocabulary.
+
+    Known terms remain supported for backward compatibility. New compounds are
+    accepted only when they occur near independently verified closure or
+    inventory-liquidation language, and obvious seasonal/promo words are
+    rejected. Definite Norwegian forms such as ``nedleggelsessalget`` are
+    normalized to the reusable base term ``nedleggelsessalg``.
+    """
+    folded = str(text or "").casefold()
+    if not folded:
+        return []
+
+    positioned: list[tuple[int, str]] = []
+    for term in _GAP_TERMS:
+        index = folded.find(term)
+        if index >= 0:
+            positioned.append((index, term))
+
+    event_markers = (*_CLOSURE_MARKERS, *_LIQUIDATION_MARKERS)
+    for match in _SALE_COMPOUND_RE.finditer(folded):
+        term = match.group("term").casefold()
+        if term in _SALE_TERM_BLOCKLIST:
+            continue
+        start = max(0, match.start() - _SALE_TERM_CONTEXT_RADIUS)
+        end = min(len(folded), match.end() + _SALE_TERM_CONTEXT_RADIUS)
+        context = folded[start:end]
+        if not any(marker in context for marker in event_markers):
+            continue
+        positioned.append((match.start(), term))
+
+    ordered: list[str] = []
+    seen: set[str] = set()
+    for _, term in sorted(positioned, key=lambda item: item[0]):
+        if term in seen:
+            continue
+        seen.add(term)
+        ordered.append(term)
+    return ordered
 _GENERIC_COMPANY_LABELS = frozenset(
     {
         "butikk",
@@ -275,7 +339,7 @@ def _verify_closure_liquidation_page(page: PublicPage) -> dict[str, Any] | None:
         return None
 
     closure_markers = [marker for marker in _CLOSURE_MARKERS if marker in folded]
-    sale_terms = [term for term in _GAP_TERMS if term in folded]
+    sale_terms = _extract_sale_terms(text)
     liquidation_markers = [marker for marker in _LIQUIDATION_MARKERS if marker in folded]
     if not closure_markers or not sale_terms or not liquidation_markers:
         return None

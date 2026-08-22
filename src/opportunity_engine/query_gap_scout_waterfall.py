@@ -38,6 +38,7 @@ from opportunity_engine.automatic_query_gap_miss_scout import (
     _canonical,
     _checkpoint_urls,
     _extract_company,
+    _extract_sale_terms,
     _merge_memory,
     _query_contains_term,
     _read_object,
@@ -246,7 +247,7 @@ def diagnose_public_page(page: PublicPage) -> dict[str, Any]:
     folded = text.casefold()
     temporary = bool(text and any(marker in folded for marker in _TEMPORARY_MARKERS))
     closure_markers = [marker for marker in _CLOSURE_MARKERS if marker in folded]
-    sale_terms = [term for term in _GAP_TERMS if term in folded]
+    sale_terms = _extract_sale_terms(text)
     liquidation_markers = [marker for marker in _LIQUIDATION_MARKERS if marker in folded]
     company = _extract_company(text) if text else None
 
