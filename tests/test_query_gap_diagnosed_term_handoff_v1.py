@@ -3,6 +3,10 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 
+class _SignalOnlyQuery(str):
+    query_scope = "SIGNAL_ONLY"
+
+
 def _query_gap_case(*, diagnosed_terms=()):
     from opportunity_engine.missed_opportunity_learning import (
         DiscoveryTrace,
@@ -66,12 +70,30 @@ def test_active_core_query_still_blocks_diagnosed_gap_candidate() -> None:
     assert all(candidate.term != "avviklingssalg" for candidate in candidates)
 
 
+def test_signal_only_query_does_not_block_diagnosed_core_gap_candidate() -> None:
+    from opportunity_engine.adaptive_keyword_learning import propose_query_gap_keywords
+
+    case = _query_gap_case(diagnosed_terms=("avviklingssalg",))
+    candidates = propose_query_gap_keywords(
+        [case],
+        active_queries=[
+            _SignalOnlyQuery("avviklingssalg butikk varelager Norge"),
+            "opphørssalg arbeidsklær sikkerhetssko Norge",
+        ],
+        max_candidates=1,
+    )
+
+    assert len(candidates) == 1
+    assert candidates[0].term == "avviklingssalg"
+
+
 def test_verified_scout_case_carries_filtered_query_gap_term_to_learner() -> None:
     from opportunity_engine.automatic_query_gap_miss_scout import PublicPage
     from opportunity_engine.discovery.search_provider import SearchHit
     from opportunity_engine.query_gap_scout_waterfall import discover_query_gap_misses
 
     news_url = "https://www.nrk.no/nyheter/bauhaus-legger-ned-i-norge-1.17996380"
+    homepage_url = "https://www.bauhaus.no/"
     official_url = "https://www.bauhaus.no/bauhaus-norge-informasjon"
 
     def search(query: str):
@@ -96,10 +118,10 @@ def test_verified_scout_case_carries_filtered_query_gap_term_to_learner() -> Non
                     "<p>Bauhaus legger ned alle butikker i Norge.</p></body></html>"
                 ),
             )
-        if url == "https://bauhaus.no/":
+        if url == homepage_url:
             return PublicPage(
                 requested_url=url,
-                final_url="https://www.bauhaus.no/",
+                final_url=url,
                 status_code=200,
                 content_type="text/html; charset=utf-8",
                 html=(
