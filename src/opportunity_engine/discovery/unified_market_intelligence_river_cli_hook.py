@@ -19,6 +19,7 @@ from opportunity_engine.discovery.source_gap_adaptive_followup import (
 from opportunity_engine.discovery.unified_market_intelligence_river import (
     write_unified_market_intelligence_river,
 )
+from opportunity_engine.parser_gap_rescue import write_parser_gap_rescue_overlay
 from opportunity_engine.root_cause_feedback_router import (
     write_root_cause_feedback_router,
 )
@@ -36,8 +37,9 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
     established persistent-entity/current-signal follow-up. Supported exact
     public item URLs are routed into existing VENTA/Auksjonen verifiers. Source-
     verified bulk clothing lots absent from the canonical checkpoint are then
-    captured into durable missed-opportunity memory, and the root-cause feedback
-    router assigns each miss to its correct adaptation mechanism.
+    captured into durable missed-opportunity memory, the root-cause feedback
+    router assigns each miss to its correct adaptation mechanism, and verified
+    PARSER_GAP cases may add bounded lot-language terms for the next run.
     """
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != "build_domain_market_intelligence_feed.py":
@@ -182,6 +184,30 @@ def install_unified_market_intelligence_river_cli_hook() -> None:
                     ),
                     "mechanism_counts": feedback.get("mechanism_counts"),
                     "root_cause_counts": feedback.get("root_cause_counts"),
+                },
+                sort_keys=True,
+            ),
+        )
+
+        parser_rescue = write_parser_gap_rescue_overlay(
+            output_dir,
+            input_root=input_root,
+            root=".",
+        )
+        print(
+            "parser_gap_rescue_learning:",
+            json.dumps(
+                {
+                    "status": parser_rescue.get("status"),
+                    "active_parser_gap_case_count": parser_rescue.get(
+                        "active_parser_gap_case_count"
+                    ),
+                    "active_term_count": parser_rescue.get("active_term_count"),
+                    "new_term_count": parser_rescue.get("new_term_count"),
+                    "rejected_noisy_terms": parser_rescue.get(
+                        "rejected_noisy_terms"
+                    ),
+                    "network_requests": parser_rescue.get("network_requests"),
                 },
                 sort_keys=True,
             ),
