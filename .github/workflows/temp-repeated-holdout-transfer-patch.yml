@@ -1,0 +1,127 @@
+name: Temporary repeated holdout transfer patch
+
+on:
+  push:
+    branches:
+      - agent/repeated-holdout-transfer-v1-work
+    paths:
+      - .github/workflows/temp-repeated-holdout-transfer-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply deterministic repeated-transfer patch
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected exactly one match, got {count}")
+              target.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          operator = "src/opportunity_engine/daily_learning_operator.py"
+          replace_once(
+              operator,
+              'from opportunity_engine.learning_promotion_gate import select_promoted_query_overlay\nfrom opportunity_engine.missed_opportunity_learning import MissedOpportunityCase\n',
+              'from opportunity_engine.learning_promotion_gate import select_promoted_query_overlay\nfrom opportunity_engine.missed_opportunity_learning import MissedOpportunityCase\nfrom opportunity_engine.safe_learning_proof import (\n    DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES,\n)\n',
+          )
+          old_helper = '''def _existing_overlay_terms(overlay: Mapping[str, Any] | None) -> list[str]:\n    if not isinstance(overlay, Mapping):\n        return []\n    markets = overlay.get("markets")\n    if not isinstance(markets, Mapping):\n        return []\n    terms: list[str] = []\n    for rows in markets.values():\n        if not isinstance(rows, list):\n            continue\n        for row in rows:\n            if not isinstance(row, Mapping):\n                continue\n            term = " ".join(str(row.get("term") or "").casefold().split()).strip()\n            if term:\n                terms.append(term)\n    return terms\n'''
+          new_helper = '''def _existing_overlay_terms(overlay: Mapping[str, Any] | None) -> list[str]:\n    """Return Shadow terms that should block fresh candidate generation.\n\n    A transfer-proven term with fewer than the required number of unique hidden\n    holdouts is intentionally *not* treated as active coverage yet. That lets a\n    later bounded run gather independent replication. Once the threshold is met\n    (or the term is explicitly promoted), it blocks re-proposal and stops\n    consuming learning budget.\n    """\n    if not isinstance(overlay, Mapping):\n        return []\n    markets = overlay.get("markets")\n    if not isinstance(markets, Mapping):\n        return []\n    terms: list[str] = []\n    for rows in markets.values():\n        if not isinstance(rows, list):\n            continue\n        for row in rows:\n            if not isinstance(row, Mapping):\n                continue\n            term = " ".join(str(row.get("term") or "").casefold().split()).strip()\n            if not term:\n                continue\n\n            promoted = (\n                str(row.get("promotion_status") or "").strip().upper() == "PROMOTED"\n                or str(row.get("activation_source") or "").strip().upper()\n                == "EXPLICIT_PROMOTION"\n            )\n            if promoted:\n                terms.append(term)\n                continue\n\n            raw_transfer_ids = row.get("transfer_validation_case_ids")\n            transfer_ids = {\n                str(item).strip()\n                for item in raw_transfer_ids\n                if str(item).strip()\n            } if isinstance(raw_transfer_ids, (list, tuple, set, frozenset)) else set()\n\n            scopes = {\n                str(item).strip().upper()\n                for item in (row.get("evaluation_scopes") or [])\n                if str(item).strip()\n            } if isinstance(row.get("evaluation_scopes"), (list, tuple, set, frozenset)) else set()\n            scope = str(row.get("evaluation_scope") or "").strip().upper()\n            if scope:\n                scopes.add(scope)\n            if transfer_ids:\n                scopes.add("HOLDOUT_TRANSFER")\n\n            count_value = row.get("independent_transfer_case_count")\n            stored_count = count_value if isinstance(count_value, int) else 0\n            transfer_count = max(len(transfer_ids), stored_count)\n            pending_transfer_replication = (\n                "HOLDOUT_TRANSFER" in scopes\n                and transfer_count < DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES\n            )\n            if pending_transfer_replication:\n                continue\n            terms.append(term)\n    return terms\n'''
+          replace_once(operator, old_helper, new_helper)
+
+          adaptive = "src/opportunity_engine/adaptive_keyword_learning.py"
+          replace_once(
+              adaptive,
+              '            occurrences[key] += 1\n            diagnosed_keys.add(key)\n\n        text = case.learning_evidence_text.strip()\n',
+              '            occurrences[key] += 1\n            diagnosed_keys.add(key)\n\n        # Once a source miss has already been recovered or transfer-proven,\n        # keep only its exact diagnosed terms available for any required\n        # replication. Do not spend later budgets mining new evidence phrases\n        # from a case whose learning objective has already been satisfied.\n        if case.learning_status in {"RECOVERED", "TRANSFER_PROVEN"}:\n            continue\n\n        text = case.learning_evidence_text.strip()\n',
+          )
+
+          config = Path("config/learning/query_gap_validation_cases.json")
+          payload = json.loads(config.read_text(encoding="utf-8"))
+          rows = payload.setdefault("cases", [])
+          existing_ids = {str(row.get("case_id")) for row in rows if isinstance(row, dict)}
+          additions = [
+              {
+                  "case_id": "HOLDOUT-NO-MARNBURG-2008",
+                  "market_code": "NO",
+                  "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+                  "observed_at": "2008-10-29T00:00:00+00:00",
+                  "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+                  "stock_proven": True,
+                  "ground_truth": {
+                      "company": "Marnburg Interiør AS",
+                      "url": "https://www.dagsavisen.no/nyheter/marnburg-legger-ned-ostehuset-flytter-inn/6791594",
+                  },
+                  "trace": {},
+                  "learning_evidence_text": "",
+                  "diagnosed_query_gap_terms": [],
+                  "learned_patterns": [],
+                  "root_cause": "VALIDATION_HOLDOUT",
+                  "learning_status": "HOLDOUT",
+                  "repeat_miss": False,
+              },
+              {
+                  "case_id": "HOLDOUT-NO-FAGHANDEL-SURNADAL-2024",
+                  "market_code": "NO",
+                  "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+                  "observed_at": "2024-05-22T00:00:00+00:00",
+                  "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+                  "stock_proven": True,
+                  "ground_truth": {
+                      "company": "Coop Faghandel Surnadal",
+                      "url": "https://www.trollheimsporten.no/coop-surnadal-sport1-surnadal-surnadalsnytt/avviklingssalg-pa-faghandel-surnadal/288445",
+                  },
+                  "trace": {},
+                  "learning_evidence_text": "",
+                  "diagnosed_query_gap_terms": [],
+                  "learned_patterns": [],
+                  "root_cause": "VALIDATION_HOLDOUT",
+                  "learning_status": "HOLDOUT",
+                  "repeat_miss": False,
+              },
+              {
+                  "case_id": "HOLDOUT-NO-SPAR-RJUKAN-2025",
+                  "market_code": "NO",
+                  "discovered_by": "HIDDEN_VALIDATION_PUBLIC_SOURCE",
+                  "observed_at": "2025-01-09T00:00:00+00:00",
+                  "opportunity_type": "STORE_CLOSURE_STOCK_LIQUIDATION",
+                  "stock_proven": True,
+                  "ground_truth": {
+                      "company": "Spar Rjukan",
+                      "url": "https://radiorjukan.no/aktuelt-lokalt/lordag-er-siste-apningsdag/",
+                  },
+                  "trace": {},
+                  "learning_evidence_text": "",
+                  "diagnosed_query_gap_terms": [],
+                  "learned_patterns": [],
+                  "root_cause": "VALIDATION_HOLDOUT",
+                  "learning_status": "HOLDOUT",
+                  "repeat_miss": False,
+              },
+          ]
+          for row in additions:
+              if row["case_id"] not in existing_ids:
+                  rows.append(row)
+          config.write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+      - name: Commit implementation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/opportunity_engine/daily_learning_operator.py src/opportunity_engine/adaptive_keyword_learning.py config/learning/query_gap_validation_cases.json
+          git commit -m "fix: allow repeated holdout transfer proof"
+          git push
