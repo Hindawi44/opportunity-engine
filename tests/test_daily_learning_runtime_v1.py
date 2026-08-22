@@ -38,25 +38,27 @@ def write_inbox(path: Path) -> None:
     path.write_text(json.dumps(payload), encoding="utf-8")
 
 
-def test_runtime_persists_recovered_memory_overlay_history_and_runtime_copy(tmp_path: Path) -> None:
+def search(term: str, market: str):
+    if term == "sluttlager":
+        return [
+            {"url": "https://example.no/MISS-1", "verified_relevant": True},
+            {"url": "https://noise.example/1"},
+        ]
+    return []
+
+
+def test_runtime_persists_recovered_memory_in_shadow_without_auto_activation(tmp_path: Path) -> None:
     inbox = tmp_path / "inbox.json"
     write_inbox(inbox)
     learning_dir = tmp_path / "inputs" / "learning"
     report_path = tmp_path / "output" / "daily-learning.json"
     runtime_overlay = tmp_path / "runtime" / "active-keyword-overlay.json"
 
-    def search(term: str, market: str):
-        if term == "sluttlager":
-            return [
-                {"url": "https://example.no/MISS-1", "verified_relevant": True},
-                {"url": "https://noise.example/1"},
-            ]
-        return []
-
     report = run_daily_learning_runtime(
         learning_dir=learning_dir,
         inbox_path=inbox,
         active_query_config=tmp_path / "missing-config.json",
+        promotion_config_path=tmp_path / "missing-promotions.json",
         report_path=report_path,
         runtime_overlay_path=runtime_overlay,
         environment={},
@@ -68,18 +70,78 @@ def test_runtime_persists_recovered_memory_overlay_history_and_runtime_copy(tmp_
 
     assert report["learning_search_requests"] >= 1
     assert report["proven_term_count_this_run"] >= 1
+    assert report["promotion_gate_enforced"] is True
+    assert report["automatic_query_activation"] is False
     assert report_path.exists()
     assert (learning_dir / "keyword-learning-history.json").exists()
+    assert (learning_dir / "shadow-keyword-overlay.json").exists()
     assert runtime_overlay.exists()
-    overlay = load_learned_query_overlay(runtime_overlay)
-    assert any(
-        row["term"] == "sluttlager"
-        for row in overlay["markets"]["NO"]
-    )
+
+    shadow = load_learned_query_overlay(learning_dir / "shadow-keyword-overlay.json")
+    assert any(row["term"] == "sluttlager" for row in shadow["markets"]["NO"])
+    active = load_learned_query_overlay(runtime_overlay)
+    assert active["active_term_count"] == 0
+    assert active["markets"] == {}
+
     memory = load_missed_opportunity_memory(learning_dir / "missed-opportunities.json")
     learned = next(item for item in memory if item.case_id == "MISS-1")
     assert learned.learning_status == "RECOVERED"
     assert "sluttlager" in learned.learned_patterns
+
+
+def test_runtime_explicit_promotion_activates_previously_proven_shadow_term(tmp_path: Path) -> None:
+    inbox = tmp_path / "inbox.json"
+    write_inbox(inbox)
+    learning_dir = tmp_path / "learning"
+    promotion_config = tmp_path / "query-promotions.json"
+
+    # First run proves the term but must not activate it.
+    run_daily_learning_runtime(
+        learning_dir=learning_dir,
+        inbox_path=inbox,
+        active_query_config=tmp_path / "missing.json",
+        promotion_config_path=tmp_path / "missing-promotions.json",
+        environment={},
+        search_override=search,
+        policy=DailyLearningPolicy(max_candidates_per_run=2),
+    )
+
+    promotion_config.write_text(
+        json.dumps(
+            {
+                "schema_version": "query-promotion-gate-1.0",
+                "decisions": [
+                    {
+                        "market_code": "NO",
+                        "term": "sluttlager",
+                        "status": "PROMOTED",
+                        "reason": "Verified shadow replay recovered the ground truth.",
+                        "approved_at": "2026-08-22T10:00:00Z",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    runtime_overlay = tmp_path / "runtime" / "active-keyword-overlay.json"
+    report = run_daily_learning_runtime(
+        learning_dir=learning_dir,
+        inbox_path=inbox,
+        active_query_config=tmp_path / "missing.json",
+        promotion_config_path=promotion_config,
+        runtime_overlay_path=runtime_overlay,
+        environment={},
+        search_override=search,
+        policy=DailyLearningPolicy(max_candidates_per_run=2),
+    )
+
+    active = load_learned_query_overlay(runtime_overlay)
+    assert active["active_term_count"] == 1
+    row = active["markets"]["NO"][0]
+    assert row["term"] == "sluttlager"
+    assert row["promotion_status"] == "PROMOTED"
+    assert report["promoted_term_count"] == 1
 
 
 def test_runtime_without_api_key_does_not_spend_learning_requests(tmp_path: Path) -> None:
@@ -90,6 +152,7 @@ def test_runtime_without_api_key_does_not_spend_learning_requests(tmp_path: Path
         learning_dir=tmp_path / "learning",
         inbox_path=inbox,
         active_query_config=tmp_path / "missing.json",
+        promotion_config_path=tmp_path / "missing-promotions.json",
         environment={},
         policy=DailyLearningPolicy(max_candidates_per_run=2),
     )
@@ -111,6 +174,7 @@ def test_empty_inbox_creates_durable_empty_state_without_search(tmp_path: Path) 
         learning_dir=tmp_path / "learning",
         inbox_path=inbox,
         active_query_config=tmp_path / "missing.json",
+        promotion_config_path=tmp_path / "missing-promotions.json",
         environment={},
         search_override=lambda term, market: calls.append((term, market)) or [],
     )
@@ -118,4 +182,5 @@ def test_empty_inbox_creates_durable_empty_state_without_search(tmp_path: Path) 
     assert calls == []
     assert report["search_status"] == "NO_CANDIDATES"
     assert (tmp_path / "learning" / "missed-opportunities.json").exists()
+    assert (tmp_path / "learning" / "shadow-keyword-overlay.json").exists()
     assert (tmp_path / "learning" / "active-keyword-overlay.json").exists()
