@@ -76,6 +76,9 @@ from opportunity_engine.discovery.daily_auto_miss_learning_cli_hook import (
 from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook import (
     install_unified_market_intelligence_river_cli_hook,
 )
+from opportunity_engine.discovery.automatic_query_gap_miss_scout_cli_hook import (
+    install_automatic_query_gap_miss_scout_cli_hook,
+)
 from opportunity_engine.discovery.promoted_stocklear_cli_hook import (
     install_promoted_stocklear_cli_hook,
 )
@@ -106,6 +109,9 @@ install_mathematical_logic_shadow_cli_hook()
 # the newly durable miss memory in the same daily run.
 install_daily_auto_miss_learning_cli_hook()
 install_unified_market_intelligence_river_cli_hook()
+# Registered after the river but before Stocklear. LIFO execution is therefore:
+# Stocklear -> independent QUERY_GAP scout -> river/capture -> daily learner.
+install_automatic_query_gap_miss_scout_cli_hook()
 # Registered after the river because atexit handlers run LIFO: promoted
 # Stocklear writes its production feed first, then the river consumes it.
 install_promoted_stocklear_cli_hook()
