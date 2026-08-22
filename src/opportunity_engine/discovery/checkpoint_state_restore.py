@@ -1,10 +1,10 @@
 """Restore durable checkpoint state from the last successful artifact.
 
-The restore is read-only against GitHub Actions. It copies only six explicitly
-allowed SQLite files plus one read-only cross-source scent report used to seed
-entity follow-up continuity. Missing prior state is a valid first-run condition.
-Network or permission failures are reported in a structured status artifact and
-do not invent cross-run continuity.
+The restore is read-only against GitHub Actions. It copies only explicitly
+allow-listed SQLite databases, one read-only cross-source follow-up seed, and
+explicitly allow-listed learning JSON state. Missing prior state is a valid
+first-run condition. Network or permission failures are reported in a
+structured status artifact and do not invent cross-run continuity.
 """
 from __future__ import annotations
 
@@ -31,6 +31,11 @@ FOLLOW_UP_SEED_FILENAME = "previous-cross-source-scent-v2.json"
 FOLLOW_UP_SEED_MEMBERS = (
     "multi-market-daily-operator-checkpoint/cross-source-scent-v2/cross-source-scent-expansion-v2.json",
     "cross-source-scent-v2/cross-source-scent-expansion-v2.json",
+)
+LEARNING_STATE_FILENAMES = (
+    "missed-opportunities.json",
+    "active-keyword-overlay.json",
+    "keyword-learning-history.json",
 )
 
 
@@ -140,11 +145,7 @@ def extract_previous_follow_up_seed(
     archive_bytes: bytes,
     output_dir: str | Path,
 ) -> dict[str, str] | None:
-    """Restore only the prior V2 report used to bootstrap entity continuity.
-
-    The report remains signal-only evidence. Restoring it does not verify or
-    promote any signal and does not restore arbitrary JSON from the artifact.
-    """
+    """Restore only the prior V2 report used to bootstrap entity continuity."""
     try:
         archive = ZipFile(BytesIO(archive_bytes))
     except BadZipFile as exc:
@@ -175,6 +176,58 @@ def extract_previous_follow_up_seed(
         }
 
 
+def extract_previous_learning_state(
+    archive_bytes: bytes,
+    input_root: str | Path,
+) -> list[dict[str, str]]:
+    """Restore only explicitly allow-listed learning JSON state.
+
+    Learning survives between scheduled runs via the existing checkpoint
+    artifact rather than by mutating repository files. Arbitrary JSON members
+    are never restored.
+    """
+    try:
+        archive = ZipFile(BytesIO(archive_bytes))
+    except BadZipFile as exc:
+        raise PreviousCheckpointRestoreError(
+            "Previous checkpoint artifact is not a valid ZIP archive"
+        ) from exc
+
+    restored: list[dict[str, str]] = []
+    destination_root = Path(input_root) / "learning"
+    with archive:
+        names = set(archive.namelist())
+        for filename in LEARNING_STATE_FILENAMES:
+            candidates = (
+                f"artifacts/multi-market-inputs/learning/{filename}",
+                f"multi-market-inputs/learning/{filename}",
+                f"learning/{filename}",
+            )
+            member = next((name for name in candidates if name in names), None)
+            if member is None:
+                continue
+            try:
+                payload = json.loads(archive.read(member).decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                raise PreviousCheckpointRestoreError(
+                    f"Previous learning state is not valid JSON: {member}"
+                ) from exc
+            if not isinstance(payload, dict):
+                raise PreviousCheckpointRestoreError(
+                    f"Previous learning state must be a JSON object: {member}"
+                )
+            target = destination_root / filename
+            _write_json(target, payload)
+            restored.append(
+                {
+                    "filename": filename,
+                    "archive_member": member,
+                    "relative_path": target.as_posix(),
+                }
+            )
+    return restored
+
+
 def restore_previous_checkpoint_databases(
     *,
     repository: str,
@@ -197,6 +250,7 @@ def restore_previous_checkpoint_databases(
             "reason": "GITHUB_TOKEN is not available",
             "restored_databases": [],
             "restored_follow_up_seed": None,
+            "restored_learning_state": [],
         }
         _write_json(output, status)
         return status
@@ -260,13 +314,22 @@ def restore_previous_checkpoint_databases(
                 archive_bytes,
                 output.parent,
             )
+            learning_state = extract_previous_learning_state(
+                archive_bytes,
+                input_root,
+            )
             status = {
-                "status": "RESTORED" if restored or follow_up_seed else "NO_DATABASES_IN_ARTIFACT",
+                "status": (
+                    "RESTORED"
+                    if restored or follow_up_seed or learning_state
+                    else "NO_DATABASES_IN_ARTIFACT"
+                ),
                 "previous_run_id": run_id,
                 "previous_run_event": event,
                 "previous_artifact_id": artifact_id,
                 "restored_databases": restored,
                 "restored_follow_up_seed": follow_up_seed,
+                "restored_learning_state": learning_state,
             }
             _write_json(output, status)
             return status
@@ -276,6 +339,7 @@ def restore_previous_checkpoint_databases(
             "reason": "No earlier successful non-expired checkpoint artifact was found",
             "restored_databases": [],
             "restored_follow_up_seed": None,
+            "restored_learning_state": [],
         }
         _write_json(output, status)
         return status
@@ -286,6 +350,7 @@ def restore_previous_checkpoint_databases(
             "error": str(exc),
             "restored_databases": [],
             "restored_follow_up_seed": None,
+            "restored_learning_state": [],
         }
         _write_json(output, status)
         return status
