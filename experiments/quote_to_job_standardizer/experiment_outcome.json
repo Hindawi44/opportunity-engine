@@ -1,0 +1,49 @@
+{
+  "status": "PENDING",
+  "experiment_id": "quote-to-job-pilot-001",
+  "idea_id": "idea-open-f68386fa98a3ff10",
+  "title": "Quote-to-Job Standardizer",
+  "contacts": [
+    {
+      "contact_id": "c1",
+      "business_type": "plumber",
+      "problem_confirmed": false,
+      "concrete_commitment": false,
+      "fatal_objection": false,
+      "notes": "REPLACE_WITH_REAL_OBSERVATION"
+    },
+    {
+      "contact_id": "c2",
+      "business_type": "electrician",
+      "problem_confirmed": false,
+      "concrete_commitment": false,
+      "fatal_objection": false,
+      "notes": "REPLACE_WITH_REAL_OBSERVATION"
+    },
+    {
+      "contact_id": "c3",
+      "business_type": "painter",
+      "problem_confirmed": false,
+      "concrete_commitment": false,
+      "fatal_objection": false,
+      "notes": "REPLACE_WITH_REAL_OBSERVATION"
+    },
+    {
+      "contact_id": "c4",
+      "business_type": "car_repair",
+      "problem_confirmed": false,
+      "concrete_commitment": false,
+      "fatal_objection": false,
+      "notes": "REPLACE_WITH_REAL_OBSERVATION"
+    },
+    {
+      "contact_id": "c5",
+      "business_type": "cleaning",
+      "problem_confirmed": false,
+      "concrete_commitment": false,
+      "fatal_objection": false,
+      "notes": "REPLACE_WITH_REAL_OBSERVATION"
+    }
+  ],
+  "lesson": "REPLACE_WITH_WHAT_THE_MARKET_TAUGHT_US"
+}
