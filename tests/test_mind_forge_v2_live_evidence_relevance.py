@@ -1,3 +1,21 @@
+import sys
+import types
+
+
+# Normal repository CI intentionally does not install the paid Agents SDK.
+# Stub only the import surface because these tests exercise pure planning/reranking logic.
+if "agents" not in sys.modules:
+    agents_stub = types.ModuleType("agents")
+
+    class _AgentsStub:
+        pass
+
+    agents_stub.Agent = _AgentsStub
+    agents_stub.ModelSettings = _AgentsStub
+    agents_stub.Runner = _AgentsStub
+    agents_stub.WebSearchTool = _AgentsStub
+    sys.modules["agents"] = agents_stub
+
 from scripts.mind_forge_v2_live_evidence_runtime import _build_plan, _prompt, _rerank
 
 
