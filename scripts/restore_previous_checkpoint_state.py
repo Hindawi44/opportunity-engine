@@ -18,12 +18,17 @@ from opportunity_engine.learned_query_overlay import (
     load_learned_query_overlay,
     save_learned_query_overlay,
 )
+from opportunity_engine.learning_promotion_gate import (
+    load_query_promotion_decisions,
+    select_promoted_query_overlay,
+)
 
 
 ITALY_MEMORY_RELATIVE_PATH = "it-market/opportunity_engine.db"
 NETHERLANDS_MEMORY_RELATIVE_PATH = "nl-market/opportunity_engine.db"
 FRANCE_MEMORY_RELATIVE_PATH = "fr-market/opportunity_engine.db"
 SHADOW_KEYWORD_OVERLAY_FILENAME = "shadow-keyword-overlay.json"
+DEFAULT_PROMOTION_CONFIG_PATH = Path("config/learning/query_promotions.json")
 
 
 def parse_args() -> argparse.Namespace:
@@ -53,40 +58,38 @@ def _write_status(path: Path, status: dict) -> None:
     )
 
 
-def _prepare_previous_runtime_overlay(input_root: Path, runtime_overlay: Path) -> None:
-    """Expose yesterday's overlay only when it already passed the promotion gate.
+def _prepare_previous_runtime_overlay(
+    input_root: Path,
+    runtime_overlay: Path,
+    *,
+    promotion_config_path: str | Path = DEFAULT_PROMOTION_CONFIG_PATH,
+) -> None:
+    """Rebuild the current active overlay from restored proof + current decisions.
 
-    Legacy auto-activated overlays fail closed during migration: they remain
-    durable shadow evidence, but never reach the current production search before
-    explicit promotion is re-established.
+    The previous active overlay is not authoritative by itself: a promotion may
+    have been added or disabled in repository config after the previous run. The
+    restored Shadow overlay is therefore re-evaluated through the same explicit
+    promotion gate before any current-run discovery starts. If Shadow is absent,
+    the prior active overlay is accepted only as evidence and is still filtered
+    through today's promotion decisions.
     """
-    durable_overlay = input_root / "learning" / "active-keyword-overlay.json"
-    if not durable_overlay.exists():
+    learning_dir = input_root / "learning"
+    shadow_overlay = learning_dir / SHADOW_KEYWORD_OVERLAY_FILENAME
+    previous_active = learning_dir / "active-keyword-overlay.json"
+    evidence_path = shadow_overlay if shadow_overlay.exists() else previous_active
+
+    if not evidence_path.exists():
         if runtime_overlay.exists():
             runtime_overlay.unlink()
         return
-    overlay = load_learned_query_overlay(durable_overlay)
-    markets = overlay.get("markets") or {}
-    safe = (
-        overlay.get("promotion_gate_enforced") is True
-        and overlay.get("automatic_query_activation") is False
-        and isinstance(markets, dict)
-    )
-    if safe:
-        for rows in markets.values():
-            if not isinstance(rows, list) or any(
-                not isinstance(row, dict)
-                or row.get("promotion_status") != "PROMOTED"
-                or row.get("activation_source") != "EXPLICIT_PROMOTION"
-                for row in rows
-            ):
-                safe = False
-                break
-    if not safe:
-        if runtime_overlay.exists():
-            runtime_overlay.unlink()
-        return
-    save_learned_query_overlay(runtime_overlay, overlay)
+
+    evidence = load_learned_query_overlay(evidence_path)
+    decisions = load_query_promotion_decisions(promotion_config_path)
+    active = select_promoted_query_overlay(evidence, decisions)
+
+    # select_promoted_query_overlay is fail-closed and can never invent a term:
+    # every active row must already be PROVEN evidence and explicitly PROMOTED.
+    save_learned_query_overlay(runtime_overlay, active)
 
 
 def main() -> int:
@@ -125,6 +128,8 @@ def main() -> int:
     try:
         _prepare_previous_runtime_overlay(input_root, runtime_overlay)
     except Exception as exc:
+        if runtime_overlay.exists():
+            runtime_overlay.unlink()
         status["previous_learning_overlay_prepare_error"] = {
             "error_type": type(exc).__name__,
             "error": str(exc)[:500],
