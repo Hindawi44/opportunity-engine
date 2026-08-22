@@ -70,6 +70,9 @@ from opportunity_engine.discovery.market_comparables_brand_cleanup import (
 from opportunity_engine.discovery.mathematical_logic_shadow_cli_hook import (
     install_mathematical_logic_shadow_cli_hook,
 )
+from opportunity_engine.discovery.daily_auto_miss_learning_cli_hook import (
+    install_daily_auto_miss_learning_cli_hook,
+)
 from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook import (
     install_unified_market_intelligence_river_cli_hook,
 )
@@ -98,6 +101,10 @@ install_market_comparables_brand_cleanup()
 # Registered before the unified river because atexit handlers run LIFO: the
 # river writes unified-market-cases.json first, then Math V1 observes it.
 install_mathematical_logic_shadow_cli_hook()
+# Also registered before the river: LIFO makes the river finish source
+# verification + missed-opportunity capture first, then this learner consumes
+# the newly durable miss memory in the same daily run.
+install_daily_auto_miss_learning_cli_hook()
 install_unified_market_intelligence_river_cli_hook()
 # Registered after the river because atexit handlers run LIFO: promoted
 # Stocklear writes its production feed first, then the river consumes it.
