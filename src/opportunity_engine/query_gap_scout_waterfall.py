@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from hashlib import sha256
 import os
 from pathlib import Path
+import re
 from typing import Any, Callable, Mapping, Sequence
 from urllib.parse import urlparse
 
@@ -74,6 +75,29 @@ SCOUT_QUERY_NO = SCOUT_QUERIES_NO[0]
 
 SearchCallback = Callable[[str], Sequence[SearchHit]]
 
+_SOURCE_PATH_HINTS = (
+    "informasjon",
+    "pressemelding",
+    "kundeservice",
+    "nyheter",
+    "news",
+    "faq",
+    "sporsmal",
+    "spørsmål",
+)
+_GENERIC_ENTITY_TOKENS = frozenset(
+    {
+        "norge",
+        "butikk",
+        "butikken",
+        "bedrift",
+        "selskap",
+        "forretning",
+        "virksomhet",
+        "virksomheten",
+    }
+)
+
 
 def build_entity_source_followup_query(company: str) -> str:
     """Build a company-targeted query without leaking candidate sale terms."""
@@ -87,12 +111,44 @@ def build_entity_source_followup_query(company: str) -> str:
     query = (
         f'"{compact}" '
         '("legger ned" OR "legges ned" OR "stenger for godt" OR avvikler OR avvikles) '
-        '(varer OR sortiment OR varelager OR lagerbeholdning)'
+        '(varer OR sortiment OR varelager OR lagerbeholdning) '
+        '(informasjon OR pressemelding OR kundeservice)'
     )
     query_folded = query.casefold()
     if any(term in query_folded for term in _GAP_TERMS):
         raise AssertionError("Entity-source follow-up leaked a learning term")
     return query
+
+
+def _entity_domain_tokens(company: str) -> tuple[str, ...]:
+    tokens = [
+        token
+        for token in re.findall(r"[a-z0-9æøå]+", str(company or "").casefold())
+        if len(token) >= 4 and token not in _GENERIC_ENTITY_TOKENS
+    ]
+    return tuple(dict.fromkeys(tokens))
+
+
+def prioritize_entity_source_hits(
+    hits: Sequence[SearchHit],
+    *,
+    company: str,
+) -> list[SearchHit]:
+    """Prefer plausible first-party information pages without treating them as proof."""
+    tokens = _entity_domain_tokens(company)
+    indexed = list(enumerate(hits))
+
+    def score(item: tuple[int, SearchHit]) -> tuple[int, int, int]:
+        index, hit = item
+        url = _canonical(hit.url) or str(hit.url or "")
+        parsed = urlparse(url)
+        host = parsed.netloc.casefold()
+        source_text = f"{parsed.path} {hit.title or ''}".casefold()
+        company_domain = bool(tokens and any(token in host for token in tokens))
+        source_hint = any(hint in source_text for hint in _SOURCE_PATH_HINTS)
+        return (int(company_domain), int(source_hint), -index)
+
+    return [hit for _, hit in sorted(indexed, key=score, reverse=True)]
 
 
 def diagnose_public_page(page: PublicPage) -> dict[str, Any]:
@@ -262,6 +318,11 @@ def discover_query_gap_misses(
 
         executed_queries.append(query)
         raw_hits = [item for item in search(query) if isinstance(item, SearchHit)]
+        if query_kind == "ENTITY_SOURCE_FOLLOW_UP" and entity_followup_company:
+            raw_hits = prioritize_entity_source_hits(
+                raw_hits,
+                company=entity_followup_company,
+            )
         search_requests += 1
         total_hits += len(raw_hits)
 
