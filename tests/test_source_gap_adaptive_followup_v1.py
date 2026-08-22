@@ -4,10 +4,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from opportunity_engine.discovery.search_provider import SearchHit
-from opportunity_engine.discovery.signal_follow_up_continuity import (
+from opportunity_engine.discovery.source_gap_adaptive_followup import (
     build_source_gap_follow_up_plan,
-    run_signal_follow_up_engine_with_continuity,
-    write_signal_follow_up_engine_with_continuity,
+    run_source_gap_adaptive_followup_with_continuity,
+    write_source_gap_adaptive_followup_with_continuity,
 )
 from opportunity_engine.missed_opportunity_learning import (
     DiscoveryTrace,
@@ -109,7 +109,7 @@ def test_recovered_non_repeat_source_gap_does_not_consume_followup_budget() -> N
 def test_source_gap_is_prioritized_inside_existing_max_cases_budget() -> None:
     provider = FakeProvider()
 
-    report = run_signal_follow_up_engine_with_continuity(
+    report = run_source_gap_adaptive_followup_with_continuity(
         {"cases": []},
         entity_signals=[_entity_signal()],
         source_gap_cases=[_source_gap()],
@@ -144,7 +144,7 @@ def test_source_gap_can_surface_new_exact_item_for_existing_verifier() -> None:
         ]
     )
 
-    report = run_signal_follow_up_engine_with_continuity(
+    report = run_source_gap_adaptive_followup_with_continuity(
         {"cases": []},
         entity_signals=[],
         source_gap_cases=[_source_gap()],
@@ -176,7 +176,7 @@ def test_known_ground_truth_url_is_not_returned_as_new_recovery() -> None:
         ]
     )
 
-    report = run_signal_follow_up_engine_with_continuity(
+    report = run_source_gap_adaptive_followup_with_continuity(
         {"cases": []},
         entity_signals=[],
         source_gap_cases=[_source_gap()],
@@ -192,7 +192,7 @@ def test_known_ground_truth_url_is_not_returned_as_new_recovery() -> None:
 def test_no_api_key_keeps_source_gap_followup_zero_cost() -> None:
     provider = FakeProvider()
 
-    report = run_signal_follow_up_engine_with_continuity(
+    report = run_source_gap_adaptive_followup_with_continuity(
         {"cases": []},
         entity_signals=[],
         source_gap_cases=[_source_gap()],
@@ -216,7 +216,7 @@ def test_many_source_gaps_cannot_expand_existing_case_budget() -> None:
     ]
     provider = FakeProvider()
 
-    report = run_signal_follow_up_engine_with_continuity(
+    report = run_source_gap_adaptive_followup_with_continuity(
         {"cases": []},
         entity_signals=[],
         source_gap_cases=gaps,
@@ -243,7 +243,7 @@ def test_writer_loads_source_gap_cases_from_durable_learning_memory(tmp_path: Pa
     )
     provider = FakeProvider()
 
-    report = write_signal_follow_up_engine_with_continuity(
+    report = write_source_gap_adaptive_followup_with_continuity(
         output_dir,
         environment={
             "INPUT_ROOT": input_root.as_posix(),
