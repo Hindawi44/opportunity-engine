@@ -48,16 +48,24 @@ ACCESS_PROOF = {
 }
 
 
-def test_one_live_discovery_round_cannot_promote_even_with_high_score() -> None:
-    report = build_source_promotion_scorecard(
+def _score(*, rounds: int, live_proof=LIVE_PROOF, access_proof=ACCESS_PROOF, candidates: int = 5):
+    return build_source_promotion_scorecard(
         SOURCE_CANDIDATES,
-        LIVE_PROOF,
-        ACCESS_PROOF,
+        live_proof,
+        access_proof,
         source_domain="joblot.stocklear.eu",
-        independent_live_discovery_rounds=1,
+        independent_live_discovery_rounds=rounds,
+        live_source_candidate_count=candidates,
     )
 
+
+def test_one_live_discovery_round_cannot_promote_even_with_high_score() -> None:
+    report = _score(rounds=1)
+
     assert report["promotion_readiness_score"] >= 90
+    assert report["metrics"]["verification_yield"] == 1.0
+    assert report["metrics"]["false_positive_count"] == 0
+    assert report["metrics"]["false_positive_rate"] == 0.0
     assert report["decision"] == "KEEP_SHADOW"
     assert "NEEDS_SECOND_INDEPENDENT_LIVE_DISCOVERY_ROUND" in report["blocking_reasons"]
     assert report["production_active"] is False
@@ -65,13 +73,7 @@ def test_one_live_discovery_round_cannot_promote_even_with_high_score() -> None:
 
 
 def test_two_independent_rounds_can_recommend_promotion_without_activating() -> None:
-    report = build_source_promotion_scorecard(
-        SOURCE_CANDIDATES,
-        LIVE_PROOF,
-        ACCESS_PROOF,
-        source_domain="joblot.stocklear.eu",
-        independent_live_discovery_rounds=2,
-    )
+    report = _score(rounds=2)
 
     assert report["decision"] == "PROMOTE_CANDIDATE"
     assert report["blocking_reasons"] == []
@@ -85,13 +87,7 @@ def test_access_instability_is_a_hard_blocker() -> None:
     unstable["rate_limited_429_count"] = 1
     unstable["usable_public_ratio"] = 17 / 18
 
-    report = build_source_promotion_scorecard(
-        SOURCE_CANDIDATES,
-        LIVE_PROOF,
-        unstable,
-        source_domain="joblot.stocklear.eu",
-        independent_live_discovery_rounds=2,
-    )
+    report = _score(rounds=2, access_proof=unstable)
 
     assert report["decision"] == "KEEP_SHADOW"
     assert "ACCESS_NOT_STABLE" in report["blocking_reasons"]
@@ -101,41 +97,25 @@ def test_teaching_url_recovery_is_a_hard_blocker() -> None:
     contaminated = {**LIVE_PROOF, "verified_new_opportunities": [dict(row) for row in LIVE_PROOF["verified_new_opportunities"]]}
     contaminated["verified_new_opportunities"][0]["teaching_url"] = True
 
-    report = build_source_promotion_scorecard(
-        SOURCE_CANDIDATES,
-        contaminated,
-        ACCESS_PROOF,
-        source_domain="joblot.stocklear.eu",
-        independent_live_discovery_rounds=2,
-    )
+    report = _score(rounds=2, live_proof=contaminated)
 
     assert report["decision"] == "KEEP_SHADOW"
     assert "NOVELTY_CONTAMINATED_BY_TEACHING_URL" in report["blocking_reasons"]
 
 
-def test_unverified_recovery_does_not_count() -> None:
+def test_unverified_recovery_does_not_count_and_increases_false_positive_rate() -> None:
     weak = {**LIVE_PROOF, "verified_new_opportunities": [dict(row) for row in LIVE_PROOF["verified_new_opportunities"]]}
     weak["verified_new_opportunities"][0]["source_page_verified"] = False
 
-    report = build_source_promotion_scorecard(
-        SOURCE_CANDIDATES,
-        weak,
-        ACCESS_PROOF,
-        source_domain="joblot.stocklear.eu",
-        independent_live_discovery_rounds=2,
-    )
+    report = _score(rounds=2, live_proof=weak)
 
     assert report["metrics"]["verified_new_opportunity_count"] == 4
+    assert report["metrics"]["false_positive_count"] == 1
+    assert report["metrics"]["false_positive_rate"] == 0.2
 
 
 def test_config_or_scorecard_never_activates_production() -> None:
-    report = build_source_promotion_scorecard(
-        SOURCE_CANDIDATES,
-        LIVE_PROOF,
-        ACCESS_PROOF,
-        source_domain="joblot.stocklear.eu",
-        independent_live_discovery_rounds=99,
-    )
+    report = _score(rounds=99)
 
     assert report["production_active"] is False
     assert report["production_mutation"] is False
