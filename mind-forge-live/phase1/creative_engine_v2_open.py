@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from hashlib import sha256
 from typing import Iterable
 
@@ -51,6 +52,65 @@ def _stable_open_id(topic: str, title: str, index: int) -> str:
     return f"idea-open-{digest}"
 
 
+def _tokens(text: str) -> set[str]:
+    return {
+        token
+        for token in re.findall(r"[\w-]+", text.casefold(), flags=re.UNICODE)
+        if len(token) >= 3
+    }
+
+
+def _draft_text(draft: OpenIdeaDraft) -> str:
+    parts = [
+        draft.title,
+        draft.core_mechanism,
+        draft.customer_value,
+        draft.business_value,
+        draft.novelty_reason,
+        *draft.required_capabilities,
+        *draft.assumptions,
+        *draft.risks,
+    ]
+    return " ".join(parts)
+
+
+def _canonical_source_question_ids(
+    draft: OpenIdeaDraft,
+    internal_questions: list[Question],
+) -> list[str]:
+    """Return only real internal-question IDs, deterministically repairing hallucinated IDs.
+
+    Valid model-supplied IDs are preserved in order. If the model supplied only unknown
+    IDs, the idea is linked to the closest real internal question by lexical overlap.
+    This repair is local and deterministic: it never makes another model request and the
+    final strict subset validation in ``apply_open_payload`` remains authoritative.
+    """
+
+    if not internal_questions:
+        raise ValueError("Creative V2 requires at least one internal question")
+
+    allowed_ids = {item.question_id for item in internal_questions}
+    valid: list[str] = []
+    seen: set[str] = set()
+    for question_id in draft.source_question_ids:
+        if question_id in allowed_ids and question_id not in seen:
+            valid.append(question_id)
+            seen.add(question_id)
+    if valid:
+        return valid
+
+    idea_tokens = _tokens(_draft_text(draft))
+    best_question = internal_questions[0]
+    best_score = -1
+    for question in internal_questions:
+        score = len(idea_tokens & _tokens(f"{question.text} {question.purpose}"))
+        if score > best_score:
+            best_question = question
+            best_score = score
+
+    return [best_question.question_id]
+
+
 def open_creative_prompt(topic: TopicInput, questions: Iterable[Question]) -> str:
     question_rows = [
         {
@@ -62,6 +122,7 @@ def open_creative_prompt(topic: TopicInput, questions: Iterable[Question]) -> st
         for item in questions
         if item.kind.value == "INTERNAL"
     ]
+    allowed_ids = [row["question_id"] for row in question_rows]
     return (
         "You are MIND FORGE Creative Engine V2. Generate exactly 14 genuinely different "
         "ideas from the topic and its internal questions. You are NOT rewriting a supplied "
@@ -73,9 +134,11 @@ def open_creative_prompt(topic: TopicInput, questions: Iterable[Question]) -> st
         "premium speed, mobile access, or partnerships unless the topic itself strongly "
         "supports them. Do not invent market facts, prices, laws, competitors, or demand. "
         "Put uncertain premises in assumptions. Every idea must cite one or more supplied "
-        "internal question IDs in source_question_ids. Return concise structured fields in "
+        "internal question IDs in source_question_ids. Use ONLY exact IDs from ALLOWED_QUESTION_IDS; "
+        "never invent, abbreviate, rewrite, or infer a question ID. Return concise structured fields in "
         "English even when the seed is Arabic.\n\n"
         f"TOPIC:\n{topic.model_dump_json()}\n\n"
+        f"ALLOWED_QUESTION_IDS:\n{allowed_ids!r}\n\n"
         f"INTERNAL QUESTIONS:\n{question_rows!r}"
     )
 
@@ -85,18 +148,25 @@ def apply_open_payload(
     questions: Iterable[Question],
     payload: OpenCreativePayload,
 ) -> CreativeEngineResult:
-    question_ids = {
-        item.question_id
-        for item in questions
+    question_list = list(questions)
+    internal_questions = [
+        item
+        for item in question_list
         if item.kind.value == "INTERNAL"
-    }
+    ]
+    question_ids = {item.question_id for item in internal_questions}
+    if not question_ids:
+        raise ValueError("Creative V2 requires at least one internal question")
+
     ideas: list[Idea] = []
     family_by_id: dict[str, str] = {}
     used_ids: set[str] = set()
 
     for index, draft in enumerate(payload.ideas):
-        if not set(draft.source_question_ids).issubset(question_ids):
+        canonical_question_ids = _canonical_source_question_ids(draft, internal_questions)
+        if not canonical_question_ids or not set(canonical_question_ids).issubset(question_ids):
             raise ValueError("open creative idea cites an unknown internal question")
+
         idea_id = _stable_open_id(topic.topic, draft.title, index)
         if idea_id in used_ids:
             raise ValueError("open creative stable IDs collided")
@@ -114,7 +184,7 @@ def apply_open_payload(
                 assumptions=draft.assumptions,
                 risks=draft.risks,
                 novelty_reason=draft.novelty_reason,
-                source_question_ids=draft.source_question_ids,
+                source_question_ids=canonical_question_ids,
             )
         )
 
