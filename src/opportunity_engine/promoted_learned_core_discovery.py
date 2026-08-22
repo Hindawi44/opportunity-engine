@@ -18,8 +18,6 @@ from typing import Any, Callable, Mapping, Sequence
 
 from opportunity_engine.automatic_query_gap_miss_scout import (
     PublicPage,
-    _CLOSURE_MARKERS,
-    _LIQUIDATION_MARKERS,
     _verify_closure_liquidation_page,
     fetch_public_page,
 )
@@ -52,6 +50,7 @@ DEFAULT_MAX_TERMS = 1
 MAX_TERMS = 2
 _OVERLAY_ENV = "OPPORTUNITY_LEARNED_QUERY_OVERLAY_PATH"
 _DEFAULT_OVERLAY_PATH = Path("learning") / "active-keyword-overlay.json"
+_PROMOTED_SEARCH_CLOSURE_HINT = "stenge butikken"
 
 SearchCallback = Callable[[str], Sequence[SearchHit]]
 PageFetcher = Callable[[str], PublicPage]
@@ -125,31 +124,20 @@ def _promoted_terms(
     return terms, None
 
 
-def _quoted_or_group(values: Sequence[str]) -> str:
-    quoted: list[str] = []
-    for value in values:
-        cleaned = _compact(value).replace('"', "")
-        if cleaned:
-            quoted.append(f'"{cleaned}"')
-    return "(" + " OR ".join(quoted) + ")"
-
-
 def _exact_query(term: str) -> str:
-    """Build one verifier-aligned query for an explicitly promoted learned term.
+    """Build one calibrated retrieval query for a promoted learned term.
 
-    The learned vocabulary must not be sent as a broad standalone search. The
-    same stable closure and inventory semantics required by the authoritative
-    exact-page verifier are added as OR groups. This raises retrieval precision
-    without weakening the verifier or increasing the one-request Brave budget.
+    Live calibration showed that duplicating the whole strict page-verification
+    contract inside Brave kills recall. Search therefore combines the learned
+    sale term with one proven closure-language hint. The fetched source page is
+    still authoritative and must independently prove closure, sale language,
+    inventory liquidation, and concrete company identity before any record is
+    emitted. The one-request Brave budget is unchanged.
     """
     safe = _compact(term).replace('"', "")
     if not safe:
         return ""
-    return (
-        f'"{safe}" '
-        f"{_quoted_or_group(_CLOSURE_MARKERS)} "
-        f"{_quoted_or_group(_LIQUIDATION_MARKERS)}"
-    )
+    return f'"{safe}" "{_PROMOTED_SEARCH_CLOSURE_HINT}"'
 
 
 def _default_search(api_key: str, *, results_per_query: int) -> SearchCallback:
