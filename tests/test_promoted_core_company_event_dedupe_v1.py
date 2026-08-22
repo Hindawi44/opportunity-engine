@@ -3,32 +3,44 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 
+from opportunity_engine.adaptive_keyword_learning import KeywordEvaluationResult
 from opportunity_engine.automatic_query_gap_miss_scout import PublicPage, _extract_company
 from opportunity_engine.discovery.search_provider import SearchHit
+from opportunity_engine.learned_query_overlay import (
+    build_learned_query_overlay,
+    save_learned_query_overlay,
+)
+from opportunity_engine.learning_promotion_gate import select_promoted_query_overlay
 from opportunity_engine.promoted_learned_core_discovery import collect_promoted_learned_core_opportunities
 
 
+TERM = "avviklingssalg"
+NOW = datetime(2026, 8, 22, 21, 30, tzinfo=timezone.utc)
+
+
 def _overlay(tmp_path):
-    path = tmp_path / "active-keyword-overlay.json"
-    path.write_text(
-        json.dumps(
-            {
-                "promotion_gate_enforced": True,
-                "automatic_query_activation": False,
-                "markets": {
-                    "NO": [
-                        {
-                            "term": "avviklingssalg",
-                            "source_verdict": "PROVEN",
-                            "promotion_status": "PROMOTED",
-                            "activation_source": "EXPLICIT_PROMOTION",
-                        }
-                    ]
-                },
-            }
+    evaluation = KeywordEvaluationResult(
+        term=TERM,
+        market_code="NO",
+        status="PROVEN",
+        recovered_case_ids=(
+            "HOLDOUT-NO-SENZE-OF-JOY",
+            "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER",
+            "HOLDOUT-NO-GAULA-NATURSENTER",
         ),
-        encoding="utf-8",
+        raw_hit_count=9,
+        verified_relevant_count=3,
+        precision=1 / 3,
+        min_recovered_cases=1,
+        min_precision=0.20,
+        automatic_activation=False,
+        support_case_ids=("AUTO-MISS-NO-BAUHAUS",),
+        evaluation_scope="HOLDOUT_TRANSFER",
     )
+    shadow = build_learned_query_overlay([evaluation])
+    active = select_promoted_query_overlay(shadow, {("NO", TERM): "PROMOTED"})
+    path = tmp_path / "active-keyword-overlay.json"
+    save_learned_query_overlay(path, active)
     return path
 
 
@@ -84,7 +96,7 @@ def test_promoted_core_collapses_same_company_same_liquidation_across_product_pa
         },
         search_override=search,
         fetch_page=_page,
-        observed_at=datetime(2026, 8, 22, 21, 30, tzinfo=timezone.utc),
+        observed_at=NOW,
         results_per_query=10,
         max_pages=10,
         max_terms=1,
@@ -136,7 +148,7 @@ def test_promoted_core_keeps_independent_companies_separate(tmp_path):
         },
         search_override=lambda _q: hits,
         fetch_page=fetch,
-        observed_at=datetime(2026, 8, 22, 21, 30, tzinfo=timezone.utc),
+        observed_at=NOW,
         results_per_query=10,
         max_pages=10,
         max_terms=1,
