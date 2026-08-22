@@ -19,6 +19,7 @@ from opportunity_engine.learned_query_overlay import (
 ITALY_MEMORY_RELATIVE_PATH = "it-market/opportunity_engine.db"
 NETHERLANDS_MEMORY_RELATIVE_PATH = "nl-market/opportunity_engine.db"
 FRANCE_MEMORY_RELATIVE_PATH = "fr-market/opportunity_engine.db"
+SHADOW_KEYWORD_OVERLAY_FILENAME = "shadow-keyword-overlay.json"
 
 
 def parse_args() -> argparse.Namespace:
@@ -49,13 +50,38 @@ def _write_status(path: Path, status: dict) -> None:
 
 
 def _prepare_previous_runtime_overlay(input_root: Path, runtime_overlay: Path) -> None:
-    """Expose yesterday's proven overlay even if today's learning step fails."""
+    """Expose yesterday's overlay only when it already passed the promotion gate.
+
+    Legacy auto-activated overlays fail closed during migration: they remain
+    available to the learning runtime as shadow evidence, but never reach the
+    current production search before explicit promotion is re-established.
+    """
     durable_overlay = input_root / "learning" / "active-keyword-overlay.json"
     if not durable_overlay.exists():
         if runtime_overlay.exists():
             runtime_overlay.unlink()
         return
     overlay = load_learned_query_overlay(durable_overlay)
+    markets = overlay.get("markets") or {}
+    safe = (
+        overlay.get("promotion_gate_enforced") is True
+        and overlay.get("automatic_query_activation") is False
+        and isinstance(markets, dict)
+    )
+    if safe:
+        for rows in markets.values():
+            if not isinstance(rows, list) or any(
+                not isinstance(row, dict)
+                or row.get("promotion_status") != "PROMOTED"
+                or row.get("activation_source") != "EXPLICIT_PROMOTION"
+                for row in rows
+            ):
+                safe = False
+                break
+    if not safe:
+        if runtime_overlay.exists():
+            runtime_overlay.unlink()
+        return
     save_learned_query_overlay(runtime_overlay, overlay)
 
 
@@ -72,6 +98,12 @@ def main() -> int:
                 *checkpoint_state_restore.DATABASE_RELATIVE_PATHS,
                 relative_path,
             )
+    if SHADOW_KEYWORD_OVERLAY_FILENAME not in checkpoint_state_restore.LEARNING_STATE_FILENAMES:
+        checkpoint_state_restore.LEARNING_STATE_FILENAMES = (
+            *checkpoint_state_restore.LEARNING_STATE_FILENAMES,
+            SHADOW_KEYWORD_OVERLAY_FILENAME,
+        )
+
     status = checkpoint_state_restore.restore_previous_checkpoint_databases(
         repository=args.repository,
         token=args.token,
@@ -100,6 +132,7 @@ def main() -> int:
             learning_dir=learning_dir,
             inbox_path="config/learning/missed_opportunity_inbox.json",
             active_query_config="config/brave_search_queries.json",
+            promotion_config_path="config/learning/query_promotions.json",
             report_path=learning_report_path,
             runtime_overlay_path=runtime_overlay,
             environment=os.environ,
@@ -123,16 +156,22 @@ def main() -> int:
             "proven_term_count_this_run": learning_report.get(
                 "proven_term_count_this_run", 0
             ),
+            "shadow_proven_term_count": learning_report.get(
+                "shadow_proven_term_count", 0
+            ),
             "active_learned_term_count": learning_report.get(
                 "active_learned_term_count", 0
+            ),
+            "promotion_gate_enforced": learning_report.get(
+                "promotion_gate_enforced", False
             ),
             "report_path": learning_report_path.as_posix(),
             "runtime_overlay_path": runtime_overlay.as_posix(),
         }
     except Exception as exc:
-        # The project must keep yesterday's proven skills and core discovery even
-        # if today's learning iteration cannot run. Learning failure is visible,
-        # never silently converted to an empty success.
+        # Core discovery must continue if today's learning iteration cannot run.
+        # The learned runtime overlay fails closed unless yesterday's copy already
+        # carried explicit promotion metadata validated above.
         status["daily_learning_cycle"] = {
             "status": "FAILED",
             "error_type": type(exc).__name__,
