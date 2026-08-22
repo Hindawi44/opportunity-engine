@@ -1,4 +1,12 @@
 {
   "schema_version": "query-promotion-gate-1.0",
-  "decisions": []
+  "decisions": [
+    {
+      "market_code": "NO",
+      "term": "avviklingssalg",
+      "status": "PROMOTED",
+      "reason": "Explicit human promotion after Live Proof V15C recovered 3 independent Norwegian HOLDOUT_TRANSFER cases with precision 0.333333; repeated-transfer eligibility was proven and PR #651 now enforces the same eligibility at the Production gate.",
+      "approved_at": "2026-08-22T19:45:00Z"
+    }
+  ]
 }
