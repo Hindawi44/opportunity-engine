@@ -24,18 +24,19 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install -r requirements.txt
-      - name: Run one balanced-query calibration request
+      - name: Run one real-language calibration request
         run: |
           python - <<'PY'
-          import json, os
+          import json, os, re
           from pathlib import Path
           from opportunity_engine.automatic_query_gap_miss_scout import (
+              _visible_text,
               _verify_closure_liquidation_page,
               fetch_public_page,
           )
           from opportunity_engine.promoted_learned_core_discovery import _default_search
 
-          query = '"avviklingssalg" "siste varelager"'
+          query = '"avviklingssalg" "stenge butikken"'
           search = _default_search(os.environ["BRAVE_SEARCH_API_KEY"], results_per_query=10)
           hits = list(search(query))[:10]
           rows = []
@@ -43,31 +44,42 @@ jobs:
               row = {"rank": rank, "title": hit.title, "url": hit.url, "description": hit.description}
               try:
                   page = fetch_public_page(hit.url)
+                  text = _visible_text(page.html)
+                  folded = text.casefold()
                   proof = _verify_closure_liquidation_page(page)
               except Exception as exc:
                   row.update({"result": "FETCH_ERROR", "error": f"{type(exc).__name__}: {exc}"[:500]})
               else:
-                  row["result"] = "VERIFIED" if proof else "REJECTED"
-                  text = page.html.casefold()
-                  row["has_stenge_butikken"] = "stenge butikken" in text or "stenger butikken" in text
+                  row.update({
+                      "result": "VERIFIED" if proof else "REJECTED",
+                      "has_avviklingssalg": "avviklingssalg" in folded,
+                      "has_stenge_butikken": "stenge butikken" in folded or "stenger butikken" in folded,
+                      "has_varelager": "varelager" in folded or "lagerbeholdning" in folded,
+                      "has_drives_av": bool(re.search(r"\b[A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?\s+drives av\b", text)),
+                      "text_sample": text[:1800],
+                  })
                   if proof:
                       row["company"] = proof.get("company")
                       row["canonical_url"] = proof.get("canonical_url")
-                      row["closure_markers"] = proof.get("closure_markers")
-                      row["liquidation_markers"] = proof.get("liquidation_markers")
-                      row["query_gap_terms"] = proof.get("query_gap_terms")
               rows.append(row)
           payload = {
               "query": query,
               "request_count": 1,
               "raw_hit_count": len(hits),
               "verified_count": sum(1 for row in rows if row["result"] == "VERIFIED"),
+              "proposed_contract_count": sum(
+                  1 for row in rows
+                  if row.get("has_avviklingssalg")
+                  and row.get("has_stenge_butikken")
+                  and row.get("has_varelager")
+                  and row.get("has_drives_av")
+              ),
               "rows": rows,
           }
           out = Path("artifacts/query-calibration")
           out.mkdir(parents=True, exist_ok=True)
           (out / "calibration.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-          print(json.dumps({k: payload[k] for k in ("query", "request_count", "raw_hit_count", "verified_count")}, ensure_ascii=False))
+          print(json.dumps({k: payload[k] for k in ("query", "request_count", "raw_hit_count", "verified_count", "proposed_contract_count")}, ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
