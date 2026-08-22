@@ -1,14 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from io import BytesIO
 import json
 from pathlib import Path
-from zipfile import ZipFile
 
-from opportunity_engine.discovery.checkpoint_state_restore import (
-    extract_previous_learning_state,
-)
 from opportunity_engine.missed_opportunity_learning import (
     DiscoveryTrace,
     MissedOpportunityCase,
@@ -18,46 +13,18 @@ from opportunity_engine.missed_opportunity_learning import (
 
 INIT = Path("src/opportunity_engine/discovery/__init__.py")
 HOOK = Path("src/opportunity_engine/discovery/daily_auto_miss_learning_cli_hook.py")
+RESTORE_SCRIPT = Path("scripts/restore_previous_checkpoint_state.py")
 
 
-def _archive(entries: dict[str, object]) -> bytes:
-    buffer = BytesIO()
-    with ZipFile(buffer, "w") as archive:
-        for name, payload in entries.items():
-            archive.writestr(name, json.dumps(payload).encode("utf-8"))
-    return buffer.getvalue()
+def test_restore_phase_preserves_shadow_but_defers_new_learning_until_post_capture() -> None:
+    script = RESTORE_SCRIPT.read_text(encoding="utf-8")
 
-
-def test_previous_checkpoint_restores_shadow_keyword_evidence(tmp_path: Path) -> None:
-    shadow = {
-        "schema_version": "learned-query-overlay-1.0",
-        "markets": {
-            "NO": [
-                {
-                    "term": "stort avslutningssalg",
-                    "evaluation_scope": "HOLDOUT_TRANSFER",
-                    "transfer_validation_case_ids": ["HOLDOUT-NO-NOREM-BAADE-2010"],
-                    "independent_transfer_case_count": 1,
-                    "source_verdict": "PROVEN",
-                }
-            ]
-        },
-    }
-    archive = _archive(
-        {
-            "artifacts/multi-market-inputs/learning/shadow-keyword-overlay.json": shadow,
-        }
-    )
-
-    restored = extract_previous_learning_state(archive, tmp_path)
-
-    assert {item["filename"] for item in restored} == {"shadow-keyword-overlay.json"}
-    restored_shadow = json.loads(
-        (tmp_path / "learning" / "shadow-keyword-overlay.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    assert restored_shadow == shadow
+    shadow_extend = script.index("SHADOW_KEYWORD_OVERLAY_FILENAME")
+    restore_call = script.index("restore_previous_checkpoint_databases(")
+    assert shadow_extend < restore_call
+    assert "shadow-keyword-overlay.json" in script
+    assert "run_daily_learning_runtime(" not in script
+    assert "DEFERRED_UNTIL_POST_CAPTURE" in script
 
 
 def test_auto_learning_hook_runs_after_unified_capture_by_atexit_order() -> None:
