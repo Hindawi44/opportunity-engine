@@ -1,0 +1,174 @@
+name: TEMP One-Time Repeated Holdout Transfer Live Proof V15
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/temp-one-time-repeated-holdout-transfer-live-proof-v15.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  live-proof:
+    if: ${{ github.head_ref == 'agent/one-time-repeated-holdout-transfer-live-proof-v15' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OPPORTUNITY_ALLOW_PAID_BRAVE_MANUAL: "true"
+      LIVE_PROOF_OUTPUT: artifacts/repeated-holdout-transfer-live-proof-v15/output
+      LIVE_PROOF_INPUT: artifacts/repeated-holdout-transfer-live-proof-v15/input
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Restore latest scheduled core checkpoint only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$LIVE_PROOF_OUTPUT" "$LIVE_PROOF_INPUT" baseline
+          RUN_ID="$(gh run list --workflow 'Multi-Market Daily Operator Checkpoint' --branch main --event schedule --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+          if [ -n "$RUN_ID" ]; then
+            gh run download "$RUN_ID" -n multi-market-daily-operator-checkpoint -D baseline || true
+          fi
+          CHECKPOINT="$(find baseline -type f -name 'multi-market-daily-checkpoint.json' | head -n 1 || true)"
+          if [ -n "$CHECKPOINT" ]; then
+            cp "$CHECKPOINT" "$LIVE_PROOF_OUTPUT/multi-market-daily-checkpoint.json"
+            echo "baseline_run_id=$RUN_ID" > "$LIVE_PROOF_OUTPUT/baseline.txt"
+          else
+            printf '%s\n' '{"deduplicated_opportunities":[]}' > "$LIVE_PROOF_OUTPUT/multi-market-daily-checkpoint.json"
+            echo "baseline_run_id=UNAVAILABLE" > "$LIVE_PROOF_OUTPUT/baseline.txt"
+          fi
+          printf '%s\n' '{"schema_version":"missed-opportunity-inbox-1.0","cases":[]}' > "$LIVE_PROOF_OUTPUT/empty-inbox.json"
+      - name: Run bounded live repeated-transfer proof
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from opportunity_engine.query_gap_scout_waterfall import write_automatic_query_gap_miss_scout
+          from opportunity_engine.daily_learning_operator import DailyLearningPolicy
+          from opportunity_engine.daily_learning_runtime import run_daily_learning_runtime
+          from opportunity_engine.missed_opportunity_learning import load_missed_opportunity_memory
+
+          output = Path(os.environ["LIVE_PROOF_OUTPUT"])
+          input_root = Path(os.environ["LIVE_PROOF_INPUT"])
+          learning_dir = input_root / "learning"
+          learning_dir.mkdir(parents=True, exist_ok=True)
+
+          scout = write_automatic_query_gap_miss_scout(
+              output,
+              input_root=input_root,
+              environment=os.environ,
+              max_pages=3,
+          )
+          pre_learning_cases = load_missed_opportunity_memory(
+              learning_dir / "missed-opportunities.json"
+          )
+          learning = run_daily_learning_runtime(
+              learning_dir=learning_dir,
+              inbox_path=output / "empty-inbox.json",
+              validation_cases_path="config/learning/query_gap_validation_cases.json",
+              active_query_config="config/brave_search_queries.json",
+              promotion_config_path="config/learning/query_promotions.json",
+              report_path=output / "daily-learning-cycle.json",
+              environment=os.environ,
+              policy=DailyLearningPolicy(max_candidates_per_run=1, min_precision=0.20),
+              results_per_candidate=5,
+          )
+
+          keyword = learning.get("keyword_learning") or {}
+          candidate_rows = keyword.get("candidate_terms") or []
+          evaluations = keyword.get("evaluations") or []
+          evaluation = evaluations[0] if evaluations else {}
+          shadow = json.loads((learning_dir / "shadow-keyword-overlay.json").read_text(encoding="utf-8"))
+          proof = json.loads((learning_dir / "safe-learning-proof.json").read_text(encoding="utf-8"))
+          shadow_rows = (shadow.get("markets") or {}).get("NO") or []
+          avvikling_row = next((row for row in shadow_rows if row.get("term") == "avviklingssalg"), {})
+          proof_rows = proof.get("cases") or []
+          bauhaus_proof = next((row for row in proof_rows if str(row.get("case_id", "")).startswith("auto-query-gap:no:")), {})
+
+          summary = {
+              "status": "COMPLETED",
+              "baseline": (output / "baseline.txt").read_text(encoding="utf-8").strip(),
+              "scout": {
+                  "status": scout.get("status"),
+                  "search_request_count": scout.get("search_request_count"),
+                  "page_request_count": scout.get("page_request_count"),
+                  "verified_page_count": scout.get("verified_page_count"),
+                  "detected_miss_count": scout.get("detected_miss_count"),
+                  "cases_metadata": scout.get("cases_metadata", []),
+                  "automatic_query_activation": scout.get("automatic_query_activation"),
+              },
+              "pre_learning_case": pre_learning_cases[0].to_dict() if pre_learning_cases else None,
+              "learning": {
+                  "evaluation_scope": learning.get("evaluation_scope"),
+                  "candidate_count": learning.get("candidate_count"),
+                  "first_candidate": candidate_rows[0] if candidate_rows else None,
+                  "evaluated_candidate_count": learning.get("evaluated_candidate_count"),
+                  "learning_search_requests": learning.get("learning_search_requests"),
+                  "evaluation": evaluation,
+                  "shadow_row": avvikling_row,
+                  "safe_learning_proof_status": learning.get("safe_learning_proof_status"),
+                  "safe_learning_shadow_transfer_proven_case_count": learning.get("safe_learning_shadow_transfer_proven_case_count"),
+                  "safe_learning_promotion_eligible_count": learning.get("safe_learning_promotion_eligible_count"),
+                  "proof_row": bauhaus_proof,
+                  "active_learned_term_count": learning.get("active_learned_term_count"),
+                  "automatic_query_activation": learning.get("automatic_query_activation"),
+              },
+              "limits": {
+                  "scout_brave_requests_max": 2,
+                  "scout_public_pages_max": 3,
+                  "learner_brave_requests_max": 1,
+                  "learner_results_per_request": 5,
+              },
+              "authoritative_verifier_relaxed": False,
+              "automatic_contact": False,
+              "automatic_bid": False,
+              "automatic_purchase": False,
+              "automatic_payment": False,
+          }
+          (output / "live-proof-summary.json").write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
+
+          assert int(scout.get("search_request_count") or 0) <= 2
+          assert int(scout.get("page_request_count") or 0) <= 3
+          assert int(scout.get("verified_page_count") or 0) >= 1
+          assert int(scout.get("detected_miss_count") or 0) == 1
+          assert scout.get("cases_metadata")[0].get("query_gap_term") == "avviklingssalg"
+          assert pre_learning_cases[0].diagnosed_query_gap_terms == ("avviklingssalg",)
+          assert pre_learning_cases[0].learned_patterns == ()
+          assert learning.get("evaluation_scope") == "HOLDOUT_TRANSFER"
+          assert candidate_rows and candidate_rows[0].get("term") == "avviklingssalg"
+          assert int(learning.get("evaluated_candidate_count") or 0) == 1
+          assert int(learning.get("learning_search_requests") or 0) <= 1
+          assert evaluation.get("term") == "avviklingssalg"
+          assert evaluation.get("evaluation_scope") == "HOLDOUT_TRANSFER"
+          assert evaluation.get("status") == "PROVEN"
+          assert len(set(evaluation.get("recovered_case_ids") or [])) >= 2
+          assert int(avvikling_row.get("independent_transfer_case_count") or 0) >= 2
+          assert bauhaus_proof.get("repeated_transfer_proven") is True
+          assert bauhaus_proof.get("promotion_eligible") is True
+          assert learning.get("safe_learning_proof_status") == "SHADOW_PASSED"
+          assert int(learning.get("active_learned_term_count") or 0) == 0
+          assert scout.get("automatic_query_activation") is False
+          assert learning.get("automatic_query_activation") is False
+          PY
+      - name: Upload proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: one-time-repeated-holdout-transfer-live-proof-v15
+          path: artifacts/repeated-holdout-transfer-live-proof-v15/
+          if-no-files-found: error
