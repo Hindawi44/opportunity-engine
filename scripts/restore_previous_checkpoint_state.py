@@ -87,7 +87,9 @@ def _prepare_previous_runtime_overlay(
     """
     learning_dir = input_root / "learning"
     shadow_path = learning_dir / SHADOW_KEYWORD_OVERLAY_FILENAME
-    previous_active_path = learning_dir / "active-keyword-overlay.json"
+    # Keep the historical explicit path shape because checkpoint restore tests
+    # treat it as part of the durable-state contract.
+    previous_active_path = input_root / "learning" / "active-keyword-overlay.json"
     bootstrap_path = Path(bootstrap_shadow_path)
 
     restored_shadow = _load_optional_overlay(shadow_path)
