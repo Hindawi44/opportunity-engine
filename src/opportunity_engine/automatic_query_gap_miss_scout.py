@@ -207,8 +207,13 @@ def _checkpoint_urls(checkpoint: Mapping[str, Any]) -> set[str]:
 
 
 def _query_contains_term(active_queries: Sequence[str], term: str) -> bool:
+    """Check Core-capable query coverage while ignoring signal-only radar probes."""
     pattern = re.compile(rf"(?<!\w){re.escape(term.casefold())}(?!\w)")
-    return any(pattern.search(str(query).casefold()) for query in active_queries)
+    return any(
+        pattern.search(str(query).casefold())
+        for query in active_queries
+        if getattr(query, "query_scope", None) != "SIGNAL_ONLY"
+    )
 
 
 def _valid_company_label(value: str) -> bool:
