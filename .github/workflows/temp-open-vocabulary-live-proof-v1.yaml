@@ -1,0 +1,114 @@
+name: TEMP Open Vocabulary QUERY_GAP Live Proof V1
+
+on:
+  push:
+    branches:
+      - agent/temp-open-vocabulary-live-proof-v1
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    env:
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Run real open-vocabulary production proof
+        run: |
+          python - <<'PY'
+          import json
+          import os
+
+          from opportunity_engine.automatic_query_gap_miss_scout import (
+              _GAP_TERMS,
+              fetch_public_page,
+          )
+          from opportunity_engine.daily_learning_runtime import load_active_learning_queries
+          from opportunity_engine.discovery.brave_search import BraveSearchProvider
+          from opportunity_engine.query_gap_scout_waterfall import discover_query_gap_misses
+
+          api_key = str(os.environ.get('BRAVE_SEARCH_API_KEY') or '').strip()
+          if not api_key:
+              raise SystemExit('BRAVE_SEARCH_API_KEY is required for live proof')
+
+          provider = BraveSearchProvider(
+              api_key,
+              country='NO',
+              freshness='pm',
+              extra_snippets=True,
+          )
+          search_requests = 0
+
+          def search(query: str):
+              global search_requests
+              search_requests += 1
+              return provider.search(query, count=10)
+
+          # Suppress vocabulary the old fixed scout already knew. The live proof
+          # may pass only by discovering a term outside that legacy vocabulary.
+          active_queries = list(load_active_learning_queries('config/brave_search_queries.json'))
+          active_queries.extend(_GAP_TERMS)
+
+          outcome = discover_query_gap_misses(
+              {'deduplicated_opportunities': []},
+              active_queries=active_queries,
+              search=search,
+              fetch_page=fetch_public_page,
+              max_pages=3,
+          )
+
+          metadata = list(outcome.get('cases_metadata') or [])
+          dynamic_terms = [
+              str(row.get('query_gap_term') or '').casefold()
+              for row in metadata
+              if str(row.get('query_gap_term') or '').casefold()
+              and str(row.get('query_gap_term') or '').casefold() not in set(_GAP_TERMS)
+          ]
+          result = {
+              'status': outcome.get('status'),
+              'search_request_count': outcome.get('search_request_count'),
+              'observed_search_callback_count': search_requests,
+              'search_hit_count': outcome.get('search_hit_count'),
+              'page_request_count': outcome.get('page_request_count'),
+              'verified_page_count': outcome.get('verified_page_count'),
+              'detected_miss_count': outcome.get('detected_miss_count'),
+              'dynamic_terms': dynamic_terms,
+              'legacy_terms_suppressed_for_proof': list(_GAP_TERMS),
+              'executed_queries': outcome.get('executed_queries'),
+              'verification_attempts': outcome.get('verification_attempts'),
+              'cases_metadata': metadata,
+              'automatic_query_activation': outcome.get('automatic_query_activation'),
+              'automatic_contact': outcome.get('automatic_contact'),
+              'automatic_bid': outcome.get('automatic_bid'),
+              'automatic_purchase': outcome.get('automatic_purchase'),
+              'automatic_payment': outcome.get('automatic_payment'),
+          }
+          print('OPEN_VOCAB_LIVE_PROOF=' + json.dumps(result, ensure_ascii=False, sort_keys=True))
+
+          assert search_requests == outcome.get('search_request_count')
+          assert outcome.get('search_request_count', 0) <= 2
+          assert outcome.get('page_request_count', 0) <= 3
+          for key in (
+              'automatic_query_activation',
+              'automatic_contact',
+              'automatic_bid',
+              'automatic_purchase',
+              'automatic_payment',
+          ):
+              assert outcome.get(key) is False, key
+          for row in metadata:
+              term = str(row.get('query_gap_term') or '').casefold()
+              assert term
+              assert all(term not in str(query).casefold() for query in outcome.get('executed_queries') or [])
+              assert row.get('source_page_verified') is True
+              assert row.get('closure_verified') is True
+              assert row.get('inventory_liquidation_verified') is True
+          if not dynamic_terms:
+              raise SystemExit('NO_DYNAMIC_TERM_LIVE_PROOF')
+          PY
