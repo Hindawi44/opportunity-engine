@@ -6,6 +6,9 @@ from pathlib import Path
 
 from opportunity_engine.adaptive_keyword_learning import KeywordEvaluationResult
 from opportunity_engine.automatic_query_gap_miss_scout import PublicPage
+from opportunity_engine.discovery.brave_market_signal_continuity import (
+    collect_manifest_brave_market_signals,
+)
 from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.learned_query_overlay import (
     build_learned_query_overlay,
@@ -43,6 +46,13 @@ def _shadow_overlay():
         evaluation_scope="HOLDOUT_TRANSFER",
     )
     return build_learned_query_overlay([evaluation])
+
+
+def _active_overlay():
+    return select_promoted_query_overlay(
+        _shadow_overlay(),
+        {("NO", TERM): "PROMOTED"},
+    )
 
 
 def test_restore_applies_current_promotion_to_restored_shadow_before_discovery(
@@ -90,11 +100,7 @@ def test_scheduled_promoted_core_search_creates_verified_direct_candidate(
     tmp_path: Path,
 ) -> None:
     overlay_path = tmp_path / "active-keyword-overlay.json"
-    active = select_promoted_query_overlay(
-        _shadow_overlay(),
-        {("NO", TERM): "PROMOTED"},
-    )
-    save_learned_query_overlay(overlay_path, active)
+    save_learned_query_overlay(overlay_path, _active_overlay())
     queries: list[str] = []
 
     def search(query: str):
@@ -156,6 +162,7 @@ def test_scheduled_promoted_core_search_creates_verified_direct_candidate(
     assert record["evaluation_status"] == "REQUIRES_VERIFICATION"
     assert record["verified"] is True
     assert record["analysis_eligible"] is False
+    assert record["top5_eligible"] is False
     assert record["metadata"]["learned_term"] == TERM
     assert record["metadata"]["source_page_verified"] is True
     assert record["metadata"]["inventory_liquidation_verified"] is True
@@ -167,6 +174,45 @@ def test_scheduled_promoted_core_search_creates_verified_direct_candidate(
     )
     assert unified["record_count"] == 1
     assert unified["records"][0]["opportunity_id"] == record["opportunity_id"]
+
+
+def test_search_hit_without_exact_page_proof_never_becomes_opportunity(
+    tmp_path: Path,
+) -> None:
+    overlay_path = tmp_path / "active-keyword-overlay.json"
+    save_learned_query_overlay(overlay_path, _active_overlay())
+
+    report = collect_promoted_learned_core_opportunities(
+        tmp_path / "source",
+        environment={
+            "BRAVE_SEARCH_API_KEY": "test-key",
+            "OPPORTUNITY_LEARNED_QUERY_OVERLAY_PATH": str(overlay_path),
+        },
+        search_override=lambda query: [
+            SearchHit(
+                title="Stor avviklingssalg",
+                url="https://example.no/no-proof",
+                description="Mange varer til salgs",
+                provider="Fake Brave",
+            )
+        ],
+        fetch_page=lambda url: PublicPage(
+            requested_url=url,
+            final_url=url,
+            status_code=200,
+            content_type="text/html",
+            html="<html><body><h1>Vanlig kampanje</h1><p>Tilbud denne uken.</p></body></html>",
+        ),
+        observed_at=NOW,
+    )
+
+    assert report["request_count"] == 1
+    assert report["verified_opportunity_count"] == 0
+    assert json.loads(
+        (tmp_path / "source" / "all-discovered-candidates.json").read_text(
+            encoding="utf-8"
+        )
+    ) == []
 
 
 def test_no_promoted_terms_makes_zero_search_requests(tmp_path: Path) -> None:
@@ -205,3 +251,63 @@ def test_no_promoted_terms_makes_zero_search_requests(tmp_path: Path) -> None:
     assert report["status"] == "VALID_ZERO"
     assert report["request_count"] == 0
     assert report["verified_opportunity_count"] == 0
+
+
+def test_precheckpoint_request_displaces_one_no_radar_request(tmp_path: Path) -> None:
+    overlay_path = tmp_path / "learning" / "active-keyword-overlay.json"
+    save_learned_query_overlay(overlay_path, _active_overlay())
+    pre_report = (
+        tmp_path
+        / "artifacts"
+        / "multi-market-inputs"
+        / "no-learned-core"
+        / "search-run-report.json"
+    )
+    pre_report.parent.mkdir(parents=True, exist_ok=True)
+    pre_report.write_text(
+        json.dumps({"request_count": 1, "applied_terms": [TERM]}),
+        encoding="utf-8",
+    )
+    manifest = {
+        "sources": [
+            {"market_code": "NO", "artifact_dir": "no"},
+            {"market_code": "SE", "artifact_dir": "se"},
+            {"market_code": "DE", "artifact_dir": "de"},
+        ]
+    }
+    calls: list[tuple[str, str]] = []
+
+    class Provider:
+        name = "Fake Brave"
+
+        def __init__(self, market: str):
+            self.market = market
+
+        def search(self, query: str, *, count: int = 10):
+            calls.append((self.market, query))
+            return []
+
+    report = collect_manifest_brave_market_signals(
+        manifest,
+        root=tmp_path,
+        observed_at=NOW,
+        environment={
+            "GITHUB_EVENT_NAME": "schedule",
+            "BRAVE_SEARCH_API_KEY": "test-key",
+            "OPPORTUNITY_LEARNED_QUERY_OVERLAY_PATH": str(overlay_path),
+        },
+        provider_factory=lambda market, api_key, freshness: Provider(market),
+        queries_per_market=2,
+        results_per_query=10,
+    )
+
+    assert len(calls) == 5
+    assert sum(1 for market, _ in calls if market == "NO") == 1
+    learned = report["learned_query_overlay"]
+    assert learned["precheckpoint_learned_request_count"] == 1
+    assert learned["radar_requests_displaced"] == 1
+    assert learned["radar_request_count_after_displacement"] == 5
+    assert learned["combined_learned_plus_radar_request_count"] == 6
+    assert learned["baseline_radar_request_budget"] == 6
+    assert learned["combined_request_budget_unchanged"] is True
+    assert learned["extra_search_requests"] == 0
