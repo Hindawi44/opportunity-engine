@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from io import BytesIO
 import json
 from pathlib import Path
@@ -8,9 +9,15 @@ from zipfile import ZipFile
 from opportunity_engine.discovery.checkpoint_state_restore import (
     extract_previous_learning_state,
 )
+from opportunity_engine.missed_opportunity_learning import (
+    DiscoveryTrace,
+    MissedOpportunityCase,
+    save_missed_opportunity_memory,
+)
 
 
-WORKFLOW = Path(".github/workflows/multi-market-daily-operator-checkpoint.yaml")
+INIT = Path("src/opportunity_engine/discovery/__init__.py")
+HOOK = Path("src/opportunity_engine/discovery/daily_auto_miss_learning_cli_hook.py")
 
 
 def _archive(entries: dict[str, object]) -> bytes:
@@ -53,51 +60,103 @@ def test_previous_checkpoint_restores_shadow_keyword_evidence(tmp_path: Path) ->
     assert restored_shadow == shadow
 
 
-def test_daily_workflow_consumes_captured_misses_in_learning_cycle() -> None:
-    workflow = WORKFLOW.read_text(encoding="utf-8")
+def test_auto_learning_hook_runs_after_unified_capture_by_atexit_order() -> None:
+    init = INIT.read_text(encoding="utf-8")
 
-    bulletin = workflow.index("- name: Build domain market intelligence bulletin")
-    learning = workflow.index("- name: Run bounded learning on captured misses")
-    validation = workflow.index("- name: Validate checkpoint safety, coverage and lifecycle integrity")
-    upload = workflow.index("- name: Upload checkpoint and source evidence")
+    auto_install = init.index("install_daily_auto_miss_learning_cli_hook()")
+    river_install = init.index("install_unified_market_intelligence_river_cli_hook()")
 
-    assert bulletin < learning < validation < upload
-    learning_block = workflow[learning:validation]
-    assert "python scripts/run_daily_learning_operator.py" in learning_block
-    assert '--learning-dir "$INPUT_ROOT/learning"' in learning_block
-    assert '--report "$OUTPUT_DIR/daily-learning-cycle.json"' in learning_block
-    assert '--max-candidates 2' in learning_block
-    assert '--results-per-candidate 5' in learning_block
-    assert "--min-precision 0.20" in learning_block
+    # atexit is LIFO: registering auto-learning before the river makes the river
+    # capture/routing handler run first, then the learning consumer runs second.
+    assert auto_install < river_install
 
-
-def test_daily_workflow_validates_learning_safety_contract() -> None:
-    workflow = WORKFLOW.read_text(encoding="utf-8")
-
-    assert 'daily-learning-cycle.json' in workflow
-    assert 'safe-learning-proof.json' in workflow
-    assert 'automatic_query_activation' in workflow
-    assert 'promotion_gate_enforced' in workflow
-    assert 'active_learned_term_count' in workflow
-    assert 'shadow_proven_term_count' in workflow
+    hook = HOOK.read_text(encoding="utf-8")
+    assert "automatic-missed-opportunity-capture.json" in hook
+    assert "run_daily_learning_runtime(" in hook
+    assert 'learning_dir=input_root / "learning"' in hook
+    assert 'report_path=output_dir / "daily-learning-cycle.json"' in hook
 
 
-def test_learning_code_changes_trigger_checkpoint_contract_ci() -> None:
-    workflow = WORKFLOW.read_text(encoding="utf-8")
-
-    required_paths = (
-        'scripts/run_daily_learning_operator.py',
-        'src/opportunity_engine/daily_learning_runtime.py',
-        'src/opportunity_engine/daily_learning_operator.py',
-        'src/opportunity_engine/automatic_missed_opportunity_capture.py',
-        'src/opportunity_engine/discovery/checkpoint_state_restore.py',
-        'tests/test_daily_auto_miss_learning_wiring_v1.py',
+def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
+    tmp_path: Path,
+) -> None:
+    from opportunity_engine.discovery.daily_auto_miss_learning_cli_hook import (
+        run_daily_auto_miss_learning,
     )
-    for path in required_paths:
-        assert f'- "{path}"' in workflow
 
-    contract_test_block = workflow[
-        workflow.index("- name: Test the multi-market checkpoint contract") :
-        workflow.index("operator-read-only-checkpoint:")
-    ]
-    assert "pytest tests/test_daily_auto_miss_learning_wiring_v1.py -q" in contract_test_block
+    input_root = tmp_path / "multi-market-inputs"
+    output_dir = tmp_path / "checkpoint"
+    output_dir.mkdir(parents=True)
+    (output_dir / "automatic-missed-opportunity-capture.json").write_text(
+        json.dumps({"status": "SUCCESS", "new_case_count": 1}),
+        encoding="utf-8",
+    )
+    (output_dir / "domain-market-intelligence-brief.json").write_text(
+        json.dumps({"schema_version": "test"}),
+        encoding="utf-8",
+    )
+
+    case = MissedOpportunityCase(
+        case_id="AUTO-QUERY-GAP-1",
+        market_code="NO",
+        discovered_by="AUTOMATIC_VERIFIED_GAP_TEST",
+        observed_at=datetime(2026, 8, 22, tzinfo=timezone.utc),
+        opportunity_type="VERIFIED_STOCK_LIQUIDATION",
+        stock_proven=True,
+        ground_truth_company="Example AS",
+        ground_truth_url="https://example.no/stock",
+        trace=DiscoveryTrace(query_generated=False),
+        learning_evidence_text="Sluttlager selges ved nedleggelse.",
+        root_cause="QUERY_GAP",
+        learning_status="DIAGNOSED",
+    )
+    save_missed_opportunity_memory(
+        input_root / "learning" / "missed-opportunities.json",
+        [case],
+    )
+
+    report = run_daily_auto_miss_learning(
+        output_dir,
+        input_root=input_root,
+        environment={"GITHUB_EVENT_NAME": "workflow_dispatch"},
+    )
+
+    assert report["known_missed_opportunity_count"] == 1
+    assert report["candidate_count"] >= 1
+    assert report["learning_search_requests"] == 0
+    assert report["search_status"] == "SKIPPED_COST_GUARD"
+    assert report["automatic_query_activation"] is False
+    assert report["promotion_gate_enforced"] is True
+    assert (output_dir / "daily-learning-cycle.json").exists()
+    assert (input_root / "learning" / "shadow-keyword-overlay.json").exists()
+    assert (input_root / "learning" / "active-keyword-overlay.json").exists()
+    assert (input_root / "learning" / "safe-learning-proof.json").exists()
+
+    brief = json.loads(
+        (output_dir / "domain-market-intelligence-brief.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    summary = brief["daily_auto_miss_learning"]
+    assert summary["known_missed_opportunity_count"] == 1
+    assert summary["automatic_query_activation"] is False
+    assert summary["promotion_gate_enforced"] is True
+
+
+def test_auto_learning_hook_skips_when_capture_stage_did_not_finish(tmp_path: Path) -> None:
+    from opportunity_engine.discovery.daily_auto_miss_learning_cli_hook import (
+        run_daily_auto_miss_learning,
+    )
+
+    output_dir = tmp_path / "checkpoint"
+    output_dir.mkdir(parents=True)
+    report = run_daily_auto_miss_learning(
+        output_dir,
+        input_root=tmp_path / "multi-market-inputs",
+        environment={"GITHUB_EVENT_NAME": "workflow_dispatch"},
+    )
+
+    assert report["status"] == "SKIPPED_NO_CAPTURE_ARTIFACT"
+    assert report["automatic_query_activation"] is False
+    assert report["automatic_purchase"] is False
+    assert not (output_dir / "daily-learning-cycle.json").exists()
