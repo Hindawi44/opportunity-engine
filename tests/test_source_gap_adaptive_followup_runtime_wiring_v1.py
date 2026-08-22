@@ -39,13 +39,13 @@ def test_source_gap_provider_rejects_off_domain_search_results() -> None:
     ]
 
 
-def test_daily_hook_uses_source_gap_wrapper_before_source_verification() -> None:
+def test_daily_hook_uses_safe_source_gap_wrapper_before_source_verification() -> None:
     hook = Path(
         "src/opportunity_engine/discovery/unified_market_intelligence_river_cli_hook.py"
     ).read_text(encoding="utf-8")
 
-    assert "write_source_gap_adaptive_followup_with_continuity" in hook
-    assert "write_signal_follow_up_engine_with_continuity" not in hook
-    assert hook.index("write_source_gap_adaptive_followup_with_continuity(") < hook.index(
-        "write_signal_follow_up_source_verification("
-    )
+    assert "write_safe_source_gap_adaptive_followup_with_continuity" in hook
+    assert "write_source_gap_adaptive_followup_with_continuity" not in hook
+    assert hook.index(
+        "write_safe_source_gap_adaptive_followup_with_continuity("
+    ) < hook.index("write_signal_follow_up_source_verification(")
