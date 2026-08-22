@@ -3,6 +3,11 @@
 A learned term may be PROVEN by shadow replay without becoming active. Production
 activation requires an exact, auditable PROMOTED decision. DISABLED decisions
 remove the term from the active overlay while preserving shadow evidence.
+
+For transfer-only proof, an explicit decision is necessary but not sufficient:
+Production also requires repeated recovery across the minimum number of unique
+independent hidden holdouts. This keeps the activation gate aligned with the
+safe-learning proof contract instead of trusting a single transfer success.
 """
 from __future__ import annotations
 
@@ -11,6 +16,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from opportunity_engine.learned_query_overlay import SCHEMA_VERSION as OVERLAY_SCHEMA_VERSION
+from opportunity_engine.safe_learning_proof import DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES
 
 SCHEMA_VERSION = "query-promotion-gate-1.0"
 _ALLOWED_STATUSES = {"PROMOTED", "DISABLED"}
@@ -18,6 +24,62 @@ _ALLOWED_STATUSES = {"PROMOTED", "DISABLED"}
 
 def _fold(value: object) -> str:
     return " ".join(str(value or "").casefold().split()).strip()
+
+
+def _ids(value: object) -> set[str]:
+    if not isinstance(value, (list, tuple, set, frozenset)):
+        return set()
+    return {
+        str(item).strip()
+        for item in value
+        if str(item).strip()
+    }
+
+
+def _promotion_evidence_ready(row: Mapping[str, Any]) -> bool:
+    """Return whether proven Shadow evidence is mature enough for Production.
+
+    Direct source-case replay preserves the existing promotion contract. A term
+    proven only through HOLDOUT_TRANSFER must have repeated independent transfer
+    evidence before even an explicit PROMOTED decision can activate it.
+
+    Old overlay rows are handled fail-closed: when the row is explicitly marked
+    HOLDOUT_TRANSFER but predates cumulative evidence fields, recovered_case_ids
+    are treated as the transfer validation identities.
+    """
+    scope = str(row.get("evaluation_scope") or "SOURCE_CASE_REPLAY").strip().upper()
+    scopes = {
+        str(item).strip().upper()
+        for item in (row.get("evaluation_scopes") or [])
+        if str(item).strip()
+    } if isinstance(row.get("evaluation_scopes"), (list, tuple, set, frozenset)) else set()
+    if scope:
+        scopes.add(scope)
+
+    source_replay_ids = _ids(row.get("source_replay_case_ids"))
+    transfer_validation_ids = _ids(row.get("transfer_validation_case_ids"))
+    recovered_ids = _ids(row.get("recovered_case_ids"))
+
+    if not source_replay_ids and not transfer_validation_ids:
+        if scope == "HOLDOUT_TRANSFER":
+            transfer_validation_ids = recovered_ids
+        else:
+            source_replay_ids = recovered_ids
+
+    if source_replay_ids or "SOURCE_CASE_REPLAY" in scopes and "HOLDOUT_TRANSFER" not in scopes:
+        return True
+
+    has_transfer_evidence = bool(transfer_validation_ids) or "HOLDOUT_TRANSFER" in scopes
+    if not has_transfer_evidence:
+        return True
+
+    stored_count = row.get("independent_transfer_case_count")
+    stored_transfer_count = stored_count if isinstance(stored_count, int) else 0
+    independent_transfer_count = max(
+        len(transfer_validation_ids),
+        stored_transfer_count,
+    )
+    return independent_transfer_count >= DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES
 
 
 def load_query_promotion_decisions(path: str | Path) -> dict[tuple[str, str], str]:
@@ -66,7 +128,7 @@ def select_promoted_query_overlay(
     *,
     max_terms_per_market: int = 5,
 ) -> dict[str, Any]:
-    """Return only explicitly promoted terms that already exist in proven shadow evidence."""
+    """Return explicitly promoted terms whose proven Shadow evidence is eligible."""
     if max_terms_per_market < 1:
         raise ValueError("max_terms_per_market must be >= 1")
     decisions = promotion_decisions or {}
@@ -88,6 +150,10 @@ def select_promoted_query_overlay(
                 # A config decision alone can never create a production term. The
                 # term must already be present in the proven shadow overlay.
                 if str(raw.get("source_verdict") or "").strip().upper() != "PROVEN":
+                    continue
+                # Transfer-only evidence has a second fail-closed gate: a single
+                # hidden recovery cannot be promoted even by explicit config.
+                if not _promotion_evidence_ready(raw):
                     continue
                 row = dict(raw)
                 row["term"] = term
