@@ -45,7 +45,8 @@ def _promotion_evidence_ready(row: Mapping[str, Any]) -> bool:
 
     Old overlay rows are handled fail-closed: when the row is explicitly marked
     HOLDOUT_TRANSFER but predates cumulative evidence fields, recovered_case_ids
-    are treated as the transfer validation identities.
+    are treated as the transfer validation identities. Stored count fields are
+    never trusted without those concrete unique identities.
     """
     scope = str(row.get("evaluation_scope") or "SOURCE_CASE_REPLAY").strip().upper()
     scopes = {
@@ -73,13 +74,7 @@ def _promotion_evidence_ready(row: Mapping[str, Any]) -> bool:
     if not has_transfer_evidence:
         return True
 
-    stored_count = row.get("independent_transfer_case_count")
-    stored_transfer_count = stored_count if isinstance(stored_count, int) else 0
-    independent_transfer_count = max(
-        len(transfer_validation_ids),
-        stored_transfer_count,
-    )
-    return independent_transfer_count >= DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES
+    return len(transfer_validation_ids) >= DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES
 
 
 def load_query_promotion_decisions(path: str | Path) -> dict[tuple[str, str], str]:
