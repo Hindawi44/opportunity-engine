@@ -1,27 +1,43 @@
-"""Remove volatile search-run fields before Brave signals enter persistence.
+"""Stabilize Brave signals and apply a bounded learned-query runtime overlay.
 
 The radar report may expose query/rank diagnostics for operators, but those
 values must not create a changed SQLite observation when the underlying public
 page title, snippet, URL, classification, or status did not change.
+
+A proven learned-query overlay may extend the existing radar OR groups and
+classification vocabulary for one collection call.  The overlay is temporary,
+bounded, and restored in ``finally`` so learned runtime state cannot leak into
+unrelated tests or collectors.  It never adds an extra Brave request.
 """
 from __future__ import annotations
 
+from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterator, Mapping
 
 from opportunity_engine.cost_guard import manual_paid_brave_block_reason
+from opportunity_engine.discovery import brave_market_signal_radar as _radar
 from opportunity_engine.discovery.brave_market_signal_radar import (
     ProviderFactory,
     SUPPORTED_MARKETS,
     collect_manifest_brave_market_signals as _collect_raw_brave_market_signals,
 )
+from opportunity_engine.learned_query_overlay import (
+    augment_market_query,
+    learned_terms_for_market,
+    load_learned_query_overlay,
+)
+from opportunity_engine.market_intelligence import MarketSignalType
 
 
 _VOLATILE_SIGNAL_METADATA = {"query_id", "query", "source_rank"}
 _VOLATILE_EVIDENCE_METADATA = {"query_id", "source_rank"}
+_OVERLAY_ENV = "OPPORTUNITY_LEARNED_QUERY_OVERLAY_PATH"
+_DEFAULT_OVERLAY_RELATIVE_PATH = Path("learning") / "active-keyword-overlay.json"
 
 
 def stabilize_brave_signal(signal: Mapping[str, Any]) -> dict[str, Any]:
@@ -80,6 +96,85 @@ def _rewrite_artifact(path: Path, stable_by_id: Mapping[str, Mapping[str, Any]])
         encoding="utf-8",
     )
     temporary.replace(path)
+
+
+def _term_table(signal_type: MarketSignalType) -> dict[str, tuple[str, ...]]:
+    if signal_type == MarketSignalType.INSOLVENCY_OR_LIQUIDATION:
+        return _radar._INSOLVENCY_TERMS
+    if signal_type == MarketSignalType.WAREHOUSE_SURPLUS:
+        return _radar._SURPLUS_TERMS
+    if signal_type == MarketSignalType.AUCTION_EVENT:
+        return _radar._AUCTION_TERMS
+    return _radar._CLOSURE_TERMS
+
+
+@contextmanager
+def learned_radar_overlay(
+    overlay: Mapping[str, Any] | None,
+) -> Iterator[dict[str, dict[str, MarketSignalType]]]:
+    """Temporarily apply proven learned terms to the existing radar.
+
+    Existing query count and provider-call count are unchanged.  Learned terms
+    are appended to the first OR group of each existing query and to the
+    corresponding event-classification vocabulary.  All mutable globals are
+    restored exactly after the collection call.
+    """
+
+    original_queries = {
+        market: tuple(_radar.MARKET_QUERIES[market]) for market in SUPPORTED_MARKETS
+    }
+    tables = (
+        _radar._INSOLVENCY_TERMS,
+        _radar._CLOSURE_TERMS,
+        _radar._SURPLUS_TERMS,
+        _radar._AUCTION_TERMS,
+    )
+    original_tables = [
+        {market: tuple(table[market]) for market in SUPPORTED_MARKETS}
+        for table in tables
+    ]
+    active_by_market: dict[str, dict[str, MarketSignalType]] = {}
+
+    try:
+        for market in SUPPORTED_MARKETS:
+            learned = learned_terms_for_market(overlay, market)
+            active_by_market[market] = learned
+            if not learned:
+                continue
+
+            _radar.MARKET_QUERIES[market] = tuple(
+                augment_market_query(query, list(learned))
+                for query in original_queries[market]
+            )
+            for term, signal_type in learned.items():
+                table = _term_table(signal_type)
+                existing = table[market]
+                if term.casefold() not in {item.casefold() for item in existing}:
+                    table[market] = (*existing, term)
+        yield active_by_market
+    finally:
+        for market, queries in original_queries.items():
+            _radar.MARKET_QUERIES[market] = queries
+        for table, snapshot in zip(tables, original_tables):
+            for market, terms in snapshot.items():
+                table[market] = terms
+
+
+def _runtime_overlay(
+    root: str | Path,
+    environment: Mapping[str, str] | None,
+) -> tuple[dict[str, Any], Path, str | None]:
+    env = environment if environment is not None else os.environ
+    configured = str(env.get(_OVERLAY_ENV) or "").strip()
+    path = Path(configured) if configured else Path(root) / _DEFAULT_OVERLAY_RELATIVE_PATH
+    try:
+        return load_learned_query_overlay(path), path, None
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        # A corrupt learning overlay must never take the core radar down.  Fail
+        # closed to the static query pack and surface the reason in diagnostics.
+        return {"schema_version": "learned-query-overlay-1.0", "markets": {}}, path, (
+            f"{type(exc).__name__}: {exc}"
+        )
 
 
 def _manual_cost_guard_report(
@@ -159,7 +254,7 @@ def collect_manifest_brave_market_signals(
     results_per_query: int = 10,
     freshness: str | None = "pm",
 ) -> dict[str, Any]:
-    """Run the bounded radar and normalize its signals for stable replay."""
+    """Run the bounded radar with optional proven learned-query overlay."""
     block_reason = manual_paid_brave_block_reason(environment)
     if block_reason is not None:
         return _manual_cost_guard_report(
@@ -171,6 +266,7 @@ def collect_manifest_brave_market_signals(
             block_reason=block_reason,
         )
 
+    overlay, overlay_path, overlay_error = _runtime_overlay(root, environment)
     kwargs: dict[str, Any] = {
         "root": root,
         "observed_at": observed_at,
@@ -181,18 +277,44 @@ def collect_manifest_brave_market_signals(
     }
     if provider_factory is not None:
         kwargs["provider_factory"] = provider_factory
-    report = _collect_raw_brave_market_signals(manifest, **kwargs)
+
+    with learned_radar_overlay(overlay) as learned_by_market:
+        report = _collect_raw_brave_market_signals(manifest, **kwargs)
+
+    report["learned_query_overlay"] = {
+        "path": overlay_path.as_posix(),
+        "load_error": overlay_error,
+        "active_term_count": sum(len(terms) for terms in learned_by_market.values()),
+        "active_terms_by_market": {
+            market: sorted(terms) for market, terms in learned_by_market.items() if terms
+        },
+        "extra_search_requests": 0,
+        "query_budget_unchanged": True,
+    }
 
     root_path = Path(root)
     stable_by_id: dict[str, dict[str, Any]] = {}
     for source in report.get("sources") or []:
         if not isinstance(source, dict):
             continue
+        market = str(source.get("source_country") or "").strip().upper()
+        learned_terms = set(learned_by_market.get(market, {}))
         stable_signals: list[dict[str, Any]] = []
         for raw in source.get("signals") or []:
             if not isinstance(raw, Mapping):
                 continue
             stable = stabilize_brave_signal(raw)
+            metadata = stable.get("metadata")
+            if isinstance(metadata, dict) and learned_terms:
+                event_terms = {
+                    str(term).casefold() for term in metadata.get("event_terms") or []
+                }
+                matched = sorted(
+                    term for term in learned_terms if term.casefold() in event_terms
+                )
+                if matched:
+                    metadata["learned_term_match"] = True
+                    metadata["learned_terms"] = matched
             signal_id = str(stable.get("signal_id") or "").strip()
             if signal_id:
                 stable_by_id[signal_id] = stable
