@@ -5,6 +5,11 @@ already-durable missed-opportunity evidence plus shadow/active overlays into one
 operator-readable answer: did the baseline miss, did shadow prove the learned
 pattern by direct replay or independent holdout transfer, how noisy was the
 proof, and is the term merely eligible for explicit promotion?
+
+A single hidden holdout proves transfer but is not enough for transfer-based
+promotion eligibility. Repeated transfer requires multiple unique independent
+holdout cases so repeated recovery of the same case cannot masquerade as
+replication.
 """
 from __future__ import annotations
 
@@ -13,6 +18,7 @@ from typing import Any, Mapping, Sequence
 from opportunity_engine.missed_opportunity_learning import MissedOpportunityCase
 
 SCHEMA_VERSION = "safe-learning-proof-1.1"
+DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES = 2
 
 
 def _rows_for_market(
@@ -30,6 +36,32 @@ def _rows_for_market(
     return [row for row in rows if isinstance(row, Mapping)]
 
 
+def _ids(value: object) -> list[str]:
+    if not isinstance(value, (list, tuple, set, frozenset)):
+        return []
+    return sorted(
+        {
+            str(item).strip()
+            for item in value
+            if str(item).strip()
+        }
+    )
+
+
+def _cumulative_evidence_ids(row: Mapping[str, Any]) -> tuple[list[str], list[str]]:
+    """Return source replay IDs and hidden transfer IDs with old-row fallback."""
+    source_replay = _ids(row.get("source_replay_case_ids"))
+    transfer_validation = _ids(row.get("transfer_validation_case_ids"))
+    if source_replay or transfer_validation:
+        return source_replay, transfer_validation
+
+    scope = str(row.get("evaluation_scope") or "SOURCE_CASE_REPLAY").strip().upper()
+    recovered = _ids(row.get("recovered_case_ids"))
+    if scope == "HOLDOUT_TRANSFER":
+        return [], recovered
+    return recovered, []
+
+
 def _matching_shadow_row(
     case: MissedOpportunityCase,
     shadow_overlay: Mapping[str, Any] | None,
@@ -37,12 +69,11 @@ def _matching_shadow_row(
     for row in _rows_for_market(shadow_overlay, case.market_code):
         if str(row.get("source_verdict") or "").strip().upper() != "PROVEN":
             continue
-        scope = str(row.get("evaluation_scope") or "SOURCE_CASE_REPLAY").strip().upper()
-        recovered_ids = {str(item) for item in (row.get("recovered_case_ids") or [])}
-        support_ids = {str(item) for item in (row.get("support_case_ids") or [])}
-        if scope == "HOLDOUT_TRANSFER" and case.case_id in support_ids:
+        source_replay_ids, transfer_validation_ids = _cumulative_evidence_ids(row)
+        support_ids = set(_ids(row.get("support_case_ids")))
+        if transfer_validation_ids and case.case_id in support_ids:
             return row, "HOLDOUT_TRANSFER"
-        if case.case_id in recovered_ids:
+        if case.case_id in set(source_replay_ids):
             return row, "SOURCE_CASE_REPLAY"
     return None, None
 
@@ -53,6 +84,7 @@ def _proof_row_for_case(
     active_overlay: Mapping[str, Any] | None,
     *,
     min_precision: float,
+    min_independent_transfer_cases: int,
 ) -> dict[str, Any]:
     shadow_match, proof_mode = _matching_shadow_row(case, shadow_overlay)
 
@@ -72,6 +104,9 @@ def _proof_row_for_case(
             "shadow_false_positive_count": None,
             "shadow_false_positive_rate": None,
             "shadow_validation_case_ids": [],
+            "independent_transfer_case_count": 0,
+            "min_independent_transfer_cases": min_independent_transfer_cases,
+            "repeated_transfer_proven": False,
             "production_term_active": False,
             "production_unchanged_during_shadow": True,
             "promotion_eligible": False,
@@ -94,10 +129,13 @@ def _proof_row_for_case(
         if false_positive_count is not None and raw_count and raw_count > 0
         else (0.0 if false_positive_count == 0 and raw_count == 0 else None)
     )
-    validation_case_ids = (
-        [str(item) for item in (shadow_match.get("recovered_case_ids") or [])]
-        if proof_mode == "HOLDOUT_TRANSFER"
-        else []
+
+    _source_replay_ids, transfer_validation_ids = _cumulative_evidence_ids(shadow_match)
+    validation_case_ids = transfer_validation_ids if proof_mode == "HOLDOUT_TRANSFER" else []
+    independent_transfer_case_count = len(set(validation_case_ids))
+    repeated_transfer_proven = (
+        proof_mode == "HOLDOUT_TRANSFER"
+        and independent_transfer_case_count >= min_independent_transfer_cases
     )
 
     production_active = False
@@ -112,7 +150,16 @@ def _proof_row_for_case(
             production_active = True
             break
 
-    promotion_eligible = bool(term) and precision >= min_precision and not production_active
+    precision_passed = bool(term) and precision >= min_precision
+    if proof_mode == "HOLDOUT_TRANSFER":
+        promotion_eligible = (
+            precision_passed and repeated_transfer_proven and not production_active
+        )
+    else:
+        # Preserve the existing direct-replay proof contract. The stricter
+        # replication requirement applies only to transfer/generalization claims.
+        promotion_eligible = precision_passed and not production_active
+
     return {
         "case_id": case.case_id,
         "market_code": case.market_code,
@@ -128,6 +175,9 @@ def _proof_row_for_case(
         "shadow_false_positive_count": false_positive_count,
         "shadow_false_positive_rate": false_positive_rate,
         "shadow_validation_case_ids": validation_case_ids,
+        "independent_transfer_case_count": independent_transfer_case_count,
+        "min_independent_transfer_cases": min_independent_transfer_cases,
+        "repeated_transfer_proven": repeated_transfer_proven,
         "production_term_active": production_active,
         "production_unchanged_during_shadow": not production_active,
         "promotion_eligible": promotion_eligible,
@@ -141,10 +191,13 @@ def build_query_gap_safe_learning_proof(
     shadow_overlay: Mapping[str, Any] | None,
     active_overlay: Mapping[str, Any] | None,
     min_precision: float = 0.20,
+    min_independent_transfer_cases: int = DEFAULT_MIN_INDEPENDENT_TRANSFER_CASES,
 ) -> dict[str, Any]:
     """Build a read-only QUERY_GAP proof report from durable source misses."""
     if not 0.0 <= min_precision <= 1.0:
         raise ValueError("min_precision must be between 0 and 1")
+    if min_independent_transfer_cases < 1:
+        raise ValueError("min_independent_transfer_cases must be >= 1")
 
     query_cases: list[MissedOpportunityCase] = []
     for raw in cases:
@@ -159,11 +212,13 @@ def build_query_gap_safe_learning_proof(
             shadow_overlay,
             active_overlay,
             min_precision=min_precision,
+            min_independent_transfer_cases=min_independent_transfer_cases,
         )
         for case in query_cases
     ]
     recovered = [row for row in rows if row["shadow_recovered"]]
     transfer_proven = [row for row in rows if row["shadow_transfer_proven"]]
+    repeated_transfer = [row for row in rows if row["repeated_transfer_proven"]]
     proven = [*recovered, *transfer_proven]
     eligible = [row for row in rows if row["promotion_eligible"]]
     promoted = [row for row in rows if row["production_term_active"]]
@@ -172,6 +227,12 @@ def build_query_gap_safe_learning_proof(
         for row in proven
         if float(row.get("shadow_precision") or 0.0) < min_precision
     ]
+    pending_replication = [
+        row
+        for row in transfer_proven
+        if float(row.get("shadow_precision") or 0.0) >= min_precision
+        and not row["repeated_transfer_proven"]
+    ]
 
     if not query_cases:
         status = "NO_QUERY_GAP_CASES"
@@ -179,6 +240,8 @@ def build_query_gap_safe_learning_proof(
         status = "PROMOTED_PROOF_EXISTS"
     elif eligible:
         status = "SHADOW_PASSED"
+    elif pending_replication:
+        status = "SHADOW_TRANSFER_PENDING_REPLICATION"
     elif proven and len(noisy) == len(proven):
         status = (
             "SHADOW_TRANSFER_PROVEN_BUT_NOISY"
@@ -201,9 +264,11 @@ def build_query_gap_safe_learning_proof(
         "query_gap_case_count": len(query_cases),
         "shadow_recovered_case_count": len(recovered),
         "shadow_transfer_proven_case_count": len(transfer_proven),
+        "repeated_transfer_proven_case_count": len(repeated_transfer),
         "promotion_eligible_count": len(eligible),
         "promoted_proof_count": len(promoted),
         "min_precision": min_precision,
+        "min_independent_transfer_cases": min_independent_transfer_cases,
         "production_mutation_performed_by_report": False,
         "automatic_promotion": False,
         "cases": rows,
