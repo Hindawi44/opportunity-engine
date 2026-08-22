@@ -1,0 +1,79 @@
+name: TEMP Promoted Core Query Calibration V1
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/temp-promoted-core-query-calibration-v1.yaml"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONPATH: src:.
+
+jobs:
+  query-calibration:
+    if: ${{ github.head_ref == 'agent/one-time-promoted-core-production-live-proof-v1' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+      - name: Run one balanced-query calibration request
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from opportunity_engine.automatic_query_gap_miss_scout import (
+              _verify_closure_liquidation_page,
+              fetch_public_page,
+          )
+          from opportunity_engine.promoted_learned_core_discovery import _default_search
+
+          query = (
+              'inpage:"avviklingssalg" AND inpage:avvikler OR '
+              'inpage:"avviklingssalg" AND inpage:"legger ned" OR '
+              'inpage:"avviklingssalg" AND inpage:lagerbeholdning OR '
+              'inpage:"avviklingssalg" AND inpage:"hele lageret"'
+          )
+          search = _default_search(os.environ["BRAVE_SEARCH_API_KEY"], results_per_query=10)
+          hits = list(search(query))[:10]
+          rows = []
+          for rank, hit in enumerate(hits, 1):
+              row = {"rank": rank, "title": hit.title, "url": hit.url, "description": hit.description}
+              try:
+                  proof = _verify_closure_liquidation_page(fetch_public_page(hit.url))
+              except Exception as exc:
+                  row.update({"result": "FETCH_ERROR", "error": f"{type(exc).__name__}: {exc}"[:500]})
+              else:
+                  row["result"] = "VERIFIED" if proof else "REJECTED"
+                  if proof:
+                      row["company"] = proof.get("company")
+                      row["canonical_url"] = proof.get("canonical_url")
+                      row["closure_markers"] = proof.get("closure_markers")
+                      row["liquidation_markers"] = proof.get("liquidation_markers")
+                      row["query_gap_terms"] = proof.get("query_gap_terms")
+              rows.append(row)
+          payload = {
+              "query": query,
+              "request_count": 1,
+              "raw_hit_count": len(hits),
+              "verified_count": sum(1 for row in rows if row["result"] == "VERIFIED"),
+              "rows": rows,
+          }
+          out = Path("artifacts/query-calibration")
+          out.mkdir(parents=True, exist_ok=True)
+          (out / "calibration.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps({k: payload[k] for k in ("query", "request_count", "raw_hit_count", "verified_count")}, ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: promoted-core-query-calibration-v1
+          path: artifacts/query-calibration/calibration.json
+          if-no-files-found: error
