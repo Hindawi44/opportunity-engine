@@ -63,6 +63,16 @@ _BLOCKED_CATEGORIES = frozenset(
     }
 )
 
+# Structured NACE evidence is stronger than a company name. Keep this bounded
+# to clothing manufacture / wholesale / specialist retail codes that already
+# appear in the official market-signal stream. Do not treat generic retail or
+# liquidation codes as project-domain evidence.
+_CLOTHING_INDUSTRY_PREFIXES = (
+    "14.",
+    "46.42",
+    "47.71",
+)
+
 # Distinctive garment / fashion vocabulary across the six operated markets.
 _CLOTHING_MARKERS = (
     "apparel",
@@ -100,15 +110,19 @@ _CLOTHING_MARKERS = (
     "kleslager",
     "arbeidsklær",
     "arbeidsklaer",
+    "arbeidsjakke",
     "arbeidsjakker",
     "bekledning",
     "mote",
+    "jakke",
     "jakker",
     "bukser",
     "skjorter",
     "kjoler",
     "sko",
     "brudekjole",
+    "korsett",
+    "korsettsalong",
     "kläder",
     "klader",
     "klädlager",
@@ -126,8 +140,14 @@ _CLOTHING_MARKERS = (
     "brollopsklanning",
     "kleidung",
     "bekleidung",
+    "arbeitskleidung",
     "modeware",
     "modeartikel",
+    "modekette",
+    "mode-kette",
+    "modemarke",
+    "modehändler",
+    "modehandler",
     "schuhe",
     "schuhen",
     "jacken",
@@ -244,6 +264,30 @@ def _category(value: object) -> str:
     return "_".join(str(value or "").strip().upper().replace("-", " ").split())
 
 
+def _industry_code_values(value: object) -> tuple[str, ...]:
+    if isinstance(value, str):
+        candidates = (value,)
+    elif isinstance(value, (list, tuple, set, frozenset)):
+        candidates = tuple(value)
+    else:
+        return ()
+
+    values: list[str] = []
+    for candidate in candidates:
+        normalized = _compact(candidate).replace(" ", "")
+        if normalized:
+            values.append(normalized)
+    return tuple(values)
+
+
+def _contains_clothing_industry_code(value: object) -> bool:
+    return any(
+        code.startswith(prefix)
+        for code in _industry_code_values(value)
+        for prefix in _CLOTHING_INDUSTRY_PREFIXES
+    )
+
+
 def _contains_marker(text: str, marker: str) -> bool:
     if not text or not marker:
         return False
@@ -257,10 +301,16 @@ def _contains_any(text: str, markers: tuple[str, ...]) -> bool:
     return any(_contains_marker(text, marker) for marker in markers)
 
 
-def classify_project_domain(*, text: object = "", category: object = "") -> str:
+def classify_project_domain(
+    *,
+    text: object = "",
+    category: object = "",
+    industry_codes: object = (),
+) -> str:
     """Classify evidence into the project's allowed commercial domains.
 
-    Explicit structured categories take precedence. Free text requires a
+    Explicit structured categories take precedence. Bounded clothing-industry
+    codes are accepted as structured evidence. Free text still requires a
     distinctive clothing/fashion or fabric/textile marker. Generic commercial
     evidence alone intentionally returns OUT_OF_DOMAIN.
     """
@@ -272,6 +322,8 @@ def classify_project_domain(*, text: object = "", category: object = "") -> str:
         return FABRIC_PROCUREMENT
     if normalized_category in _BLOCKED_CATEGORIES:
         return OUT_OF_DOMAIN
+    if _contains_clothing_industry_code(industry_codes):
+        return CLOTHING_INVENTORY
 
     combined = _compact(f"{category or ''} {text or ''}")
     if _contains_any(combined, _CLOTHING_MARKERS):
@@ -283,16 +335,49 @@ def classify_project_domain(*, text: object = "", category: object = "") -> str:
     return OUT_OF_DOMAIN
 
 
-def is_project_domain(*, text: object = "", category: object = "") -> bool:
-    return classify_project_domain(text=text, category=category) in {
+def is_project_domain(
+    *,
+    text: object = "",
+    category: object = "",
+    industry_codes: object = (),
+) -> bool:
+    return classify_project_domain(
+        text=text,
+        category=category,
+        industry_codes=industry_codes,
+    ) in {
         CLOTHING_INVENTORY,
         FABRIC_PROCUREMENT,
     }
 
 
-def is_clothing_inventory(*, text: object = "", category: object = "") -> bool:
-    return classify_project_domain(text=text, category=category) == CLOTHING_INVENTORY
+def is_clothing_inventory(
+    *,
+    text: object = "",
+    category: object = "",
+    industry_codes: object = (),
+) -> bool:
+    return (
+        classify_project_domain(
+            text=text,
+            category=category,
+            industry_codes=industry_codes,
+        )
+        == CLOTHING_INVENTORY
+    )
 
 
-def is_fabric_procurement(*, text: object = "", category: object = "") -> bool:
-    return classify_project_domain(text=text, category=category) == FABRIC_PROCUREMENT
+def is_fabric_procurement(
+    *,
+    text: object = "",
+    category: object = "",
+    industry_codes: object = (),
+) -> bool:
+    return (
+        classify_project_domain(
+            text=text,
+            category=category,
+            industry_codes=industry_codes,
+        )
+        == FABRIC_PROCUREMENT
+    )

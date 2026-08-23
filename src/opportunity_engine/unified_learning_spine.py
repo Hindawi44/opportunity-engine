@@ -88,6 +88,7 @@ def _compact_json_text(value: object) -> str:
 def _river_item_domain(item: Mapping[str, Any]) -> str:
     kind = _upper(item.get("record_kind"))
     details = _mapping(item.get("details"))
+    metadata = _mapping(details.get("metadata"))
 
     if kind == "FABRIC_PROCUREMENT_ITEM":
         category = FABRIC_PROCUREMENT
@@ -118,7 +119,11 @@ def _river_item_domain(item: Mapping[str, Any]) -> str:
         )
         if part
     )
-    return classify_project_domain(text=combined, category=category)
+    return classify_project_domain(
+        text=combined,
+        category=category,
+        industry_codes=_string_list(metadata.get("nace_codes")),
+    )
 
 
 def _search_route_domain(route: Mapping[str, Any]) -> str:
