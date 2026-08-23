@@ -1,0 +1,181 @@
+name: Exact Lot Independent Replication Proof TEMP
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/exact-lot-independent-replication-proof-temp.yml"
+      - "proof/search-success-memory-seed.json"
+
+permissions:
+  contents: read
+
+jobs:
+  france-exa-independent-replication-proof:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      OUTPUT_DIR: artifacts/exact-lot-independent-replication-v1
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+
+      - name: Verify focused contracts
+        run: >-
+          pytest -q
+          tests/test_exact_lot_multihop_resolution_v1.py
+          tests/test_exact_lot_multihop_hub_root_v1.py
+          tests/test_provider_route_success_learning_v1.py
+          tests/test_project_domain_french_clothing_subject_v1.py
+
+      - name: Confirm Exa credential
+        run: test -n "$EXA_API_KEY"
+
+      - name: Exa France exact-lot live search
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_exa_brave_shadow_benchmark.py \
+            --output "$OUTPUT_DIR/benchmark.json" \
+            --markets FR \
+            --results-per-query 5 \
+            --provider-mode exa \
+            --query-mode exact_lot
+
+      - name: Verify Exa original pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
+
+          root = Path("artifacts/exact-lot-independent-replication-v1")
+          benchmark = json.loads((root / "benchmark.json").read_text(encoding="utf-8"))
+          verification = verify_provider_unique_pages(benchmark, provider="exa", max_page_fetches=5)
+          (root / "exa-verification.json").write_text(
+              json.dumps(verification, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          assert verification["status"] == "SUCCESS"
+          assert verification["shadow_only"] is True
+          assert verification["required_project_domain"] == "CLOTHING_INVENTORY"
+          assert verification["project_domain_gate_enforced"] is True
+          assert verification["commercial_specificity_gate_enforced"] is True
+          print("exa_unique_urls:", verification["provider_unique_url_count"])
+          print("exa_pages_fetched:", verification["page_fetches_succeeded"])
+          PY
+
+      - name: Resolve bounded same-origin multi-hop exact lots
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_exact_lot_multihop
+
+          root = Path("artifacts/exact-lot-independent-replication-v1")
+          verification = json.loads((root / "exa-verification.json").read_text(encoding="utf-8"))
+          report = resolve_exact_lot_multihop(
+              verification,
+              max_root_parents=3,
+              max_navigation_depth=3,
+              max_links_per_page=12,
+              max_navigation_page_fetches=18,
+          )
+          (root / "multihop.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          assert report["status"] == "SUCCESS"
+          assert report["shadow_only"] is True
+          assert report["commercial_hub_navigation_only"] is True
+          assert report["same_origin_only"] is True
+          assert report["bounded_multi_hop"] is True
+          assert report["exact_lot_acceptance_only"] is True
+          assert report["required_project_domain"] == "CLOTHING_INVENTORY"
+          for key in ("automatic_contact", "automatic_bid", "automatic_reservation", "automatic_purchase", "automatic_payment"):
+              assert report[key] is False
+          print("eligible_roots:", report["eligible_root_parent_count"])
+          print("gateway_pages:", report["gateway_page_count"])
+          print("exact_lots:", report["exact_lot_candidate_count"])
+          PY
+
+      - name: Feed independent run into Search Success Learning
+        shell: bash
+        run: |
+          python scripts/run_provider_route_success_learning.py \
+            --provider exa \
+            --benchmark "$OUTPUT_DIR/benchmark.json" \
+            --provider-verification "$OUTPUT_DIR/exa-verification.json" \
+            --multihop-resolution "$OUTPUT_DIR/multihop.json" \
+            --run-id "$GITHUB_RUN_ID" \
+            --existing-memory proof/search-success-memory-seed.json \
+            --observation-output "$OUTPUT_DIR/search-success-observation.json" \
+            --memory-output "$OUTPUT_DIR/search-success-memory.json"
+
+      - name: Assert independent route replication
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          HUB = "https://friptadium.com/pages/lot-de-vetements-revendeur"
+          root = Path("artifacts/exact-lot-independent-replication-v1")
+          multihop = json.loads((root / "multihop.json").read_text(encoding="utf-8"))
+          observation = json.loads((root / "search-success-observation.json").read_text(encoding="utf-8"))
+          memory = json.loads((root / "search-success-memory.json").read_text(encoding="utf-8"))
+
+          hub_roots = [r for r in multihop["root_results"] if r.get("root_url") == HUB]
+          hub_exact = [
+              r for r in multihop["exact_lots"]
+              if (r.get("navigation_chain") or [None])[0] == HUB
+              and "/products/" in (r.get("url") or "")
+          ]
+          route = next(
+              r for r in memory["route_learning"]
+              if r.get("provider") == "exa"
+              and r.get("market_code") == "FR"
+              and r.get("parent_domain") == "friptadium.com"
+          )
+
+          print("new_run_id:", os.environ["GITHUB_RUN_ID"])
+          print("hub_exact_lots:", len(hub_exact))
+          print("memory_run_count:", memory["run_count"])
+          print("route_independent_run_count:", route["independent_run_count"])
+          print("route_status:", route["status"])
+          print("provider_status:", memory["provider_learning"]["exa"]["status"])
+          print("replicated_route_count:", memory["replicated_route_count"])
+
+          assert os.environ["GITHUB_RUN_ID"] != "32655969884"
+          assert hub_roots
+          assert all(r.get("root_exact_lot_accepted") is False for r in hub_roots)
+          assert hub_exact
+          assert observation["provider_preference_status"] == "PROVIDER_COMPARISON_NOT_EVALUATED"
+          assert observation["automatic_provider_activation"] is False
+          assert observation["production_query_mutation"] is False
+          assert memory["run_count"] >= 2
+          assert route["independent_run_count"] >= 2
+          assert route["status"] == "REPLICATED_FOR_REVIEW"
+          assert memory["provider_learning"]["exa"]["status"] == "REPLICATED_FOR_REVIEW"
+          assert memory["replicated_route_count"] >= 1
+          assert memory["automatic_provider_activation"] is False
+          assert memory["production_query_mutation"] is False
+          PY
+
+      - name: Upload proof artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exact-lot-independent-replication-v1
+          path: artifacts/exact-lot-independent-replication-v1/
+          if-no-files-found: warn
+          retention-days: 30
