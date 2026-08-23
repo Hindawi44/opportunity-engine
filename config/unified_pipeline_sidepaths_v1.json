@@ -1,6 +1,6 @@
 {
   "schema_version": "unified-pipeline-sidepaths-inventory-1.0",
-  "generated_at": "2026-08-23T12:31:00Z",
+  "generated_at": "2026-08-23T12:45:00Z",
   "governing_pipeline": {
     "contract": "UNIFIED_SIX_MARKET_PIPELINE_V1",
     "module": "src/opportunity_engine/discovery/unified_six_market_pipeline.py",
@@ -68,9 +68,11 @@
         "src/opportunity_engine/discovery/mathematical_logic_shadow.py",
         "src/opportunity_engine/discovery/keyword_shadow_verification.py",
         "src/opportunity_engine/discovery/exa_search.py",
+        "src/opportunity_engine/discovery/exa_shadow_page_verification.py",
         "src/opportunity_engine/source_discovery_shadow.py",
         "src/opportunity_engine/source_shadow_live_validation.py",
         "scripts/run_exa_brave_shadow_benchmark.py",
+        "scripts/run_exa_stage2_page_verification.py",
         "scripts/run_keyword_shadow_verification.py",
         "scripts/run_source_shadow_live_validation.py",
         "scripts/run_stocklear_second_shadow_round.py"
