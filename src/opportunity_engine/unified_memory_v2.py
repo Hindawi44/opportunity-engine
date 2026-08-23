@@ -13,6 +13,13 @@ The layer is intentionally review-only:
 
 Fixed-rule conversion is explicit. A pattern is marked converted only when an
 ACTIVE entry exists in the optional fixed-rule registry.
+
+Pattern proof is intentionally conservative. Distinct GitHub Actions run IDs
+from the same UTC checkpoint day are not treated as independent Memory V2 proof.
+A manual rerun minutes later may re-observe evidence, but it cannot by itself
+promote a SOURCE_OUTCOME, MISS_REASON, or fallback ROUTE_SUCCESS pattern to
+PROVEN. Search Success Learning's explicit replicated/independent-run evidence
+remains authoritative for route proof.
 """
 from __future__ import annotations
 
@@ -244,6 +251,45 @@ def _checkpoint_run_ids(rows: list[Mapping[str, Any]]) -> set[str]:
     return run_ids
 
 
+def _checkpoint_day(value: object) -> str:
+    """Return a stable UTC calendar-day key from an ISO checkpoint timestamp."""
+    text = _text(value)
+    if (
+        len(text) >= 10
+        and text[4:5] == "-"
+        and text[7:8] == "-"
+        and text[:4].isdigit()
+        and text[5:7].isdigit()
+        and text[8:10].isdigit()
+    ):
+        return text[:10]
+    return ""
+
+
+def _checkpoint_day_ids(
+    rows: list[Mapping[str, Any]],
+    *,
+    run_history: list[Mapping[str, Any]],
+) -> set[str]:
+    """Map observed run IDs to independent checkpoint days.
+
+    This intentionally collapses multiple GitHub Actions runs generated on the
+    same UTC date. Existing Memory V2 state created before this guard is handled
+    without migration because its run_history already records generated_at.
+    """
+    observed_run_ids = _checkpoint_run_ids(rows)
+    generated_at_by_run = {
+        _text(history.get("run_id")): _text(history.get("generated_at"))
+        for history in run_history
+        if _text(history.get("run_id"))
+    }
+    return {
+        day
+        for run_id in observed_run_ids
+        if (day := _checkpoint_day(generated_at_by_run.get(run_id)))
+    }
+
+
 def _apply_rule_state(
     pattern: dict[str, Any],
     *,
@@ -283,6 +329,7 @@ def _route_patterns(
     evidence_rows: list[Mapping[str, Any]],
     *,
     rules: Mapping[str, Mapping[str, Any]],
+    run_history: list[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
     groups: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for row in evidence_rows:
@@ -303,6 +350,7 @@ def _route_patterns(
     patterns: list[dict[str, Any]] = []
     for pattern_key, rows in groups.items():
         checkpoint_runs = _checkpoint_run_ids(rows)
+        checkpoint_days = _checkpoint_day_ids(rows, run_history=run_history)
         supporting_runs: set[str] = set()
         queries: set[str] = set()
         urls: set[str] = set()
@@ -325,11 +373,10 @@ def _route_patterns(
             if _upper(row.get("latest_outcome")) == "REPLICATED_FOR_REVIEW":
                 replicated = True
 
-        independent_run_count = max(
-            max_independent_runs,
-            len(supporting_runs),
-            len(checkpoint_runs),
-        )
+        # Search Success Learning may already provide a stronger independent-run
+        # proof. Memory V2 trusts that explicit contract. Its own fallback proof,
+        # however, requires independent checkpoint days rather than raw run IDs.
+        independent_run_count = max(max_independent_runs, len(checkpoint_days))
         status = "PROVEN" if replicated or independent_run_count >= 2 else "CANDIDATE"
         first = rows[0]
         pattern = {
@@ -344,6 +391,8 @@ def _route_patterns(
             "source_identity": _text(first.get("source_identity")) or None,
             "distinct_evidence_count": len(rows),
             "checkpoint_run_count": len(checkpoint_runs),
+            "checkpoint_day_count": len(checkpoint_days),
+            "checkpoint_days": sorted(checkpoint_days),
             "independent_run_count": independent_run_count,
             "supporting_run_ids": sorted(supporting_runs or checkpoint_runs),
             "queries": sorted(queries),
@@ -357,6 +406,7 @@ def _failure_patterns(
     evidence_rows: list[Mapping[str, Any]],
     *,
     rules: Mapping[str, Mapping[str, Any]],
+    run_history: list[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
     groups: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for row in evidence_rows:
@@ -376,10 +426,11 @@ def _failure_patterns(
     patterns: list[dict[str, Any]] = []
     for pattern_key, rows in groups.items():
         checkpoint_runs = _checkpoint_run_ids(rows)
+        checkpoint_days = _checkpoint_day_ids(rows, run_history=run_history)
         distinct = len(rows)
-        if distinct >= 2 and len(checkpoint_runs) >= 2:
+        if distinct >= 2 and len(checkpoint_days) >= 2:
             status = "PROVEN"
-        elif distinct >= 2 or len(checkpoint_runs) >= 2:
+        elif distinct >= 2 or len(checkpoint_days) >= 2:
             status = "REPEATED"
         else:
             status = "OBSERVED"
@@ -394,6 +445,8 @@ def _failure_patterns(
             "miss_reason": _upper(first.get("latest_miss_reason")) or "UNDIAGNOSED",
             "distinct_evidence_count": distinct,
             "checkpoint_run_count": len(checkpoint_runs),
+            "checkpoint_day_count": len(checkpoint_days),
+            "checkpoint_days": sorted(checkpoint_days),
             "case_ids": sorted(
                 _text(row.get("source_identity"))
                 for row in rows
@@ -408,6 +461,7 @@ def _source_patterns(
     evidence_rows: list[Mapping[str, Any]],
     *,
     rules: Mapping[str, Mapping[str, Any]],
+    run_history: list[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
     groups: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for row in evidence_rows:
@@ -428,10 +482,11 @@ def _source_patterns(
     patterns: list[dict[str, Any]] = []
     for pattern_key, rows in groups.items():
         checkpoint_runs = _checkpoint_run_ids(rows)
+        checkpoint_days = _checkpoint_day_ids(rows, run_history=run_history)
         distinct = len(rows)
-        if distinct >= 2 and len(checkpoint_runs) >= 2:
+        if distinct >= 2 and len(checkpoint_days) >= 2:
             status = "PROVEN"
-        elif distinct >= 2 or len(checkpoint_runs) >= 2:
+        elif distinct >= 2 or len(checkpoint_days) >= 2:
             status = "REPEATED"
         else:
             status = "OBSERVED"
@@ -448,6 +503,8 @@ def _source_patterns(
             "outcome": _upper(first.get("latest_outcome")) or None,
             "distinct_evidence_count": distinct,
             "checkpoint_run_count": len(checkpoint_runs),
+            "checkpoint_day_count": len(checkpoint_days),
+            "checkpoint_days": sorted(checkpoint_days),
             "evidence_ids": sorted(_text(row.get("learning_evidence_id")) for row in rows),
         }
         patterns.append(_apply_rule_state(pattern, rules=rules))
@@ -524,6 +581,36 @@ def _memory_summary(memory: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _build_run_history(
+    prior: Mapping[str, Any],
+    spine: Mapping[str, Any],
+    *,
+    run: str,
+    current_ids: set[str],
+    new_ids: list[str],
+    reobserved_ids: list[str],
+) -> list[dict[str, Any]]:
+    run_history = [
+        dict(row)
+        for row in _rows(prior.get("run_history"))
+        if _text(row.get("run_id")) != run
+    ]
+    run_history.append(
+        {
+            "run_id": run,
+            "generated_at": _text(spine.get("generated_at")) or None,
+            "spine_status": _upper(spine.get("status")),
+            "current_evidence_count": len(current_ids),
+            "new_evidence_count": len(new_ids),
+            "reobserved_evidence_count": len(reobserved_ids),
+            "market_counts": dict(_mapping(spine.get("market_counts"))),
+            "domain_counts": dict(_mapping(spine.get("domain_counts"))),
+            "evidence_kind_counts": dict(_mapping(spine.get("evidence_kind_counts"))),
+        }
+    )
+    return run_history[-_MAX_RUN_HISTORY:]
+
+
 def build_unified_memory_v2(
     *,
     existing_memory: Mapping[str, Any] | None,
@@ -566,9 +653,20 @@ def build_unified_memory_v2(
     )
     reobserved_ids = sorted(current_ids - set(new_ids))
 
-    route_patterns = _route_patterns(evidence_rows, rules=rules)
-    failure_patterns = _failure_patterns(evidence_rows, rules=rules)
-    source_patterns = _source_patterns(evidence_rows, rules=rules)
+    # Build run history before pattern evaluation so same-day prior/current run IDs
+    # can be collapsed into one independent proof day, including existing V2 state.
+    run_history = _build_run_history(
+        prior,
+        spine,
+        run=run,
+        current_ids=current_ids,
+        new_ids=new_ids,
+        reobserved_ids=reobserved_ids,
+    )
+
+    route_patterns = _route_patterns(evidence_rows, rules=rules, run_history=run_history)
+    failure_patterns = _failure_patterns(evidence_rows, rules=rules, run_history=run_history)
+    source_patterns = _source_patterns(evidence_rows, rules=rules, run_history=run_history)
     patterns = sorted(
         [*route_patterns, *failure_patterns, *source_patterns],
         key=lambda row: (
@@ -578,26 +676,6 @@ def build_unified_memory_v2(
         ),
     )
     queries = _query_memory(evidence_rows)
-
-    run_history = [
-        dict(row)
-        for row in _rows(prior.get("run_history"))
-        if _text(row.get("run_id")) != run
-    ]
-    run_history.append(
-        {
-            "run_id": run,
-            "generated_at": _text(spine.get("generated_at")) or None,
-            "spine_status": _upper(spine.get("status")),
-            "current_evidence_count": len(current_ids),
-            "new_evidence_count": len(new_ids),
-            "reobserved_evidence_count": len(reobserved_ids),
-            "market_counts": dict(_mapping(spine.get("market_counts"))),
-            "domain_counts": dict(_mapping(spine.get("domain_counts"))),
-            "evidence_kind_counts": dict(_mapping(spine.get("evidence_kind_counts"))),
-        }
-    )
-    run_history = run_history[-_MAX_RUN_HISTORY:]
 
     failure_reason_counts = Counter(
         _upper(row.get("latest_miss_reason")) or "UNDIAGNOSED"
