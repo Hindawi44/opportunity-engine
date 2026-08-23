@@ -75,7 +75,7 @@ def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
         ground_truth_company="Example AS",
         ground_truth_url="https://example.no/stock",
         trace=DiscoveryTrace(query_generated=False),
-        learning_evidence_text="Sluttlager selges ved nedleggelse.",
+        learning_evidence_text="Sluttlager med arbeidsklær selges ved nedleggelse.",
         root_cause="QUERY_GAP",
         learning_status="DIAGNOSED",
     )
@@ -88,9 +88,7 @@ def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
         environment={"GITHUB_EVENT_NAME": "workflow_dispatch"},
     )
 
-    # The repository may also contain curated real inbox cases (for example the
-    # first Lene Interiør proof). The post-capture cycle must merge rather than
-    # erase either source of memory.
+    # Only project-domain cases may survive the post-capture learning gate.
     assert report["known_missed_opportunity_count"] >= 1
     persisted_ids = {item.case_id for item in load_missed_opportunity_memory(memory_path)}
     assert "AUTO-QUERY-GAP-1" in persisted_ids
@@ -99,6 +97,7 @@ def test_auto_learning_consumes_durable_miss_memory_without_manual_brave_cost(
     assert report["search_status"] == "SKIPPED_COST_GUARD"
     assert report["automatic_query_activation"] is False
     assert report["promotion_gate_enforced"] is True
+    assert report["project_domain_gate_enforced"] is True
     assert (output_dir / "daily-learning-cycle.json").exists()
     assert (input_root / "learning" / "shadow-keyword-overlay.json").exists()
     assert (input_root / "learning" / "active-keyword-overlay.json").exists()
