@@ -21,7 +21,6 @@ if "agents" not in sys.modules:
 from scripts.mind_forge_v2_live_evidence_runtime import _build_plan, _prompt, run_live_top3_evidence
 
 
-LIVE_CREATIVE = Path("mind-forge-live/phase1/live_creative_v2_open.py")
 LIVE_EVIDENCE = Path("scripts/mind_forge_v2_live_evidence_runtime.py")
 
 
@@ -76,8 +75,9 @@ def test_live_runtime_accepts_prior_memory_and_writes_current_fast_memory_artifa
     assert "GITHUB_RUN_ID" in source
 
 
-def test_live_creative_hook_can_load_prior_memory_path_and_pass_it_to_evidence_runtime():
-    source = LIVE_CREATIVE.read_text(encoding="utf-8")
+def test_live_runtime_can_load_prior_memory_path_without_changing_the_creative_caller():
+    source = LIVE_EVIDENCE.read_text(encoding="utf-8")
 
     assert "MIND_FORGE_PRIOR_MEMORY_PATH" in source
-    assert "prior_memory=prior_memory" in source
+    assert "_load_prior_memory" in source
+    assert "prior_memory = _load_prior_memory(prior_memory)" in source
