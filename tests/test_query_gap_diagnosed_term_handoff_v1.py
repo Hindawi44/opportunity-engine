@@ -14,18 +14,18 @@ def _query_gap_case(*, diagnosed_terms=()):
     )
 
     return MissedOpportunityCase(
-        case_id="auto-query-gap:no:bauhaus-test",
+        case_id="auto-query-gap:no:nordic-fashion-test",
         market_code="NO",
         discovered_by="AUTOMATIC_INDEPENDENT_QUERY_GAP_SCOUT",
         observed_at=datetime(2026, 8, 22, 18, 0, tzinfo=timezone.utc),
         opportunity_type="VERIFIED_STORE_CLOSURE_INVENTORY_LIQUIDATION",
         stock_proven=True,
-        ground_truth_company="BAUHAUS",
-        ground_truth_url="https://www.bauhaus.no/bauhaus-norge-informasjon",
+        ground_truth_company="Nordic Fashion",
+        ground_truth_url="https://www.nordicfashion.no/avvikling",
         trace=DiscoveryTrace(query_generated=False),
         learning_evidence_text=(
-            "BAUHAUS Norge Informasjon Opphørssalg! Klikk her for mer informasjon. "
-            "BAUHAUS avvikler virksomheten i Norge og lagerbeholdningen tømmes."
+            "Nordic Fashion opphørssalg. Klesbutikken avvikler virksomheten i Norge, "
+            "og hele lagerbeholdningen av klær, jakker og bukser tømmes."
         ),
         diagnosed_query_gap_terms=tuple(diagnosed_terms),
     ).with_diagnosis()
@@ -92,16 +92,16 @@ def test_verified_scout_case_carries_filtered_query_gap_term_to_learner() -> Non
     from opportunity_engine.discovery.search_provider import SearchHit
     from opportunity_engine.query_gap_scout_waterfall import discover_query_gap_misses
 
-    news_url = "https://www.nrk.no/nyheter/bauhaus-legger-ned-i-norge-1.17996380"
-    homepage_url = "https://www.bauhaus.no/"
-    official_url = "https://www.bauhaus.no/bauhaus-norge-informasjon"
+    news_url = "https://news.example.no/nordic-fashion-legger-ned"
+    homepage_url = "https://www.nordicfashion.no/"
+    official_url = "https://www.nordicfashion.no/avvikling"
 
     def search(query: str):
         return [
             SearchHit(
-                title="Bauhaus legger ned i Norge",
+                title="Nordic Fashion legger ned i Norge",
                 url=news_url,
-                description="Bauhaus legger ned alle butikker i Norge.",
+                description="Klesbutikken Nordic Fashion legger ned.",
                 provider="Brave Search",
             )
         ]
@@ -114,8 +114,8 @@ def test_verified_scout_case_carries_filtered_query_gap_term_to_learner() -> Non
                 status_code=200,
                 content_type="text/html; charset=utf-8",
                 html=(
-                    "<html><body><h1>Bauhaus legger ned i Norge</h1>"
-                    "<p>Bauhaus legger ned alle butikker i Norge.</p></body></html>"
+                    "<html><body><h1>Nordic Fashion legger ned i Norge</h1>"
+                    "<p>Klesbutikken Nordic Fashion legger ned alle butikker i Norge.</p></body></html>"
                 ),
             )
         if url == homepage_url:
@@ -125,8 +125,8 @@ def test_verified_scout_case_carries_filtered_query_gap_term_to_learner() -> Non
                 status_code=200,
                 content_type="text/html; charset=utf-8",
                 html=(
-                    '<html><body><a href="/bauhaus-norge-informasjon">Informasjon</a>'
-                    "<p>BAUHAUS Norge</p></body></html>"
+                    '<html><body><a href="/avvikling">Informasjon om avvikling</a>'
+                    "<p>Nordic Fashion klesbutikk</p></body></html>"
                 ),
             )
         if url == official_url:
@@ -136,9 +136,10 @@ def test_verified_scout_case_carries_filtered_query_gap_term_to_learner() -> Non
                 status_code=200,
                 content_type="text/html; charset=utf-8",
                 html=(
-                    "<html><body><h1>BAUHAUS avvikler virksomheten i Norge</h1>"
-                    "<p>Opphørssalget starter lørdag 22. august.</p>"
-                    "<p>Dette er også et avviklingssalg, og lagerbeholdningen selges ut.</p>"
+                    "<html><body><h1>Nordic Fashion avvikler virksomheten i Norge</h1>"
+                    "<p>Klesbutikken starter opphørssalg.</p>"
+                    "<p>Dette er også et avviklingssalg, og hele lagerbeholdningen av klær, "
+                    "jakker og bukser selges ut.</p>"
                     "</body></html>"
                 ),
             )
