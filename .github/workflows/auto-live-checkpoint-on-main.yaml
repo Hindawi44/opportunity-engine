@@ -1,0 +1,48 @@
+name: Auto Live Checkpoint On Main
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/auto-live-checkpoint-on-main.yaml"
+      - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+      - "config/learning/**"
+      - "scripts/build_domain_market_intelligence_feed.py"
+      - "scripts/run_daily_search_success_learning.py"
+      - "scripts/run_auksjonen_live_clothing.py"
+      - "scripts/restore_previous_checkpoint_state.py"
+      - "scripts/**/*route*.py"
+      - "src/opportunity_engine/**/*learning*.py"
+      - "src/opportunity_engine/**/*memory*.py"
+      - "src/opportunity_engine/**/*route*.py"
+      - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
+      - "src/opportunity_engine/discovery/domain_market_intelligence_feed.py"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: auto-live-checkpoint-on-main
+  cancel-in-progress: true
+
+jobs:
+  dispatch-live-checkpoint:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Multi-Market Daily Operator Checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_WORKFLOW: multi-market-daily-operator-checkpoint.yaml
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows/${TARGET_WORKFLOW}/dispatches" \
+            --data '{"ref":"main"}'
+          echo "Dispatched ${TARGET_WORKFLOW} on main."
