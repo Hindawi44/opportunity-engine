@@ -1,0 +1,191 @@
+name: Exact Lot Multi-Hop France Proof TEMP
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/exact-lot-multihop-france-proof-temp.yml"
+      - "src/opportunity_engine/project_domain_boundary.py"
+      - "src/opportunity_engine/discovery/exa_shadow_page_verification.py"
+      - "src/opportunity_engine/discovery/provider_unique_page_verification.py"
+      - "src/opportunity_engine/discovery/exact_lot_child_link_resolution.py"
+      - "src/opportunity_engine/discovery/exact_lot_multihop_resolution.py"
+      - "src/opportunity_engine/provider_route_success_learning.py"
+      - "src/opportunity_engine/search_success_learning.py"
+      - "scripts/run_exa_brave_shadow_benchmark.py"
+      - "scripts/run_provider_route_success_learning.py"
+      - "tests/test_exact_lot_multihop_resolution_v1.py"
+      - "tests/test_item_specific_url_guard_v1.py"
+      - "tests/test_provider_route_success_learning_v1.py"
+      - "tests/test_project_domain_french_clothing_subject_v1.py"
+
+permissions:
+  contents: read
+
+jobs:
+  france-exa-multihop-proof:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      OUTPUT_DIR: artifacts/exact-lot-multihop-france-v1
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+
+      - name: Verify focused contracts
+        run: >-
+          pytest -q
+          tests/test_exact_lot_multihop_resolution_v1.py
+          tests/test_item_specific_url_guard_v1.py
+          tests/test_provider_route_success_learning_v1.py
+          tests/test_project_domain_french_clothing_subject_v1.py
+
+      - name: Confirm Exa credential
+        shell: bash
+        run: |
+          test -n "$EXA_API_KEY" || { echo "EXA_API_KEY is required" >&2; exit 1; }
+          echo "EXA_API_KEY present and masked."
+
+      - name: Exa France exact-lot search only
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_exa_brave_shadow_benchmark.py \
+            --output "$OUTPUT_DIR/benchmark.json" \
+            --markets FR \
+            --results-per-query 5 \
+            --provider-mode exa \
+            --query-mode exact_lot
+
+      - name: Verify Exa original pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
+
+          root = Path("artifacts/exact-lot-multihop-france-v1")
+          benchmark = json.loads((root / "benchmark.json").read_text(encoding="utf-8"))
+          verification = verify_provider_unique_pages(
+              benchmark,
+              provider="exa",
+              max_page_fetches=5,
+          )
+          (root / "exa-verification.json").write_text(
+              json.dumps(verification, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          assert verification["status"] == "SUCCESS"
+          assert verification["shadow_only"] is True
+          assert verification["required_project_domain"] == "CLOTHING_INVENTORY"
+          assert verification["project_domain_gate_enforced"] is True
+          assert verification["commercial_specificity_gate_enforced"] is True
+          print("exa_unique_urls:", verification["provider_unique_url_count"])
+          print("exa_pages_fetched:", verification["page_fetches_succeeded"])
+          for row in verification["verified_pages"]:
+              print(row.get("classification"), row.get("final_url"), row.get("tool_learning_useful"))
+          PY
+
+      - name: Resolve bounded same-origin multi-hop exact lots
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_exact_lot_multihop
+
+          root = Path("artifacts/exact-lot-multihop-france-v1")
+          verification = json.loads((root / "exa-verification.json").read_text(encoding="utf-8"))
+          report = resolve_exact_lot_multihop(
+              verification,
+              max_root_parents=3,
+              max_navigation_depth=3,
+              max_links_per_page=12,
+              max_navigation_page_fetches=18,
+          )
+          (root / "multihop.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          assert report["status"] == "SUCCESS"
+          assert report["shadow_only"] is True
+          assert report["same_origin_only"] is True
+          assert report["bounded_multi_hop"] is True
+          assert report["exact_lot_acceptance_only"] is True
+          assert report["required_project_domain"] == "CLOTHING_INVENTORY"
+          for key in ("automatic_contact", "automatic_bid", "automatic_reservation", "automatic_purchase", "automatic_payment"):
+              assert report[key] is False
+          print("eligible_roots:", report["eligible_root_parent_count"])
+          print("gateway_pages:", report["gateway_page_count"])
+          print("exact_lots:", report["exact_lot_candidate_count"])
+          for row in report["gateway_pages"]:
+              print("GATEWAY", row.get("navigation_depth"), row.get("url"))
+          for row in report["exact_lots"]:
+              print("EXACT", row.get("navigation_depth"), row.get("url"), row.get("navigation_chain"))
+          PY
+
+      - name: Feed Exa-only route into Search Success Learning
+        shell: bash
+        run: |
+          python scripts/run_provider_route_success_learning.py \
+            --provider exa \
+            --benchmark "$OUTPUT_DIR/benchmark.json" \
+            --provider-verification "$OUTPUT_DIR/exa-verification.json" \
+            --multihop-resolution "$OUTPUT_DIR/multihop.json" \
+            --run-id "$GITHUB_RUN_ID" \
+            --observation-output "$OUTPUT_DIR/search-success-observation.json" \
+            --memory-output "$OUTPUT_DIR/search-success-memory.json"
+
+      - name: Print Friptadium proof and enforce interpretation guards
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from urllib.parse import urlsplit
+
+          root = Path("artifacts/exact-lot-multihop-france-v1")
+          benchmark = json.loads((root / "benchmark.json").read_text(encoding="utf-8"))
+          multihop = json.loads((root / "multihop.json").read_text(encoding="utf-8"))
+          observation = json.loads((root / "search-success-observation.json").read_text(encoding="utf-8"))
+          memory = json.loads((root / "search-success-memory.json").read_text(encoding="utf-8"))
+
+          exa_results = benchmark["market_results"][0]["exa"]["results"]
+          friptadium_search = [r for r in exa_results if "friptadium.com" in (r.get("domain") or "")]
+          friptadium_gateways = [r for r in multihop["gateway_pages"] if "friptadium.com" in (urlsplit(r.get("url") or "").hostname or "")]
+          friptadium_exact = [r for r in multihop["exact_lots"] if "friptadium.com" in (urlsplit(r.get("url") or "").hostname or "")]
+
+          print("friptadium_search_hits:", len(friptadium_search))
+          print("friptadium_gateways:", len(friptadium_gateways))
+          print("friptadium_exact_lots:", len(friptadium_exact))
+          for row in friptadium_search:
+              print("SEARCH", row.get("url"))
+          for row in friptadium_gateways:
+              print("GATEWAY", row.get("url"))
+          for row in friptadium_exact:
+              print("EXACT", row.get("url"), row.get("navigation_chain"))
+
+          assert observation["observed_provider_leader"] == "NOT_EVALUATED"
+          assert observation["provider_preference_status"] == "PROVIDER_COMPARISON_NOT_EVALUATED"
+          assert observation["automatic_provider_activation"] is False
+          assert observation["production_query_mutation"] is False
+          assert memory["automatic_provider_activation"] is False
+          assert memory["production_query_mutation"] is False
+          PY
+
+      - name: Upload France proof artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exact-lot-multihop-france-v1
+          path: artifacts/exact-lot-multihop-france-v1/
+          if-no-files-found: warn
+          retention-days: 30
