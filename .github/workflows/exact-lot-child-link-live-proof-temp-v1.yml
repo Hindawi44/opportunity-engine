@@ -1,0 +1,201 @@
+name: Exact Lot Child Link Resolution Live Proof TEMP V1
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/exact-lot-child-link-live-proof-temp-v1.yml"
+      - "src/opportunity_engine/discovery/exact_lot_child_link_resolution.py"
+      - "tests/test_exact_lot_child_link_resolution_v1.py"
+      - "tests/test_item_specific_url_guard_v1.py"
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-child-link-live-proof:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/exact-lot-child-link-live-proof-v1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+
+      - name: Verify child-link and subject-domain guards
+        run: pytest tests/test_exact_lot_child_link_resolution_v1.py tests/test_item_specific_url_guard_v1.py -q
+
+      - name: Confirm bounded search credentials
+        shell: bash
+        run: |
+          test -n "$EXA_API_KEY" || { echo "EXA_API_KEY is required" >&2; exit 1; }
+          test -n "$BRAVE_SEARCH_API_KEY" || { echo "BRAVE_SEARCH_API_KEY is required" >&2; exit 1; }
+
+      - name: Run current exact-lot benchmark
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_exa_brave_shadow_benchmark.py \
+            --output "$OUTPUT_DIR/benchmark.json" \
+            --markets "NO,SE,DE,FR,IT,NL" \
+            --results-per-query 3 \
+            --provider-mode both \
+            --query-mode exact_lot
+
+      - name: Verify provider-unique original pages
+        shell: bash
+        run: |
+          python scripts/run_exa_brave_tool_learning.py \
+            --benchmark "$OUTPUT_DIR/benchmark.json" \
+            --output "$OUTPUT_DIR/tool-learning.json" \
+            --max-page-fetches-per-provider 18 \
+            --min-successful-pages-per-provider 5
+
+      - name: Resolve child links from search-discovered aggregate parents
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from opportunity_engine.discovery.exact_lot_child_link_resolution import resolve_exact_lot_child_links
+
+          root = Path("artifacts/exact-lot-child-link-live-proof-v1")
+          proof = json.loads((root / "tool-learning.json").read_text(encoding="utf-8"))
+          exa = resolve_exact_lot_child_links(
+              proof["exa_verification"],
+              max_parent_fetches=6,
+              max_child_links_per_parent=12,
+              max_child_page_fetches=24,
+          )
+          brave = resolve_exact_lot_child_links(
+              proof["brave_verification"],
+              max_parent_fetches=6,
+              max_child_links_per_parent=12,
+              max_child_page_fetches=24,
+          )
+          payload = {
+              "schema_version": "exact-lot-child-link-live-proof-1.1",
+              "status": "SUCCESS",
+              "shadow_only": True,
+              "exa": exa,
+              "brave": brave,
+              "exact_lot_candidate_count": exa["exact_lot_candidate_count"] + brave["exact_lot_candidate_count"],
+              "production_mutation": False,
+              "automatic_contact": False,
+              "automatic_purchase": False,
+          }
+          (root / "child-resolution-search-driven.json").write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("exa eligible parents:", exa["eligible_parent_count"])
+          print("exa exact lots:", exa["exact_lot_candidate_count"])
+          print("brave eligible parents:", brave["eligible_parent_count"])
+          print("brave exact lots:", brave["exact_lot_candidate_count"])
+          for provider, report in (("exa", exa), ("brave", brave)):
+              for row in report["exact_lots"]:
+                  print("SEARCH_DRIVEN_EXACT", provider, row["url"])
+          PY
+
+      - name: Prove strict child navigation on SDPIE aggregate parent
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from opportunity_engine.discovery.exact_lot_child_link_resolution import (
+              _classify_child_page,
+              _extract_candidate_child_links,
+              fetch_public_html,
+          )
+          from opportunity_engine.discovery.exa_shadow_page_verification import EXACT_LOT_CANDIDATE, fetch_public_page
+          from opportunity_engine.project_domain_boundary import OUT_OF_DOMAIN
+
+          root = Path("artifacts/exact-lot-child-link-live-proof-v1")
+          parent = "https://www.sdpie.com/lots-en-vente/"
+          fetched_parent = fetch_public_html(parent)
+          assert fetched_parent.ok, fetched_parent.error
+          links = _extract_candidate_child_links(parent_url=fetched_parent.final_url, html_text=fetched_parent.html)
+          assert parent not in links
+          assert links
+
+          rows = []
+          for url in links[:12]:
+              fetched = fetch_public_page(url)
+              if not fetched.ok:
+                  rows.append({"url": url, "fetch_ok": False, "error": fetched.error})
+                  continue
+              classification, evidence = _classify_child_page(
+                  title=fetched.title,
+                  text=fetched.text,
+                  url=fetched.final_url or url,
+              )
+              rows.append({
+                  "url": url,
+                  "fetch_ok": True,
+                  "classification": classification,
+                  "evidence": evidence,
+              })
+
+          exact = [row for row in rows if row.get("classification") == EXACT_LOT_CANDIDATE]
+          non_clothing = [
+              row for row in rows
+              if any(token in row.get("url", "") for token in ("peinture", "savon", "miroirs", "chevilles"))
+          ]
+          assert non_clothing
+          assert all(row.get("classification") == OUT_OF_DOMAIN for row in non_clothing if row.get("fetch_ok"))
+          payload = {
+              "parent_url": parent,
+              "candidate_child_url_count": len(links),
+              "checked_child_count": len(rows),
+              "exact_lot_candidate_count": len(exact),
+              "exact_lots": exact,
+              "rows": rows,
+          }
+          (root / "sdpie-targeted-child-proof.json").write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("candidate child links:", len(links))
+          print("exact lots:", len(exact))
+          for row in exact:
+              print("TARGETED_EXACT:", row["url"])
+          assert exact, "SDPIE child navigation found no strict exact-lot child page"
+          PY
+
+      - name: Assert read-only safety
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("artifacts/exact-lot-child-link-live-proof-v1")
+          payload = json.loads((root / "child-resolution-search-driven.json").read_text(encoding="utf-8"))
+          assert payload["shadow_only"] is True
+          assert payload["production_mutation"] is False
+          assert payload["automatic_contact"] is False
+          assert payload["automatic_purchase"] is False
+          for provider in ("exa", "brave"):
+              report = payload[provider]
+              assert report["same_origin_child_links_only"] is True
+              assert report["descendant_path_child_links_only"] is True
+              assert report["exact_lot_acceptance_only"] is True
+              assert report["child_subject_domain_gate_enforced"] is True
+              assert report["production_mutation"] is False
+          PY
+
+      - name: Upload child-link live proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exact-lot-child-link-live-proof-v1
+          path: artifacts/exact-lot-child-link-live-proof-v1/*.json
+          if-no-files-found: warn
+          retention-days: 30
