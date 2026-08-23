@@ -8,13 +8,13 @@ from typing import Any
 from scripts.mind_forge_v2_pattern_application import reconcile_pattern_applications
 
 
-def _shadow_hints(prior_memory: dict[str, Any] | None) -> list[dict[str, str]]:
+def _shadow_hints(prior_memory: dict[str, Any] | None) -> list[dict[str, Any]]:
     if not prior_memory:
         return []
     if prior_memory.get("auto_apply_to_production") is True:
         raise ValueError("adaptive memory may not auto-apply to production")
 
-    hints: list[dict[str, str]] = []
+    hints: list[dict[str, Any]] = []
     for row in prior_memory.get("next_cycle_search_adjustments", []) or []:
         if str(row.get("mode")) != "SHADOW_HINT":
             continue
@@ -30,6 +30,7 @@ def _shadow_hints(prior_memory: dict[str, Any] | None) -> list[dict[str, str]]:
             "search_question": question,
             "required_evidence": evidence,
             "origin_memory_id": str(row.get("origin_memory_id") or "").strip(),
+            "mode": "SHADOW_HINT",
         })
     return hints
 
@@ -66,6 +67,25 @@ def _approved_policies(prior_memory: dict[str, Any] | None) -> list[dict[str, An
     return policies
 
 
+def _approved_runtime_hints(policies: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Encode approved policies through the existing bounded evidence-prompt channel."""
+    rows: list[dict[str, Any]] = []
+    for policy in policies:
+        rows.append({
+            "action": f"APPROVED CROSS-RUN POLICY — {policy['action']}",
+            "search_question": (
+                "Human-approved search guidance only. It is not evidence, cannot alter the candidate set, "
+                "cannot change the search budget, cannot auto-reject an idea, and cannot make the final decision. "
+                + str(policy["search_question"])
+            ),
+            "required_evidence": str(policy["required_evidence"]),
+            "origin_memory_id": str(policy["origin_memory_id"]),
+            "application_id": str(policy["application_id"]),
+            "mode": "APPROVED_POLICY_HINT",
+        })
+    return rows
+
+
 def build_top3_research_plan(
     reasoning: dict[str, Any],
     prior_memory: dict[str, Any] | None = None,
@@ -81,6 +101,7 @@ def build_top3_research_plan(
         row for row in _shadow_hints(prior_memory)
         if str(row.get("origin_memory_id") or "") not in approved_origins
     ]
+    runtime_guidance = hints + _approved_runtime_hints(approved)
 
     requests: list[dict[str, Any]] = []
     for rank, idea_id in enumerate(selected, start=1):
@@ -108,7 +129,7 @@ def build_top3_research_plan(
             "acceptable_source_types": ["official", "public_data", "primary", "academic", "industry", "company"],
             "max_search_operations": 1,
             "max_results": 3,
-            "shadow_search_hints": hints,
+            "shadow_search_hints": runtime_guidance,
             "approved_search_policies": approved,
         })
 
@@ -131,6 +152,7 @@ def build_top3_research_plan(
         "adaptive_memory_mode": adaptive_mode,
         "adaptive_hint_count": len(hints),
         "approved_policy_count": len(approved),
+        "runtime_guidance_count": len(runtime_guidance),
         "may_auto_reject_ideas_from_memory": False,
         "requests": requests,
     }
@@ -154,6 +176,7 @@ def main() -> None:
         "adaptive_memory_mode": result["adaptive_memory_mode"],
         "adaptive_hint_count": result["adaptive_hint_count"],
         "approved_policy_count": result["approved_policy_count"],
+        "runtime_guidance_count": result["runtime_guidance_count"],
     }, ensure_ascii=False))
 
 
