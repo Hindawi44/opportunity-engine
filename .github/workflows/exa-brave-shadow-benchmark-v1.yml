@@ -81,10 +81,10 @@ jobs:
             echo "markets=${{ inputs.markets }}" >> "$GITHUB_OUTPUT"
             echo "results=${{ inputs.results_per_query }}" >> "$GITHUB_OUTPUT"
           else
-            # Pull requests prove only one live Exa request. Full comparison is opt-in.
-            echo "mode=exa" >> "$GITHUB_OUTPUT"
-            echo "markets=NO" >> "$GITHUB_OUTPUT"
-            echo "results=1" >> "$GITHUB_OUTPUT"
+            # One bounded six-market A/B proof on this implementation PR.
+            echo "mode=both" >> "$GITHUB_OUTPUT"
+            echo "markets=NO,SE,DE,FR,IT,NL" >> "$GITHUB_OUTPUT"
+            echo "results=3" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run bounded shadow search proof
