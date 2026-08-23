@@ -29,7 +29,7 @@ def _overlay(tmp_path):
         recovered_case_ids=(
             "HOLDOUT-NO-SENZE-OF-JOY",
             "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER",
-            "HOLDOUT-NO-GAULA-NATURSENTER",
+            "HOLDOUT-NO-CLOTHING-THREE",
         ),
         raw_hit_count=9,
         verified_relevant_count=3,
@@ -37,7 +37,7 @@ def _overlay(tmp_path):
         min_recovered_cases=1,
         min_precision=0.20,
         automatic_activation=False,
-        support_case_ids=("AUTO-MISS-NO-BAUHAUS",),
+        support_case_ids=("AUTO-MISS-NO-CLOTHING-LIQUIDATION",),
         evaluation_scope="HOLDOUT_TRANSFER",
     )
     shadow = build_learned_query_overlay([evaluation])
@@ -51,6 +51,7 @@ def _page(url: str) -> PublicPage:
     html = """
     <html><body>
       <div>Stengt BEDRIFTSDETALJER BEDRIFTSDETALJER Senna Mode drives av Senna Mode B.V.</div>
+      <div>Klesbutikken selger klær, jakker og bukser.</div>
       <div>Avviklingssalg</div>
       <div>Vi må dessverre stenge butikken vår og selge ut vårt siste varelager.</div>
     </body></html>
@@ -86,7 +87,7 @@ def test_promoted_core_collapses_same_company_same_liquidation_across_product_pa
             SearchHit(
                 title=f"Product {index} – Senna Mode",
                 url=url,
-                description="Avviklingssalg – stenge butikken",
+                description="Klesbutikk avviklingssalg – stenge butikken",
                 provider="Brave Search",
             )
             for index, url in enumerate(urls, start=1)
@@ -129,15 +130,15 @@ def test_promoted_core_keeps_independent_companies_separate(tmp_path):
     overlay = _overlay(tmp_path)
     hits = [
         SearchHit(
-            title="Senna Mode sale",
+            title="Senna Mode clothing sale",
             url="https://www.sennamode.com/products/alpha",
-            description="Avviklingssalg – stenge butikken",
+            description="Klesbutikk avviklingssalg – stenge butikken",
             provider="Brave Search",
         ),
         SearchHit(
-            title="Nord Stil sale",
+            title="Nord Stil clothing sale",
             url="https://www.nordstil.no/products/alpha",
-            description="Avviklingssalg – stenge butikken",
+            description="Klesbutikk avviklingssalg – stenge butikken",
             provider="Brave Search",
         ),
     ]
@@ -147,6 +148,7 @@ def test_promoted_core_keeps_independent_companies_separate(tmp_path):
         html = f"""
         <html><body>
           <div>BEDRIFTSDETALJER {company} drives av {company} AS.</div>
+          <div>Klesbutikken selger klær, jakker og bukser.</div>
           <div>Avviklingssalg</div>
           <div>Vi må dessverre stenge butikken vår og selge ut vårt siste varelager.</div>
         </body></html>
