@@ -117,3 +117,23 @@ def test_info_page_outside_commercial_hub_role_cannot_be_navigation_root() -> No
     assert report["eligible_root_parent_count"] == 0
     assert report["root_results"] == []
     assert report["exact_lot_candidate_count"] == 0
+
+
+def test_commercial_hub_with_out_of_domain_verified_evidence_fails_closed() -> None:
+    verification = _hub_verification()
+    verification["verified_pages"][0]["evidence"]["project_domain"] = "OUT_OF_DOMAIN"
+
+    report = resolve_exact_lot_multihop(
+        verification,
+        aggregate_fetcher=_aggregate_fetcher,
+        page_fetcher=_page_fetcher,
+        max_root_parents=1,
+        max_navigation_depth=2,
+        max_links_per_page=8,
+        max_navigation_page_fetches=8,
+    )
+
+    assert report["status"] == "SUCCESS"
+    assert report["eligible_root_parent_count"] == 0
+    assert report["root_results"] == []
+    assert report["exact_lot_candidate_count"] == 0
