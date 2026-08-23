@@ -4,6 +4,11 @@ Search results are observations, not opportunities. This stage fetches only URLs
 returned by Exa that were not returned by Brave for the same market/query and
 classifies the original page conservatively. It cannot activate Exa in
 production or perform any commercial action.
+
+Commercial-looking pages are not allowed to become exact-lot or active-stock
+candidates unless the original page also proves the canonical
+CLOTHING_INVENTORY domain. Fabric/textile procurement remains a separate bounded
+lane, and unrelated goods fail closed as OUT_OF_DOMAIN.
 """
 from __future__ import annotations
 
@@ -17,8 +22,13 @@ from opportunity_engine.discovery.keyword_shadow_verification import (
     PageFetchResult,
     fetch_public_page,
 )
+from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    OUT_OF_DOMAIN,
+    classify_project_domain,
+)
 
-SCHEMA_VERSION = "exa-shadow-page-verification-1.0"
+SCHEMA_VERSION = "exa-shadow-page-verification-1.1"
 LAB_FAMILY = "EXA_SHADOW_PAGE_VERIFICATION_V1"
 SUPPORTED_MARKETS = frozenset({"NO", "SE", "DE", "FR", "IT", "NL"})
 MAX_ALLOWED_PAGE_FETCHES = 30
@@ -202,8 +212,9 @@ def _looks_item_specific_url(url: str) -> bool:
     return bool(_ITEM_PATH_RE.search(path))
 
 
-def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[str, bool]]:
-    combined = f"{_compact(title)} {_compact(text)}".casefold()
+def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[str, Any]]:
+    combined_raw = f"{_compact(title)} {_compact(text)}"
+    combined = combined_raw.casefold()
     has_inventory = _contains_any(combined, _INVENTORY_MARKERS)
     has_direct_sale = _contains_any(combined, _DIRECT_SALE_MARKERS)
     has_buyer_source = _contains_any(combined, _BUYER_OR_SOURCE_MARKERS)
@@ -211,8 +222,10 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
     has_price = bool(_PRICE_RE.search(combined))
     has_quantity = bool(_QUANTITY_RE.search(combined))
     item_specific_url = _looks_item_specific_url(url)
+    project_domain = classify_project_domain(text=combined_raw)
+    domain_evidence = project_domain == CLOTHING_INVENTORY
 
-    evidence = {
+    evidence: dict[str, Any] = {
         "inventory_evidence": has_inventory,
         "direct_sale_evidence": has_direct_sale,
         "buyer_or_source_evidence": has_buyer_source,
@@ -220,24 +233,33 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
         "price_evidence": has_price,
         "quantity_evidence": has_quantity,
         "item_specific_url_evidence": item_specific_url,
+        "project_domain": project_domain,
+        "domain_evidence": domain_evidence,
+        "required_project_domain": CLOTHING_INVENTORY,
     }
 
-    if (
+    exact_shape = (
         has_inventory
         and has_direct_sale
         and has_quantity
         and has_price
         and item_specific_url
         and not has_info_legal
-    ):
+    )
+    active_shape = has_inventory and has_direct_sale and not has_info_legal and not has_buyer_source
+
+    # Commercial-looking stock pages must prove the clothing domain before they
+    # may become exact-lot or active-stock candidates. This is the boundary that
+    # blocks generic merchandise such as granite, appliances or building stock.
+    if (exact_shape or active_shape) and not domain_evidence:
+        return OUT_OF_DOMAIN, evidence
+    if exact_shape:
         return EXACT_LOT_CANDIDATE, evidence
-    if has_inventory and has_direct_sale and not has_info_legal and not has_buyer_source:
+    if active_shape:
         return ACTIVE_STOCK_SIGNAL, evidence
     if has_inventory and has_buyer_source and not has_direct_sale:
         return SOURCE_INTELLIGENCE_ONLY, evidence
-    if has_info_legal and not (
-        has_inventory and has_direct_sale and has_quantity and has_price and item_specific_url
-    ):
+    if has_info_legal and not exact_shape:
         return INFO_OR_LEGAL_ONLY, evidence
     if has_inventory and has_buyer_source:
         return SOURCE_INTELLIGENCE_ONLY, evidence
@@ -250,6 +272,8 @@ def _base_payload(*, max_page_fetches: int) -> dict[str, Any]:
         "lab_family": LAB_FAMILY,
         "shadow_only": True,
         "max_page_fetches": max_page_fetches,
+        "project_domain_gate_enforced": True,
+        "required_project_domain": CLOTHING_INVENTORY,
         "production_provider_activation": False,
         "promotion_to_live_engine_enabled": False,
         "automatic_contact": False,
@@ -258,7 +282,7 @@ def _base_payload(*, max_page_fetches: int) -> dict[str, Any]:
         "automatic_purchase": False,
         "automatic_payment": False,
         "interpretation_guard": (
-            "Verified pages remain shadow evidence. EXACT_LOT_CANDIDATE is not a commercial decision."
+            "Verified pages remain shadow evidence. Exact-lot status additionally requires direct clothing-domain proof and is not a commercial decision."
         ),
     }
 
@@ -391,6 +415,7 @@ def verify_exa_unique_pages(
                 "exa_unique_url_count": len(market_items),
                 "exact_lot_candidate_count": market_counts[EXACT_LOT_CANDIDATE],
                 "active_stock_signal_count": market_counts[ACTIVE_STOCK_SIGNAL],
+                "out_of_domain_count": market_counts[OUT_OF_DOMAIN],
                 "source_intelligence_only_count": market_counts[SOURCE_INTELLIGENCE_ONLY],
                 "info_or_legal_only_count": market_counts[INFO_OR_LEGAL_ONLY],
                 "unproven_page_count": market_counts[UNPROVEN_PAGE],
@@ -409,6 +434,7 @@ def verify_exa_unique_pages(
         "budget_exhausted_count": budget_exhausted,
         "exact_lot_candidate_count": counts[EXACT_LOT_CANDIDATE],
         "active_stock_signal_count": counts[ACTIVE_STOCK_SIGNAL],
+        "out_of_domain_count": counts[OUT_OF_DOMAIN],
         "source_intelligence_only_count": counts[SOURCE_INTELLIGENCE_ONLY],
         "info_or_legal_only_count": counts[INFO_OR_LEGAL_ONLY],
         "unproven_page_count": counts[UNPROVEN_PAGE],

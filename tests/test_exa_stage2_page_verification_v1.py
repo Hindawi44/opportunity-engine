@@ -3,6 +3,7 @@ from __future__ import annotations
 from opportunity_engine.discovery.exa_shadow_page_verification import (
     EXACT_LOT_CANDIDATE,
     INFO_OR_LEGAL_ONLY,
+    OUT_OF_DOMAIN,
     SOURCE_INTELLIGENCE_ONLY,
     ACTIVE_STOCK_SIGNAL,
     verify_exa_unique_pages,
@@ -150,10 +151,11 @@ def test_stage2_verifies_only_exa_unique_urls_and_classifies_page_role() -> None
     assert by_url["https://buyer.no/restlager"]["classification"] == SOURCE_INTELLIGENCE_ONLY
     assert by_url["https://example.de/restposten"]["classification"] == ACTIVE_STOCK_SIGNAL
     assert by_url["https://legal.fr/regles"]["classification"] == INFO_OR_LEGAL_ONLY
-    assert by_url["https://market.nl/voorraad"]["classification"] == ACTIVE_STOCK_SIGNAL
+    assert by_url["https://market.nl/voorraad"]["classification"] == OUT_OF_DOMAIN
 
     assert report["exact_lot_candidate_count"] == 1
-    assert report["active_stock_signal_count"] == 2
+    assert report["active_stock_signal_count"] == 1
+    assert report["out_of_domain_count"] == 1
     assert report["source_intelligence_only_count"] == 1
     assert report["info_or_legal_only_count"] == 1
 

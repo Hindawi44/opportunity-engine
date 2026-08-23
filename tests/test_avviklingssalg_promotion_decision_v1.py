@@ -29,19 +29,19 @@ def _transfer_shadow(*case_ids: str):
         min_recovered_cases=1,
         min_precision=0.20,
         automatic_activation=False,
-        support_case_ids=("AUTO-MISS-NO-BAUHAUS",),
+        support_case_ids=("SUPPORT-NO-CLOTHING-LIQUIDATION",),
         evaluation_scope="HOLDOUT_TRANSFER",
     )
     return build_learned_query_overlay([evaluation])
 
 
-def test_repository_config_explicitly_promotes_only_avviklingssalg_for_no() -> None:
+def test_repository_config_disables_avviklingssalg_pending_clothing_only_reproof() -> None:
     decisions = load_query_promotion_decisions(PROMOTION_CONFIG)
 
-    assert decisions == {("NO", TERM): "PROMOTED"}
+    assert decisions == {("NO", TERM): "DISABLED"}
 
 
-def test_repository_promotion_decision_cannot_bypass_single_holdout_gate() -> None:
+def test_repository_disabled_decision_cannot_bypass_single_holdout_gate() -> None:
     decisions = load_query_promotion_decisions(PROMOTION_CONFIG)
     active = select_promoted_query_overlay(
         _transfer_shadow("HOLDOUT-NO-SENZE-OF-JOY"),
@@ -52,7 +52,7 @@ def test_repository_promotion_decision_cannot_bypass_single_holdout_gate() -> No
     assert active["active_term_count"] == 0
 
 
-def test_repository_promotion_decision_activates_after_repeated_transfer_proof() -> None:
+def test_repository_disabled_decision_stays_closed_even_with_old_repeated_transfer_proof() -> None:
     decisions = load_query_promotion_decisions(PROMOTION_CONFIG)
     active = select_promoted_query_overlay(
         _transfer_shadow(
@@ -63,9 +63,6 @@ def test_repository_promotion_decision_activates_after_repeated_transfer_proof()
         decisions,
     )
 
-    assert set(learned_terms_for_market(active, "NO")) == {TERM}
-    row = active["markets"]["NO"][0]
-    assert row["promotion_status"] == "PROMOTED"
-    assert row["activation_source"] == "EXPLICIT_PROMOTION"
-    assert row["independent_transfer_case_count"] == 3
+    assert learned_terms_for_market(active, "NO") == {}
+    assert active["active_term_count"] == 0
     assert active["automatic_query_activation"] is False

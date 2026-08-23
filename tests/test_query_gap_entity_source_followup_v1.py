@@ -3,24 +3,24 @@ from __future__ import annotations
 from opportunity_engine.discovery.search_provider import SearchHit
 
 
-NEWS_URL = "https://www.nrk.no/nyheter/bauhaus-legger-ned-i-norge-1.17996380"
-HOME_URL = "https://www.bauhaus.no/"
-OFFICIAL_URL = "https://www.bauhaus.no/pressemelding-bauhaus-legger-ned-i-norge"
+NEWS_URL = "https://news.example.no/nordic-fashion-legger-ned"
+HOME_URL = "https://www.nordicfashion.no/"
+OFFICIAL_URL = "https://www.nordicfashion.no/pressemelding-avvikling"
 
 NEWS_HTML = """
 <html><body>
-<h1>Bauhaus legger ned i Norge</h1>
-<p>Bauhaus legger ned alle butikker i Norge.</p>
-<p>223 ansatte blir berørt av nedleggelsen.</p>
+<h1>Nordic Fashion legger ned i Norge</h1>
+<p>Klesbutikken Nordic Fashion legger ned alle butikker i Norge.</p>
+<p>Ansatte blir berørt av nedleggelsen.</p>
 </body></html>
 """
 
 OFFICIAL_HTML = """
 <html><body>
-<h1>BAUHAUS legger ned sin virksomhet i Norge</h1>
-<p>BAUHAUS legger ned virksomheten i Norge.</p>
+<h1>Nordic Fashion legger ned sin virksomhet i Norge</h1>
+<p>Klesbutikken Nordic Fashion legger ned virksomheten i Norge.</p>
 <p>Fra 22. august starter opphørssalg.</p>
-<p>Alle varer skal ut, og hele lageret selges ut.</p>
+<p>Alle klær, jakker og bukser skal ut, og hele lagerbeholdningen selges ut.</p>
 </body></html>
 """
 
@@ -65,24 +65,22 @@ def test_entity_source_followup_uses_company_without_leaking_learning_term() -> 
             return [
                 _hit(
                     NEWS_URL,
-                    "Bauhaus legger ned i Norge",
-                    "Bauhaus legger ned alle butikker i Norge.",
+                    "Nordic Fashion legger ned i Norge",
+                    "Klesbutikken Nordic Fashion legger ned alle butikker i Norge.",
                 )
             ]
-        assert query == build_entity_source_followup_query("Bauhaus")
+        assert query == build_entity_source_followup_query("Nordic Fashion")
         return [
             _hit(
                 OFFICIAL_URL,
-                "BAUHAUS legger ned sin virksomhet i Norge",
-                "Informasjon fra BAUHAUS Norge.",
+                "Nordic Fashion legger ned sin virksomhet i Norge",
+                "Informasjon fra Nordic Fashion.",
             )
         ]
 
     def fetch_page(url: str):
         if url == NEWS_URL:
             return _page(url, NEWS_HTML)
-        # This fixture intentionally makes the direct homepage probe fail,
-        # proving the bounded Brave fallback still works afterward.
         if url == HOME_URL:
             raise OSError("probe unavailable")
         if url == OFFICIAL_URL:
@@ -98,7 +96,7 @@ def test_entity_source_followup_uses_company_without_leaking_learning_term() -> 
     )
 
     assert calls[0] == SCOUT_QUERIES_NO[0]
-    assert calls[1] == build_entity_source_followup_query("Bauhaus")
+    assert calls[1] == build_entity_source_followup_query("Nordic Fashion")
     forbidden = {
         "sluttsalg",
         "avslutningssalg",
@@ -116,12 +114,12 @@ def test_entity_source_followup_uses_company_without_leaking_learning_term() -> 
     assert outcome["detected_miss_count"] == 1
     assert outcome["waterfall_stopped_reason"] == "FIRST_VERIFIED_MISS"
     assert outcome["entity_source_followup_used"] is True
-    assert outcome["entity_source_followup_company"] == "Bauhaus"
+    assert outcome["entity_source_followup_company"] == "Nordic Fashion"
     assert outcome["search_stages"][1]["query_kind"] == "ENTITY_SOURCE_FOLLOW_UP"
 
     case = outcome["cases"][0]
     assert case.root_cause == "QUERY_GAP"
-    assert case.ground_truth_company.casefold() == "bauhaus"
+    assert case.ground_truth_company.casefold() == "nordic fashion"
     assert case.ground_truth_url == OFFICIAL_URL
     assert outcome["cases_metadata"][0]["query_gap_term"] == "opphørssalg"
     assert outcome["cases_metadata"][0]["discovery_path"] == "ENTITY_SOURCE_FOLLOW_UP"
@@ -173,9 +171,9 @@ def test_entity_followup_does_not_relax_authoritative_page_verifier() -> None:
     def search(query: str):
         calls.append(query)
         if query == SCOUT_QUERIES_NO[0]:
-            return [_hit(NEWS_URL, "Bauhaus legger ned i Norge")]
-        assert query == build_entity_source_followup_query("Bauhaus")
-        return [_hit(OFFICIAL_URL, "BAUHAUS informasjon")]
+            return [_hit(NEWS_URL, "Nordic Fashion legger ned i Norge")]
+        assert query == build_entity_source_followup_query("Nordic Fashion")
+        return [_hit(OFFICIAL_URL, "Nordic Fashion informasjon")]
 
     def fetch_page(url: str):
         if url == NEWS_URL:
@@ -184,7 +182,8 @@ def test_entity_followup_does_not_relax_authoritative_page_verifier() -> None:
             raise OSError("probe unavailable")
         return _page(
             url,
-            "<html><body><h1>BAUHAUS legger ned i Norge</h1><p>BAUHAUS legger ned.</p></body></html>",
+            "<html><body><h1>Nordic Fashion legger ned i Norge</h1>"
+            "<p>Klesbutikken selger klær. Nordic Fashion legger ned.</p></body></html>",
         )
 
     outcome = discover_query_gap_misses(
@@ -212,18 +211,18 @@ def test_entity_followup_respects_existing_two_search_three_page_caps() -> None:
     )
 
     calls: list[str] = []
-    official_noise_1 = "https://example.no/bauhaus-1"
-    official_noise_2 = "https://example.no/bauhaus-2"
-    official_noise_3 = "https://example.no/bauhaus-3"
+    official_noise_1 = "https://example.no/nordic-fashion-1"
+    official_noise_2 = "https://example.no/nordic-fashion-2"
+    official_noise_3 = "https://example.no/nordic-fashion-3"
 
     def search(query: str):
         calls.append(query)
         if query == SCOUT_QUERIES_NO[0]:
-            return [_hit(NEWS_URL, "Bauhaus legger ned i Norge")]
+            return [_hit(NEWS_URL, "Nordic Fashion legger ned i Norge")]
         return [
-            _hit(official_noise_1, "BAUHAUS info 1"),
-            _hit(official_noise_2, "BAUHAUS info 2"),
-            _hit(official_noise_3, "BAUHAUS info 3"),
+            _hit(official_noise_1, "Nordic Fashion info 1"),
+            _hit(official_noise_2, "Nordic Fashion info 2"),
+            _hit(official_noise_3, "Nordic Fashion info 3"),
         ]
 
     def fetch_page(url: str):

@@ -9,7 +9,7 @@ def test_extract_company_accepts_active_avvikler_form() -> None:
     assert _extract_company(text) == "BAUHAUS"
 
 
-def test_official_bauhaus_style_page_keeps_company_identity_mandatory_and_can_verify() -> None:
+def test_official_bauhaus_style_page_is_out_of_domain_even_with_company_identity() -> None:
     from opportunity_engine.automatic_query_gap_miss_scout import (
         PublicPage,
         _verify_closure_liquidation_page,
@@ -24,15 +24,10 @@ def test_official_bauhaus_style_page_keeps_company_identity_mandatory_and_can_ve
         <html><body>
         <h1>BAUHAUS avvikler virksomheten i Norge.</h1>
         <p>Opphørssalget starter lørdag 22. august.</p>
-        <p>I forbindelse med avviklingen vil vi selge ut vårt sortiment.</p>
+        <p>I forbindelse med avviklingen vil vi selge ut byggematerialer, verktøy og fliser.</p>
         <p>Kundeservice har ikke ytterligere informasjon om lagerbeholdningen.</p>
         </body></html>
         """,
     )
 
-    proof = _verify_closure_liquidation_page(page)
-
-    assert proof is not None
-    assert proof["company"] == "BAUHAUS"
-    assert "opphørssalg" in proof["query_gap_terms"]
-    assert "lagerbeholdning" in proof["liquidation_markers"]
+    assert _verify_closure_liquidation_page(page) is None

@@ -3,32 +3,32 @@ from __future__ import annotations
 from opportunity_engine.discovery.search_provider import SearchHit
 
 
-NEWS_URL = "https://www.nrk.no/nyheter/bauhaus-legger-ned-i-norge-1.17996380"
-HOME_URL = "https://www.bauhaus.no/"
-INFO_URL = "https://www.bauhaus.no/bauhaus-norge-informasjon"
+NEWS_URL = "https://news.example.no/nordic-fashion-legger-ned"
+HOME_URL = "https://www.nordicfashion.no/"
+INFO_URL = "https://www.nordicfashion.no/avvikling-informasjon"
 
 NEWS_HTML = """
 <html><body>
-<h1>Bauhaus legger ned i Norge</h1>
-<p>Bauhaus legger ned alle butikker i Norge.</p>
+<h1>Nordic Fashion legger ned i Norge</h1>
+<p>Klesbutikken Nordic Fashion legger ned alle butikker i Norge.</p>
 </body></html>
 """
 
 HOME_HTML = """
 <html><body>
-<h1>BAUHAUS</h1>
-<a href="/maling-tapet/produkt">Produkt</a>
+<h1>Nordic Fashion klesbutikk</h1>
+<a href="/collections/jakker">Produkt</a>
 <a href="https://example.com/informasjon">Ekstern informasjon</a>
-<a href="/bauhaus-norge-informasjon">Se mer informasjon her</a>
+<a href="/avvikling-informasjon">Se mer informasjon her</a>
 </body></html>
 """
 
 INFO_HTML = """
 <html><body>
-<h1>BAUHAUS legger ned virksomheten i Norge</h1>
-<p>BAUHAUS avvikles i Norge.</p>
+<h1>Nordic Fashion legger ned virksomheten i Norge</h1>
+<p>Klesbutikken Nordic Fashion avvikles i Norge.</p>
 <p>Opphørssalg starter 22. august.</p>
-<p>Lagerbeholdningen skal selges ut før butikkene stenger.</p>
+<p>Lagerbeholdningen av klær, jakker og bukser skal selges ut før butikkene stenger.</p>
 </body></html>
 """
 
@@ -61,7 +61,7 @@ def test_extract_internal_source_links_keeps_same_domain_information_links_only(
 
     links = extract_entity_internal_source_links(
         _page(HOME_URL, HOME_HTML),
-        company="Bauhaus",
+        company="Nordic Fashion",
     )
 
     assert links == [INFO_URL]
@@ -79,7 +79,7 @@ def test_official_homepage_can_follow_one_internal_page_to_verified_query_gap() 
     def search(query: str):
         calls.append(query)
         assert query == SCOUT_QUERIES_NO[0]
-        return [_hit(NEWS_URL, "Bauhaus legger ned i Norge")]
+        return [_hit(NEWS_URL, "Nordic Fashion legger ned i Norge")]
 
     def fetch_page(url: str):
         fetched.append(url)
@@ -99,7 +99,6 @@ def test_official_homepage_can_follow_one_internal_page_to_verified_query_gap() 
         max_pages=3,
     )
 
-    # V10 probes the plausible first-party homepage before spending Brave #2.
     assert calls == [SCOUT_QUERIES_NO[0]]
     assert fetched == [NEWS_URL, HOME_URL, INFO_URL]
     assert outcome["search_request_count"] == 1
@@ -107,7 +106,6 @@ def test_official_homepage_can_follow_one_internal_page_to_verified_query_gap() 
     assert outcome["verified_page_count"] == 1
     assert outcome["detected_miss_count"] == 1
     assert outcome["waterfall_stopped_reason"] == "FIRST_VERIFIED_MISS"
-    # No entity Brave search was needed because the direct domain probe succeeded.
     assert outcome["entity_source_followup_used"] is False
     assert outcome["entity_domain_probe_used"] is True
     assert outcome["entity_domain_probe_count"] == 1

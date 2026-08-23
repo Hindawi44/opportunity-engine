@@ -4,9 +4,9 @@
     {
       "market_code": "NO",
       "term": "avviklingssalg",
-      "status": "PROMOTED",
-      "reason": "Explicit human promotion after Live Proof V15C recovered 3 independent Norwegian HOLDOUT_TRANSFER cases with precision 0.333333; repeated-transfer eligibility was proven and PR #651 now enforces the same eligibility at the Production gate.",
-      "approved_at": "2026-08-22T19:45:00Z"
+      "status": "DISABLED",
+      "reason": "Scope repair 2026-08-23: the retained V15C promotion evidence included out-of-domain general commercial closures and was not proven exclusively against CLOTHING_INVENTORY. Preserve the learned term in Shadow evidence, but keep Production disabled until repeated independent clothing-inventory holdouts re-prove it under PROJECT_DOMAIN_BOUNDARY_V1.",
+      "approved_at": "2026-08-23T15:05:00Z"
     }
   ]
 }

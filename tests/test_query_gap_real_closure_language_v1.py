@@ -24,13 +24,14 @@ def test_company_identity_parser_recognizes_operating_identity_before_drives_av(
     assert _extract_company(text) == "Senna Mode"
 
 
-def test_exact_page_verifier_accepts_real_stenge_butikken_language_only_with_stock_sale_and_identity() -> None:
+def test_exact_page_verifier_accepts_real_stenge_butikken_language_only_with_stock_sale_identity_and_clothing() -> None:
     proof = _verify_closure_liquidation_page(
         _page(
             """
             <html><body>
               <h1>Avviklingssalg</h1>
               <h2>Senna Mode Oslo</h2>
+              <p>Klesbutikken selger klær, jakker og bukser.</p>
               <p>På grunn av personlige omstendigheter må vi dessverre stenge butikken vår.</p>
               <p>Derfor holder vi vårt største salg noensinne for å selge ut vårt siste varelager.</p>
               <p>Senna Mode drives av Senna Mode B.V., et selskap registrert i Nederland.</p>
@@ -41,6 +42,7 @@ def test_exact_page_verifier_accepts_real_stenge_butikken_language_only_with_sto
 
     assert proof is not None
     assert proof["company"] == "Senna Mode"
+    assert proof["project_domain"] == "CLOTHING_INVENTORY"
     assert "stenge butikken" in proof["closure_markers"]
     assert "avviklingssalg" in proof["query_gap_terms"]
     assert "varelager" in proof["liquidation_markers"]
@@ -51,6 +53,7 @@ def test_stenge_butikken_phrase_alone_does_not_weaken_strict_contract() -> None:
         """
         <html><body>
           <h1>Senna Mode</h1>
+          <p>Klesbutikken selger klær.</p>
           <p>Vi må stenge butikken vår.</p>
           <p>Senna Mode drives av Senna Mode B.V.</p>
         </body></html>
@@ -65,6 +68,7 @@ def test_temporary_stenge_butikken_language_is_rejected_even_with_sale_and_inven
         """
         <html><body>
           <h1>Avviklingssalg</h1>
+          <p>Klesbutikken selger klær.</p>
           <p>Vi må stenge butikken midlertidig for oppussing.</p>
           <p>Varelager er tilgjengelig under kampanjen.</p>
           <p>Senna Mode drives av Senna Mode B.V.</p>

@@ -35,6 +35,7 @@ HOLDOUTS = (
     "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER",
     "HOLDOUT-NO-GAULA-NATURSENTER",
 )
+CLOTHING_URL = "https://www.nordicfashion.no/avvikling-informasjon"
 
 
 def _shadow_overlay():
@@ -90,7 +91,8 @@ def _fake_page(url: str) -> PublicPage:
         status_code=200,
         content_type="text/html; charset=utf-8",
         html=(
-            "<html><body><h1>BAUHAUS Norge avvikler virksomheten</h1>"
+            "<html><body><h1>Nordic Fashion avvikler virksomheten</h1>"
+            "<p>Klesbutikken Nordic Fashion selger klær, jakker og bukser.</p>"
             "<p>Vi avvikler virksomheten og har avviklingssalg. "
             "Hele lagerbeholdningen skal ut.</p></body></html>"
         ),
@@ -165,9 +167,9 @@ def test_scheduled_promoted_core_search_creates_verified_direct_candidate(
         queries.append(query)
         return [
             SearchHit(
-                title="BAUHAUS Norge avvikler virksomheten",
-                url="https://www.bauhaus.no/bauhaus-norge-informasjon",
-                description="Avviklingssalg. Hele lagerbeholdningen skal ut.",
+                title="Nordic Fashion avvikler virksomheten",
+                url=CLOTHING_URL,
+                description="Klesbutikk avviklingssalg. Hele lagerbeholdningen av klær skal ut.",
                 provider="Fake Brave",
             )
         ]
@@ -201,7 +203,7 @@ def test_scheduled_promoted_core_search_creates_verified_direct_candidate(
     assert len(candidates) == 1
     record = candidates[0]
     assert record["market_code"] == "NO"
-    assert record["company_name"] == "BAUHAUS Norge"
+    assert record["company_name"] == "Nordic Fashion"
     assert record["scenario"] == "STOCK_LIQUIDATION"
     assert record["workflow_status"] == "REQUIRES_VERIFICATION"
     assert record["evaluation_status"] == "REQUIRES_VERIFICATION"
@@ -313,9 +315,9 @@ def test_verified_learned_record_merges_into_existing_norway_source(
         },
         search_override=lambda query: [
             SearchHit(
-                title="BAUHAUS Norge avvikler virksomheten",
-                url="https://www.bauhaus.no/bauhaus-norge-informasjon",
-                description="Avviklingssalg. Hele lagerbeholdningen skal ut.",
+                title="Nordic Fashion avvikler virksomheten",
+                url=CLOTHING_URL,
+                description="Klesbutikk avviklingssalg. Hele lagerbeholdningen av klær skal ut.",
                 provider="Fake Brave",
             )
         ],
@@ -379,9 +381,7 @@ def test_verified_learned_record_merges_into_existing_norway_source(
     assert len(candidates) == 1
     assert candidates[0]["learned_term"] == TERM
     assert candidates[0]["source_page_verified"] is True
-    assert candidates[0]["source_urls"] == [
-        "https://www.bauhaus.no/bauhaus-norge-informasjon"
-    ]
+    assert candidates[0]["source_urls"] == [CLOTHING_URL]
     unified = json.loads(
         (cross / "unified-opportunity-report.json").read_text(encoding="utf-8")
     )

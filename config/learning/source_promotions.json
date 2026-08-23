@@ -3,9 +3,9 @@
   "decisions": [
     {
       "source_domain": "joblot.stocklear.eu",
-      "status": "PROMOTED",
-      "reason": "Explicit operator approval after two independent 5/5 exact-page-verified shadow rounds, 10/10 combined verification yield, 0 measured false positives, and 18/18 stable public-access checks.",
-      "approved_at": "2026-08-22T15:48:00+02:00"
+      "status": "DISABLED",
+      "reason": "Scope repair 2026-08-23: the promotion scorecard was built from general-merchandise/appliance evidence outside the authoritative CLOTHING_INVENTORY scope. Keep the source available for future Shadow evaluation, but close the Production network path until at least two independent clothing-inventory lots are exact-page verified and the source is explicitly re-approved.",
+      "approved_at": "2026-08-23T15:05:00Z"
     }
   ]
 }

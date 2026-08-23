@@ -3,28 +3,30 @@ from __future__ import annotations
 from opportunity_engine.discovery.search_provider import SearchHit
 
 
-NEWS_URL = "https://www.nrk.no/nyheter/bauhaus-legger-ned-i-norge-1.17996380"
-HOME_URL = "https://www.bauhaus.no/"
-INFO_URL = "https://www.bauhaus.no/bauhaus-norge-informasjon"
+NEWS_URL = "https://news.example.no/nordic-fashion-legger-ned"
+HOME_URL = "https://www.nordicfashion.no/"
+INFO_URL = "https://www.nordicfashion.no/avvikling-informasjon"
 
 NEWS_HTML = """
 <html><body>
-<h1>Bauhaus legger ned i Norge</h1>
-<p>Bauhaus legger ned alle butikker i Norge.</p>
+<h1>Nordic Fashion legger ned i Norge</h1>
+<p>Klesbutikken Nordic Fashion legger ned alle butikker i Norge.</p>
 </body></html>
 """
 HOME_HTML = """
 <html><body>
-<h1>BAUHAUS Norge</h1>
-<a href="/bauhaus-norge-informasjon">BAUHAUS Norge Informasjon</a>
+<h1>Nordic Fashion klesbutikk</h1>
+<a href="/collections/jakker">Jakker</a>
+<a href="https://example.com/informasjon">Ekstern informasjon</a>
+<a href="/avvikling-informasjon">Se mer informasjon her</a>
 </body></html>
 """
 INFO_HTML = """
 <html><body>
-<h1>BAUHAUS legger ned sin virksomhet i Norge</h1>
-<p>BAUHAUS legger ned virksomheten i Norge.</p>
+<h1>Nordic Fashion legger ned sin virksomhet i Norge</h1>
+<p>Klesbutikken Nordic Fashion legger ned virksomheten i Norge.</p>
 <p>Fra 22. august starter opphørssalg.</p>
-<p>Alle varer skal ut, og hele lageret selges ut.</p>
+<p>Alle klær, jakker og bukser skal ut, og hele lagerbeholdningen selges ut.</p>
 </body></html>
 """
 
@@ -55,10 +57,10 @@ def test_domain_probe_candidate_is_conservative_and_contains_no_learning_term() 
         build_entity_first_party_probe_urls,
     )
 
-    assert build_entity_first_party_probe_urls("Bauhaus") == [HOME_URL]
-    assert build_entity_first_party_probe_urls("Bauhaus Norge AS") == [HOME_URL]
+    assert build_entity_first_party_probe_urls("Nordic Fashion") == [HOME_URL]
+    assert build_entity_first_party_probe_urls("Nordic Fashion AS") == [HOME_URL]
 
-    joined = " ".join(build_entity_first_party_probe_urls("Bauhaus")).casefold()
+    joined = " ".join(build_entity_first_party_probe_urls("Nordic Fashion")).casefold()
     forbidden = {
         "sluttsalg",
         "avslutningssalg",
@@ -81,7 +83,7 @@ def test_direct_domain_probe_can_reach_verified_internal_source_before_second_se
     def search(query: str):
         search_calls.append(query)
         assert query == SCOUT_QUERIES_NO[0]
-        return [_hit(NEWS_URL, "Bauhaus legger ned i Norge")]
+        return [_hit(NEWS_URL, "Nordic Fashion legger ned i Norge")]
 
     def fetch_page(url: str):
         fetched.append(url)
