@@ -1,7 +1,9 @@
 """Conservative Tool Learning scorecard for Exa-vs-Brave shadow evidence.
 
 The scorecard learns only from symmetrically page-verified provider-unique URLs.
-Raw search-hit counts are diagnostic and never count as provider quality.
+Raw search-hit counts are diagnostic and never count as provider quality. A
+provider lead may be declared only after at least one page passes the strict
+Tool Learning commercial-usefulness gate.
 """
 from __future__ import annotations
 
@@ -9,7 +11,7 @@ from typing import Any, Mapping
 
 from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
 
-SCHEMA_VERSION = "search-tool-learning-scorecard-1.0"
+SCHEMA_VERSION = "search-tool-learning-scorecard-1.1"
 _SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 
 
@@ -22,6 +24,7 @@ def _metrics(report: Mapping[str, Any]) -> dict[str, Any]:
     attempted = max(0, int(report.get("page_fetches_attempted") or 0))
     useful = max(0, int(report.get("useful_clothing_signal_count") or 0))
     out_of_domain = max(0, int(report.get("out_of_domain_count") or 0))
+    filtered_active = max(0, int(report.get("non_specific_active_filtered_count") or 0))
     unique_urls = max(0, int(report.get("provider_unique_url_count") or 0))
     useful_yield = useful / successful if successful else 0.0
     out_of_domain_rate = out_of_domain / successful if successful else 0.0
@@ -34,6 +37,7 @@ def _metrics(report: Mapping[str, Any]) -> dict[str, Any]:
         "fetch_success_rate": round(fetch_success_rate, 4),
         "useful_clothing_signal_count": useful,
         "useful_clothing_yield": round(useful_yield, 4),
+        "non_specific_active_filtered_count": filtered_active,
         "out_of_domain_count": out_of_domain,
         "out_of_domain_rate": round(out_of_domain_rate, 4),
         "quality_index": round(quality_index, 4),
@@ -69,6 +73,8 @@ def build_search_tool_learning_scorecard(
             blocking_reasons.append(f"{provider.upper()}_NOT_SHADOW_ONLY")
         if report.get("symmetric_provider_verification") is not True:
             blocking_reasons.append(f"{provider.upper()}_NOT_SYMMETRICALLY_VERIFIED")
+        if report.get("commercial_specificity_gate_enforced") is not True:
+            blocking_reasons.append(f"{provider.upper()}_COMMERCIAL_SPECIFICITY_GATE_NOT_ENFORCED")
         if report.get("project_domain_gate_enforced") is not True:
             blocking_reasons.append(f"{provider.upper()}_DOMAIN_GATE_NOT_ENFORCED")
         if _compact(report.get("required_project_domain")) != CLOTHING_INVENTORY:
@@ -80,6 +86,9 @@ def build_search_tool_learning_scorecard(
         "exa": _metrics(reports["exa"]),
         "brave": _metrics(reports["brave"]),
     }
+    total_useful = sum(int(row["useful_clothing_signal_count"]) for row in metrics.values())
+    if total_useful == 0:
+        blocking_reasons.append("NO_VERIFIED_USEFUL_COMMERCIAL_PAGES")
 
     if blocking_reasons:
         decision = "INSUFFICIENT_EVIDENCE"
@@ -95,14 +104,17 @@ def build_search_tool_learning_scorecard(
     return {
         "schema_version": SCHEMA_VERSION,
         "decision": decision,
-        "blocking_reasons": blocking_reasons,
+        "blocking_reasons": list(dict.fromkeys(blocking_reasons)),
         "required_project_domain": CLOTHING_INVENTORY,
         "project_domain_gate_enforced": True,
-        "comparison_basis": "VERIFIED_USEFUL_CLOTHING_YIELD_MINUS_OUT_OF_DOMAIN_RATE",
+        "commercial_specificity_gate_enforced": True,
+        "comparison_basis": "ITEM_SPECIFIC_VERIFIED_CLOTHING_YIELD_MINUS_OUT_OF_DOMAIN_RATE",
         "min_successful_pages_per_provider": min_successful_pages_per_provider,
         "minimum_quality_margin": minimum_quality_margin,
         "metrics": metrics,
-        "interpretation_guard": "Raw result volume cannot choose or activate a provider.",
+        "interpretation_guard": (
+            "A provider cannot lead from raw volume, broad ACTIVE_STOCK_SIGNAL pages, or lower noise alone; at least one item-specific verified commercial clothing page is required."
+        ),
         "automatic_provider_activation": False,
         "automatic_provider_disable": False,
         "production_mutation": False,

@@ -1,13 +1,19 @@
 """Symmetric exact-page verification for search-provider unique discoveries.
 
 This layer exists so Tool Learning compares Exa and Brave on the same evidence
-standard. Raw hit counts, snippets, and domain counts are not provider quality.
-A provider receives useful credit only when its unique original page is fetched
-successfully and proves a CLOTHING_INVENTORY commercial signal under the same
-classifier used by Exa shadow verification.
+standard. Raw hit counts, snippets, broad articles and aggregate stock pages are
+not provider quality.
 
-The verifier is shadow-only and cannot activate a provider or perform a
-commercial action.
+A provider receives positive Tool Learning credit only when its unique original
+page is fetched successfully, proves CLOTHING_INVENTORY, and has commercial page
+specificity strong enough for the comparison contract:
+
+* EXACT_LOT_CANDIDATE always qualifies;
+* ACTIVE_STOCK_SIGNAL qualifies only when the verified URL is item-specific.
+
+Out-of-domain evidence is counted as noise from the domain classifier even when
+the page's broader content classification is UNPROVEN_PAGE or another non-sale
+class. The verifier remains shadow-only and cannot activate a provider.
 """
 from __future__ import annotations
 
@@ -31,7 +37,7 @@ from opportunity_engine.discovery.exa_shadow_page_verification import (
 )
 from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
 
-SCHEMA_VERSION = "search-provider-unique-page-verification-1.0"
+SCHEMA_VERSION = "search-provider-unique-page-verification-1.1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 
 
@@ -48,6 +54,7 @@ def _base(*, provider: str, max_page_fetches: int) -> dict[str, Any]:
         "required_project_domain": CLOTHING_INVENTORY,
         "project_domain_gate_enforced": True,
         "symmetric_provider_verification": True,
+        "commercial_specificity_gate_enforced": True,
         "production_provider_activation": False,
         "promotion_to_live_engine_enabled": False,
         "automatic_provider_activation": False,
@@ -57,6 +64,17 @@ def _base(*, provider: str, max_page_fetches: int) -> dict[str, Any]:
         "automatic_purchase": False,
         "automatic_payment": False,
     }
+
+
+def _tool_learning_useful(classification: str, evidence: dict[str, Any]) -> bool:
+    if evidence.get("project_domain") != CLOTHING_INVENTORY:
+        return False
+    if classification == EXACT_LOT_CANDIDATE:
+        return True
+    return bool(
+        classification == ACTIVE_STOCK_SIGNAL
+        and evidence.get("item_specific_url_evidence") is True
+    )
 
 
 def verify_provider_unique_pages(
@@ -152,6 +170,7 @@ def verify_provider_unique_pages(
                     "status_code": None,
                     "final_url": candidate["url"],
                     "fetch_error": "PAGE_BUDGET_EXHAUSTED",
+                    "tool_learning_useful": False,
                     "evidence": {},
                 }
             )
@@ -168,6 +187,7 @@ def verify_provider_unique_pages(
                     "status_code": fetched.status_code,
                     "final_url": fetched.final_url,
                     "fetch_error": fetched.error,
+                    "tool_learning_useful": False,
                     "evidence": {},
                 }
             )
@@ -188,12 +208,25 @@ def verify_provider_unique_pages(
                 "final_url": fetched.final_url,
                 "fetch_error": None,
                 "truncated": fetched.truncated,
+                "tool_learning_useful": _tool_learning_useful(classification, evidence),
                 "evidence": evidence,
             }
         )
 
     counts = Counter(item["classification"] for item in verified_pages)
-    useful_count = counts[EXACT_LOT_CANDIDATE] + counts[ACTIVE_STOCK_SIGNAL]
+    useful_count = sum(1 for item in verified_pages if item.get("tool_learning_useful") is True)
+    out_of_domain_count = sum(
+        1
+        for item in verified_pages
+        if item.get("fetch_ok") is True
+        and (item.get("evidence") or {}).get("project_domain") == OUT_OF_DOMAIN
+    )
+    non_specific_active_filtered = sum(
+        1
+        for item in verified_pages
+        if item.get("classification") == ACTIVE_STOCK_SIGNAL
+        and item.get("tool_learning_useful") is not True
+    )
 
     return {
         **base,
@@ -206,7 +239,8 @@ def verify_provider_unique_pages(
         "useful_clothing_signal_count": useful_count,
         "exact_lot_candidate_count": counts[EXACT_LOT_CANDIDATE],
         "active_stock_signal_count": counts[ACTIVE_STOCK_SIGNAL],
-        "out_of_domain_count": counts[OUT_OF_DOMAIN],
+        "non_specific_active_filtered_count": non_specific_active_filtered,
+        "out_of_domain_count": out_of_domain_count,
         "source_intelligence_only_count": counts[SOURCE_INTELLIGENCE_ONLY],
         "info_or_legal_only_count": counts[INFO_OR_LEGAL_ONLY],
         "unproven_page_count": counts[UNPROVEN_PAGE],
