@@ -3,9 +3,9 @@ from __future__ import annotations
 from opportunity_engine.discovery.exa_shadow_page_verification import (
     EXACT_LOT_CANDIDATE,
     OUT_OF_DOMAIN,
-    verify_provider_unique_pages,
 )
 from opportunity_engine.discovery.keyword_shadow_verification import PageFetchResult
+from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
 from opportunity_engine.discovery.search_tool_learning import build_search_tool_learning_scorecard
 from scripts.run_exa_brave_shadow_benchmark import MARKET_QUERIES
 
