@@ -17,6 +17,7 @@ def test_pattern_application_gate_reuses_existing_manual_launcher_and_is_main_on
     assert "schedule:" not in text
     assert SEPARATE_WORKFLOW.exists() is False
     assert "operation:" in text
+    assert "default: RUN_SEED" in text
     assert "inputs.operation != 'RUN_SEED'" in gate
     assert "GITHUB_REF_NAME" in gate
     assert "main" in gate
