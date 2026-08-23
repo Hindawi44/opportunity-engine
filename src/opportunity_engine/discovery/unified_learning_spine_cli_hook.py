@@ -9,10 +9,12 @@ import sys
 from typing import Any
 
 import opportunity_engine.discovery.checkpoint_state_restore as checkpoint_state_restore
+from opportunity_engine.auksjonen_route_learning import (
+    write_unified_learning_spine_with_native_routes,
+)
 from opportunity_engine.unified_learning_spine import (
     OUTPUT_FILENAME,
     SCHEMA_VERSION,
-    write_unified_learning_spine,
 )
 from opportunity_engine.unified_memory_v2 import (
     MEMORY_FILENAME as UNIFIED_MEMORY_FILENAME,
@@ -114,7 +116,10 @@ def run_unified_learning_spine_fail_closed(
     input_root: str | Path,
 ) -> dict[str, Any]:
     try:
-        return write_unified_learning_spine(output_dir, input_root=input_root)
+        return write_unified_learning_spine_with_native_routes(
+            output_dir,
+            input_root=input_root,
+        )
     except Exception as exc:
         return _write_failed(Path(output_dir), exc)
 
