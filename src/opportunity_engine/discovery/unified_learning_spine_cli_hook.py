@@ -10,7 +10,7 @@ from typing import Any
 
 import opportunity_engine.discovery.checkpoint_state_restore as checkpoint_state_restore
 from opportunity_engine.auksjonen_route_learning import (
-    write_unified_learning_spine_with_native_routes,
+    write_unified_learning_spine_with_native_routes as write_unified_learning_spine,
 )
 from opportunity_engine.unified_learning_spine import (
     OUTPUT_FILENAME,
@@ -116,7 +116,7 @@ def run_unified_learning_spine_fail_closed(
     input_root: str | Path,
 ) -> dict[str, Any]:
     try:
-        return write_unified_learning_spine_with_native_routes(
+        return write_unified_learning_spine(
             output_dir,
             input_root=input_root,
         )
