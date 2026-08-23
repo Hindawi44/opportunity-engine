@@ -1,0 +1,115 @@
+name: Search Success Learning Live Proof TEMP V1
+
+on:
+  pull_request:
+    branches: [feat/search-success-learning-v1]
+    paths:
+      - ".github/workflows/search-success-learning-live-proof-temp-v1.yml"
+      - "src/opportunity_engine/search_success_learning.py"
+      - "scripts/run_search_success_learning.py"
+      - "tests/test_search_success_learning_v1.py"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prove-positive-learning-from-prior-live-artifact:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      INPUT_DIR: artifacts/search-success-learning-input
+      OUTPUT_DIR: artifacts/search-success-learning-proof-v1
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+
+      - name: Verify positive-learning contract tests
+        run: pytest tests/test_search_success_learning_v1.py -q
+
+      - name: Download prior successful Exact-Lot live proof artifact
+        shell: bash
+        run: |
+          mkdir -p "$INPUT_DIR" "$OUTPUT_DIR"
+          gh run download 32653292874 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name exact-lot-child-link-live-proof-v1 \
+            --dir "$INPUT_DIR"
+          test -f "$INPUT_DIR/benchmark.json"
+          test -f "$INPUT_DIR/tool-learning.json"
+          test -f "$INPUT_DIR/child-resolution-search-driven.json"
+
+      - name: Teach positive search-success memory from proven live run
+        shell: bash
+        run: |
+          python scripts/run_search_success_learning.py \
+            --benchmark "$INPUT_DIR/benchmark.json" \
+            --tool-learning "$INPUT_DIR/tool-learning.json" \
+            --child-resolution "$INPUT_DIR/child-resolution-search-driven.json" \
+            --run-id "32653292874" \
+            --observation-output "$OUTPUT_DIR/observation.json" \
+            --memory-output "$OUTPUT_DIR/memory.json" \
+            --min-independent-runs 2
+
+      - name: Assert learning is useful but still conservative
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["OUTPUT_DIR"])
+          observation = json.loads((root / "observation.json").read_text(encoding="utf-8"))
+          memory = json.loads((root / "memory.json").read_text(encoding="utf-8"))
+
+          assert observation["status"] == "SUCCESS"
+          assert observation["observed_provider_leader"] == "EXA"
+          assert observation["provider_preference_status"] == "SINGLE_RUN_OBSERVATION_ONLY"
+          assert observation["providers"]["exa"]["child_exact_lot_count"] == 2
+          assert observation["providers"]["exa"]["end_to_end_exact_lot_count"] == 2
+          assert observation["providers"]["brave"]["end_to_end_exact_lot_count"] == 0
+          assert observation["automatic_provider_activation"] is False
+          assert observation["automatic_source_promotion"] is False
+          assert observation["production_query_mutation"] is False
+
+          routes = observation["successful_routes"]
+          assert len(routes) == 1
+          route = routes[0]
+          assert route["provider"] == "exa"
+          assert route["market_code"] == "FR"
+          assert route["pathway"] == "AGGREGATE_CHILD"
+          assert route["parent_domain"] == "sdpie.com"
+          assert route["exact_lot_count"] == 2
+          assert "prix quantité" in route["query"]
+
+          assert memory["run_count"] == 1
+          assert memory["replicated_route_count"] == 0
+          assert memory["route_learning"][0]["status"] == "CANDIDATE"
+          assert memory["provider_learning"]["exa"]["status"] == "CANDIDATE"
+          assert memory["provider_learning"]["brave"]["status"] == "NO_VERIFIED_SUCCESS"
+          assert memory["automatic_provider_activation"] is False
+          assert memory["automatic_source_promotion"] is False
+          assert memory["production_query_mutation"] is False
+
+          print("learned_run:", observation["run_id"])
+          print("observed_leader:", observation["observed_provider_leader"])
+          print("route_status:", memory["route_learning"][0]["status"])
+          print("route:", route["market_code"], route["provider"], route["parent_domain"])
+          print("exact_lots:", route["exact_lot_count"])
+          PY
+
+      - name: Upload positive-learning proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: search-success-learning-proof-v1
+          path: artifacts/search-success-learning-proof-v1/*.json
+          if-no-files-found: warn
+          retention-days: 30
