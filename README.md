@@ -87,8 +87,6 @@ bridal + bounded B2B intelligence
         +
 IT fabric procurement
         ↓
-PROJECT_DOMAIN_BOUNDARY_V1
-        ↓
 UNIFIED MARKET INTELLIGENCE RIVER
         ↓
 linked intelligence items / market cases
