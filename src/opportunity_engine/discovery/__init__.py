@@ -73,6 +73,9 @@ from opportunity_engine.discovery.mathematical_logic_shadow_cli_hook import (
 from opportunity_engine.discovery.learning_layer_review_cli_hook import (
     install_learning_layer_review_cli_hook,
 )
+from opportunity_engine.discovery.ai_teaching_gate_cli_hook import (
+    install_ai_teaching_gate_cli_hook,
+)
 from opportunity_engine.discovery.unified_learning_spine_cli_hook import (
     install_unified_learning_spine_cli_hook,
 )
@@ -120,11 +123,15 @@ install_market_comparables_brand_cleanup()
 # river writes unified-market-cases.json first, then Math V1 observes it.
 install_mathematical_logic_shadow_cli_hook()
 # Registered before Spine, the daily learner and river. LIFO execution therefore
-# runs river -> daily learning -> Spine -> Learning Layer aggregation.
+# runs river -> daily learning -> Spine -> AI Teaching Gate -> Learning Layer.
 install_learning_layer_review_cli_hook()
-# Registered between Learning Layer and the daily learner. The spine therefore
-# sees same-run river output and same-run learning memory, while Learning Layer
-# remains the final operator-facing review plane.
+# Registered before Spine. Because atexit handlers run LIFO, Spine first writes
+# Memory V2 + Route Portfolio, then this gate routes only unresolved work toward
+# future manual MIND FORGE teaching. It never calls AI itself.
+install_ai_teaching_gate_cli_hook()
+# Registered between Learning Layer/Teaching Gate and the daily learner. The
+# spine therefore sees same-run river output and same-run learning memory, while
+# Learning Layer remains the final operator-facing review plane.
 install_unified_learning_spine_cli_hook()
 # Also registered before the river: LIFO makes the river finish source
 # verification + missed-opportunity capture first, then this learner consumes
