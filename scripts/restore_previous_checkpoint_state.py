@@ -35,7 +35,7 @@ from opportunity_engine.mind_forge_checkpoint_bridge_restore import (
     restore_latest_mind_forge_search_memory,
 )
 from opportunity_engine.search_experiment_execution_bridge_v1 import write_json
-from run_search_experiment_checkpoint_cycle import run_checkpoint_cycle
+from scripts.run_search_experiment_checkpoint_cycle import run_checkpoint_cycle
 
 
 ITALY_MEMORY_RELATIVE_PATH = "it-market/opportunity_engine.db"
