@@ -3,6 +3,11 @@
 Repeated independent verified opportunities from the same previously unseen source
 can validate that source as worth shadow evaluation. Validation never activates
 or adds the source to production.
+
+Project-domain evidence is mandatory before a miss may teach source quality.
+Unrelated goods may remain in historical benchmark files for auditability, but
+building materials, appliances and general merchandise cannot train the source
+learner.
 """
 from __future__ import annotations
 
@@ -11,7 +16,12 @@ from hashlib import sha256
 from typing import Any, Mapping
 from urllib.parse import urlsplit, urlunsplit
 
-SCHEMA_VERSION = "source-discovery-shadow-candidates-1.0"
+from opportunity_engine.project_domain_boundary import (
+    OUT_OF_DOMAIN,
+    classify_project_domain,
+)
+
+SCHEMA_VERSION = "source-discovery-shadow-candidates-1.1"
 
 
 def _compact(value: object) -> str:
@@ -67,7 +77,7 @@ def build_source_shadow_candidates(
     *,
     min_independent_opportunities: int = 2,
 ) -> dict[str, Any]:
-    """Aggregate confirmed SOURCE_GAP misses into safe source candidates."""
+    """Aggregate in-domain confirmed SOURCE_GAP misses into safe candidates."""
     if benchmark.get("schema_version") != "external-ground-truth-benchmark-1.0":
         raise ValueError("unsupported external ground-truth benchmark schema")
     if min_independent_opportunities < 2:
@@ -79,6 +89,7 @@ def build_source_shadow_candidates(
         raise ValueError("external benchmark opportunities must be a list")
 
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    out_of_domain_case_ids: list[str] = []
     for raw in opportunities:
         if not isinstance(raw, Mapping):
             continue
@@ -95,12 +106,20 @@ def build_source_shadow_candidates(
         category = ""
         if isinstance(evidence, Mapping):
             category = _compact(evidence.get("category")).upper()
+        project_domain = classify_project_domain(
+            category=category,
+            text=f"{raw.get('title') or ''} {raw.get('description') or ''}",
+        )
+        if project_domain == OUT_OF_DOMAIN:
+            out_of_domain_case_ids.append(case_id)
+            continue
         grouped[source_domain].append(
             {
                 "case_id": case_id,
                 "source_name": _compact(raw.get("source_name")),
                 "source_url": source_url,
                 "category": category,
+                "project_domain": project_domain,
             }
         )
 
@@ -115,6 +134,7 @@ def build_source_shadow_candidates(
         validated = count >= min_independent_opportunities
         source_names = sorted({row["source_name"] for row in independent_rows if row["source_name"]})
         categories = sorted({row["category"] for row in independent_rows if row["category"]})
+        project_domains = sorted({row["project_domain"] for row in independent_rows if row["project_domain"]})
         candidate_id = f"source-candidate:{sha256(source_domain.encode('utf-8')).hexdigest()[:20]}"
         source_candidates.append(
             {
@@ -126,11 +146,13 @@ def build_source_shadow_candidates(
                 "evidence_case_ids": sorted(row["case_id"] for row in independent_rows),
                 "evidence_urls": sorted(row["source_url"] for row in independent_rows),
                 "categories": categories,
+                "project_domains": project_domains,
                 "status": "VALIDATED_SOURCE" if validated else "CANDIDATE",
                 "shadow_eligible": validated,
                 "validation_rule": (
-                    f">={min_independent_opportunities} independent publicly verified stock opportunities"
+                    f">={min_independent_opportunities} independent publicly verified in-domain stock opportunities"
                 ),
+                "project_domain_gate_enforced": True,
                 "production_active": False,
                 "automatic_source_addition": False,
             }
@@ -143,7 +165,10 @@ def build_source_shadow_candidates(
         "validated_source_count": validated_count,
         "shadow_eligible_source_count": sum(1 for row in source_candidates if row["shadow_eligible"]),
         "source_candidates": source_candidates,
-        "learning_input": "CONFIRMED_EXTERNAL_SOURCE_GAP_MISSES_ONLY",
+        "learning_input": "CONFIRMED_EXTERNAL_SOURCE_GAP_MISSES_IN_PROJECT_DOMAIN_ONLY",
+        "project_domain_gate_enforced": True,
+        "out_of_domain_evidence_count": len(out_of_domain_case_ids),
+        "out_of_domain_case_ids": sorted(out_of_domain_case_ids),
         "min_independent_opportunities": min_independent_opportunities,
         "automatic_source_addition": False,
         "automatic_promotion": False,
