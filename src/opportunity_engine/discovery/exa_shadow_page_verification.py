@@ -164,9 +164,13 @@ _QUANTITY_RE = re.compile(
     r"metres|ruller|rollen|rolls|kartonger|kartons|cartons)\b",
     re.IGNORECASE,
 )
+# Only singular item/detail route tokens qualify. Plural collection tokens such
+# as /lots-.../, /lots/, /products/ and /items/ are intentionally excluded:
+# those routes commonly represent category/index pages whose aggregate HTML may
+# contain many unrelated prices and quantities.
 _ITEM_PATH_RE = re.compile(
-    r"(?:^|/)(?:item|items|lot|lots|lotto|lotti|product|products|produkt|kavel|"
-    r"annuncio|annunci|articolo|auction|auktion|auksjon|veiling)(?:[-_/]|$)",
+    r"(?:^|/)(?:item|lot|lotto|product|produkt|kavel|annuncio|articolo|auction|"
+    r"auktion|auksjon|veiling)(?:[-_/]|$)",
     re.IGNORECASE,
 )
 _AGGREGATE_PATH_MARKERS = (
@@ -196,7 +200,8 @@ def _looks_item_specific_url(url: str) -> bool:
 
     Homepages, search pages, category pages and marketplace roots cannot become
     exact lots merely because their aggregate HTML contains many prices and
-    quantities.
+    quantities. Plural collection routes also fail closed unless a later path
+    segment proves a singular item/detail route.
     """
     try:
         parsed = urlsplit(_compact(url))
