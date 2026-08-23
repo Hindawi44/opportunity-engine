@@ -34,14 +34,17 @@ def classify_missed_opportunity_case_domain(case: MissedOpportunityCase) -> str:
     """Classify only evidence that can actually prove the project's product domain.
 
     Company names and URLs are intentionally excluded: a retailer name or domain
-    cannot prove that the missed inventory was clothing or fabric. The opportunity
-    type may establish scope only when it itself contains explicit project-domain
-    language; otherwise the learning evidence text must do so.
+    cannot prove that the missed inventory was clothing or fabric. A structured
+    opportunity type may establish scope when it explicitly names clothing/fabric;
+    underscores/hyphens are normalized to word separators before text matching.
     """
+    opportunity_type = (
+        str(case.opportunity_type or "").replace("_", " ").replace("-", " ").strip()
+    )
     evidence = " ".join(
         part
         for part in (
-            str(case.opportunity_type or "").strip(),
+            opportunity_type,
             str(case.learning_evidence_text or "").strip(),
         )
         if part
@@ -102,7 +105,8 @@ def quarantine_learning_overlay(
                 continue
 
             support_ids = [
-                case_id for case_id in _ids(row.get("support_case_ids"))
+                case_id
+                for case_id in _ids(row.get("support_case_ids"))
                 if case_id in allowed_support_case_ids
             ]
             if not support_ids:
@@ -115,7 +119,8 @@ def quarantine_learning_overlay(
                 scopes.add(scope)
 
             transfer_ids = [
-                case_id for case_id in _ids(row.get("transfer_validation_case_ids"))
+                case_id
+                for case_id in _ids(row.get("transfer_validation_case_ids"))
                 if case_id in allowed_validation_case_ids
             ]
             if "HOLDOUT_TRANSFER" in scopes and not transfer_ids:
@@ -123,12 +128,14 @@ def quarantine_learning_overlay(
                 continue
 
             source_replay_ids = [
-                case_id for case_id in _ids(row.get("source_replay_case_ids"))
+                case_id
+                for case_id in _ids(row.get("source_replay_case_ids"))
                 if case_id in allowed_support_case_ids
             ]
             if scope != "HOLDOUT_TRANSFER" and not source_replay_ids:
                 source_replay_ids = [
-                    case_id for case_id in _ids(row.get("recovered_case_ids"))
+                    case_id
+                    for case_id in _ids(row.get("recovered_case_ids"))
                     if case_id in allowed_support_case_ids
                 ]
 
