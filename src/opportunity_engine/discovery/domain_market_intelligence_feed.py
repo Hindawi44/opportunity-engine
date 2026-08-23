@@ -24,8 +24,10 @@ from opportunity_engine.persistence.market_signal_repository import MarketSignal
 BRIEF_SCHEMA_VERSION = "domain-market-intelligence-brief-1.0"
 CORE_MARKETS = ("NO", "SE", "DE")
 CORE_MARKET_SET = frozenset(CORE_MARKETS)
-KNOWN_SIDECAR_MARKETS = ("IT", "NL", "FR")
-DECISION_SCOPE_MODE = "CORE_ONLY_WITH_SIDECAR_OBSERVATORY"
+KNOWN_SIDECAR_MARKETS = ("FR", "IT", "NL")
+DECISION_MARKETS = CORE_MARKETS + KNOWN_SIDECAR_MARKETS
+DECISION_MARKET_SET = frozenset(DECISION_MARKETS)
+DECISION_SCOPE_MODE = "UNIFIED_SIX_MARKET_DECISION_GATE"
 DIRECT_WORKFLOWS = {
     "REQUIRES_VERIFICATION",
     "ACTIVE_OPPORTUNITY",
@@ -55,6 +57,10 @@ def _market_code(value: object) -> str:
 
 def _is_core_market(value: object) -> bool:
     return _market_code(value) in CORE_MARKET_SET
+
+
+def _is_decision_market(value: object) -> bool:
+    return _market_code(value) in DECISION_MARKET_SET
 
 
 def _read_json(path: Path, *, default: Any = None) -> Any:
@@ -359,13 +365,13 @@ def _early_signals(signals: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]
     )
 
 
-def _existing_action_is_core(
+def _existing_action_is_decision_market(
     existing: Mapping[str, Any],
     direct_opportunities: Sequence[Mapping[str, Any]],
 ) -> bool:
     explicit_market = _market_code(existing.get("market_code"))
     if explicit_market:
-        return explicit_market in CORE_MARKET_SET
+        return explicit_market in DECISION_MARKET_SET
     identity = _compact(existing.get("opportunity_identity"))
     if not identity:
         return True
@@ -379,7 +385,7 @@ def _existing_action_is_core(
     )
     if match is None:
         return True
-    return _is_core_market(match.get("market_code"))
+    return _is_decision_market(match.get("market_code"))
 
 
 def _selected_action(
@@ -393,7 +399,7 @@ def _selected_action(
         if (
             action
             and action != "NO_IMMEDIATE_ACTION"
-            and _existing_action_is_core(existing, direct_opportunities)
+            and _existing_action_is_decision_market(existing, direct_opportunities)
         ):
             return {
                 "action": action,
@@ -401,11 +407,11 @@ def _selected_action(
                 "opportunity_identity": existing.get("opportunity_identity"),
                 "signal_id": None,
             }
-    core_early = [
-        signal for signal in early_signals if _is_core_market(signal.get("source_country"))
+    decision_early = [
+        signal for signal in early_signals if _is_decision_market(signal.get("source_country"))
     ]
-    if core_early:
-        signal = core_early[0]
+    if decision_early:
+        signal = decision_early[0]
         signal_type = _compact(signal.get("signal_type")).upper()
         if signal_type == MarketSignalType.REPEATED_SELLER_ACTIVITY.value:
             action = "INVESTIGATE_RELATED_INVENTORY"
@@ -427,7 +433,7 @@ def _selected_action(
         }
     return {
         "action": "NO_IMMEDIATE_ACTION",
-        "reason": "No credible core-market direct opportunity or early market signal requires action.",
+        "reason": "No credible six-market direct opportunity or early market signal requires action.",
         "opportunity_identity": None,
         "signal_id": None,
     }
@@ -458,7 +464,7 @@ def build_domain_market_intelligence_brief(
     checkpoint: Mapping[str, Any],
     signal_persistence: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Separate early market news from direct opportunities with core-only decisions."""
+    """Separate market signals from direct opportunities under one six-market decision gate."""
     current = [
         dict(item)
         for item in signal_persistence.get("current_signals") or []
@@ -497,16 +503,20 @@ def build_domain_market_intelligence_brief(
     return {
         "schema_version": BRIEF_SCHEMA_VERSION,
         "generated_at": checkpoint.get("generated_at"),
-        "market_coverage": checkpoint.get("market_coverage") or list(CORE_MARKETS),
+        "market_coverage": checkpoint.get("market_coverage") or list(DECISION_MARKETS),
         "decision_scope": {
             "mode": DECISION_SCOPE_MODE,
+            "decision_markets": list(DECISION_MARKETS),
+            "observatory_markets": [],
+            "all_supported_markets_share_decision_gate": True,
             "core_markets": list(CORE_MARKETS),
             "known_sidecar_markets": list(KNOWN_SIDECAR_MARKETS),
             "observed_sidecar_markets": observed_sidecars,
             "sidecar_records_retained": True,
-            "sidecars_drive_selected_human_action": False,
+            "sidecars_drive_selected_human_action": True,
             "sidecars_trigger_paid_targeted_enrichment": False,
-            "promotion_mode": "EXPLICIT_POLICY_CHANGE_ONLY",
+            "promotion_mode": "NOT_REQUIRED_UNIFIED_DECISION_SCOPE",
+            "source_tiers_affect_decision_eligibility": False,
         },
         "new_signals_today": new_signals,
         "changed_signals_since_previous_checkpoint": changed_signals,
@@ -542,8 +552,8 @@ def render_domain_market_intelligence_brief(brief: Mapping[str, Any]) -> str:
     lines = [
         "نشرة استخبارات سوق مخزون الملابس",
         f"الوقت: {brief.get('generated_at')}",
-        "الأسواق الأساسية: النرويج | السويد | ألمانيا",
-        f"Sidecars مرصودة: {', '.join(str(item) for item in observed_sidecars) if observed_sidecars else 'لا يوجد'}",
+        "أسواق القرار الموحدة: النرويج | السويد | ألمانيا | فرنسا | إيطاليا | هولندا",
+        f"أسواق tier الجانبي المرصودة (مصدر فقط، لا يقيّد القرار): {', '.join(str(item) for item in observed_sidecars) if observed_sidecars else 'لا يوجد'}",
         f"إشارات جديدة اليوم: {counts.get('new_signals_today', 0)}",
         f"إشارات تغيرت: {counts.get('changed_signals_since_previous_checkpoint', 0)}",
         f"إشارات مبكرة للمراقبة: {counts.get('early_signals_to_watch', 0)}",

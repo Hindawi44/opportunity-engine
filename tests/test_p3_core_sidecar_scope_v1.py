@@ -56,7 +56,7 @@ def _direct(country: str, identity: str) -> dict:
 def _checkpoint(*direct: dict, selected_identity: str | None = None) -> dict:
     action = {
         "action": "NO_IMMEDIATE_ACTION",
-        "reason": "No direct core opportunity selected.",
+        "reason": "No direct opportunity selected.",
     }
     if selected_identity:
         action = {
@@ -66,7 +66,7 @@ def _checkpoint(*direct: dict, selected_identity: str | None = None) -> dict:
         }
     return {
         "generated_at": "2026-08-16T20:00:00Z",
-        "market_coverage": ["NO", "SE", "DE"],
+        "market_coverage": ["NO", "SE", "DE", "FR", "IT", "NL"],
         "sources": [],
         "deduplicated_opportunities": list(direct),
         "next_human_action": action,
@@ -82,59 +82,68 @@ def _persistence(*signals: dict) -> dict:
     }
 
 
-def test_sidecars_remain_visible_but_cannot_override_core_decision_or_paid_gate() -> None:
-    italy = _signal("IT", "signal:it:sidecar", 0.99)
+def test_source_tiers_do_not_limit_decision_gate_or_change_paid_enrichment_gate() -> None:
+    italy = _signal("IT", "signal:it:source-tier", 0.99)
     norway = _signal("NO", "signal:no:core", 0.60)
-    italy_direct = _direct("IT", "it:sidecar:lot")
+    italy_direct = _direct("IT", "it:source-tier:lot")
 
     brief = build_domain_market_intelligence_brief(
-        _checkpoint(italy_direct, selected_identity="it:sidecar:lot"),
+        _checkpoint(italy_direct, selected_identity="it:source-tier:lot"),
         _persistence(italy, norway),
     )
 
     assert {item["signal_id"] for item in brief["early_signals_to_watch"]} == {
-        "signal:it:sidecar",
+        "signal:it:source-tier",
         "signal:no:core",
     }
     assert [item["opportunity_identity"] for item in brief["current_direct_opportunities"]] == [
-        "it:sidecar:lot"
+        "it:source-tier:lot"
     ]
-    assert brief["selected_human_action"]["signal_id"] == "signal:no:core"
-    assert brief["selected_human_action"]["opportunity_identity"] is None
+    assert brief["selected_human_action"]["action"] == "REVIEW_ONE_OPPORTUNITY"
+    assert brief["selected_human_action"]["opportunity_identity"] == "it:source-tier:lot"
+    assert brief["selected_human_action"]["signal_id"] is None
 
     scope = brief["decision_scope"]
-    assert scope["mode"] == "CORE_ONLY_WITH_SIDECAR_OBSERVATORY"
+    assert scope["mode"] == "UNIFIED_SIX_MARKET_DECISION_GATE"
+    assert scope["decision_markets"] == ["NO", "SE", "DE", "FR", "IT", "NL"]
+    assert scope["observatory_markets"] == []
+    assert scope["all_supported_markets_share_decision_gate"] is True
     assert scope["core_markets"] == ["NO", "SE", "DE"]
-    assert scope["known_sidecar_markets"] == ["IT", "NL", "FR"]
+    assert scope["known_sidecar_markets"] == ["FR", "IT", "NL"]
     assert scope["observed_sidecar_markets"] == ["IT"]
     assert scope["sidecar_records_retained"] is True
-    assert scope["sidecars_drive_selected_human_action"] is False
+    assert scope["sidecars_drive_selected_human_action"] is True
     assert scope["sidecars_trigger_paid_targeted_enrichment"] is False
-    assert scope["promotion_mode"] == "EXPLICIT_POLICY_CHANGE_ONLY"
+    assert scope["promotion_mode"] == "NOT_REQUIRED_UNIFIED_DECISION_SCOPE"
+    assert scope["source_tiers_affect_decision_eligibility"] is False
 
     assert brief["counts"]["core_early_signals_to_watch"] == 1
     assert brief["counts"]["sidecar_early_signals_to_watch"] == 1
     assert brief["counts"]["core_direct_opportunities"] == 0
     assert brief["counts"]["sidecar_direct_opportunities"] == 1
 
+    # Paid targeted enrichment is a separate cost-control gate. This change only
+    # unifies decision eligibility and must not silently expand paid enrichment.
     assert SUPPORTED_MARKETS == set(CORE_MARKETS)
     paid_candidates = select_hunt_signals(brief, max_signals=10)
     assert [item["signal_id"] for item in paid_candidates] == ["signal:no:core"]
 
 
-def test_sidecar_only_data_is_observatory_evidence_not_a_daily_action() -> None:
-    france = _signal("FR", "signal:fr:sidecar", 0.95)
-    france_direct = _direct("FR", "fr:sidecar:lot")
+def test_source_tier_market_can_drive_daily_action_without_expanding_paid_enrichment() -> None:
+    france = _signal("FR", "signal:fr:source-tier", 0.95)
+    france_direct = _direct("FR", "fr:source-tier:lot")
 
     brief = build_domain_market_intelligence_brief(
-        _checkpoint(france_direct, selected_identity="fr:sidecar:lot"),
+        _checkpoint(france_direct, selected_identity="fr:source-tier:lot"),
         _persistence(france),
     )
 
-    assert brief["selected_human_action"]["action"] == "NO_IMMEDIATE_ACTION"
-    assert brief["selected_human_action"]["opportunity_identity"] is None
+    assert brief["selected_human_action"]["action"] == "REVIEW_ONE_OPPORTUNITY"
+    assert brief["selected_human_action"]["opportunity_identity"] == "fr:source-tier:lot"
     assert brief["selected_human_action"]["signal_id"] is None
     assert brief["counts"]["sidecar_early_signals_to_watch"] == 1
     assert brief["counts"]["sidecar_direct_opportunities"] == 1
     assert brief["decision_scope"]["observed_sidecar_markets"] == ["FR"]
+    assert brief["decision_scope"]["observatory_markets"] == []
+    assert brief["decision_scope"]["source_tiers_affect_decision_eligibility"] is False
     assert select_hunt_signals(brief, max_signals=10) == []
