@@ -1,0 +1,174 @@
+name: MIND FORGE Pattern Application Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Explicit human action for one learned pattern
+        required: true
+        type: choice
+        default: APPROVE_PATTERN
+        options:
+          - APPROVE_PATTERN
+          - ROLLBACK_PATTERN
+      pattern_code:
+        description: Pattern code to approve; ignored for rollback
+        required: false
+        type: string
+        default: ""
+      application_id:
+        description: Unique approval/application id, or target application id for rollback
+        required: true
+        type: string
+      rollback_id:
+        description: Unique rollback id; required only for rollback
+        required: false
+        type: string
+        default: ""
+      observed_independent_run_count:
+        description: Exact production-eligible run count observed before approval
+        required: false
+        type: string
+        default: "0"
+      observed_example_diversity_count:
+        description: Exact production-eligible example-diversity count observed before approval
+        required: false
+        type: string
+        default: "0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mind-forge-pattern-application-gate
+  cancel-in-progress: false
+
+jobs:
+  apply-pattern-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require default main branch
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_REF_NAME" != "main" ]; then
+            echo "Pattern application is allowed only from main."
+            exit 1
+          fi
+
+      - name: Check out current main
+        uses: actions/checkout@v4
+
+      - name: Restore latest fast-learning memory
+        uses: actions/cache/restore@v4
+        with:
+          path: .mind-forge-memory
+          key: mind-forge-fast-memory-gate-${{ github.run_id }}
+          restore-keys: |
+            mind-forge-fast-memory-
+
+      - name: Require persisted learning memory
+        run: |
+          set -euo pipefail
+          MEMORY="$GITHUB_WORKSPACE/.mind-forge-memory/fast_learning_memory.json"
+          if [ ! -f "$MEMORY" ]; then
+            echo "No persisted MIND FORGE fast-learning memory is available."
+            exit 1
+          fi
+          echo "MIND_FORGE_MEMORY=$MEMORY" >> "$GITHUB_ENV"
+
+      - name: Apply explicit approval or rollback
+        env:
+          GATE_ACTION: ${{ inputs.action }}
+          PATTERN_CODE: ${{ inputs.pattern_code }}
+          APPLICATION_ID: ${{ inputs.application_id }}
+          ROLLBACK_ID: ${{ inputs.rollback_id }}
+          OBSERVED_RUN_COUNT: ${{ inputs.observed_independent_run_count }}
+          OBSERVED_DIVERSITY_COUNT: ${{ inputs.observed_example_diversity_count }}
+          HUMAN_ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/fast_learning_memory.updated.json"
+          if [ "$GATE_ACTION" = "APPROVE_PATTERN" ]; then
+            python scripts/mind_forge_v2_pattern_application.py \
+              "$MIND_FORGE_MEMORY" \
+              --output "$OUT" \
+              --action APPROVE_PATTERN \
+              --pattern-code "$PATTERN_CODE" \
+              --application-id "$APPLICATION_ID" \
+              --actor "$HUMAN_ACTOR" \
+              --observed-independent-run-count "$OBSERVED_RUN_COUNT" \
+              --observed-example-diversity-count "$OBSERVED_DIVERSITY_COUNT"
+          elif [ "$GATE_ACTION" = "ROLLBACK_PATTERN" ]; then
+            python scripts/mind_forge_v2_pattern_application.py \
+              "$MIND_FORGE_MEMORY" \
+              --output "$OUT" \
+              --action ROLLBACK_PATTERN \
+              --application-id "$APPLICATION_ID" \
+              --rollback-id "$ROLLBACK_ID" \
+              --actor "$HUMAN_ACTOR"
+          else
+            echo "Unsupported gate action: $GATE_ACTION"
+            exit 1
+          fi
+          mv "$OUT" "$MIND_FORGE_MEMORY"
+
+      - name: Validate application safety invariants
+        env:
+          GATE_ACTION: ${{ inputs.action }}
+          APPLICATION_ID: ${{ inputs.application_id }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          memory = json.loads(Path(os.environ["MIND_FORGE_MEMORY"]).read_text(encoding="utf-8"))
+          if memory.get("auto_apply_to_production") is not False:
+              raise SystemExit("pattern gate must never enable auto_apply_to_production")
+
+          for policy in memory.get("approved_production_adjustments", []) or []:
+              if policy.get("mode") != "APPROVED_POLICY_HINT":
+                  raise SystemExit("unexpected approved policy mode")
+              if policy.get("human_approval_recorded") is not True:
+                  raise SystemExit("approved policy is missing human approval")
+              if policy.get("may_auto_reject_ideas") is not False:
+                  raise SystemExit("approved policy may not auto-reject ideas")
+
+          application_id = os.environ["APPLICATION_ID"]
+          matches = [
+              row for row in memory.get("pattern_applications", []) or []
+              if row.get("application_id") == application_id
+          ]
+          if len(matches) != 1:
+              raise SystemExit("target application record is missing or duplicated")
+          status = matches[0].get("status")
+          if os.environ["GATE_ACTION"] == "APPROVE_PATTERN" and status != "ACTIVE":
+              raise SystemExit(f"approval did not become ACTIVE: {status}")
+          if os.environ["GATE_ACTION"] == "ROLLBACK_PATTERN" and status != "ROLLED_BACK":
+              raise SystemExit(f"rollback did not become ROLLED_BACK: {status}")
+
+          print(json.dumps({
+              "status": "MIND_FORGE_PATTERN_APPLICATION_GATE_VALIDATED",
+              "action": os.environ["GATE_ACTION"],
+              "application_id": application_id,
+              "application_status": status,
+              "active_pattern_application_count": memory.get("active_pattern_application_count", 0),
+              "approved_policy_count": len(memory.get("approved_production_adjustments", []) or []),
+              "auto_apply_to_production": memory.get("auto_apply_to_production"),
+          }, ensure_ascii=False))
+          PY
+
+      - name: Save updated memory for later MIND FORGE runs
+        uses: actions/cache/save@v4
+        with:
+          path: .mind-forge-memory
+          key: mind-forge-fast-memory-${{ github.run_id }}-application-gate
+
+      - name: Upload gate audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-pattern-application-gate-${{ github.run_id }}
+          path: .mind-forge-memory/fast_learning_memory.json
+          if-no-files-found: error
+          retention-days: 30
