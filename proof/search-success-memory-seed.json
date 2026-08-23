@@ -1,0 +1,133 @@
+{
+  "automatic_provider_activation": false,
+  "automatic_source_promotion": false,
+  "learning_interpretation_guard": "Replicated learning is review-only. It may guide future shadow search experiments but cannot activate providers, promote sources, or mutate production queries automatically.",
+  "min_independent_runs_for_replication": 2,
+  "observations": [
+    {
+      "automatic_provider_activation": false,
+      "automatic_source_promotion": false,
+      "evaluated_provider": "exa",
+      "learning_interpretation_guard": "This observation can replicate a provider-specific route, including bounded same-origin multi-hop navigation, but cannot compare providers. A provider win requires separate symmetric Exa-vs-Brave evidence.",
+      "observation_scope": "SINGLE_PROVIDER_ROUTE_REPLICATION",
+      "observed_at": "2026-08-23T18:10:01.470285+00:00",
+      "observed_provider_leader": "NOT_EVALUATED",
+      "production_mutation": false,
+      "production_query_mutation": false,
+      "provider_preference_status": "PROVIDER_COMPARISON_NOT_EVALUATED",
+      "providers": {
+        "brave": {
+          "automatic_activation": false,
+          "child_exact_lot_count": 0,
+          "child_page_fetches_succeeded": 0,
+          "direct_exact_lot_count": 0,
+          "eligible_aggregate_parent_count": 0,
+          "end_to_end_exact_lot_count": 0,
+          "evaluation_status": "NOT_EVALUATED",
+          "multihop_exact_lot_count": 0,
+          "provider_unique_url_count": 0,
+          "resolved_exact_lot_count": 0,
+          "search_hit_count": 0,
+          "successful_markets": [],
+          "successful_route_count": 0,
+          "verified_original_page_count": 0
+        },
+        "exa": {
+          "automatic_activation": false,
+          "child_exact_lot_count": 0,
+          "child_page_fetches_succeeded": 18,
+          "direct_exact_lot_count": 0,
+          "eligible_aggregate_parent_count": 3,
+          "end_to_end_exact_lot_count": 3,
+          "evaluation_status": "EVALUATED_FOR_ROUTE_REPLICATION",
+          "multihop_exact_lot_count": 3,
+          "provider_unique_url_count": 5,
+          "resolved_exact_lot_count": 3,
+          "search_hit_count": 5,
+          "successful_markets": [
+            "FR"
+          ],
+          "successful_route_count": 1,
+          "verified_original_page_count": 5
+        }
+      },
+      "query_mode": "exact_lot",
+      "required_project_domain": "CLOTHING_INVENTORY",
+      "run_id": "32655969884",
+      "schema_version": "search-success-learning-1.0",
+      "status": "SUCCESS",
+      "successful_routes": [
+        {
+          "exact_lot_count": 3,
+          "exact_lot_urls": [
+            "https://friptadium.com/products/hauts-femme-au-kilo",
+            "https://friptadium.com/products/hauts-femme-premium-au-kilo",
+            "https://friptadium.com/products/robes-femme-au-kilo"
+          ],
+          "market_code": "FR",
+          "parent_domain": "friptadium.com",
+          "pathway": "AGGREGATE_CHILD",
+          "provider": "exa",
+          "query": "France vêtements mode lot de marchandises à vendre prix quantité stock déstockage disponible",
+          "result_domain": null
+        }
+      ]
+    }
+  ],
+  "production_mutation": false,
+  "production_query_mutation": false,
+  "provider_learning": {
+    "brave": {
+      "automatic_activation": false,
+      "status": "NO_VERIFIED_SUCCESS",
+      "successful_independent_run_count": 0,
+      "successful_markets": [],
+      "supporting_run_ids": [],
+      "verified_exact_lot_url_count": 0,
+      "verified_exact_lot_urls": []
+    },
+    "exa": {
+      "automatic_activation": false,
+      "status": "CANDIDATE",
+      "successful_independent_run_count": 1,
+      "successful_markets": [
+        "FR"
+      ],
+      "supporting_run_ids": [
+        "32655969884"
+      ],
+      "verified_exact_lot_url_count": 3,
+      "verified_exact_lot_urls": [
+        "https://friptadium.com/products/hauts-femme-au-kilo",
+        "https://friptadium.com/products/hauts-femme-premium-au-kilo",
+        "https://friptadium.com/products/robes-femme-au-kilo"
+      ]
+    }
+  },
+  "replicated_route_count": 0,
+  "route_learning": [
+    {
+      "automatic_activation": false,
+      "independent_run_count": 1,
+      "market_code": "FR",
+      "parent_domain": "friptadium.com",
+      "pathway": "AGGREGATE_CHILD",
+      "production_query_mutation": false,
+      "provider": "exa",
+      "query": "France vêtements mode lot de marchandises à vendre prix quantité stock déstockage disponible",
+      "result_domain": null,
+      "status": "CANDIDATE",
+      "supporting_run_ids": [
+        "32655969884"
+      ],
+      "verified_exact_lot_url_count": 3,
+      "verified_exact_lot_urls": [
+        "https://friptadium.com/products/hauts-femme-au-kilo",
+        "https://friptadium.com/products/hauts-femme-premium-au-kilo",
+        "https://friptadium.com/products/robes-femme-au-kilo"
+      ]
+    }
+  ],
+  "run_count": 1,
+  "schema_version": "search-success-memory-1.0"
+}
