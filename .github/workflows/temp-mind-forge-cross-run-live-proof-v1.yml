@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     env:
-      PROOF_PASS: "1"
+      PROOF_PASS: "2"
       MIND_FORGE_LIVE_ENABLED: "1"
       OPENAI_AGENTS_DISABLE_TRACING: "1"
       OPENAI_AGENTS_DONT_LOG_MODEL_DATA: "1"
