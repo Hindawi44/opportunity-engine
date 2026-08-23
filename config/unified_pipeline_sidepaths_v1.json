@@ -1,0 +1,153 @@
+{
+  "schema_version": "unified-pipeline-sidepaths-inventory-1.0",
+  "generated_at": "2026-08-23T08:03:00Z",
+  "governing_pipeline": {
+    "contract": "UNIFIED_SIX_MARKET_PIPELINE_V1",
+    "module": "src/opportunity_engine/discovery/unified_six_market_pipeline.py",
+    "primary_workflow": ".github/workflows/multi-market-daily-operator-checkpoint.yaml",
+    "markets": ["NO", "SE", "DE", "FR", "IT", "NL"]
+  },
+  "workflow_inventory": [
+    {
+      "path": ".github/workflows/multi-market-daily-operator-checkpoint.yaml",
+      "role": "PRIMARY_RUNTIME",
+      "decision": "KEEP_AS_SINGLE_GOVERNING_DAILY_PIPELINE",
+      "feeds_stage": "DISCOVERY_TO_REPORT"
+    },
+    {
+      "path": ".github/workflows/one-opportunity-commercial-analysis.yaml",
+      "role": "DOWNSTREAM_ANALYSIS",
+      "decision": "KEEP_AND_CONSUME_ONLY_UNIFIED_VERIFIED_OPPORTUNITIES",
+      "feeds_stage": "EVIDENCE_TO_OPPORTUNITY_DECISION"
+    },
+    {
+      "path": ".github/workflows/mind-forge-live-research-launcher.yaml",
+      "role": "LEARNING_AND_RESEARCH",
+      "decision": "KEEP_SEPARATE_FROM_DAILY_DECISION_AND_FEED_DISCOVERY_ONLY_THROUGH_GATES",
+      "feeds_stage": "FEEDBACK_TO_DISCOVERY"
+    },
+    {
+      "path": ".github/workflows/sweden-clothing-inventory-live.yaml",
+      "role": "MANUAL_DIAGNOSTIC",
+      "decision": "KEEP_MANUAL_ONLY_NO_PARALLEL_PRODUCTION_AUTHORITY",
+      "feeds_stage": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "path": ".github/workflows/germany-clothing-inventory-live.yaml",
+      "role": "MANUAL_DIAGNOSTIC",
+      "decision": "KEEP_MANUAL_ONLY_NO_PARALLEL_PRODUCTION_AUTHORITY",
+      "feeds_stage": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "role": "CI_GUARD",
+      "decision": "KEEP_AS_TEST_ONLY",
+      "feeds_stage": "NONE"
+    }
+  ],
+  "architectural_families": [
+    {
+      "family": "SOURCE_SPECIFIC_ADAPTERS",
+      "role": "OPTIONAL_INGESTION_PROVIDER",
+      "decision": "ROUTE_BEHIND_UNIFIED_DISCOVERY_NOT_AS_PARALLEL_PIPELINES",
+      "representative_paths": [
+        "scripts/run_auksjonen_live_clothing.py",
+        "scripts/run_finn_email_intake.py",
+        "scripts/run_cross_source_checkpoint_adapter.py",
+        "scripts/run_riegermann_active_discovery.py",
+        "scripts/run_venta_active_discovery.py",
+        "scripts/run_dpv_active_discovery.py",
+        "scripts/run_market_clothing_inventory_discovery.py"
+      ]
+    },
+    {
+      "family": "SHADOW_AND_LABS",
+      "role": "EXPERIMENTAL_OBSERVATORY",
+      "decision": "KEEP_SHADOW_ONLY_NO_DIRECT_PROMOTION_OR_FINAL_DECISION",
+      "representative_paths": [
+        "src/opportunity_engine/discovery/mathematical_logic_shadow.py",
+        "src/opportunity_engine/discovery/keyword_shadow_verification.py",
+        "src/opportunity_engine/source_discovery_shadow.py",
+        "src/opportunity_engine/source_shadow_live_validation.py",
+        "scripts/run_keyword_shadow_verification.py",
+        "scripts/run_source_shadow_live_validation.py",
+        "scripts/run_stocklear_second_shadow_round.py"
+      ]
+    },
+    {
+      "family": "LEARNING_QUERY_GAP_AND_FEEDBACK",
+      "role": "CONTROLLED_FEEDBACK_LOOP",
+      "decision": "FEED_DISCOVERY_ONLY_AFTER_EVIDENCE_HOLDOUT_AND_PROMOTION_GATES",
+      "representative_paths": [
+        "src/opportunity_engine/root_cause_feedback_router.py",
+        "scripts/mind_forge_v2_pattern_promotion.py",
+        "scripts/mind_forge_v2_fast_learning_memory.py",
+        "scripts/mind_forge_v2_learning_memory.py",
+        "scripts/mind_forge_v2_experiment_outcome.py"
+      ]
+    },
+    {
+      "family": "COMMERCIAL_EVIDENCE_COST_AND_LOGISTICS",
+      "role": "DOWNSTREAM_ANALYSIS_CAPABILITY",
+      "decision": "KEEP_AS_SHARED_STAGES_AFTER_EXACT_LOT_AND_COMMERCIAL_QUALIFICATION",
+      "representative_paths": [
+        "src/opportunity_engine/logistics/operational_transport.py",
+        "src/opportunity_engine/costs/decision_landed_cost.py",
+        "scripts/build_shipment_evidence_queue.py",
+        "scripts/build_operational_transport_input.py",
+        "scripts/build_operational_landed_cost.py",
+        "scripts/build_economic_evaluation_queue.py"
+      ]
+    },
+    {
+      "family": "STATE_REVIEW_AND_OPERATOR_CONTROL",
+      "role": "SHARED_CONTROL_PLANE",
+      "decision": "KEEP_SHARED_AND_ATTACH_TO_UNIFIED_PIPELINE",
+      "representative_paths": [
+        "scripts/apply_human_review_outcome.py",
+        "scripts/restore_previous_checkpoint_state.py",
+        "scripts/build_action_center.py",
+        "src/opportunity_engine/discovery/domain_market_intelligence_feed.py"
+      ]
+    },
+    {
+      "family": "DOMAIN_SPECIFIC_EXPERIMENTS",
+      "role": "NON_GOVERNING_DOMAIN_EXTENSION",
+      "decision": "KEEP_OUTSIDE_PRIMARY_DECISION_UNTIL_MAPPED_TO_THE_UNIFIED_CONTRACT",
+      "representative_paths": [
+        "scripts/build_fabric_procurement_watch.py",
+        "experiments/quote_to_job_standardizer/README.md"
+      ]
+    }
+  ],
+  "migration_rules": {
+    "single_governing_pipeline": true,
+    "source_or_country_may_own_parallel_final_decision": false,
+    "shadow_may_promote_directly_to_production": false,
+    "learning_requires_validation_gate": true,
+    "downstream_analysis_requires_verified_unified_input": true,
+    "diagnostic_workflows_may_be_scheduled": false,
+    "automatic_contact": false,
+    "automatic_bid": false,
+    "automatic_reservation": false,
+    "automatic_purchase": false,
+    "automatic_payment": false,
+    "legacy_deletion_requires_separate_cleanup_pr": true
+  },
+  "git_branch_hygiene": {
+    "snapshot_date": "2026-08-23",
+    "agent_branch_count": 240,
+    "runtime_authority": false,
+    "decision": "SEPARATE_BRANCH_CLEANUP_AFTER_MERGE_STATUS_AUDIT",
+    "delete_in_this_inventory": false,
+    "observed_patterns": [
+      "agent/temp-*",
+      "agent/one-time-*",
+      "agent/*-live-proof-*",
+      "agent/fix-*",
+      "agent/mind-forge-*",
+      "agent/sweden-*",
+      "agent/italy-*"
+    ]
+  }
+}
