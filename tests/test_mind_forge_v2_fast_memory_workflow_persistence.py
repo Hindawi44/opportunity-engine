@@ -5,6 +5,7 @@ WORKFLOW = Path(".github/workflows/mind-forge-live-research-launcher.yaml")
 
 
 def test_launcher_restores_latest_fast_memory_before_live_cycle():
+    assert WORKFLOW.is_file()
     text = WORKFLOW.read_text(encoding="utf-8")
 
     assert "actions/cache/restore@v4" in text
