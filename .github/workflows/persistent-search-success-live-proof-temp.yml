@@ -1,0 +1,114 @@
+name: Persistent Search Success Live Proof TEMP
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/persistent-search-success-live-proof-temp.yml"
+      - "scripts/run_daily_search_success_learning.py"
+      - "config/learning/search-success-bootstrap-v1.json"
+      - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
+
+permissions:
+  contents: read
+
+jobs:
+  persistent-search-success-live-proof:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      INPUT_ROOT: artifacts/multi-market-inputs
+      OUTPUT_DIR: artifacts/persistent-search-success-live-proof
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+
+      - name: Verify focused contracts
+        run: |
+          pytest tests/test_persistent_search_success_memory_v1.py -q
+          pytest tests/test_provider_route_success_learning_v1.py -q
+          pytest tests/test_exact_lot_multihop_resolution_v1.py -q
+          pytest tests/test_exact_lot_multihop_hub_root_v1.py -q
+
+      - name: Run persistent daily Search Success live proof
+        run: |
+          test -n "$EXA_API_KEY"
+          python scripts/run_daily_search_success_learning.py \
+            --input-root "$INPUT_ROOT" \
+            --output-dir "$OUTPUT_DIR" \
+            --run-id "$GITHUB_RUN_ID" \
+            --bootstrap-memory config/learning/search-success-bootstrap-v1.json \
+            --results-per-query 5
+
+      - name: Assert durable replicated review state
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          input_root = Path("artifacts/multi-market-inputs")
+          output = Path("artifacts/persistent-search-success-live-proof")
+          memory = json.loads((input_root / "learning/search-success-memory.json").read_text(encoding="utf-8"))
+          review = json.loads((output / "search-success-review.json").read_text(encoding="utf-8"))
+          observation = json.loads((output / "search-success-observation.json").read_text(encoding="utf-8"))
+          multihop = json.loads((output / "search-success-multihop.json").read_text(encoding="utf-8"))
+
+          current_run = os.environ["GITHUB_RUN_ID"]
+          routes = [
+              row for row in memory.get("route_learning") or []
+              if row.get("provider") == "exa"
+              and row.get("market_code") == "FR"
+              and row.get("parent_domain") == "friptadium.com"
+          ]
+          assert routes, "verified Friptadium route disappeared"
+          route = routes[0]
+
+          print("current_run_id:", current_run)
+          print("memory_source:", review.get("memory_source"))
+          print("memory_run_count:", review.get("memory_run_count"))
+          print("current_run_successful_route_count:", review.get("current_run_successful_route_count"))
+          print("replicated_route_count:", review.get("replicated_route_count"))
+          print("route_independent_run_count:", route.get("independent_run_count"))
+          print("route_status:", route.get("status"))
+          print("exact_lots:", multihop.get("exact_lot_candidate_count"))
+
+          assert review["memory_source"] == "VERIFIED_BOOTSTRAP_MEMORY"
+          assert review["review_status"] == "REPLICATED_FOR_REVIEW"
+          assert review["memory_run_count"] >= 3
+          assert review["current_run_successful_route_count"] >= 1
+          assert review["replicated_route_count"] >= 1
+          assert route["status"] == "REPLICATED_FOR_REVIEW"
+          assert route["independent_run_count"] >= 3
+          assert current_run in route["supporting_run_ids"]
+          assert {"32655969884", "32657298412"}.issubset(set(route["supporting_run_ids"]))
+          assert observation["provider_preference_status"] == "PROVIDER_COMPARISON_NOT_EVALUATED"
+          assert multihop["exact_lot_candidate_count"] >= 1
+          assert review["automatic_provider_activation"] is False
+          assert review["automatic_source_promotion"] is False
+          assert review["production_query_mutation"] is False
+          assert review["production_mutation"] is False
+          assert review["automatic_contact"] is False
+          assert review["automatic_bid"] is False
+          assert review["automatic_reservation"] is False
+          assert review["automatic_purchase"] is False
+          assert review["automatic_payment"] is False
+          PY
+
+      - name: Upload live proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: persistent-search-success-live-proof
+          path: |
+            artifacts/persistent-search-success-live-proof/
+            artifacts/multi-market-inputs/learning/search-success-memory.json
+          if-no-files-found: error
+          retention-days: 30
