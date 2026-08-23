@@ -27,7 +27,7 @@ PROMOTIONS = {
         {
             "source_domain": "joblot.stocklear.eu",
             "status": "PROMOTED",
-            "reason": "Explicit operator approval after two independent 5/5 verified shadow rounds and stable public access.",
+            "reason": "Test-only explicit promotion after in-domain proof.",
             "approved_at": "2026-08-22T15:48:00+02:00",
         }
     ],
@@ -61,16 +61,18 @@ def _promoted_feed() -> dict:
     </body></html>
     """
     detail1 = """
-    <html><head><title>111 Bosch Siemens appliances</title>
+    <html><head><title>Mixed fashion clothing stock - jackets and trousers</title>
     <style>.quality{display:flex}.rrp781{color:red}</style></head><body>
     Starting price € 2,000. Number of pallets 2. 111 units.
+    Apparel stocklot with jackets, trousers and shirts.
     Quality: Functional customer returns. RRP € 14,922.
     </body></html>
     """
     detail2 = """
-    <html><head><title>Mixed household stock</title>
+    <html><head><title>111 Bosch Siemens appliances</title>
     <script>const quality = 'fake'; const RRP = 999999;</script></head><body>
     Last bid 1,250 EUR. Number of pallets 4. 699 units.
+    Kitchen appliances and household electronics.
     Quality: New in original packaging.
     </body></html>
     """
@@ -92,27 +94,30 @@ def _promoted_feed() -> dict:
     )
 
 
-def test_promoted_stocklear_feed_is_exact_page_verified_and_bounded() -> None:
+def test_promoted_stocklear_feed_is_exact_page_verified_bounded_and_domain_gated() -> None:
     report = _promoted_feed()
 
     assert report["status"] == "ACTIVE"
     assert report["production_source_active"] is True
-    assert report["candidate_count"] == 2
+    assert report["candidate_count"] == 1
+    assert report["out_of_domain_filtered_count"] == 1
     assert report["network_request_count"] == 3
     assert report["automatic_promotion"] is False
     assert report["explicit_promotion_required"] is True
-    assert all(row["source_page_verified"] is True for row in report["candidates"])
-    assert all(row["feed_family"] == "STOCKLEAR_PROMOTED_AUCTION_FEED_V1" for row in report["candidates"])
-    first = report["candidates"][0]
+    assert report["project_domain_gate_enforced"] is True
+    [first] = report["candidates"]
+    assert first["source_page_verified"] is True
+    assert first["feed_family"] == "STOCKLEAR_PROMOTED_AUCTION_FEED_V1"
+    assert first["project_domain"] == "CLOTHING_INVENTORY"
+    assert first["inventory_focus"] == "CLOTHING_INVENTORY"
     assert first["total_price"] == 2000.0
     assert first["currency"] == "EUR"
     assert first["estimated_retail_value"] == 14922.0
     assert first["condition_terms"] == ["Functional customer returns"]
     assert "display:flex" not in first["description"]
-    assert "999999" not in report["candidates"][1]["description"]
 
 
-def test_promoted_feed_enters_unified_river_as_auction_inventory() -> None:
+def test_promoted_feed_enters_unified_river_only_for_clothing_inventory() -> None:
     report = _promoted_feed()
     artifacts = {
         "domain-market-intelligence-brief.json": {
@@ -127,8 +132,8 @@ def test_promoted_feed_enters_unified_river_as_auction_inventory() -> None:
         generated_at=datetime(2026, 8, 22, 13, 48, tzinfo=timezone.utc),
     )
     kinds = [row["record_kind"] for row in river["items"]["items"]]
-    assert kinds == ["AUCTION_LOT", "AUCTION_LOT"]
-    assert river["brief"]["counts"]["deduplicated_items"] == 2
+    assert kinds == ["AUCTION_LOT"]
+    assert river["brief"]["counts"]["deduplicated_items"] == 1
 
 
 def test_missing_or_disabled_promotion_performs_zero_network_requests() -> None:
