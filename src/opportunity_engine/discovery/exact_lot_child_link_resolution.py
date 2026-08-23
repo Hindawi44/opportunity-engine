@@ -7,14 +7,16 @@ item-specific Tool Learning credit.
 
 Child links are restricted to HTTPS, same-origin descendant paths. A child is
 accepted only when the strict commercial classifier proves an item-specific
-clothing lot with direct sale, price and quantity. Child classification adds two
+clothing lot with direct sale, price and quantity. Child classification adds
 conservative protections that are intentionally scoped to this layer:
 
 * prices such as ``4 €`` and ``1000€`` are normalized to ``EUR`` before the
   existing price parser runs;
 * an item-specific child must prove the clothing domain from its own title/URL
-  subject. Site-wide navigation text cannot turn paint, hardware or other goods
-  into clothing inventory.
+  subject;
+* explicit e-commerce controls such as ``Ajouter au panier`` prove direct sale
+  only on canonical ``/products/<slug>`` detail routes. Site-wide cart controls
+  on hubs or collections cannot create exact-lot credit.
 
 The layer is read-only and cannot contact, bid, reserve, buy or pay.
 """
@@ -44,7 +46,7 @@ from opportunity_engine.project_domain_boundary import (
     classify_project_domain,
 )
 
-SCHEMA_VERSION = "exact-lot-child-link-resolution-1.1"
+SCHEMA_VERSION = "exact-lot-child-link-resolution-1.2"
 LAB_FAMILY = "EXACT_LOT_CHILD_LINK_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_PARENT_FETCHES = 12
@@ -53,6 +55,29 @@ MAX_CHILD_PAGE_FETCHES = 30
 MAX_RESPONSE_BYTES = 800_000
 
 _EURO_AFTER_NUMBER_RE = re.compile(r"(?<=\d)\s*€")
+_CANONICAL_PRODUCT_DETAIL_RE = re.compile(
+    r"(?:^|/)products/(?P<slug>[^/?#]+)/*$",
+    re.IGNORECASE,
+)
+_EXPLICIT_PURCHASE_MARKERS = (
+    "add to cart",
+    "buy now",
+    "ajouter au panier",
+    "acheter maintenant",
+    "in den warenkorb",
+    "jetzt kaufen",
+    "aggiungi al carrello",
+    "acquista ora",
+    "in winkelwagen",
+    "nu kopen",
+    "lägg i varukorg",
+    "lagg i varukorg",
+    "köp nu",
+    "kop nu",
+    "legg i handlekurv",
+    "kjøp nå",
+    "kjop na",
+)
 
 
 def _compact(value: object) -> str:
@@ -92,7 +117,7 @@ def fetch_public_html(url: str) -> AggregateHtmlFetchResult:
             allow_redirects=True,
             stream=True,
             headers={
-                "User-Agent": "opportunity-engine-exact-lot-child-link-resolver/1.1",
+                "User-Agent": "opportunity-engine-exact-lot-child-link-resolver/1.2",
                 "Accept": "text/html,application/xhtml+xml",
             },
         ) as response:
@@ -223,12 +248,29 @@ def _normalize_child_price_text(text: str) -> str:
     return _EURO_AFTER_NUMBER_RE.sub(" EUR", str(text or ""))
 
 
+def _looks_canonical_product_detail_url(url: str) -> bool:
+    try:
+        path = (urlsplit(_compact(url)).path or "").casefold().rstrip("/")
+    except ValueError:
+        return False
+    match = _CANONICAL_PRODUCT_DETAIL_RE.search(path)
+    if not match:
+        return False
+    return match.group("slug").casefold() not in {"search", "all", "index", "catalog", "catalogue"}
+
+
+def _has_explicit_purchase_control(text: str) -> bool:
+    normalized = _compact(text).casefold()
+    return any(marker in normalized for marker in _EXPLICIT_PURCHASE_MARKERS)
+
+
 def _classify_child_page(*, title: str, text: str, url: str) -> tuple[str, dict[str, Any]]:
     """Classify one item-specific child with local-subject domain evidence.
 
-    The existing classifier still supplies all commercial evidence. We only add
-    a child-scoped subject-domain gate so shared navigation text cannot establish
-    clothing relevance for an unrelated item page.
+    The existing classifier supplies the base commercial evidence. This layer
+    adds local subject-domain protection and one narrow e-commerce rule: an
+    explicit purchase control can prove direct sale only on a canonical product
+    detail URL, never on a hub/collection page where cart text may be global UI.
     """
     normalized_text = _normalize_child_price_text(text)
     classification, evidence = _classify_page(
@@ -239,18 +281,37 @@ def _classify_child_page(*, title: str, text: str, url: str) -> tuple[str, dict[
     evidence = dict(evidence)
     full_page_domain = evidence.get("project_domain")
     subject_domain = classify_project_domain(text=_subject_context(title=title, url=url))
+    canonical_product = _looks_canonical_product_detail_url(url)
+    purchase_control = bool(canonical_product and _has_explicit_purchase_control(normalized_text))
+
     evidence["full_page_project_domain"] = full_page_domain
     evidence["page_subject_domain"] = subject_domain
     evidence["child_price_symbol_normalization"] = normalized_text != str(text or "")
+    evidence["canonical_product_detail_url_evidence"] = canonical_product
+    evidence["explicit_purchase_evidence"] = purchase_control
+
+    if purchase_control:
+        evidence["direct_sale_evidence"] = True
 
     if evidence.get("item_specific_url_evidence") is True and subject_domain != CLOTHING_INVENTORY:
         evidence["project_domain"] = OUT_OF_DOMAIN
         evidence["domain_evidence"] = False
-        if classification in {EXACT_LOT_CANDIDATE, ACTIVE_STOCK_SIGNAL}:
+        if classification in {EXACT_LOT_CANDIDATE, ACTIVE_STOCK_SIGNAL} or purchase_control:
             classification = OUT_OF_DOMAIN
     elif subject_domain == CLOTHING_INVENTORY:
         evidence["project_domain"] = CLOTHING_INVENTORY
         evidence["domain_evidence"] = True
+        strict_product_shape = bool(
+            canonical_product
+            and purchase_control
+            and evidence.get("inventory_evidence") is True
+            and evidence.get("price_evidence") is True
+            and evidence.get("quantity_evidence") is True
+            and evidence.get("item_specific_url_evidence") is True
+            and evidence.get("info_or_legal_evidence") is not True
+        )
+        if strict_product_shape:
+            classification = EXACT_LOT_CANDIDATE
 
     return classification, evidence
 
@@ -511,6 +572,6 @@ def resolve_exact_lot_child_links(
         "child_results": child_results,
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Aggregate parents remain non-opportunities. A child must be a directly fetched same-origin descendant item page whose own subject proves clothing and whose page proves direct sale, price and quantity."
+            "Aggregate parents remain non-opportunities. A child must be a directly fetched same-origin descendant item page whose own subject proves clothing and whose page proves direct sale, price and quantity. Explicit cart/buy controls count only on canonical product-detail URLs."
         ),
     }

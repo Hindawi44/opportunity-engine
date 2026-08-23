@@ -164,13 +164,17 @@ _QUANTITY_RE = re.compile(
     r"metres|ruller|rollen|rolls|kartonger|kartons|cartons)\b",
     re.IGNORECASE,
 )
-# Only singular item/detail route tokens qualify. Plural collection tokens such
-# as /lots-.../, /lots/, /products/ and /items/ are intentionally excluded:
-# those routes commonly represent category/index pages whose aggregate HTML may
-# contain many unrelated prices and quantities.
+# Singular item/detail route tokens qualify directly. Plural collection roots
+# still fail closed, with one narrow exception: canonical commerce product
+# containers such as /products/<slug> are item-specific only when a real slug
+# exists after the container. Bare /products/ remains aggregate.
 _ITEM_PATH_RE = re.compile(
     r"(?:^|/)(?:item|lot|lotto|product|produkt|kavel|annuncio|articolo|auction|"
     r"auktion|auksjon|veiling)(?:[-_/]|$)",
+    re.IGNORECASE,
+)
+_PRODUCT_DETAIL_CONTAINER_RE = re.compile(
+    r"(?:^|/)products/(?P<slug>[^/?#]+)(?:/|$)",
     re.IGNORECASE,
 )
 _AGGREGATE_PATH_MARKERS = (
@@ -200,20 +204,24 @@ def _looks_item_specific_url(url: str) -> bool:
 
     Homepages, search pages, category pages and marketplace roots cannot become
     exact lots merely because their aggregate HTML contains many prices and
-    quantities. Plural collection routes also fail closed unless a later path
-    segment proves a singular item/detail route.
+    quantities. Bare plural collection routes fail closed. A canonical
+    ``/products/<slug>`` route qualifies only when it contains a non-generic
+    product slug after the container.
     """
     try:
         parsed = urlsplit(_compact(url))
     except ValueError:
         return False
     path = (parsed.path or "/").casefold().rstrip("/")
-    if not path or path == "":
-        return False
-    if path == "/":
+    if not path or path == "/":
         return False
     if any(marker in path for marker in _AGGREGATE_PATH_MARKERS):
         return False
+    product_match = _PRODUCT_DETAIL_CONTAINER_RE.search(path)
+    if product_match:
+        slug = product_match.group("slug").casefold()
+        if slug not in {"search", "all", "index", "catalog", "catalogue"}:
+            return True
     return bool(_ITEM_PATH_RE.search(path))
 
 

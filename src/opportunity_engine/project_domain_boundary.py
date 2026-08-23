@@ -145,6 +145,13 @@ _CLOTHING_MARKERS = (
     "pantalons",
     "chemises",
     "robes",
+    # French product titles often name a garment family without repeating the
+    # generic word "vêtements". Keep these markers deliberately compound so a
+    # broad word such as "haut" cannot make unrelated pages clothing evidence.
+    "haut femme",
+    "hauts femme",
+    "haut homme",
+    "hauts homme",
     "robe de mariée",
     "robe de mariee",
     "abbigliamento",

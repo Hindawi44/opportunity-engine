@@ -11,6 +11,8 @@ QUERY_FR = "France vêtements mode lot de marchandises à vendre prix quantité 
 PARENT = "https://www.sdpie.com/lots-en-vente/"
 LOT_A = "https://www.sdpie.com/lots-en-vente/lot-de-vestes-et-costumes/"
 LOT_B = "https://www.sdpie.com/lots-en-vente/lot-epi-vetements-professionnels/"
+FRIPTADIUM_HUB = "https://friptadium.com/pages/lot-de-vetements-revendeur"
+FRIPTADIUM_PRODUCT = "https://friptadium.com/products/hauts-femme-au-kilo"
 
 
 def _benchmark() -> dict:
@@ -51,10 +53,10 @@ def _verification() -> dict:
     }
 
 
-def _exact(url: str) -> dict:
+def _exact(url: str, *, parent_url: str = PARENT) -> dict:
     return {
         "url": url,
-        "parent_url": PARENT,
+        "parent_url": parent_url,
         "market_code": "FR",
         "query": QUERY_FR,
         "provider": "exa",
@@ -91,6 +93,33 @@ def _child_resolution() -> dict:
         "child_page_fetches_succeeded": 2,
         "exact_lot_candidate_count": 2,
         "exact_lots": [_exact(LOT_A), _exact(LOT_B)],
+    }
+
+
+def _multihop_resolution() -> dict:
+    return {
+        "status": "SUCCESS",
+        "provider": "exa",
+        "shadow_only": True,
+        "required_project_domain": "CLOTHING_INVENTORY",
+        "project_domain_gate_enforced": True,
+        "commercial_specificity_gate_enforced": True,
+        "child_subject_domain_gate_enforced": True,
+        "same_origin_only": True,
+        "bounded_multi_hop": True,
+        "exact_lot_acceptance_only": True,
+        "production_mutation": False,
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_reservation": False,
+        "automatic_purchase": False,
+        "automatic_payment": False,
+        "eligible_root_parent_count": 1,
+        "navigation_page_fetches_succeeded": 3,
+        "exact_lot_candidate_count": 1,
+        "exact_lots": [
+            _exact(FRIPTADIUM_PRODUCT, parent_url=FRIPTADIUM_HUB)
+        ],
     }
 
 
@@ -192,3 +221,65 @@ def test_provider_route_learning_fails_closed_without_child_subject_guard() -> N
             provider_verification=_verification(),
             child_resolution=child,
         )
+
+
+def test_multihop_exact_lot_feeds_shared_search_success_memory_without_tool_comparison() -> None:
+    observation = build_provider_route_success_observation(
+        run_id="friptadium-multihop-run",
+        provider="exa",
+        benchmark=_benchmark(),
+        provider_verification=_verification(),
+        multihop_resolution=_multihop_resolution(),
+    )
+
+    assert observation["observed_provider_leader"] == "NOT_EVALUATED"
+    assert observation["provider_preference_status"] == "PROVIDER_COMPARISON_NOT_EVALUATED"
+    assert observation["providers"]["exa"]["child_exact_lot_count"] == 0
+    assert observation["providers"]["exa"]["multihop_exact_lot_count"] == 1
+    assert observation["providers"]["exa"]["end_to_end_exact_lot_count"] == 1
+
+    route = observation["successful_routes"][0]
+    assert route["pathway"] == "AGGREGATE_CHILD"
+    assert route["parent_domain"] == "friptadium.com"
+    assert route["exact_lot_urls"] == [FRIPTADIUM_PRODUCT]
+
+    memory = update_search_success_memory({}, observation, min_independent_runs=2)
+    assert memory["route_learning"][0]["status"] == "CANDIDATE"
+    assert memory["provider_learning"]["exa"]["status"] == "CANDIDATE"
+    assert memory["automatic_provider_activation"] is False
+
+
+def test_multihop_route_learning_fails_closed_without_same_origin_guard() -> None:
+    multihop = _multihop_resolution()
+    multihop["same_origin_only"] = False
+
+    with pytest.raises(ValueError, match="same-origin multi-hop guard"):
+        build_provider_route_success_observation(
+            run_id="unsafe-multihop",
+            provider="exa",
+            benchmark=_benchmark(),
+            provider_verification=_verification(),
+            multihop_resolution=multihop,
+        )
+
+
+def test_child_and_multihop_inputs_do_not_double_count_same_exact_lot() -> None:
+    child = _child_resolution()
+    child["exact_lots"] = [_exact(FRIPTADIUM_PRODUCT, parent_url=FRIPTADIUM_HUB)]
+    child["exact_lot_candidate_count"] = 1
+    child["child_page_fetches_succeeded"] = 1
+
+    observation = build_provider_route_success_observation(
+        run_id="dedupe-resolved-lots",
+        provider="exa",
+        benchmark=_benchmark(),
+        provider_verification=_verification(),
+        child_resolution=child,
+        multihop_resolution=_multihop_resolution(),
+    )
+
+    assert observation["providers"]["exa"]["child_exact_lot_count"] == 1
+    assert observation["providers"]["exa"]["multihop_exact_lot_count"] == 1
+    assert observation["providers"]["exa"]["resolved_exact_lot_count"] == 1
+    assert observation["providers"]["exa"]["end_to_end_exact_lot_count"] == 1
+    assert observation["successful_routes"][0]["exact_lot_count"] == 1

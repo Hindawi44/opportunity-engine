@@ -36,7 +36,8 @@ def main() -> int:
     parser.add_argument("--provider", choices=("exa",), default="exa")
     parser.add_argument("--benchmark", required=True)
     parser.add_argument("--provider-verification", required=True)
-    parser.add_argument("--child-resolution", required=True)
+    parser.add_argument("--child-resolution")
+    parser.add_argument("--multihop-resolution")
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--observed-at")
     parser.add_argument("--existing-memory")
@@ -45,12 +46,18 @@ def main() -> int:
     parser.add_argument("--min-independent-runs", type=int, default=2)
     args = parser.parse_args()
 
+    if not args.child_resolution and not args.multihop_resolution:
+        parser.error("one of --child-resolution or --multihop-resolution is required")
+
     observation = build_provider_route_success_observation(
         run_id=args.run_id,
         provider=args.provider,
         benchmark=_load(args.benchmark),
         provider_verification=_load(args.provider_verification),
-        child_resolution=_load(args.child_resolution),
+        child_resolution=_load(args.child_resolution) if args.child_resolution else None,
+        multihop_resolution=(
+            _load(args.multihop_resolution) if args.multihop_resolution else None
+        ),
         observed_at=args.observed_at,
     )
     existing = _load(args.existing_memory) if args.existing_memory else {}
@@ -62,10 +69,14 @@ def main() -> int:
     _write(args.observation_output, observation)
     _write(args.memory_output, memory)
 
+    evaluated = observation["providers"][args.provider]
     print(f"status={observation['status']}")
     print(f"scope={observation['observation_scope']}")
     print(f"evaluated_provider={observation['evaluated_provider']}")
     print(f"provider_comparison={observation['provider_preference_status']}")
+    print(f"direct_exact_lots={evaluated['direct_exact_lot_count']}")
+    print(f"child_exact_lots={evaluated['child_exact_lot_count']}")
+    print(f"multihop_exact_lots={evaluated['multihop_exact_lot_count']}")
     print(f"successful_routes={len(observation['successful_routes'])}")
     print(f"memory_run_count={memory['run_count']}")
     print(f"replicated_routes={memory['replicated_route_count']}")
