@@ -48,6 +48,25 @@ jobs:
       - name: Check out current main-line V2 implementation
         uses: actions/checkout@v4
 
+      - name: Restore prior fast-learning memory
+        uses: actions/cache/restore@v4
+        with:
+          path: .mind-forge-memory
+          key: mind-forge-fast-memory-${{ github.run_id }}
+          restore-keys: |
+            mind-forge-fast-memory-
+
+      - name: Activate prior fast-learning memory when present
+        run: |
+          set -euo pipefail
+          MEMORY="$GITHUB_WORKSPACE/.mind-forge-memory/fast_learning_memory.json"
+          if [ -f "$MEMORY" ]; then
+            echo "MIND_FORGE_PRIOR_MEMORY_PATH=$MEMORY" >> "$GITHUB_ENV"
+            echo "Prior fast-learning memory restored for shadow search guidance."
+          else
+            echo "No prior fast-learning memory found; this run starts without cross-run hints."
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -184,6 +203,7 @@ jobs:
               "evidence.json",
               "final_rank.json",
               "live_evidence_usage.json",
+              "fast_learning_memory.json",
               "decision.json",
           ]
           missing = [name for name in required if not (root / name).exists()]
@@ -206,6 +226,17 @@ jobs:
                   if abs(float(row["final_score"]) - float(row["reasoning_score"])) > 0.0001:
                       raise SystemExit("irrelevant-only evidence changed final score")
 
+          fast_memory = json.loads((root / "fast_learning_memory.json").read_text(encoding="utf-8"))
+          if fast_memory.get("status") != "MIND_FORGE_V2_FAST_CROSS_RUN_MEMORY_COMPLETE":
+              raise SystemExit("fast cross-run learning memory did not complete")
+          if fast_memory.get("source") != "RUN_EVIDENCE":
+              raise SystemExit("fast memory is not evidence-derived")
+          if fast_memory.get("auto_apply_to_production") is not False:
+              raise SystemExit("fast memory may not auto-apply to production")
+          for hint in fast_memory.get("next_cycle_search_adjustments", []):
+              if hint.get("mode") != "SHADOW_HINT" or hint.get("may_auto_reject_ideas") is not False:
+                  raise SystemExit("fast memory escaped shadow-only guardrails")
+
           decision = json.loads((root / "decision.json").read_text(encoding="utf-8"))
           if decision.get("status") != "MIND_FORGE_V2_DECISION_EXPERIMENT_COMPLETE":
               raise SystemExit("decision/experiment stage did not complete")
@@ -225,8 +256,23 @@ jobs:
               if float(experiment.get("max_cash_commitment_nok", 999999)) > 1000:
                   raise SystemExit("experiment cash cap exceeded 1000 NOK")
 
-          print("MIND FORGE SEED-ONLY AUTO V2 + DECISION/EXPERIMENT: PASS")
+          print("MIND FORGE SEED-ONLY AUTO V2 + FAST CROSS-RUN LEARNING + DECISION: PASS")
           PY
+
+      - name: Stage current fast-learning memory for the next run
+        if: success()
+        run: |
+          set -euo pipefail
+          mkdir -p .mind-forge-memory
+          cp artifacts/mind-forge-creative-v2-open-live/fast_learning_memory.json \
+            .mind-forge-memory/fast_learning_memory.json
+
+      - name: Save current fast-learning memory for next run
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: .mind-forge-memory
+          key: mind-forge-fast-memory-${{ github.run_id }}
 
       - name: Upload autonomous MIND FORGE result
         if: always()
