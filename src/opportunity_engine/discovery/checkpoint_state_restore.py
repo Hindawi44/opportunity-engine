@@ -37,6 +37,7 @@ LEARNING_STATE_FILENAMES = (
     "active-keyword-overlay.json",
     "keyword-learning-history.json",
     "parser-rescue-overlay.json",
+    "search-success-memory.json",
 )
 
 
