@@ -18,6 +18,12 @@ def _search_success_memory() -> dict:
         "schema_version": "search-success-memory-1.0",
         "run_count": 3,
         "replicated_route_count": 1,
+        "observations": [
+            {
+                "run_id": "run-3",
+                "provider_preference_status": "PROVIDER_COMPARISON_NOT_EVALUATED",
+            }
+        ],
         "route_learning": [
             {
                 "provider": "exa",
@@ -28,12 +34,17 @@ def _search_success_memory() -> dict:
                 "independent_run_count": 2,
                 "supporting_run_ids": ["run-1", "run-2"],
                 "status": "REPLICATED_FOR_REVIEW",
-                "exact_lot_urls": ["https://friptadium.com/products/example"],
+                "verified_exact_lot_url_count": 1,
+                "verified_exact_lot_urls": [
+                    "https://friptadium.com/products/example"
+                ],
+                "automatic_activation": False,
+                "production_query_mutation": False,
             }
         ],
         "provider_learning": {
             "exa": {"status": "REPLICATED_FOR_REVIEW"},
-            "brave": {"status": "NOT_EVALUATED"},
+            "brave": {"status": "NO_VERIFIED_SUCCESS"},
         },
         "automatic_provider_activation": False,
         "automatic_source_promotion": False,
@@ -96,6 +107,7 @@ def test_learning_layer_unifies_success_and_miss_learning_without_mutation() -> 
     assert review["review_item_count"] == 3
     assert review["what_worked_count"] >= 2
     assert review["what_failed_count"] == 1
+    assert review["provider_comparison_status"] == "PROVIDER_COMPARISON_NOT_EVALUATED"
 
     kinds = {item["kind"] for item in review["review_queue"]}
     assert kinds == {
@@ -111,6 +123,7 @@ def test_learning_layer_unifies_success_and_miss_learning_without_mutation() -> 
     assert route["provider"] == "exa"
     assert route["market_code"] == "FR"
     assert route["independent_run_count"] == 2
+    assert route["exact_lot_count"] == 1
     assert route["review_action"] == "REVIEW_REPLICATED_ROUTE"
 
     miss = next(
