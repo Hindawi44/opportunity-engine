@@ -1,6 +1,9 @@
 name: MIND FORGE Live Research Launcher
 
 on:
+  workflow_run:
+    workflows: ["Multi-Market Daily Operator Checkpoint"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       operation:
@@ -71,8 +74,123 @@ jobs:
       - name: Refuse unconfirmed paid execution
         run: echo "Paid execution was not explicitly authorized; no API call was made."
 
+  scheduled-teaching-dispatch:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.event == 'schedule' && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Check out current main-line teaching selector
+        uses: actions/checkout@v4
+
+      - name: Restore scheduled teaching fingerprints
+        uses: actions/cache/restore@v4
+        with:
+          path: .mind-forge-scheduled
+          key: mind-forge-scheduled-teaching-${{ github.run_id }}
+          restore-keys: |
+            mind-forge-scheduled-teaching-
+
+      - name: Download successful morning checkpoint artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: multi-market-daily-operator-checkpoint
+          path: artifacts/morning-checkpoint
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Select at most one unseen AI teaching task
+        id: teaching
+        run: |
+          set -euo pipefail
+          QUEUE="$(find artifacts/morning-checkpoint -type f -name ai-teaching-queue-v1.json -print -quit)"
+          if [ -z "$QUEUE" ]; then
+            echo "Morning checkpoint artifact is missing ai-teaching-queue-v1.json" >&2
+            exit 1
+          fi
+          mkdir -p .mind-forge-scheduled artifacts/mind-forge-scheduled-teaching
+          STATE="$GITHUB_WORKSPACE/.mind-forge-scheduled/scheduled_teaching_state.json"
+          SELECTION="$GITHUB_WORKSPACE/artifacts/mind-forge-scheduled-teaching/selection.json"
+          ARGS=(select --queue "$QUEUE" --output "$SELECTION" --github-output "$GITHUB_OUTPUT")
+          if [ -f "$STATE" ]; then
+            ARGS+=(--state "$STATE")
+          fi
+          python scripts/mind_forge_scheduled_teaching_selector.py "${ARGS[@]}"
+          echo "selection_path=$SELECTION" >> "$GITHUB_OUTPUT"
+          echo "state_path=$STATE" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch bounded MIND FORGE for selected teaching task
+        if: steps.teaching.outputs.should_run == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SELECTION_PATH: ${{ steps.teaching.outputs.selection_path }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/mind-forge-dispatch.json"
+          import json
+          import os
+          from pathlib import Path
+
+          selection = json.loads(Path(os.environ["SELECTION_PATH"]).read_text(encoding="utf-8"))
+          task = selection.get("selected_task") or {}
+          seed = str(task.get("mind_forge_seed") or "").strip()
+          if not seed:
+              raise SystemExit("selected scheduled teaching task has no MIND FORGE seed")
+          print(json.dumps({
+              "ref": "main",
+              "inputs": {
+                  "operation": "RUN_SEED",
+                  "seed": seed,
+                  "confirm_paid_live_research": "YES"
+              }
+          }, ensure_ascii=False))
+          PY
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows/mind-forge-live-research-launcher.yaml/dispatches" \
+            --data-binary @"$RUNNER_TEMP/mind-forge-dispatch.json"
+          echo "Scheduled MIND FORGE teaching dispatched for task ${{ steps.teaching.outputs.task_id }}."
+
+      - name: Record dispatched scheduled teaching fingerprint
+        if: steps.teaching.outputs.should_run == 'true'
+        env:
+          SELECTION_PATH: ${{ steps.teaching.outputs.selection_path }}
+          STATE_PATH: ${{ steps.teaching.outputs.state_path }}
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/scheduled_teaching_state.json"
+          ARGS=(record --selection "$SELECTION_PATH" --run-id "${{ github.run_id }}" --source-run-id "${{ github.event.workflow_run.id }}" --output "$OUT")
+          if [ -f "$STATE_PATH" ]; then
+            ARGS+=(--state "$STATE_PATH")
+          fi
+          python scripts/mind_forge_scheduled_teaching_selector.py "${ARGS[@]}"
+          mv "$OUT" "$STATE_PATH"
+          cp "$STATE_PATH" artifacts/mind-forge-scheduled-teaching/scheduled_teaching_state.json
+
+      - name: Save scheduled teaching fingerprints
+        if: steps.teaching.outputs.should_run == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .mind-forge-scheduled
+          key: mind-forge-scheduled-teaching-${{ github.run_id }}
+
+      - name: Upload scheduled teaching dispatch audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-scheduled-teaching-${{ github.run_id }}
+          path: artifacts/mind-forge-scheduled-teaching/
+          if-no-files-found: warn
+          retention-days: 30
+
   pattern-application-gate:
-    if: ${{ inputs.operation != 'RUN_SEED' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation != 'RUN_SEED' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
