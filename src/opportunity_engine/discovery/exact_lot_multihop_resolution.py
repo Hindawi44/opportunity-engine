@@ -31,11 +31,16 @@ from opportunity_engine.discovery.exact_lot_child_link_resolution import (
 from opportunity_engine.discovery.exa_shadow_page_verification import (
     EXACT_LOT_CANDIDATE,
     FETCH_FAILED,
+    INFO_OR_LEGAL_ONLY,
     PageFetcher,
     fetch_public_page,
 )
 from opportunity_engine.discovery.keyword_shadow_verification import _public_https_url
-from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY, OUT_OF_DOMAIN
+from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    OUT_OF_DOMAIN,
+    classify_project_domain,
+)
 
 SCHEMA_VERSION = "exact-lot-multihop-resolution-1.0"
 LAB_FAMILY = "EXACT_LOT_MULTIHOP_RESOLUTION_V1"
@@ -194,6 +199,47 @@ def _gateway_eligible(*, url: str, classification: str, evidence: dict[str, Any]
     )
 
 
+def _root_subject_domain(page: dict[str, Any], url: str) -> str:
+    path_words = _path(url).replace("-", " ").replace("_", " ").replace("/", " ")
+    return classify_project_domain(
+        text=_compact(f"{page.get('title') or ''} {path_words}")
+    )
+
+
+def _eligible_multihop_root(page: dict[str, Any]) -> bool:
+    """Allow strict aggregate roots plus commercial clothing hubs for navigation.
+
+    INFO_OR_LEGAL_ONLY is never promoted to an opportunity here. It may only be
+    used as a navigation root when the URL itself is an allowlisted commercial
+    hub, its local title/path prove CLOTHING_INVENTORY, and the verified page
+    already proves inventory plus direct-sale evidence and at least one of price
+    or quantity. Exact-Lot acceptance remains exclusively downstream through
+    ``_strict_exact``.
+    """
+    if _eligible_parent(page):
+        return True
+
+    url = _compact(page.get("final_url") or page.get("url"))
+    evidence = page.get("evidence") or {}
+    return bool(
+        page.get("fetch_ok") is True
+        and page.get("classification") == INFO_OR_LEGAL_ONLY
+        and page.get("tool_learning_useful") is not True
+        and _commercial_url_role(url) == "COMMERCIAL_HUB"
+        and _root_subject_domain(page, url) == CLOTHING_INVENTORY
+        and evidence.get("project_domain") == CLOTHING_INVENTORY
+        and evidence.get("inventory_evidence") is True
+        and evidence.get("direct_sale_evidence") is True
+        and (evidence.get("price_evidence") is True or evidence.get("quantity_evidence") is True)
+    )
+
+
+def _root_priority(page: dict[str, Any]) -> int:
+    """Prefer a verified commercial hub over a generic aggregate homepage."""
+    url = _compact(page.get("final_url") or page.get("url"))
+    return 0 if _commercial_url_role(url) == "COMMERCIAL_HUB" else 1
+
+
 def _base(
     *,
     provider: str,
@@ -211,6 +257,7 @@ def _base(
         "project_domain_gate_enforced": True,
         "commercial_specificity_gate_enforced": True,
         "child_subject_domain_gate_enforced": True,
+        "commercial_hub_navigation_only": True,
         "same_origin_only": True,
         "bounded_multi_hop": True,
         "exact_lot_acceptance_only": True,
@@ -299,15 +346,18 @@ def resolve_exact_lot_multihop(
     roots: list[dict[str, Any]] = []
     seen_root_urls: set[str] = set()
     for page in provider_verification.get("verified_pages") or []:
-        if not isinstance(page, dict) or not _eligible_parent(page):
+        if not isinstance(page, dict) or not _eligible_multihop_root(page):
             continue
         root_url = _compact(page.get("final_url") or page.get("url"))
         if not root_url or root_url in seen_root_urls:
             continue
         seen_root_urls.add(root_url)
         roots.append(page)
-        if len(roots) >= max_root_parents:
-            break
+
+    # Commercial hubs are more specific navigation seeds than generic aggregate
+    # homepages. Stable sorting preserves provider/search order within each tier.
+    roots.sort(key=_root_priority)
+    roots = roots[:max_root_parents]
 
     root_results: list[dict[str, Any]] = []
     navigation_results: list[dict[str, Any]] = []
@@ -324,7 +374,14 @@ def resolve_exact_lot_multihop(
         root_host = _host(root_url)
         if not root_host or not _public_https_url(root_url):
             root_results.append(
-                {"root_url": root_url, "fetch_ok": False, "fetch_error": "UNSAFE_ROOT_URL"}
+                {
+                    "root_url": root_url,
+                    "root_classification": root.get("classification"),
+                    "root_navigation_role": _commercial_url_role(root_url),
+                    "root_exact_lot_accepted": False,
+                    "fetch_ok": False,
+                    "fetch_error": "UNSAFE_ROOT_URL",
+                }
             )
             continue
         fetched_root = aggregate_fetcher(root_url)
@@ -332,6 +389,9 @@ def resolve_exact_lot_multihop(
             root_results.append(
                 {
                     "root_url": root_url,
+                    "root_classification": root.get("classification"),
+                    "root_navigation_role": _commercial_url_role(root_url),
+                    "root_exact_lot_accepted": False,
                     "fetch_ok": False,
                     "status_code": fetched_root.status_code,
                     "final_url": fetched_root.final_url,
@@ -350,6 +410,9 @@ def resolve_exact_lot_multihop(
         root_results.append(
             {
                 "root_url": root_url,
+                "root_classification": root.get("classification"),
+                "root_navigation_role": _commercial_url_role(root_url),
+                "root_exact_lot_accepted": False,
                 "fetch_ok": True,
                 "status_code": fetched_root.status_code,
                 "final_url": resolved_root,
@@ -500,6 +563,6 @@ def resolve_exact_lot_multihop(
         "exact_lot_candidate_count": len(exact_lots),
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing product/lot pages. Multi-hop navigation is same-origin and bounded by explicit commercial URL roles, depth and page budgets."
+            "Commercial hubs and other gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing product/lot pages. Multi-hop navigation is same-origin and bounded by explicit commercial URL roles, depth and page budgets."
         ),
     }
