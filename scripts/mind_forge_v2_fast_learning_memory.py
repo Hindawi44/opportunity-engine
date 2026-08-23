@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from scripts.mind_forge_v2_pattern_promotion import evaluate_pattern_promotions
+
 
 _PATTERN_HINTS = {
     "DIRECT_EVIDENCE_CONFIRMED_CLAIM": {
@@ -205,7 +207,7 @@ def learn_from_run(
         activation = "NO_REUSABLE_PATTERN"
 
     adjustments = [_adjustment_for(row) for row in ordered_patterns if row["pattern_code"] in _PATTERN_HINTS]
-    return {
+    result = {
         "status": "MIND_FORGE_V2_FAST_CROSS_RUN_MEMORY_COMPLETE",
         "source": "RUN_EVIDENCE",
         "run_ids": run_ids,
@@ -215,6 +217,13 @@ def learn_from_run(
         "auto_apply_to_production": False,
         "next_cycle_search_adjustments": adjustments,
     }
+    promotion = evaluate_pattern_promotions(result)
+    result["promotion_evaluation"] = promotion
+    if promotion["overall_stage"] == "PRODUCTION_ELIGIBLE":
+        result["pattern_activation_state"] = "PROMOTION_ELIGIBLE"
+    elif promotion["overall_stage"] == "VALIDATED":
+        result["pattern_activation_state"] = "VALIDATED"
+    return result
 
 
 def main() -> None:
@@ -246,6 +255,7 @@ def main() -> None:
         "run_count": result["run_count"],
         "pattern_count": len(result["patterns"]),
         "pattern_activation_state": result["pattern_activation_state"],
+        "promotion_stage": result["promotion_evaluation"]["overall_stage"],
     }, ensure_ascii=False))
 
 
