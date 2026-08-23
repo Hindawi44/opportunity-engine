@@ -1,0 +1,79 @@
+name: Blocket Exact Lot Probe TEMP
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/blocket-item-probe-temp.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PYTHONPATH: src:.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fetch and extract bounded source facts
+        shell: bash
+        run: |
+          mkdir -p artifacts/blocket-item-probe
+          python - <<'PY'
+          import json, re
+          from pathlib import Path
+          from opportunity_engine.discovery.keyword_shadow_verification import fetch_public_page
+
+          url = "https://www.blocket.se/recommerce/forsale/item/24362849"
+          page = fetch_public_page(url)
+          text = " ".join((page.text or "").split())
+          lowered = text.casefold()
+          needles = ("pris", " kr", "sek", "st", "paket", "3x6", "granit", "plats", "ort", "frakt", "hämt", "leverans", "skick")
+          excerpts = []
+          seen = set()
+          for needle in needles:
+              start = 0
+              while True:
+                  idx = lowered.find(needle.casefold(), start)
+                  if idx < 0:
+                      break
+                  a = max(0, idx - 180)
+                  b = min(len(text), idx + 320)
+                  chunk = text[a:b]
+                  chunk = re.sub(r"\b[\w.+-]+@[\w.-]+\.\w+\b", "[EMAIL_REDACTED]", chunk)
+                  chunk = re.sub(r"(?<!\d)(?:\+?46|0)[\s-]?(?:\d[\s-]?){7,10}(?!\d)", "[PHONE_REDACTED]", chunk)
+                  marker = chunk.casefold()
+                  if marker not in seen:
+                      seen.add(marker)
+                      excerpts.append(chunk)
+                  if len(excerpts) >= 24:
+                      break
+                  start = idx + max(1, len(needle))
+              if len(excerpts) >= 24:
+                  break
+          payload = {
+              "url": url,
+              "ok": page.ok,
+              "status_code": page.status_code,
+              "final_url": page.final_url,
+              "title": page.title,
+              "text_length": len(text),
+              "truncated": page.truncated,
+              "excerpts": excerpts,
+          }
+          Path("artifacts/blocket-item-probe/report.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          print("ok=", page.ok, "status=", page.status_code, "title=", page.title, "excerpts=", len(excerpts))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blocket-item-probe
+          path: artifacts/blocket-item-probe/report.json
+          if-no-files-found: error
+          retention-days: 7
