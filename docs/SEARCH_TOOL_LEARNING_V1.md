@@ -16,7 +16,9 @@ CLOTHING_INVENTORY
 
 Fabric procurement remains a separate bounded lane and is not mixed into this provider comparison.
 
-The Exa-vs-Brave benchmark queries are clothing/fashion anchored in every supported market. Generic liquidation or business-closure results cannot improve a provider's Tool Learning result merely because they are numerous.
+The six-market coverage inherited from the existing Exa-vs-Brave Shadow Lab is diagnostic only. It does **not** promote FR, IT, or NL into canonical clothing-inventory production markets; the current daily market model remains unchanged, including Italy's bounded `FABRIC_PROCUREMENT` role.
+
+The Exa-vs-Brave benchmark queries are clothing/fashion anchored in every supported shadow market. Generic liquidation or business-closure results cannot improve a provider's Tool Learning result merely because they are numerous.
 
 ## Evidence flow
 
