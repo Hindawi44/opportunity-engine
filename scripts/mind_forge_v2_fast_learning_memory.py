@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from scripts.mind_forge_v2_pattern_application import reconcile_pattern_applications
 from scripts.mind_forge_v2_pattern_promotion import evaluate_pattern_promotions
 
 
@@ -216,6 +217,7 @@ def learn_from_run(
         "pattern_activation_state": activation,
         "auto_apply_to_production": False,
         "next_cycle_search_adjustments": adjustments,
+        "pattern_applications": [dict(row) for row in prior_memory.get("pattern_applications", []) or []],
     }
     promotion = evaluate_pattern_promotions(result)
     result["promotion_evaluation"] = promotion
@@ -223,7 +225,7 @@ def learn_from_run(
         result["pattern_activation_state"] = "PROMOTION_ELIGIBLE"
     elif promotion["overall_stage"] == "VALIDATED":
         result["pattern_activation_state"] = "VALIDATED"
-    return result
+    return reconcile_pattern_applications(result)
 
 
 def main() -> None:
@@ -256,6 +258,7 @@ def main() -> None:
         "pattern_count": len(result["patterns"]),
         "pattern_activation_state": result["pattern_activation_state"],
         "promotion_stage": result["promotion_evaluation"]["overall_stage"],
+        "active_pattern_application_count": result.get("active_pattern_application_count", 0),
     }, ensure_ascii=False))
 
 
