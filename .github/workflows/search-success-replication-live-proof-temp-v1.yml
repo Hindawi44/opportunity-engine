@@ -1,0 +1,170 @@
+name: Search Success Replication Live Proof TEMP V1
+
+on:
+  pull_request:
+    branches: [feat/search-success-learning-v1]
+    paths:
+      - ".github/workflows/search-success-replication-live-proof-temp-v1.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independent-replication:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      PRIOR_DIR: artifacts/prior-search-success-memory
+      OUTPUT_DIR: artifacts/search-success-replication-live-proof-v1
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+
+      - name: Verify learning and child-resolution contracts
+        run: |
+          pytest tests/test_search_success_learning_v1.py -q
+          pytest tests/test_exact_lot_child_link_resolution_v1.py -q
+          pytest tests/test_item_specific_url_guard_v1.py -q
+
+      - name: Confirm bounded credentials
+        shell: bash
+        run: |
+          test -n "$EXA_API_KEY" || { echo "EXA_API_KEY is required" >&2; exit 1; }
+          test -n "$BRAVE_SEARCH_API_KEY" || { echo "BRAVE_SEARCH_API_KEY is required" >&2; exit 1; }
+
+      - name: Restore prior positive-learning memory
+        shell: bash
+        run: |
+          mkdir -p "$PRIOR_DIR" "$OUTPUT_DIR"
+          gh run download 32654103196 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name search-success-learning-proof-v1 \
+            --dir "$PRIOR_DIR"
+          test -f "$PRIOR_DIR/memory.json"
+
+      - name: Run fresh Exact-Lot Exa-vs-Brave benchmark
+        shell: bash
+        run: |
+          python scripts/run_exa_brave_shadow_benchmark.py \
+            --output "$OUTPUT_DIR/benchmark.json" \
+            --markets "NO,SE,DE,FR,IT,NL" \
+            --results-per-query 3 \
+            --provider-mode both \
+            --query-mode exact_lot
+
+      - name: Verify original provider pages
+        shell: bash
+        run: |
+          python scripts/run_exa_brave_tool_learning.py \
+            --benchmark "$OUTPUT_DIR/benchmark.json" \
+            --output "$OUTPUT_DIR/tool-learning.json" \
+            --max-page-fetches-per-provider 18 \
+            --min-successful-pages-per-provider 5
+
+      - name: Resolve bounded aggregate child pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from opportunity_engine.discovery.exact_lot_child_link_resolution import resolve_exact_lot_child_links
+
+          root = Path(os.environ["OUTPUT_DIR"])
+          proof = json.loads((root / "tool-learning.json").read_text(encoding="utf-8"))
+          exa = resolve_exact_lot_child_links(
+              proof["exa_verification"],
+              max_parent_fetches=6,
+              max_child_links_per_parent=12,
+              max_child_page_fetches=24,
+          )
+          brave = resolve_exact_lot_child_links(
+              proof["brave_verification"],
+              max_parent_fetches=6,
+              max_child_links_per_parent=12,
+              max_child_page_fetches=24,
+          )
+          payload = {
+              "schema_version": "exact-lot-child-link-live-proof-1.1",
+              "status": "SUCCESS",
+              "shadow_only": True,
+              "exa": exa,
+              "brave": brave,
+              "exact_lot_candidate_count": exa["exact_lot_candidate_count"] + brave["exact_lot_candidate_count"],
+              "production_mutation": False,
+              "automatic_contact": False,
+              "automatic_purchase": False,
+          }
+          (root / "child-resolution-search-driven.json").write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("fresh_exa_exact_lots:", exa["exact_lot_candidate_count"])
+          print("fresh_brave_exact_lots:", brave["exact_lot_candidate_count"])
+          for provider, report in (("exa", exa), ("brave", brave)):
+              for row in report["exact_lots"]:
+                  print("FRESH_EXACT", provider, row.get("market_code"), row.get("url"))
+          PY
+
+      - name: Update positive-learning memory with independent live run
+        shell: bash
+        run: |
+          python scripts/run_search_success_learning.py \
+            --benchmark "$OUTPUT_DIR/benchmark.json" \
+            --tool-learning "$OUTPUT_DIR/tool-learning.json" \
+            --child-resolution "$OUTPUT_DIR/child-resolution-search-driven.json" \
+            --run-id "$GITHUB_RUN_ID" \
+            --existing-memory "$PRIOR_DIR/memory.json" \
+            --observation-output "$OUTPUT_DIR/observation.json" \
+            --memory-output "$OUTPUT_DIR/memory.json" \
+            --min-independent-runs 2
+
+      - name: Assert conservative replication semantics
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["OUTPUT_DIR"])
+          observation = json.loads((root / "observation.json").read_text(encoding="utf-8"))
+          memory = json.loads((root / "memory.json").read_text(encoding="utf-8"))
+
+          assert observation["status"] == "SUCCESS"
+          assert observation["automatic_provider_activation"] is False
+          assert observation["automatic_source_promotion"] is False
+          assert observation["production_query_mutation"] is False
+          assert memory["run_count"] == 2
+          assert memory["automatic_provider_activation"] is False
+          assert memory["automatic_source_promotion"] is False
+          assert memory["production_query_mutation"] is False
+
+          current_routes = observation["successful_routes"]
+          replicated = [row for row in memory["route_learning"] if row["status"] == "REPLICATED_FOR_REVIEW"]
+          print("fresh_observed_leader:", observation["observed_provider_leader"])
+          print("fresh_success_routes:", len(current_routes))
+          print("replicated_route_count:", len(replicated))
+          for row in current_routes:
+              print("CURRENT_ROUTE:", row["provider"], row["market_code"], row["pathway"], row.get("parent_domain"), row["exact_lot_count"])
+          for row in replicated:
+              print("REPLICATED_ROUTE:", row["provider"], row["market_code"], row["pathway"], row.get("parent_domain"), row["independent_run_count"])
+          PY
+
+      - name: Upload independent replication proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: search-success-replication-live-proof-v1
+          path: artifacts/search-success-replication-live-proof-v1/*.json
+          if-no-files-found: warn
+          retention-days: 30
