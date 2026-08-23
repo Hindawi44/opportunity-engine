@@ -1,6 +1,6 @@
 {
   "schema_version": "unified-pipeline-sidepaths-inventory-1.0",
-  "generated_at": "2026-08-23T12:47:00Z",
+  "generated_at": "2026-08-23T12:58:00Z",
   "governing_pipeline": {
     "contract": "UNIFIED_SIX_MARKET_PIPELINE_V1",
     "module": "src/opportunity_engine/discovery/unified_six_market_pipeline.py",
@@ -69,10 +69,12 @@
         "src/opportunity_engine/discovery/keyword_shadow_verification.py",
         "src/opportunity_engine/discovery/exa_search.py",
         "src/opportunity_engine/discovery/exa_shadow_page_verification.py",
+        "src/opportunity_engine/discovery/exa_exact_lot_shadow_hunt.py",
         "src/opportunity_engine/source_discovery_shadow.py",
         "src/opportunity_engine/source_shadow_live_validation.py",
         "scripts/run_exa_brave_shadow_benchmark.py",
         "scripts/run_exa_stage2_page_verification.py",
+        "scripts/run_exa_exact_lot_shadow_hunt.py",
         "scripts/run_keyword_shadow_verification.py",
         "scripts/run_source_shadow_live_validation.py",
         "scripts/run_stocklear_second_shadow_round.py"
@@ -167,5 +169,22 @@
     "unproven_page_count": 5,
     "fetch_failed_count": 3,
     "interpretation": "Exa demonstrated source-discovery value but did not prove a buyable exact lot in this bounded six-market round."
+  },
+  "exa_exact_lot_shadow_proof": {
+    "run_id": 32640825800,
+    "status": "SUCCESS",
+    "exa_request_count": 6,
+    "exa_unique_url_count": 30,
+    "page_fetches_attempted": 30,
+    "page_fetches_succeeded": 21,
+    "exact_lot_candidate_count": 1,
+    "active_stock_signal_count": 9,
+    "source_intelligence_only_count": 4,
+    "info_or_legal_only_count": 0,
+    "unproven_page_count": 7,
+    "fetch_failed_count": 9,
+    "exact_lot_market": "SE",
+    "exact_lot_url": "https://www.blocket.se/recommerce/forsale/item/24362849",
+    "interpretation": "After requiring item-specific page granularity, only one candidate retained exact-lot evidence. Marketplace home/search pages were correctly downgraded."
   }
 }
