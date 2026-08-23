@@ -28,7 +28,7 @@ def _active_overlay():
         recovered_case_ids=(
             "HOLDOUT-NO-SENZE-OF-JOY",
             "HOLDOUT-NO-TOFF-OG-LITEN-STEINKJER",
-            "HOLDOUT-NO-GAULA-NATURSENTER",
+            "HOLDOUT-NO-CLOTHING-THREE",
         ),
         raw_hit_count=9,
         verified_relevant_count=3,
@@ -36,7 +36,7 @@ def _active_overlay():
         min_recovered_cases=1,
         min_precision=0.2,
         automatic_activation=False,
-        support_case_ids=("auto-query-gap:no:a1d0426721ee47e868026b31",),
+        support_case_ids=("auto-query-gap:no:clothing-proof",),
         evaluation_scope="HOLDOUT_TRANSFER",
     )
     shadow = build_learned_query_overlay([evaluation])
@@ -63,9 +63,9 @@ def test_promoted_core_can_verify_late_ranked_result_within_ten_hit_window(
     ]
     hits.append(
         SearchHit(
-            title="Gaula Natursenter avvikler virksomheten",
-            url="https://gaula.example.no/avviklingssalg",
-            description="Avviklingssalg. Hele lagerbeholdningen skal ut.",
+            title="Nord Stil klesbutikk avvikler virksomheten",
+            url="https://nordstil.example.no/avviklingssalg",
+            description="Klesbutikk avviklingssalg. Hele lagerbeholdningen av klær skal ut.",
             provider="Fake Brave",
         )
     )
@@ -73,9 +73,9 @@ def test_promoted_core_can_verify_late_ranked_result_within_ten_hit_window(
     def fetch_page(url: str) -> PublicPage:
         if url.endswith("/avviklingssalg"):
             html = (
-                "<html><body><h1>Gaula Natursenter avvikler virksomheten</h1>"
-                "<p>Gaula Natursenter avvikler virksomheten. Avviklingssalg. "
-                "Hele lagerbeholdningen skal ut.</p></body></html>"
+                "<html><body><h1>Nord Stil avvikler virksomheten</h1>"
+                "<p>Klesbutikken Nord Stil avvikler virksomheten. Avviklingssalg. "
+                "Hele lagerbeholdningen av klær, jakker og bukser skal ut.</p></body></html>"
             )
         else:
             html = "<html><body><p>Vanlig kampanje.</p></body></html>"
