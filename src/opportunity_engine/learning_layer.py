@@ -65,6 +65,15 @@ def _read_json(path: Path) -> dict[str, Any]:
     return dict(payload) if isinstance(payload, Mapping) else {}
 
 
+def _provider_comparison_status(memory: Mapping[str, Any]) -> str:
+    observations = _rows(memory.get("observations"))
+    if observations:
+        value = _text(observations[-1].get("provider_preference_status")).upper()
+        if value:
+            return value
+    return "PROVIDER_COMPARISON_NOT_EVALUATED"
+
+
 def _replicated_route_items(memory: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     worked: list[dict[str, Any]] = []
     reviews: list[dict[str, Any]] = []
@@ -73,8 +82,10 @@ def _replicated_route_items(memory: Mapping[str, Any]) -> tuple[list[dict[str, A
             continue
         provider = _text(route.get("provider")).lower()
         market = _text(route.get("market_code")).upper()
-        domain = _text(route.get("parent_domain"))
+        domain = _text(route.get("parent_domain") or route.get("result_domain"))
         count = _int(route.get("independent_run_count"))
+        verified_urls = route.get("verified_exact_lot_urls") or route.get("exact_lot_urls") or []
+        exact_count = _int(route.get("verified_exact_lot_url_count")) or len(verified_urls)
         evidence = {
             "kind": "REPLICATED_SEARCH_ROUTE",
             "provider": provider,
@@ -85,7 +96,7 @@ def _replicated_route_items(memory: Mapping[str, Any]) -> tuple[list[dict[str, A
             "supporting_run_ids": [
                 _text(item) for item in (route.get("supporting_run_ids") or []) if _text(item)
             ],
-            "exact_lot_count": len(route.get("exact_lot_urls") or []),
+            "exact_lot_count": exact_count,
             "status": "REPLICATED_FOR_REVIEW",
         }
         worked.append(dict(evidence))
@@ -210,7 +221,7 @@ def build_learning_layer_review(
         "what_worked": worked,
         "what_failed": failed,
         "review_queue": queue,
-        "provider_comparison_status": "PROVIDER_COMPARISON_NOT_EVALUATED",
+        "provider_comparison_status": _provider_comparison_status(memory),
         "learning_contract": (
             "Observe -> diagnose -> shadow learn -> replicate -> review. "
             "Learning Layer V1 aggregates evidence only and never activates production changes."
