@@ -1,0 +1,214 @@
+name: TEMP MIND FORGE Cross-Run Learning Live Proof V1
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/temp-mind-forge-cross-run-live-proof-v1.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  creative-v2-open-live:
+    if: ${{ github.head_ref == 'agent/temp-mind-forge-cross-run-live-proof-v1' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PROOF_PASS: "1"
+      MIND_FORGE_LIVE_ENABLED: "1"
+      OPENAI_AGENTS_DISABLE_TRACING: "1"
+      OPENAI_AGENTS_DONT_LOG_MODEL_DATA: "1"
+      OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
+    steps:
+      - name: Check out merged main-line plus temporary proof
+        uses: actions/checkout@v4
+
+      - name: Restore prior proof memory
+        uses: actions/cache/restore@v4
+        with:
+          path: .mind-forge-memory
+          key: mind-forge-cross-run-live-proof-v1-${{ github.run_id }}
+          restore-keys: |
+            mind-forge-cross-run-live-proof-v1-
+
+      - name: Activate restored memory when present
+        run: |
+          set -euo pipefail
+          MEMORY="$GITHUB_WORKSPACE/.mind-forge-memory/fast_learning_memory.json"
+          if [ -f "$MEMORY" ]; then
+            echo "MIND_FORGE_PRIOR_MEMORY_PATH=$MEMORY" >> "$GITHUB_ENV"
+            echo "Prior proof memory restored."
+          else
+            echo "No prior proof memory found."
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install bounded MIND FORGE dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "openai-agents>=0.14.0" "pydantic>=2.11.0,<3.0"
+
+      - name: Build isolated Creative V2 runtime
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/mind-forge-v2"
+          mkdir -p "$APP/mind_forge" artifacts/mind-forge-creative-v2-open-live
+          touch "$APP/mind_forge/__init__.py"
+          for file in \
+            contracts_v1.py \
+            question_generator_v1.py \
+            creative_engine_v1.py \
+            creative_engine_v2_open.py \
+            expert_minds_v1.py \
+            live_model_adapter_v1.py \
+            live_creative_v2_open.py
+          do
+            cp "mind-forge-live/phase1/$file" "$APP/mind_forge/$file"
+          done
+          python -m compileall -q "$APP/mind_forge"
+          echo "APP=$APP" >> "$GITHUB_ENV"
+
+      - name: Normalize API secret without printing it
+        env:
+          RAW_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          raw = os.getenv("RAW_OPENAI_API_KEY", "")
+          if not raw:
+              raise SystemExit("OPENAI_API_KEY is not available")
+          clean = raw.strip()
+          if not clean or any(ch in clean for ch in "\r\n\t"):
+              raise SystemExit("OPENAI_API_KEY hygiene failed")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"OPENAI_API_KEY={clean}\n")
+          print("OPENAI_API_KEY hygiene: OK; value not displayed")
+          PY
+
+      - name: Run bounded autonomous cycle
+        env:
+          PYTHONPATH: ${{ env.APP }}
+          MIND_FORGE_SEED: "التجارة في النرويج"
+        run: |
+          set -euo pipefail
+          python - <<'PY' | tee artifacts/mind-forge-creative-v2-open-live/stdout.json
+          import json
+          import os
+          from pathlib import Path
+          from mind_forge.contracts_v1 import TopicInput
+          from mind_forge.question_generator_v1 import generate_questions
+          from mind_forge.live_model_adapter_v1 import LiveBudgetGate, LiveModelPolicy
+          from mind_forge.live_creative_v2_open import generate_live_open_ideas
+
+          seed = os.environ["MIND_FORGE_SEED"]
+          topic = TopicInput(topic=seed)
+          questions = generate_questions(topic)
+          policy = LiveModelPolicy(
+              enabled=True,
+              creative_model="gpt-5.6-luna",
+              expert_model="gpt-5.6-luna",
+              max_requests=1,
+              max_input_tokens=20_000,
+              max_output_tokens=12_500,
+              max_estimated_cost_usd=0.01,
+              creative_max_output_tokens=3_500,
+              expert_max_output_tokens=900,
+              creative_reasoning_effort="medium",
+              expert_reasoning_effort="low",
+          )
+          gate = LiveBudgetGate(policy)
+          creative = generate_live_open_ideas(topic, questions, policy, gate)
+          payload = {
+              "status": "CREATIVE_V2_OPEN_LIVE_COMPLETE",
+              "seed": seed,
+              "idea_count": len(creative.ideas),
+              "mechanism_diversity_ratio": creative.mechanism_diversity_ratio,
+              "usage": gate.usage.model_dump(),
+              "ideas": [idea.model_dump(mode="json") for idea in creative.ideas],
+          }
+          out = Path("artifacts/mind-forge-creative-v2-open-live/result.json")
+          out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(json.dumps(payload, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Validate pass and capture learning state
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("artifacts/mind-forge-creative-v2-open-live")
+          usage = json.loads((root / "live_evidence_usage.json").read_text(encoding="utf-8"))
+          memory = json.loads((root / "fast_learning_memory.json").read_text(encoding="utf-8"))
+          proof_pass = int(os.environ["PROOF_PASS"])
+
+          if int(usage["search_operations"]) != 3:
+              raise SystemExit("search budget changed from exactly three operations")
+          if float(usage["estimated_research_cost_usd"]) > 0.03:
+              raise SystemExit("research cost cap exceeded")
+          if memory.get("auto_apply_to_production") is not False:
+              raise SystemExit("fast memory escaped shadow-only mode")
+          if not memory.get("patterns"):
+              raise SystemExit("proof produced no reusable evidence-derived pattern")
+
+          loaded = bool(usage.get("prior_memory_loaded"))
+          if proof_pass == 1 and loaded:
+              raise SystemExit("pass 1 unexpectedly loaded prior proof memory")
+          if proof_pass == 2 and not loaded:
+              raise SystemExit("pass 2 failed to restore prior proof memory")
+          if proof_pass == 2 and int(memory.get("run_count", 0)) < 2:
+              raise SystemExit("pass 2 did not accumulate memory across runs")
+
+          state = {
+              "proof_pass": proof_pass,
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "prior_memory_loaded": loaded,
+              "search_operations": usage["search_operations"],
+              "estimated_research_cost_usd": usage["estimated_research_cost_usd"],
+              "run_count": memory.get("run_count"),
+              "pattern_activation_state": memory.get("pattern_activation_state"),
+              "patterns": [
+                  {
+                      "pattern_code": row.get("pattern_code"),
+                      "observation_count": row.get("observation_count"),
+                      "run_ids": row.get("run_ids"),
+                  }
+                  for row in memory.get("patterns", [])
+              ],
+              "shadow_hint_count": len(memory.get("next_cycle_search_adjustments", [])),
+              "auto_apply_to_production": memory.get("auto_apply_to_production"),
+          }
+          (root / "cross_run_proof_state.json").write_text(
+              json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8"
+          )
+          print(json.dumps(state, ensure_ascii=False))
+          PY
+
+      - name: Stage proof memory
+        if: success()
+        run: |
+          mkdir -p .mind-forge-memory
+          cp artifacts/mind-forge-creative-v2-open-live/fast_learning_memory.json \
+            .mind-forge-memory/fast_learning_memory.json
+
+      - name: Save proof memory for the next workflow run
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: .mind-forge-memory
+          key: mind-forge-cross-run-live-proof-v1-${{ github.run_id }}
+
+      - name: Upload proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-cross-run-live-proof-pass-${{ env.PROOF_PASS }}
+          path: artifacts/mind-forge-creative-v2-open-live/
+          if-no-files-found: warn
+          retention-days: 30
