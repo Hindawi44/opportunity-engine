@@ -1,5 +1,6 @@
 import pytest
 
+from scripts.mind_forge_v2_fast_learning_memory import learn_from_run
 from scripts.mind_forge_v2_pattern_promotion import evaluate_pattern_promotions
 
 
@@ -35,6 +36,41 @@ def _memory(pattern):
         "auto_apply_to_production": False,
         "patterns": [pattern],
     }
+
+
+def _run_inputs():
+    reasoning = {
+        "selected_idea_ids": ["a"],
+        "assessments": [
+            {"idea_id": "a", "title": "A", "critique": {"key_assumption": "Claim A"}}
+        ],
+    }
+    evidence = {
+        "observations": [
+            {
+                "idea_id": "a",
+                "stance": "SUPPORTS",
+                "confidence": 0.9,
+                "source_type": "official",
+                "source_ref": "https://example.test/generic",
+                "relevance": "GENERIC",
+            }
+        ]
+    }
+    final_rank = {
+        "ranking": [
+            {
+                "idea_id": "a",
+                "title": "A",
+                "evidence_status": "INSUFFICIENT_EVIDENCE",
+                "evidence_signal": 0.0,
+                "evidence_count": 1,
+                "relevant_evidence_count": 0,
+                "conflicting_evidence": False,
+            }
+        ]
+    }
+    return reasoning, evidence, final_rank
 
 
 def test_one_independent_observation_stays_shadow_only():
@@ -160,3 +196,13 @@ def test_memory_that_claims_auto_apply_is_rejected():
     memory["auto_apply_to_production"] = True
     with pytest.raises(ValueError, match="auto-apply"):
         evaluate_pattern_promotions(memory)
+
+
+def test_fast_learning_output_contains_current_promotion_evaluation_but_never_auto_applies():
+    reasoning, evidence, final_rank = _run_inputs()
+    memory = learn_from_run(reasoning, evidence, final_rank, run_id="run-1")
+
+    assert memory["promotion_evaluation"]["status"] == "MIND_FORGE_V2_PATTERN_PROMOTION_COMPLETE"
+    assert memory["promotion_evaluation"]["assessments"][0]["stage"] == "SHADOW_ONLY"
+    assert memory["promotion_evaluation"]["auto_apply_to_production"] is False
+    assert memory["auto_apply_to_production"] is False
