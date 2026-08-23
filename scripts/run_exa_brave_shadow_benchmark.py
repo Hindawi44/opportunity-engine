@@ -17,6 +17,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
+from opportunity_engine.discovery.exa_exact_lot_shadow_hunt import MARKET_EXACT_LOT_QUERIES
 from opportunity_engine.discovery.exa_search import ExaSearchProvider
 from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
 
@@ -28,6 +29,17 @@ MARKET_QUERIES = {
     "IT": "Italia abbigliamento moda cessazione attività liquidazione magazzino stock vendita",
     "NL": "Nederland kleding mode bedrijfsbeëindiging voorraad partijhandel uitverkoop",
 }
+
+QUERY_MODES = ("discovery", "exact_lot")
+
+
+def market_queries_for_mode(query_mode: str) -> dict[str, str]:
+    """Return a defensive copy of the bounded query set for one search intent."""
+    if query_mode == "discovery":
+        return dict(MARKET_QUERIES)
+    if query_mode == "exact_lot":
+        return dict(MARKET_EXACT_LOT_QUERIES)
+    raise ValueError("query_mode must be discovery or exact_lot")
 
 
 def _compact(value: object) -> str:
@@ -66,11 +78,13 @@ def run_benchmark(
     markets: list[str],
     results_per_query: int,
     provider_mode: str,
+    query_mode: str = "discovery",
 ) -> dict[str, Any]:
     if not 1 <= results_per_query <= 5:
         raise ValueError("results_per_query must be between 1 and 5")
+    selected_queries = market_queries_for_mode(query_mode)
     normalized_markets = [code.strip().upper() for code in markets if code.strip()]
-    unsupported = [code for code in normalized_markets if code not in MARKET_QUERIES]
+    unsupported = [code for code in normalized_markets if code not in selected_queries]
     if unsupported:
         raise ValueError(f"unsupported markets: {unsupported}")
     if not normalized_markets:
@@ -86,7 +100,7 @@ def run_benchmark(
     brave_request_count = 0
 
     for market in normalized_markets:
-        query = MARKET_QUERIES[market]
+        query = selected_queries[market]
         exa_hits = exa.search(query, count=results_per_query)
         exa_request_count += 1
         brave_hits = []
@@ -138,6 +152,8 @@ def run_benchmark(
         "status": "SUCCESS",
         "shadow_only": True,
         "provider_mode": provider_mode,
+        "query_mode": query_mode,
+        "query_set": {market: selected_queries[market] for market in normalized_markets},
         "project_domain": CLOTHING_INVENTORY,
         "project_domain_gate_enforced": True,
         "markets": normalized_markets,
@@ -172,6 +188,12 @@ def main() -> int:
         default="both",
         help="exa performs a connectivity/search proof; both compares Exa and Brave",
     )
+    parser.add_argument(
+        "--query-mode",
+        choices=QUERY_MODES,
+        default="discovery",
+        help="discovery uses closure/liquidation intent; exact_lot requires item-specific price and quantity intent",
+    )
     args = parser.parse_args()
 
     exa_api_key = _compact(os.environ.get("EXA_API_KEY"))
@@ -185,11 +207,13 @@ def main() -> int:
         markets=args.markets.split(","),
         results_per_query=args.results_per_query,
         provider_mode=args.provider_mode,
+        query_mode=args.query_mode,
     )
     output = Path(args.output)
     _write_json(output, report)
     print(f"status={report['status']}")
     print(f"shadow_only={report['shadow_only']}")
+    print(f"query_mode={report['query_mode']}")
     print(f"markets={','.join(report['markets'])}")
     print(f"exa_requests={report['exa_request_count']}")
     print(f"brave_requests={report['brave_request_count']}")
