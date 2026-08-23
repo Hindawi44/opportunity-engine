@@ -1,6 +1,6 @@
 # Opportunity Engine — Project Status
 
-**Last updated:** 2026-08-12  
+**Last updated:** 2026-08-23  
 **Status:** ACTIVE / OPERATIONAL  
 **Authoritative repository:** `Hindawi44/opportunity-engine`
 
@@ -13,10 +13,11 @@ For a new development session, read:
 
 1. `docs/00_PROJECT_STATUS.md`
 2. `README.md`
-3. `config/market_completion_matrix.json`
-4. `docs/UNIFIED_MARKET_INTELLIGENCE_RIVER_V1.md`
-5. `docs/CENTRAL_INTELLIGENCE_ORCHESTRATOR_V1.md`
-6. the documentation for the subsystem being changed
+3. `docs/PROJECT_DOMAIN_BOUNDARY_V1.md`
+4. `config/market_completion_matrix.json`
+5. `docs/UNIFIED_MARKET_INTELLIGENCE_RIVER_V1.md`
+6. `docs/CENTRAL_INTELLIGENCE_ORCHESTRATOR_V1.md`
+7. the documentation for the subsystem being changed
 
 ## Product goal
 
@@ -37,6 +38,60 @@ source observation
 ```
 
 Signals are not automatically promoted into opportunities. AI output is advisory.
+
+## Authoritative project-domain boundary
+
+`PROJECT_DOMAIN_BOUNDARY_V1` is the mandatory commercial scope gate before
+learning, promotion, exact-lot qualification, or canonical opportunity output.
+
+Allowed project domains are only:
+
+```text
+CLOTHING_INVENTORY
+FABRIC_PROCUREMENT
+```
+
+Definitions:
+
+- `CLOTHING_INVENTORY` — clothing, fashion, apparel, footwear and bridal garments
+  when they are part of a commercial stock/liquidation opportunity.
+- `FABRIC_PROCUREMENT` — fabric and textile stock handled by the existing bounded
+  procurement lane.
+
+Everything else is:
+
+```text
+OUT_OF_DOMAIN
+```
+
+This includes unrelated building materials, appliances, electronics, furniture,
+hardware, and general merchandise. Generic commercial wording such as `stock`,
+`liquidation`, `lot`, `price`, or `quantity` is never sufficient by itself to prove
+project-domain relevance. Absence of positive clothing/fabric evidence fails closed.
+
+The same deterministic boundary is required before:
+
+1. external ground-truth evidence can train Source Learning;
+2. a promoted broad source can emit a Production candidate;
+3. Promoted Learned Core can emit a canonical commercial opportunity;
+4. Exa exact-lot verification can classify a page as an exact-lot candidate.
+
+Current promotion safety state after the 2026-08-23 scope repair:
+
+```text
+Stocklear Production source promotion — DISABLED
+NO query promotion: avviklingssalg — DISABLED
+```
+
+Both remain available as Shadow/learning evidence but cannot re-enter Production
+until independent clothing-inventory evidence re-proves them under the domain
+boundary and an explicit promotion decision is made.
+
+Reference:
+
+```text
+docs/PROJECT_DOMAIN_BOUNDARY_V1.md
+```
 
 ## Current market model
 
@@ -80,6 +135,8 @@ bridal and bounded B2B intelligence
         +
 IT fabric procurement
         ↓
+PROJECT_DOMAIN_BOUNDARY_V1
+        ↓
 UNIFIED MARKET INTELLIGENCE RIVER
         ↓
 UNIFIED DECISION PRIORITY
@@ -101,6 +158,9 @@ The river preserves independent record kinds such as:
 - `FABRIC_PROCUREMENT_ITEM`
 - `CANONICAL_OPPORTUNITY`
 - `HISTORICAL_EVIDENCE`
+
+Presence in the intelligence river does not grant commercial qualification when a
+record is outside `PROJECT_DOMAIN_BOUNDARY_V1`.
 
 ## Unified decision priority
 
@@ -210,6 +270,8 @@ runtime inventory.
 
 ## Authoritative operational files
 
+- `docs/PROJECT_DOMAIN_BOUNDARY_V1.md` — project scope gate before learning,
+  promotion, and qualification.
 - `config/market_completion_matrix.json` — market foundation and source-state semantics.
 - `config/source_expansion_plan.json` — source expansion/activation planning.
 - `data/source_gap_matrix.json` — runtime source-status snapshot.
@@ -235,6 +297,10 @@ runtime inventory.
 - `BUY_REVIEW` requires human review and is not automatic buying.
 - No automatic contact, bid, reservation, purchase, or payment.
 - Do not run authorization-gated collectors without permission.
+- `OUT_OF_DOMAIN` evidence may be retained for diagnostics but must not train source
+  or query promotion and must not enter commercial qualification.
+- Production promotions that lost in-domain proof remain disabled until explicit
+  re-approval after independent in-domain validation.
 
 ## Current development priority
 
@@ -243,11 +309,14 @@ Do not restart completed markets or add tools merely because they are available.
 The priority is now:
 
 ```text
-run existing daily intelligence
+protect PROJECT_DOMAIN_BOUNDARY_V1
+→ run existing daily intelligence inside the allowed domain
 → inspect the central operator brief
 → verify commercial facts for the selected target
-→ improve only demonstrated gaps
+→ improve only demonstrated in-domain gaps
 ```
 
-New tools, sources, or countries should be added only when the central daily flow
-shows a concrete gap that existing components cannot solve.
+New tools, sources, learning loops, or countries should be added only when the
+central daily flow shows a concrete gap that existing components cannot solve and
+the proposed expansion remains inside `CLOTHING_INVENTORY` or the bounded
+`FABRIC_PROCUREMENT` lane.
