@@ -85,7 +85,7 @@ jobs:
           assert route["provider"] == "exa"
           assert route["market_code"] == "FR"
           assert route["pathway"] == "AGGREGATE_CHILD"
-          assert route["parent_domain"] == "sdpie.com"
+          assert route["parent_domain"] == "www.sdpie.com"
           assert route["exact_lot_count"] == 2
           assert "prix quantité" in route["query"]
 
