@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Run a bounded Exa-vs-Brave shadow search benchmark.
+"""Run a bounded clothing-inventory Exa-vs-Brave shadow search benchmark.
 
 This script is diagnostic only. Search hits are not opportunities and the
 output cannot contact, bid, reserve, purchase, pay, or activate a provider in
-production.
+production. Query wording is explicitly anchored to CLOTHING_INVENTORY so the
+benchmark cannot reward a provider for unrelated liquidation noise.
 """
 from __future__ import annotations
 
@@ -17,14 +18,15 @@ from urllib.parse import urlparse
 
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.exa_search import ExaSearchProvider
+from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
 
 MARKET_QUERIES = {
-    "NO": "Norge bedrift avvikling restlager varelager selges",
-    "SE": "Sverige företag avveckling restlager lager säljes",
-    "DE": "Deutschland Geschäftsauflösung Restposten Warenlager Verkauf",
-    "FR": "France liquidation entreprise stock déstockage vente",
-    "IT": "Italia cessazione attività liquidazione magazzino stock vendita",
-    "NL": "Nederland bedrijfsbeëindiging voorraad partijhandel uitverkoop",
+    "NO": "Norge klær mote bedrift avvikling restlager varelager selges",
+    "SE": "Sverige kläder mode företag avveckling restlager lager säljes",
+    "DE": "Deutschland Kleidung Mode Geschäftsauflösung Restposten Warenlager Verkauf",
+    "FR": "France vêtements mode liquidation entreprise stock déstockage vente",
+    "IT": "Italia abbigliamento moda cessazione attività liquidazione magazzino stock vendita",
+    "NL": "Nederland kleding mode bedrijfsbeëindiging voorraad partijhandel uitverkoop",
 }
 
 
@@ -131,18 +133,20 @@ def run_benchmark(
         )
 
     return {
-        "schema_version": "exa-brave-shadow-benchmark-1.0",
+        "schema_version": "exa-brave-shadow-benchmark-1.1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "status": "SUCCESS",
         "shadow_only": True,
         "provider_mode": provider_mode,
+        "project_domain": CLOTHING_INVENTORY,
+        "project_domain_gate_enforced": True,
         "markets": normalized_markets,
         "results_per_query": results_per_query,
         "exa_request_count": exa_request_count,
         "brave_request_count": brave_request_count,
         "market_results": rows,
         "interpretation_guard": (
-            "Search hits are discovery observations only; they are not verified opportunities."
+            "Search hits are discovery observations only; exact pages must prove CLOTHING_INVENTORY relevance before tool learning may reward them."
         ),
         "production_provider_activation": False,
         "automatic_contact": False,
