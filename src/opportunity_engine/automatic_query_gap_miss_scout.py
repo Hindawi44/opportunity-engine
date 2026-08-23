@@ -4,7 +4,8 @@ The scout is deliberately separate from the canonical query pack. It performs
 one bounded Norway search using closure/inventory semantics without embedding
 the candidate sale words that learning is expected to discover. A search hit is
 never ground truth: an exact public HTML page must independently prove a real
-business closure, inventory liquidation, and a concrete company identity.
+business closure, inventory liquidation, a concrete company identity, and
+CLOTHING_INVENTORY relevance.
 
 Only then, if the exact page is absent from the canonical checkpoint and the
 page contains a commercially meaningful sale term absent from active queries,
@@ -36,8 +37,12 @@ from opportunity_engine.missed_opportunity_learning import (
     load_missed_opportunity_memory,
     save_missed_opportunity_memory,
 )
+from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    classify_project_domain,
+)
 
-SCHEMA_VERSION = "automatic-query-gap-miss-scout-1.0"
+SCHEMA_VERSION = "automatic-query-gap-miss-scout-1.1"
 OUTPUT_FILENAME = "automatic-query-gap-miss-scout.json"
 MEMORY_RELATIVE_PATH = Path("learning/missed-opportunities.json")
 DEFAULT_ACTIVE_QUERY_CONFIG = "config/brave_search_queries.json"
@@ -168,6 +173,8 @@ def _extract_sale_terms(text: str) -> list[str]:
         seen.add(term)
         ordered.append(term)
     return ordered
+
+
 _GENERIC_COMPANY_LABELS = frozenset(
     {
         "butikk",
@@ -183,21 +190,16 @@ _GENERIC_COMPANY_LABELS = frozenset(
     }
 )
 _COMPANY_PATTERNS = (
-    # A public operating-identity statement is strong company evidence, e.g.
-    # "Senna Mode drives av Senna Mode B.V.". Some commerce templates place a
-    # BEDRIFTSDETALJER heading immediately before the displayed trading name.
     re.compile(
         r"\b(?:(?i:bedriftsdetaljer)\s+)?"
         r"([A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?)\s+"
         r"(?i:drives av)\b"
     ),
-    # Prefer a role-labelled identity, e.g. "Klesbutikken Rita Korsettsalong i ...".
     re.compile(
         r"\b(?i:klesbutikken|butikken|bedriften|selskapet|forretningen)\s+"
         r"([A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?)\s+"
         r"(?i:i|på|stenger|legger|legges|skal|har|vil)\b"
     ),
-    # Fallback: a concrete title/name immediately followed by a closure verb.
     re.compile(
         r"\b([A-ZÆØÅ][A-Za-zÆØÅæøå0-9&.'’\- ]{1,80}?)\s+"
         r"(?i:legger ned|legges ned|stenger for godt|stenger etter|stenge butikken|stenger butikken|avvikler|avvikles|opphører)\b"
@@ -320,8 +322,6 @@ def _valid_company_label(value: str) -> bool:
 
 
 def _extract_company(text: str) -> str | None:
-    # Use finditer, not search, so a generic headline such as "Butikken legger
-    # ned" cannot prevent a later concrete identity from being considered.
     for pattern in _COMPANY_PATTERNS:
         for match in pattern.finditer(text):
             value = _compact(match.group(1)).strip(" -–—|:,.;")
@@ -352,6 +352,12 @@ def _verify_closure_liquidation_page(page: PublicPage) -> dict[str, Any] | None:
     if not text or any(marker in folded for marker in _TEMPORARY_MARKERS):
         return None
 
+    # This is the authoritative scope boundary. Closure + liquidation language
+    # is insufficient unless the exact public page also proves clothing stock.
+    project_domain = classify_project_domain(text=text)
+    if project_domain != CLOTHING_INVENTORY:
+        return None
+
     closure_markers = [marker for marker in _CLOSURE_MARKERS if marker in folded]
     sale_terms = _extract_sale_terms(text)
     liquidation_markers = [marker for marker in _LIQUIDATION_MARKERS if marker in folded]
@@ -369,6 +375,8 @@ def _verify_closure_liquidation_page(page: PublicPage) -> dict[str, Any] | None:
         "closure_markers": closure_markers,
         "liquidation_markers": liquidation_markers,
         "evidence_text": _bounded_context(text, sale_terms[0]),
+        "project_domain": CLOTHING_INVENTORY,
+        "project_domain_gate_enforced": True,
         "source_page_verified": True,
         "closure_verified": True,
         "inventory_liquidation_verified": True,
@@ -482,6 +490,8 @@ def discover_query_gap_misses(
                 "canonical_url": final_url,
                 "company": case.ground_truth_company,
                 "query_gap_term": term,
+                "project_domain": CLOTHING_INVENTORY,
+                "project_domain_gate_enforced": True,
                 "source_page_verified": True,
                 "closure_verified": True,
                 "inventory_liquidation_verified": True,
@@ -506,6 +516,8 @@ def discover_query_gap_misses(
         "no_new_query_term_count": no_new_term,
         "cases": cases,
         "cases_metadata": metadata,
+        "required_project_domain": CLOTHING_INVENTORY,
+        "project_domain_gate_enforced": True,
         "search_hit_alone_is_never_ground_truth": True,
         "source_page_verification_required": True,
         "automatic_query_activation": False,
@@ -554,6 +566,7 @@ def _attach_to_brief(output_dir: Path, report: Mapping[str, Any]) -> None:
             "known_case_count_after",
             "core_already_knew_count",
             "no_new_query_term_count",
+            "project_domain_gate_enforced",
             "automatic_query_activation",
         )
     }
@@ -571,6 +584,8 @@ def _safe_empty_report(status: str, **extra: Any) -> dict[str, Any]:
         "detected_miss_count": 0,
         "new_case_count": 0,
         "repeat_miss_count_this_run": 0,
+        "required_project_domain": CLOTHING_INVENTORY,
+        "project_domain_gate_enforced": True,
         "automatic_query_activation": False,
         "automatic_contact": False,
         "automatic_bid": False,
