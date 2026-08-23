@@ -137,7 +137,7 @@ def test_positive_learning_records_end_to_end_success_without_automatic_activati
     assert route["market_code"] == "FR"
     assert route["query"] == QUERY_FR
     assert route["pathway"] == "AGGREGATE_CHILD"
-    assert route["parent_domain"] == "sdpie.com"
+    assert route["parent_domain"] == "www.sdpie.com"
     assert route["exact_lot_count"] == 2
     assert route["exact_lot_urls"] == [LOT_A, LOT_B]
 
