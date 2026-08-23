@@ -183,7 +183,7 @@ def test_learning_search_replays_term_without_product_or_company_leakage() -> No
     assert "interiør" not in query.casefold()
 
 
-def test_real_miss_runs_end_to_end_through_persistent_holdout_runtime(tmp_path) -> None:
+def test_out_of_domain_historical_miss_is_quarantined_by_persistent_runtime(tmp_path) -> None:
     learning_dir = tmp_path / "learning"
     inbox = tmp_path / "missed-opportunity-inbox.json"
     validation = tmp_path / "query-gap-validation-cases.json"
@@ -241,29 +241,26 @@ def test_real_miss_runs_end_to_end_through_persistent_holdout_runtime(tmp_path) 
         (learning_dir / "safe-learning-proof.json").read_text(encoding="utf-8")
     )
 
-    assert report["known_missed_opportunity_count"] == 1
-    assert report["validation_case_count"] == 1
-    assert report["proven_term_count_this_run"] == 1
-    assert report["recovered_case_count"] == 0
-    assert report["transfer_proven_case_count"] == 1
-    assert report["shadow_proven_term_count"] >= 1
+    assert report["known_missed_opportunity_count"] == 0
+    assert report["validation_case_count"] == 0
+    assert report["proven_term_count_this_run"] == 0
+    assert report["shadow_proven_term_count"] == 0
     assert report["active_learned_term_count"] == 0
+    assert report["project_domain_gate_enforced"] is True
+    assert report["out_of_domain_excluded_case_ids"] == [
+        "REAL-MISS-NO-LENE-INTERIOR-2025-08"
+    ]
+    assert report["out_of_domain_excluded_validation_case_ids"] == [
+        "HOLDOUT-NO-NOREM-BAADE-2010"
+    ]
     assert report["automatic_query_activation"] is False
     assert report["promotion_gate_enforced"] is True
 
-    assert "stort avslutningssalg" in learned_terms_for_market(shadow_payload, "NO")
+    assert learned_terms_for_market(shadow_payload, "NO") == {}
     assert learned_terms_for_market(active_payload, "NO") == {}
-    assert memory_payload["cases"][0]["learning_status"] == "TRANSFER_PROVEN"
-    assert proof["status"] == "SHADOW_TRANSFER_PENDING_REPLICATION"
-    assert proof["shadow_recovered_case_count"] == 0
-    assert proof["shadow_transfer_proven_case_count"] == 1
-    assert proof["repeated_transfer_proven_case_count"] == 0
-    assert proof["promotion_eligible_count"] == 0
-    assert proof["promoted_proof_count"] == 0
-    assert proof["automatic_promotion"] is False
-    assert proof["min_independent_transfer_cases"] == 2
-    proof_case = proof["cases"][0]
-    assert proof_case["shadow_transfer_proven"] is True
-    assert proof_case["shadow_validation_case_ids"] == ["HOLDOUT-NO-NOREM-BAADE-2010"]
-    assert proof_case["independent_transfer_case_count"] == 1
-    assert proof_case["repeated_transfer_proven"] is False
+    assert memory_payload["case_count"] == 0
+    assert memory_payload["cases"] == []
+    assert proof["project_domain_gate_enforced"] is True
+    assert proof["out_of_domain_excluded_case_ids"] == [
+        "REAL-MISS-NO-LENE-INTERIOR-2025-08"
+    ]
