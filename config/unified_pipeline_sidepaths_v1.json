@@ -1,6 +1,6 @@
 {
   "schema_version": "unified-pipeline-sidepaths-inventory-1.0",
-  "generated_at": "2026-08-23T12:45:00Z",
+  "generated_at": "2026-08-23T12:47:00Z",
   "governing_pipeline": {
     "contract": "UNIFIED_SIX_MARKET_PIPELINE_V1",
     "module": "src/opportunity_engine/discovery/unified_six_market_pipeline.py",
@@ -153,5 +153,19 @@
       "agent/sweden-*",
       "agent/italy-*"
     ]
+  },
+  "exa_stage2_live_proof": {
+    "run_id": 32640232220,
+    "status": "SUCCESS",
+    "exa_unique_url_count": 17,
+    "page_fetches_attempted": 17,
+    "page_fetches_succeeded": 14,
+    "exact_lot_candidate_count": 0,
+    "active_stock_signal_count": 2,
+    "source_intelligence_only_count": 5,
+    "info_or_legal_only_count": 2,
+    "unproven_page_count": 5,
+    "fetch_failed_count": 3,
+    "interpretation": "Exa demonstrated source-discovery value but did not prove a buyable exact lot in this bounded six-market round."
   }
 }
