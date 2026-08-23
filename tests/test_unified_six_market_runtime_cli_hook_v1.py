@@ -10,6 +10,11 @@ from opportunity_engine.discovery.unified_six_market_runtime_cli_hook import (
 )
 
 
+ROOT = Path(__file__).resolve().parents[1]
+DISCOVERY_INIT = ROOT / "src/opportunity_engine/discovery/__init__.py"
+RUNTIME_HOOK = ROOT / "src/opportunity_engine/discovery/unified_six_market_runtime_cli_hook.py"
+
+
 def _write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
@@ -130,6 +135,7 @@ def test_runtime_build_writes_one_six_market_authority_artifact(tmp_path: Path) 
     assert ledger["market_coverage"] == ["NO", "SE", "DE", "FR", "IT", "NL"]
     assert ledger["pipeline_contract"] == "UNIFIED_SIX_MARKET_PIPELINE_V1"
     assert ledger["runtime_authority"] == "PRIMARY_DAILY_OPERATOR_VIEW"
+    assert ledger["runtime_emission_stage"] == "AFTER_LIFECYCLE_REVIEW_AND_DOMAIN_INTELLIGENCE"
     assert ledger["legacy_three_market_checkpoint_retained"] is True
     assert ledger["country_specific_bypass_allowed"] is False
 
@@ -158,3 +164,13 @@ def test_runtime_authority_preserves_missing_capabilities_instead_of_hiding_them
 
     italy_stages = {item["stage"]: item for item in by_market["IT"]["stages"]}
     assert italy_stages["EXACT_LOT_VERIFICATION"]["verified_active_exact_lot_count"] == 1
+
+
+def test_final_daily_bulletin_cli_is_the_runtime_emission_point() -> None:
+    init_text = DISCOVERY_INIT.read_text(encoding="utf-8")
+    hook_text = RUNTIME_HOOK.read_text(encoding="utf-8")
+
+    assert "install_unified_six_market_runtime_cli_hook" in init_text
+    assert "install_unified_six_market_runtime_cli_hook()" in init_text
+    assert '_TARGET_CLI = "build_domain_market_intelligence_feed.py"' in hook_text
+    assert '_TARGET_CLI = "run_multi_market_daily_operator_checkpoint.py"' not in hook_text
