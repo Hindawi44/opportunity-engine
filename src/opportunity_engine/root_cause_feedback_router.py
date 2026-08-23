@@ -4,7 +4,7 @@ The project must not respond to every miss by broadening search vocabulary.
 This router is a deterministic control plane above durable missed-opportunity
 memory: QUERY_GAP may flow into the existing bounded keyword learner, while
 source, parser, verification, entity, ranking and reporting failures are routed
-to dedicated repair queues.  The router itself does not mutate source policy,
+to dedicated repair queues. The router itself does not mutate source policy,
 code, queries, rankings, or financial state.
 """
 from __future__ import annotations
@@ -14,6 +14,9 @@ import json
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from opportunity_engine.missed_opportunity_domain_gate import (
+    partition_project_domain_cases,
+)
 from opportunity_engine.missed_opportunity_learning import (
     MissedOpportunityCase,
     load_missed_opportunity_memory,
@@ -235,6 +238,9 @@ def _attach_to_brief(output_dir: Path, report: Mapping[str, Any]) -> None:
             "keyword_learning_route_count",
             "mechanism_counts",
             "root_cause_counts",
+            "project_domain_gate_enforced",
+            "out_of_domain_excluded_case_count",
+            "out_of_domain_excluded_case_ids",
         )
     }
     _write_json(path, brief)
@@ -245,12 +251,18 @@ def write_root_cause_feedback_router(
     *,
     input_root: str | Path,
 ) -> dict[str, Any]:
-    """Read durable missed-opportunity memory and write the operator routing view."""
+    """Read durable miss memory and route only current project-domain cases."""
     output = Path(output_dir)
     memory_path = Path(input_root) / MEMORY_RELATIVE_PATH
-    cases = load_missed_opportunity_memory(memory_path)
-    report = build_root_cause_feedback_report(cases)
+    raw_cases = load_missed_opportunity_memory(memory_path)
+    partition = partition_project_domain_cases(raw_cases)
+    report = build_root_cause_feedback_report(partition.allowed)
     report["memory_path"] = memory_path.as_posix()
+    report["project_domain_gate_enforced"] = True
+    report["out_of_domain_excluded_case_count"] = len(
+        partition.excluded_case_ids
+    )
+    report["out_of_domain_excluded_case_ids"] = partition.excluded_case_ids
     _write_json(output / OUTPUT_FILENAME, report)
     _attach_to_brief(output, report)
     return report
