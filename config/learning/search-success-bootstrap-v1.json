@@ -1,0 +1,98 @@
+{
+  "schema_version": "search-success-memory-1.0",
+  "observations": [
+    {
+      "schema_version": "search-success-learning-1.0",
+      "status": "SUCCESS",
+      "run_id": "32655969884",
+      "observed_at": "2026-08-23T18:10:01.470285+00:00",
+      "observation_scope": "SINGLE_PROVIDER_ROUTE_REPLICATION",
+      "query_mode": "exact_lot",
+      "required_project_domain": "CLOTHING_INVENTORY",
+      "evaluated_provider": "exa",
+      "providers": {
+        "exa": {
+          "evaluation_status": "EVALUATED_FOR_ROUTE_REPLICATION",
+          "end_to_end_exact_lot_count": 3,
+          "successful_markets": ["FR"]
+        },
+        "brave": {
+          "evaluation_status": "NOT_EVALUATED",
+          "end_to_end_exact_lot_count": 0,
+          "successful_markets": []
+        }
+      },
+      "successful_routes": [
+        {
+          "provider": "exa",
+          "market_code": "FR",
+          "query": "France vêtements mode lot de marchandises à vendre prix quantité stock déstockage disponible",
+          "pathway": "AGGREGATE_CHILD",
+          "parent_domain": "friptadium.com",
+          "result_domain": null,
+          "exact_lot_count": 3,
+          "exact_lot_urls": [
+            "https://friptadium.com/products/hauts-femme-au-kilo",
+            "https://friptadium.com/products/hauts-femme-premium-au-kilo",
+            "https://friptadium.com/products/robes-femme-au-kilo"
+          ]
+        }
+      ],
+      "observed_provider_leader": "NOT_EVALUATED",
+      "provider_preference_status": "PROVIDER_COMPARISON_NOT_EVALUATED",
+      "automatic_provider_activation": false,
+      "automatic_source_promotion": false,
+      "production_query_mutation": false,
+      "production_mutation": false
+    },
+    {
+      "schema_version": "search-success-learning-1.0",
+      "status": "SUCCESS",
+      "run_id": "32657298412",
+      "observed_at": "2026-08-23T18:13:10.268000+00:00",
+      "observation_scope": "SINGLE_PROVIDER_ROUTE_REPLICATION",
+      "query_mode": "exact_lot",
+      "required_project_domain": "CLOTHING_INVENTORY",
+      "evaluated_provider": "exa",
+      "providers": {
+        "exa": {
+          "evaluation_status": "EVALUATED_FOR_ROUTE_REPLICATION",
+          "end_to_end_exact_lot_count": 3,
+          "successful_markets": ["FR"]
+        },
+        "brave": {
+          "evaluation_status": "NOT_EVALUATED",
+          "end_to_end_exact_lot_count": 0,
+          "successful_markets": []
+        }
+      },
+      "successful_routes": [
+        {
+          "provider": "exa",
+          "market_code": "FR",
+          "query": "France vêtements mode lot de marchandises à vendre prix quantité stock déstockage disponible",
+          "pathway": "AGGREGATE_CHILD",
+          "parent_domain": "friptadium.com",
+          "result_domain": null,
+          "exact_lot_count": 3,
+          "exact_lot_urls": [
+            "https://friptadium.com/products/hauts-femme-au-kilo",
+            "https://friptadium.com/products/hauts-femme-premium-au-kilo",
+            "https://friptadium.com/products/robes-femme-au-kilo"
+          ]
+        }
+      ],
+      "observed_provider_leader": "NOT_EVALUATED",
+      "provider_preference_status": "PROVIDER_COMPARISON_NOT_EVALUATED",
+      "automatic_provider_activation": false,
+      "automatic_source_promotion": false,
+      "production_query_mutation": false,
+      "production_mutation": false
+    }
+  ],
+  "automatic_provider_activation": false,
+  "automatic_source_promotion": false,
+  "production_query_mutation": false,
+  "production_mutation": false,
+  "bootstrap_guard": "Verified live proofs only. This seed is review-only and is used only when no restored daily Search Success memory exists."
+}
