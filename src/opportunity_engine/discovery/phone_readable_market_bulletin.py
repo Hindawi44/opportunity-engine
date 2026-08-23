@@ -16,6 +16,9 @@ COUNTRY_LABELS = {
     "NO": "النرويج",
     "SE": "السويد",
     "DE": "ألمانيا",
+    "FR": "فرنسا",
+    "IT": "إيطاليا",
+    "NL": "هولندا",
 }
 SIGNAL_TYPE_LABELS = {
     "ITEM_LISTING": "إعلان مخزون",
@@ -252,7 +255,7 @@ def render_phone_readable_market_bulletin(brief: Mapping[str, Any]) -> str:
     lines = [
         "نشرة استخبارات سوق مخزون الملابس",
         f"الوقت: {brief.get('generated_at')}",
-        "الأسواق: النرويج | السويد | ألمانيا",
+        "الأسواق: النرويج | السويد | ألمانيا | فرنسا | إيطاليا | هولندا",
         (
             "الملخص: "
             f"جديدة {counts.get('new_signals_today', 0)} | "
