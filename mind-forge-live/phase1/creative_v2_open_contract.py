@@ -41,6 +41,7 @@ def run_contract() -> dict[str, object]:
         "open_creative_prompt",
         "apply_open_payload",
         "v1_benchmark",
+        "_canonical_source_question_ids",
     }
     missing_engine = required_engine.difference(_functions(engine_tree))
     if missing_engine:
@@ -64,10 +65,20 @@ def run_contract() -> dict[str, object]:
         "NOT constrained to predefined mechanism families",
         "Discover the opportunity space from the meaning of the seed itself",
         "at least eight distinct mechanism families",
+        "Use ONLY exact IDs from ALLOWED_QUESTION_IDS",
     )
     for text in required_prompt_meaning:
         if text not in engine_literals:
             raise AssertionError(f"V2 open prompt lost required instruction: {text}")
+
+    required_question_id_guards = (
+        "canonical_question_ids = _canonical_source_question_ids",
+        "not set(canonical_question_ids).issubset(question_ids)",
+        "source_question_ids=canonical_question_ids",
+    )
+    for text in required_question_id_guards:
+        if text not in engine_source:
+            raise AssertionError(f"Creative V2 question-ID guard missing: {text}")
 
     if "generate_v1_ideas(topic, questions)" not in engine_source:
         raise AssertionError("V1 benchmark/fallback hook is missing")
@@ -86,6 +97,8 @@ def run_contract() -> dict[str, object]:
         "v2_uses_predefined_pattern_frames": False,
         "v2_min_required_family_diversity": 8,
         "v2_target_idea_count": 14,
+        "unknown_question_ids_are_canonicalized": True,
+        "final_question_id_subset_validation_is_strict": True,
     }
 
 
