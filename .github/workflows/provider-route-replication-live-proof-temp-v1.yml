@@ -1,0 +1,174 @@
+name: Provider Route Replication Live Proof TEMP V1
+
+on:
+  pull_request:
+    branches: [feat/provider-route-replication-learning-v1]
+    paths:
+      - ".github/workflows/provider-route-replication-live-proof-temp-v1.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  exa-fr-route-replication:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      PRIOR_DIR: artifacts/prior-search-success-memory
+      OUTPUT_DIR: artifacts/provider-route-replication-live-proof-v1
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+
+      - name: Verify provider-route contract tests
+        run: |
+          pytest tests/test_provider_route_success_learning_v1.py -q
+          pytest tests/test_search_success_learning_v1.py -q
+          pytest tests/test_exact_lot_child_link_resolution_v1.py -q
+
+      - name: Confirm Exa credential and restore prior memory
+        shell: bash
+        run: |
+          test -n "$EXA_API_KEY" || { echo "EXA_API_KEY is required" >&2; exit 1; }
+          mkdir -p "$PRIOR_DIR" "$OUTPUT_DIR"
+          gh run download 32654103196 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name search-success-learning-proof-v1 \
+            --dir "$PRIOR_DIR"
+          test -f "$PRIOR_DIR/memory.json"
+
+      - name: Run fresh FR Exact-Lot search with Exa only
+        shell: bash
+        run: |
+          python scripts/run_exa_brave_shadow_benchmark.py \
+            --output "$OUTPUT_DIR/benchmark.json" \
+            --markets "FR" \
+            --results-per-query 3 \
+            --provider-mode exa \
+            --query-mode exact_lot
+
+      - name: Strictly verify Exa original pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
+
+          root = Path(os.environ["OUTPUT_DIR"])
+          benchmark = json.loads((root / "benchmark.json").read_text(encoding="utf-8"))
+          report = verify_provider_unique_pages(
+              benchmark,
+              provider="exa",
+              max_page_fetches=3,
+          )
+          assert report["status"] == "SUCCESS"
+          (root / "exa-verification.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("exa_verified:", report["page_fetches_succeeded"])
+          print("exa_active_stock:", report["active_stock_signal_count"])
+          print("exa_direct_exact:", report["exact_lot_candidate_count"])
+          PY
+
+      - name: Resolve bounded Exa aggregate child pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from opportunity_engine.discovery.exact_lot_child_link_resolution import resolve_exact_lot_child_links
+
+          root = Path(os.environ["OUTPUT_DIR"])
+          verification = json.loads((root / "exa-verification.json").read_text(encoding="utf-8"))
+          report = resolve_exact_lot_child_links(
+              verification,
+              max_parent_fetches=3,
+              max_child_links_per_parent=12,
+              max_child_page_fetches=18,
+          )
+          assert report["status"] == "SUCCESS"
+          (root / "exa-child-resolution.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print("eligible_parents:", report["eligible_parent_count"])
+          print("child_exact_lots:", report["exact_lot_candidate_count"])
+          for row in report["exact_lots"]:
+              print("FRESH_EXA_EXACT:", row.get("market_code"), row.get("parent_url"), row.get("url"))
+          PY
+
+      - name: Update memory from single-provider route observation
+        shell: bash
+        run: |
+          python scripts/run_provider_route_success_learning.py \
+            --provider exa \
+            --benchmark "$OUTPUT_DIR/benchmark.json" \
+            --provider-verification "$OUTPUT_DIR/exa-verification.json" \
+            --child-resolution "$OUTPUT_DIR/exa-child-resolution.json" \
+            --run-id "$GITHUB_RUN_ID" \
+            --existing-memory "$PRIOR_DIR/memory.json" \
+            --observation-output "$OUTPUT_DIR/observation.json" \
+            --memory-output "$OUTPUT_DIR/memory.json" \
+            --min-independent-runs 2
+
+      - name: Assert route learning without provider-comparison claim
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["OUTPUT_DIR"])
+          obs = json.loads((root / "observation.json").read_text(encoding="utf-8"))
+          memory = json.loads((root / "memory.json").read_text(encoding="utf-8"))
+
+          assert obs["observation_scope"] == "SINGLE_PROVIDER_ROUTE_REPLICATION"
+          assert obs["observed_provider_leader"] == "NOT_EVALUATED"
+          assert obs["provider_preference_status"] == "PROVIDER_COMPARISON_NOT_EVALUATED"
+          assert obs["providers"]["brave"]["evaluation_status"] == "NOT_EVALUATED"
+          assert obs["automatic_provider_activation"] is False
+          assert obs["production_query_mutation"] is False
+          assert memory["run_count"] == 2
+          assert memory["automatic_provider_activation"] is False
+          assert memory["automatic_source_promotion"] is False
+          assert memory["production_query_mutation"] is False
+
+          repeated = [
+              row for row in memory["route_learning"]
+              if row["provider"] == "exa"
+              and row["market_code"] == "FR"
+              and row["pathway"] == "AGGREGATE_CHILD"
+              and row.get("parent_domain") == "www.sdpie.com"
+          ]
+          print("fresh_exact_lots:", obs["providers"]["exa"]["end_to_end_exact_lot_count"])
+          print("fresh_routes:", len(obs["successful_routes"]))
+          if repeated:
+              route = repeated[0]
+              print("learned_route_status:", route["status"])
+              print("independent_run_count:", route["independent_run_count"])
+              print("verified_exact_lot_url_count:", route["verified_exact_lot_url_count"])
+          else:
+              print("learned_route_status: NOT_REOBSERVED_IN_THIS_RUN")
+          PY
+
+      - name: Upload provider-route replication proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: provider-route-replication-live-proof-v1
+          path: artifacts/provider-route-replication-live-proof-v1/*.json
+          if-no-files-found: warn
+          retention-days: 30
