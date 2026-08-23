@@ -15,6 +15,7 @@ on:
       - "scripts/run_exa_brave_shadow_benchmark.py"
       - "scripts/run_provider_route_success_learning.py"
       - "tests/test_exact_lot_multihop_resolution_v1.py"
+      - "tests/test_exact_lot_multihop_hub_root_v1.py"
       - "tests/test_item_specific_url_guard_v1.py"
       - "tests/test_provider_route_success_learning_v1.py"
       - "tests/test_project_domain_french_clothing_subject_v1.py"
@@ -43,6 +44,7 @@ jobs:
         run: >-
           pytest -q
           tests/test_exact_lot_multihop_resolution_v1.py
+          tests/test_exact_lot_multihop_hub_root_v1.py
           tests/test_item_specific_url_guard_v1.py
           tests/test_provider_route_success_learning_v1.py
           tests/test_project_domain_french_clothing_subject_v1.py
@@ -117,6 +119,7 @@ jobs:
           )
           assert report["status"] == "SUCCESS"
           assert report["shadow_only"] is True
+          assert report["commercial_hub_navigation_only"] is True
           assert report["same_origin_only"] is True
           assert report["bounded_multi_hop"] is True
           assert report["exact_lot_acceptance_only"] is True
@@ -126,6 +129,8 @@ jobs:
           print("eligible_roots:", report["eligible_root_parent_count"])
           print("gateway_pages:", report["gateway_page_count"])
           print("exact_lots:", report["exact_lot_candidate_count"])
+          for row in report["root_results"]:
+              print("ROOT", row.get("root_navigation_role"), row.get("root_exact_lot_accepted"), row.get("root_url"))
           for row in report["gateway_pages"]:
               print("GATEWAY", row.get("navigation_depth"), row.get("url"))
           for row in report["exact_lots"]:
@@ -144,7 +149,7 @@ jobs:
             --observation-output "$OUTPUT_DIR/search-success-observation.json" \
             --memory-output "$OUTPUT_DIR/search-success-memory.json"
 
-      - name: Print Friptadium proof and enforce interpretation guards
+      - name: Assert Friptadium hub to exact-product proof
         shell: bash
         run: |
           python - <<'PY'
@@ -152,6 +157,7 @@ jobs:
           from pathlib import Path
           from urllib.parse import urlsplit
 
+          HUB = "https://friptadium.com/pages/lot-de-vetements-revendeur"
           root = Path("artifacts/exact-lot-multihop-france-v1")
           benchmark = json.loads((root / "benchmark.json").read_text(encoding="utf-8"))
           multihop = json.loads((root / "multihop.json").read_text(encoding="utf-8"))
@@ -160,18 +166,33 @@ jobs:
 
           exa_results = benchmark["market_results"][0]["exa"]["results"]
           friptadium_search = [r for r in exa_results if "friptadium.com" in (r.get("domain") or "")]
-          friptadium_gateways = [r for r in multihop["gateway_pages"] if "friptadium.com" in (urlsplit(r.get("url") or "").hostname or "")]
-          friptadium_exact = [r for r in multihop["exact_lots"] if "friptadium.com" in (urlsplit(r.get("url") or "").hostname or "")]
+          hub_roots = [r for r in multihop["root_results"] if r.get("root_url") == HUB]
+          friptadium_exact = [
+              r for r in multihop["exact_lots"]
+              if "friptadium.com" in (urlsplit(r.get("url") or "").hostname or "")
+          ]
+          hub_exact = [
+              r for r in friptadium_exact
+              if (r.get("navigation_chain") or [None])[0] == HUB
+          ]
 
           print("friptadium_search_hits:", len(friptadium_search))
-          print("friptadium_gateways:", len(friptadium_gateways))
+          print("friptadium_hub_roots:", len(hub_roots))
           print("friptadium_exact_lots:", len(friptadium_exact))
+          print("hub_to_exact_lots:", len(hub_exact))
           for row in friptadium_search:
               print("SEARCH", row.get("url"))
-          for row in friptadium_gateways:
-              print("GATEWAY", row.get("url"))
-          for row in friptadium_exact:
-              print("EXACT", row.get("url"), row.get("navigation_chain"))
+          for row in hub_roots:
+              print("HUB_ROOT", row.get("root_navigation_role"), row.get("root_exact_lot_accepted"), row.get("root_url"))
+          for row in hub_exact:
+              print("HUB_EXACT", row.get("url"), row.get("navigation_chain"))
+
+          assert hub_roots
+          assert all(r.get("root_navigation_role") == "COMMERCIAL_HUB" for r in hub_roots)
+          assert all(r.get("root_exact_lot_accepted") is False for r in hub_roots)
+          assert HUB not in {r.get("url") for r in multihop["exact_lots"]}
+          assert hub_exact, "Friptadium commercial hub did not resolve any strict Exact-Lot product"
+          assert all("/products/" in (r.get("url") or "") for r in hub_exact)
 
           assert observation["observed_provider_leader"] == "NOT_EVALUATED"
           assert observation["provider_preference_status"] == "PROVIDER_COMPARISON_NOT_EVALUATED"
