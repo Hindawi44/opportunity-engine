@@ -1,6 +1,6 @@
 """Authoritative project-domain boundary for discovery and learning.
 
-The Opportunity Engine is not a general-merchandise liquidation engine.  Its
+The Opportunity Engine is not a general-merchandise liquidation engine. Its
 commercial scope is deliberately narrow:
 
 * CLOTHING_INVENTORY: clothing, fashion, apparel, footwear and bridal garments
@@ -8,7 +8,7 @@ commercial scope is deliberately narrow:
 * FABRIC_PROCUREMENT: fabric and textile stock handled by the bounded
   procurement lane.
 
-Everything else fails closed as OUT_OF_DOMAIN.  The classifier is deterministic
+Everything else fails closed as OUT_OF_DOMAIN. The classifier is deterministic
 and evidence-based; generic words such as stock, liquidation, lot, price or
 quantity never establish project-domain relevance on their own.
 """
@@ -96,7 +96,11 @@ _CLOTHING_MARKERS = (
     "klær",
     "klaer",
     "klesbutikk",
+    "klesbutikken",
     "kleslager",
+    "arbeidsklær",
+    "arbeidsklaer",
+    "arbeidsjakker",
     "bekledning",
     "mote",
     "jakker",
@@ -111,6 +115,8 @@ _CLOTHING_MARKERS = (
     "kladlager",
     "klädbutik",
     "kladbutik",
+    "klädbutiken",
+    "kladbutiken",
     "jackor",
     "byxor",
     "skjortor",
@@ -123,6 +129,7 @@ _CLOTHING_MARKERS = (
     "modeware",
     "modeartikel",
     "schuhe",
+    "schuhen",
     "jacken",
     "hosen",
     "hemden",
@@ -151,6 +158,7 @@ _CLOTHING_MARKERS = (
     "kleding",
     "kledingvoorraad",
     "kledingwinkel",
+    "kledingwinkelvoorraad",
     "schoenen",
     "jassen",
     "broeken",
@@ -193,9 +201,9 @@ _FABRIC_MARKERS = (
     "stofrollen",
 )
 
-# These are only diagnostic negatives.  Absence of positive project-domain
-# evidence already fails closed, so this list does not need to enumerate every
-# unrelated product on earth.
+# These are diagnostic negatives only. Absence of positive project-domain
+# evidence already fails closed, so this list need not enumerate every unrelated
+# product category.
 _OUT_OF_DOMAIN_MARKERS = (
     "appliance",
     "appliances",
@@ -245,8 +253,8 @@ def _contains_any(text: str, markers: tuple[str, ...]) -> bool:
 def classify_project_domain(*, text: object = "", category: object = "") -> str:
     """Classify evidence into the project's allowed commercial domains.
 
-    Explicit structured categories take precedence.  Free text requires a
-    distinctive clothing/fashion or fabric/textile marker.  Generic commercial
+    Explicit structured categories take precedence. Free text requires a
+    distinctive clothing/fashion or fabric/textile marker. Generic commercial
     evidence alone intentionally returns OUT_OF_DOMAIN.
     """
 
