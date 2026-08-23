@@ -1,9 +1,11 @@
-"""Emit the six-market runtime authority after the real daily checkpoint CLI.
+"""Emit the six-market runtime authority after daily enrichment is complete.
 
-The existing daily runner still owns source execution while migration is in
-progress. This hook runs only for that CLI, after its synchronous NO/SE/DE
-checkpoint and FR/IT/NL market cycles have written their evidence artifacts.
-It then materializes one country-neutral six-market operator view.
+The existing daily checkpoint still owns source execution while migration is in
+progress. The workflow then enriches lifecycle state, reconciles human review,
+and builds the domain-intelligence bulletin. This hook runs only at the end of
+that final bulletin CLI, when the NO/SE/DE checkpoint and FR/IT/NL market-cycle
+artifacts are all present and the core checkpoint already contains its final
+lifecycle/review state for the run.
 """
 from __future__ import annotations
 
@@ -24,7 +26,7 @@ LEGACY_CORE_FILENAME = "multi-market-daily-checkpoint.json"
 FRANCE_CYCLE_FILENAME = "france-case-memory-v1.json"
 ITALY_CYCLE_FILENAME = "italy-case-memory-v1.json"
 NETHERLANDS_CYCLE_FILENAME = "netherlands-case-memory-v1.json"
-_TARGET_CLI = "run_multi_market_daily_operator_checkpoint.py"
+_TARGET_CLI = "build_domain_market_intelligence_feed.py"
 _INSTALLED = False
 
 
@@ -71,7 +73,7 @@ def render_unified_phone_summary(ledger: Mapping[str, Any]) -> str:
 
 
 def build_unified_runtime_artifacts(output_dir: str | Path) -> dict[str, Path]:
-    """Build the authoritative six-market daily view from current market truth."""
+    """Build the authoritative six-market daily view from final current truth."""
     root = Path(output_dir)
     core = _load_json(root / LEGACY_CORE_FILENAME)
     france_cycle = _load_json(root / FRANCE_CYCLE_FILENAME)
@@ -85,6 +87,7 @@ def build_unified_runtime_artifacts(output_dir: str | Path) -> dict[str, Path]:
         netherlands_sidecar=netherlands_cycle,
     )
     ledger["runtime_authority"] = "PRIMARY_DAILY_OPERATOR_VIEW"
+    ledger["runtime_emission_stage"] = "AFTER_LIFECYCLE_REVIEW_AND_DOMAIN_INTELLIGENCE"
     ledger["legacy_three_market_checkpoint_retained"] = True
     ledger["legacy_compatibility_input"] = LEGACY_CORE_FILENAME
     ledger["runtime_input_files"] = [
@@ -119,8 +122,8 @@ def _emit_after_daily_cli() -> None:
     output_dir = _output_dir_from_argv(sys.argv)
     core_path = output_dir / LEGACY_CORE_FILENAME
     if not core_path.exists():
-        # The main CLI failed before producing its checkpoint; preserve that
-        # original failure instead of replacing it with a secondary error.
+        # Upstream failed before a checkpoint existed; preserve that original
+        # failure instead of replacing it with a secondary runtime error.
         return
 
     required = [
@@ -141,7 +144,7 @@ def _emit_after_daily_cli() -> None:
 
 
 def install_unified_six_market_runtime_cli_hook() -> bool:
-    """Register the daily-runtime emitter only for the real checkpoint CLI."""
+    """Register the final daily six-market emitter for the bulletin CLI only."""
     global _INSTALLED
     if _INSTALLED:
         return False
