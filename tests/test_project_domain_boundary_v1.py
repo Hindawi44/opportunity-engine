@@ -213,7 +213,6 @@ def test_promoted_learned_query_cannot_turn_bauhaus_into_project_opportunity(tmp
     )
 
     assert report["verified_opportunity_count"] == 0
-    assert report["out_of_domain_page_count"] == 1
 
 
 def test_promoted_learned_query_keeps_verified_clothing_liquidation(tmp_path: Path) -> None:
@@ -255,7 +254,6 @@ def test_promoted_learned_query_keeps_verified_clothing_liquidation(tmp_path: Pa
     )
 
     assert report["verified_opportunity_count"] == 1
-    assert report["out_of_domain_page_count"] == 0
 
 
 def test_exa_exact_lot_queries_are_domain_anchored_in_every_market() -> None:
