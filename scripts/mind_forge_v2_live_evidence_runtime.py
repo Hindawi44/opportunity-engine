@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from pathlib import Path
@@ -9,6 +10,9 @@ from urllib.parse import urlparse
 
 from agents import Agent, ModelSettings, Runner, WebSearchTool
 from pydantic import BaseModel, ConfigDict, Field
+
+from scripts.mind_forge_v2_fast_learning_memory import learn_from_run
+from scripts.mind_forge_v2_top3_research_plan import build_top3_research_plan
 
 
 _SOURCE_WEIGHTS = {
@@ -122,36 +126,61 @@ def _source_type(url: str) -> str:
     return "primary"
 
 
-def _build_plan(reasoning: dict[str, Any]) -> list[dict[str, Any]]:
-    selected = list(reasoning.get("selected_idea_ids", []) or [])
-    assessments = {str(row["idea_id"]): row for row in reasoning.get("assessments", []) or []}
-    if len(selected) != 3:
-        raise ValueError(f"live evidence requires exactly three selected ideas, got {len(selected)}")
+def _load_prior_memory(explicit: dict[str, Any] | None) -> dict[str, Any] | None:
+    if explicit is not None:
+        return dict(explicit)
+    path_text = os.getenv("MIND_FORGE_PRIOR_MEMORY_PATH", "").strip()
+    if not path_text:
+        return None
+    path = Path(path_text)
+    if not path.is_file():
+        raise ValueError(f"MIND_FORGE_PRIOR_MEMORY_PATH does not exist: {path}")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("prior fast-learning memory must be a JSON object")
+    return data
+
+
+def _build_plan(
+    reasoning: dict[str, Any],
+    prior_memory: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     topic = str(reasoning.get("seed") or "").strip()
     if not topic:
         raise ValueError("live evidence requires the original topic/seed for relevance checking")
 
+    research_plan = build_top3_research_plan(reasoning, prior_memory)
+    requests = list(research_plan.get("requests", []) or [])
+    if len(requests) != 3:
+        raise ValueError(f"live evidence requires exactly three selected ideas, got {len(requests)}")
+
     plan: list[dict[str, Any]] = []
-    for rank, idea_id in enumerate(selected, start=1):
-        idea_id = str(idea_id)
-        row = assessments.get(idea_id)
-        if row is None:
-            raise ValueError(f"selected idea missing from assessments: {idea_id}")
-        critique = row.get("critique", {}) or {}
-        claim = str(critique.get("key_assumption") or critique.get("key_risk") or "").strip()
-        if not claim:
-            claim = f"There is a real material need in Norway for {row.get('title') or idea_id}."
-        plan.append({
-            "request_id": f"v2-top3-{rank}",
-            "idea_id": idea_id,
-            "title": str(row.get("title") or idea_id),
-            "claim_text": claim,
-            "topic": topic,
-        })
+    for row in requests:
+        request = dict(row)
+        request["topic"] = topic
+        plan.append(request)
     return plan
 
 
 def _prompt(request: dict[str, Any]) -> str:
+    hints = list(request.get("shadow_search_hints", []) or [])
+    memory_block = ""
+    if hints:
+        lines = []
+        for hint in hints:
+            action = str(hint.get("action") or "").strip()
+            question = str(hint.get("search_question") or "").strip()
+            required = str(hint.get("required_evidence") or "").strip()
+            if not question or not required:
+                continue
+            lines.append(f"- {action}: {question} Required evidence: {required}")
+        if lines:
+            memory_block = (
+                "\n\nPRIOR CROSS-RUN LEARNING — search guidance only. "
+                "It is not evidence, cannot reject an idea, and cannot override the exact current claim.\n"
+                + "\n".join(lines)
+            )
+
     return (
         "You are the bounded Evidence collector for MIND FORGE Creative V2. Perform exactly one web search. "
         "Prefer Norwegian official/public/primary sources. Return only one or two grounded observations in the schema. "
@@ -166,7 +195,8 @@ def _prompt(request: dict[str, Any]) -> str:
         "- OFF_DOMAIN: evidence about a different product, service, or industry.\n"
         "Do not label evidence DIRECT merely because the source is official or contains a generic word such as repair. "
         "If the search finds only generic or off-domain evidence, return it with that relevance label rather than forcing "
-        "a supportive conclusion. Give a short relevance_reason explaining the domain match or mismatch.\n\n"
+        "a supportive conclusion. Give a short relevance_reason explaining the domain match or mismatch."
+        f"{memory_block}\n\n"
         f"TOPIC: {request['topic']}\n"
         f"IDEA: {request['title']}\n"
         f"CLAIM: {request['claim_text']}\n"
@@ -319,8 +349,14 @@ def _rerank(reasoning: dict[str, Any], observations: list[dict[str, Any]]) -> di
     }
 
 
-def run_live_top3_evidence(reasoning: dict[str, Any], *, model: str = "gpt-5.6-luna") -> dict[str, Any]:
-    plan = _build_plan(reasoning)
+def run_live_top3_evidence(
+    reasoning: dict[str, Any],
+    *,
+    model: str = "gpt-5.6-luna",
+    prior_memory: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    prior_memory = _load_prior_memory(prior_memory)
+    plan = _build_plan(reasoning, prior_memory=prior_memory)
     all_observations: list[dict[str, Any]] = []
     search_operations = 0
     for request in plan:
@@ -334,17 +370,36 @@ def run_live_top3_evidence(reasoning: dict[str, Any], *, model: str = "gpt-5.6-l
         raise RuntimeError("Top 3 live evidence budget contract violated")
 
     final_rank = _rerank(reasoning, all_observations)
+    run_id = str(os.getenv("GITHUB_RUN_ID") or os.getenv("MIND_FORGE_RUN_ID") or "local-live-run")
+    fast_memory = learn_from_run(
+        reasoning,
+        {"observations": all_observations},
+        final_rank,
+        run_id=run_id,
+        prior_memory=prior_memory,
+    )
+
     out_dir = Path("artifacts/mind-forge-creative-v2-open-live")
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "evidence.json").write_text(
         json.dumps({"observations": all_observations}, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     (out_dir / "final_rank.json").write_text(json.dumps(final_rank, ensure_ascii=False, indent=2), encoding="utf-8")
+    (out_dir / "fast_learning_memory.json").write_text(
+        json.dumps(fast_memory, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     usage = {
         "search_operations": search_operations,
         "estimated_research_cost_usd": estimated_cost_usd,
         "hard_search_operation_cap": 3,
         "hard_estimated_cost_cap_usd": 0.03,
+        "prior_memory_loaded": bool(prior_memory),
+        "fast_learning_pattern_count": len(fast_memory.get("patterns", []) or []),
     }
     (out_dir / "live_evidence_usage.json").write_text(json.dumps(usage, ensure_ascii=False, indent=2), encoding="utf-8")
-    return {"usage": usage, "final_rank": final_rank, "observations": all_observations}
+    return {
+        "usage": usage,
+        "final_rank": final_rank,
+        "observations": all_observations,
+        "fast_learning_memory": fast_memory,
+    }
