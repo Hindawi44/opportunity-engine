@@ -37,6 +37,7 @@ _INVENTORY_MARKERS = (
     "varelager",
     "vareparti",
     "lagerparti",
+    "parti med",
     "overskottslager",
     "överskottslager",
     "restparti",
@@ -180,8 +181,6 @@ def _classify_page(*, title: str, text: str) -> tuple[str, dict[str, bool]]:
         "quantity_evidence": has_quantity,
     }
 
-    # Exact-lot candidacy is intentionally strict: a direct original page must
-    # show inventory, sale availability, a concrete quantity, and a price.
     if has_inventory and has_direct_sale and has_quantity and has_price and not has_info_legal:
         return EXACT_LOT_CANDIDATE, evidence
     if has_inventory and has_direct_sale and not has_info_legal and not has_buyer_source:
@@ -191,9 +190,6 @@ def _classify_page(*, title: str, text: str) -> tuple[str, dict[str, bool]]:
     if has_info_legal and not (has_inventory and has_direct_sale and has_quantity and has_price):
         return INFO_OR_LEGAL_ONLY, evidence
     if has_inventory and has_buyer_source:
-        # A page primarily advertising acquisition services is useful source
-        # intelligence but is not a buyable lot merely because sale wording is
-        # present in a seller-facing call to action.
         return SOURCE_INTELLIGENCE_ONLY, evidence
     return UNPROVEN_PAGE, evidence
 
