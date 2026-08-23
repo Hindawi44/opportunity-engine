@@ -1,6 +1,6 @@
 {
   "schema_version": "unified-pipeline-sidepaths-inventory-1.0",
-  "generated_at": "2026-08-23T08:03:00Z",
+  "generated_at": "2026-08-23T12:28:00Z",
   "governing_pipeline": {
     "contract": "UNIFIED_SIX_MARKET_PIPELINE_V1",
     "module": "src/opportunity_engine/discovery/unified_six_market_pipeline.py",
@@ -39,6 +39,12 @@
       "feeds_stage": "DIAGNOSTIC_ONLY"
     },
     {
+      "path": ".github/workflows/exa-brave-shadow-benchmark-v1.yml",
+      "role": "SHADOW_DIAGNOSTIC",
+      "decision": "KEEP_BOUNDED_SHADOW_ONLY_NO_PRODUCTION_PROVIDER_ACTIVATION",
+      "feeds_stage": "DISCOVERY_DIAGNOSTIC_ONLY"
+    },
+    {
       "path": ".github/workflows/tests.yml",
       "role": "CI_GUARD",
       "decision": "KEEP_AS_TEST_ONLY",
@@ -67,8 +73,10 @@
       "representative_paths": [
         "src/opportunity_engine/discovery/mathematical_logic_shadow.py",
         "src/opportunity_engine/discovery/keyword_shadow_verification.py",
+        "src/opportunity_engine/discovery/exa_search.py",
         "src/opportunity_engine/source_discovery_shadow.py",
         "src/opportunity_engine/source_shadow_live_validation.py",
+        "scripts/run_exa_brave_shadow_benchmark.py",
         "scripts/run_keyword_shadow_verification.py",
         "scripts/run_source_shadow_live_validation.py",
         "scripts/run_stocklear_second_shadow_round.py"
