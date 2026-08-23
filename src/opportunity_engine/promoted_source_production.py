@@ -4,7 +4,10 @@ V1 activates only Stocklear. A source is allowed to fetch in production only whe
 1) an exact domain decision is explicitly PROMOTED, and
 2) the frozen promotion scorecard proves PROMOTE_CANDIDATE with no blockers.
 
-Changing the decision to DISABLED closes the network path immediately.
+Source promotion does not promote every product category on that source. Exact
+pages must additionally prove CLOTHING_INVENTORY before they may enter the
+production feed. Changing the decision to DISABLED closes the network path
+immediately.
 """
 from __future__ import annotations
 
@@ -19,12 +22,16 @@ from urllib.parse import urlsplit
 
 import requests
 
+from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    classify_project_domain,
+)
 from opportunity_engine.source_shadow_live_validation import (
     _detail_page_proves_opportunity,
     extract_shadow_candidates,
 )
 
-SCHEMA_VERSION = "promoted-source-production-feed-1.0"
+SCHEMA_VERSION = "promoted-source-production-feed-1.1"
 PROMOTION_SCHEMA_VERSION = "source-promotion-gate-1.0"
 FEED_FAMILY = "STOCKLEAR_PROMOTED_AUCTION_FEED_V1"
 SOURCE_DOMAIN = "joblot.stocklear.eu"
@@ -112,6 +119,12 @@ def _title(html: str, fallback: str) -> str:
     return _compact(html_module.unescape(_TAG_RE.sub(" ", match.group("title")))) or _compact(fallback)
 
 
+def _project_domain_for_detail(html: str, title_hint: str = "") -> str:
+    title = _title(html, title_hint)
+    text = _plain_text(html)
+    return classify_project_domain(text=f"{title} {text}")
+
+
 def _decision_rows(promotions: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     if promotions.get("schema_version") != PROMOTION_SCHEMA_VERSION:
         return []
@@ -192,7 +205,12 @@ def _condition(text: str) -> str | None:
 def _candidate_from_detail(url: str, html: str, title_hint: str, observed_at: str) -> dict[str, Any] | None:
     if not _detail_page_proves_opportunity(SOURCE_DOMAIN, html):
         return None
+    title = _title(html, title_hint or f"Stocklear auction {urlsplit(url).path.rstrip('/').rsplit('/', 1)[-1]}")
     text = _plain_text(html)
+    project_domain = classify_project_domain(text=f"{title} {text}")
+    if project_domain != CLOTHING_INVENTORY:
+        return None
+
     total_price, currency = _money(_MONEY_RE, text)
     rrp, rrp_currency = _money(_RRP_TOTAL_RE, text)
     if rrp is None:
@@ -203,7 +221,6 @@ def _candidate_from_detail(url: str, html: str, title_hint: str, observed_at: st
     pallets = _number(pallets_match.group("amount")) if pallets_match else None
     condition = _condition(text)
     reference = urlsplit(url).path.rstrip("/").rsplit("/", 1)[-1]
-    title = _title(html, title_hint or f"Stocklear auction {reference}")
     candidate_id = "stocklear-promoted:" + sha256(url.encode("utf-8")).hexdigest()[:24]
     return {
         "candidate_id": candidate_id,
@@ -220,7 +237,9 @@ def _candidate_from_detail(url: str, html: str, title_hint: str, observed_at: st
         "page_role": "SPECIFIC_AUCTION_LOT",
         "listing_status": "ACTIVE_REQUIRES_VERIFICATION_OF_END_TIME",
         "sale_mode": "AUCTION",
-        "inventory_focus": "GENERAL_MERCHANDISE_STOCKLOT",
+        "inventory_focus": CLOTHING_INVENTORY,
+        "project_domain": CLOTHING_INVENTORY,
+        "project_domain_gate_enforced": True,
         "quantity": quantity,
         "quantity_unit": "units" if quantity is not None else None,
         "lot_units": pallets,
@@ -233,7 +252,7 @@ def _candidate_from_detail(url: str, html: str, title_hint: str, observed_at: st
         "condition_terms": [condition] if condition else [],
         "verification_status": "SOURCE_PAGE_VERIFIED",
         "source_page_verified": True,
-        "opportunity_state": "VERIFIED_B2B_AUCTION_LOT",
+        "opportunity_state": "VERIFIED_CLOTHING_B2B_AUCTION_LOT",
         "score": 95,
         "missing_information": [
             field
@@ -250,7 +269,7 @@ def _candidate_from_detail(url: str, html: str, title_hint: str, observed_at: st
                 "source_url": url,
                 "verified": True,
                 "captured_at": observed_at,
-                "value": "Exact public Stocklear auction page independently proved a commercial stock lot.",
+                "value": "Exact public Stocklear auction page proved both a commercial stock lot and CLOTHING_INVENTORY relevance.",
             }
         ],
         "promotion_status": "PROMOTED",
@@ -277,6 +296,8 @@ def build_promoted_stocklear_feed(
         "source_name": SOURCE_NAME,
         "source_domain": SOURCE_DOMAIN,
         "generated_at": now,
+        "required_project_domain": CLOTHING_INVENTORY,
+        "project_domain_gate_enforced": True,
         "explicit_promotion_required": True,
         "automatic_promotion": False,
         "automatic_contact": False,
@@ -290,6 +311,7 @@ def build_promoted_stocklear_feed(
             "status": "DISABLED",
             "production_source_active": False,
             "candidate_count": 0,
+            "out_of_domain_filtered_count": 0,
             "candidates": [],
             "network_request_count": 0,
         }
@@ -306,6 +328,7 @@ def build_promoted_stocklear_feed(
 
     candidates: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
+    out_of_domain_filtered = 0
     for raw in discovered:
         url = _compact(raw.get("source_url"))
         if not url:
@@ -316,6 +339,9 @@ def build_promoted_stocklear_feed(
         except Exception as exc:
             network_requests += 1
             failures.append({"source_url": url, "error": f"{type(exc).__name__}: {exc}"})
+            continue
+        if _project_domain_for_detail(page, _compact(raw.get("title"))) != CLOTHING_INVENTORY:
+            out_of_domain_filtered += 1
             continue
         candidate = _candidate_from_detail(url, page, _compact(raw.get("title")), now)
         if candidate is not None:
@@ -328,6 +354,7 @@ def build_promoted_stocklear_feed(
         "promotion_gate_enforced": True,
         "promotion_score": float(scorecard.get("promotion_readiness_score") or 0),
         "candidate_count": len(candidates),
+        "out_of_domain_filtered_count": out_of_domain_filtered,
         "discovered_link_count": len(discovered),
         "source_page_failed_count": len(failures),
         "failures": failures,
