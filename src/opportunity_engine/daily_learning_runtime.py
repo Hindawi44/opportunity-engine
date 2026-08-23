@@ -20,6 +20,10 @@ from opportunity_engine.learned_query_overlay import (
     load_learned_query_overlay,
     save_learned_query_overlay,
 )
+from opportunity_engine.missed_opportunity_domain_gate import (
+    partition_project_domain_cases,
+    quarantine_learning_overlay,
+)
 from opportunity_engine.missed_opportunity_learning import (
     MissedOpportunityCase,
     load_missed_opportunity_memory,
@@ -132,6 +136,15 @@ def append_learning_history(
         "evaluation_scope": report.get("evaluation_scope"),
         "promotion_gate_enforced": report.get("promotion_gate_enforced", False),
         "safe_learning_proof_status": report.get("safe_learning_proof_status"),
+        "out_of_domain_excluded_case_count": report.get(
+            "out_of_domain_excluded_case_count", 0
+        ),
+        "out_of_domain_excluded_validation_case_count": report.get(
+            "out_of_domain_excluded_validation_case_count", 0
+        ),
+        "out_of_domain_excluded_shadow_term_count": report.get(
+            "out_of_domain_excluded_shadow_term_count", 0
+        ),
     }
     runs.append(entry)
     _write_object(
@@ -145,13 +158,7 @@ def append_learning_history(
 
 
 def _learning_query(term: str) -> str:
-    """Replay the learned commercial pattern itself, without vertical leakage.
-
-    Candidate extraction already requires a commercial signal. Adding clothing,
-    product-category, or closure anchors can distort ranking. Hidden source-case
-    replay or independent holdout transfer remains the safety gate for rejecting
-    noisy terms.
-    """
+    """Replay the learned commercial pattern itself, without product leakage."""
     safe_term = term.replace('"', "").strip()
     return f'"{safe_term}"'
 
@@ -205,13 +212,11 @@ def run_daily_learning_runtime(
     search_override: RuntimeSearch | None = None,
     observed_at: datetime | None = None,
 ) -> dict[str, Any]:
-    """Load durable state, run one bounded cycle, and persist the next state.
+    """Load durable state, quarantine out-of-domain legacy state, then learn.
 
-    Miss cases generate candidate patterns. Validation cases are an optional,
-    explicitly selected hidden holdout set used only for transfer/generalization
-    proof. Omitting ``validation_cases_path`` preserves direct source-case replay.
-    Proven learning is stored only in ``shadow-keyword-overlay.json`` until an
-    explicit promotion decision.
+    Project-domain gating happens before candidate generation, holdout proof and
+    retained overlay merge. A restored pre-boundary case therefore remains in
+    historical artifacts but cannot keep influencing current learning.
     """
     if not 1 <= results_per_candidate <= 10:
         raise ValueError("results_per_candidate must be between 1 and 10")
@@ -224,23 +229,53 @@ def run_daily_learning_runtime(
     proof_path = root / "safe-learning-proof.json"
     history_path = root / "keyword-learning-history.json"
 
-    existing_cases = load_missed_opportunity_memory(memory_path)
-    inbox_cases = load_missed_opportunity_inbox(inbox_path)
-    validation_cases = (
+    raw_existing_cases = load_missed_opportunity_memory(memory_path)
+    raw_inbox_cases = load_missed_opportunity_inbox(inbox_path)
+    raw_validation_cases = (
         load_query_gap_validation_cases(validation_cases_path)
         if validation_cases_path is not None
         else []
     )
+
+    existing_partition = partition_project_domain_cases(raw_existing_cases)
+    inbox_partition = partition_project_domain_cases(raw_inbox_cases)
+    validation_partition = partition_project_domain_cases(raw_validation_cases)
+    existing_cases = list(existing_partition.allowed)
+    inbox_cases = list(inbox_partition.allowed)
+    validation_cases = list(validation_partition.allowed)
+
+    excluded_case_ids = sorted(
+        set(existing_partition.excluded_case_ids)
+        | set(inbox_partition.excluded_case_ids)
+    )
+    excluded_validation_case_ids = validation_partition.excluded_case_ids
+    allowed_support_case_ids = {
+        case.case_id for case in [*existing_cases, *inbox_cases] if case.case_id
+    }
+    allowed_validation_case_ids = {
+        case.case_id for case in validation_cases if case.case_id
+    }
+
     active_queries = load_active_learning_queries(active_query_config)
-    existing_active_overlay = (
+    raw_active_overlay = (
         load_learned_query_overlay(active_overlay_path)
         if active_overlay_path.exists()
         else build_learned_query_overlay([])
     )
-    existing_shadow_overlay = (
+    raw_shadow_overlay = (
         load_learned_query_overlay(shadow_overlay_path)
         if shadow_overlay_path.exists()
         else build_learned_query_overlay([])
+    )
+    existing_active_overlay, excluded_active_terms = quarantine_learning_overlay(
+        raw_active_overlay,
+        allowed_support_case_ids=allowed_support_case_ids,
+        allowed_validation_case_ids=allowed_validation_case_ids,
+    )
+    existing_shadow_overlay, excluded_shadow_terms = quarantine_learning_overlay(
+        raw_shadow_overlay,
+        allowed_support_case_ids=allowed_support_case_ids,
+        allowed_validation_case_ids=allowed_validation_case_ids,
     )
     promotion_decisions = load_query_promotion_decisions(promotion_config_path)
 
@@ -294,6 +329,10 @@ def run_daily_learning_runtime(
         min_precision=active_policy.min_precision,
     )
     proof["generated_at"] = generated_at
+    proof["project_domain_gate_enforced"] = True
+    proof["out_of_domain_excluded_case_ids"] = excluded_case_ids
+    proof["out_of_domain_excluded_validation_case_ids"] = excluded_validation_case_ids
+    proof["out_of_domain_excluded_shadow_terms"] = excluded_shadow_terms
     _write_object(proof_path, proof)
 
     report = dict(outcome.report)
@@ -325,9 +364,22 @@ def run_daily_learning_runtime(
             "results_per_candidate": results_per_candidate,
             "max_possible_learning_search_requests": active_policy.max_candidates_per_run,
             "cost_guard_reason": cost_block,
+            "project_domain_gate_enforced": True,
+            "out_of_domain_excluded_case_count": len(excluded_case_ids),
+            "out_of_domain_excluded_case_ids": excluded_case_ids,
+            "out_of_domain_excluded_validation_case_count": len(
+                excluded_validation_case_ids
+            ),
+            "out_of_domain_excluded_validation_case_ids": excluded_validation_case_ids,
+            "out_of_domain_excluded_shadow_term_count": len(excluded_shadow_terms),
+            "out_of_domain_excluded_shadow_terms": excluded_shadow_terms,
+            "out_of_domain_excluded_active_term_count": len(excluded_active_terms),
+            "out_of_domain_excluded_active_terms": excluded_active_terms,
         }
     )
 
+    # Persist only the gated next-state. The excluded legacy rows remain
+    # auditable in earlier GitHub artifacts but cannot be handed forward again.
     save_missed_opportunity_memory(memory_path, outcome.cases)
     save_learned_query_overlay(shadow_overlay_path, outcome.shadow_overlay)
     save_learned_query_overlay(active_overlay_path, outcome.overlay)
