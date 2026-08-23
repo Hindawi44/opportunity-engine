@@ -66,6 +66,7 @@ on:
       - "scripts/run_cross_source_scent_expansion_v2.py"
       - "scripts/run_market_clothing_inventory_discovery.py"
       - "scripts/run_germany_clothing_inventory_discovery_search.py"
+      - "scripts/run_daily_search_success_learning.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/market_intelligence.py"
@@ -90,6 +91,7 @@ on:
       - "src/opportunity_engine/persistence/unified_report_adapter.py"
       - "config/buyers/mahmoud_namsos_v1.json"
       - "config/market_completion_matrix.json"
+      - "config/learning/search-success-bootstrap-v1.json"
       - "tests/test_auksjonen_unified_lifecycle_persistence_v1.py"
       - "tests/test_domain_market_intelligence_feed_v1.py"
       - "tests/test_openai_hunt_case_enrichment_v1.py"
@@ -100,6 +102,7 @@ on:
       - "tests/test_human_review_outcome_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "tests/test_persistent_search_success_memory_v1.py"
       - "tests/test_useful_output_checkpoint_validator_regression.py"
       - "tests/test_germany_sen_sen_source_v1.py"
       - "tests/test_germany_targeted_source_runner_v1.py"
@@ -144,6 +147,7 @@ jobs:
           pytest tests/test_human_review_checkpoint_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
+          pytest tests/test_persistent_search_success_memory_v1.py -q
           pytest tests/test_useful_output_checkpoint_validator_regression.py -q
           pytest tests/test_germany_sen_sen_source_v1.py -q
           pytest tests/test_germany_targeted_source_runner_v1.py -q
@@ -160,6 +164,7 @@ jobs:
     env:
       PYTHONPATH: src:.
       BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
       BOLAGSVERKET_CLIENT_ID: ${{ secrets.BOLAGSVERKET_CLIENT_ID }}
       BOLAGSVERKET_CLIENT_SECRET: ${{ secrets.BOLAGSVERKET_CLIENT_SECRET }}
       BOLAGSVERKET_SE_ORGANISATION_NUMBERS: ${{ secrets.BOLAGSVERKET_SE_ORGANISATION_NUMBERS }}
@@ -202,6 +207,19 @@ jobs:
           python scripts/restore_previous_checkpoint_state.py \
             --input-root "$INPUT_ROOT" \
             --status-path "$OUTPUT_DIR/previous-state-restore.json"
+
+      - name: Run daily Search Success shadow learning
+        continue-on-error: true
+        run: |
+          python scripts/run_daily_search_success_learning.py \
+            --input-root "$INPUT_ROOT" \
+            --output-dir "$OUTPUT_DIR" \
+            --run-id "${{ github.run_id }}" \
+            --bootstrap-memory config/learning/search-success-bootstrap-v1.json \
+            --results-per-query 5
+          test -f "$INPUT_ROOT/learning/search-success-memory.json"
+          test -f "$OUTPUT_DIR/search-success-review.json"
+          test -f "$OUTPUT_DIR/search-success-review.txt"
 
       - name: Run Norway Auksjonen public clothing path
         run: |
@@ -461,6 +479,14 @@ jobs:
             --root . \
             --output-dir "$OUTPUT_DIR"
 
+      - name: Append Search Success review to phone summary
+        if: always()
+        run: |
+          if [ -f "$OUTPUT_DIR/search-success-review.txt" ] && [ -f "$OUTPUT_DIR/multi-market-phone-summary.txt" ]; then
+            printf '\n' >> "$OUTPUT_DIR/multi-market-phone-summary.txt"
+            cat "$OUTPUT_DIR/search-success-review.txt" >> "$OUTPUT_DIR/multi-market-phone-summary.txt"
+          fi
+
       - name: Run optional cross-source scent expansion V2 trial
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_cross_source_scent_v2 }}
         continue-on-error: true
@@ -598,6 +624,29 @@ jobs:
                   raise SystemExit(f"OpenAI hunt case changed automatic safety: {key}")
           if "ليست إثباتًا لوجود بيع أو مخزون" not in hunt_text:
               raise SystemExit("OpenAI hunt-case advisory warning is missing")
+
+          search_success_review = root / "search-success-review.json"
+          if search_success_review.exists():
+              payload = json.loads(search_success_review.read_text(encoding="utf-8"))
+              if payload.get("review_status") not in {
+                  "NO_VERIFIED_ROUTE",
+                  "CANDIDATE",
+                  "REPLICATED_FOR_REVIEW",
+              }:
+                  raise SystemExit("Search Success review status is invalid")
+              for key in (
+                  "automatic_provider_activation",
+                  "automatic_source_promotion",
+                  "production_query_mutation",
+                  "production_mutation",
+                  "automatic_contact",
+                  "automatic_bid",
+                  "automatic_reservation",
+                  "automatic_purchase",
+                  "automatic_payment",
+              ):
+                  if payload.get(key) is not False:
+                      raise SystemExit(f"Search Success review changed safety: {key}")
 
           review = root / "human-review-outcome.json"
           if review.exists():
