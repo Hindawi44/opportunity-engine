@@ -91,6 +91,9 @@ from opportunity_engine.discovery.fabric_procurement_watch_cli_hook import (
 from opportunity_engine.discovery.scheduled_promoted_core_cli_hook import (
     install_scheduled_promoted_core_cli_hook,
 )
+from opportunity_engine.discovery.unified_six_market_runtime_cli_hook import (
+    install_unified_six_market_runtime_cli_hook,
+)
 
 install_openai_hunt_case_schema_compat()
 install_bilingual_bridal_search()
@@ -123,6 +126,10 @@ install_automatic_query_gap_miss_scout_cli_hook()
 install_promoted_stocklear_cli_hook()
 install_openai_fabric_procurement_cli_hook()
 install_fabric_procurement_watch_cli_hook()
+# Registered last so the daily six-market authority is emitted first at atexit.
+# It consumes only artifacts written synchronously by the daily checkpoint CLI;
+# learning/shadow hooks remain advisory and do not override this authority.
+install_unified_six_market_runtime_cli_hook()
 
 __all__ = [
     "CLOTHING_INVENTORY_MAP",
