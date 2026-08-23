@@ -1,0 +1,104 @@
+name: Exa Brave Tool Learning Live Proof TEMP V2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/exa-brave-tool-learning-live-proof-temp-v2.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-tool-learning-proof-v2:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/exa-brave-tool-learning-live-proof-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+
+      - name: Verify strict Tool Learning contract
+        run: pytest tests/test_search_tool_learning_v1.py -q
+
+      - name: Confirm bounded credentials
+        shell: bash
+        run: |
+          test -n "$EXA_API_KEY" || { echo "EXA_API_KEY is required" >&2; exit 1; }
+          test -n "$BRAVE_SEARCH_API_KEY" || { echo "BRAVE_SEARCH_API_KEY is required" >&2; exit 1; }
+          echo "Secrets present and remain masked."
+
+      - name: Run clothing-domain Exa-vs-Brave benchmark
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_exa_brave_shadow_benchmark.py \
+            --output "$OUTPUT_DIR/benchmark.json" \
+            --markets "NO,SE,DE,FR,IT,NL" \
+            --results-per-query 3 \
+            --provider-mode both
+
+      - name: Run strict symmetric Tool Learning proof
+        shell: bash
+        run: |
+          python scripts/run_exa_brave_tool_learning.py \
+            --benchmark "$OUTPUT_DIR/benchmark.json" \
+            --output "$OUTPUT_DIR/tool-learning.json" \
+            --max-page-fetches-per-provider 18 \
+            --min-successful-pages-per-provider 5
+
+      - name: Assert strict usefulness and read-only safety
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/exa-brave-tool-learning-live-proof-v2")
+          benchmark = json.loads((root / "benchmark.json").read_text(encoding="utf-8"))
+          proof = json.loads((root / "tool-learning.json").read_text(encoding="utf-8"))
+
+          assert benchmark["status"] == "SUCCESS"
+          assert benchmark["project_domain"] == "CLOTHING_INVENTORY"
+          assert benchmark["project_domain_gate_enforced"] is True
+          assert benchmark["production_provider_activation"] is False
+
+          assert proof["status"] == "SUCCESS"
+          assert proof["automatic_provider_activation"] is False
+          assert proof["production_mutation"] is False
+
+          score = proof["tool_learning"]
+          assert score["commercial_specificity_gate_enforced"] is True
+          assert score["automatic_provider_activation"] is False
+          assert score["production_mutation"] is False
+
+          for provider in ("exa_verification", "brave_verification"):
+              report = proof[provider]
+              assert report["commercial_specificity_gate_enforced"] is True
+              assert report["project_domain_gate_enforced"] is True
+              for page in report["verified_pages"]:
+                  if page.get("tool_learning_useful") is True and page.get("classification") == "ACTIVE_STOCK_SIGNAL":
+                      assert page["evidence"].get("item_specific_url_evidence") is True
+
+          print("decision:", score["decision"])
+          print("blocking_reasons:", score["blocking_reasons"])
+          print("exa_metrics:", score["metrics"]["exa"])
+          print("brave_metrics:", score["metrics"]["brave"])
+          PY
+
+      - name: Upload live proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exa-brave-tool-learning-live-proof-v2
+          path: artifacts/exa-brave-tool-learning-live-proof-v2/*.json
+          if-no-files-found: warn
+          retention-days: 30
