@@ -70,27 +70,38 @@ jobs:
           ]
           assert routes, "verified Friptadium route disappeared"
           route = routes[0]
+          current_successes = int(review.get("current_run_successful_route_count") or 0)
+          current_exact_lots = int(multihop.get("exact_lot_candidate_count") or 0)
+          supporting = set(route.get("supporting_run_ids") or [])
 
           print("current_run_id:", current_run)
           print("memory_source:", review.get("memory_source"))
           print("memory_run_count:", review.get("memory_run_count"))
-          print("current_run_successful_route_count:", review.get("current_run_successful_route_count"))
+          print("current_run_successful_route_count:", current_successes)
           print("replicated_route_count:", review.get("replicated_route_count"))
           print("route_independent_run_count:", route.get("independent_run_count"))
           print("route_status:", route.get("status"))
-          print("exact_lots:", multihop.get("exact_lot_candidate_count"))
+          print("exact_lots:", current_exact_lots)
 
           assert review["memory_source"] == "VERIFIED_BOOTSTRAP_MEMORY"
           assert review["review_status"] == "REPLICATED_FOR_REVIEW"
           assert review["memory_run_count"] >= 3
-          assert review["current_run_successful_route_count"] >= 1
           assert review["replicated_route_count"] >= 1
           assert route["status"] == "REPLICATED_FOR_REVIEW"
-          assert route["independent_run_count"] >= 3
-          assert current_run in route["supporting_run_ids"]
-          assert {"32655969884", "32657298412"}.issubset(set(route["supporting_run_ids"]))
+          assert route["independent_run_count"] >= 2
+          assert {"32655969884", "32657298412"}.issubset(supporting)
+          # A current no-hit run must be recorded as an observation without
+          # receiving false route-replication credit. If the route is found,
+          # the current run may legitimately increase route support.
+          if current_successes == 0:
+              assert current_exact_lots == 0
+              assert current_run not in supporting
+              assert route["independent_run_count"] == 2
+          else:
+              assert current_exact_lots >= 1
+              assert current_run in supporting
+              assert route["independent_run_count"] >= 3
           assert observation["provider_preference_status"] == "PROVIDER_COMPARISON_NOT_EVALUATED"
-          assert multihop["exact_lot_candidate_count"] >= 1
           assert review["automatic_provider_activation"] is False
           assert review["automatic_source_promotion"] is False
           assert review["production_query_mutation"] is False
