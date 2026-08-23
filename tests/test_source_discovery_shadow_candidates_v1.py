@@ -67,33 +67,33 @@ def _benchmark_result() -> dict:
     }
 
 
-def test_repeated_verified_source_gaps_become_validated_shadow_sources() -> None:
+def test_repeated_verified_in_domain_source_gaps_become_validated_shadow_sources() -> None:
     report = build_source_shadow_candidates(_benchmark(), _benchmark_result())
 
-    assert report["source_candidate_count"] == 2
-    assert report["validated_source_count"] == 2
-    assert report["shadow_eligible_source_count"] == 2
+    assert report["source_candidate_count"] == 1
+    assert report["validated_source_count"] == 1
+    assert report["shadow_eligible_source_count"] == 1
     by_domain = {row["source_domain"]: row for row in report["source_candidates"]}
 
     worldwise = by_domain["www.worldwiseusa.com"]
     assert worldwise["status"] == "VALIDATED_SOURCE"
-    assert worldwise["verified_opportunity_count"] == 3
-    assert worldwise["evidence_case_ids"] == [
-        "worldwise-1",
-        "worldwise-2",
-        "worldwise-3",
-    ]
-    assert worldwise["categories"] == ["APPAREL", "BUILDING_MATERIALS"]
+    assert worldwise["verified_opportunity_count"] == 2
+    assert worldwise["evidence_case_ids"] == ["worldwise-1", "worldwise-3"]
+    assert worldwise["categories"] == ["APPAREL"]
+    assert worldwise["project_domains"] == ["CLOTHING_INVENTORY"]
     assert worldwise["shadow_eligible"] is True
     assert worldwise["production_active"] is False
 
-    stocklear = by_domain["joblot.stocklear.eu"]
-    assert stocklear["status"] == "VALIDATED_SOURCE"
-    assert stocklear["verified_opportunity_count"] == 2
-    assert stocklear["shadow_eligible"] is True
+    assert "joblot.stocklear.eu" not in by_domain
+    assert report["out_of_domain_evidence_count"] == 3
+    assert set(report["out_of_domain_case_ids"]) == {
+        "worldwise-2",
+        "stocklear-1",
+        "stocklear-2",
+    }
 
 
-def test_single_verified_miss_stays_candidate_not_validated() -> None:
+def test_single_verified_in_domain_miss_stays_candidate_not_validated() -> None:
     benchmark = _benchmark()
     benchmark["opportunities"] = benchmark["opportunities"][:1]
     result = _benchmark_result()
@@ -133,7 +133,7 @@ def test_duplicate_url_does_not_fake_independent_source_validation() -> None:
     assert candidate["shadow_eligible"] is False
 
 
-def test_non_source_gap_and_unconfirmed_cases_do_not_train_source_candidates() -> None:
+def test_non_source_gap_unconfirmed_and_out_of_domain_cases_do_not_train() -> None:
     result = _benchmark_result()
     result["cases"][0]["root_cause"] = "QUERY_GAP"
     result["cases"][1]["confirmed_miss"] = False
@@ -144,7 +144,7 @@ def test_non_source_gap_and_unconfirmed_cases_do_not_train_source_candidates() -
     worldwise = by_domain["www.worldwiseusa.com"]
     assert worldwise["verified_opportunity_count"] == 1
     assert worldwise["status"] == "CANDIDATE"
-    assert by_domain["joblot.stocklear.eu"]["status"] == "VALIDATED_SOURCE"
+    assert "joblot.stocklear.eu" not in by_domain
 
 
 def test_source_shadow_learning_never_activates_production() -> None:
