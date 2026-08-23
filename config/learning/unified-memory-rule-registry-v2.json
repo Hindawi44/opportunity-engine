@@ -1,7 +1,27 @@
 {
   "schema_version": "unified-memory-rule-registry-2.0",
-  "rules": [],
-  "interpretation_guard": "Only explicit reviewed ACTIVE mappings may mark a proven memory pattern as converted to a fixed rule. This registry never changes code automatically.",
+  "rules": [
+    {
+      "rule_id": "rule:fr-exa-friptadium-aggregate-child-v1",
+      "pattern_key": "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|friptadium.com",
+      "status": "ACTIVE",
+      "implemented_in": "config/learning/unified-memory-rule-registry-v2.json",
+      "review_basis": "Search Success Learning REPLICATED_FOR_REVIEW with 5 independent supporting runs; live Memory V2 proof retained the route as the only PROVEN pattern after same-day rerun correction.",
+      "deterministic_scope": {
+        "market_code": "FR",
+        "project_domain": "CLOTHING_INVENTORY",
+        "provider": "exa",
+        "route": "AGGREGATE_CHILD",
+        "source_identity": "friptadium.com"
+      },
+      "effect": "MARK_PROVEN_PATTERN_AS_FIXED_RULE_HANDLED",
+      "automatic_query_activation": false,
+      "automatic_provider_activation": false,
+      "automatic_source_promotion": false,
+      "production_mutation": false
+    }
+  ],
+  "interpretation_guard": "Only explicit reviewed ACTIVE mappings may mark a proven memory pattern as converted to a fixed rule. This registry never changes code automatically and never activates providers, queries, sources, or commercial actions.",
   "automatic_query_activation": false,
   "automatic_provider_activation": false,
   "automatic_source_promotion": false,
