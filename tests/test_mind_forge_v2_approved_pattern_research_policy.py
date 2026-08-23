@@ -86,9 +86,12 @@ def test_approved_pattern_replaces_same_shadow_hint_without_changing_candidates_
     assert adaptive["adaptive_memory_mode"] == "APPROVED_POLICY"
     assert adaptive["approved_policy_count"] == 1
     assert adaptive["adaptive_hint_count"] == 0
+    assert adaptive["runtime_guidance_count"] == 1
     assert adaptive["may_auto_reject_ideas_from_memory"] is False
     assert all(len(row["approved_search_policies"]) == 1 for row in adaptive["requests"])
-    assert all(row["shadow_search_hints"] == [] for row in adaptive["requests"])
+    assert all(len(row["shadow_search_hints"]) == 1 for row in adaptive["requests"])
+    assert all(row["shadow_search_hints"][0]["mode"] == "APPROVED_POLICY_HINT" for row in adaptive["requests"])
+    assert all("APPROVED CROSS-RUN POLICY" in row["shadow_search_hints"][0]["action"] for row in adaptive["requests"])
 
 
 def test_live_prompt_marks_human_approved_policy_as_search_guidance_not_evidence_or_decision():
@@ -99,6 +102,6 @@ def test_live_prompt_marks_human_approved_policy_as_search_guidance_not_evidence
     assert "human-approved" in prompt.lower()
     assert "cannot alter the candidate set" in prompt.lower()
     assert "cannot change the search budget" in prompt.lower()
+    assert "cannot auto-reject" in prompt.lower()
     assert "not evidence" in prompt.lower()
     assert "REQUIRE_EXACT_CLAIM_RELEVANCE" in prompt
-    assert "PRIOR CROSS-RUN LEARNING" not in prompt
