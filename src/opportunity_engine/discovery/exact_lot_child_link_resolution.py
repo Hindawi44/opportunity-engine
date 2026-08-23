@@ -1,28 +1,30 @@
 """Bounded child-link resolution for verified aggregate clothing-stock pages.
 
-Search providers may legitimately surface an aggregate stock page instead of a
-single commercial lot. Such a page must never receive item-specific Tool
-Learning credit, but it can be used as a read-only navigation parent when the
-existing symmetric verifier has already proven all of the following:
+Aggregate/category pages never become opportunities. This layer may use a page
+only as a navigation parent after the symmetric provider verifier has already
+proved clothing-inventory + direct-sale evidence and rejected the page from
+item-specific Tool Learning credit.
 
-* the original page was fetched successfully;
-* the page is inside CLOTHING_INVENTORY;
-* inventory and direct-sale evidence are present;
-* the URL is not item-specific; and
-* the page was therefore filtered from Tool Learning usefulness.
+Child links are restricted to HTTPS, same-origin descendant paths. A child is
+accepted only when the strict commercial classifier proves an item-specific
+clothing lot with direct sale, price and quantity. Child classification adds two
+conservative protections that are intentionally scoped to this layer:
 
-This layer re-fetches only those bounded parents, extracts same-origin descendant
-links whose URL shape is item-specific, fetches those child pages, and accepts a
-child only when the existing strict classifier returns EXACT_LOT_CANDIDATE. It
-cannot contact sellers, bid, reserve, buy, pay, activate a provider, or mutate
-production state.
+* prices such as ``4 €`` and ``1000€`` are normalized to ``EUR`` before the
+  existing price parser runs;
+* an item-specific child must prove the clothing domain from its own title/URL
+  subject. Site-wide navigation text cannot turn paint, hardware or other goods
+  into clothing inventory.
+
+The layer is read-only and cannot contact, bid, reserve, buy or pay.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 from html.parser import HTMLParser
+import re
 from typing import Any, Callable
-from urllib.parse import urldefrag, urljoin, urlsplit
+from urllib.parse import urldefrag, unquote, urljoin, urlsplit
 
 import requests
 
@@ -36,15 +38,21 @@ from opportunity_engine.discovery.exa_shadow_page_verification import (
     fetch_public_page,
 )
 from opportunity_engine.discovery.keyword_shadow_verification import _public_https_url
-from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
+from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    OUT_OF_DOMAIN,
+    classify_project_domain,
+)
 
-SCHEMA_VERSION = "exact-lot-child-link-resolution-1.0"
+SCHEMA_VERSION = "exact-lot-child-link-resolution-1.1"
 LAB_FAMILY = "EXACT_LOT_CHILD_LINK_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_PARENT_FETCHES = 12
 MAX_CHILD_LINKS_PER_PARENT = 20
 MAX_CHILD_PAGE_FETCHES = 30
 MAX_RESPONSE_BYTES = 800_000
+
+_EURO_AFTER_NUMBER_RE = re.compile(r"(?<=\d)\s*€")
 
 
 def _compact(value: object) -> str:
@@ -84,38 +92,23 @@ def fetch_public_html(url: str) -> AggregateHtmlFetchResult:
             allow_redirects=True,
             stream=True,
             headers={
-                "User-Agent": "opportunity-engine-exact-lot-child-link-resolver/1.0",
+                "User-Agent": "opportunity-engine-exact-lot-child-link-resolver/1.1",
                 "Accept": "text/html,application/xhtml+xml",
             },
         ) as response:
             final_url = str(response.url or requested)
             if not _public_https_url(final_url):
                 return AggregateHtmlFetchResult(
-                    requested_url=requested,
-                    final_url=final_url,
-                    ok=False,
-                    status_code=response.status_code,
-                    html="",
-                    error="UNSAFE_REDIRECT_TARGET",
+                    requested, final_url, False, response.status_code, "", "UNSAFE_REDIRECT_TARGET"
                 )
-            if response.status_code < 200 or response.status_code >= 300:
+            if not 200 <= response.status_code < 300:
                 return AggregateHtmlFetchResult(
-                    requested_url=requested,
-                    final_url=final_url,
-                    ok=False,
-                    status_code=response.status_code,
-                    html="",
-                    error=f"HTTP_{response.status_code}",
+                    requested, final_url, False, response.status_code, "", f"HTTP_{response.status_code}"
                 )
             content_type = str(response.headers.get("Content-Type") or "").casefold()
             if "html" not in content_type:
                 return AggregateHtmlFetchResult(
-                    requested_url=requested,
-                    final_url=final_url,
-                    ok=False,
-                    status_code=response.status_code,
-                    html="",
-                    error="NON_HTML_CONTENT",
+                    requested, final_url, False, response.status_code, "", "NON_HTML_CONTENT"
                 )
 
             chunks: list[bytes] = []
@@ -130,7 +123,6 @@ def fetch_public_html(url: str) -> AggregateHtmlFetchResult:
                     break
                 if len(chunk) > remaining:
                     chunks.append(chunk[:remaining])
-                    total += remaining
                     truncated = True
                     break
                 chunks.append(chunk)
@@ -143,22 +135,10 @@ def fetch_public_html(url: str) -> AggregateHtmlFetchResult:
                 html = body.decode("utf-8", errors="replace")
             if not html.strip():
                 return AggregateHtmlFetchResult(
-                    requested_url=requested,
-                    final_url=final_url,
-                    ok=False,
-                    status_code=response.status_code,
-                    html="",
-                    error="EMPTY_HTML",
-                    truncated=truncated,
+                    requested, final_url, False, response.status_code, "", "EMPTY_HTML", truncated
                 )
             return AggregateHtmlFetchResult(
-                requested_url=requested,
-                final_url=final_url,
-                ok=True,
-                status_code=response.status_code,
-                html=html,
-                error=None,
-                truncated=truncated,
+                requested, final_url, True, response.status_code, html, None, truncated
             )
     except requests.RequestException as exc:
         return AggregateHtmlFetchResult(
@@ -182,7 +162,7 @@ class _AnchorParser(HTMLParser):
         for key, value in attrs:
             if key.casefold() == "href" and value:
                 self.hrefs.append(value.strip())
-                break
+                return
 
 
 def _extract_candidate_child_links(*, parent_url: str, html_text: str) -> list[str]:
@@ -195,18 +175,17 @@ def _extract_candidate_child_links(*, parent_url: str, html_text: str) -> list[s
     except ValueError:
         return []
     parent_host = (parent_parts.hostname or "").casefold()
-    parent_path = parent_parts.path or "/"
-    parent_prefix = parent_path.rstrip("/") + "/"
+    parent_prefix = (parent_parts.path or "/").rstrip("/") + "/"
+    parent_defragged = urldefrag(parent).url
 
     parser = _AnchorParser()
     try:
         parser.feed(str(html_text or ""))
-    except (ValueError, TypeError):
+    except (TypeError, ValueError):
         return []
 
     output: list[str] = []
     seen: set[str] = set()
-    parent_defragged = urldefrag(parent).url
     for href in parser.hrefs:
         try:
             candidate = urldefrag(urljoin(parent, href)).url
@@ -228,6 +207,52 @@ def _extract_candidate_child_links(*, parent_url: str, html_text: str) -> list[s
         seen.add(candidate)
         output.append(candidate)
     return output
+
+
+def _subject_context(*, title: str, url: str) -> str:
+    try:
+        path = unquote(urlsplit(url).path or "")
+    except ValueError:
+        path = ""
+    path_words = path.replace("-", " ").replace("_", " ").replace("/", " ")
+    return _compact(f"{title} {path_words}")
+
+
+def _normalize_child_price_text(text: str) -> str:
+    """Normalize number-followed-by-euro-symbol prices without inventing values."""
+    return _EURO_AFTER_NUMBER_RE.sub(" EUR", str(text or ""))
+
+
+def _classify_child_page(*, title: str, text: str, url: str) -> tuple[str, dict[str, Any]]:
+    """Classify one item-specific child with local-subject domain evidence.
+
+    The existing classifier still supplies all commercial evidence. We only add
+    a child-scoped subject-domain gate so shared navigation text cannot establish
+    clothing relevance for an unrelated item page.
+    """
+    normalized_text = _normalize_child_price_text(text)
+    classification, evidence = _classify_page(
+        title=title,
+        text=normalized_text,
+        url=url,
+    )
+    evidence = dict(evidence)
+    full_page_domain = evidence.get("project_domain")
+    subject_domain = classify_project_domain(text=_subject_context(title=title, url=url))
+    evidence["full_page_project_domain"] = full_page_domain
+    evidence["page_subject_domain"] = subject_domain
+    evidence["child_price_symbol_normalization"] = normalized_text != str(text or "")
+
+    if evidence.get("item_specific_url_evidence") is True and subject_domain != CLOTHING_INVENTORY:
+        evidence["project_domain"] = OUT_OF_DOMAIN
+        evidence["domain_evidence"] = False
+        if classification in {EXACT_LOT_CANDIDATE, ACTIVE_STOCK_SIGNAL}:
+            classification = OUT_OF_DOMAIN
+    elif subject_domain == CLOTHING_INVENTORY:
+        evidence["project_domain"] = CLOTHING_INVENTORY
+        evidence["domain_evidence"] = True
+
+    return classification, evidence
 
 
 def _eligible_parent(page: dict[str, Any]) -> bool:
@@ -252,6 +277,7 @@ def _base(*, provider: str, max_parent_fetches: int, max_child_page_fetches: int
         "required_project_domain": CLOTHING_INVENTORY,
         "project_domain_gate_enforced": True,
         "commercial_specificity_gate_enforced": True,
+        "child_subject_domain_gate_enforced": True,
         "same_origin_child_links_only": True,
         "descendant_path_child_links_only": True,
         "exact_lot_acceptance_only": True,
@@ -268,6 +294,19 @@ def _base(*, provider: str, max_parent_fetches: int, max_child_page_fetches: int
     }
 
 
+def _blocked(base: dict[str, Any], reason: str) -> dict[str, Any]:
+    return {
+        **base,
+        "status": "BLOCKED_INPUT",
+        "block_reason": reason,
+        "eligible_parent_count": 0,
+        "parent_results": [],
+        "child_results": [],
+        "exact_lots": [],
+        "exact_lot_candidate_count": 0,
+    }
+
+
 def resolve_exact_lot_child_links(
     provider_verification: dict[str, Any],
     *,
@@ -277,7 +316,7 @@ def resolve_exact_lot_child_links(
     max_child_links_per_parent: int = 10,
     max_child_page_fetches: int = 20,
 ) -> dict[str, Any]:
-    """Resolve exact-lot child pages from verified non-specific clothing-sale parents."""
+    """Resolve strict exact-lot children from verified non-specific sale parents."""
     if not 1 <= max_parent_fetches <= MAX_PARENT_FETCHES:
         raise ValueError(f"max_parent_fetches must be between 1 and {MAX_PARENT_FETCHES}")
     if not 1 <= max_child_links_per_parent <= MAX_CHILD_LINKS_PER_PARENT:
@@ -296,19 +335,19 @@ def resolve_exact_lot_child_links(
         max_child_page_fetches=max_child_page_fetches,
     )
     if provider_verification.get("status") != "SUCCESS":
-        return {**base, "status": "BLOCKED_INPUT", "block_reason": "VERIFICATION_NOT_SUCCESSFUL", "exact_lots": [], "child_results": []}
+        return _blocked(base, "VERIFICATION_NOT_SUCCESSFUL")
     if provider not in SUPPORTED_PROVIDERS:
-        return {**base, "status": "BLOCKED_INPUT", "block_reason": "UNSUPPORTED_PROVIDER", "exact_lots": [], "child_results": []}
+        return _blocked(base, "UNSUPPORTED_PROVIDER")
     if provider_verification.get("shadow_only") is not True:
-        return {**base, "status": "BLOCKED_INPUT", "block_reason": "INPUT_NOT_SHADOW_ONLY", "exact_lots": [], "child_results": []}
+        return _blocked(base, "INPUT_NOT_SHADOW_ONLY")
     if provider_verification.get("symmetric_provider_verification") is not True:
-        return {**base, "status": "BLOCKED_INPUT", "block_reason": "INPUT_NOT_SYMMETRIC_PROVIDER_VERIFICATION", "exact_lots": [], "child_results": []}
+        return _blocked(base, "INPUT_NOT_SYMMETRIC_PROVIDER_VERIFICATION")
     if provider_verification.get("commercial_specificity_gate_enforced") is not True:
-        return {**base, "status": "BLOCKED_INPUT", "block_reason": "COMMERCIAL_SPECIFICITY_GATE_NOT_ENFORCED", "exact_lots": [], "child_results": []}
+        return _blocked(base, "COMMERCIAL_SPECIFICITY_GATE_NOT_ENFORCED")
     if provider_verification.get("project_domain_gate_enforced") is not True or _compact(
         provider_verification.get("required_project_domain")
     ) != CLOTHING_INVENTORY:
-        return {**base, "status": "BLOCKED_INPUT", "block_reason": "INPUT_NOT_CLOTHING_DOMAIN_GATED", "exact_lots": [], "child_results": []}
+        return _blocked(base, "INPUT_NOT_CLOTHING_DOMAIN_GATED")
 
     eligible: list[dict[str, Any]] = []
     seen_parents: set[str] = set()
@@ -353,6 +392,7 @@ def resolve_exact_lot_child_links(
                 }
             )
             continue
+
         parent_succeeded += 1
         resolved_parent = fetched.final_url or parent_url
         links = _extract_candidate_child_links(
@@ -405,6 +445,7 @@ def resolve_exact_lot_child_links(
                 }
             )
             continue
+
         child_attempted += 1
         fetched = child_page_fetcher(candidate["url"])
         if not fetched.ok:
@@ -421,15 +462,18 @@ def resolve_exact_lot_child_links(
                 }
             )
             continue
+
         child_succeeded += 1
-        classification, evidence = _classify_page(
+        final_url = fetched.final_url or candidate["url"]
+        classification, evidence = _classify_child_page(
             title=fetched.title,
             text=fetched.text,
-            url=fetched.final_url or candidate["url"],
+            url=final_url,
         )
         accepted = bool(
             classification == EXACT_LOT_CANDIDATE
             and evidence.get("project_domain") == CLOTHING_INVENTORY
+            and evidence.get("page_subject_domain") == CLOTHING_INVENTORY
             and evidence.get("item_specific_url_evidence") is True
             and evidence.get("inventory_evidence") is True
             and evidence.get("direct_sale_evidence") is True
@@ -441,7 +485,7 @@ def resolve_exact_lot_child_links(
             "classification": classification,
             "fetch_ok": True,
             "status_code": fetched.status_code,
-            "final_url": fetched.final_url,
+            "final_url": final_url,
             "fetch_error": None,
             "truncated": fetched.truncated,
             "exact_lot_accepted": accepted,
@@ -467,6 +511,6 @@ def resolve_exact_lot_child_links(
         "child_results": child_results,
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Aggregate parents remain non-opportunities. Only directly fetched same-origin descendant child pages that prove clothing inventory, direct sale, item specificity, price and quantity are accepted as exact-lot evidence."
+            "Aggregate parents remain non-opportunities. A child must be a directly fetched same-origin descendant item page whose own subject proves clothing and whose page proves direct sale, price and quantity."
         ),
     }
