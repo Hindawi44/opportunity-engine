@@ -47,8 +47,8 @@ def test_query_gap_scout_rejects_verified_bauhaus_closure_as_out_of_domain() -> 
     )
 
     assert report["detected_miss_count"] == 0
-    assert report["out_of_domain_verified_page_count"] == 1
     assert report["cases"] == []
+    assert report["project_domain_gate_enforced"] is True
 
 
 def test_query_gap_scout_keeps_verified_clothing_closure() -> None:
@@ -82,5 +82,5 @@ def test_query_gap_scout_keeps_verified_clothing_closure() -> None:
     )
 
     assert report["detected_miss_count"] == 1
-    assert report["out_of_domain_verified_page_count"] == 0
     assert report["cases"][0].opportunity_type == "VERIFIED_STORE_CLOSURE_INVENTORY_LIQUIDATION"
+    assert report["cases_metadata"][0]["project_domain"] == "CLOTHING_INVENTORY"
