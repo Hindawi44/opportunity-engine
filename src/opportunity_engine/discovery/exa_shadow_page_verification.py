@@ -11,6 +11,7 @@ import re
 from collections import Counter
 from collections.abc import Callable
 from typing import Any
+from urllib.parse import urlsplit
 
 from opportunity_engine.discovery.keyword_shadow_verification import (
     PageFetchResult,
@@ -153,6 +154,23 @@ _QUANTITY_RE = re.compile(
     r"metres|ruller|rollen|rolls|kartonger|kartons|cartons)\b",
     re.IGNORECASE,
 )
+_ITEM_PATH_RE = re.compile(
+    r"(?:^|/)(?:item|items|lot|lots|lotto|lotti|product|products|produkt|kavel|"
+    r"annuncio|annunci|articolo|auction|auktion|auksjon|veiling)(?:[-_/]|$)",
+    re.IGNORECASE,
+)
+_AGGREGATE_PATH_MARKERS = (
+    "/search",
+    "/sok",
+    "/søk",
+    "/category",
+    "/categories",
+    "/kategori",
+    "/catalog",
+    "/catalogue",
+    "/assortment",
+    "/sortiment",
+)
 
 
 def _compact(value: object) -> str:
@@ -163,7 +181,28 @@ def _contains_any(text: str, markers: tuple[str, ...]) -> bool:
     return any(marker in text for marker in markers)
 
 
-def _classify_page(*, title: str, text: str) -> tuple[str, dict[str, bool]]:
+def _looks_item_specific_url(url: str) -> bool:
+    """Return true only for conservative item/lot-detail URL shapes.
+
+    Homepages, search pages, category pages and marketplace roots cannot become
+    exact lots merely because their aggregate HTML contains many prices and
+    quantities.
+    """
+    try:
+        parsed = urlsplit(_compact(url))
+    except ValueError:
+        return False
+    path = (parsed.path or "/").casefold().rstrip("/")
+    if not path or path == "":
+        return False
+    if path == "/":
+        return False
+    if any(marker in path for marker in _AGGREGATE_PATH_MARKERS):
+        return False
+    return bool(_ITEM_PATH_RE.search(path))
+
+
+def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[str, bool]]:
     combined = f"{_compact(title)} {_compact(text)}".casefold()
     has_inventory = _contains_any(combined, _INVENTORY_MARKERS)
     has_direct_sale = _contains_any(combined, _DIRECT_SALE_MARKERS)
@@ -171,6 +210,7 @@ def _classify_page(*, title: str, text: str) -> tuple[str, dict[str, bool]]:
     has_info_legal = _contains_any(combined, _INFO_OR_LEGAL_MARKERS)
     has_price = bool(_PRICE_RE.search(combined))
     has_quantity = bool(_QUANTITY_RE.search(combined))
+    item_specific_url = _looks_item_specific_url(url)
 
     evidence = {
         "inventory_evidence": has_inventory,
@@ -179,15 +219,25 @@ def _classify_page(*, title: str, text: str) -> tuple[str, dict[str, bool]]:
         "info_or_legal_evidence": has_info_legal,
         "price_evidence": has_price,
         "quantity_evidence": has_quantity,
+        "item_specific_url_evidence": item_specific_url,
     }
 
-    if has_inventory and has_direct_sale and has_quantity and has_price and not has_info_legal:
+    if (
+        has_inventory
+        and has_direct_sale
+        and has_quantity
+        and has_price
+        and item_specific_url
+        and not has_info_legal
+    ):
         return EXACT_LOT_CANDIDATE, evidence
     if has_inventory and has_direct_sale and not has_info_legal and not has_buyer_source:
         return ACTIVE_STOCK_SIGNAL, evidence
     if has_inventory and has_buyer_source and not has_direct_sale:
         return SOURCE_INTELLIGENCE_ONLY, evidence
-    if has_info_legal and not (has_inventory and has_direct_sale and has_quantity and has_price):
+    if has_info_legal and not (
+        has_inventory and has_direct_sale and has_quantity and has_price and item_specific_url
+    ):
         return INFO_OR_LEGAL_ONLY, evidence
     if has_inventory and has_buyer_source:
         return SOURCE_INTELLIGENCE_ONLY, evidence
@@ -313,6 +363,7 @@ def verify_exa_unique_pages(
         classification, evidence = _classify_page(
             title=fetched.title or candidate["title"],
             text=fetched.text,
+            url=fetched.final_url or candidate["url"],
         )
         verified_pages.append(
             {
