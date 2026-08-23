@@ -1,5 +1,5 @@
 {
-  "schema_version": "ai-teaching-gate-policy-1.0",
+  "schema_version": "ai-teaching-gate-policy-1.1",
   "purpose": "Keep paid AI focused on novel or unresolved learning while reusing existing MIND FORGE, Unified Memory V2 and Learning Layer work.",
   "governing_principle": "AI teaches only what the project has not already learned; proven reviewed knowledge is handled by fixed rules.",
   "allowed_project_domains": [
@@ -16,13 +16,27 @@
     "runtime_reference": "mind-forge-live/phase1/live_model_adapter_v1.py",
     "reuse_existing_cross_run_learning": true,
     "learning_reference": "scripts/mind_forge_v2_fast_learning_memory.py",
-    "manual_paid_run_required": true,
+    "manual_paid_run_required_for_ad_hoc_runs": true,
     "existing_budget_gate_authoritative": true,
     "duplicate_budget_policy": false,
-    "automatic_ai_invocation": false
+    "gate_itself_calls_ai": false,
+    "scheduled_consumer": {
+      "enabled": true,
+      "user_authorized": true,
+      "source_workflow": "Multi-Market Daily Operator Checkpoint",
+      "source_event_must_equal": "schedule",
+      "source_conclusion_must_equal": "success",
+      "condition": "UNSEEN_AI_TEACHING_TASK_EXISTS",
+      "max_paid_ai_tasks_per_checkpoint": 1,
+      "skip_unchanged_completed_task_fingerprint": true,
+      "reuse_existing_openai_api_key_secret": true,
+      "reuse_existing_budget_gate": true,
+      "automatic_ai_invocation": true
+    }
   },
   "project_domain_gate_enforced": true,
   "automatic_ai_invocation": false,
+  "scheduled_consumer_automatic_ai_invocation": true,
   "automatic_query_activation": false,
   "automatic_provider_activation": false,
   "automatic_source_promotion": false,
