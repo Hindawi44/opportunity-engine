@@ -130,7 +130,8 @@ def _extract_navigation_links(
         "COMMERCIAL_HUB": 4,
     }
     current = urldefrag(page_url).url
-    candidates: list[tuple[int, int, str]] = []
+    current_path = _path(page_url).rstrip("/") or "/"
+    candidates: list[tuple[int, int, int, str]] = []
     seen: set[str] = set()
     for position, href in enumerate(parser.hrefs):
         try:
@@ -147,10 +148,19 @@ def _extract_navigation_links(
         role = _commercial_url_role(candidate)
         if role is None:
             continue
+
+        candidate_path = (parts.path or "/").casefold().rstrip("/") or "/"
+        if current_path != "/" and candidate_path.startswith(current_path + "/"):
+            scope_priority = 0
+        elif candidate_path.startswith("/product/"):
+            scope_priority = 1
+        else:
+            scope_priority = 2 if current_path != "/" else 0
+
         seen.add(candidate)
-        candidates.append((role_priority[role], position, candidate))
-    candidates.sort(key=lambda item: (item[0], item[1]))
-    return [item[2] for item in candidates[:max_links]]
+        candidates.append((scope_priority, role_priority[role], position, candidate))
+    candidates.sort(key=lambda item: (item[0], item[1], item[2]))
+    return [item[3] for item in candidates[:max_links]]
 
 
 def _strict_exact(classification: str, evidence: dict[str, Any]) -> bool:
