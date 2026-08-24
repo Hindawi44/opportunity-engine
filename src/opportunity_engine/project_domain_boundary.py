@@ -74,6 +74,7 @@ _FABRIC_MARKERS = (
 _FABRIC_PRIMARY_MARKERS = (
     "fabric wholesale", "fabric wholesaler", "textile wholesale", "textile wholesaler",
     "deadstock fabric", "deadstock fabrics", "fabric deadstock",
+    "designer fabric", "designer fabrics",
     "stoffen groothandel", "stoffengroothandel", "textiel groothandel",
     "textielgroothandel", "stoffen en fournituren", "deadstock stoffen",
     "stoffen deadstock", "restpartij stoffen", "restpartijen stoffen",
