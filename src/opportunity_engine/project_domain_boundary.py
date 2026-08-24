@@ -69,10 +69,16 @@ _FABRIC_MARKERS = (
     "rotolo di tessuto", "rotoli di tessuto", "stoffen", "stofrol", "stofrollen",
 )
 
+# Strong fabric-commercial phrases take precedence over incidental garment words.
+# These phrases describe the material being sold, not merely clothing made from it.
 _FABRIC_PRIMARY_MARKERS = (
     "fabric wholesale", "fabric wholesaler", "textile wholesale", "textile wholesaler",
+    "deadstock fabric", "deadstock fabrics", "fabric deadstock",
     "stoffen groothandel", "stoffengroothandel", "textiel groothandel",
-    "textielgroothandel", "stoffen en fournituren",
+    "textielgroothandel", "stoffen en fournituren", "deadstock stoffen",
+    "stoffen deadstock", "restpartij stoffen", "restpartijen stoffen",
+    "partij stoffen", "partijhandel stoffen", "stoffen outlet", "stoffen per meter",
+    "stoffenwinkel", "voorraad stoffen", "stoffen voorraad",
 )
 
 _OUT_OF_DOMAIN_MARKERS = (
