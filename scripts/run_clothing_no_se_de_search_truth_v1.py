@@ -31,6 +31,22 @@ QUERIES = {
 }
 
 
+def _commercial_evidence(ev: dict) -> dict:
+    return {
+        "project_domain": ev.get("project_domain"),
+        "subject_domain": ev.get("page_subject_domain"),
+        "inventory": ev.get("inventory_evidence"),
+        "sale": ev.get("direct_sale_evidence"),
+        "price": ev.get("price_evidence"),
+        "quantity": ev.get("quantity_evidence"),
+        "item_specific": ev.get("item_specific_url_evidence"),
+        "canonical_product": ev.get("canonical_product_detail_url_evidence"),
+        "explicit_purchase": ev.get("explicit_purchase_evidence"),
+        "mixed_subject": ev.get("mixed_general_merchandise_subject_evidence"),
+        "info_or_legal": ev.get("info_or_legal_evidence"),
+    }
+
+
 def main() -> int:
     key = os.environ.get("EXA_API_KEY", "").strip()
     if not key:
@@ -103,6 +119,40 @@ def main() -> int:
                 },
             })
 
+        root_results = []
+        for row in multihop.get("root_results") or []:
+            if not isinstance(row, dict):
+                continue
+            root_results.append({
+                "root_url": row.get("root_url"),
+                "final_url": row.get("final_url"),
+                "classification": row.get("root_classification"),
+                "navigation_role": row.get("root_navigation_role"),
+                "fetch_ok": row.get("fetch_ok"),
+                "navigation_link_count": row.get("navigation_link_count"),
+                "navigation_links": row.get("navigation_links") or [],
+                "fetch_error": row.get("fetch_error"),
+            })
+
+        navigation_results = []
+        for row in multihop.get("navigation_results") or []:
+            if not isinstance(row, dict):
+                continue
+            ev = row.get("evidence") or {}
+            navigation_results.append({
+                "title": row.get("title"),
+                "url": row.get("url"),
+                "final_url": row.get("final_url"),
+                "classification": row.get("classification"),
+                "fetch_ok": row.get("fetch_ok"),
+                "status_code": row.get("status_code"),
+                "navigation_role": row.get("navigation_role"),
+                "navigation_depth": row.get("navigation_depth") or row.get("depth"),
+                "navigation_chain": row.get("navigation_chain") or row.get("chain"),
+                "fetch_error": row.get("fetch_error"),
+                "evidence": _commercial_evidence(ev),
+            })
+
         exact_lots = []
         for row in multihop.get("exact_lots") or []:
             if not isinstance(row, dict):
@@ -143,6 +193,8 @@ def main() -> int:
                 "gateways": multihop.get("gateway_page_count"),
                 "exact_lots": multihop.get("exact_lot_candidate_count"),
             },
+            "root_results": root_results,
+            "navigation_results": navigation_results,
             "exact_lots": exact_lots,
         }
 
@@ -161,11 +213,20 @@ def main() -> int:
                 f"domain={ev['project_domain']} inv={ev['inventory']} sale={ev['sale']} price={ev['price']} "
                 f"qty={ev['quantity']} item={ev['item_specific']} b2b={ev['b2b']} q_b2b={ev['qualified_b2b']}"
             )
+        for nav in navigation_results:
+            ev = nav["evidence"]
+            print(
+                f"  NAV {nav['classification']} | {nav['title']} | {nav['final_url'] or nav['url']} | "
+                f"role={nav['navigation_role']} depth={nav['navigation_depth']} domain={ev['project_domain']} "
+                f"subject={ev['subject_domain']} inv={ev['inventory']} sale={ev['sale']} price={ev['price']} "
+                f"qty={ev['quantity']} item={ev['item_specific']} canonical={ev['canonical_product']} "
+                f"purchase={ev['explicit_purchase']}"
+            )
         for lot in exact_lots:
             print(f"  EXACT | {lot['title']} | {lot['url']}")
 
     payload = {
-        "schema_version": "clothing-no-se-de-search-truth-1.0",
+        "schema_version": "clothing-no-se-de-search-truth-1.1",
         "status": "SUCCESS",
         "project_domain": CLOTHING_INVENTORY,
         "provider": "exa",
