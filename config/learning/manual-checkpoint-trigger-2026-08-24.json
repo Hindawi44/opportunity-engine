@@ -1,14 +1,14 @@
 {
   "schema_version": "manual-checkpoint-trigger-1.0",
-  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after unified search truth reconciliation.",
-  "requested_at_utc": "2026-08-24T19:10:00Z",
-  "requested_for_main_sha": "7a42f8ce3846719a49b7e764cde385d897e85b32",
+  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Adaptive Zero-Yield Exa Recall V2 was merged into the unified six-market search path.",
+  "requested_at_utc": "2026-08-24T19:30:00Z",
+  "requested_for_main_sha": "6e5f93e75f41fd3eb81935bbf5789c13f2031e58",
   "project_scope": [
     "CLOTHING_INVENTORY",
     "FABRIC_PROCUREMENT"
   ],
-  "production_logic_change": false,
-  "query_change": false,
+  "production_logic_change": true,
+  "query_change": true,
   "source_change": false,
   "agent_change": false
 }
