@@ -44,6 +44,8 @@ _CLOTHING_MARKERS = (
     "dress", "dresses", "jeans", "skirt", "skirts", "coat", "coats", "bridal",
     "wedding dress", "klær", "klaer", "klesbutikk", "klesbutikken", "kleslager",
     "arbeidsklær", "arbeidsklaer", "arbeidsjakke", "arbeidsjakker", "bekledning",
+    # Norwegian compound clothing noun confirmed by a live auction clothing lot.
+    "næringsmiddelklær",
     "mote", "jakke", "jakker", "bukser", "skjorter", "kjoler", "sko",
     "brudekjole", "korsett", "korsettsalong", "kläder", "klader", "klädlager",
     "kladlager", "klädbutik", "kladbutik", "klädbutiken", "kladbutiken",
