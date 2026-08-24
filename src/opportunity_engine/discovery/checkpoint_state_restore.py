@@ -22,10 +22,13 @@ RESTORABLE_EVENTS = {"workflow_dispatch", "schedule"}
 DATABASE_RELATIVE_PATHS = (
     "no-auksjonen/opportunity_engine.db",
     "no-finn-email/opportunity_engine.db",
+    "no-exa-exact-lot/opportunity_engine.db",
     "se-blinto/opportunity_engine.db",
+    "se-exa-exact-lot/opportunity_engine.db",
     "de-riegermann/opportunity_engine.db",
     "de-venta/opportunity_engine.db",
     "de-dpv/opportunity_engine.db",
+    "de-exa-exact-lot/opportunity_engine.db",
 )
 FOLLOW_UP_SEED_FILENAME = "previous-cross-source-scent-v2.json"
 FOLLOW_UP_SEED_MEMBERS = (
