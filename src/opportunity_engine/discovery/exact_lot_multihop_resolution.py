@@ -37,7 +37,7 @@ from opportunity_engine.project_domain_boundary import (
     classify_project_domain,
 )
 
-SCHEMA_VERSION = "exact-lot-multihop-resolution-1.0"
+SCHEMA_VERSION = "exact-lot-multihop-resolution-1.1"
 LAB_FAMILY = "EXACT_LOT_MULTIHOP_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_ROOT_PARENTS = 6
@@ -85,6 +85,13 @@ def _commercial_url_role(url: str) -> str | None:
     path = _path(url).rstrip("/") or "/"
     if any(path == prefix or path.startswith(prefix + "/") for prefix in _EXCLUDED_PATH_PREFIXES):
         return None
+
+    # German clothing wholesalers may expose an aggregate hierarchy below
+    # /products/bekleidung/ while reserving singular /product/<slug> for actual
+    # item pages. Treat the hierarchy as navigation only before the generic
+    # item-specific guard can mistake a nested category for a product detail.
+    if path == "/products/bekleidung" or path.startswith("/products/bekleidung/"):
+        return "CATEGORY"
 
     # Use the canonical item-specific guard for singular /product/, /lot/, etc.
     # Also recognize a generic numeric listing-id + slug detail shape. Neither
@@ -160,16 +167,31 @@ def _strict_exact(classification: str, evidence: dict[str, Any]) -> bool:
 
 
 def _gateway_eligible(*, url: str, classification: str, evidence: dict[str, Any]) -> bool:
-    if _commercial_url_role(url) == "PRODUCT_DETAIL":
+    role = _commercial_url_role(url)
+    if role == "PRODUCT_DETAIL":
         return False
     if classification in {OUT_OF_DOMAIN, FETCH_FAILED}:
         return False
+
+    # Aggregate category pages are navigation evidence only. Some legitimate
+    # wholesale category pages expose stock cards with price + quantity without
+    # a page-level sale verb. That is enough to follow same-origin product links,
+    # but never enough for Exact-Lot credit, which remains strict in _strict_exact.
+    navigation_commercial_evidence = bool(
+        evidence.get("direct_sale_evidence") is True
+        or (
+            role == "CATEGORY"
+            and evidence.get("inventory_evidence") is True
+            and evidence.get("price_evidence") is True
+            and evidence.get("quantity_evidence") is True
+        )
+    )
     return bool(
-        _commercial_url_role(url) is not None
+        role is not None
         and evidence.get("project_domain") == CLOTHING_INVENTORY
         and evidence.get("page_subject_domain") == CLOTHING_INVENTORY
         and evidence.get("inventory_evidence") is True
-        and evidence.get("direct_sale_evidence") is True
+        and navigation_commercial_evidence
         and (evidence.get("price_evidence") is True or evidence.get("quantity_evidence") is True)
     )
 
