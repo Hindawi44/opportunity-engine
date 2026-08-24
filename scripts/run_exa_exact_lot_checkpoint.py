@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Run the proven Exa Exact-Lot + Multi-Hop route as a checkpoint source.
 
-The runner reuses the exact NO/SE/DE query pack that was live-proven before
-promotion. It does not add source-specific domains, does not mutate queries,
-and does not activate Brave. Only strict clothing Exact-Lots become checkpoint
-candidates; aggregate pages remain navigation evidence only.
+The runner uses the live-proven six-market clothing queries. It does not add
+source-specific domains, does not mutate queries, and does not activate Brave.
+Only strict clothing Exact-Lots become checkpoint candidates; aggregate pages
+remain navigation evidence only.
 """
 from __future__ import annotations
 
@@ -23,6 +23,7 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     apply_post_verification_top5_hard_gate,
     write_discovery_artifacts,
 )
+from opportunity_engine.discovery.exa_exact_lot_shadow_hunt import MARKET_EXACT_LOT_QUERIES
 from opportunity_engine.discovery.exa_search import ExaSearchProvider
 from opportunity_engine.discovery.exa_shadow_page_verification import EXACT_LOT_CANDIDATE
 from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_exact_lot_multihop
@@ -33,7 +34,14 @@ from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_ben
 
 
 RESULTS_PER_QUERY = 5
-MARKET_CURRENCIES = {"NO": "NOK", "SE": "SEK", "DE": "EUR"}
+MARKET_CURRENCIES = {
+    "NO": "NOK",
+    "SE": "SEK",
+    "DE": "EUR",
+    "FR": "EUR",
+    "IT": "EUR",
+    "NL": "EUR",
+}
 MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
     "NO": (
         "Norge restlager klær grossist parti",
@@ -50,6 +58,11 @@ MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
         "Deutschland Sonderposten Kleidung zu verkaufen Großhandel",
         "Deutschland Warenlager Mode Restposten Bekleidung",
     ),
+    # Reuse the already-live-proven six-market Exa queries for the expansion
+    # markets instead of leaving them on a separate market-specific path.
+    "FR": (MARKET_EXACT_LOT_QUERIES["FR"],),
+    "IT": (MARKET_EXACT_LOT_QUERIES["IT"],),
+    "NL": (MARKET_EXACT_LOT_QUERIES["NL"],),
 }
 
 
@@ -70,7 +83,12 @@ def _title_from_url(url: str) -> str:
 
 
 def _subject_domain(title: str, url: str) -> str:
-    path_words = unquote(urlsplit(url).path or "").replace("-", " ").replace("_", " ").replace("/", " ")
+    path_words = (
+        unquote(urlsplit(url).path or "")
+        .replace("-", " ")
+        .replace("_", " ")
+        .replace("/", " ")
+    )
     return classify_project_domain(text=_compact(f"{title} {path_words}"))
 
 
@@ -95,7 +113,9 @@ def _strict_exact_evidence(*, row: Mapping[str, Any], require_subject_evidence: 
     )
 
 
-def _exact_lot_rows(verification: Mapping[str, Any], multihop: Mapping[str, Any]) -> list[dict[str, Any]]:
+def _exact_lot_rows(
+    verification: Mapping[str, Any], multihop: Mapping[str, Any]
+) -> list[dict[str, Any]]:
     accepted: list[dict[str, Any]] = []
     seen: set[str] = set()
 
@@ -151,7 +171,9 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "page_role": ITEM_LISTING,
         "source_urls": [url],
         "canonical_urls": [url],
-        "found_by_queries": [_compact(row.get("query"))] if _compact(row.get("query")) else [],
+        "found_by_queries": [_compact(row.get("query"))]
+        if _compact(row.get("query"))
+        else [],
         "source_providers": ["EXA"],
         "evidence_signals": [
             "CLOTHING_INVENTORY",
@@ -174,7 +196,8 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
                 "page_role": ITEM_LISTING,
                 "opportunity_identity": url,
                 "identity_stable": True,
-                "clothing_inventory_evidence": evidence.get("project_domain") == CLOTHING_INVENTORY,
+                "clothing_inventory_evidence": evidence.get("project_domain")
+                == CLOTHING_INVENTORY,
                 "sale_evidence": evidence.get("direct_sale_evidence") is True,
                 "verification_content_match": True,
                 "bounded_context": bounded_context,
@@ -226,7 +249,7 @@ def build_checkpoint_result_from_exact_lots(
 ) -> dict[str, Any]:
     candidates = [_candidate_from_exact_lot(row, market=market) for row in exact_lots]
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.1",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.2",
         "status": "SUCCESS",
         "execution_status": "PASS",
         "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -234,7 +257,7 @@ def build_checkpoint_result_from_exact_lots(
         "market_code": market,
         "currency": MARKET_CURRENCIES[market],
         "source_mode": "EXA_EXACT_LOT_MULTIHOP",
-        "query_pack": "NO_SE_DE_EXACT_LOT_PROVEN_V1",
+        "query_pack": "SIX_MARKET_EXACT_LOT_PROVEN_V1",
         "queries_submitted": query_count,
         "hits_received": hit_count,
         "merged_candidates": len(candidates),
@@ -242,8 +265,12 @@ def build_checkpoint_result_from_exact_lots(
         "strong_leads_requiring_verification": 0,
         "rejected_results": 0,
         "generic_pages_excluded": int(multihop.get("gateway_page_count") or 0),
-        "direct_exact_lot_count": int(verification.get("exact_lot_candidate_count") or 0),
-        "multihop_exact_lot_count": int(multihop.get("exact_lot_candidate_count") or 0),
+        "direct_exact_lot_count": int(
+            verification.get("exact_lot_candidate_count") or 0
+        ),
+        "multihop_exact_lot_count": int(
+            multihop.get("exact_lot_candidate_count") or 0
+        ),
         "strict_exact_lot_count": len(candidates),
         "currency_conversion_performed": False,
         "tax_calculation_performed": False,
@@ -264,10 +291,15 @@ def build_checkpoint_result_from_exact_lots(
 
 def _write_json(path: Path, payload: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
-def run_market(*, market: str, exa_api_key: str, output_dir: Path, results_per_query: int) -> dict[str, Any]:
+def run_market(
+    *, market: str, exa_api_key: str, output_dir: Path, results_per_query: int
+) -> dict[str, Any]:
     queries = MARKET_EXACT_LOT_QUERY_PACKS[market]
     provider = ExaSearchProvider(exa_api_key)
     all_hits = []
@@ -280,10 +312,19 @@ def run_market(*, market: str, exa_api_key: str, output_dir: Path, results_per_q
         if classify_project_domain(text=query) != CLOTHING_INVENTORY:
             raise RuntimeError(f"query escaped clothing domain: {market}: {query}")
         hits = list(provider.search(query, count=results_per_query))[:results_per_query]
-        query_rows.append({
-            "query": query,
-            "hits": [{"title": hit.title, "url": hit.url, "description": hit.description} for hit in hits],
-        })
+        query_rows.append(
+            {
+                "query": query,
+                "hits": [
+                    {
+                        "title": hit.title,
+                        "url": hit.url,
+                        "description": hit.description,
+                    }
+                    for hit in hits
+                ],
+            }
+        )
         for hit in hits:
             if hit.url in seen_urls:
                 continue
@@ -320,7 +361,7 @@ def run_market(*, market: str, exa_api_key: str, output_dir: Path, results_per_q
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.0",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.1",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
@@ -339,7 +380,9 @@ def run_market(*, market: str, exa_api_key: str, output_dir: Path, results_per_q
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--market", choices=("NO", "SE", "DE"), required=True)
+    parser.add_argument(
+        "--market", choices=tuple(MARKET_EXACT_LOT_QUERY_PACKS), required=True
+    )
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--results-per-query", type=int, default=RESULTS_PER_QUERY)
     parser.add_argument("--persist-unified", action="store_true")
@@ -348,7 +391,9 @@ def main() -> int:
     args = parser.parse_args()
 
     if not 1 <= args.results_per_query <= RESULTS_PER_QUERY:
-        raise SystemExit(f"--results-per-query must be between 1 and {RESULTS_PER_QUERY}")
+        raise SystemExit(
+            f"--results-per-query must be between 1 and {RESULTS_PER_QUERY}"
+        )
     if args.persist_unified and not _compact(args.database_url):
         raise SystemExit("--database-url is required with --persist-unified")
     exa_api_key = _compact(os.environ.get("EXA_API_KEY"))
@@ -374,7 +419,9 @@ def main() -> int:
     paths["unified_opportunity_report"] = unified_path
 
     if args.persist_unified:
-        from opportunity_engine.persistence.live_unified_persistence import persist_unified_report_with_artifacts
+        from opportunity_engine.persistence.live_unified_persistence import (
+            persist_unified_report_with_artifacts,
+        )
 
         _, persistence_summary_path = persist_unified_report_with_artifacts(
             unified_path,
