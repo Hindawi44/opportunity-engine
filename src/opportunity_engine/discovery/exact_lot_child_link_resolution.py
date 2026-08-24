@@ -15,8 +15,9 @@ conservative protections that are intentionally scoped to this layer:
 * an item-specific child must prove the clothing domain from its own title/URL
   subject;
 * explicit e-commerce controls such as ``Ajouter au panier`` prove direct sale
-  only on canonical ``/products/<slug>`` detail routes. Site-wide cart controls
-  on hubs or collections cannot create exact-lot credit.
+  only on item-specific canonical ``/product/<slug>`` or ``/products/<slug>``
+  detail routes. Site-wide cart controls on hubs or collections cannot create
+  exact-lot credit.
 
 The layer is read-only and cannot contact, bid, reserve, buy or pay.
 """
@@ -56,7 +57,7 @@ MAX_RESPONSE_BYTES = 800_000
 
 _EURO_AFTER_NUMBER_RE = re.compile(r"(?<=\d)\s*€")
 _CANONICAL_PRODUCT_DETAIL_RE = re.compile(
-    r"(?:^|/)products/(?P<slug>[^/?#]+)/*$",
+    r"(?:^|/)products?/(?P<slug>[^/?#]+)/*$",
     re.IGNORECASE,
 )
 _EXPLICIT_PURCHASE_MARKERS = (
@@ -77,6 +78,34 @@ _EXPLICIT_PURCHASE_MARKERS = (
     "legg i handlekurv",
     "kjøp nå",
     "kjop na",
+)
+_MIXED_SUBJECT_MARKERS = (
+    "blandet",
+    "blandat",
+    "mixed",
+    "mixed lot",
+    "mix lot",
+    "gemischt",
+    "gemischte",
+    "lot mixte",
+    "misto",
+)
+_OUT_OF_SCOPE_SUBJECT_MARKERS = (
+    "elektro",
+    "elektronikk",
+    "electronics",
+    "verktøy",
+    "verktoy",
+    "tools",
+    "husholdning",
+    "household",
+    "hvitevarer",
+    "appliances",
+    "møbler",
+    "mobler",
+    "furniture",
+    "bygg",
+    "building",
 )
 
 
@@ -243,6 +272,14 @@ def _subject_context(*, title: str, url: str) -> str:
     return _compact(f"{title} {path_words}")
 
 
+def _mixed_general_merchandise_subject(subject: str) -> bool:
+    normalized = _compact(subject).casefold()
+    return bool(
+        any(marker in normalized for marker in _MIXED_SUBJECT_MARKERS)
+        and any(marker in normalized for marker in _OUT_OF_SCOPE_SUBJECT_MARKERS)
+    )
+
+
 def _normalize_child_price_text(text: str) -> str:
     """Normalize number-followed-by-euro-symbol prices without inventing values."""
     return _EURO_AFTER_NUMBER_RE.sub(" EUR", str(text or ""))
@@ -256,7 +293,7 @@ def _looks_canonical_product_detail_url(url: str) -> bool:
     match = _CANONICAL_PRODUCT_DETAIL_RE.search(path)
     if not match:
         return False
-    return match.group("slug").casefold() not in {"search", "all", "index", "catalog", "catalogue"}
+    return bool(_looks_item_specific_url(url))
 
 
 def _has_explicit_purchase_control(text: str) -> bool:
@@ -269,8 +306,9 @@ def _classify_child_page(*, title: str, text: str, url: str) -> tuple[str, dict[
 
     The existing classifier supplies the base commercial evidence. This layer
     adds local subject-domain protection and one narrow e-commerce rule: an
-    explicit purchase control can prove direct sale only on a canonical product
-    detail URL, never on a hub/collection page where cart text may be global UI.
+    explicit purchase control can prove direct sale only on an item-specific
+    canonical product detail URL, never on a hub/collection page where cart
+    text may be global UI.
     """
     normalized_text = _normalize_child_price_text(text)
     classification, evidence = _classify_page(
@@ -280,12 +318,19 @@ def _classify_child_page(*, title: str, text: str, url: str) -> tuple[str, dict[
     )
     evidence = dict(evidence)
     full_page_domain = evidence.get("project_domain")
-    subject_domain = classify_project_domain(text=_subject_context(title=title, url=url))
+    subject_context = _subject_context(title=title, url=url)
+    mixed_general_merchandise = _mixed_general_merchandise_subject(subject_context)
+    subject_domain = (
+        OUT_OF_DOMAIN
+        if mixed_general_merchandise
+        else classify_project_domain(text=subject_context)
+    )
     canonical_product = _looks_canonical_product_detail_url(url)
     purchase_control = bool(canonical_product and _has_explicit_purchase_control(normalized_text))
 
     evidence["full_page_project_domain"] = full_page_domain
     evidence["page_subject_domain"] = subject_domain
+    evidence["mixed_general_merchandise_subject_evidence"] = mixed_general_merchandise
     evidence["child_price_symbol_normalization"] = normalized_text != str(text or "")
     evidence["canonical_product_detail_url_evidence"] = canonical_product
     evidence["explicit_purchase_evidence"] = purchase_control
@@ -572,6 +617,6 @@ def resolve_exact_lot_child_links(
         "child_results": child_results,
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Aggregate parents remain non-opportunities. A child must be a directly fetched same-origin descendant item page whose own subject proves clothing and whose page proves direct sale, price and quantity. Explicit cart/buy controls count only on canonical product-detail URLs."
+            "Aggregate parents remain non-opportunities. A child must be a directly fetched same-origin descendant item page whose own subject proves clothing and whose page proves direct sale, price and quantity. Explicit cart/buy controls count only on item-specific canonical product-detail URLs."
         ),
     }

@@ -44,6 +44,8 @@ _CLOTHING_MARKERS = (
     "dress", "dresses", "jeans", "skirt", "skirts", "coat", "coats", "bridal",
     "wedding dress", "klær", "klaer", "klesbutikk", "klesbutikken", "kleslager",
     "arbeidsklær", "arbeidsklaer", "arbeidsjakke", "arbeidsjakker", "bekledning",
+    # Norwegian compound clothing noun confirmed by a live auction clothing lot.
+    "næringsmiddelklær",
     "mote", "jakke", "jakker", "bukser", "skjorter", "kjoler", "sko",
     "brudekjole", "korsett", "korsettsalong", "kläder", "klader", "klädlager",
     "kladlager", "klädbutik", "kladbutik", "klädbutiken", "kladbutiken",
@@ -51,6 +53,8 @@ _CLOTHING_MARKERS = (
     "bröllopsklänning", "brollopsklanning", "kleidung", "bekleidung",
     "arbeitskleidung", "modeware", "modeartikel", "modekette", "mode-kette",
     "modemarke", "modehändler", "modehandler", "schuhe", "schuhen", "jacken",
+    # German compound clothing nouns confirmed for commercial stock/product titles.
+    "sweatjacken", "fleecejacken", "herrenbekleidung",
     "hosen", "hemden", "kleider", "brautkleid", "vêtement", "vêtements",
     "vetement", "vetements", "habillement", "chaussures", "vestes", "pantalons",
     "chemises", "robes", "haut femme", "hauts femme", "haut homme", "hauts homme",

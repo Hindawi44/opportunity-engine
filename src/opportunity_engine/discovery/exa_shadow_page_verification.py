@@ -85,6 +85,7 @@ _DIRECT_SALE_MARKERS = (
     "til salgs",
     "for salg",
     "säljes",
+    "säljas",
     "till salu",
     "zu verkaufen",
     "zum verkauf",
@@ -161,18 +162,28 @@ _PRICE_RE = re.compile(
     r"(?:\b\d[\d\s.,]{0,14}\s*(?:nok|sek|eur|euro|kr\.?|€)\b|(?:€|kr\.?)[\s]*\d)",
     re.IGNORECASE,
 )
+_SCANDINAVIAN_DASH_PRICE_RE = re.compile(
+    r"\b\d{1,3}(?:[ .]\d{3})*,-(?!\d)",
+    re.IGNORECASE,
+)
 _QUANTITY_RE = re.compile(
-    r"\b\d[\d\s.,]{0,10}\s*(?:stk|st\.?|pcs|pieces|pièces|pieces|pezzi|stuks|"
+    r"\b\d[\d\s.,]{0,10}\s*(?:stk|st\.?|plagg|pcs|pieces|pièces|pieces|pezzi|stuks|"
     r"units|paller|pallets|paletten|pallet|kg|tonn|ton|tonnes|meter|metri|mètres|"
     r"metres|ruller|rollen|rolls|kartonger|kartons|cartons)\b",
+    re.IGNORECASE,
+)
+_LABELED_QUANTITY_RE = re.compile(
+    r"\b(?:kvantitet|quantity|menge|verfügbare\s+menge|verfugbare\s+menge|antall|antal|"
+    r"quantité|quantite|quantità|quantita|hoeveelheid)\b\s*(?:[:|=\-]\s*)?\d[\d\s.,]{0,10}",
     re.IGNORECASE,
 )
 # Singular item/detail route tokens qualify directly. Plural collection roots
 # still fail closed, with one narrow exception: canonical commerce product
 # containers such as /products/<slug> are item-specific only when a real slug
-# exists after the container. Bare /products/ remains aggregate.
+# exists after the container. Bare /products/ and generic category slugs remain
+# aggregate.
 _ITEM_PATH_RE = re.compile(
-    r"(?:^|/)(?:item|lot|lotto|product|produkt|kavel|annuncio|articolo|auction|"
+    r"(?:^|/)(?:item|lot|lotto|parti|product|produkt|kavel|annuncio|articolo|auction|"
     r"auktion|auksjon|veiling)(?:[-_/]|$)",
     re.IGNORECASE,
 )
@@ -180,6 +191,29 @@ _PRODUCT_DETAIL_CONTAINER_RE = re.compile(
     r"(?:^|/)products/(?P<slug>[^/?#]+)(?:/|$)",
     re.IGNORECASE,
 )
+_GENERIC_PRODUCT_CONTAINER_SLUGS = frozenset({
+    "search",
+    "all",
+    "index",
+    "catalog",
+    "catalogue",
+    "clothing",
+    "clothes",
+    "apparel",
+    "fashion",
+    "footwear",
+    "shoes",
+    "bekleidung",
+    "kleidung",
+    "kläder",
+    "klader",
+    "klær",
+    "klaer",
+    "vêtements",
+    "vetements",
+    "abbigliamento",
+    "kleding",
+})
 # Generic marketplace record-detail shape. The numeric id + meaningful slug is
 # only URL specificity evidence; domain, inventory, sale, price and quantity are
 # still required before Exact-Lot acceptance.
@@ -234,6 +268,9 @@ def _looks_item_specific_url(url: str) -> bool:
     product_match = _PRODUCT_DETAIL_CONTAINER_RE.search(path)
     if product_match:
         slug = product_match.group("slug").casefold()
+        exact_container_path = path == f"/products/{slug}"
+        if exact_container_path and slug in _GENERIC_PRODUCT_CONTAINER_SLUGS:
+            return False
         if slug not in {"search", "all", "index", "catalog", "catalogue"}:
             return True
     if _MARKETPLACE_ID_SLUG_RE.search(path):
@@ -248,8 +285,8 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
     has_direct_sale = _contains_any(combined, _DIRECT_SALE_MARKERS)
     has_buyer_source = _contains_any(combined, _BUYER_OR_SOURCE_MARKERS)
     has_info_legal = _contains_any(combined, _INFO_OR_LEGAL_MARKERS)
-    has_price = bool(_PRICE_RE.search(combined))
-    has_quantity = bool(_QUANTITY_RE.search(combined))
+    has_price = bool(_PRICE_RE.search(combined) or _SCANDINAVIAN_DASH_PRICE_RE.search(combined))
+    has_quantity = bool(_QUANTITY_RE.search(combined) or _LABELED_QUANTITY_RE.search(combined))
     item_specific_url = _looks_item_specific_url(url)
     project_domain = classify_project_domain(text=combined_raw)
     domain_evidence = project_domain == CLOTHING_INVENTORY
