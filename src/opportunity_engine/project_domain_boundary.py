@@ -51,6 +51,8 @@ _CLOTHING_MARKERS = (
     "bröllopsklänning", "brollopsklanning", "kleidung", "bekleidung",
     "arbeitskleidung", "modeware", "modeartikel", "modekette", "mode-kette",
     "modemarke", "modehändler", "modehandler", "schuhe", "schuhen", "jacken",
+    # German compound clothing nouns confirmed for commercial stock/product titles.
+    "sweatjacken", "fleecejacken", "herrenbekleidung",
     "hosen", "hemden", "kleider", "brautkleid", "vêtement", "vêtements",
     "vetement", "vetements", "habillement", "chaussures", "vestes", "pantalons",
     "chemises", "robes", "haut femme", "hauts femme", "haut homme", "hauts homme",
