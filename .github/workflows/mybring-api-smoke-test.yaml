@@ -1,0 +1,133 @@
+name: Mybring API Smoke Test
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  mybring-read-only-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MYBRING_API_UID: ${{ secrets.MYBRING_API_UID }}
+      MYBRING_API_KEY: ${{ secrets.MYBRING_API_KEY }}
+      MYBRING_CLIENT_URL: ${{ secrets.MYBRING_CLIENT_URL }}
+      MYBRING_CUSTOMER_NUMBER: ${{ secrets.MYBRING_CUSTOMER_NUMBER }}
+    steps:
+      - name: Verify Mybring credentials and customer access without exposing secrets
+        id: smoke
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in MYBRING_API_UID MYBRING_API_KEY MYBRING_CLIENT_URL MYBRING_CUSTOMER_NUMBER; do
+            if [ -z "${!name:-}" ]; then
+              echo "missing_secret=$name"
+              exit 2
+            fi
+          done
+          echo "configured_secrets=4/4"
+
+          python - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          url = "https://api.bring.com/customer-info/customers"
+          headers = {
+              "Accept": "application/json",
+              "X-Mybring-API-Uid": os.environ["MYBRING_API_UID"],
+              "X-Mybring-API-Key": os.environ["MYBRING_API_KEY"],
+              "X-Bring-Client-URL": os.environ["MYBRING_CLIENT_URL"],
+          }
+          request = urllib.request.Request(url, headers=headers, method="GET")
+          try:
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  status = response.status
+                  payload = json.loads(response.read().decode("utf-8"))
+          except urllib.error.HTTPError as exc:
+              print(f"bring_http_status={exc.code}")
+              raise SystemExit("MYBRING_API_AUTH_FAILED") from exc
+          except Exception as exc:
+              print(f"bring_request_error={type(exc).__name__}")
+              raise SystemExit("MYBRING_API_REQUEST_FAILED") from exc
+
+          customers = payload.get("customers") if isinstance(payload, dict) else None
+          if not isinstance(customers, list):
+              raise SystemExit("MYBRING_CUSTOMER_INFO_INVALID_RESPONSE")
+
+          expected = os.environ["MYBRING_CUSTOMER_NUMBER"].strip()
+          matched = [
+              row for row in customers
+              if isinstance(row, dict) and str(row.get("customerNumber", "")).strip() == expected
+          ]
+          print(f"bring_http_status={status}")
+          print(f"accessible_customer_count={len(customers)}")
+          print(f"expected_customer_found={'true' if bool(matched) else 'false'}")
+          if matched:
+              products = matched[0].get("products")
+              print(f"expected_customer_product_count={len(products) if isinstance(products, list) else 0}")
+
+          if status != 200:
+              raise SystemExit("MYBRING_API_HTTP_NOT_OK")
+          if not matched:
+              raise SystemExit("MYBRING_CUSTOMER_NUMBER_NOT_AUTHORIZED")
+          print("mybring_smoke_test=PASS")
+          PY
+
+      - name: Publish sanitized smoke result as commit status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$SMOKE_OUTCOME" = "success" ]; then
+            STATE=success
+            DESCRIPTION="Mybring auth and customer access verified"
+          else
+            STATE=failure
+            DESCRIPTION="Mybring smoke test failed; inspect Actions log"
+          fi
+          export STATE DESCRIPTION
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          sha = os.environ["GITHUB_SHA"]
+          state = os.environ["STATE"]
+          description = os.environ["DESCRIPTION"]
+          token = os.environ["GH_TOKEN"]
+          url = f"https://api.github.com/repos/{repo}/statuses/{sha}"
+          payload = json.dumps({
+              "state": state,
+              "context": "mybring/read-only-smoke",
+              "description": description,
+          }).encode("utf-8")
+          request = urllib.request.Request(
+              url,
+              data=payload,
+              method="POST",
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": f"Bearer {token}",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "Content-Type": "application/json",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=20) as response:
+              print(f"commit_status_publish_http={response.status}")
+          PY
+
+      - name: Fail job if smoke test failed
+        if: ${{ steps.smoke.outcome != 'success' }}
+        run: exit 1
