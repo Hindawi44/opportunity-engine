@@ -97,6 +97,7 @@ jobs:
             STATE=failure
             DESCRIPTION="Mybring smoke test failed; inspect Actions log"
           fi
+          export STATE DESCRIPTION
           python - <<'PY'
           import json
           import os
