@@ -1,4 +1,4 @@
-name: NL Exa Depth Benchmark V1
+name: NL Exa Query Diversity Benchmark V1
 
 on:
   pull_request:
@@ -26,11 +26,11 @@ jobs:
       - name: Install existing project dependencies
         run: pip install -r requirements.txt
 
-      - name: Run NL Exa 5/10/20 depth benchmark
+      - name: Run NL Exa query diversity benchmark
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p artifacts/nl-exa-depth-benchmark-v1
+          mkdir -p artifacts/nl-exa-query-diversity-v1
           python - <<'PY'
           import json
           import os
@@ -42,10 +42,16 @@ jobs:
           from opportunity_engine.discovery.keyword_shadow_verification import fetch_public_page
           from opportunity_engine.search_experiment_execution_bridge_v1 import _fabric_page_candidate
 
-          QUERY = "fabric textile Nederland stoffen groothandel leveranciers catalogus"
-          DEPTHS = (5, 10, 20)
-          # Evaluation truth set only. These domains are NOT discovery sources and are
-          # never injected into the search query, provider, routing, or production config.
+          QUERIES = [
+              "fabric textile Nederland stoffen groothandel leveranciers catalogus",
+              "Nederland restpartijen stoffen groothandel",
+              "Nederland textielgroothandel voorraad stoffen",
+              "Nederland deadstock stoffen B2B groothandel",
+          ]
+          RESULTS_PER_QUERY = 5
+
+          # Evaluation truth set only. Never used as discovery sources, query terms,
+          # provider filters, routing, or production configuration.
           BENCHMARK_DOMAINS = {
               "hajetrading.nl",
               "bitextrading.nl",
@@ -70,71 +76,119 @@ jobs:
               raise SystemExit("EXA_API_KEY is required")
 
           provider = ExaSearchProvider(key)
-          hits = provider.search(QUERY, count=20)
-          audits = [_fabric_page_candidate(hit, page_fetcher=fetch_public_page) for hit in hits]
+          per_query = []
+          unique_hits = {}
 
-          depth_rows = []
-          for depth in DEPTHS:
-              rows = audits[:depth]
-              accepted = [row for row in rows if row.get("verification_decision") == "ACCEPT"]
-              rejected = [row for row in rows if row.get("verification_decision") != "ACCEPT"]
-              result_domains = [domain(row.get("final_url") or row.get("url")) for row in rows]
-              accepted_domains = sorted({domain(row.get("final_url") or row.get("url")) for row in accepted if domain(row.get("final_url") or row.get("url"))})
-              benchmark_matches = sorted(set(accepted_domains) & BENCHMARK_DOMAINS)
-              reason_counts = Counter(str(row.get("rejection_reason") or "UNDIAGNOSED") for row in rejected)
-              unique_result_domains = {d for d in result_domains if d}
-              depth_rows.append({
-                  "depth": depth,
-                  "returned_hit_count": len(rows),
-                  "unique_result_domain_count": len(unique_result_domains),
-                  "duplicate_domain_count": max(0, len(result_domains) - len(unique_result_domains)),
-                  "fetch_success_count": sum(row.get("fetch_ok") is True for row in rows),
-                  "fetch_failed_count": sum(row.get("fetch_ok") is not True for row in rows),
-                  "accepted_count": len(accepted),
-                  "accepted_domains": accepted_domains,
-                  "rejected_count": len(rejected),
-                  "rejection_reason_counts": dict(sorted(reason_counts.items())),
-                  "benchmark_match_count": len(benchmark_matches),
-                  "benchmark_matches": benchmark_matches,
-                  "benchmark_recall": round(len(benchmark_matches) / len(BENCHMARK_DOMAINS), 4),
+          for query in QUERIES:
+              hits = provider.search(query, count=RESULTS_PER_QUERY)
+              raw_domains = [domain(hit.url) for hit in hits if domain(hit.url)]
+              for hit in hits:
+                  unique_hits.setdefault(hit.url, hit)
+              raw_matches = sorted(set(raw_domains) & BENCHMARK_DOMAINS)
+              per_query.append({
+                  "query": query,
+                  "hit_count": len(hits),
+                  "raw_unique_domain_count": len(set(raw_domains)),
+                  "raw_domains": raw_domains,
+                  "raw_benchmark_matches": raw_matches,
+                  "raw_benchmark_match_count": len(raw_matches),
               })
 
+          audits_by_url = {
+              url: _fabric_page_candidate(hit, page_fetcher=fetch_public_page)
+              for url, hit in unique_hits.items()
+          }
+
+          all_raw_domains = {
+              domain(hit.url) for hit in unique_hits.values() if domain(hit.url)
+          }
+          raw_benchmark_matches = sorted(all_raw_domains & BENCHMARK_DOMAINS)
+
+          accepted = [
+              row for row in audits_by_url.values()
+              if row.get("verification_decision") == "ACCEPT"
+          ]
+          rejected = [
+              row for row in audits_by_url.values()
+              if row.get("verification_decision") != "ACCEPT"
+          ]
+          accepted_domains = sorted({
+              domain(row.get("final_url") or row.get("url"))
+              for row in accepted
+              if domain(row.get("final_url") or row.get("url"))
+          })
+          verified_benchmark_matches = sorted(set(accepted_domains) & BENCHMARK_DOMAINS)
+          rejection_reason_counts = Counter(
+              str(row.get("rejection_reason") or "UNDIAGNOSED") for row in rejected
+          )
+
+          for item in per_query:
+              urls_for_query = []
+              hits = provider.search(item["query"], count=RESULTS_PER_QUERY)
+              urls_for_query = [hit.url for hit in hits]
+              rows = [audits_by_url[url] for url in urls_for_query if url in audits_by_url]
+              q_accepted_domains = sorted({
+                  domain(row.get("final_url") or row.get("url"))
+                  for row in rows
+                  if row.get("verification_decision") == "ACCEPT"
+                  and domain(row.get("final_url") or row.get("url"))
+              })
+              item["verified_accepted_domains"] = q_accepted_domains
+              item["verified_benchmark_matches"] = sorted(set(q_accepted_domains) & BENCHMARK_DOMAINS)
+              item["verified_benchmark_match_count"] = len(item["verified_benchmark_matches"])
+
           report = {
-              "schema_version": "nl-exa-depth-benchmark-1.0",
+              "schema_version": "nl-exa-query-diversity-benchmark-1.0",
               "market_code": "NL",
               "project_domain": "FABRIC_PROCUREMENT",
               "provider": "exa",
-              "query": QUERY,
-              "search_request_count": 1,
-              "max_requested_results": 20,
-              "evaluation_mode": "single-ranked-result-list-prefixes",
-              "benchmark_domain_count": len(BENCHMARK_DOMAINS),
-              "benchmark_domains": sorted(BENCHMARK_DOMAINS),
-              "depth_results": depth_rows,
-              "search_hit_audit": audits,
+              "query_count": len(QUERIES),
+              "results_per_query": RESULTS_PER_QUERY,
+              "nominal_hit_budget": len(QUERIES) * RESULTS_PER_QUERY,
+              "unique_url_count": len(unique_hits),
+              "raw_unique_domain_count": len(all_raw_domains),
+              "raw_benchmark_match_count": len(raw_benchmark_matches),
+              "raw_benchmark_matches": raw_benchmark_matches,
+              "raw_benchmark_recall": round(len(raw_benchmark_matches) / len(BENCHMARK_DOMAINS), 4),
+              "verified_accepted_url_count": len(accepted),
+              "verified_accepted_domain_count": len(accepted_domains),
+              "verified_accepted_domains": accepted_domains,
+              "verified_benchmark_match_count": len(verified_benchmark_matches),
+              "verified_benchmark_matches": verified_benchmark_matches,
+              "verified_benchmark_recall": round(len(verified_benchmark_matches) / len(BENCHMARK_DOMAINS), 4),
+              "fetch_failed_count": sum(row.get("fetch_ok") is not True for row in audits_by_url.values()),
+              "rejection_reason_counts": dict(sorted(rejection_reason_counts.items())),
+              "per_query": per_query,
+              "search_hit_audit": list(audits_by_url.values()),
               "production_mutation": False,
               "automatic_source_promotion": False,
           }
-          out = Path("artifacts/nl-exa-depth-benchmark-v1/report.json")
+
+          out = Path("artifacts/nl-exa-query-diversity-v1/report.json")
           out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
-          for row in depth_rows:
-              print(
-                  f"depth={row['depth']} hits={row['returned_hit_count']} "
-                  f"accepted={row['accepted_count']} benchmark={row['benchmark_match_count']}/12 "
-                  f"recall={row['benchmark_recall']:.4f} fetch_failed={row['fetch_failed_count']} "
-                  f"duplicates={row['duplicate_domain_count']}"
-              )
-              print("accepted_domains=", row["accepted_domains"])
-              print("benchmark_matches=", row["benchmark_matches"])
-              print("rejection_reason_counts=", row["rejection_reason_counts"])
+          print("query_count=", report["query_count"])
+          print("nominal_hit_budget=", report["nominal_hit_budget"])
+          print("unique_url_count=", report["unique_url_count"])
+          print("raw_unique_domain_count=", report["raw_unique_domain_count"])
+          print("raw_benchmark=", f"{report['raw_benchmark_match_count']}/12")
+          print("raw_benchmark_matches=", report["raw_benchmark_matches"])
+          print("verified_domains=", report["verified_accepted_domain_count"])
+          print("verified_benchmark=", f"{report['verified_benchmark_match_count']}/12")
+          print("verified_benchmark_matches=", report["verified_benchmark_matches"])
+          print("fetch_failed_count=", report["fetch_failed_count"])
+          print("rejection_reason_counts=", report["rejection_reason_counts"])
+          for item in per_query:
+              print("QUERY:", item["query"])
+              print(" raw=", item["raw_benchmark_matches"])
+              print(" verified=", item["verified_benchmark_matches"])
           PY
 
       - name: Upload benchmark artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: nl-exa-depth-benchmark-v1
-          path: artifacts/nl-exa-depth-benchmark-v1/report.json
+          name: nl-exa-query-diversity-v1
+          path: artifacts/nl-exa-query-diversity-v1/report.json
           if-no-files-found: error
           retention-days: 30
