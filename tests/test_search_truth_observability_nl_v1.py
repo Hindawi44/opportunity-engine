@@ -53,13 +53,13 @@ def _provider_factory(hits):
     return client, lambda _key: client
 
 
-def _page(url, text, *, ok=True):
+def _page(url, text, *, ok=True, title="Nederland stoffen groothandel"):
     return PageFetchResult(
         requested_url=url,
         final_url=url,
         ok=ok,
         status_code=200 if ok else 503,
-        title="Nederland stoffen groothandel",
+        title=title,
         text=text,
         error=None if ok else "blocked",
     )
@@ -118,8 +118,15 @@ def test_every_rejected_fabric_hit_has_exact_reason_and_enters_spine():
     ]
     _, factory = _provider_factory(hits)
     pages = {
-        "https://a.nl/fabric": _page("https://a.nl/fabric", "Stoffen en textiel voor inspiratie."),
-        "https://b.nl/fabric": _page("https://b.nl/fabric", "Stoffen op voorraad en restpartijen voor consumenten."),
+        "https://a.nl/fabric": _page(
+            "https://a.nl/fabric",
+            "Stoffen en textiel voor inspiratie.",
+        ),
+        "https://b.nl/fabric": _page(
+            "https://b.nl/fabric",
+            "Stoffen op voorraad en restpartijen voor consumenten.",
+            title="Nederland stoffen voorraad",
+        ),
         "https://c.nl/fabric": _page("https://c.nl/fabric", "", ok=False),
     }
     spec = select_search_experiment_spec(
@@ -176,7 +183,10 @@ def test_search_rejections_survive_memory_and_are_visible_as_learning_failures()
         exa_api_key="test",
         run_id="origin-1",
         provider_factory=factory,
-        page_fetcher=lambda url: _page(url, "Stoffen en textiel zonder voorraad of handelsinformatie."),
+        page_fetcher=lambda url: _page(
+            url,
+            "Stoffen en textiel voor inspiratie.",
+        ),
     )
     memory = merge_experiment_result_into_memory(
         existing_memory={}, result=result, checkpoint_run_id="checkpoint-1"
