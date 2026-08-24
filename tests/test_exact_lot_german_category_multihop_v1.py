@@ -41,8 +41,14 @@ def _verification() -> dict:
 
 def _html_fetcher(url: str) -> AggregateHtmlFetchResult:
     html = {
-        ROOT: '<a href="/products/bekleidung/herrenbekleidung/">Herrenbekleidung</a>',
+        ROOT: (
+            '<a href="/products/schuhe/">Schuhe</a>'
+            '<a href="/products/haus-garten-buero/">Haus Garten Büro</a>'
+            '<a href="/products/elektro-multimedia/">Elektro</a>'
+            '<a href="/products/bekleidung/herrenbekleidung/">Herrenbekleidung</a>'
+        ),
         CATEGORY: (
+            '<a href="/products/schuhe/">Schuhe</a>'
             '<a href="/product/herbol-herren-fleece-und-sweatjacken-a-ware/">'
             "Herbol Herren Fleece- und Sweatjacken A-Ware</a>"
         ),
@@ -84,11 +90,12 @@ def test_german_category_with_stock_cards_is_navigation_only_then_reaches_produc
         page_fetcher=_page_fetcher,
         max_root_parents=1,
         max_navigation_depth=2,
-        max_links_per_page=8,
+        max_links_per_page=1,
         max_navigation_page_fetches=8,
     )
 
     assert report["status"] == "SUCCESS"
+    assert report["root_results"][0]["navigation_links"] == [CATEGORY]
     assert report["gateway_page_count"] == 1
     assert report["exact_lot_candidate_count"] == 1
 
