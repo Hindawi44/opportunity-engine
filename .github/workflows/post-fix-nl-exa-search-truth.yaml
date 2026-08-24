@@ -1,0 +1,102 @@
+name: Post-Fix NL Exa Search Truth
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/post-fix-nl-exa-search-truth.yaml
+  workflow_dispatch:
+
+jobs:
+  nl-fabric-search-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install existing project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run isolated post-fix NL fabric Search Truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/post-fix-nl-exa-search-truth
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from opportunity_engine.search_experiment_execution_bridge_v1 import execute_search_experiment_spec
+
+          run_id = os.environ.get("GITHUB_RUN_ID", "post-fix-local")
+          query = "fabric textile Nederland stoffen groothandel leveranciers catalogus"
+          spec = {
+              "schema_version": "search-experiment-spec-1.1",
+              "status": "READY",
+              "experiment_fingerprint": f"post-fix-nl-fabric:{run_id}",
+              "teaching_task_id": "POST_FIX_NL_SEARCH_TRUTH",
+              "teaching_task_kind": "DETERMINISTIC_REPROOF",
+              "selected_idea_id": "POST_FIX_NL_SEARCH_TRUTH",
+              "selected_idea_rank": 1,
+              "selected_idea_title": "Post-Fix NL Fabric Search Truth",
+              "market_code": "NL",
+              "project_domain": "FABRIC_PROCUREMENT",
+              "slot_id": "FABRIC_PROCUREMENT",
+              "provider": "exa",
+              "query": query,
+              "raw_query": "FABRIC_PROCUREMENT Nederland stoffen groothandel leveranciers catalogus",
+              "query_internal_labels_removed": ["FABRIC_PROCUREMENT"],
+              "route": "SEARCH_TO_FABRIC_COMMERCIAL_PAGE",
+              "route_source_identity": "search-experiment:fabric_procurement",
+              "max_search_requests": 1,
+              "max_results": 5,
+              "max_independent_executions": 3,
+              "shadow_only": True,
+              "project_domain_gate_enforced": True,
+              "automatic_query_activation": False,
+              "automatic_provider_activation": False,
+              "automatic_source_promotion": False,
+              "automatic_code_change": False,
+              "production_query_mutation": False,
+              "production_mutation": False,
+              "automatic_contact": False,
+              "automatic_bid": False,
+              "automatic_reservation": False,
+              "automatic_purchase": False,
+              "automatic_payment": False,
+          }
+          result = execute_search_experiment_spec(
+              spec,
+              exa_api_key=os.environ.get("EXA_API_KEY", ""),
+              run_id=f"post-fix-nl-{run_id}",
+          )
+          output = Path("artifacts/post-fix-nl-exa-search-truth/result.json")
+          output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+          print("outcome=", result.get("outcome"))
+          print("search_hit_count=", result.get("search_hit_count"))
+          print("verified_page_count=", result.get("verified_page_count"))
+          print("successful_result_count=", result.get("successful_result_count"))
+          print("verified_result_domains=", result.get("verified_result_domains"))
+          print("rejected_result_count=", result.get("rejected_result_count"))
+          print("rejection_reason_counts=", result.get("rejection_reason_counts"))
+          PY
+
+      - name: Upload Search Truth artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-fix-nl-exa-search-truth
+          path: artifacts/post-fix-nl-exa-search-truth/result.json
+          if-no-files-found: error
+          retention-days: 30
