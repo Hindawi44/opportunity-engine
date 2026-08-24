@@ -63,23 +63,41 @@ _CLOTHING_MARKERS = (
 _FABRIC_MARKERS = (
     "fabric", "fabrics", "fabric stock", "fabric deadstock", "textile fabric",
     "textile fabrics", "cloth roll", "cloth rolls", "fabric roll", "fabric rolls",
-    "metervare", "metervarer", "stoffrull", "stoffruller", "tyg", "tygrulle",
-    "tygrullar", "meterware", "stoffballen", "gewebe", "tissu", "tissus",
-    "rouleau de tissu", "rouleaux de tissu", "tessuto", "tessuti",
+    "metervare", "metervarer", "stoffrull", "stoffruller", "stoffer",
+    "tyg", "tyger", "tygrulle", "tygrullar", "meterware", "stoffballen", "gewebe",
+    "tissu", "tissus", "rouleau de tissu", "rouleaux de tissu", "tessuto", "tessuti",
     "rotolo di tessuto", "rotoli di tessuto", "stoffen", "stofrol", "stofrollen",
 )
 
 # Strong fabric-commercial phrases take precedence over incidental garment words.
 # These phrases describe the material being sold, not merely clothing made from it.
 _FABRIC_PRIMARY_MARKERS = (
-    "fabric wholesale", "fabric wholesaler", "textile wholesale", "textile wholesaler",
-    "deadstock fabric", "deadstock fabrics", "fabric deadstock",
+    "fabric wholesale", "fabric wholesaler", "wholesale fabric", "wholesale fabrics",
+    "textile wholesale", "textile wholesaler", "stock fabrics", "leftover fabric",
+    "leftover fabrics", "deadstock fabric", "deadstock fabrics", "fabric deadstock",
     "designer fabric", "designer fabrics",
+    # Dutch
     "stoffen groothandel", "stoffengroothandel", "textiel groothandel",
     "textielgroothandel", "stoffen en fournituren", "deadstock stoffen",
     "stoffen deadstock", "restpartij stoffen", "restpartijen stoffen",
     "partij stoffen", "partijhandel stoffen", "stoffen outlet", "stoffen per meter",
     "stoffenwinkel", "voorraad stoffen", "stoffen voorraad",
+    # Norwegian
+    "grossist for stoffer", "stoffgrossist", "stoffer grossist",
+    "overskuddstekstiler", "stoffer og sytilbehør",
+    # Swedish
+    "grossist för tyger", "grossist for tyger", "tyg grossist", "tyggrossist",
+    "tyg på metervara", "tyg pa metervara",
+    # German
+    "stoffgroßhandel", "stoffgrosshandel", "stoff großhandel", "stoff grosshandel",
+    "meterware großhandel", "meterware grosshandel", "deadstock stoffe",
+    "designerstoffe", "stoff lagerverkauf",
+    # French
+    "grossiste tissus", "grossiste de tissus", "fournisseur tissus",
+    "tissu en gros", "tissus en gros", "déstockage tissus", "destockage tissus",
+    # Italian
+    "ingrosso tessuti", "tessuti ingrosso", "tessuti a stock", "tessuti stock",
+    "stock tessuti", "tessuti all'ingrosso", "rotoli tessuti",
 )
 
 _OUT_OF_DOMAIN_MARKERS = (
