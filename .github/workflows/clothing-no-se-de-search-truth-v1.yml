@@ -1,0 +1,40 @@
+name: Clothing NO SE DE Search Truth V1
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/run_clothing_no_se_de_search_truth_v1.py
+      - .github/workflows/clothing-no-se-de-search-truth-v1.yml
+      - src/opportunity_engine/discovery/exa_shadow_page_verification.py
+      - src/opportunity_engine/discovery/provider_unique_page_verification.py
+      - src/opportunity_engine/discovery/exact_lot_multihop_resolution.py
+      - src/opportunity_engine/project_domain_boundary.py
+  workflow_dispatch:
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+      - name: Run NO SE DE clothing search-truth diagnostic
+        run: python scripts/run_clothing_no_se_de_search_truth_v1.py
+      - name: Upload proof report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clothing-no-se-de-search-truth-v1
+          path: artifacts/clothing-no-se-de-search-truth-v1/report.json
+          if-no-files-found: error
+          retention-days: 30
