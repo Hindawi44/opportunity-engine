@@ -40,6 +40,24 @@ from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
 SCHEMA_VERSION = "search-provider-unique-page-verification-1.1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 
+# B2B role words alone are not sale proof. They may upgrade one already-proven
+# clothing inventory page to ACTIVE_STOCK_SIGNAL only when the fetched page also
+# contains a concrete price or quantity signal. Exact-Lot requirements remain
+# unchanged and still require an item-specific page with strict evidence.
+_B2B_WHOLESALE_MARKERS = (
+    "wholesale",
+    "b2b",
+    "grossist",
+    "grossister",
+    "engros",
+    "großhandel",
+    "grosshandel",
+    "grossiste",
+    "grossistes",
+    "groothandel",
+    "ingrosso",
+)
+
 
 def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
@@ -75,6 +93,43 @@ def _tool_learning_useful(classification: str, evidence: dict[str, Any]) -> bool
         classification == ACTIVE_STOCK_SIGNAL
         and evidence.get("item_specific_url_evidence") is True
     )
+
+
+def _qualified_b2b_active_stock(
+    *,
+    classification: str,
+    evidence: dict[str, Any],
+    title: str,
+    text: str,
+) -> tuple[str, dict[str, Any]]:
+    """Conservatively recognize B2B stock-sale pages missed by literal sale verbs.
+
+    A wholesale role is never enough on its own. The page must already prove
+    CLOTHING_INVENTORY + inventory evidence and also expose price or quantity.
+    Buyer/source pages and info/legal pages remain excluded. This may create an
+    aggregate ACTIVE_STOCK_SIGNAL for bounded navigation, never an Exact-Lot.
+    """
+    updated = dict(evidence)
+    combined = _compact(f"{title} {text}").casefold()
+    has_b2b_role = any(marker in combined for marker in _B2B_WHOLESALE_MARKERS)
+    qualifies = bool(
+        classification == UNPROVEN_PAGE
+        and updated.get("project_domain") == CLOTHING_INVENTORY
+        and updated.get("inventory_evidence") is True
+        and has_b2b_role
+        and (
+            updated.get("price_evidence") is True
+            or updated.get("quantity_evidence") is True
+        )
+        and updated.get("buyer_or_source_evidence") is not True
+        and updated.get("info_or_legal_evidence") is not True
+    )
+    updated["b2b_wholesale_evidence"] = has_b2b_role
+    updated["qualified_b2b_sale_evidence"] = qualifies
+    if not qualifies:
+        return classification, updated
+    updated["direct_sale_evidence"] = True
+    return ACTIVE_STOCK_SIGNAL, updated
 
 
 def verify_provider_unique_pages(
@@ -194,10 +249,17 @@ def verify_provider_unique_pages(
             continue
 
         succeeded += 1
+        page_title = fetched.title or candidate["title"]
         classification, evidence = _classify_page(
-            title=fetched.title or candidate["title"],
+            title=page_title,
             text=fetched.text,
             url=fetched.final_url or candidate["url"],
+        )
+        classification, evidence = _qualified_b2b_active_stock(
+            classification=classification,
+            evidence=evidence,
+            title=page_title,
+            text=fetched.text,
         )
         verified_pages.append(
             {

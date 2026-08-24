@@ -93,6 +93,9 @@ _DIRECT_SALE_MARKERS = (
     "à vendre",
     "a vendre",
     "en vente",
+    # Explicit buyer action on B2B marketplace detail pages. This is stronger
+    # than a role word such as grossiste and therefore may prove direct sale.
+    "acheter au vendeur",
     "vendita stock",
     "in vendita",
     "te koop",
@@ -177,6 +180,13 @@ _PRODUCT_DETAIL_CONTAINER_RE = re.compile(
     r"(?:^|/)products/(?P<slug>[^/?#]+)(?:/|$)",
     re.IGNORECASE,
 )
+# Generic marketplace record-detail shape. The numeric id + meaningful slug is
+# only URL specificity evidence; domain, inventory, sale, price and quantity are
+# still required before Exact-Lot acceptance.
+_MARKETPLACE_ID_SLUG_RE = re.compile(
+    r"(?:^|/)(?:c|listing|annonce|annuncio)-\d{2,}-[^/?#]+(?:\.html?)?(?:/|$)",
+    re.IGNORECASE,
+)
 _AGGREGATE_PATH_MARKERS = (
     "/search",
     "/sok",
@@ -188,6 +198,10 @@ _AGGREGATE_PATH_MARKERS = (
     "/catalogue",
     "/assortment",
     "/sortiment",
+    "/recherche-fournisseur",
+    "/pages/",
+    "/product-categorie/",
+    "/product-category/",
 )
 
 
@@ -204,9 +218,9 @@ def _looks_item_specific_url(url: str) -> bool:
 
     Homepages, search pages, category pages and marketplace roots cannot become
     exact lots merely because their aggregate HTML contains many prices and
-    quantities. Bare plural collection routes fail closed. A canonical
-    ``/products/<slug>`` route qualifies only when it contains a non-generic
-    product slug after the container.
+    quantities. Bare plural collection routes fail closed. Canonical product
+    routes and numeric marketplace record-detail slugs may qualify only as URL
+    specificity evidence; all commercial/domain evidence is still required.
     """
     try:
         parsed = urlsplit(_compact(url))
@@ -222,6 +236,8 @@ def _looks_item_specific_url(url: str) -> bool:
         slug = product_match.group("slug").casefold()
         if slug not in {"search", "all", "index", "catalog", "catalogue"}:
             return True
+    if _MARKETPLACE_ID_SLUG_RE.search(path):
+        return True
     return bool(_ITEM_PATH_RE.search(path))
 
 
@@ -261,9 +277,6 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
     )
     active_shape = has_inventory and has_direct_sale and not has_info_legal and not has_buyer_source
 
-    # Commercial-looking stock pages must prove the clothing domain before they
-    # may become exact-lot or active-stock candidates. This is the boundary that
-    # blocks generic merchandise such as granite, appliances or building stock.
     if (exact_shape or active_shape) and not domain_evidence:
         return OUT_OF_DOMAIN, evidence
     if exact_shape:
