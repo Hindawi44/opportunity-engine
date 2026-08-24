@@ -85,6 +85,9 @@ from opportunity_engine.discovery.daily_auto_miss_learning_cli_hook import (
 from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook import (
     install_unified_market_intelligence_river_cli_hook,
 )
+from opportunity_engine.discovery.unified_search_runtime_cli_hook import (
+    install_unified_search_runtime_cli_hook,
+)
 from opportunity_engine.discovery.automatic_query_gap_miss_scout_cli_hook import (
     install_automatic_query_gap_miss_scout_cli_hook,
 )
@@ -138,6 +141,10 @@ install_unified_learning_spine_cli_hook()
 # the newly durable miss memory in the same daily run.
 install_daily_auto_miss_learning_cli_hook()
 install_unified_market_intelligence_river_cli_hook()
+# Registered immediately after the river. LIFO lets the established fabric
+# hooks write first, then this hook merges Exa FR/IT/NL and rewrites the unified
+# operator search view before the river consumes final fabric truth.
+install_unified_search_runtime_cli_hook()
 # Registered after the river but before Stocklear. LIFO execution is therefore:
 # Stocklear -> independent QUERY_GAP scout -> river/capture -> daily learner.
 install_automatic_query_gap_miss_scout_cli_hook()
@@ -146,9 +153,9 @@ install_automatic_query_gap_miss_scout_cli_hook()
 install_promoted_stocklear_cli_hook()
 install_openai_fabric_procurement_cli_hook()
 install_fabric_procurement_watch_cli_hook()
-# Registered last so the daily six-market authority is emitted first at atexit.
-# It consumes only artifacts written synchronously by the daily checkpoint CLI;
-# learning/shadow hooks remain advisory and do not override this authority.
+# Registered last so the legacy six-market authority is emitted first at atexit.
+# Unified Search Runtime later augments it with both project domains and removes
+# the operational FR/IT/NL search gap without enabling automatic actions.
 install_unified_six_market_runtime_cli_hook()
 
 __all__ = [
