@@ -42,7 +42,9 @@ _CLOTHING_MARKERS = (
     "footwear", "shoes", "sportswear", "workwear", "menswear", "womenswear",
     "kidswear", "jacket", "jackets", "shirt", "shirts", "trouser", "trousers",
     "dress", "dresses", "jeans", "skirt", "skirts", "coat", "coats", "bridal",
-    "wedding dress", "klær", "klaer", "klesbutikk", "klesbutikken", "kleslager",
+    "wedding dress", "blazer", "blazers", "shorts", "sweat", "sweats",
+    "polo shirt", "polo shirts", "poloshirt", "poloshirts",
+    "klær", "klaer", "klesbutikk", "klesbutikken", "kleslager",
     "arbeidsklær", "arbeidsklaer", "arbeidsjakke", "arbeidsjakker", "bekledning",
     # Norwegian compound clothing noun confirmed by a live auction clothing lot.
     "næringsmiddelklær",
@@ -54,11 +56,13 @@ _CLOTHING_MARKERS = (
     "arbeitskleidung", "modeware", "modeartikel", "modekette", "mode-kette",
     "modemarke", "modehändler", "modehandler", "schuhe", "schuhen", "jacken",
     # German compound clothing nouns confirmed for commercial stock/product titles.
-    "sweatjacken", "fleecejacken", "herrenbekleidung",
+    "sweatjacken", "fleecejacken", "herrenbekleidung", "damenbekleidung",
+    "unterwäsche", "unterwaesche", "bundhosen", "malerhosen", "longtops",
+    "tunika", "westen", "arbeitsmantel", "arbeitskittel", "malerjacke",
     "hosen", "hemden", "kleider", "brautkleid", "vêtement", "vêtements",
     "vetement", "vetements", "habillement", "chaussures", "vestes", "pantalons",
     "chemises", "robes", "haut femme", "hauts femme", "haut homme", "hauts homme",
-    "robe de mariée", "robe de mariee", "abbigliamento", "vestiti", "calzature",
+    "robe de mariée", "robe de mariee", "short de bain", "abbigliamento", "vestiti", "calzature",
     "giacche", "pantaloni", "camicie", "abiti", "abito da sposa", "kleding",
     "kledingvoorraad", "kledingwinkel", "kledingwinkelvoorraad",
     # Dutch compound clothing nouns commonly used in commercial lot titles/URLs.
