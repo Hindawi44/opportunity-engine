@@ -4,6 +4,7 @@ import importlib.util
 from pathlib import Path
 
 from opportunity_engine.discovery.checkpoint_state_restore import DATABASE_RELATIVE_PATHS
+from opportunity_engine.discovery.exa_exact_lot_shadow_hunt import MARKET_EXACT_LOT_QUERIES
 from opportunity_engine.discovery.source_artifact_continuity import _time
 from opportunity_engine.discovery.unified_opportunity_report import build_unified_opportunity_report
 
@@ -101,7 +102,15 @@ def test_numeric_product_slug_gets_readable_fallback_title() -> None:
     assert module._title_from_url("https://grossist.example/parti/2359") == "Clothing Exact-Lot 2359"
 
 
-def test_exa_exact_lot_databases_are_restorable_across_daily_checkpoints() -> None:
+def test_exa_exact_lot_runner_covers_all_existing_six_markets() -> None:
+    module = _load_script()
+    assert tuple(module.MARKET_EXACT_LOT_QUERY_PACKS) == ("NO", "SE", "DE", "FR", "IT", "NL")
+    assert set(module.MARKET_CURRENCIES) == {"NO", "SE", "DE", "FR", "IT", "NL"}
+    for market in ("FR", "IT", "NL"):
+        assert module.MARKET_EXACT_LOT_QUERY_PACKS[market] == (MARKET_EXACT_LOT_QUERIES[market],)
+
+
+def test_existing_core_exa_databases_remain_restorable_across_daily_checkpoints() -> None:
     assert "no-exa-exact-lot/opportunity_engine.db" in DATABASE_RELATIVE_PATHS
     assert "se-exa-exact-lot/opportunity_engine.db" in DATABASE_RELATIVE_PATHS
     assert "de-exa-exact-lot/opportunity_engine.db" in DATABASE_RELATIVE_PATHS
