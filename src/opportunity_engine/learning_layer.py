@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
-SCHEMA_VERSION = "learning-layer-review-1.1"
+SCHEMA_VERSION = "learning-layer-review-1.0"
 OUTPUT_JSON = "learning-layer-review.json"
 OUTPUT_TEXT = "learning-layer-review.txt"
 _PRIORITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
