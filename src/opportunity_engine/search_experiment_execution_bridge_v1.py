@@ -1,21 +1,13 @@
-"""Execute bounded search experiments proposed by MIND FORGE and feed existing memory.
+"""Execute bounded MIND FORGE search experiments and preserve truth diagnostics.
 
-This bridge deliberately does not create a new learner or durable memory system.
-It converts one structured MIND FORGE route idea into a single-provider Exa
-shadow search, verifies the original public pages, emits a tiny Unified Learning
-Spine-compatible evidence envelope, and lets Unified Memory V2 do the persistence
-and proof accounting.
-
-The bridge is fail-closed:
-- only CLOTHING_INVENTORY and FABRIC_PROCUREMENT;
-- only the six operated markets;
-- Exa only in V1 because provider-route replication is already proven there;
-- at most one query and five search hits per execution;
-- no query/provider/source activation;
-- no production mutation or commercial action.
+V1 remains deliberately bounded: one Exa query and at most five hits.  The bridge
+is shadow-only, but every fetched fabric result now carries an explicit
+ACCEPT/REJECT decision and a deterministic rejection reason so failures can be
+remembered and reviewed instead of disappearing as a false zero.
 """
 from __future__ import annotations
 
+from collections import Counter
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
@@ -25,29 +17,20 @@ from typing import Any, Callable, Mapping, Sequence
 from urllib.parse import urlsplit
 
 from opportunity_engine.discovery.exa_search import ExaSearchProvider
-from opportunity_engine.discovery.exact_lot_multihop_resolution import (
-    resolve_exact_lot_multihop,
-)
-from opportunity_engine.discovery.keyword_shadow_verification import (
-    PageFetchResult,
-    fetch_public_page,
-)
-from opportunity_engine.discovery.provider_unique_page_verification import (
-    verify_provider_unique_pages,
-)
+from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_exact_lot_multihop
+from opportunity_engine.discovery.keyword_shadow_verification import PageFetchResult, fetch_public_page
+from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
 from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.project_domain_boundary import (
     CLOTHING_INVENTORY,
     FABRIC_PROCUREMENT,
     classify_project_domain,
 )
-from opportunity_engine.provider_route_success_learning import (
-    build_provider_route_success_observation,
-)
+from opportunity_engine.provider_route_success_learning import build_provider_route_success_observation
 from opportunity_engine.unified_memory_v2 import build_unified_memory_v2
 
-SCHEMA_VERSION = "search-experiment-execution-bridge-1.0"
-SPEC_SCHEMA_VERSION = "search-experiment-spec-1.0"
+SCHEMA_VERSION = "search-experiment-execution-bridge-1.1"
+SPEC_SCHEMA_VERSION = "search-experiment-spec-1.1"
 SPINE_SCHEMA_VERSION = "unified-learning-spine-1.0"
 
 SUPPORTED_MARKETS = frozenset({"NO", "SE", "DE", "FR", "NL", "IT"})
@@ -57,12 +40,7 @@ MAX_RESULTS = 5
 MAX_EXECUTIONS_PER_FINGERPRINT = 3
 
 _EXECUTABLE_TASK_KINDS = frozenset(
-    {
-        "DISCOVER_NEW_ROUTE",
-        "TURN_TRACKED_TARGET_INTO_ROUTE",
-        "RESOLVE_OBSERVATION_TO_ROUTE",
-        "RESOLVE_ROUTE_GAP",
-    }
+    {"DISCOVER_NEW_ROUTE", "TURN_TRACKED_TARGET_INTO_ROUTE", "RESOLVE_OBSERVATION_TO_ROUTE", "RESOLVE_ROUTE_GAP"}
 )
 _MARKET_ANCHORS: dict[str, tuple[str, ...]] = {
     "NO": ("norge", "norway", "norsk"),
@@ -77,16 +55,26 @@ _STRUCTURED_LINE_RE = re.compile(
     r'query=(?P<quote>["\'])(?P<query>.+?)(?P=quote)\s*$',
     re.IGNORECASE,
 )
+_INTERNAL_QUERY_LABEL_REPLACEMENTS = {
+    FABRIC_PROCUREMENT: "fabric textile",
+    CLOTHING_INVENTORY: "clothing apparel",
+}
+
+# Inventory language must describe available stock/lot/rolls, not merely fabric.
+# Dutch terms below come from the NL Search Truth benchmark and are vocabulary,
+# not hard-coded sources or domains.
 _FABRIC_INVENTORY_MARKERS = (
-    "deadstock", "stock", "surplus", "clearance", "restpost", "restlager",
-    "lager", "magazzino", "scorte", "rotoli", "rolls", "roll", "lotto",
-    "lotti", "déstockage", "destockage", "fine pezza", "fine serie",
+    "deadstock", "stock", "surplus", "clearance", "restpost", "restlager", "lager",
+    "magazzino", "scorte", "rotoli", "rolls", "roll", "lotto", "lotti",
+    "déstockage", "destockage", "fine pezza", "fine serie",
+    "restpartij", "restpartijen", "restant", "restanten", "voorraad",
+    "partijgoed", "partijgoederen", "overschot", "opruiming", "stofrol", "stofrollen",
 )
 _FABRIC_TRADE_MARKERS = (
-    "wholesale", "grossiste", "ingrosso", "b2b", "bulk", "moq",
-    "minimum order", "minimum quantity", "metri", "meters", "metres",
-    "meterware", "rouleaux", "price", "prix", "prezzo", "eur", "€",
-    "nok", "sek", "gbp", "£", "usd", "$", "per meter", "al metro",
+    "wholesale", "grossiste", "ingrosso", "b2b", "bulk", "moq", "minimum order",
+    "minimum quantity", "metri", "meters", "metres", "meterware", "rouleaux",
+    "price", "prix", "prezzo", "eur", "€", "nok", "sek", "gbp", "£", "usd", "$",
+    "per meter", "al metro", "groothandel", "per rol", "per rollen",
 )
 _SLOT_ROUTE = {
     "AUCTION": "SEARCH_EXPERIMENT_AUCTION",
@@ -169,16 +157,11 @@ def _source_identity_for_slot(slot_id: str) -> str:
 
 
 def _route_pattern_key(spec: Mapping[str, Any]) -> str:
-    return "|".join(
-        (
-            "ROUTE_SUCCESS",
-            _upper(spec.get("market_code")),
-            _upper(spec.get("project_domain")),
-            _text(spec.get("provider")).casefold(),
-            _upper(spec.get("route")),
-            _text(spec.get("route_source_identity")).casefold(),
-        )
-    )
+    return "|".join((
+        "ROUTE_SUCCESS", _upper(spec.get("market_code")), _upper(spec.get("project_domain")),
+        _text(spec.get("provider")).casefold(), _upper(spec.get("route")),
+        _text(spec.get("route_source_identity")).casefold(),
+    ))
 
 
 def _task_is_search_route_task(task: Mapping[str, Any]) -> bool:
@@ -190,11 +173,7 @@ def _task_is_search_route_task(task: Mapping[str, Any]) -> bool:
 
 
 def _idea_map(creative_result: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
-    return {
-        _text(row.get("idea_id")): row
-        for row in _rows(creative_result.get("ideas"))
-        if _text(row.get("idea_id"))
-    }
+    return {_text(row.get("idea_id")): row for row in _rows(creative_result.get("ideas")) if _text(row.get("idea_id"))}
 
 
 def _parse_structured_core(core_mechanism: object) -> tuple[str, str] | None:
@@ -205,21 +184,22 @@ def _parse_structured_core(core_mechanism: object) -> tuple[str, str] | None:
     return match.group("provider").casefold(), _text(match.group("query"))
 
 
-def select_search_experiment_spec(
-    *,
-    teaching_task: Mapping[str, Any],
-    creative_result: Mapping[str, Any],
-    final_rank: Mapping[str, Any],
-) -> dict[str, Any]:
-    """Select the highest-ranked executable MIND FORGE search idea."""
+def _sanitize_public_query(query: str, domain: str) -> tuple[str, list[str]]:
+    """Remove internal enum labels from public search text without changing scope."""
+    clean = _text(query)
+    removed: list[str] = []
+    for label, replacement in _INTERNAL_QUERY_LABEL_REPLACEMENTS.items():
+        pattern = re.compile(rf"(?<!\w){re.escape(label)}(?!\w)", re.IGNORECASE)
+        if pattern.search(clean):
+            removed.append(label)
+            clean = pattern.sub(replacement if label == domain else " ", clean)
+    return _text(clean), removed
+
+
+def select_search_experiment_spec(*, teaching_task: Mapping[str, Any], creative_result: Mapping[str, Any], final_rank: Mapping[str, Any]) -> dict[str, Any]:
     task = _mapping(teaching_task)
     if not _task_is_search_route_task(task):
-        return {
-            "schema_version": SPEC_SCHEMA_VERSION,
-            "status": "NO_EXECUTABLE_SEARCH_TASK",
-            "reason": "TEACHING_TASK_IS_NOT_A_ROUTE_SEARCH_TASK",
-            **_safety(),
-        }
+        return {"schema_version": SPEC_SCHEMA_VERSION, "status": "NO_EXECUTABLE_SEARCH_TASK", "reason": "TEACHING_TASK_IS_NOT_A_ROUTE_SEARCH_TASK", **_safety()}
 
     context = _mapping(task.get("context"))
     market = _upper(context.get("market_code"))
@@ -242,10 +222,11 @@ def select_search_experiment_spec(
         if parsed is None:
             rejected.append({"idea_id": idea_id, "reason": "MISSING_SEARCH_TEST_V1"})
             continue
-        provider, query = parsed
+        provider, raw_query = parsed
         if provider != SUPPORTED_PROVIDER:
             rejected.append({"idea_id": idea_id, "reason": "UNSUPPORTED_PROVIDER"})
             continue
+        query, removed_labels = _sanitize_public_query(raw_query, domain)
         if not _market_anchored(query, market):
             rejected.append({"idea_id": idea_id, "reason": "QUERY_NOT_MARKET_ANCHORED"})
             continue
@@ -255,8 +236,7 @@ def select_search_experiment_spec(
             continue
 
         task_id = _text(task.get("task_id"))
-        fingerprint_material = "|".join((task_id, market, domain, slot_id, provider, query.casefold()))
-        fingerprint = _hash("search-experiment", fingerprint_material)
+        fingerprint = _hash("search-experiment", "|".join((task_id, market, domain, slot_id, provider, query.casefold())))
         return {
             "schema_version": SPEC_SCHEMA_VERSION,
             "status": "READY",
@@ -271,6 +251,8 @@ def select_search_experiment_spec(
             "slot_id": slot_id,
             "provider": provider,
             "query": query,
+            "raw_query": raw_query,
+            "query_internal_labels_removed": removed_labels,
             "route": route,
             "route_source_identity": _source_identity_for_slot(slot_id),
             "max_search_requests": 1,
@@ -294,53 +276,42 @@ def select_search_experiment_spec(
 
 
 def _hit_row(hit: SearchHit) -> dict[str, Any]:
-    return {
-        "title": _text(hit.title)[:1000],
-        "url": _text(hit.url),
-        "domain": _domain(hit.url),
-        "description": _text(hit.description)[:1000],
-        "provider": _text(hit.provider),
-    }
+    return {"title": _text(hit.title)[:1000], "url": _text(hit.url), "domain": _domain(hit.url), "description": _text(hit.description)[:1000], "provider": _text(hit.provider)}
 
 
 def _custom_benchmark(*, market: str, query: str, hits: Sequence[SearchHit], project_domain: str) -> dict[str, Any]:
     exa_rows = [_hit_row(hit) for hit in hits]
+    unique_domains = len({row["domain"] for row in exa_rows if row["domain"]})
     return {
         "schema_version": "search-experiment-benchmark-1.0",
-        "generated_at": _now(),
-        "status": "SUCCESS",
-        "shadow_only": True,
-        "provider_mode": "exa",
-        "query_mode": "exact_lot",
-        "query_set": {market: query},
-        "project_domain": project_domain,
-        "project_domain_gate_enforced": True,
-        "markets": [market],
-        "results_per_query": MAX_RESULTS,
-        "exa_request_count": 1,
-        "brave_request_count": 0,
-        "market_results": [
-            {
-                "market_code": market,
-                "query": query,
-                "exa": {"result_count": len(exa_rows), "unique_domain_count": len({row["domain"] for row in exa_rows if row["domain"]}), "results": exa_rows},
-                "brave": {"result_count": 0, "unique_domain_count": 0, "results": []},
-                "comparison": {
-                    "shared_url_count": 0,
-                    "exa_unique_url_count": len({row["url"] for row in exa_rows}),
-                    "brave_unique_url_count": 0,
-                    "shared_domain_count": 0,
-                    "exa_unique_domain_count": len({row["domain"] for row in exa_rows if row["domain"]}),
-                    "brave_unique_domain_count": 0,
-                },
-            }
-        ],
+        "generated_at": _now(), "status": "SUCCESS", "shadow_only": True,
+        "provider_mode": "exa", "query_mode": "exact_lot", "query_set": {market: query},
+        "project_domain": project_domain, "project_domain_gate_enforced": True,
+        "markets": [market], "results_per_query": MAX_RESULTS, "exa_request_count": 1, "brave_request_count": 0,
+        "market_results": [{
+            "market_code": market, "query": query,
+            "exa": {"result_count": len(exa_rows), "unique_domain_count": unique_domains, "results": exa_rows},
+            "brave": {"result_count": 0, "unique_domain_count": 0, "results": []},
+            "comparison": {"shared_url_count": 0, "exa_unique_url_count": len({row["url"] for row in exa_rows}), "brave_unique_url_count": 0, "shared_domain_count": 0, "exa_unique_domain_count": unique_domains, "brave_unique_domain_count": 0},
+        }],
         **_safety(),
     }
 
 
 def _default_provider_factory(api_key: str) -> ExaSearchProvider:
     return ExaSearchProvider(api_key)
+
+
+def _fabric_rejection_reason(*, fetch_ok: bool, domain: str | None, inventory: bool, trade: bool) -> str | None:
+    if not fetch_ok:
+        return "FETCH_FAILED"
+    if domain != FABRIC_PROCUREMENT:
+        return "OUT_OF_PROJECT_DOMAIN"
+    if not inventory:
+        return "MISSING_INVENTORY_SIGNAL"
+    if not trade:
+        return "MISSING_TRADE_OR_PRICE_SIGNAL"
+    return None
 
 
 def _fabric_page_candidate(hit: SearchHit, *, page_fetcher: PageFetcher) -> dict[str, Any]:
@@ -355,33 +326,32 @@ def _fabric_page_candidate(hit: SearchHit, *, page_fetcher: PageFetcher) -> dict
         "result_domain": _domain(fetched.final_url or hit.url),
     }
     if not fetched.ok:
-        return {**base, "project_domain": None, "commercial_fabric_page": False}
+        reason = _fabric_rejection_reason(fetch_ok=False, domain=None, inventory=False, trade=False)
+        return {**base, "project_domain": None, "inventory_signal": False, "trade_or_price_signal": False, "commercial_fabric_page": False, "verification_decision": "REJECT", "rejection_reason": reason}
 
     combined = _text(f"{fetched.title} {fetched.text}")
     domain = classify_project_domain(text=combined)
     folded = combined.casefold()
     inventory = any(marker in folded for marker in _FABRIC_INVENTORY_MARKERS)
     trade = any(marker in folded for marker in _FABRIC_TRADE_MARKERS)
+    reason = _fabric_rejection_reason(fetch_ok=True, domain=domain, inventory=inventory, trade=trade)
+    accepted = reason is None
     return {
         **base,
         "project_domain": domain,
         "inventory_signal": inventory,
         "trade_or_price_signal": trade,
-        "commercial_fabric_page": domain == FABRIC_PROCUREMENT and inventory and trade,
+        "commercial_fabric_page": accepted,
+        "verification_decision": "ACCEPT" if accepted else "REJECT",
+        "rejection_reason": reason,
     }
 
 
 def _execute_clothing(*, spec: Mapping[str, Any], hits: Sequence[SearchHit], run_id: str) -> dict[str, Any]:
-    benchmark = _custom_benchmark(
-        market=_upper(spec.get("market_code")), query=_text(spec.get("query")), hits=hits, project_domain=CLOTHING_INVENTORY
-    )
+    benchmark = _custom_benchmark(market=_upper(spec.get("market_code")), query=_text(spec.get("query")), hits=hits, project_domain=CLOTHING_INVENTORY)
     verification = verify_provider_unique_pages(benchmark, provider="exa", max_page_fetches=MAX_RESULTS)
-    multihop = resolve_exact_lot_multihop(
-        verification, max_root_parents=3, max_navigation_depth=3, max_links_per_page=12, max_navigation_page_fetches=18
-    )
-    observation = build_provider_route_success_observation(
-        run_id=run_id, provider="exa", benchmark=benchmark, provider_verification=verification, multihop_resolution=multihop
-    )
+    multihop = resolve_exact_lot_multihop(verification, max_root_parents=3, max_navigation_depth=3, max_links_per_page=12, max_navigation_page_fetches=18)
+    observation = build_provider_route_success_observation(run_id=run_id, provider="exa", benchmark=benchmark, provider_verification=verification, multihop_resolution=multihop)
     urls: set[str] = set()
     domains: set[str] = set()
     for route in _rows(observation.get("successful_routes")):
@@ -392,43 +362,38 @@ def _execute_clothing(*, spec: Mapping[str, Any], hits: Sequence[SearchHit], run
                 if _domain(clean):
                     domains.add(_domain(clean))
     return {
-        "search_hit_count": len(hits),
-        "verified_page_count": int(verification.get("page_fetches_succeeded") or 0),
-        "successful_result_count": len(urls),
-        "verified_result_urls": sorted(urls),
-        "verified_result_domains": sorted(domains),
-        "verification_summary": {
-            "exact_lot_candidate_count": int(verification.get("exact_lot_candidate_count") or 0),
-            "multihop_exact_lot_count": int(multihop.get("exact_lot_candidate_count") or 0),
-        },
+        "search_hit_count": len(hits), "verified_page_count": int(verification.get("page_fetches_succeeded") or 0),
+        "successful_result_count": len(urls), "verified_result_urls": sorted(urls), "verified_result_domains": sorted(domains),
+        "verification_summary": {"exact_lot_candidate_count": int(verification.get("exact_lot_candidate_count") or 0), "multihop_exact_lot_count": int(multihop.get("exact_lot_candidate_count") or 0)},
     }
 
 
 def _execute_fabric(*, hits: Sequence[SearchHit], page_fetcher: PageFetcher) -> dict[str, Any]:
     rows = [_fabric_page_candidate(hit, page_fetcher=page_fetcher) for hit in list(hits)[:MAX_RESULTS]]
     accepted = [row for row in rows if row.get("commercial_fabric_page") is True]
+    rejected = [row for row in rows if row.get("commercial_fabric_page") is not True]
     urls = sorted({_text(row.get("final_url") or row.get("url")) for row in accepted if _text(row.get("final_url") or row.get("url"))})
     domains = sorted({_domain(url) for url in urls if _domain(url)})
+    reasons = Counter(_text(row.get("rejection_reason")) or "UNDIAGNOSED" for row in rejected)
     return {
         "search_hit_count": len(hits),
         "verified_page_count": sum(row.get("fetch_ok") is True for row in rows),
         "successful_result_count": len(urls),
         "verified_result_urls": urls,
         "verified_result_domains": domains,
+        "rejected_result_count": len(rejected),
+        "rejection_reason_counts": dict(sorted(reasons.items())),
+        "search_hit_audit": rows,
         "verification_summary": {
             "commercial_fabric_page_count": len(urls),
-            "out_of_domain_page_count": sum(row.get("fetch_ok") is True and row.get("project_domain") not in {None, FABRIC_PROCUREMENT} for row in rows),
+            "rejected_fabric_page_count": len(rejected),
+            "out_of_domain_page_count": sum(row.get("rejection_reason") == "OUT_OF_PROJECT_DOMAIN" for row in rows),
         },
         "verified_pages": rows,
     }
 
 
-def execute_search_experiment_spec(
-    spec: Mapping[str, Any], *, exa_api_key: str, run_id: str,
-    provider_factory: ProviderFactory = _default_provider_factory,
-    page_fetcher: PageFetcher = fetch_public_page,
-) -> dict[str, Any]:
-    """Run one bounded shadow query and preserve source-backed verification."""
+def execute_search_experiment_spec(spec: Mapping[str, Any], *, exa_api_key: str, run_id: str, provider_factory: ProviderFactory = _default_provider_factory, page_fetcher: PageFetcher = fetch_public_page) -> dict[str, Any]:
     ready = _mapping(spec)
     if _upper(ready.get("status")) != "READY":
         raise ValueError("search experiment spec must be READY")
@@ -451,20 +416,12 @@ def execute_search_experiment_spec(
 
     provider_client = provider_factory(key)
     hits = provider_client.search(query, count=MAX_RESULTS)
-    details = (
-        _execute_clothing(spec=ready, hits=hits, run_id=origin_run)
-        if domain == CLOTHING_INVENTORY
-        else _execute_fabric(hits=hits, page_fetcher=page_fetcher)
-    )
+    details = _execute_clothing(spec=ready, hits=hits, run_id=origin_run) if domain == CLOTHING_INVENTORY else _execute_fabric(hits=hits, page_fetcher=page_fetcher)
     success_count = int(details.get("successful_result_count") or 0)
     return {
-        "schema_version": SCHEMA_VERSION,
-        "status": "SUCCESS",
-        "shadow_only": True,
-        "origin_experiment_run_id": origin_run,
-        "observed_at": _now(),
-        "experiment_fingerprint": _text(ready.get("experiment_fingerprint")),
-        "spec": dict(ready),
+        "schema_version": SCHEMA_VERSION, "status": "SUCCESS", "shadow_only": True,
+        "origin_experiment_run_id": origin_run, "observed_at": _now(),
+        "experiment_fingerprint": _text(ready.get("experiment_fingerprint")), "spec": dict(ready),
         "outcome": "VERIFIED_ROUTE_SUCCESS" if success_count else "NO_VERIFIED_ROUTE",
         "successful_route": success_count > 0,
         **details,
@@ -472,34 +429,18 @@ def execute_search_experiment_spec(
     }
 
 
-def _record(
-    *, evidence_kind: str, identity: str, market: str, domain: str,
-    source_name: str, provider: str, query: str, result_type: str, outcome: str,
-    route: str, source_identity: str, observed_at: str, supporting_run_ids: list[str],
-    metadata: Mapping[str, Any], url: str | None = None,
-) -> dict[str, Any]:
+def _record(*, evidence_kind: str, identity: str, market: str, domain: str, source_name: str, provider: str, query: str, result_type: str, outcome: str, route: str, source_identity: str, observed_at: str, supporting_run_ids: list[str], metadata: Mapping[str, Any], url: str | None = None, miss_reason: str | None = None) -> dict[str, Any]:
     return {
         "learning_evidence_id": _hash("learning-evidence", f"{evidence_kind}|{identity}"),
-        "evidence_kind": evidence_kind,
-        "market_code": market,
-        "project_domain": domain,
-        "source_name": source_name,
-        "provider": provider,
-        "query": query,
-        "url": url,
-        "result_type": result_type,
-        "outcome": outcome,
-        "miss_reason": None,
-        "route": route,
-        "source_identity": source_identity,
-        "observed_at": observed_at,
-        "supporting_run_ids": supporting_run_ids,
-        "metadata": dict(metadata),
+        "evidence_kind": evidence_kind, "market_code": market, "project_domain": domain,
+        "source_name": source_name, "provider": provider, "query": query, "url": url,
+        "result_type": result_type, "outcome": outcome, "miss_reason": miss_reason,
+        "route": route, "source_identity": source_identity, "observed_at": observed_at,
+        "supporting_run_ids": supporting_run_ids, "metadata": dict(metadata),
     }
 
 
 def build_experiment_spine(result: Mapping[str, Any]) -> dict[str, Any]:
-    """Convert one result into the existing Unified Learning Spine contract."""
     report = _mapping(result)
     if _upper(report.get("status")) != "SUCCESS":
         raise ValueError("search experiment result must be SUCCESS")
@@ -518,6 +459,7 @@ def build_experiment_spine(result: Mapping[str, Any]) -> dict[str, Any]:
     if not origin_run or not fingerprint or not query or not route or not source_identity:
         raise ValueError("experiment result is missing required identity fields")
 
+    audit = [dict(row) for row in _rows(report.get("search_hit_audit"))]
     metadata = {
         "experiment_fingerprint": fingerprint,
         "origin_experiment_run_id": origin_run,
@@ -525,106 +467,76 @@ def build_experiment_spine(result: Mapping[str, Any]) -> dict[str, Any]:
         "search_hit_count": int(report.get("search_hit_count") or 0),
         "verified_page_count": int(report.get("verified_page_count") or 0),
         "successful_result_count": int(report.get("successful_result_count") or 0),
+        "rejected_result_count": int(report.get("rejected_result_count") or 0),
+        "rejection_reason_counts": dict(_mapping(report.get("rejection_reason_counts"))),
+        "search_hit_audit": audit,
         "verified_result_urls": [_text(url) for url in report.get("verified_result_urls") or [] if _text(url)],
         "verified_result_domains": [_text(item) for item in report.get("verified_result_domains") or [] if _text(item)],
+        "query_internal_labels_removed": [_text(item) for item in spec.get("query_internal_labels_removed") or [] if _text(item)],
         "shadow_only": True,
         "single_use_experiment_origin": True,
     }
-    records = [
-        _record(
+    records = [_record(
+        evidence_kind="MARKET_OBSERVATION", identity=f"{fingerprint}|{origin_run}|summary",
+        market=market, domain=domain, source_name="SEARCH_EXPERIMENT_BRIDGE", provider=provider,
+        query=query, result_type="SEARCH_EXPERIMENT", outcome=_upper(report.get("outcome")),
+        route=route, source_identity=fingerprint, observed_at=observed_at,
+        supporting_run_ids=[origin_run], metadata=metadata,
+    )]
+
+    for index, row in enumerate(audit):
+        if _upper(row.get("verification_decision")) != "REJECT":
+            continue
+        url = _text(row.get("final_url") or row.get("url")) or None
+        reason = _upper(row.get("rejection_reason")) or "UNDIAGNOSED"
+        records.append(_record(
             evidence_kind="MARKET_OBSERVATION",
-            identity=f"{fingerprint}|{origin_run}|summary",
-            market=market,
-            domain=domain,
-            source_name="SEARCH_EXPERIMENT_BRIDGE",
-            provider=provider,
-            query=query,
-            result_type="SEARCH_EXPERIMENT",
-            outcome=_upper(report.get("outcome")),
-            route=route,
-            source_identity=fingerprint,
-            observed_at=observed_at,
-            supporting_run_ids=[origin_run],
-            metadata=metadata,
-        )
-    ]
+            identity=f"{fingerprint}|{origin_run}|rejection|{index}|{url or reason}",
+            market=market, domain=domain, source_name="SEARCH_EXPERIMENT_BRIDGE", provider=provider,
+            query=query, url=url, result_type="SEARCH_RESULT_REJECTION", outcome="REJECTED",
+            miss_reason=reason, route=route, source_identity=url or f"{fingerprint}:rejection:{index}",
+            observed_at=observed_at, supporting_run_ids=[origin_run],
+            metadata={"experiment_fingerprint": fingerprint, "origin_experiment_run_id": origin_run, "verification_decision": "REJECT", "rejection_reason": reason, "fetch_ok": row.get("fetch_ok"), "status_code": row.get("status_code"), "result_domain": _text(row.get("result_domain")) or None, "project_domain": _text(row.get("project_domain")) or None, "inventory_signal": row.get("inventory_signal"), "trade_or_price_signal": row.get("trade_or_price_signal"), "shadow_only": True},
+        ))
+
     urls = metadata["verified_result_urls"]
     if report.get("successful_route") is True and urls:
-        records.append(
-            _record(
-                evidence_kind="SEARCH_ROUTE_SUCCESS",
-                identity=f"{fingerprint}|{origin_run}|route",
-                market=market,
-                domain=domain,
-                source_name="SEARCH_EXPERIMENT_BRIDGE",
-                provider=provider,
-                query=query,
-                url=urls[0],
-                result_type="SEARCH_ROUTE",
-                outcome="CANDIDATE",
-                route=route,
-                source_identity=source_identity,
-                observed_at=observed_at,
-                supporting_run_ids=[origin_run],
-                metadata={
-                    **metadata,
-                    "verified_exact_lot_urls": urls,
-                    "verified_exact_lot_url_count": len(urls),
-                    "independent_run_count": 0,
-                    "automatic_activation": False,
-                    "production_query_mutation": False,
-                },
-            )
-        )
+        records.append(_record(
+            evidence_kind="SEARCH_ROUTE_SUCCESS", identity=f"{fingerprint}|{origin_run}|route",
+            market=market, domain=domain, source_name="SEARCH_EXPERIMENT_BRIDGE", provider=provider,
+            query=query, url=urls[0], result_type="SEARCH_ROUTE", outcome="CANDIDATE", route=route,
+            source_identity=source_identity, observed_at=observed_at, supporting_run_ids=[origin_run],
+            metadata={**metadata, "verified_exact_lot_urls": urls, "verified_exact_lot_url_count": len(urls), "independent_run_count": 0, "automatic_activation": False, "production_query_mutation": False},
+        ))
+
+    kind_counts = Counter(_upper(row.get("evidence_kind")) for row in records)
     return {
-        "schema_version": SPINE_SCHEMA_VERSION,
-        "status": "SUCCESS",
-        "generated_at": observed_at,
+        "schema_version": SPINE_SCHEMA_VERSION, "status": "SUCCESS", "generated_at": observed_at,
         "input_presence": {"search_experiment_execution_bridge": True},
-        "evidence_record_count": len(records),
-        "market_counts": {market: len(records)},
-        "domain_counts": {domain: len(records)},
-        "evidence_kind_counts": {"MARKET_OBSERVATION": 1, **({"SEARCH_ROUTE_SUCCESS": 1} if len(records) > 1 else {})},
-        "out_of_domain_excluded_count": 0,
-        "out_of_domain_excluded_ids": [],
-        "records": records,
-        "learning_contract": "MIND FORGE -> bounded Search Experiment -> temporary Spine evidence -> existing Unified Memory V2. No second memory or learner is created.",
+        "evidence_record_count": len(records), "market_counts": {market: len(records)},
+        "domain_counts": {domain: len(records)}, "evidence_kind_counts": dict(sorted(kind_counts.items())),
+        "out_of_domain_excluded_count": 0, "out_of_domain_excluded_ids": [], "records": records,
+        "learning_contract": "MIND FORGE -> bounded Search Experiment -> explicit accept/reject evidence -> Unified Memory V2. No production mutation.",
         **_safety(),
     }
 
 
 def _origin_seen(memory: Mapping[str, Any], *, fingerprint: str, origin_run_id: str) -> bool:
-    for row in _rows(memory.get("evidence_memory")):
-        metadata = _mapping(row.get("latest_metadata"))
-        if _text(metadata.get("experiment_fingerprint")) == fingerprint and _text(metadata.get("origin_experiment_run_id")) == origin_run_id:
-            return True
-    return False
+    return any(_text(_mapping(row.get("latest_metadata")).get("experiment_fingerprint")) == fingerprint and _text(_mapping(row.get("latest_metadata")).get("origin_experiment_run_id")) == origin_run_id for row in _rows(memory.get("evidence_memory")))
 
 
 def _fingerprint_execution_count(memory: Mapping[str, Any], *, fingerprint: str) -> int:
-    origins = {
-        _text(_mapping(row.get("latest_metadata")).get("origin_experiment_run_id"))
-        for row in _rows(memory.get("evidence_memory"))
-        if _text(_mapping(row.get("latest_metadata")).get("experiment_fingerprint")) == fingerprint
-        and _text(_mapping(row.get("latest_metadata")).get("origin_experiment_run_id"))
-    }
-    return len(origins)
+    return len({_text(_mapping(row.get("latest_metadata")).get("origin_experiment_run_id")) for row in _rows(memory.get("evidence_memory")) if _text(_mapping(row.get("latest_metadata")).get("experiment_fingerprint")) == fingerprint and _text(_mapping(row.get("latest_metadata")).get("origin_experiment_run_id"))})
 
 
 def _matching_route_status(memory: Mapping[str, Any], *, pattern_key: str) -> str:
     for row in _rows(memory.get("patterns")):
         if _text(row.get("pattern_key")) == pattern_key:
-            if row.get("converted_to_rule") is True:
-                return "FIXED_RULE_ACTIVE"
-            return _upper(row.get("pattern_status"))
+            return "FIXED_RULE_ACTIVE" if row.get("converted_to_rule") is True else _upper(row.get("pattern_status"))
     return ""
 
 
-def merge_experiment_result_into_memory(
-    *, existing_memory: Mapping[str, Any] | None, result: Mapping[str, Any],
-    checkpoint_run_id: str, rule_registry: Mapping[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Idempotently ingest one experiment origin into existing Unified Memory V2."""
+def merge_experiment_result_into_memory(*, existing_memory: Mapping[str, Any] | None, result: Mapping[str, Any], checkpoint_run_id: str, rule_registry: Mapping[str, Any] | None = None) -> dict[str, Any]:
     memory = dict(existing_memory or {})
     fingerprint = _text(result.get("experiment_fingerprint"))
     origin_run = _text(result.get("origin_experiment_run_id"))
@@ -632,22 +544,10 @@ def merge_experiment_result_into_memory(
         raise ValueError("experiment result identity is required")
     if _origin_seen(memory, fingerprint=fingerprint, origin_run_id=origin_run):
         return memory
-    return build_unified_memory_v2(
-        existing_memory=memory,
-        unified_learning_spine=build_experiment_spine(result),
-        run_id=_text(checkpoint_run_id),
-        rule_registry=rule_registry or {},
-    )
+    return build_unified_memory_v2(existing_memory=memory, unified_learning_spine=build_experiment_spine(result), run_id=_text(checkpoint_run_id), rule_registry=rule_registry or {})
 
 
-def replay_or_ingest_pending_experiment(
-    *, pending_result: Mapping[str, Any], existing_memory: Mapping[str, Any] | None,
-    checkpoint_run_id: str, exa_api_key: str,
-    rule_registry: Mapping[str, Any] | None = None,
-    provider_factory: ProviderFactory = _default_provider_factory,
-    page_fetcher: PageFetcher = fetch_public_page,
-) -> dict[str, Any]:
-    """Ingest unseen origin, or re-run a candidate/unresolved query within hard limits."""
+def replay_or_ingest_pending_experiment(*, pending_result: Mapping[str, Any], existing_memory: Mapping[str, Any] | None, checkpoint_run_id: str, exa_api_key: str, rule_registry: Mapping[str, Any] | None = None, provider_factory: ProviderFactory = _default_provider_factory, page_fetcher: PageFetcher = fetch_public_page) -> dict[str, Any]:
     pending = _mapping(pending_result)
     memory = dict(existing_memory or {})
     fingerprint = _text(pending.get("experiment_fingerprint"))
@@ -658,64 +558,21 @@ def replay_or_ingest_pending_experiment(
     pattern_key = _route_pattern_key(spec)
 
     if not _origin_seen(memory, fingerprint=fingerprint, origin_run_id=origin_run):
-        merged = merge_experiment_result_into_memory(
-            existing_memory=memory, result=pending, checkpoint_run_id=checkpoint_run_id, rule_registry=rule_registry
-        )
-        return {
-            "schema_version": SCHEMA_VERSION,
-            "status": "INGESTED_PENDING_ORIGIN",
-            "network_search_executed": False,
-            "experiment_fingerprint": fingerprint,
-            "origin_experiment_run_id": origin_run,
-            "memory": merged,
-            **_safety(),
-        }
+        merged = merge_experiment_result_into_memory(existing_memory=memory, result=pending, checkpoint_run_id=checkpoint_run_id, rule_registry=rule_registry)
+        return {"schema_version": SCHEMA_VERSION, "status": "INGESTED_PENDING_ORIGIN", "network_search_executed": False, "experiment_fingerprint": fingerprint, "origin_experiment_run_id": origin_run, "memory": merged, **_safety()}
 
     status = _matching_route_status(memory, pattern_key=pattern_key)
     if status in {"PROVEN", "FIXED_RULE_ACTIVE"}:
-        return {
-            "schema_version": SCHEMA_VERSION,
-            "status": "SKIPPED_ALREADY_PROVEN",
-            "network_search_executed": False,
-            "experiment_fingerprint": fingerprint,
-            "route_pattern_status": status,
-            "memory": memory,
-            **_safety(),
-        }
+        return {"schema_version": SCHEMA_VERSION, "status": "SKIPPED_ALREADY_PROVEN", "network_search_executed": False, "experiment_fingerprint": fingerprint, "route_pattern_status": status, "memory": memory, **_safety()}
 
     count = _fingerprint_execution_count(memory, fingerprint=fingerprint)
-    max_exec = int(spec.get("max_independent_executions") or MAX_EXECUTIONS_PER_FINGERPRINT)
-    max_exec = min(MAX_EXECUTIONS_PER_FINGERPRINT, max(1, max_exec))
+    max_exec = min(MAX_EXECUTIONS_PER_FINGERPRINT, max(1, int(spec.get("max_independent_executions") or MAX_EXECUTIONS_PER_FINGERPRINT)))
     if count >= max_exec:
-        return {
-            "schema_version": SCHEMA_VERSION,
-            "status": "SKIPPED_EXECUTION_CAP_REACHED",
-            "network_search_executed": False,
-            "experiment_fingerprint": fingerprint,
-            "execution_count": count,
-            "execution_cap": max_exec,
-            "memory": memory,
-            **_safety(),
-        }
+        return {"schema_version": SCHEMA_VERSION, "status": "SKIPPED_EXECUTION_CAP_REACHED", "network_search_executed": False, "experiment_fingerprint": fingerprint, "execution_count": count, "execution_cap": max_exec, "memory": memory, **_safety()}
 
-    rerun = execute_search_experiment_spec(
-        spec, exa_api_key=exa_api_key, run_id=checkpoint_run_id,
-        provider_factory=provider_factory, page_fetcher=page_fetcher,
-    )
-    merged = merge_experiment_result_into_memory(
-        existing_memory=memory, result=rerun, checkpoint_run_id=checkpoint_run_id, rule_registry=rule_registry
-    )
-    return {
-        "schema_version": SCHEMA_VERSION,
-        "status": "REEXECUTED_AND_INGESTED",
-        "network_search_executed": True,
-        "experiment_fingerprint": fingerprint,
-        "execution_count": count + 1,
-        "execution_cap": max_exec,
-        "rerun_result": rerun,
-        "memory": merged,
-        **_safety(),
-    }
+    rerun = execute_search_experiment_spec(spec, exa_api_key=exa_api_key, run_id=checkpoint_run_id, provider_factory=provider_factory, page_fetcher=page_fetcher)
+    merged = merge_experiment_result_into_memory(existing_memory=memory, result=rerun, checkpoint_run_id=checkpoint_run_id, rule_registry=rule_registry)
+    return {"schema_version": SCHEMA_VERSION, "status": "REEXECUTED_AND_INGESTED", "network_search_executed": True, "experiment_fingerprint": fingerprint, "execution_count": count + 1, "execution_cap": max_exec, "rerun_result": rerun, "memory": merged, **_safety()}
 
 
 def write_json(path: str | Path, payload: Mapping[str, Any]) -> None:

@@ -1,19 +1,4 @@
-"""Unified review plane over the project's existing learning subsystems.
-
-Learning Layer V1 does not learn a new vocabulary, activate a provider, promote a
-source, or mutate production queries. It only reads already-produced learning
-artifacts and turns them into one operator-facing review queue:
-
-* Search Success memory -> repeated successful routes that deserve review.
-* Root-cause feedback -> missed opportunities and the repair mechanism assigned
-  by the existing router.
-* Daily keyword learning -> proven shadow learning that may deserve explicit
-  promotion review.
-
-The layer is intentionally deterministic and read-only. Missing artifacts are a
-valid zero state; malformed artifacts are ignored by the filesystem adapter and
-never converted into positive learning evidence.
-"""
+"""Unified read-only review plane over the project's learning subsystems."""
 from __future__ import annotations
 
 import json
@@ -23,7 +8,6 @@ from typing import Any, Mapping
 SCHEMA_VERSION = "learning-layer-review-1.0"
 OUTPUT_JSON = "learning-layer-review.json"
 OUTPUT_TEXT = "learning-layer-review.txt"
-
 _PRIORITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
 
 
@@ -48,10 +32,7 @@ def _int(value: object) -> int:
 def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(
-        json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    temporary.write_text(json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     temporary.replace(path)
 
 
@@ -87,27 +68,14 @@ def _replicated_route_items(memory: Mapping[str, Any]) -> tuple[list[dict[str, A
         verified_urls = route.get("verified_exact_lot_urls") or route.get("exact_lot_urls") or []
         exact_count = _int(route.get("verified_exact_lot_url_count")) or len(verified_urls)
         evidence = {
-            "kind": "REPLICATED_SEARCH_ROUTE",
-            "provider": provider,
-            "market_code": market,
-            "parent_domain": domain,
-            "pathway": _text(route.get("pathway")),
+            "kind": "REPLICATED_SEARCH_ROUTE", "provider": provider, "market_code": market,
+            "parent_domain": domain, "pathway": _text(route.get("pathway")),
             "independent_run_count": count,
-            "supporting_run_ids": [
-                _text(item) for item in (route.get("supporting_run_ids") or []) if _text(item)
-            ],
-            "exact_lot_count": exact_count,
-            "status": "REPLICATED_FOR_REVIEW",
+            "supporting_run_ids": [_text(item) for item in (route.get("supporting_run_ids") or []) if _text(item)],
+            "exact_lot_count": exact_count, "status": "REPLICATED_FOR_REVIEW",
         }
         worked.append(dict(evidence))
-        reviews.append(
-            {
-                **evidence,
-                "priority": "HIGH",
-                "review_action": "REVIEW_REPLICATED_ROUTE",
-                "automatic_activation": False,
-            }
-        )
+        reviews.append({**evidence, "priority": "HIGH", "review_action": "REVIEW_REPLICATED_ROUTE", "automatic_activation": False})
     return worked, reviews
 
 
@@ -118,8 +86,7 @@ def _root_cause_items(feedback: Mapping[str, Any]) -> tuple[list[dict[str, Any]]
         if _text(route.get("route_status")).upper() != "ACTIVE":
             continue
         item = {
-            "kind": "MISSED_OPPORTUNITY_ROOT_CAUSE",
-            "case_id": _text(route.get("case_id")),
+            "kind": "MISSED_OPPORTUNITY_ROOT_CAUSE", "case_id": _text(route.get("case_id")),
             "market_code": _text(route.get("market_code")).upper(),
             "root_cause": _text(route.get("root_cause")).upper(),
             "mechanism": _text(route.get("mechanism")).upper(),
@@ -129,8 +96,34 @@ def _root_cause_items(feedback: Mapping[str, Any]) -> tuple[list[dict[str, Any]]
             "review_action": _text(route.get("action")).upper() or "REVIEW_PIPELINE_GAP",
             "automatic_adaptation_available": route.get("automatic_adaptation_available") is True,
         }
-        failed.append(dict(item))
-        reviews.append(dict(item))
+        failed.append(dict(item)); reviews.append(dict(item))
+    return failed, reviews
+
+
+def _search_experiment_rejection_items(unified_memory: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Expose persisted Search Experiment verifier failures to Learning Layer."""
+    failed: list[dict[str, Any]] = []
+    reviews: list[dict[str, Any]] = []
+    for row in _rows(unified_memory.get("evidence_memory")):
+        if _text(row.get("result_type")).upper() != "SEARCH_RESULT_REJECTION":
+            continue
+        if _text(row.get("latest_outcome")).upper() != "REJECTED":
+            continue
+        reason = _text(row.get("latest_miss_reason")).upper() or "UNDIAGNOSED"
+        item = {
+            "kind": "SEARCH_EXPERIMENT_REJECTION",
+            "case_id": _text(row.get("learning_evidence_id")),
+            "market_code": _text(row.get("market_code")).upper(),
+            "project_domain": _text(row.get("project_domain")).upper(),
+            "provider": _text(row.get("provider")).lower(),
+            "query": _text(row.get("query")),
+            "url": _text(row.get("url")) or None,
+            "root_cause": reason,
+            "priority": "MEDIUM",
+            "review_action": "REVIEW_SEARCH_REJECTION_REASON",
+            "automatic_adaptation_available": False,
+        }
+        failed.append(dict(item)); reviews.append(dict(item))
     return failed, reviews
 
 
@@ -141,129 +134,64 @@ def _daily_learning_items(daily: Mapping[str, Any]) -> tuple[list[dict[str, Any]
     shadow_count = _int(daily.get("shadow_proven_term_count"))
     eligible = _int(daily.get("safe_learning_promotion_eligible_count"))
     if proven_this_run > 0 or shadow_count > 0:
-        worked.append(
-            {
-                "kind": "SHADOW_KEYWORD_LEARNING",
-                "proven_term_count_this_run": proven_this_run,
-                "shadow_proven_term_count": shadow_count,
-                "search_status": _text(daily.get("search_status")).upper(),
-                "promotion_gate_enforced": daily.get("promotion_gate_enforced") is True,
-            }
-        )
+        worked.append({"kind": "SHADOW_KEYWORD_LEARNING", "proven_term_count_this_run": proven_this_run, "shadow_proven_term_count": shadow_count, "search_status": _text(daily.get("search_status")).upper(), "promotion_gate_enforced": daily.get("promotion_gate_enforced") is True})
     if eligible > 0:
-        reviews.append(
-            {
-                "kind": "SHADOW_KEYWORD_PROMOTION_REVIEW",
-                "priority": "MEDIUM",
-                "promotion_eligible_count": eligible,
-                "review_action": "REVIEW_SHADOW_KEYWORD_EVIDENCE",
-                "automatic_activation": False,
-            }
-        )
+        reviews.append({"kind": "SHADOW_KEYWORD_PROMOTION_REVIEW", "priority": "MEDIUM", "promotion_eligible_count": eligible, "review_action": "REVIEW_SHADOW_KEYWORD_EVIDENCE", "automatic_activation": False})
     return worked, reviews
 
 
 def _sort_review_queue(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return sorted(
-        items,
-        key=lambda item: (
-            _PRIORITY_ORDER.get(_text(item.get("priority")).upper(), 9),
-            _text(item.get("kind")),
-            _text(item.get("market_code")),
-            _text(item.get("case_id")),
-            _text(item.get("parent_domain")),
-        ),
-    )
+    return sorted(items, key=lambda item: (_PRIORITY_ORDER.get(_text(item.get("priority")).upper(), 9), _text(item.get("kind")), _text(item.get("market_code")), _text(item.get("case_id")), _text(item.get("parent_domain"))))
 
 
-def build_learning_layer_review(
-    *,
-    search_success_memory: Mapping[str, Any] | None,
-    root_cause_feedback: Mapping[str, Any] | None,
-    daily_learning: Mapping[str, Any] | None,
-) -> dict[str, Any]:
-    """Build one review-only learning summary from established subsystem state."""
+def build_learning_layer_review(*, search_success_memory: Mapping[str, Any] | None, root_cause_feedback: Mapping[str, Any] | None, daily_learning: Mapping[str, Any] | None, unified_memory: Mapping[str, Any] | None = None) -> dict[str, Any]:
     memory = _mapping(search_success_memory)
     feedback = _mapping(root_cause_feedback)
     daily = _mapping(daily_learning)
+    unified = _mapping(unified_memory)
 
     route_worked, route_reviews = _replicated_route_items(memory)
     miss_failed, miss_reviews = _root_cause_items(feedback)
+    search_failed, search_reviews = _search_experiment_rejection_items(unified)
     keyword_worked, keyword_reviews = _daily_learning_items(daily)
 
     worked = [*route_worked, *keyword_worked]
-    failed = miss_failed
-    queue = _sort_review_queue([*route_reviews, *miss_reviews, *keyword_reviews])
-
-    if queue:
-        status = "REVIEW_REQUIRED"
-    elif worked or failed:
-        status = "MONITOR_ONLY"
-    else:
-        status = "VALID_ZERO_NO_REVIEW_ITEMS"
+    failed = [*miss_failed, *search_failed]
+    queue = _sort_review_queue([*route_reviews, *miss_reviews, *search_reviews, *keyword_reviews])
+    status = "REVIEW_REQUIRED" if queue else ("MONITOR_ONLY" if worked or failed else "VALID_ZERO_NO_REVIEW_ITEMS")
 
     return {
-        "schema_version": SCHEMA_VERSION,
-        "status": status,
-        "generated_at": daily.get("generated_at"),
-        "input_presence": {
-            "search_success_memory": bool(memory),
-            "root_cause_feedback": bool(feedback),
-            "daily_learning": bool(daily),
-        },
+        "schema_version": SCHEMA_VERSION, "status": status, "generated_at": daily.get("generated_at"),
+        "input_presence": {"search_success_memory": bool(memory), "root_cause_feedback": bool(feedback), "daily_learning": bool(daily), "unified_memory": bool(unified)},
         "search_success_run_count": _int(memory.get("run_count")),
         "replicated_search_route_count": len(route_reviews),
         "active_root_cause_route_count": len(miss_reviews),
+        "search_experiment_rejection_count": len(search_reviews),
         "shadow_keyword_promotion_review_count": len(keyword_reviews),
-        "what_worked_count": len(worked),
-        "what_failed_count": len(failed),
-        "review_item_count": len(queue),
-        "what_worked": worked,
-        "what_failed": failed,
-        "review_queue": queue,
+        "what_worked_count": len(worked), "what_failed_count": len(failed), "review_item_count": len(queue),
+        "what_worked": worked, "what_failed": failed, "review_queue": queue,
         "provider_comparison_status": _provider_comparison_status(memory),
-        "learning_contract": (
-            "Observe -> diagnose -> shadow learn -> replicate -> review. "
-            "Learning Layer V1 aggregates evidence only and never activates production changes."
-        ),
-        "automatic_query_activation": False,
-        "automatic_provider_activation": False,
-        "automatic_source_promotion": False,
-        "automatic_code_change": False,
-        "production_query_mutation": False,
-        "production_mutation": False,
-        "automatic_contact": False,
-        "automatic_bid": False,
-        "automatic_reservation": False,
-        "automatic_purchase": False,
-        "automatic_payment": False,
+        "learning_contract": "Observe -> diagnose -> shadow learn -> replicate -> review. Search Experiment rejections are visible but never auto-adapt production.",
+        "automatic_query_activation": False, "automatic_provider_activation": False,
+        "automatic_source_promotion": False, "automatic_code_change": False,
+        "production_query_mutation": False, "production_mutation": False,
+        "automatic_contact": False, "automatic_bid": False, "automatic_reservation": False,
+        "automatic_purchase": False, "automatic_payment": False,
     }
 
 
 def render_learning_layer_review(review: Mapping[str, Any]) -> str:
     lines = [
-        "LEARNING LAYER:",
-        f"status: {_text(review.get('status'))}",
+        "LEARNING LAYER:", f"status: {_text(review.get('status'))}",
         f"what worked: {_int(review.get('what_worked_count'))}",
         f"what failed: {_int(review.get('what_failed_count'))}",
+        f"search rejections: {_int(review.get('search_experiment_rejection_count'))}",
         f"review items: {_int(review.get('review_item_count'))}",
     ]
     queue = _rows(review.get("review_queue"))
     if queue:
         top = queue[0]
-        lines.append(
-            "top review: "
-            + " / ".join(
-                part
-                for part in (
-                    _text(top.get("priority")),
-                    _text(top.get("kind")),
-                    _text(top.get("market_code")),
-                    _text(top.get("review_action")),
-                )
-                if part
-            )
-        )
+        lines.append("top review: " + " / ".join(part for part in (_text(top.get("priority")), _text(top.get("kind")), _text(top.get("market_code")), _text(top.get("review_action"))) if part))
     lines.append("production mutation: disabled")
     return "\n".join(lines) + "\n"
 
@@ -273,25 +201,13 @@ def _attach_to_brief(output_dir: Path, review: Mapping[str, Any]) -> None:
     brief = _read_json(path)
     if not brief:
         return
-    brief["learning_layer"] = {
-        key: review.get(key)
-        for key in (
-            "schema_version",
-            "status",
-            "search_success_run_count",
-            "replicated_search_route_count",
-            "active_root_cause_route_count",
-            "shadow_keyword_promotion_review_count",
-            "what_worked_count",
-            "what_failed_count",
-            "review_item_count",
-            "provider_comparison_status",
-            "automatic_query_activation",
-            "automatic_provider_activation",
-            "automatic_source_promotion",
-            "production_mutation",
-        )
-    }
+    brief["learning_layer"] = {key: review.get(key) for key in (
+        "schema_version", "status", "search_success_run_count", "replicated_search_route_count",
+        "active_root_cause_route_count", "search_experiment_rejection_count",
+        "shadow_keyword_promotion_review_count", "what_worked_count", "what_failed_count",
+        "review_item_count", "provider_comparison_status", "automatic_query_activation",
+        "automatic_provider_activation", "automatic_source_promotion", "production_mutation",
+    )}
     _write_json(path, brief)
 
 
@@ -306,18 +222,14 @@ def _append_phone_summary(output_dir: Path, text: str) -> None:
     path.write_text(current.rstrip() + "\n\n" + text, encoding="utf-8")
 
 
-def write_learning_layer_review(
-    output_dir: str | Path,
-    *,
-    input_root: str | Path,
-) -> dict[str, Any]:
-    """Read existing daily artifacts, emit one unified review, and attach summaries."""
+def write_learning_layer_review(output_dir: str | Path, *, input_root: str | Path) -> dict[str, Any]:
     output = Path(output_dir)
     root = Path(input_root)
     review = build_learning_layer_review(
         search_success_memory=_read_json(root / "learning" / "search-success-memory.json"),
         root_cause_feedback=_read_json(output / "root-cause-feedback-router.json"),
         daily_learning=_read_json(output / "daily-learning-cycle.json"),
+        unified_memory=_read_json(root / "learning" / "unified-memory-v2.json"),
     )
     _write_json(output / OUTPUT_JSON, review)
     text = render_learning_layer_review(review)
