@@ -1,8 +1,8 @@
 {
   "schema_version": "manual-checkpoint-trigger-1.0",
-  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint through the repository's existing main-change gate after the Exa checkpoint timestamp fix.",
-  "requested_at_utc": "2026-08-24T17:49:00Z",
-  "requested_for_main_sha": "a70c72dbcff263247de2c1b778f3e89ab55457b0",
+  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after unified six-market clothing and fabric runtime wiring.",
+  "requested_at_utc": "2026-08-24T18:45:00Z",
+  "requested_for_main_sha": "d0582d491a097bf7def2d59ea79267ba8411f3f6",
   "project_scope": [
     "CLOTHING_INVENTORY",
     "FABRIC_PROCUREMENT"
