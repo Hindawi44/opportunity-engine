@@ -85,6 +85,9 @@ from opportunity_engine.discovery.daily_auto_miss_learning_cli_hook import (
 from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook import (
     install_unified_market_intelligence_river_cli_hook,
 )
+from opportunity_engine.discovery.unified_search_truth_reconciliation_cli_hook import (
+    install_unified_search_truth_reconciliation_cli_hook,
+)
 from opportunity_engine.discovery.unified_search_runtime_cli_hook import (
     install_unified_search_runtime_cli_hook,
 )
@@ -141,6 +144,10 @@ install_unified_learning_spine_cli_hook()
 # the newly durable miss memory in the same daily run.
 install_daily_auto_miss_learning_cli_hook()
 install_unified_market_intelligence_river_cli_hook()
+# Registered before Unified Search Runtime so LIFO executes reconciliation after
+# the runtime has written current six-market search truth. This corrects stale
+# report labels only; it does not create a second search path.
+install_unified_search_truth_reconciliation_cli_hook()
 # Registered immediately after the river. LIFO lets the established fabric
 # hooks write first, then this hook merges Exa FR/IT/NL and rewrites the unified
 # operator search view before the river consumes final fabric truth.
