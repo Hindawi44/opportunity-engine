@@ -1,0 +1,39 @@
+name: Fabric All Markets Shadow Proof V1
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/run_fabric_all_markets_shadow_proof.py
+      - .github/workflows/fabric-all-markets-shadow-proof-v1.yml
+      - src/opportunity_engine/query_family_shadow.py
+      - src/opportunity_engine/search_experiment_execution_bridge_v1.py
+      - src/opportunity_engine/project_domain_boundary.py
+  workflow_dispatch:
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+      - name: Run all-market fabric shadow proof
+        run: python scripts/run_fabric_all_markets_shadow_proof.py
+      - name: Upload proof report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fabric-all-markets-shadow-proof-v1
+          path: artifacts/fabric-all-markets-shadow-proof-v1/report.json
+          if-no-files-found: error
+          retention-days: 30
