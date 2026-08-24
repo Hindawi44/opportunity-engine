@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 jobs:
   mybring-read-only-smoke:
@@ -19,7 +20,9 @@ jobs:
       MYBRING_CLIENT_URL: ${{ secrets.MYBRING_CLIENT_URL }}
       MYBRING_CUSTOMER_NUMBER: ${{ secrets.MYBRING_CUSTOMER_NUMBER }}
     steps:
-      - name: Validate configured Mybring secrets without exposing values
+      - name: Verify Mybring credentials and customer access without exposing secrets
+        id: smoke
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -31,9 +34,6 @@ jobs:
           done
           echo "configured_secrets=4/4"
 
-      - name: Verify Mybring authentication and customer access
-        shell: bash
-        run: |
           python - <<'PY'
           import json
           import os
@@ -81,3 +81,53 @@ jobs:
               raise SystemExit("MYBRING_CUSTOMER_NUMBER_NOT_AUTHORIZED")
           print("mybring_smoke_test=PASS")
           PY
+
+      - name: Publish sanitized smoke result as commit status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$SMOKE_OUTCOME" = "success" ]; then
+            STATE=success
+            DESCRIPTION="Mybring auth and customer access verified"
+          else
+            STATE=failure
+            DESCRIPTION="Mybring smoke test failed; inspect Actions log"
+          fi
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          sha = os.environ["GITHUB_SHA"]
+          state = os.environ["STATE"]
+          description = os.environ["DESCRIPTION"]
+          token = os.environ["GH_TOKEN"]
+          url = f"https://api.github.com/repos/{repo}/statuses/{sha}"
+          payload = json.dumps({
+              "state": state,
+              "context": "mybring/read-only-smoke",
+              "description": description,
+          }).encode("utf-8")
+          request = urllib.request.Request(
+              url,
+              data=payload,
+              method="POST",
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": f"Bearer {token}",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "Content-Type": "application/json",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=20) as response:
+              print(f"commit_status_publish_http={response.status}")
+          PY
+
+      - name: Fail job if smoke test failed
+        if: ${{ steps.smoke.outcome != 'success' }}
+        run: exit 1
