@@ -4,6 +4,7 @@ import importlib.util
 from pathlib import Path
 
 from opportunity_engine.discovery.checkpoint_state_restore import DATABASE_RELATIVE_PATHS
+from opportunity_engine.discovery.source_artifact_continuity import _time
 from opportunity_engine.discovery.unified_opportunity_report import build_unified_opportunity_report
 
 
@@ -38,9 +39,9 @@ def _strict_row(url: str = "https://example.test/product/500-jackets") -> dict:
     }
 
 
-def test_strict_exact_lot_becomes_checkpoint_top5_but_not_financially_analyzed() -> None:
+def _build_result():
     module = _load_script()
-    result = module.build_checkpoint_result_from_exact_lots(
+    return module.build_checkpoint_result_from_exact_lots(
         [_strict_row()],
         market="DE",
         query_count=3,
@@ -48,6 +49,10 @@ def test_strict_exact_lot_becomes_checkpoint_top5_but_not_financially_analyzed()
         verification={"exact_lot_candidate_count": 0},
         multihop={"exact_lot_candidate_count": 1, "gateway_page_count": 2},
     )
+
+
+def test_strict_exact_lot_becomes_checkpoint_top5_but_not_financially_analyzed() -> None:
+    result = _build_result()
 
     assert result["search_run_report"]["status"] == "SUCCESS"
     assert result["search_run_report"]["strict_exact_lot_count"] == 1
@@ -73,6 +78,15 @@ def test_strict_exact_lot_becomes_checkpoint_top5_but_not_financially_analyzed()
     assert record["top5_eligible"] is True
     assert record["analysis_eligible"] is False
     assert record["source_provider"] == "EXA"
+
+
+def test_search_report_emits_parseable_utc_discovered_at_for_source_continuity() -> None:
+    report = _build_result()["search_run_report"]
+
+    parsed = _time(report["discovered_at"])
+    assert parsed.tzinfo is not None
+    assert parsed.utcoffset() is not None
+    assert parsed.utcoffset().total_seconds() == 0
 
 
 def test_exact_lot_rows_fail_closed_when_any_strict_evidence_is_missing() -> None:
