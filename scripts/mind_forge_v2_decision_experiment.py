@@ -1,9 +1,21 @@
 from __future__ import annotations
 
 import argparse
+from hashlib import sha256
 import json
 from pathlib import Path
+import re
+import sys
 from typing import Any
+
+
+_ROUTE_SEED_RE = re.compile(
+    r"Improve discovery intelligence for\s+"
+    r"(?P<market>[A-Z]{2})\s*/\s*"
+    r"(?P<domain>CLOTHING_INVENTORY|FABRIC_PROCUREMENT)\s*/\s*"
+    r"(?P<slot>[A-Z_]+)\.",
+    re.IGNORECASE,
+)
 
 
 def _top_row(final_rank: dict[str, Any]) -> dict[str, Any]:
@@ -11,6 +23,82 @@ def _top_row(final_rank: dict[str, Any]) -> dict[str, Any]:
     if not ranking:
         raise ValueError("final_rank has no ranking rows")
     return dict(ranking[0])
+
+
+def _route_teaching_task(seed: str) -> dict[str, Any] | None:
+    match = _ROUTE_SEED_RE.search(str(seed or ""))
+    if not match:
+        return None
+    market = match.group("market").upper()
+    domain = match.group("domain").upper()
+    slot = match.group("slot").upper()
+    digest = sha256(f"{market}|{domain}|{slot}".encode("utf-8")).hexdigest()[:20]
+    return {
+        "task_id": f"mind-forge-route:{digest}",
+        "execution_mode": "AI_TEACHING",
+        "task_kind": "RESOLVE_ROUTE_GAP",
+        "requires_paid_ai": True,
+        "context": {
+            "market_code": market,
+            "project_domain": domain,
+            "slot_id": slot,
+        },
+    }
+
+
+def _attach_search_experiment_spec(
+    *,
+    result: dict[str, Any],
+    final_rank_path: Path,
+) -> dict[str, Any]:
+    root = final_rank_path.parent
+    creative_path = root / "result.json"
+    fast_memory_path = root / "fast_learning_memory.json"
+    if not creative_path.exists() or not fast_memory_path.exists():
+        return result
+
+    creative = json.loads(creative_path.read_text(encoding="utf-8"))
+    seed = str(creative.get("seed") or "")
+    task = _route_teaching_task(seed)
+    if task is None:
+        return result
+
+    repo_root = Path(__file__).resolve().parents[1]
+    src = repo_root / "src"
+    if src.as_posix() not in sys.path:
+        sys.path.insert(0, src.as_posix())
+    from opportunity_engine.search_experiment_execution_bridge_v1 import (
+        select_search_experiment_spec,
+    )
+
+    spec = select_search_experiment_spec(
+        teaching_task=task,
+        creative_result=creative,
+        final_rank=json.loads(final_rank_path.read_text(encoding="utf-8")),
+    )
+    result["search_experiment_spec"] = spec
+    result["search_experiment_bridge"] = (
+        "READY_FOR_NEXT_CHECKPOINT"
+        if spec.get("status") == "READY"
+        else "NO_EXECUTABLE_SEARCH_SPEC"
+    )
+    if spec.get("status") != "READY":
+        return result
+
+    fast_memory = json.loads(fast_memory_path.read_text(encoding="utf-8"))
+    if not isinstance(fast_memory, dict):
+        raise ValueError("fast learning memory must be a JSON object")
+    fast_memory["pending_search_experiment_spec"] = spec
+    fast_memory["pending_search_experiment_fingerprint"] = spec[
+        "experiment_fingerprint"
+    ]
+    fast_memory["pending_search_experiment_mode"] = "SHADOW_ONLY"
+    fast_memory["auto_apply_to_production"] = False
+    fast_memory_path.write_text(
+        json.dumps(fast_memory, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return result
 
 
 def decide_and_design_experiment(
@@ -130,12 +218,30 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
-    final_rank = json.loads(Path(args.final_rank_json).read_text(encoding="utf-8"))
+    final_rank_path = Path(args.final_rank_json)
+    final_rank = json.loads(final_rank_path.read_text(encoding="utf-8"))
     reasoning = json.loads(Path(args.reasoning_json).read_text(encoding="utf-8"))
     evidence = json.loads(Path(args.evidence_json).read_text(encoding="utf-8"))
     result = decide_and_design_experiment(final_rank, reasoning, evidence)
-    Path(args.output).write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({"status": result["status"], "decision": result["decision"], "title": result["title"]}, ensure_ascii=False))
+    result = _attach_search_experiment_spec(
+        result=result,
+        final_rank_path=final_rank_path,
+    )
+    Path(args.output).write_text(
+        json.dumps(result, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(
+        json.dumps(
+            {
+                "status": result["status"],
+                "decision": result["decision"],
+                "title": result["title"],
+                "search_experiment_bridge": result.get("search_experiment_bridge"),
+            },
+            ensure_ascii=False,
+        )
+    )
 
 
 if __name__ == "__main__":

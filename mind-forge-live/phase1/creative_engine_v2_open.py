@@ -78,13 +78,7 @@ def _canonical_source_question_ids(
     draft: OpenIdeaDraft,
     internal_questions: list[Question],
 ) -> list[str]:
-    """Return only real internal-question IDs, deterministically repairing hallucinated IDs.
-
-    Valid model-supplied IDs are preserved in order. If the model supplied only unknown
-    IDs, the idea is linked to the closest real internal question by lexical overlap.
-    This repair is local and deterministic: it never makes another model request and the
-    final strict subset validation in ``apply_open_payload`` remains authoritative.
-    """
+    """Return only real internal-question IDs, deterministically repairing hallucinated IDs."""
 
     if not internal_questions:
         raise ValueError("Creative V2 requires at least one internal question")
@@ -111,6 +105,38 @@ def _canonical_source_question_ids(
     return [best_question.question_id]
 
 
+def _search_route_contract(topic: TopicInput) -> str:
+    seed = topic.topic
+    if "Improve discovery intelligence for" not in seed:
+        return ""
+    match = re.search(
+        r"Improve discovery intelligence for\s+"
+        r"(?P<market>[A-Z]{2})\s*/\s*"
+        r"(?P<domain>CLOTHING_INVENTORY|FABRIC_PROCUREMENT)\s*/\s*"
+        r"(?P<slot>[A-Z_]+)\.",
+        seed,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return ""
+
+    market = match.group("market").upper()
+    domain = match.group("domain").upper()
+    slot = match.group("slot").upper()
+    return (
+        "\n\nEXECUTABLE SEARCH CONTRACT FOR THIS ROUTE-TEACHING TOPIC:\n"
+        "Every idea MUST begin core_mechanism with exactly one machine-readable first line:\n"
+        'SEARCH_TEST_V1 provider=exa; query="<one public-web search query>"\n'
+        "After that first line you may add one short explanatory sentence. "
+        f"The query must explicitly anchor market {market}, remain strictly inside {domain}, "
+        f"and target the commercial route intent {slot}. "
+        "Do not use site: restrictions unless the mechanism intentionally tests one named source. "
+        "Prefer local-language commercial vocabulary and a query capable of reaching an original "
+        "commercial page rather than a generic article. Never put contact, bid, reservation, "
+        "purchase, payment, or production activation instructions in the query."
+    )
+
+
 def open_creative_prompt(topic: TopicInput, questions: Iterable[Question]) -> str:
     question_rows = [
         {
@@ -123,6 +149,7 @@ def open_creative_prompt(topic: TopicInput, questions: Iterable[Question]) -> st
         if item.kind.value == "INTERNAL"
     ]
     allowed_ids = [row["question_id"] for row in question_rows]
+    search_contract = _search_route_contract(topic)
     return (
         "You are MIND FORGE Creative Engine V2. Generate exactly 14 genuinely different "
         "ideas from the topic and its internal questions. You are NOT rewriting a supplied "
@@ -136,7 +163,8 @@ def open_creative_prompt(topic: TopicInput, questions: Iterable[Question]) -> st
         "Put uncertain premises in assumptions. Every idea must cite one or more supplied "
         "internal question IDs in source_question_ids. Use ONLY exact IDs from ALLOWED_QUESTION_IDS; "
         "never invent, abbreviate, rewrite, or infer a question ID. Return concise structured fields in "
-        "English even when the seed is Arabic.\n\n"
+        "English even when the seed is Arabic."
+        f"{search_contract}\n\n"
         f"TOPIC:\n{topic.model_dump_json()}\n\n"
         f"ALLOWED_QUESTION_IDS:\n{allowed_ids!r}\n\n"
         f"INTERNAL QUESTIONS:\n{question_rows!r}"
@@ -201,4 +229,5 @@ def apply_open_payload(
 
 def v1_benchmark(topic: TopicInput, questions: Iterable[Question]) -> CreativeEngineResult:
     """Keep deterministic V1 available only as benchmark/fallback, never as V2 idea frames."""
+
     return generate_v1_ideas(topic, questions)
