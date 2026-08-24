@@ -56,8 +56,11 @@ _CLOTHING_MARKERS = (
     "chemises", "robes", "haut femme", "hauts femme", "haut homme", "hauts homme",
     "robe de mariée", "robe de mariee", "abbigliamento", "vestiti", "calzature",
     "giacche", "pantaloni", "camicie", "abiti", "abito da sposa", "kleding",
-    "kledingvoorraad", "kledingwinkel", "kledingwinkelvoorraad", "schoenen",
-    "jassen", "broeken", "overhemden", "jurken", "trouwjurk",
+    "kledingvoorraad", "kledingwinkel", "kledingwinkelvoorraad",
+    # Dutch compound clothing nouns commonly used in commercial lot titles/URLs.
+    "kledingpartij", "kledingpartijen", "herenkleding", "dameskleding",
+    "kinderkleding", "merkkleding",
+    "schoenen", "jassen", "broeken", "overhemden", "jurken", "trouwjurk",
 )
 
 _FABRIC_MARKERS = (
