@@ -1,4 +1,7 @@
+import json
 from pathlib import Path
+
+import opportunity_engine.discovery.ai_teaching_gate_cli_hook as hook
 
 
 DISCOVERY_INIT = Path("src/opportunity_engine/discovery/__init__.py")
@@ -39,6 +42,43 @@ def test_teaching_gate_consumes_existing_memory_and_route_portfolio_artifacts():
     assert "PORTFOLIO_OUTPUT_FILENAME" in source
     assert "write_ai_teaching_gate_v1" in source
     assert "ai_teaching_gate_v1:" in source
+
+
+def test_teaching_gate_reads_memory_from_durable_learning_root(tmp_path, monkeypatch):
+    output = tmp_path / "multi-market-daily-operator-checkpoint"
+    input_root = tmp_path / "multi-market-inputs"
+    learning = input_root / "learning"
+    output.mkdir(parents=True)
+    learning.mkdir(parents=True)
+
+    memory = {"sentinel": "durable-memory"}
+    portfolio = {"sentinel": "portfolio"}
+    (learning / hook.UNIFIED_MEMORY_FILENAME).write_text(
+        json.dumps(memory), encoding="utf-8"
+    )
+    (output / hook.PORTFOLIO_OUTPUT_FILENAME).write_text(
+        json.dumps(portfolio), encoding="utf-8"
+    )
+
+    captured = {}
+
+    def fake_writer(output_dir, *, unified_memory, market_route_portfolio):
+        captured["output_dir"] = Path(output_dir)
+        captured["memory"] = unified_memory
+        captured["portfolio"] = market_route_portfolio
+        return {"status": "SUCCESS"}
+
+    monkeypatch.setattr(hook, "write_ai_teaching_gate_v1", fake_writer)
+
+    report = hook.run_ai_teaching_gate_v1_fail_closed(
+        output,
+        input_root=input_root,
+    )
+
+    assert report["status"] == "SUCCESS"
+    assert captured["memory"] == memory
+    assert captured["portfolio"] == portfolio
+    assert captured["output_dir"] == output
 
 
 def test_gate_reuses_existing_mind_forge_runtime_and_learning_instead_of_rebuilding_them():

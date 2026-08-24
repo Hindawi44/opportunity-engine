@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import atexit
 import json
+import os
 from pathlib import Path
 import sys
 from typing import Any
@@ -72,10 +73,31 @@ def _read_json(path: Path) -> dict[str, Any]:
     return payload
 
 
-def run_ai_teaching_gate_v1_fail_closed(output_dir: str | Path) -> dict[str, Any]:
+def _memory_path(output: Path, input_root: str | Path | None) -> Path:
+    if input_root is not None:
+        root = Path(input_root)
+    else:
+        configured = str(os.environ.get("INPUT_ROOT") or "").strip()
+        root = Path(configured) if configured else output.parent / "multi-market-inputs"
+
+    durable = root / "learning" / UNIFIED_MEMORY_FILENAME
+    if durable.exists():
+        return durable
+
+    # Backward-compatible fallback for isolated/local tests that still stage the
+    # full memory beside other review artifacts. Production checkpoint memory is
+    # authoritative under INPUT_ROOT/learning.
+    return output / UNIFIED_MEMORY_FILENAME
+
+
+def run_ai_teaching_gate_v1_fail_closed(
+    output_dir: str | Path,
+    *,
+    input_root: str | Path | None = None,
+) -> dict[str, Any]:
     output = Path(output_dir)
     try:
-        memory = _read_json(output / UNIFIED_MEMORY_FILENAME)
+        memory = _read_json(_memory_path(output, input_root))
         portfolio = _read_json(output / PORTFOLIO_OUTPUT_FILENAME)
         return write_ai_teaching_gate_v1(
             output,
@@ -109,8 +131,18 @@ def install_ai_teaching_gate_cli_hook() -> None:
     except (ValueError, IndexError):
         return
 
+    configured_input_root = str(os.environ.get("INPUT_ROOT") or "").strip()
+    input_root = (
+        Path(configured_input_root)
+        if configured_input_root
+        else output_dir.parent / "multi-market-inputs"
+    )
+
     def _run_after_memory_and_portfolio() -> None:
-        report = run_ai_teaching_gate_v1_fail_closed(output_dir)
+        report = run_ai_teaching_gate_v1_fail_closed(
+            output_dir,
+            input_root=input_root,
+        )
         print(
             "ai_teaching_gate_v1:",
             json.dumps(
