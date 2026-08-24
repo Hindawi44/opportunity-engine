@@ -1,0 +1,140 @@
+name: NL Exa Depth Benchmark V1
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/nl-exa-depth-benchmark-v1.yaml
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install existing project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run NL Exa 5/10/20 depth benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nl-exa-depth-benchmark-v1
+          python - <<'PY'
+          import json
+          import os
+          from collections import Counter
+          from pathlib import Path
+          from urllib.parse import urlsplit
+
+          from opportunity_engine.discovery.exa_search import ExaSearchProvider
+          from opportunity_engine.discovery.keyword_shadow_verification import fetch_public_page
+          from opportunity_engine.search_experiment_execution_bridge_v1 import _fabric_page_candidate
+
+          QUERY = "fabric textile Nederland stoffen groothandel leveranciers catalogus"
+          DEPTHS = (5, 10, 20)
+          # Evaluation truth set only. These domains are NOT discovery sources and are
+          # never injected into the search query, provider, routing, or production config.
+          BENCHMARK_DOMAINS = {
+              "hajetrading.nl",
+              "bitextrading.nl",
+              "stoffenstation.nl",
+              "wouters-textiles.nl",
+              "bertrums.nl",
+              "vangelderenstoffen.nl",
+              "textilecenter.nl",
+              "rijstextiles.com",
+              "mutsaerstextiles.nl",
+              "bbfabrics.com",
+              "knipidee.nl",
+              "nooteboomtextiles.com",
+          }
+
+          def domain(url):
+              host = (urlsplit(str(url or "")).hostname or "").casefold()
+              return host.removeprefix("www.")
+
+          key = os.environ.get("EXA_API_KEY", "").strip()
+          if not key:
+              raise SystemExit("EXA_API_KEY is required")
+
+          provider = ExaSearchProvider(key)
+          hits = provider.search(QUERY, count=20)
+          audits = [_fabric_page_candidate(hit, page_fetcher=fetch_public_page) for hit in hits]
+
+          depth_rows = []
+          for depth in DEPTHS:
+              rows = audits[:depth]
+              accepted = [row for row in rows if row.get("verification_decision") == "ACCEPT"]
+              rejected = [row for row in rows if row.get("verification_decision") != "ACCEPT"]
+              result_domains = [domain(row.get("final_url") or row.get("url")) for row in rows]
+              accepted_domains = sorted({domain(row.get("final_url") or row.get("url")) for row in accepted if domain(row.get("final_url") or row.get("url"))})
+              benchmark_matches = sorted(set(accepted_domains) & BENCHMARK_DOMAINS)
+              reason_counts = Counter(str(row.get("rejection_reason") or "UNDIAGNOSED") for row in rejected)
+              unique_result_domains = {d for d in result_domains if d}
+              depth_rows.append({
+                  "depth": depth,
+                  "returned_hit_count": len(rows),
+                  "unique_result_domain_count": len(unique_result_domains),
+                  "duplicate_domain_count": max(0, len(result_domains) - len(unique_result_domains)),
+                  "fetch_success_count": sum(row.get("fetch_ok") is True for row in rows),
+                  "fetch_failed_count": sum(row.get("fetch_ok") is not True for row in rows),
+                  "accepted_count": len(accepted),
+                  "accepted_domains": accepted_domains,
+                  "rejected_count": len(rejected),
+                  "rejection_reason_counts": dict(sorted(reason_counts.items())),
+                  "benchmark_match_count": len(benchmark_matches),
+                  "benchmark_matches": benchmark_matches,
+                  "benchmark_recall": round(len(benchmark_matches) / len(BENCHMARK_DOMAINS), 4),
+              })
+
+          report = {
+              "schema_version": "nl-exa-depth-benchmark-1.0",
+              "market_code": "NL",
+              "project_domain": "FABRIC_PROCUREMENT",
+              "provider": "exa",
+              "query": QUERY,
+              "search_request_count": 1,
+              "max_requested_results": 20,
+              "evaluation_mode": "single-ranked-result-list-prefixes",
+              "benchmark_domain_count": len(BENCHMARK_DOMAINS),
+              "benchmark_domains": sorted(BENCHMARK_DOMAINS),
+              "depth_results": depth_rows,
+              "search_hit_audit": audits,
+              "production_mutation": False,
+              "automatic_source_promotion": False,
+          }
+          out = Path("artifacts/nl-exa-depth-benchmark-v1/report.json")
+          out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+
+          for row in depth_rows:
+              print(
+                  f"depth={row['depth']} hits={row['returned_hit_count']} "
+                  f"accepted={row['accepted_count']} benchmark={row['benchmark_match_count']}/12 "
+                  f"recall={row['benchmark_recall']:.4f} fetch_failed={row['fetch_failed_count']} "
+                  f"duplicates={row['duplicate_domain_count']}"
+              )
+              print("accepted_domains=", row["accepted_domains"])
+              print("benchmark_matches=", row["benchmark_matches"])
+              print("rejection_reason_counts=", row["rejection_reason_counts"])
+          PY
+
+      - name: Upload benchmark artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nl-exa-depth-benchmark-v1
+          path: artifacts/nl-exa-depth-benchmark-v1/report.json
+          if-no-files-found: error
+          retention-days: 30
