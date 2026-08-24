@@ -2,10 +2,14 @@
 
 Some search results are useful commercial gateways but are more than one link
 away from a concrete product. This resolver permits a small, same-origin,
-commercially-scoped breadth-first walk. It is deliberately not a general
-crawler: only public HTTPS links on the same origin and in a bounded commercial
-URL role are considered, and only strict item pages may receive Exact-Lot
-credit.
+commercially-scoped walk. It is deliberately not a general crawler: only
+public HTTPS links on the same origin and in a bounded commercial URL role are
+considered, and only strict item pages may receive Exact-Lot credit.
+
+Navigation is root-fair: eligible commercial roots share the fixed page budget
+in round-robin order so one large catalogue cannot starve other search results.
+The total navigation budget, provider gates, domain gates and Exact-Lot gates
+remain unchanged.
 """
 from __future__ import annotations
 
@@ -37,7 +41,7 @@ from opportunity_engine.project_domain_boundary import (
     classify_project_domain,
 )
 
-SCHEMA_VERSION = "exact-lot-multihop-resolution-1.1"
+SCHEMA_VERSION = "exact-lot-multihop-resolution-1.2"
 LAB_FAMILY = "EXACT_LOT_MULTIHOP_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_ROOT_PARENTS = 6
@@ -250,6 +254,8 @@ def _base(
         "commercial_hub_navigation_only": True,
         "same_origin_only": True,
         "bounded_multi_hop": True,
+        "root_fair_navigation": True,
+        "navigation_scheduling": "ROUND_ROBIN_ROOT_FAIR_V1",
         "exact_lot_acceptance_only": True,
         "max_root_parents": max_root_parents,
         "max_navigation_depth": max_navigation_depth,
@@ -273,6 +279,7 @@ def _blocked(base: dict[str, Any], reason: str) -> dict[str, Any]:
         "block_reason": reason,
         "eligible_root_parent_count": 0,
         "root_results": [],
+        "root_navigation_fetch_counts": {},
         "navigation_results": [],
         "gateway_pages": [],
         "gateway_page_count": 0,
@@ -348,11 +355,14 @@ def resolve_exact_lot_multihop(
     gateway_pages: list[dict[str, Any]] = []
     exact_lots: list[dict[str, Any]] = []
     seen_navigation_urls: set[str] = set()
+    root_states: list[dict[str, Any]] = []
     page_attempted = 0
     page_succeeded = 0
     depth_exhausted = 0
-    page_budget_exhausted = 0
 
+    # Phase 1: fetch every eligible root and seed one independent queue. No root
+    # is allowed to consume navigation page budget before the other roots are
+    # represented in the scheduler.
     for root in roots:
         root_url = _compact(root.get("final_url") or root.get("url"))
         root_host = _host(root_url)
@@ -413,26 +423,41 @@ def resolve_exact_lot_multihop(
                 "market_code": _compact(root.get("market_code")).upper(),
                 "query": _compact(root.get("query")),
             })
+        if queue:
+            root_states.append(
+                {
+                    "root_url": resolved_root,
+                    "root_host": root_host,
+                    "queue": queue,
+                    "fetch_count": 0,
+                }
+            )
 
-        while queue:
-            node = queue.popleft()
-            if page_attempted >= max_navigation_page_fetches:
-                page_budget_exhausted += 1
-                continue
-            page_attempted += 1
-            fetched = page_fetcher(node["url"])
-            if not fetched.ok:
-                navigation_results.append({
-                    **node,
-                    "classification": FETCH_FAILED,
-                    "fetch_ok": False,
-                    "status_code": fetched.status_code,
-                    "final_url": fetched.final_url,
-                    "fetch_error": fetched.error,
-                    "evidence": {},
-                })
-                continue
+    # Phase 2: one navigation fetch per root per turn. This preserves the global
+    # budget while preventing a large first catalogue from starving later roots.
+    active: deque[dict[str, Any]] = deque(root_states)
+    while active and page_attempted < max_navigation_page_fetches:
+        state = active.popleft()
+        queue = state["queue"]
+        if not queue:
+            continue
+        node = queue.popleft()
+        root_host = state["root_host"]
+        page_attempted += 1
+        state["fetch_count"] += 1
 
+        fetched = page_fetcher(node["url"])
+        if not fetched.ok:
+            navigation_results.append({
+                **node,
+                "classification": FETCH_FAILED,
+                "fetch_ok": False,
+                "status_code": fetched.status_code,
+                "final_url": fetched.final_url,
+                "fetch_error": fetched.error,
+                "evidence": {},
+            })
+        else:
             final_url = fetched.final_url or node["url"]
             role = _commercial_url_role(final_url)
             if _host(final_url) != root_host or role is None:
@@ -445,73 +470,88 @@ def resolve_exact_lot_multihop(
                     "fetch_error": None,
                     "evidence": {},
                 })
-                continue
+            else:
+                page_succeeded += 1
+                classification, evidence = _classify_child_page(
+                    title=fetched.title,
+                    text=fetched.text,
+                    url=final_url,
+                )
+                row = {
+                    **node,
+                    "url": final_url,
+                    "classification": classification,
+                    "fetch_ok": True,
+                    "status_code": fetched.status_code,
+                    "final_url": final_url,
+                    "fetch_error": None,
+                    "truncated": fetched.truncated,
+                    "navigation_role": role,
+                    "navigation_depth": node["depth"],
+                    "navigation_chain": [*node["chain"][:-1], final_url],
+                    "evidence": evidence,
+                }
+                navigation_results.append(row)
 
-            page_succeeded += 1
-            classification, evidence = _classify_child_page(
-                title=fetched.title,
-                text=fetched.text,
-                url=final_url,
-            )
-            row = {
-                **node,
-                "url": final_url,
-                "classification": classification,
-                "fetch_ok": True,
-                "status_code": fetched.status_code,
-                "final_url": final_url,
-                "fetch_error": None,
-                "truncated": fetched.truncated,
-                "navigation_role": role,
-                "navigation_depth": node["depth"],
-                "navigation_chain": [*node["chain"][:-1], final_url],
-                "evidence": evidence,
-            }
-            navigation_results.append(row)
+                if _strict_exact(classification, evidence):
+                    exact_lots.append({
+                        **row,
+                        "provider": provider,
+                        "parent_url": node["root_url"],
+                        "exact_lot_accepted": True,
+                    })
+                elif _gateway_eligible(
+                    url=final_url,
+                    classification=classification,
+                    evidence=evidence,
+                ):
+                    gateway_pages.append({
+                        **row,
+                        "provider": provider,
+                        "parent_url": node["root_url"],
+                        "exact_lot_accepted": False,
+                    })
+                    if node["depth"] >= max_navigation_depth:
+                        depth_exhausted += 1
+                    else:
+                        fetched_html = aggregate_fetcher(final_url)
+                        if (
+                            fetched_html.ok
+                            and _host(fetched_html.final_url or final_url) == root_host
+                        ):
+                            html_url = fetched_html.final_url or final_url
+                            next_links = _extract_navigation_links(
+                                page_url=html_url,
+                                root_host=root_host,
+                                html_text=fetched_html.html,
+                                max_links=max_links_per_page,
+                            )
+                            # Child links are already ranked PRODUCT_DETAIL first.
+                            # Put them ahead of older siblings inside this root,
+                            # while root-level round-robin still protects fairness.
+                            fresh_nodes: list[dict[str, Any]] = []
+                            for link in next_links:
+                                if link in seen_navigation_urls:
+                                    continue
+                                seen_navigation_urls.add(link)
+                                fresh_nodes.append({
+                                    "url": link,
+                                    "depth": node["depth"] + 1,
+                                    "chain": [*row["navigation_chain"], link],
+                                    "root_url": node["root_url"],
+                                    "market_code": node["market_code"],
+                                    "query": node["query"],
+                                })
+                            for fresh in reversed(fresh_nodes):
+                                queue.appendleft(fresh)
 
-            if _strict_exact(classification, evidence):
-                exact_lots.append({
-                    **row,
-                    "provider": provider,
-                    "parent_url": node["root_url"],
-                    "exact_lot_accepted": True,
-                })
-                continue
+        if queue:
+            active.append(state)
 
-            if not _gateway_eligible(url=final_url, classification=classification, evidence=evidence):
-                continue
-            gateway_pages.append({
-                **row,
-                "provider": provider,
-                "parent_url": node["root_url"],
-                "exact_lot_accepted": False,
-            })
-            if node["depth"] >= max_navigation_depth:
-                depth_exhausted += 1
-                continue
-
-            fetched_html = aggregate_fetcher(final_url)
-            if not fetched_html.ok or _host(fetched_html.final_url or final_url) != root_host:
-                continue
-            html_url = fetched_html.final_url or final_url
-            next_links = _extract_navigation_links(
-                page_url=html_url,
-                root_host=root_host,
-                html_text=fetched_html.html,
-                max_links=max_links_per_page,
-            )
-            for link in next_links:
-                if link in seen_navigation_urls:
-                    continue
-                seen_navigation_urls.add(link)
-                queue.append({
-                    "url": link,
-                    "depth": node["depth"] + 1,
-                    "chain": [*row["navigation_chain"], link],
-                    "root_url": node["root_url"],
-                    "market_code": node["market_code"],
-                    "query": node["query"],
-                })
+    page_budget_exhausted = sum(len(state["queue"]) for state in root_states)
+    root_navigation_fetch_counts = {
+        state["root_url"]: state["fetch_count"] for state in root_states
+    }
 
     return {
         **base,
@@ -519,6 +559,7 @@ def resolve_exact_lot_multihop(
         "block_reason": None,
         "eligible_root_parent_count": len(roots),
         "root_results": root_results,
+        "root_navigation_fetch_counts": root_navigation_fetch_counts,
         "navigation_page_fetches_attempted": page_attempted,
         "navigation_page_fetches_succeeded": page_succeeded,
         "depth_budget_exhausted_count": depth_exhausted,
@@ -529,6 +570,6 @@ def resolve_exact_lot_multihop(
         "exact_lot_candidate_count": len(exact_lots),
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Commercial hubs and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Multi-hop navigation stays same-origin and bounded by explicit URL roles, depth and page budgets."
+            "Commercial hubs and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Multi-hop navigation stays same-origin, root-fair and bounded by explicit URL roles, depth and the unchanged global page budget."
         ),
     }
