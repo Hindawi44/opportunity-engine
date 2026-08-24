@@ -226,9 +226,10 @@ def build_checkpoint_result_from_exact_lots(
 ) -> dict[str, Any]:
     candidates = [_candidate_from_exact_lot(row, market=market) for row in exact_lots]
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.0",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.1",
         "status": "SUCCESS",
         "execution_status": "PASS",
+        "discovered_at": datetime.now(timezone.utc).isoformat(),
         "domain": CLOTHING_INVENTORY,
         "market_code": market,
         "currency": MARKET_CURRENCIES[market],
