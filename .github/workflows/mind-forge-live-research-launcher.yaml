@@ -40,6 +40,7 @@ on:
         default: ""
       rollback_id:
         description: Unique rollback id; required only for rollback
+        required: false
         type: string
         default: ""
       observed_independent_run_count:
