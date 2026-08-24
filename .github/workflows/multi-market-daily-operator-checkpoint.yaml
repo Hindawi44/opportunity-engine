@@ -67,6 +67,7 @@ on:
       - "scripts/run_market_clothing_inventory_discovery.py"
       - "scripts/run_germany_clothing_inventory_discovery_search.py"
       - "scripts/run_daily_search_success_learning.py"
+      - "scripts/run_exa_exact_lot_checkpoint.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/market_intelligence.py"
@@ -102,6 +103,7 @@ on:
       - "tests/test_human_review_outcome_v1.py"
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "tests/test_exa_exact_lot_checkpoint_bridge_v1.py"
       - "tests/test_persistent_search_success_memory_v1.py"
       - "tests/test_useful_output_checkpoint_validator_regression.py"
       - "tests/test_germany_sen_sen_source_v1.py"
@@ -147,6 +149,7 @@ jobs:
           pytest tests/test_human_review_checkpoint_v1.py -q
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
+          pytest tests/test_exa_exact_lot_checkpoint_bridge_v1.py -q
           pytest tests/test_persistent_search_success_memory_v1.py -q
           pytest tests/test_useful_output_checkpoint_validator_regression.py -q
           pytest tests/test_germany_sen_sen_source_v1.py -q
@@ -220,6 +223,39 @@ jobs:
           test -f "$INPUT_ROOT/learning/search-success-memory.json"
           test -f "$OUTPUT_DIR/search-success-review.json"
           test -f "$OUTPUT_DIR/search-success-review.txt"
+
+      - name: Run Exa Exact-Lot NO checkpoint source
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/no-exa-exact-lot" -- \
+            python scripts/run_exa_exact_lot_checkpoint.py \
+              --market NO \
+              --output-dir "$INPUT_ROOT/no-exa-exact-lot" \
+              --results-per-query 5 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/no-exa-exact-lot/opportunity_engine.db"
+
+      - name: Run Exa Exact-Lot SE checkpoint source
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/se-exa-exact-lot" -- \
+            python scripts/run_exa_exact_lot_checkpoint.py \
+              --market SE \
+              --output-dir "$INPUT_ROOT/se-exa-exact-lot" \
+              --results-per-query 5 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/se-exa-exact-lot/opportunity_engine.db"
+
+      - name: Run Exa Exact-Lot DE checkpoint source
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-exa-exact-lot" -- \
+            python scripts/run_exa_exact_lot_checkpoint.py \
+              --market DE \
+              --output-dir "$INPUT_ROOT/de-exa-exact-lot" \
+              --results-per-query 5 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-exa-exact-lot/opportunity_engine.db"
 
       - name: Run Norway Auksjonen public clothing path
         run: |
@@ -401,6 +437,12 @@ jobs:
                 "artifact_dir": "artifacts/multi-market-inputs/no-cross-source"
               },
               {
+                "market_code": "NO",
+                "source_name": "Exa Exact-Lot NO",
+                "currency": "NOK",
+                "artifact_dir": "artifacts/multi-market-inputs/no-exa-exact-lot"
+              },
+              {
                 "market_code": "SE",
                 "source_name": "Blinto",
                 "currency": "SEK",
@@ -417,6 +459,12 @@ jobs:
                 "source_name": "PS Auction",
                 "currency": "SEK",
                 "artifact_dir": "artifacts/multi-market-inputs/se-psauction"
+              },
+              {
+                "market_code": "SE",
+                "source_name": "Exa Exact-Lot SE",
+                "currency": "SEK",
+                "artifact_dir": "artifacts/multi-market-inputs/se-exa-exact-lot"
               },
               {
                 "market_code": "DE",
@@ -441,6 +489,12 @@ jobs:
                 "source_name": "Deutsche Pfandverwertung",
                 "currency": "EUR",
                 "artifact_dir": "artifacts/multi-market-inputs/de-dpv"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "Exa Exact-Lot DE",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-exa-exact-lot"
               }
             ]
           }
@@ -525,8 +579,9 @@ jobs:
           # Compatibility markers for previous source-count contracts:
           # "all six bounded source paths"
           # "all nine bounded source paths"
-          if len(report.get("sources") or []) != 10:
-              raise SystemExit("The checkpoint did not include all ten bounded source paths")
+          # "all ten bounded source paths"
+          if len(report.get("sources") or []) != 13:
+              raise SystemExit("The checkpoint did not include all thirteen bounded source paths")
           if summary.count("الإجراء البشري الوحيد:") != 1:
               raise SystemExit("The phone report must contain exactly one human action")
           for key in (
@@ -537,7 +592,7 @@ jobs:
           ):
               if report.get(key) is not False:
                   raise SystemExit(f"Automatic action safety changed: {key}")
-          if sum((report.get("source_execution_counts") or {}).values()) != 10:
+          if sum((report.get("source_execution_counts") or {}).values()) != 13:
               raise SystemExit("Source execution statuses do not reconcile")
 
           source_by_name = {
@@ -557,6 +612,9 @@ jobs:
               raise SystemExit("PS Auction was not included in the checkpoint")
           if "Sen & Sen" not in source_by_name:
               raise SystemExit("Sen & Sen was not included in the checkpoint")
+          for exa_source in ("Exa Exact-Lot NO", "Exa Exact-Lot SE", "Exa Exact-Lot DE"):
+              if exa_source not in source_by_name:
+                  raise SystemExit(f"{exa_source} was not included in the checkpoint")
 
           lifecycle = report.get("lifecycle") or {}
           stage_counts = lifecycle.get("stage_counts") or {}

@@ -50,6 +50,28 @@ def test_checkpoint_workflow_covers_only_completed_markets() -> None:
     assert "run_dpv_active_discovery.py" in text
 
 
+def test_exa_exact_lot_bridge_runs_for_no_se_de_before_legacy_sources() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    search_success = text.index("- name: Run daily Search Success shadow learning")
+    exa_no = text.index("- name: Run Exa Exact-Lot NO checkpoint source")
+    exa_se = text.index("- name: Run Exa Exact-Lot SE checkpoint source")
+    exa_de = text.index("- name: Run Exa Exact-Lot DE checkpoint source")
+    auksjonen = text.index("- name: Run Norway Auksjonen public clothing path")
+
+    assert search_success < exa_no < exa_se < exa_de < auksjonen
+    assert text.count("python scripts/run_exa_exact_lot_checkpoint.py") == 3
+    for market, directory, currency in (
+        ("NO", "no-exa-exact-lot", "NOK"),
+        ("SE", "se-exa-exact-lot", "SEK"),
+        ("DE", "de-exa-exact-lot", "EUR"),
+    ):
+        assert f"--market {market}" in text
+        assert f'"source_name": "Exa Exact-Lot {market}"' in text
+        assert f'"currency": "{currency}"' in text
+        assert f'"artifact_dir": "artifacts/multi-market-inputs/{directory}"' in text
+        assert f"sqlite:///$INPUT_ROOT/{directory}/opportunity_engine.db" in text
+
+
 def test_checkpoint_reads_finn_gmail_after_auksjonen() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     auksjonen = text.index("- name: Run Norway Auksjonen public clothing path")
@@ -79,7 +101,8 @@ def test_sweden_daily_checkpoint_runs_three_direct_source_packs_before_germany()
     assert blinto < klaravik < psauction < sen_sen < riegermann
     assert "all nine bounded source paths" in text
     assert "all ten bounded source paths" in text
-    assert '!= 10' in text
+    assert "all thirteen bounded source paths" in text
+    assert '!= 13' in text
     assert '"Klaravik" not in source_by_name' in text
     assert '"PS Auction" not in source_by_name' in text
     assert '"Sen & Sen" not in source_by_name' in text
@@ -95,13 +118,14 @@ def test_checkpoint_workflow_preserves_one_human_action() -> None:
 def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     restore = text.index("- name: Restore previous lifecycle SQLite state")
-    first_source = text.index("- name: Run Norway Auksjonen public clothing path")
+    first_source = text.index("- name: Run Exa Exact-Lot NO checkpoint source")
+    auksjonen_source = text.index("- name: Run Norway Auksjonen public clothing path")
     finn_source = text.index("- name: Read FINN saved-search alerts from Gmail")
     build = text.index("- name: Build the three-market operator checkpoint")
     enrich = text.index("- name: Enrich checkpoint with lifecycle state and transitions")
     reconcile = text.index("- name: Reconcile persisted human review outcomes")
 
-    assert restore < first_source < finn_source < build < enrich < reconcile
+    assert restore < first_source < auksjonen_source < finn_source < build < enrich < reconcile
     assert "previous-state-restore.json" in text
     assert "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT" in text
     assert "CURRENT_RUN_INITIALIZATION" in text
