@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Run the proven Exa Exact-Lot + Multi-Hop route as a checkpoint source.
+"""Run the unified Exa Exact-Lot + Multi-Hop route as a checkpoint source.
 
-The runner uses the live-proven six-market clothing queries. It does not add
-source-specific domains, does not activate Brave, and keeps all markets on the
-same Search -> Verification -> Multi-Hop -> Exact-Lot path. Expansion markets
-may run one bounded, historically proven fallback query only when the primary
-query produces zero strict Exact-Lots.
+All six clothing markets stay on the same Search -> Verification -> Multi-Hop ->
+Exact-Lot path. A bounded, source-neutral recall query may run only after the
+primary query pack reaches zero strict Exact-Lots. No source-specific domain,
+Brave activation, query promotion, or commercial action is enabled here.
 """
 from __future__ import annotations
 
@@ -64,10 +63,12 @@ MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
     "NL": (MARKET_EXACT_LOT_QUERIES["NL"],),
 }
 
-# These are generic, source-neutral queries that already produced strict live
-# Exact-Lots in run 32728681986. They are not executed unless the primary query
-# reaches the end of Verification + Multi-Hop with zero strict Exact-Lots.
+# Generic, source-neutral recall queries. FR/IT/NL were live-proven in run
+# 32728681986. SE is derived from the live-proven Swedish Restpartier route in
+# run 32737032530 and deliberately describes the commercial page pattern, not
+# a website/domain. None of these queries runs unless primary strict yield = 0.
 MARKET_ZERO_YIELD_RECALL_QUERIES: dict[str, tuple[str, ...]] = {
+    "SE": ("Sverige restpartier kläder grossist säljes parti",),
     "FR": ("France déstockage vêtements grossiste stock lot",),
     "IT": ("Italia liquidazione stock abbigliamento ingrosso",),
     "NL": ("Nederland kledingvoorraad restpartij groothandel",),
@@ -179,9 +180,7 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "page_role": ITEM_LISTING,
         "source_urls": [url],
         "canonical_urls": [url],
-        "found_by_queries": [_compact(row.get("query"))]
-        if _compact(row.get("query"))
-        else [],
+        "found_by_queries": [_compact(row.get("query"))] if _compact(row.get("query")) else [],
         "source_providers": ["EXA"],
         "evidence_signals": [
             "CLOTHING_INVENTORY",
@@ -204,8 +203,7 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
                 "page_role": ITEM_LISTING,
                 "opportunity_identity": url,
                 "identity_stable": True,
-                "clothing_inventory_evidence": evidence.get("project_domain")
-                == CLOTHING_INVENTORY,
+                "clothing_inventory_evidence": evidence.get("project_domain") == CLOTHING_INVENTORY,
                 "sale_evidence": evidence.get("direct_sale_evidence") is True,
                 "verification_content_match": True,
                 "bounded_context": bounded_context,
@@ -257,7 +255,7 @@ def build_checkpoint_result_from_exact_lots(
 ) -> dict[str, Any]:
     candidates = [_candidate_from_exact_lot(row, market=market) for row in exact_lots]
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.3",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.4",
         "status": "SUCCESS",
         "execution_status": "PASS",
         "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -273,12 +271,8 @@ def build_checkpoint_result_from_exact_lots(
         "strong_leads_requiring_verification": 0,
         "rejected_results": 0,
         "generic_pages_excluded": int(multihop.get("gateway_page_count") or 0),
-        "direct_exact_lot_count": int(
-            verification.get("exact_lot_candidate_count") or 0
-        ),
-        "multihop_exact_lot_count": int(
-            multihop.get("exact_lot_candidate_count") or 0
-        ),
+        "direct_exact_lot_count": int(verification.get("exact_lot_candidate_count") or 0),
+        "multihop_exact_lot_count": int(multihop.get("exact_lot_candidate_count") or 0),
         "strict_exact_lot_count": len(candidates),
         "currency_conversion_performed": False,
         "tax_calculation_performed": False,
@@ -326,11 +320,7 @@ def run_market(
                 "query": query,
                 "query_stage": stage,
                 "hits": [
-                    {
-                        "title": hit.title,
-                        "url": hit.url,
-                        "description": hit.description,
-                    }
+                    {"title": hit.title, "url": hit.url, "description": hit.description}
                     for hit in hits
                 ],
             }
@@ -387,9 +377,7 @@ def run_market(
     report["primary_strict_exact_lot_count"] = primary_strict_exact_lot_count
     report["zero_yield_recall_available"] = bool(recall_queries)
     report["zero_yield_recall_triggered"] = zero_yield_recall_triggered
-    report["zero_yield_recall_query_count"] = (
-        len(recall_queries) if zero_yield_recall_triggered else 0
-    )
+    report["zero_yield_recall_query_count"] = len(recall_queries) if zero_yield_recall_triggered else 0
     report["zero_yield_recall_added_exact_lot_count"] = max(
         0, len(exact_lots) - primary_strict_exact_lot_count
     )
@@ -397,7 +385,7 @@ def run_market(
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.2",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.3",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
@@ -407,9 +395,7 @@ def run_market(
                 "available": bool(recall_queries),
                 "triggered": zero_yield_recall_triggered,
                 "primary_strict_exact_lot_count": primary_strict_exact_lot_count,
-                "recall_query_count": len(recall_queries)
-                if zero_yield_recall_triggered
-                else 0,
+                "recall_query_count": len(recall_queries) if zero_yield_recall_triggered else 0,
                 "final_strict_exact_lot_count": len(exact_lots),
             },
             "verification": verification,
@@ -425,9 +411,7 @@ def run_market(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--market", choices=tuple(MARKET_EXACT_LOT_QUERY_PACKS), required=True
-    )
+    parser.add_argument("--market", choices=tuple(MARKET_EXACT_LOT_QUERY_PACKS), required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--results-per-query", type=int, default=RESULTS_PER_QUERY)
     parser.add_argument("--persist-unified", action="store_true")
@@ -436,9 +420,7 @@ def main() -> int:
     args = parser.parse_args()
 
     if not 1 <= args.results_per_query <= RESULTS_PER_QUERY:
-        raise SystemExit(
-            f"--results-per-query must be between 1 and {RESULTS_PER_QUERY}"
-        )
+        raise SystemExit(f"--results-per-query must be between 1 and {RESULTS_PER_QUERY}")
     if args.persist_unified and not _compact(args.database_url):
         raise SystemExit("--database-url is required with --persist-unified")
     exa_api_key = _compact(os.environ.get("EXA_API_KEY"))
