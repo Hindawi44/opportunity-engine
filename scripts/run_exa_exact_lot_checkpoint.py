@@ -2,9 +2,10 @@
 """Run the proven Exa Exact-Lot + Multi-Hop route as a checkpoint source.
 
 The runner uses the live-proven six-market clothing queries. It does not add
-source-specific domains, does not mutate queries, and does not activate Brave.
-Only strict clothing Exact-Lots become checkpoint candidates; aggregate pages
-remain navigation evidence only.
+source-specific domains, does not activate Brave, and keeps all markets on the
+same Search -> Verification -> Multi-Hop -> Exact-Lot path. Expansion markets
+may run one bounded, historically proven fallback query only when the primary
+query produces zero strict Exact-Lots.
 """
 from __future__ import annotations
 
@@ -58,11 +59,18 @@ MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
         "Deutschland Sonderposten Kleidung zu verkaufen Großhandel",
         "Deutschland Warenlager Mode Restposten Bekleidung",
     ),
-    # Reuse the already-live-proven six-market Exa queries for the expansion
-    # markets instead of leaving them on a separate market-specific path.
     "FR": (MARKET_EXACT_LOT_QUERIES["FR"],),
     "IT": (MARKET_EXACT_LOT_QUERIES["IT"],),
     "NL": (MARKET_EXACT_LOT_QUERIES["NL"],),
+}
+
+# These are generic, source-neutral queries that already produced strict live
+# Exact-Lots in run 32728681986. They are not executed unless the primary query
+# reaches the end of Verification + Multi-Hop with zero strict Exact-Lots.
+MARKET_ZERO_YIELD_RECALL_QUERIES: dict[str, tuple[str, ...]] = {
+    "FR": ("France déstockage vêtements grossiste stock lot",),
+    "IT": ("Italia liquidazione stock abbigliamento ingrosso",),
+    "NL": ("Nederland kledingvoorraad restpartij groothandel",),
 }
 
 
@@ -249,7 +257,7 @@ def build_checkpoint_result_from_exact_lots(
 ) -> dict[str, Any]:
     candidates = [_candidate_from_exact_lot(row, market=market) for row in exact_lots]
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.2",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.3",
         "status": "SUCCESS",
         "execution_status": "PASS",
         "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -257,7 +265,7 @@ def build_checkpoint_result_from_exact_lots(
         "market_code": market,
         "currency": MARKET_CURRENCIES[market],
         "source_mode": "EXA_EXACT_LOT_MULTIHOP",
-        "query_pack": "SIX_MARKET_EXACT_LOT_PROVEN_V1",
+        "query_pack": "SIX_MARKET_EXACT_LOT_ADAPTIVE_RECALL_V2",
         "queries_submitted": query_count,
         "hits_received": hit_count,
         "merged_candidates": len(candidates),
@@ -300,13 +308,14 @@ def _write_json(path: Path, payload: object) -> None:
 def run_market(
     *, market: str, exa_api_key: str, output_dir: Path, results_per_query: int
 ) -> dict[str, Any]:
-    queries = MARKET_EXACT_LOT_QUERY_PACKS[market]
+    primary_queries = MARKET_EXACT_LOT_QUERY_PACKS[market]
+    recall_queries = MARKET_ZERO_YIELD_RECALL_QUERIES.get(market, ())
     provider = ExaSearchProvider(exa_api_key)
     all_hits = []
     seen_urls: set[str] = set()
     query_rows: list[dict[str, Any]] = []
 
-    for query in queries:
+    def collect(query: str, *, stage: str) -> None:
         if not _market_anchored(query, market):
             raise RuntimeError(f"query not market anchored: {market}: {query}")
         if classify_project_domain(text=query) != CLOTHING_INVENTORY:
@@ -315,6 +324,7 @@ def run_market(
         query_rows.append(
             {
                 "query": query,
+                "query_stage": stage,
                 "hits": [
                     {
                         "title": hit.title,
@@ -331,42 +341,77 @@ def run_market(
             seen_urls.add(hit.url)
             all_hits.append(hit)
 
-    benchmark = _custom_benchmark(
-        market=market,
-        query=" | ".join(queries),
-        hits=all_hits,
-        project_domain=CLOTHING_INVENTORY,
-    )
-    verification = verify_provider_unique_pages(
-        benchmark,
-        provider="exa",
-        max_page_fetches=min(30, max(1, len(all_hits))),
-    )
-    multihop = resolve_exact_lot_multihop(
-        verification,
-        max_root_parents=6,
-        max_navigation_depth=3,
-        max_links_per_page=12,
-        max_navigation_page_fetches=30,
-    )
-    exact_lots = _exact_lot_rows(verification, multihop)
+    def evaluate() -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
+        benchmark = _custom_benchmark(
+            market=market,
+            query=" | ".join(row["query"] for row in query_rows),
+            hits=all_hits,
+            project_domain=CLOTHING_INVENTORY,
+        )
+        verification = verify_provider_unique_pages(
+            benchmark,
+            provider="exa",
+            max_page_fetches=min(30, max(1, len(all_hits))),
+        )
+        multihop = resolve_exact_lot_multihop(
+            verification,
+            max_root_parents=6,
+            max_navigation_depth=3,
+            max_links_per_page=12,
+            max_navigation_page_fetches=30,
+        )
+        return verification, multihop, _exact_lot_rows(verification, multihop)
+
+    for query in primary_queries:
+        collect(query, stage="PRIMARY")
+
+    verification, multihop, exact_lots = evaluate()
+    primary_strict_exact_lot_count = len(exact_lots)
+    zero_yield_recall_triggered = not exact_lots and bool(recall_queries)
+
+    if zero_yield_recall_triggered:
+        for query in recall_queries:
+            collect(query, stage="ZERO_YIELD_RECALL")
+        verification, multihop, exact_lots = evaluate()
+
     result = build_checkpoint_result_from_exact_lots(
         exact_lots,
         market=market,
-        query_count=len(queries),
+        query_count=len(query_rows),
         hit_count=sum(len(row["hits"]) for row in query_rows),
         verification=verification,
         multihop=multihop,
     )
+    report = result["search_run_report"]
+    report["primary_query_count"] = len(primary_queries)
+    report["primary_strict_exact_lot_count"] = primary_strict_exact_lot_count
+    report["zero_yield_recall_available"] = bool(recall_queries)
+    report["zero_yield_recall_triggered"] = zero_yield_recall_triggered
+    report["zero_yield_recall_query_count"] = (
+        len(recall_queries) if zero_yield_recall_triggered else 0
+    )
+    report["zero_yield_recall_added_exact_lot_count"] = max(
+        0, len(exact_lots) - primary_strict_exact_lot_count
+    )
+
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.1",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.2",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
             "provider": "exa",
             "queries": query_rows,
+            "adaptive_zero_yield_recall": {
+                "available": bool(recall_queries),
+                "triggered": zero_yield_recall_triggered,
+                "primary_strict_exact_lot_count": primary_strict_exact_lot_count,
+                "recall_query_count": len(recall_queries)
+                if zero_yield_recall_triggered
+                else 0,
+                "final_strict_exact_lot_count": len(exact_lots),
+            },
             "verification": verification,
             "multihop": multihop,
             "strict_exact_lot_count": len(exact_lots),

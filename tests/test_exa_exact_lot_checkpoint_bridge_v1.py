@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 from opportunity_engine.discovery.checkpoint_state_restore import DATABASE_RELATIVE_PATHS
 from opportunity_engine.discovery.exa_exact_lot_shadow_hunt import MARKET_EXACT_LOT_QUERIES
+from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.discovery.source_artifact_continuity import _time
 from opportunity_engine.discovery.unified_opportunity_report import build_unified_opportunity_report
+from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY, classify_project_domain
+from opportunity_engine.search_experiment_execution_bridge_v1 import _market_anchored
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -108,6 +112,133 @@ def test_exa_exact_lot_runner_covers_all_existing_six_markets() -> None:
     assert set(module.MARKET_CURRENCIES) == {"NO", "SE", "DE", "FR", "IT", "NL"}
     for market in ("FR", "IT", "NL"):
         assert module.MARKET_EXACT_LOT_QUERY_PACKS[market] == (MARKET_EXACT_LOT_QUERIES[market],)
+        assert len(module.MARKET_ZERO_YIELD_RECALL_QUERIES[market]) == 1
+        fallback = module.MARKET_ZERO_YIELD_RECALL_QUERIES[market][0]
+        assert _market_anchored(fallback, market)
+        assert classify_project_domain(text=fallback) == CLOTHING_INVENTORY
+        assert "site:" not in fallback.casefold()
+
+
+def test_zero_yield_recall_runs_only_after_primary_strict_zero(monkeypatch, tmp_path: Path) -> None:
+    module = _load_script()
+    searches: list[str] = []
+    verification_calls = 0
+
+    class FakeProvider:
+        def __init__(self, _key: str):
+            pass
+
+        def search(self, query: str, *, count: int):
+            searches.append(query)
+            return [
+                SearchHit(
+                    title="Wholesale clothing stock",
+                    url=f"https://example.test/search/{len(searches)}",
+                    description="clothing stock wholesale",
+                    provider="exa",
+                )
+            ][:count]
+
+    def fake_verify(_benchmark, **_kwargs):
+        nonlocal verification_calls
+        verification_calls += 1
+        return {"verified_pages": [], "exact_lot_candidate_count": 0}
+
+    def fake_multihop(_verification, **_kwargs):
+        if verification_calls == 1:
+            return {
+                "exact_lots": [],
+                "exact_lot_candidate_count": 0,
+                "gateway_page_count": 1,
+            }
+        row = _strict_row("https://example.test/product/55-pezzi-abbigliamento")
+        row["query"] = module.MARKET_ZERO_YIELD_RECALL_QUERIES["IT"][0]
+        return {
+            "exact_lots": [row],
+            "exact_lot_candidate_count": 1,
+            "gateway_page_count": 1,
+        }
+
+    monkeypatch.setattr(module, "ExaSearchProvider", FakeProvider)
+    monkeypatch.setattr(module, "verify_provider_unique_pages", fake_verify)
+    monkeypatch.setattr(module, "resolve_exact_lot_multihop", fake_multihop)
+
+    result = module.run_market(
+        market="IT",
+        exa_api_key="test-key",
+        output_dir=tmp_path,
+        results_per_query=5,
+    )
+
+    assert searches == [
+        MARKET_EXACT_LOT_QUERIES["IT"],
+        module.MARKET_ZERO_YIELD_RECALL_QUERIES["IT"][0],
+    ]
+    report = result["search_run_report"]
+    assert report["strict_exact_lot_count"] == 1
+    assert report["primary_strict_exact_lot_count"] == 0
+    assert report["zero_yield_recall_triggered"] is True
+    assert report["zero_yield_recall_query_count"] == 1
+    assert report["zero_yield_recall_added_exact_lot_count"] == 1
+    assert report["queries_submitted"] == 2
+
+    resolution = json.loads((tmp_path / "exa-exact-lot-resolution.json").read_text())
+    assert [row["query_stage"] for row in resolution["queries"]] == [
+        "PRIMARY",
+        "ZERO_YIELD_RECALL",
+    ]
+    assert resolution["adaptive_zero_yield_recall"]["triggered"] is True
+
+
+def test_zero_yield_recall_is_not_spent_when_primary_already_has_exact_lot(
+    monkeypatch, tmp_path: Path
+) -> None:
+    module = _load_script()
+    searches: list[str] = []
+
+    class FakeProvider:
+        def __init__(self, _key: str):
+            pass
+
+        def search(self, query: str, *, count: int):
+            searches.append(query)
+            return [
+                SearchHit(
+                    title="Wholesale clothing stock",
+                    url="https://example.test/root",
+                    description="clothing stock wholesale",
+                    provider="exa",
+                )
+            ][:count]
+
+    def fake_verify(_benchmark, **_kwargs):
+        return {"verified_pages": [], "exact_lot_candidate_count": 0}
+
+    def fake_multihop(_verification, **_kwargs):
+        row = _strict_row("https://example.test/product/2174-stuks-kleding")
+        return {
+            "exact_lots": [row],
+            "exact_lot_candidate_count": 1,
+            "gateway_page_count": 1,
+        }
+
+    monkeypatch.setattr(module, "ExaSearchProvider", FakeProvider)
+    monkeypatch.setattr(module, "verify_provider_unique_pages", fake_verify)
+    monkeypatch.setattr(module, "resolve_exact_lot_multihop", fake_multihop)
+
+    result = module.run_market(
+        market="NL",
+        exa_api_key="test-key",
+        output_dir=tmp_path,
+        results_per_query=5,
+    )
+
+    assert searches == [MARKET_EXACT_LOT_QUERIES["NL"]]
+    report = result["search_run_report"]
+    assert report["primary_strict_exact_lot_count"] == 1
+    assert report["zero_yield_recall_triggered"] is False
+    assert report["zero_yield_recall_query_count"] == 0
+    assert report["queries_submitted"] == 1
 
 
 def test_existing_core_exa_databases_remain_restorable_across_daily_checkpoints() -> None:
