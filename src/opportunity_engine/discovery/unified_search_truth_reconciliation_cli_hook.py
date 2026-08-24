@@ -1,11 +1,8 @@
-"""Reconcile operator stage labels with the already-unified live search runtime.
+"""Reconcile operator stage labels with the unified live search runtime.
 
-This is a reporting/truth guard, not a new search path. It runs after
-UNIFIED_SEARCH_RUNTIME_V1 has written the six-market clothing and fabric search
-facts, then updates stale legacy stage labels without hiding source failures.
-
-Search development stays on one runtime path. No country-specific bypass,
-source promotion, contact, bid, reservation, purchase, or payment is enabled.
+This is a reporting/truth guard, not a search path. It applies the already-run
+UNIFIED_SEARCH_RUNTIME_V1 facts to stale legacy stage labels while preserving
+source failures as diagnostics. Search development remains on one shared path.
 """
 from __future__ import annotations
 
@@ -96,10 +93,27 @@ def _search_development_contract() -> dict[str, Any]:
     }
 
 
+def _change(
+    market_changes: dict[str, Any],
+    stage: dict[str, Any],
+    *,
+    name: str,
+    new_status: str,
+) -> None:
+    old = _compact(stage.get("status")).upper() or "UNKNOWN"
+    if new_status == old:
+        return
+    market_changes["stage_changes"].append(
+        {"stage": name, "from": old, "to": new_status}
+    )
+    stage["legacy_status_before_search_truth"] = old
+    stage["status"] = new_status
+
+
 def reconcile_unified_search_truth(
     ledger: Mapping[str, Any],
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Apply live search truth to stale stage labels without erasing failures."""
+    """Apply unified search truth without hiding legacy source failures."""
     reconciled = deepcopy(dict(ledger))
     runtime = reconciled.get("search_runtime") or {}
     if not isinstance(runtime, Mapping):
@@ -141,6 +155,8 @@ def reconcile_unified_search_truth(
         existing_exact = _int(exact_stage.get("verified_active_exact_lot_count"))
         effective_exact = max(existing_exact, exa_exact)
         source_failures = _source_failure_count(discovery)
+        qualification_count = _int(qualification.get("qualification_count"))
+        financial_ready = _int(qualification.get("financial_decision_ready_count"))
 
         market_changes: dict[str, Any] = {
             "market_code": code,
@@ -155,73 +171,69 @@ def reconcile_unified_search_truth(
         old_discovery = _compact(discovery.get("status")).upper() or "UNKNOWN"
         if effective_exact > 0:
             new_discovery = "SUCCESS"
-        elif hits > 0 and old_discovery == "FAILURE":
+        elif hits > 0 and old_discovery in {"FAILURE", "BLOCKED_RETRIEVAL"}:
             new_discovery = "PARTIAL"
         else:
             new_discovery = old_discovery
-        if new_discovery != old_discovery:
-            market_changes["stage_changes"].append(
-                {"stage": "DISCOVERY", "from": old_discovery, "to": new_discovery}
-            )
-            discovery["legacy_status_before_search_truth"] = old_discovery
-            discovery["status"] = new_discovery
+        _change(market_changes, discovery, name="DISCOVERY", new_status=new_discovery)
         discovery["unified_search_status"] = search_status
         discovery["unified_search_hits"] = hits
         discovery["verified_exact_lot_count"] = effective_exact
         discovery["source_failures_preserved"] = source_failures > 0
         discovery["partial_source_failure_count"] = source_failures
 
-        old_exact = _compact(exact_stage.get("status")).upper() or "UNKNOWN"
-        new_exact = "SUCCESS" if effective_exact > 0 else "VALID_ZERO"
-        if new_exact != old_exact:
-            market_changes["stage_changes"].append(
-                {"stage": "EXACT_LOT_VERIFICATION", "from": old_exact, "to": new_exact}
-            )
-            exact_stage["legacy_status_before_search_truth"] = old_exact
-            exact_stage["status"] = new_exact
+        _change(
+            market_changes,
+            exact_stage,
+            name="EXACT_LOT_VERIFICATION",
+            new_status="SUCCESS" if effective_exact > 0 else "VALID_ZERO",
+        )
         exact_stage["verified_active_exact_lot_count"] = effective_exact
         exact_stage["exa_verified_exact_lot_count"] = exa_exact
         exact_stage["capability_implemented"] = True
         exact_stage["engine_version"] = "UNIFIED_EXA_EXACT_LOT_MULTIHOP_V1"
 
-        qualification_count = _int(qualification.get("qualification_count"))
-        financial_ready = _int(qualification.get("financial_decision_ready_count"))
         old_qualification = _compact(qualification.get("status")).upper() or "UNKNOWN"
         if effective_exact > 0 and not financial_ready and not qualification_count:
             new_qualification = "REQUIRES_VERIFICATION"
         elif effective_exact == 0 and old_qualification in {
             "NOT_IMPLEMENTED",
             "BLOCKED_BY_EXACT_LOT",
+            "ADAPTED_FROM_CANONICAL_PIPELINE",
+            "REQUIRES_VERIFICATION",
         }:
             new_qualification = "NOT_READY"
         else:
             new_qualification = old_qualification
-        if new_qualification != old_qualification:
-            market_changes["stage_changes"].append(
-                {
-                    "stage": "COMMERCIAL_QUALIFICATION",
-                    "from": old_qualification,
-                    "to": new_qualification,
-                }
-            )
-            qualification["legacy_status_before_search_truth"] = old_qualification
-            qualification["status"] = new_qualification
+        _change(
+            market_changes,
+            qualification,
+            name="COMMERCIAL_QUALIFICATION",
+            new_status=new_qualification,
+        )
         if effective_exact > 0 and not financial_ready:
             qualification["commercial_value_extraction_required"] = True
             qualification["verified_exact_lot_count"] = effective_exact
 
-        if evidence is not None and effective_exact > 0:
+        if evidence is not None:
             old_evidence = _compact(evidence.get("status")).upper() or "UNKNOWN"
-            if old_evidence in {
+            if effective_exact > 0 and old_evidence in {
                 "NOT_READY",
                 "BLOCKED_BY_COMMERCIAL_QUALIFICATION",
                 "BLOCKED_BY_EXACT_LOT",
+                "ADAPTED_FROM_CANONICAL_PIPELINE",
             }:
-                evidence["legacy_status_before_search_truth"] = old_evidence
-                evidence["status"] = "REQUIRES_EVIDENCE"
-                market_changes["stage_changes"].append(
-                    {"stage": "EVIDENCE", "from": old_evidence, "to": "REQUIRES_EVIDENCE"}
-                )
+                new_evidence = "REQUIRES_EVIDENCE"
+            elif effective_exact == 0 and old_evidence == "ADAPTED_FROM_CANONICAL_PIPELINE":
+                new_evidence = "NOT_READY"
+            else:
+                new_evidence = old_evidence
+            _change(
+                market_changes,
+                evidence,
+                name="EVIDENCE",
+                new_status=new_evidence,
+            )
 
         old_decision = _compact(decision.get("status")).upper() or "UNKNOWN"
         if effective_exact > 0 and not financial_ready and old_decision not in {
@@ -229,15 +241,22 @@ def reconcile_unified_search_truth(
             "READY_FOR_HUMAN_DECISION",
         }:
             new_decision = "CANDIDATE_AVAILABLE_REQUIRES_VERIFICATION"
+        elif effective_exact == 0 and hits > 0 and old_decision in {
+            "BLOCKED_BY_DISCOVERY_FAILURE",
+            "NOT_READY",
+            "ADAPTED_FROM_CANONICAL_PIPELINE",
+        }:
+            new_decision = "NO_EXACT_LOT_CURRENTLY"
         else:
             new_decision = old_decision
-        if new_decision != old_decision:
-            market_changes["stage_changes"].append(
-                {"stage": "OPPORTUNITY_DECISION", "from": old_decision, "to": new_decision}
-            )
-            decision["legacy_status_before_search_truth"] = old_decision
-            decision["status"] = new_decision
+        _change(
+            market_changes,
+            decision,
+            name="OPPORTUNITY_DECISION",
+            new_status=new_decision,
+        )
         decision["verified_exact_lot_count"] = effective_exact
+        decision["unified_search_hits"] = hits
 
         market["search_truth_reconciled"] = True
         market["unified_search_provider"] = "exa"
@@ -249,7 +268,7 @@ def reconcile_unified_search_truth(
     reconciled["separated_country_search_paths"] = False
     reconciled["search_development_contract"] = _search_development_contract()
     audit = {
-        "schema_version": "unified-search-truth-reconciliation-1.0",
+        "schema_version": "unified-search-truth-reconciliation-1.1",
         "status": "SUCCESS",
         "search_truth_authority": "UNIFIED_SEARCH_RUNTIME_V1",
         "market_change_count": len(changes),
