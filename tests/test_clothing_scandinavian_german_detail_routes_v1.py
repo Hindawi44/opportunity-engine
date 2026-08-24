@@ -5,7 +5,11 @@ from opportunity_engine.discovery.exa_shadow_page_verification import (
     EXACT_LOT_CANDIDATE,
     _looks_item_specific_url,
 )
-from opportunity_engine.project_domain_boundary import OUT_OF_DOMAIN
+from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    OUT_OF_DOMAIN,
+    classify_project_domain,
+)
 
 
 def test_swedish_parti_numeric_route_is_item_specific() -> None:
@@ -56,17 +60,29 @@ def test_norwegian_plagg_and_dash_bid_price_are_commercial_evidence() -> None:
     assert evidence["item_specific_url_evidence"] is True
 
 
+def test_confirmed_german_clothing_compounds_stay_in_clothing_domain() -> None:
+    samples = (
+        "Herbol Herren Fleece- und Sweatjacken A-Ware",
+        "Restposten Fleecejacken A-Ware",
+        "Herrenbekleidung Restposten",
+    )
+    for text in samples:
+        assert classify_project_domain(text=text) == CLOTHING_INVENTORY
+
+
 def test_german_singular_product_uses_cart_control_only_on_real_detail() -> None:
     classification, evidence = _classify_child_page(
         title="Herbol Herren Fleece- und Sweatjacken A-Ware",
         text=(
-            "Restposten Bekleidung. Verfügbare Menge 32 Stk. Preis 2,88€. "
-            "In den Warenkorb. Herren Jacken A-Ware."
+            "Restposten A-Ware. Verfügbare Menge 32 Stk. Preis 2,88€. "
+            "In den Warenkorb."
         ),
         url="https://example.de/product/herbol-herren-fleece-und-sweatjacken-a-ware/",
     )
 
     assert classification == EXACT_LOT_CANDIDATE
+    assert evidence["project_domain"] == CLOTHING_INVENTORY
+    assert evidence["page_subject_domain"] == CLOTHING_INVENTORY
     assert evidence["canonical_product_detail_url_evidence"] is True
     assert evidence["explicit_purchase_evidence"] is True
     assert evidence["direct_sale_evidence"] is True
