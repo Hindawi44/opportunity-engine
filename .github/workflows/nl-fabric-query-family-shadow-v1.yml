@@ -1,0 +1,53 @@
+name: NL Fabric Query Family Shadow V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/run_nl_fabric_query_family_shadow.py
+      - tests/test_nl_fabric_query_family_shadow.py
+      - .github/workflows/nl-fabric-query-family-shadow-v1.yml
+      - src/opportunity_engine/search_experiment_execution_bridge_v1.py
+      - src/opportunity_engine/project_domain_boundary.py
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run focused regression tests
+        run: pytest -q tests/test_nl_fabric_query_family_shadow.py
+
+      - name: Run live NL fabric query family shadow
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nl-fabric-query-family-shadow-v1
+          python scripts/run_nl_fabric_query_family_shadow.py \
+            --results-per-query 5 \
+            --output artifacts/nl-fabric-query-family-shadow-v1/report.json
+
+      - name: Upload shadow report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nl-fabric-query-family-shadow-v1
+          path: artifacts/nl-fabric-query-family-shadow-v1/report.json
+          if-no-files-found: error
+          retention-days: 30
