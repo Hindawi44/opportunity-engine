@@ -1,8 +1,8 @@
 {
   "schema_version": "manual-checkpoint-trigger-1.0",
-  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after unified six-market clothing and fabric runtime wiring.",
-  "requested_at_utc": "2026-08-24T18:45:00Z",
-  "requested_for_main_sha": "d0582d491a097bf7def2d59ea79267ba8411f3f6",
+  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after unified search truth reconciliation.",
+  "requested_at_utc": "2026-08-24T19:10:00Z",
+  "requested_for_main_sha": "7a42f8ce3846719a49b7e764cde385d897e85b32",
   "project_scope": [
     "CLOTHING_INVENTORY",
     "FABRIC_PROCUREMENT"
