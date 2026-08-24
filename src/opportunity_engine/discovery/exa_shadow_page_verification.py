@@ -199,6 +199,9 @@ _AGGREGATE_PATH_MARKERS = (
     "/assortment",
     "/sortiment",
     "/recherche-fournisseur",
+    "/pages/",
+    "/product-categorie/",
+    "/product-category/",
 )
 
 
