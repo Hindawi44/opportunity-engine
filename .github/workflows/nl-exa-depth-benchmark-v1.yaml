@@ -77,10 +77,12 @@ jobs:
 
           provider = ExaSearchProvider(key)
           per_query = []
+          query_hits = {}
           unique_hits = {}
 
           for query in QUERIES:
               hits = provider.search(query, count=RESULTS_PER_QUERY)
+              query_hits[query] = hits
               raw_domains = [domain(hit.url) for hit in hits if domain(hit.url)]
               for hit in hits:
                   unique_hits.setdefault(hit.url, hit)
@@ -123,10 +125,7 @@ jobs:
           )
 
           for item in per_query:
-              urls_for_query = []
-              hits = provider.search(item["query"], count=RESULTS_PER_QUERY)
-              urls_for_query = [hit.url for hit in hits]
-              rows = [audits_by_url[url] for url in urls_for_query if url in audits_by_url]
+              rows = [audits_by_url[hit.url] for hit in query_hits[item["query"]] if hit.url in audits_by_url]
               q_accepted_domains = sorted({
                   domain(row.get("final_url") or row.get("url"))
                   for row in rows
@@ -143,6 +142,7 @@ jobs:
               "project_domain": "FABRIC_PROCUREMENT",
               "provider": "exa",
               "query_count": len(QUERIES),
+              "search_request_count": len(QUERIES),
               "results_per_query": RESULTS_PER_QUERY,
               "nominal_hit_budget": len(QUERIES) * RESULTS_PER_QUERY,
               "unique_url_count": len(unique_hits),
@@ -168,6 +168,7 @@ jobs:
           out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
           print("query_count=", report["query_count"])
+          print("search_request_count=", report["search_request_count"])
           print("nominal_hit_budget=", report["nominal_hit_budget"])
           print("unique_url_count=", report["unique_url_count"])
           print("raw_unique_domain_count=", report["raw_unique_domain_count"])
