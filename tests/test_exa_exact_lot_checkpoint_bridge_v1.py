@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+from opportunity_engine.discovery.checkpoint_state_restore import DATABASE_RELATIVE_PATHS
 from opportunity_engine.discovery.unified_opportunity_report import build_unified_opportunity_report
 
 
@@ -84,3 +85,9 @@ def test_exact_lot_rows_fail_closed_when_any_strict_evidence_is_missing() -> Non
 def test_numeric_product_slug_gets_readable_fallback_title() -> None:
     module = _load_script()
     assert module._title_from_url("https://grossist.example/parti/2359") == "Clothing Exact-Lot 2359"
+
+
+def test_exa_exact_lot_databases_are_restorable_across_daily_checkpoints() -> None:
+    assert "no-exa-exact-lot/opportunity_engine.db" in DATABASE_RELATIVE_PATHS
+    assert "se-exa-exact-lot/opportunity_engine.db" in DATABASE_RELATIVE_PATHS
+    assert "de-exa-exact-lot/opportunity_engine.db" in DATABASE_RELATIVE_PATHS
