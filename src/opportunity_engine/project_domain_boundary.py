@@ -42,7 +42,7 @@ _CLOTHING_MARKERS = (
     "footwear", "shoes", "sportswear", "workwear", "menswear", "womenswear",
     "kidswear", "jacket", "jackets", "shirt", "shirts", "trouser", "trousers",
     "dress", "dresses", "jeans", "skirt", "skirts", "coat", "coats", "bridal",
-    "wedding dress", "blazer", "blazers", "shorts", "sweat", "sweats",
+    "wedding dress", "blazer", "blazers", "shorts", "sweats",
     "polo shirt", "polo shirts", "poloshirt", "poloshirts",
     "klær", "klaer", "klesbutikk", "klesbutikken", "kleslager",
     "arbeidsklær", "arbeidsklaer", "arbeidsjakke", "arbeidsjakker", "bekledning",
