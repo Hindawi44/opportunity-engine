@@ -98,8 +98,8 @@ def _page_fetcher(url: str) -> PageFetchResult:
             url,
             True,
             200,
-            "Bekleidung Jacken Restposten",
-            "Bekleidung Lagerbestand. 50 Stück. Preis 100 €. Jetzt kaufen. Auf Lager.",
+            "Lot de vêtements en stock",
+            "Stock de vêtements Grade A. 50 pièces. Prix 100 €. Ajouter au panier. Paiement sécurisé.",
         )
     if url in ZERO_PRODUCTS:
         return PageFetchResult(
@@ -107,8 +107,8 @@ def _page_fetcher(url: str) -> PageFetchResult:
             url,
             True,
             200,
-            "Bekleidung Jacken Lagerbestand",
-            "Bekleidung Lagerbestand verfügbar. Kontaktieren Sie uns für Details.",
+            "Vêtements en stock",
+            "Stock de vêtements disponible. Contactez-nous pour les détails.",
         )
     return PageFetchResult(url, url, False, 404, "", "", "HTTP_404")
 
@@ -163,8 +163,8 @@ def test_zero_yield_roots_remain_root_fair_when_no_proven_alternative_exists() -
             url,
             True,
             200,
-            "Bekleidung Jacken Lagerbestand",
-            "Bekleidung Lagerbestand verfügbar. Kontaktieren Sie uns für Details.",
+            "Vêtements en stock",
+            "Stock de vêtements disponible. Contactez-nous pour les détails.",
         ),
         max_root_parents=2,
         max_navigation_depth=2,
