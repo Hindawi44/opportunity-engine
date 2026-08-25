@@ -58,18 +58,21 @@ def _create_market_signal_db(path: Path, rows: list[dict]) -> None:
         connection.close()
 
 
-def _official_payload(company_name: str) -> dict:
+def _official_payload(company_name: str, *, official_bulk_anchor: bool = False) -> dict:
+    metadata = {
+        "official_register": True,
+        "signal_only": True,
+        "organisation_number": "5560000000",
+        "legal_status_code": "KK",
+    }
+    if official_bulk_anchor:
+        metadata["official_bulk_anchor_v1"] = True
     return {
         "signal_type": "INSOLVENCY_OR_LIQUIDATION",
         "source_country": "SE",
         "company_name": company_name,
         "status": "WATCH",
-        "metadata": {
-            "official_register": True,
-            "signal_only": True,
-            "organisation_number": "5560000000",
-            "legal_status_code": "KK",
-        },
+        "metadata": metadata,
         "evidence": [
             {
                 "evidence_type": "OFFICIAL_SWEDISH_COMPANY_STATUS",
@@ -105,6 +108,35 @@ def test_loader_accepts_only_verified_bolagsverket_liquidation_signals(tmp_path:
     anchors = load_sweden_official_company_anchors(database_path=database)
 
     assert anchors == (("OFFICIAL_COMPANY", "Nordic Mode AB"),)
+
+
+def test_loader_prioritizes_bulk_clothing_anchor_over_newer_legacy_signal(tmp_path: Path) -> None:
+    database = tmp_path / "opportunity_engine.db"
+    _create_market_signal_db(
+        database,
+        [
+            {
+                "company_name": "Legacy Official AB",
+                "payload": _official_payload("Legacy Official AB"),
+                "last_seen_at": "2026-08-25T12:35:55+00:00",
+            },
+            {
+                "company_name": "Bulk Clothing Konkurs AB",
+                "payload": _official_payload(
+                    "Bulk Clothing Konkurs AB",
+                    official_bulk_anchor=True,
+                ),
+                "last_seen_at": "2026-08-25T12:34:00+00:00",
+            },
+        ],
+    )
+
+    anchors = load_sweden_official_company_anchors(
+        database_path=database,
+        max_anchors=1,
+    )
+
+    assert anchors == (("OFFICIAL_COMPANY", "Bulk Clothing Konkurs AB"),)
 
 
 def test_sweden_uses_official_company_before_generic_catalog(monkeypatch, tmp_path: Path) -> None:
