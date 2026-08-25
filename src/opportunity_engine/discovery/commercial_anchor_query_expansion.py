@@ -19,8 +19,9 @@ ALLOWED_COMMERCIAL_ANCHOR_TYPES = frozenset(
     {"BRAND", "RETAIL_CHAIN", "BRIDAL", "WHOLESALER", "MANUFACTURER"}
 )
 
-# V1 deliberately keeps the active catalog small. The type contract supports the
-# approved commercial-anchor families without creating a source list or runtime.
+# V1 deliberately keeps the default active catalog small. The type contract
+# supports the approved commercial-anchor families without creating a source
+# list or a separate runtime.
 COMMERCIAL_ANCHORS: dict[str, tuple[tuple[str, str], ...]] = {
     CLOTHING_INVENTORY: (
         ("BRAND", "Jack & Jones"),
@@ -29,6 +30,21 @@ COMMERCIAL_ANCHORS: dict[str, tuple[tuple[str, str], ...]] = {
     ),
     FABRIC_PROCUREMENT: (
         ("WHOLESALER", "Wouters Textiles"),
+    ),
+}
+
+# Market-specific anchors are allowed only when prior live Exact-Lot evidence
+# proves that the commercial entity is a useful discovery route. This is still
+# an entity-name search anchor, never a domain/URL pin and never qualification
+# evidence. Germany's Salzmann route yielded 22 strict Exact-Lots in live
+# checkpoint 32813183448, while checkpoint 32814383057 showed that relying on a
+# bridal-brand query to rediscover that route is unstable.
+MARKET_COMMERCIAL_ANCHORS: dict[
+    tuple[str, str], tuple[tuple[str, str], ...]
+] = {
+    (CLOTHING_INVENTORY, "DE"): (
+        ("WHOLESALER", "Salzmann Restwaren"),
+        ("BRAND", "Jack & Jones"),
     ),
 }
 
@@ -70,8 +86,14 @@ def build_commercial_anchor_queries(
     if not frame or not max_queries:
         return ()
 
+    anchors = MARKET_COMMERCIAL_ANCHORS.get(
+        (project_domain, market_code),
+        COMMERCIAL_ANCHORS.get(project_domain, ()),
+    )
+    market_specific = (project_domain, market_code) in MARKET_COMMERCIAL_ANCHORS
+
     rows: list[dict[str, Any]] = []
-    for anchor_type, anchor_value in COMMERCIAL_ANCHORS.get(project_domain, ()):
+    for anchor_type, anchor_value in anchors:
         if anchor_type not in ALLOWED_COMMERCIAL_ANCHOR_TYPES:
             raise ValueError(f"unsupported commercial anchor type: {anchor_type}")
         rows.append(
@@ -80,6 +102,11 @@ def build_commercial_anchor_queries(
                 "project_domain": project_domain,
                 "anchor_type": anchor_type,
                 "anchor_value": anchor_value,
+                "anchor_origin": (
+                    "EVIDENCE_BACKED_MARKET_ENTITY_V1"
+                    if market_specific
+                    else "CONTROLLED_GLOBAL_CATALOG_V1"
+                ),
                 "query": frame.format(anchor=anchor_value),
                 "anchor_is_qualification_evidence": False,
                 "source_specific": False,
