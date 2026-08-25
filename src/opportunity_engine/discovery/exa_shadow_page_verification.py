@@ -99,6 +99,9 @@ _DIRECT_SALE_MARKERS = (
     "acheter au vendeur",
     "vendita stock",
     "in vendita",
+    # Explicit order intent on a B2B stock-detail page is buyer-facing sale
+    # evidence, not a generic supplier/source mention.
+    "per info liste e ordini",
     "te koop",
     "voor verkoop",
     "beschikbaar voor zakelijke kopers",
