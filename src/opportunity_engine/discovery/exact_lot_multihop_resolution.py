@@ -10,8 +10,12 @@ Navigation is root-fair: eligible commercial roots share the fixed page budget
 in round-robin order so one large catalogue cannot starve other search results.
 Within each root, bounded URL-subject priority spends earlier fetches on links
 whose own path already names clothing, without filtering neutral links or
-turning URL priority into qualification evidence. The total navigation budget,
-provider gates, domain gates and Exact-Lot gates remain unchanged.
+turning URL priority into qualification evidence. Aggregate catalog pagination
+keeps a bounded continuity reserve so product-detail links cannot erase the
+path to adjacent stock pages. After a fair probe, a zero-yield root may be
+deferred only while another root has already produced a strict Exact-Lot and
+still has queued work. The total navigation budget, provider gates, domain gates
+and Exact-Lot gates remain unchanged.
 """
 from __future__ import annotations
 
@@ -44,13 +48,15 @@ from opportunity_engine.project_domain_boundary import (
     classify_project_domain,
 )
 
-SCHEMA_VERSION = "exact-lot-multihop-resolution-1.4"
+SCHEMA_VERSION = "exact-lot-multihop-resolution-1.5"
 LAB_FAMILY = "EXACT_LOT_MULTIHOP_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_ROOT_PARENTS = 6
 MAX_NAVIGATION_DEPTH = 4
 MAX_LINKS_PER_PAGE = 20
 MAX_NAVIGATION_PAGE_FETCHES = 30
+MAX_PAGINATION_CONTINUITY_LINKS_PER_PAGE = 2
+FAIR_PROBE_FETCHES_PER_ROOT = 3
 
 _EXCLUDED_PATH_PREFIXES = (
     "/blog", "/blogs", "/faq", "/contact", "/about", "/policies", "/policy",
@@ -62,6 +68,12 @@ _COMMERCIAL_PAGE_SLUG_MARKERS = (
     "lot", "stock", "wholesale", "grossiste", "revendeur", "revente", "reseller",
     "destock", "déstock", "liquidation", "vetement", "vêtement", "clothing",
     "apparel", "fashion", "mode", "friperie", "kleding", "kleidung", "abbigliamento",
+)
+
+_AGGREGATE_NAVIGATION_ROLES = frozenset({"COLLECTION", "CATEGORY", "CATALOG"})
+_PAGINATION_PATH_RE = re.compile(
+    r"^(?P<base>.*?)/page/(?P<number>\d+)$",
+    re.IGNORECASE,
 )
 
 # Generic marketplace detail shape: a short listing-kind token, a numeric record
@@ -124,6 +136,39 @@ def _commercial_url_role(url: str) -> str | None:
     return None
 
 
+def _pagination_continuity_distance(page_url: str, candidate_url: str) -> int | None:
+    """Return adjacent aggregate-page distance, never commercial qualification evidence."""
+    if _commercial_url_role(page_url) not in _AGGREGATE_NAVIGATION_ROLES:
+        return None
+    if _commercial_url_role(candidate_url) not in _AGGREGATE_NAVIGATION_ROLES:
+        return None
+
+    current_path = _path(page_url).rstrip("/") or "/"
+    candidate_path = _path(candidate_url).rstrip("/") or "/"
+    current_match = _PAGINATION_PATH_RE.fullmatch(current_path)
+    candidate_match = _PAGINATION_PATH_RE.fullmatch(candidate_path)
+
+    if current_match:
+        current_base = (current_match.group("base") or "/").rstrip("/") or "/"
+        current_number = int(current_match.group("number"))
+    else:
+        current_base = current_path
+        current_number = 1
+
+    if candidate_match:
+        candidate_base = (candidate_match.group("base") or "/").rstrip("/") or "/"
+        candidate_number = int(candidate_match.group("number"))
+    elif current_match and candidate_path == current_base:
+        candidate_base = candidate_path
+        candidate_number = 1
+    else:
+        return None
+
+    if candidate_base != current_base or candidate_number == current_number:
+        return None
+    return abs(candidate_number - current_number)
+
+
 def _extract_navigation_links(
     *, page_url: str, root_host: str, html_text: str, max_links: int
 ) -> list[str]:
@@ -144,7 +189,7 @@ def _extract_navigation_links(
     }
     current = urldefrag(page_url).url
     current_path = _path(page_url).rstrip("/") or "/"
-    candidates: list[tuple[int, int, int, int, str]] = []
+    candidates: list[tuple[int, int, int, int, str, int | None]] = []
     seen: set[str] = set()
     for position, href in enumerate(parser.hrefs):
         try:
@@ -178,9 +223,33 @@ def _extract_navigation_links(
                 _link_subject_priority(candidate),
                 position,
                 candidate,
+                _pagination_continuity_distance(page_url, candidate),
             )
         )
     candidates.sort(key=lambda item: (item[0], item[1], item[2], item[3]))
+
+    pagination_candidates = [item for item in candidates if item[5] is not None]
+    if pagination_candidates and max_links > 1:
+        pagination_candidates.sort(key=lambda item: (item[5], item[3]))
+        reserve = min(
+            MAX_PAGINATION_CONTINUITY_LINKS_PER_PAGE,
+            len(pagination_candidates),
+            max_links,
+        )
+        reserved_urls = {item[4] for item in pagination_candidates[:reserve]}
+        regular = [item for item in candidates if item[4] not in reserved_urls]
+        selected = regular[: max_links - reserve] + pagination_candidates[:reserve]
+        if len(selected) < max_links:
+            selected_urls = {item[4] for item in selected}
+            for item in candidates:
+                if item[4] in selected_urls:
+                    continue
+                selected.append(item)
+                selected_urls.add(item[4])
+                if len(selected) >= max_links:
+                    break
+        return [item[4] for item in selected[:max_links]]
+
     return [item[4] for item in candidates[:max_links]]
 
 
@@ -299,6 +368,13 @@ def _base(
         "bounded_multi_hop": True,
         "root_fair_navigation": True,
         "navigation_scheduling": "ROUND_ROBIN_ROOT_FAIR_V1",
+        "post_probe_scheduling": "PROVEN_YIELD_PRESERVATION_V1",
+        "fair_probe_fetches_per_root": FAIR_PROBE_FETCHES_PER_ROOT,
+        "yield_stall_requires_proven_alternative": True,
+        "yield_stall_is_qualification_evidence": False,
+        "pagination_continuity_preserved": True,
+        "pagination_continuity_reserve_per_page": MAX_PAGINATION_CONTINUITY_LINKS_PER_PAGE,
+        "pagination_continuity_is_qualification_evidence": False,
         "within_root_link_priority": "ROLE_THEN_CLOTHING_SUBJECT_V1",
         "link_priority_is_qualification_evidence": False,
         "exact_lot_acceptance_only": True,
@@ -325,6 +401,9 @@ def _blocked(base: dict[str, Any], reason: str) -> dict[str, Any]:
         "eligible_root_parent_count": 0,
         "root_results": [],
         "root_navigation_fetch_counts": {},
+        "root_exact_lot_counts": {},
+        "root_yield_stall_counts": {},
+        "yield_stalled_root_count": 0,
         "navigation_results": [],
         "gateway_pages": [],
         "gateway_page_count": 0,
@@ -476,17 +555,42 @@ def resolve_exact_lot_multihop(
                     "root_host": root_host,
                     "queue": queue,
                     "fetch_count": 0,
+                    "exact_lot_count": 0,
+                    "yield_stall_count": 0,
                 }
             )
 
-    # Phase 2: one navigation fetch per root per turn. This preserves the global
-    # budget while preventing a large first catalogue from starving later roots.
+    # Phase 2 starts root-fair. Once every zero-yield root has had a bounded fair
+    # probe, it may be deferred only if another root has already yielded a strict
+    # Exact-Lot and still has queued work. Deferred roots are restored if proven
+    # roots run out of work before the global page budget is exhausted.
     active: deque[dict[str, Any]] = deque(root_states)
-    while active and page_attempted < max_navigation_page_fetches:
+    deferred_zero_yield: deque[dict[str, Any]] = deque()
+    while (active or deferred_zero_yield) and page_attempted < max_navigation_page_fetches:
+        if not active:
+            while deferred_zero_yield:
+                active.append(deferred_zero_yield.popleft())
+
         state = active.popleft()
         queue = state["queue"]
         if not queue:
             continue
+
+        proven_alternative_has_work = any(
+            other is not state
+            and other["exact_lot_count"] > 0
+            and bool(other["queue"])
+            for other in root_states
+        )
+        if (
+            state["fetch_count"] >= FAIR_PROBE_FETCHES_PER_ROOT
+            and state["exact_lot_count"] == 0
+            and proven_alternative_has_work
+        ):
+            state["yield_stall_count"] += 1
+            deferred_zero_yield.append(state)
+            continue
+
         node = queue.popleft()
         root_host = state["root_host"]
         page_attempted += 1
@@ -540,6 +644,7 @@ def resolve_exact_lot_multihop(
                 navigation_results.append(row)
 
                 if _strict_exact(classification, evidence):
+                    state["exact_lot_count"] += 1
                     exact_lots.append({
                         **row,
                         "provider": provider,
@@ -573,9 +678,11 @@ def resolve_exact_lot_multihop(
                                 max_links=max_links_per_page,
                             )
                             # Child links are ranked by bounded URL role and clothing
-                            # subject before DOM position. Put them ahead of older
-                            # siblings inside this root while root-level round-robin
-                            # still protects fairness.
+                            # subject before DOM position. A tiny aggregate-pagination
+                            # reserve keeps catalog continuity without granting any
+                            # qualification credit. Fresh links stay ahead of older
+                            # siblings inside the same root; root-level fairness and
+                            # the unchanged global page budget still apply.
                             fresh_nodes: list[dict[str, Any]] = []
                             for link in next_links:
                                 if link in seen_navigation_urls:
@@ -599,6 +706,15 @@ def resolve_exact_lot_multihop(
     root_navigation_fetch_counts = {
         state["root_url"]: state["fetch_count"] for state in root_states
     }
+    root_exact_lot_counts = {
+        state["root_url"]: state["exact_lot_count"] for state in root_states
+    }
+    root_yield_stall_counts = {
+        state["root_url"]: state["yield_stall_count"] for state in root_states
+    }
+    yield_stalled_root_count = sum(
+        1 for state in root_states if state["yield_stall_count"] > 0
+    )
     exact_lot_yield_per_fetch = (
         round(len(exact_lots) / page_attempted, 4) if page_attempted else 0.0
     )
@@ -610,6 +726,9 @@ def resolve_exact_lot_multihop(
         "eligible_root_parent_count": len(roots),
         "root_results": root_results,
         "root_navigation_fetch_counts": root_navigation_fetch_counts,
+        "root_exact_lot_counts": root_exact_lot_counts,
+        "root_yield_stall_counts": root_yield_stall_counts,
+        "yield_stalled_root_count": yield_stalled_root_count,
         "navigation_page_fetches_attempted": page_attempted,
         "navigation_page_fetches_succeeded": page_succeeded,
         "depth_budget_exhausted_count": depth_exhausted,
@@ -621,6 +740,6 @@ def resolve_exact_lot_multihop(
         "exact_lot_yield_per_fetch": exact_lot_yield_per_fetch,
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Commercial hubs, aggregate categories and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Smart link priority changes fetch order only and is never qualification evidence. Multi-hop navigation stays same-origin, root-fair and bounded by explicit URL roles, depth and the unchanged global page budget."
+            "Commercial hubs, aggregate categories, pagination and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Smart link priority and proven-yield scheduling change navigation order only and are never qualification evidence. Multi-hop navigation stays same-origin, root-fair through a bounded probe and bounded by explicit URL roles, depth and the unchanged global page budget."
         ),
     }
