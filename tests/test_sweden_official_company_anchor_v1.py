@@ -83,6 +83,25 @@ def _official_payload(company_name: str, *, official_bulk_anchor: bool = False) 
     }
 
 
+def _ranked_bulk_payload(
+    company_name: str,
+    *,
+    legal_status_code: str,
+    from_date: str,
+    sni_code: str,
+) -> dict:
+    payload = _official_payload(company_name, official_bulk_anchor=True)
+    payload["metadata"].update(
+        {
+            "legal_status_code": legal_status_code,
+            "from_date": from_date,
+            "sni": [{"code": sni_code, "source": "SCB Ng1 SNI 2025"}],
+        }
+    )
+    payload["event_date"] = f"{from_date}T00:00:00Z"
+    return payload
+
+
 def test_loader_accepts_only_verified_bolagsverket_liquidation_signals(tmp_path: Path) -> None:
     database = tmp_path / "opportunity_engine.db"
     _create_market_signal_db(
@@ -137,6 +156,66 @@ def test_loader_prioritizes_bulk_clothing_anchor_over_newer_legacy_signal(tmp_pa
     )
 
     assert anchors == (("OFFICIAL_COMPANY", "Bulk Clothing Konkurs AB"),)
+
+
+def test_loader_preserves_bulk_commercial_rank_when_persistence_order_is_arbitrary(tmp_path: Path) -> None:
+    database = tmp_path / "opportunity_engine.db"
+    same_seen_at = "2026-08-25T13:44:47+00:00"
+    _create_market_signal_db(
+        database,
+        [
+            {
+                "company_name": "Old Wholesale Konkurs AB",
+                "payload": _ranked_bulk_payload(
+                    "Old Wholesale Konkurs AB",
+                    legal_status_code="KK",
+                    from_date="2026-04-22",
+                    sni_code="46420",
+                ),
+                "last_seen_at": same_seen_at,
+            },
+            {
+                "company_name": "Recent Liquidation Wholesale AB",
+                "payload": _ranked_bulk_payload(
+                    "Recent Liquidation Wholesale AB",
+                    legal_status_code="LI",
+                    from_date="2026-08-20",
+                    sni_code="46420",
+                ),
+                "last_seen_at": same_seen_at,
+            },
+            {
+                "company_name": "Recent Wholesale Konkurs AB",
+                "payload": _ranked_bulk_payload(
+                    "Recent Wholesale Konkurs AB",
+                    legal_status_code="KK",
+                    from_date="2026-08-13",
+                    sni_code="46420",
+                ),
+                "last_seen_at": same_seen_at,
+            },
+            {
+                "company_name": "Second Recent Wholesale Konkurs AB",
+                "payload": _ranked_bulk_payload(
+                    "Second Recent Wholesale Konkurs AB",
+                    legal_status_code="KK",
+                    from_date="2026-07-20",
+                    sni_code="46420",
+                ),
+                "last_seen_at": same_seen_at,
+            },
+        ],
+    )
+
+    anchors = load_sweden_official_company_anchors(
+        database_path=database,
+        max_anchors=2,
+    )
+
+    assert anchors == (
+        ("OFFICIAL_COMPANY", "Recent Wholesale Konkurs AB"),
+        ("OFFICIAL_COMPANY", "Second Recent Wholesale Konkurs AB"),
+    )
 
 
 def test_sweden_uses_official_company_before_generic_catalog(monkeypatch, tmp_path: Path) -> None:
