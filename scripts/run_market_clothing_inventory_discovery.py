@@ -52,6 +52,15 @@ def _persistence_output_args(argv: Sequence[str]) -> argparse.Namespace:
     return parsed
 
 
+def _paid_brave_scope_args(argv: Sequence[str]) -> argparse.Namespace:
+    """Read only the source/budget fields needed by the fail-closed cost guard."""
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--source", default="")
+    parser.add_argument("--query-budget", type=int, default=0)
+    parsed, _ = parser.parse_known_args(list(argv))
+    return parsed
+
+
 def _write_post_persistence_report(
     *,
     database_url: str,
@@ -86,10 +95,17 @@ def main() -> int:
     selector = argparse.ArgumentParser(add_help=False)
     selector.add_argument("--market", choices=("NO", "SE", "DE"), default="NO")
     selected, remaining = selector.parse_known_args()
+    paid_scope = _paid_brave_scope_args(remaining)
 
-    # Manual GitHub workflow runs are diagnostics by default.  Stop before the
-    # selected SE/DE/NO Brave-backed runner can consume paid search credit.
-    ensure_paid_brave_allowed()
+    # Manual GitHub workflow runs remain zero-cost by default. The cost guard may
+    # allow only one already-bounded direct-source scope when this process belongs
+    # to the repository's auto-dispatched operator checkpoint. All other callers
+    # and any budget above the existing cap still fail closed.
+    ensure_paid_brave_allowed(
+        market=selected.market,
+        source=paid_scope.source,
+        query_budget=paid_scope.query_budget,
+    )
 
     runner = select_market_runner(selected.market)
     persistence = _persistence_output_args(remaining)
