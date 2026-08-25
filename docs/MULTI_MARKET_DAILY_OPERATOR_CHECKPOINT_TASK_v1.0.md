@@ -90,6 +90,10 @@ docs/UNIFIED_MARKET_INTELLIGENCE_RIVER_V1.md
 docs/OPENAI_FABRIC_PROCUREMENT_ADVISOR_V1.md
 ```
 
+## Current compatibility note — Swedish official bulk anchors
+
+The checkpoint may persist bounded Swedish company-anchor signals produced by joining the official weekly Bolagsverket and SCB bulk files. These records remain `signal_only` / `anchor_only`: they do not add a checkpoint source, do not add search budget, and cannot qualify an opportunity. Any company name subsequently used by the Swedish commercial-anchor stage must still pass the existing `Exa → Verification → Multi-Hop → Exact-Lot` path.
+
 ## Historical note
 
 Keep this file because it explains the design constraints that produced the original checkpoint. Do not treat its original phase lock or pending-validation language as current instructions.
