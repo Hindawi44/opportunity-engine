@@ -1,14 +1,14 @@
 {
   "schema_version": "manual-checkpoint-trigger-1.0",
-  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Smart Link Priority / Yield-per-Fetch V1 was merged into the unified search path.",
-  "requested_at_utc": "2026-08-25T05:01:30Z",
-  "requested_for_main_sha": "87c818a03ce8d23ce90ee54c229194fa4e033ba8",
+  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Controlled Commercial Anchor Expansion V1 was merged into the unified search path.",
+  "requested_at_utc": "2026-08-25T05:30:00Z",
+  "requested_for_main_sha": "19533e4fa9789d7e9af71978598dcc4357a0f7fb",
   "project_scope": [
     "CLOTHING_INVENTORY",
     "FABRIC_PROCUREMENT"
   ],
   "production_logic_change": true,
-  "query_change": false,
+  "query_change": true,
   "source_change": false,
   "agent_change": false
 }
