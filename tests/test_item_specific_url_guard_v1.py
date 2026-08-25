@@ -3,6 +3,7 @@ from __future__ import annotations
 from opportunity_engine.discovery.exact_lot_child_link_resolution import _classify_child_page
 from opportunity_engine.discovery.exa_shadow_page_verification import (
     EXACT_LOT_CANDIDATE,
+    _classify_page,
     _looks_item_specific_url,
 )
 from opportunity_engine.project_domain_boundary import OUT_OF_DOMAIN
@@ -32,6 +33,43 @@ def test_plural_products_container_with_specific_slug_is_item_specific() -> None
         )
         is True
     )
+
+
+def test_numeric_html_wholesale_product_detail_is_item_specific() -> None:
+    url = (
+        "https://bijuymoda.com/en/wholesale-mens-clothing/"
+        "3347-wholesale-jack-jones-men-s-clothing-lot.html"
+    )
+    assert _looks_item_specific_url(url) is True
+    assert (
+        _looks_item_specific_url(
+            "https://example.com/catalog/wholesale-mens-clothing/"
+            "3347-wholesale-jack-jones-men-s-clothing-lot.html"
+        )
+        is False
+    )
+
+
+def test_numeric_html_wholesale_clothing_lot_can_be_exact_lot() -> None:
+    classification, evidence = _classify_page(
+        title="Wholesale Jack & Jones Men's Clothing Lot",
+        text=(
+            "Stock of men's clothing available for sale. Quantity: 120 pcs. "
+            "Wholesale price 6 EUR per piece. Jack & Jones jackets and shirts."
+        ),
+        url=(
+            "https://bijuymoda.com/en/wholesale-mens-clothing/"
+            "3347-wholesale-jack-jones-men-s-clothing-lot.html"
+        ),
+    )
+
+    assert classification == EXACT_LOT_CANDIDATE
+    assert evidence["item_specific_url_evidence"] is True
+    assert evidence["domain_evidence"] is True
+    assert evidence["inventory_evidence"] is True
+    assert evidence["direct_sale_evidence"] is True
+    assert evidence["price_evidence"] is True
+    assert evidence["quantity_evidence"] is True
 
 
 def test_child_clothing_lot_accepts_number_then_euro_symbol_price() -> None:
