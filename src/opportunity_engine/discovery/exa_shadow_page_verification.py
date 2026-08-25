@@ -221,6 +221,17 @@ _MARKETPLACE_ID_SLUG_RE = re.compile(
     r"(?:^|/)(?:c|listing|annonce|annuncio)-\d{2,}-[^/?#]+(?:\.html?)?(?:/|$)",
     re.IGNORECASE,
 )
+# Some B2B catalogues use a commerce-category segment followed by a numeric
+# product id and a descriptive .html slug instead of /product/<slug>. Keep this
+# deliberately narrow: the parent segment must itself look commercial, the id
+# must be stable-looking (3+ digits), and this remains URL-specificity evidence
+# only. All clothing, inventory, direct-sale, price and quantity gates still
+# apply before Exact-Lot acceptance.
+_NUMERIC_HTML_COMMERCE_DETAIL_RE = re.compile(
+    r"(?:^|/)[^/?#]*(?:wholesale|stock|rest|grossist|engros|lot|parti|clothing|clothes|apparel|fashion)[^/?#]*/"
+    r"\d{3,}-[^/?#]+\.html?(?:/|$)",
+    re.IGNORECASE,
+)
 _AGGREGATE_PATH_MARKERS = (
     "/search",
     "/sok",
@@ -274,6 +285,8 @@ def _looks_item_specific_url(url: str) -> bool:
         if slug not in {"search", "all", "index", "catalog", "catalogue"}:
             return True
     if _MARKETPLACE_ID_SLUG_RE.search(path):
+        return True
+    if _NUMERIC_HTML_COMMERCE_DETAIL_RE.search(path):
         return True
     return bool(_ITEM_PATH_RE.search(path))
 
