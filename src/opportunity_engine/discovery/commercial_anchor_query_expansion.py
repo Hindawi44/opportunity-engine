@@ -82,6 +82,14 @@ _QUERY_FRAMES: dict[str, dict[str, str]] = {
     },
 }
 
+# Official Swedish company anchors come from verified insolvency/liquidation
+# signals, so their two bounded search slots should seek the company's disposal
+# path rather than generic wholesale pages. The company name remains only a
+# search seed: qualification still requires Verification -> Multi-Hop -> Exact-Lot.
+_SWEDEN_OFFICIAL_COMPANY_LIQUIDATION_FRAME = (
+    'Sverige "{anchor}" konkursbo likvidation kläder varulager lager säljes konkursauktion'
+)
+
 
 def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
@@ -331,6 +339,14 @@ def build_commercial_anchor_queries(
         safe_value = _safe_anchor_value(anchor_value)
         if not safe_value:
             continue
+        query_frame = frame
+        if (
+            market_code == "SE"
+            and project_domain == CLOTHING_INVENTORY
+            and anchor_type == "OFFICIAL_COMPANY"
+            and anchor_origin == SWEDEN_OFFICIAL_ANCHOR_ORIGIN
+        ):
+            query_frame = _SWEDEN_OFFICIAL_COMPANY_LIQUIDATION_FRAME
         rows.append(
             {
                 "market_code": market_code,
@@ -338,7 +354,7 @@ def build_commercial_anchor_queries(
                 "anchor_type": anchor_type,
                 "anchor_value": safe_value,
                 "anchor_origin": anchor_origin,
-                "query": frame.format(anchor=safe_value),
+                "query": query_frame.format(anchor=safe_value),
                 "anchor_is_qualification_evidence": False,
                 "source_specific": False,
             }
