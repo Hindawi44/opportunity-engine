@@ -214,6 +214,7 @@ _GENERIC_PRODUCT_CONTAINER_SLUGS = frozenset({
     "fashion",
     "footwear",
     "shoes",
+    "schuhe",
     "bekleidung",
     "kleidung",
     "kläder",
