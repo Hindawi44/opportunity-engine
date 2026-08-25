@@ -387,7 +387,7 @@ jobs:
             CHANGED="$(git diff --name-only "$BEFORE" "$CURRENT")"
           fi
           printf '%s\n' "$CHANGED"
-          if printf '%s\n' "$CHANGED" | grep -Eq '^(config/learning/|scripts/(build_domain_market_intelligence_feed\.py|run_daily_search_success_learning\.py|run_auksjonen_live_clothing\.py|run_exa_exact_lot_checkpoint\.py|restore_previous_checkpoint_state\.py)|src/opportunity_engine/.*(learning|memory|route).*\.py$|src/opportunity_engine/discovery/(checkpoint_state_restore|domain_market_intelligence_feed|exact_lot_multihop_resolution|exa_shadow_page_verification|provider_unique_page_verification)\.py$|\.github/workflows/(multi-market-daily-operator-checkpoint\.yaml|tests\.yml)$)'; then
+          if printf '%s\n' "$CHANGED" | grep -Eq '^(config/learning/|scripts/(build_domain_market_intelligence_feed\.py|run_daily_search_success_learning\.py|run_auksjonen_live_clothing\.py|run_exa_exact_lot_checkpoint\.py|restore_previous_checkpoint_state\.py)|src/opportunity_engine/.*(learning|memory|route).*\.py$|src/opportunity_engine/discovery/(auksjonen_exact_item_verification|checkpoint_state_restore|domain_market_intelligence_feed|exact_lot_multihop_resolution|exa_shadow_page_verification|provider_unique_page_verification)\.py$|\.github/workflows/(multi-market-daily-operator-checkpoint\.yaml|tests\.yml)$)'; then
             echo "dispatch=true" >> "$GITHUB_OUTPUT"
           else
             echo "dispatch=false" >> "$GITHUB_OUTPUT"
