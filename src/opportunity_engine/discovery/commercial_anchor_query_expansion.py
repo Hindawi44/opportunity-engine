@@ -32,6 +32,7 @@ SWEDEN_OFFICIAL_ANCHOR_SOURCE = "Bolagsverket Värdefulla datamängder"
 SWEDEN_OFFICIAL_ANCHOR_SIGNAL_TYPE = "INSOLVENCY_OR_LIQUIDATION"
 SWEDEN_OFFICIAL_ANCHOR_ORIGIN = "OFFICIAL_SWEDISH_LIQUIDATION_SIGNAL_V1"
 SWEDEN_OFFICIAL_ANCHOR_DB_RELATIVE_PATH = Path("se-blinto/opportunity_engine.db")
+SWEDEN_OFFICIAL_ANCHOR_SCAN_LIMIT = 100
 
 # V1 deliberately keeps the default active catalog small. The type contract
 # supports the approved commercial-anchor families without creating a source
@@ -72,7 +73,7 @@ _QUERY_FRAMES: dict[str, dict[str, str]] = {
         "NL": "Nederland kleding clothing {anchor} restpartij groothandel voorraad te koop",
     },
     FABRIC_PROCUREMENT: {
-        "NO": "Norge stoff fabric {anchor} restlager engros ruller til salgs",
+        "NO": "Norge stoff fabric {anchor} restlager engros rullar till salu",
         "SE": "Sverige tyg fabric {anchor} restparti grossist rullar säljes",
         "DE": "Deutschland Stoff fabric {anchor} Restposten Großhandel Rollen zu verkaufen",
         "FR": "France tissu fabric {anchor} déstockage grossiste rouleaux à vendre",
@@ -103,12 +104,17 @@ def _sweden_official_anchor_db_path() -> Path:
     return Path(input_root) / SWEDEN_OFFICIAL_ANCHOR_DB_RELATIVE_PATH
 
 
-def _verified_official_signal(payload_json: object) -> bool:
+def _official_signal_payload(payload_json: object) -> dict[str, Any] | None:
     try:
         payload = json.loads(str(payload_json or ""))
     except (TypeError, ValueError, json.JSONDecodeError):
-        return False
-    if not isinstance(payload, dict):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def _verified_official_signal(payload_json: object) -> bool:
+    payload = _official_signal_payload(payload_json)
+    if payload is None:
         return False
     metadata = payload.get("metadata") or {}
     if not isinstance(metadata, dict):
@@ -124,6 +130,14 @@ def _verified_official_signal(payload_json: object) -> bool:
     )
 
 
+def _official_bulk_anchor(payload_json: object) -> bool:
+    payload = _official_signal_payload(payload_json)
+    if payload is None:
+        return False
+    metadata = payload.get("metadata") or {}
+    return isinstance(metadata, dict) and metadata.get("official_bulk_anchor_v1") is True
+
+
 def load_sweden_official_company_anchors(
     *,
     max_anchors: int = MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
@@ -133,8 +147,10 @@ def load_sweden_official_company_anchors(
 
     Only persisted WATCH signals with the exact official provider, Swedish country,
     insolvency/liquidation type, confidence >= 0.99 and verified official-register
-    evidence are accepted. Failure or absence is a valid zero and falls back to the
-    existing controlled catalog.
+    evidence are accepted. Official bulk clothing-liquidation anchors are preferred
+    over legacy official signals, while the externally visible query cap remains
+    unchanged. Failure or absence is a valid zero and falls back to the existing
+    controlled catalog.
     """
     if max_anchors < 0:
         raise ValueError("max_anchors must be non-negative")
@@ -164,9 +180,13 @@ def load_sweden_official_company_anchors(
                       AND company_name IS NOT NULL
                       AND TRIM(company_name) <> ''
                     ORDER BY last_seen_at DESC, signal_id ASC
-                    LIMIT 20
+                    LIMIT ?
                     """,
-                    ("SE", SWEDEN_OFFICIAL_ANCHOR_SIGNAL_TYPE),
+                    (
+                        "SE",
+                        SWEDEN_OFFICIAL_ANCHOR_SIGNAL_TYPE,
+                        SWEDEN_OFFICIAL_ANCHOR_SCAN_LIMIT,
+                    ),
                 )
             )
         finally:
@@ -174,9 +194,9 @@ def load_sweden_official_company_anchors(
     except sqlite3.Error:
         return ()
 
-    anchors: list[tuple[str, str]] = []
-    seen: set[str] = set()
-    for company_name, source_provider, source_country, signal_type, status, confidence, payload_json in rows:
+    eligible: list[tuple[int, int, str]] = []
+    for recency_rank, row in enumerate(rows):
+        company_name, source_provider, source_country, signal_type, status, confidence, payload_json = row
         company = _safe_anchor_value(company_name)
         if not company:
             continue
@@ -194,6 +214,13 @@ def load_sweden_official_company_anchors(
             continue
         if confidence_value < 0.99 or not _verified_official_signal(payload_json):
             continue
+        bulk_priority = 0 if _official_bulk_anchor(payload_json) else 1
+        eligible.append((bulk_priority, recency_rank, company))
+
+    eligible.sort(key=lambda item: (item[0], item[1]))
+    anchors: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for _, _, company in eligible:
         marker = company.casefold()
         if marker in seen:
             continue
