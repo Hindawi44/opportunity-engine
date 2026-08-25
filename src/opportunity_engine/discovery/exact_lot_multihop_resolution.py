@@ -29,6 +29,7 @@ from opportunity_engine.discovery.exact_lot_child_link_resolution import (
     fetch_public_html,
 )
 from opportunity_engine.discovery.exa_shadow_page_verification import (
+    ACTIVE_STOCK_SIGNAL,
     EXACT_LOT_CANDIDATE,
     FETCH_FAILED,
     INFO_OR_LEGAL_ONLY,
@@ -43,7 +44,7 @@ from opportunity_engine.project_domain_boundary import (
     classify_project_domain,
 )
 
-SCHEMA_VERSION = "exact-lot-multihop-resolution-1.3"
+SCHEMA_VERSION = "exact-lot-multihop-resolution-1.4"
 LAB_FAMILY = "EXACT_LOT_MULTIHOP_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_ROOT_PARENTS = 6
@@ -231,11 +232,30 @@ def _root_subject_domain(page: dict[str, Any], url: str) -> str:
     return classify_project_domain(text=_compact(f"{page.get('title') or ''} {path_words}"))
 
 
+def _aggregate_navigation_root_eligible(
+    *, url: str, page: dict[str, Any], evidence: dict[str, Any]
+) -> bool:
+    """Rescue proven aggregate clothing pages for navigation only, never credit."""
+    role = _commercial_url_role(url)
+    return bool(
+        page.get("fetch_ok") is True
+        and page.get("classification") == ACTIVE_STOCK_SIGNAL
+        and role in {"COLLECTION", "CATEGORY", "CATALOG"}
+        and _root_subject_domain(page, url) == CLOTHING_INVENTORY
+        and evidence.get("project_domain") == CLOTHING_INVENTORY
+        and evidence.get("inventory_evidence") is True
+        and evidence.get("direct_sale_evidence") is True
+        and (evidence.get("price_evidence") is True or evidence.get("quantity_evidence") is True)
+    )
+
+
 def _eligible_multihop_root(page: dict[str, Any]) -> bool:
     if _eligible_parent(page):
         return True
     url = _compact(page.get("final_url") or page.get("url"))
     evidence = page.get("evidence") or {}
+    if _aggregate_navigation_root_eligible(url=url, page=page, evidence=evidence):
+        return True
     return bool(
         page.get("fetch_ok") is True
         and page.get("classification") == INFO_OR_LEGAL_ONLY
@@ -251,7 +271,12 @@ def _eligible_multihop_root(page: dict[str, Any]) -> bool:
 
 def _root_priority(page: dict[str, Any]) -> int:
     url = _compact(page.get("final_url") or page.get("url"))
-    return 0 if _commercial_url_role(url) == "COMMERCIAL_HUB" else 1
+    role = _commercial_url_role(url)
+    if role == "COMMERCIAL_HUB":
+        return 0
+    if role in {"COLLECTION", "CATEGORY", "CATALOG"}:
+        return 1
+    return 2
 
 
 def _base(
@@ -268,6 +293,8 @@ def _base(
         "commercial_specificity_gate_enforced": True,
         "child_subject_domain_gate_enforced": True,
         "commercial_hub_navigation_only": True,
+        "aggregate_role_root_navigation_only": True,
+        "aggregate_role_root_is_qualification_evidence": False,
         "same_origin_only": True,
         "bounded_multi_hop": True,
         "root_fair_navigation": True,
@@ -594,6 +621,6 @@ def resolve_exact_lot_multihop(
         "exact_lot_yield_per_fetch": exact_lot_yield_per_fetch,
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Commercial hubs and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Smart link priority changes fetch order only and is never qualification evidence. Multi-hop navigation stays same-origin, root-fair and bounded by explicit URL roles, depth and the unchanged global page budget."
+            "Commercial hubs, aggregate categories and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Smart link priority changes fetch order only and is never qualification evidence. Multi-hop navigation stays same-origin, root-fair and bounded by explicit URL roles, depth and the unchanged global page budget."
         ),
     }
