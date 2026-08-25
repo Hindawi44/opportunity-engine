@@ -1,14 +1,14 @@
 {
   "schema_version": "manual-checkpoint-trigger-1.0",
-  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Controlled Commercial Anchor Expansion V1 was merged into the unified search path.",
-  "requested_at_utc": "2026-08-25T05:30:00Z",
-  "requested_for_main_sha": "19533e4fa9789d7e9af71978598dcc4357a0f7fb",
+  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Direct Strict-Evidence Rescue V1 was merged into the unified search path.",
+  "requested_at_utc": "2026-08-25T05:49:00Z",
+  "requested_for_main_sha": "3d28f1450716d7d33136651c91545990429f34e7",
   "project_scope": [
     "CLOTHING_INVENTORY",
     "FABRIC_PROCUREMENT"
   ],
   "production_logic_change": true,
-  "query_change": true,
+  "query_change": false,
   "source_change": false,
   "agent_change": false
 }
