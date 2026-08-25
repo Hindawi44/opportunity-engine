@@ -138,6 +138,54 @@ def _official_bulk_anchor(payload_json: object) -> bool:
     return isinstance(metadata, dict) and metadata.get("official_bulk_anchor_v1") is True
 
 
+def _bulk_sni_rank(metadata: dict[str, Any]) -> int:
+    sni_code = ""
+    raw_sni = metadata.get("sni") or []
+    if isinstance(raw_sni, list):
+        for item in raw_sni:
+            if isinstance(item, dict):
+                sni_code = "".join(character for character in _compact(item.get("code")) if character.isdigit())
+                if sni_code:
+                    break
+    if sni_code.startswith("4642"):
+        return 0
+    if sni_code.startswith("4771"):
+        return 1
+    if sni_code.startswith("14"):
+        return 2
+    if sni_code.startswith("152"):
+        return 3
+    return 9
+
+
+def _bulk_date_rank(payload: dict[str, Any], metadata: dict[str, Any]) -> int:
+    date_text = _compact(metadata.get("from_date")) or _compact(payload.get("event_date"))
+    digits = "".join(character for character in date_text[:10] if character.isdigit())
+    if len(digits) != 8:
+        return 0
+    try:
+        return -int(digits)
+    except ValueError:
+        return 0
+
+
+def _official_bulk_commercial_rank(payload_json: object) -> tuple[int, int, int] | None:
+    """Recover the collector's bounded commercial rank from persisted bulk metadata."""
+    payload = _official_signal_payload(payload_json)
+    if payload is None:
+        return None
+    metadata = payload.get("metadata") or {}
+    if not isinstance(metadata, dict) or metadata.get("official_bulk_anchor_v1") is not True:
+        return None
+    legal_code = _compact(metadata.get("legal_status_code")).upper()
+    legal_rank = 0 if legal_code == "KK" else 1 if legal_code == "LI" else 9
+    return (
+        legal_rank,
+        _bulk_sni_rank(metadata),
+        _bulk_date_rank(payload, metadata),
+    )
+
+
 def load_sweden_official_company_anchors(
     *,
     max_anchors: int = MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
@@ -148,7 +196,9 @@ def load_sweden_official_company_anchors(
     Only persisted WATCH signals with the exact official provider, Swedish country,
     insolvency/liquidation type, confidence >= 0.99 and verified official-register
     evidence are accepted. Official bulk clothing-liquidation anchors are preferred
-    over legacy official signals, while the externally visible query cap remains
+    over legacy official signals. Within the bulk set, the original collector's
+    commercial order is reconstructed from legal state, clothing SNI and event date
+    instead of hash-like signal IDs. The externally visible query cap remains
     unchanged. Failure or absence is a valid zero and falls back to the existing
     controlled catalog.
     """
@@ -194,7 +244,7 @@ def load_sweden_official_company_anchors(
     except sqlite3.Error:
         return ()
 
-    eligible: list[tuple[int, int, str]] = []
+    eligible: list[tuple[int, int, int, int, int, str, str]] = []
     for recency_rank, row in enumerate(rows):
         company_name, source_provider, source_country, signal_type, status, confidence, payload_json = row
         company = _safe_anchor_value(company_name)
@@ -214,13 +264,19 @@ def load_sweden_official_company_anchors(
             continue
         if confidence_value < 0.99 or not _verified_official_signal(payload_json):
             continue
-        bulk_priority = 0 if _official_bulk_anchor(payload_json) else 1
-        eligible.append((bulk_priority, recency_rank, company))
+        bulk_rank = _official_bulk_commercial_rank(payload_json)
+        if bulk_rank is None:
+            eligible.append((1, 0, 0, 0, recency_rank, company.casefold(), company))
+        else:
+            legal_rank, sni_rank, date_rank = bulk_rank
+            eligible.append(
+                (0, legal_rank, sni_rank, date_rank, recency_rank, company.casefold(), company)
+            )
 
-    eligible.sort(key=lambda item: (item[0], item[1]))
+    eligible.sort(key=lambda item: item[:-1])
     anchors: list[tuple[str, str]] = []
     seen: set[str] = set()
-    for _, _, company in eligible:
+    for *_, company in eligible:
         marker = company.casefold()
         if marker in seen:
             continue
