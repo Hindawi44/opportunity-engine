@@ -165,7 +165,7 @@ def _bootstrap_payload() -> dict[str, Any]:
         return {}
     if payload.get("fresh_page_verification_required") is not True:
         return {}
-    if int(payload.get("search_request_count") or -1) != 0:
+    if payload.get("search_request_count") != 0:
         return {}
     for field in (
         "production_mutation",
