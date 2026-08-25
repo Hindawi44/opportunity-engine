@@ -8,8 +8,10 @@ considered, and only strict item pages may receive Exact-Lot credit.
 
 Navigation is root-fair: eligible commercial roots share the fixed page budget
 in round-robin order so one large catalogue cannot starve other search results.
-The total navigation budget, provider gates, domain gates and Exact-Lot gates
-remain unchanged.
+Within each root, bounded URL-subject priority spends earlier fetches on links
+whose own path already names clothing, without filtering neutral links or
+turning URL priority into qualification evidence. The total navigation budget,
+provider gates, domain gates and Exact-Lot gates remain unchanged.
 """
 from __future__ import annotations
 
@@ -41,7 +43,7 @@ from opportunity_engine.project_domain_boundary import (
     classify_project_domain,
 )
 
-SCHEMA_VERSION = "exact-lot-multihop-resolution-1.2"
+SCHEMA_VERSION = "exact-lot-multihop-resolution-1.3"
 LAB_FAMILY = "EXACT_LOT_MULTIHOP_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_ROOT_PARENTS = 6
@@ -82,6 +84,12 @@ def _path(url: str) -> str:
         return (urlsplit(_compact(url)).path or "/").casefold()
     except ValueError:
         return "/"
+
+
+def _link_subject_priority(url: str) -> int:
+    """Prefer proven clothing words in a URL path, but never reject neutral links."""
+    path_words = _path(url).replace("-", " ").replace("_", " ").replace("/", " ")
+    return 0 if classify_project_domain(text=path_words) == CLOTHING_INVENTORY else 1
 
 
 def _commercial_url_role(url: str) -> str | None:
@@ -135,7 +143,7 @@ def _extract_navigation_links(
     }
     current = urldefrag(page_url).url
     current_path = _path(page_url).rstrip("/") or "/"
-    candidates: list[tuple[int, int, int, str]] = []
+    candidates: list[tuple[int, int, int, int, str]] = []
     seen: set[str] = set()
     for position, href in enumerate(parser.hrefs):
         try:
@@ -162,9 +170,17 @@ def _extract_navigation_links(
             scope_priority = 2 if current_path != "/" else 0
 
         seen.add(candidate)
-        candidates.append((scope_priority, role_priority[role], position, candidate))
-    candidates.sort(key=lambda item: (item[0], item[1], item[2]))
-    return [item[3] for item in candidates[:max_links]]
+        candidates.append(
+            (
+                scope_priority,
+                role_priority[role],
+                _link_subject_priority(candidate),
+                position,
+                candidate,
+            )
+        )
+    candidates.sort(key=lambda item: (item[0], item[1], item[2], item[3]))
+    return [item[4] for item in candidates[:max_links]]
 
 
 def _strict_exact(classification: str, evidence: dict[str, Any]) -> bool:
@@ -256,6 +272,8 @@ def _base(
         "bounded_multi_hop": True,
         "root_fair_navigation": True,
         "navigation_scheduling": "ROUND_ROBIN_ROOT_FAIR_V1",
+        "within_root_link_priority": "ROLE_THEN_CLOTHING_SUBJECT_V1",
+        "link_priority_is_qualification_evidence": False,
         "exact_lot_acceptance_only": True,
         "max_root_parents": max_root_parents,
         "max_navigation_depth": max_navigation_depth,
@@ -285,6 +303,7 @@ def _blocked(base: dict[str, Any], reason: str) -> dict[str, Any]:
         "gateway_page_count": 0,
         "exact_lots": [],
         "exact_lot_candidate_count": 0,
+        "exact_lot_yield_per_fetch": 0.0,
         "navigation_page_fetches_attempted": 0,
         "navigation_page_fetches_succeeded": 0,
         "depth_budget_exhausted_count": 0,
@@ -526,9 +545,10 @@ def resolve_exact_lot_multihop(
                                 html_text=fetched_html.html,
                                 max_links=max_links_per_page,
                             )
-                            # Child links are already ranked PRODUCT_DETAIL first.
-                            # Put them ahead of older siblings inside this root,
-                            # while root-level round-robin still protects fairness.
+                            # Child links are ranked by bounded URL role and clothing
+                            # subject before DOM position. Put them ahead of older
+                            # siblings inside this root while root-level round-robin
+                            # still protects fairness.
                             fresh_nodes: list[dict[str, Any]] = []
                             for link in next_links:
                                 if link in seen_navigation_urls:
@@ -552,6 +572,9 @@ def resolve_exact_lot_multihop(
     root_navigation_fetch_counts = {
         state["root_url"]: state["fetch_count"] for state in root_states
     }
+    exact_lot_yield_per_fetch = (
+        round(len(exact_lots) / page_attempted, 4) if page_attempted else 0.0
+    )
 
     return {
         **base,
@@ -568,8 +591,9 @@ def resolve_exact_lot_multihop(
         "gateway_page_count": len(gateway_pages),
         "gateway_pages": gateway_pages,
         "exact_lot_candidate_count": len(exact_lots),
+        "exact_lot_yield_per_fetch": exact_lot_yield_per_fetch,
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Commercial hubs and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Multi-hop navigation stays same-origin, root-fair and bounded by explicit URL roles, depth and the unchanged global page budget."
+            "Commercial hubs and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Smart link priority changes fetch order only and is never qualification evidence. Multi-hop navigation stays same-origin, root-fair and bounded by explicit URL roles, depth and the unchanged global page budget."
         ),
     }
