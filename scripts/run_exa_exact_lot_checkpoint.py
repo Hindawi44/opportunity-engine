@@ -43,6 +43,7 @@ from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_ben
 RESULTS_PER_QUERY = 5
 COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD = 3
 COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS = 8
+EVIDENCE_BACKED_MARKET_ENTITY_ORIGIN = "EVIDENCE_BACKED_MARKET_ENTITY_V1"
 DIRECT_STRICT_EVIDENCE_RESCUE = "QUALIFIED_B2B_STRICT_EVIDENCE_V1"
 MARKET_CURRENCIES = {
     "NO": "NOK",
@@ -84,6 +85,23 @@ MARKET_ZERO_YIELD_RECALL_QUERIES: dict[str, tuple[str, ...]] = {
 
 def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
+
+
+def _should_expand_commercial_anchors(
+    *,
+    anchor_queries: tuple[Mapping[str, Any], ...],
+    strict_exact_lot_count: int,
+    unique_discovery_hit_count: int,
+) -> bool:
+    """Keep global anchors broad-only, but let proven market entities rescue sparse recall."""
+    if not anchor_queries or strict_exact_lot_count >= COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD:
+        return False
+    if unique_discovery_hit_count >= COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS:
+        return True
+    return any(
+        _compact(anchor.get("anchor_origin")) == EVIDENCE_BACKED_MARKET_ENTITY_ORIGIN
+        for anchor in anchor_queries
+    )
 
 
 def _title_from_url(url: str) -> str:
@@ -417,10 +435,10 @@ def run_market(
     post_recall_strict_exact_lot_count = len(exact_lots)
     anchor_pre_count = post_recall_strict_exact_lot_count
     anchor_pre_unique_hit_count = len(all_hits)
-    anchor_expansion_triggered = bool(
-        anchor_queries
-        and anchor_pre_count < COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD
-        and anchor_pre_unique_hit_count >= COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS
+    anchor_expansion_triggered = _should_expand_commercial_anchors(
+        anchor_queries=anchor_queries,
+        strict_exact_lot_count=anchor_pre_count,
+        unique_discovery_hit_count=anchor_pre_unique_hit_count,
     )
 
     if anchor_expansion_triggered:
