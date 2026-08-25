@@ -190,18 +190,16 @@ _LABELED_QUANTITY_RE = re.compile(
     r"quantité|quantite|quantità|quantita|hoeveelheid)\b\s*(?:[:|=\-]\s*)?\d[\d\s.,]{0,10}",
     re.IGNORECASE,
 )
-# Singular item/detail route tokens qualify directly. Plural collection roots
-# still fail closed, with one narrow exception: canonical commerce product
-# containers such as /products/<slug> are item-specific only when a real slug
-# exists after the container. Bare /products/ and generic category slugs remain
-# aggregate.
+# Singular lot/auction route tokens qualify directly. Canonical product routes
+# are handled separately below so aggregate product categories cannot inherit
+# Exact-Lot specificity from their first path segment.
 _ITEM_PATH_RE = re.compile(
-    r"(?:^|/)(?:item|lot|lotto|parti|product|produkt|kavel|annuncio|articolo|auction|"
+    r"(?:^|/)(?:item|lot|lotto|parti|kavel|annuncio|articolo|auction|"
     r"auktion|auksjon|veiling)(?:[-_/]|$)",
     re.IGNORECASE,
 )
 _PRODUCT_DETAIL_CONTAINER_RE = re.compile(
-    r"(?:^|/)products/(?P<slug>[^/?#]+)(?:/|$)",
+    r"(?:^|/)(?:products?|produkt)/(?P<slug>[^/?#]+)(?:/|$)",
     re.IGNORECASE,
 )
 _GENERIC_PRODUCT_CONTAINER_SLUGS = frozenset({
@@ -227,6 +225,47 @@ _GENERIC_PRODUCT_CONTAINER_SLUGS = frozenset({
     "abbigliamento",
     "kleding",
 })
+_LOCAL_LOT_PRODUCT_TERMS = frozenset({
+    "lot",
+    "lotto",
+    "parti",
+    "partij",
+    "stock",
+    "wholesale",
+    "grossist",
+    "grossiste",
+    "engros",
+    "ingrosso",
+    "groothandel",
+    "box",
+    "bundle",
+    "bale",
+    "pallet",
+    "palette",
+    "kilo",
+    "kg",
+    "stuks",
+    "pcs",
+    "pieces",
+    "pièces",
+    "pezzi",
+    "units",
+})
+_LOCAL_LOT_PRODUCT_PREFIXES = (
+    "restpart",
+    "restpost",
+    "sonderpost",
+    "destock",
+    "déstock",
+    "liquidat",
+    "surplus",
+    "overstock",
+    "deadstock",
+)
+_LOCAL_LOT_QUANTITY_TOKEN_RE = re.compile(
+    r"^\d{2,}(?:kg|stk|stuks|pcs|pieces|pièces|pezzi|units)?$",
+    re.IGNORECASE,
+)
 # Some wholesalers expose concrete lot pages below /stock/<category>/<slug>.
 # Bare /stock/ and one-segment /stock/<category>/ routes remain aggregate. The
 # nested stock route supplies URL-specificity evidence only; all domain,
@@ -304,14 +343,31 @@ def _contains_any(text: str, markers: tuple[str, ...]) -> bool:
     return any(marker in text for marker in markers)
 
 
+def _product_slug_has_local_lot_intent(slug: str) -> bool:
+    tokens = [token for token in re.split(r"[-_]+", _compact(slug).casefold()) if token]
+    if any(token in _LOCAL_LOT_PRODUCT_TERMS for token in tokens):
+        return True
+    if any(
+        token.startswith(prefix)
+        for token in tokens
+        for prefix in _LOCAL_LOT_PRODUCT_PREFIXES
+    ):
+        return True
+    return any(_LOCAL_LOT_QUANTITY_TOKEN_RE.fullmatch(token) for token in tokens)
+
+
 def _looks_item_specific_url(url: str) -> bool:
     """Return true only for conservative item/lot-detail URL shapes.
 
     Homepages, search pages, category pages and marketplace roots cannot become
     exact lots merely because their aggregate HTML contains many prices and
-    quantities. Bare plural collection routes fail closed. Canonical product
-    routes and numeric marketplace record-detail slugs may qualify only as URL
-    specificity evidence; all commercial/domain evidence is still required.
+    quantities. Bare plural collection routes fail closed. Singular canonical
+    ``/product/<slug>`` and ``/products/<slug>`` routes remain item-specific so
+    proven B2B product lots continue to work, while nested product-category paths
+    fail closed. The localized ``/produkt/<slug>`` shape is more ambiguous in the
+    live Swedish evidence, so it must carry local lot/bulk intent in its own slug
+    before it can provide Exact-Lot specificity. This is URL specificity only;
+    all domain, inventory, sale, price and quantity gates still apply.
     """
     try:
         parsed = urlsplit(_compact(url))
@@ -325,11 +381,16 @@ def _looks_item_specific_url(url: str) -> bool:
     product_match = _PRODUCT_DETAIL_CONTAINER_RE.search(path)
     if product_match:
         slug = product_match.group("slug").casefold()
-        exact_container_path = path == f"/products/{slug}"
-        if exact_container_path and slug in _GENERIC_PRODUCT_CONTAINER_SLUGS:
+        matched = product_match.group(0).strip("/")
+        container = matched.split("/", 1)[0].casefold()
+        exact_detail_suffix = f"/{container}/{slug}"
+        if not path.endswith(exact_detail_suffix):
             return False
-        if slug not in {"search", "all", "index", "catalog", "catalogue"}:
-            return True
+        if slug in _GENERIC_PRODUCT_CONTAINER_SLUGS:
+            return False
+        if container == "produkt":
+            return _product_slug_has_local_lot_intent(slug)
+        return True
     stock_match = _STOCK_DETAIL_CONTAINER_RE.search(path)
     if stock_match:
         slug = stock_match.group("slug").casefold()
