@@ -240,7 +240,6 @@ def _aggregate_navigation_root_eligible(
     return bool(
         page.get("fetch_ok") is True
         and page.get("classification") == ACTIVE_STOCK_SIGNAL
-        and page.get("tool_learning_useful") is not True
         and role in {"COLLECTION", "CATEGORY", "CATALOG"}
         and _root_subject_domain(page, url) == CLOTHING_INVENTORY
         and evidence.get("project_domain") == CLOTHING_INVENTORY
