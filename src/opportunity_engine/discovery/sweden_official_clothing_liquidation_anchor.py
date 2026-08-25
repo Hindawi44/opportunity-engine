@@ -184,8 +184,19 @@ def _liquidation_events(value: object) -> list[dict[str, str | None]]:
         if code not in CURRENT_LIQUIDATION_CODES:
             continue
         short_code, default_text = CURRENT_LIQUIDATION_CODES[code]
-        legal_text = _compact(fields[1]) if len(fields) > 1 else ""
-        from_date = _compact(fields[2]) if len(fields) > 2 else ""
+        second_field = _compact(fields[1]) if len(fields) > 1 else ""
+        if len(fields) > 2:
+            legal_text = second_field
+            from_date = _compact(fields[2])
+        elif second_field and _parse_event_date(second_field) is not None:
+            # The live weekly bulk file currently emits CODE$DATE for these
+            # proceedings. Preserve compatibility with the documented/tested
+            # CODE$TEXT$DATE shape without mistaking the date for legal text.
+            legal_text = default_text
+            from_date = second_field
+        else:
+            legal_text = second_field
+            from_date = ""
         events.append(
             {
                 "source_code": code,
