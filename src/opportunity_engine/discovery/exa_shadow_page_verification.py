@@ -191,10 +191,8 @@ _LABELED_QUANTITY_RE = re.compile(
     re.IGNORECASE,
 )
 # Singular lot/auction route tokens qualify directly. Canonical product routes
-# are intentionally handled separately below: a generic retail product slug is
-# not Exact-Lot specificity evidence unless the slug itself carries local
-# lot/bulk intent. This prevents site-wide inventory/header text from turning
-# ordinary retail products into commercial inventory opportunities.
+# are handled separately below so aggregate product categories cannot inherit
+# Exact-Lot specificity from their first path segment.
 _ITEM_PATH_RE = re.compile(
     r"(?:^|/)(?:item|lot|lotto|parti|kavel|annuncio|articolo|auction|"
     r"auktion|auksjon|veiling)(?:[-_/]|$)",
@@ -359,15 +357,17 @@ def _product_slug_has_local_lot_intent(slug: str) -> bool:
 
 
 def _looks_item_specific_url(url: str) -> bool:
-    """Return true only for conservative Exact-Lot item/detail URL shapes.
+    """Return true only for conservative item/lot-detail URL shapes.
 
     Homepages, search pages, category pages and marketplace roots cannot become
     exact lots merely because their aggregate HTML contains many prices and
-    quantities. Bare plural collection routes fail closed. Generic canonical
-    product routes also fail closed unless the product slug itself carries local
-    lot/bulk intent such as ``parti``, ``box``, ``kilo`` or ``stock``. This keeps
-    ordinary retail product pages out even when a site-wide header contains
-    inventory language. All commercial/domain evidence is still required.
+    quantities. Bare plural collection routes fail closed. Singular canonical
+    ``/product/<slug>`` and ``/products/<slug>`` routes remain item-specific so
+    proven B2B product lots continue to work, while nested product-category paths
+    fail closed. The localized ``/produkt/<slug>`` shape is more ambiguous in the
+    live Swedish evidence, so it must carry local lot/bulk intent in its own slug
+    before it can provide Exact-Lot specificity. This is URL specificity only;
+    all domain, inventory, sale, price and quantity gates still apply.
     """
     try:
         parsed = urlsplit(_compact(url))
@@ -381,9 +381,16 @@ def _looks_item_specific_url(url: str) -> bool:
     product_match = _PRODUCT_DETAIL_CONTAINER_RE.search(path)
     if product_match:
         slug = product_match.group("slug").casefold()
+        matched = product_match.group(0).strip("/")
+        container = matched.split("/", 1)[0].casefold()
+        exact_detail_suffix = f"/{container}/{slug}"
+        if not path.endswith(exact_detail_suffix):
+            return False
         if slug in _GENERIC_PRODUCT_CONTAINER_SLUGS:
             return False
-        return _product_slug_has_local_lot_intent(slug)
+        if container == "produkt":
+            return _product_slug_has_local_lot_intent(slug)
+        return True
     stock_match = _STOCK_DETAIL_CONTAINER_RE.search(path)
     if stock_match:
         slug = stock_match.group("slug").casefold()
