@@ -37,6 +37,9 @@ from opportunity_engine.discovery.openai_hunt_case_enrichment import (
 from opportunity_engine.discovery.signal_role_freshness_correction import (
     write_corrected_market_bulletin_artifacts,
 )
+from opportunity_engine.discovery.sweden_official_clothing_liquidation_anchor import (
+    collect_and_store_sweden_official_clothing_liquidation_anchors,
+)
 from opportunity_engine.discovery.sweden_organisation_discovery_bridge import (
     resolve_sweden_artifact_company_identities,
 )
@@ -143,6 +146,54 @@ def main() -> int:
     print(
         "sweden_organisation_discovery_bridge_status:",
         sweden_identity_bridge.get("status"),
+    )
+
+    # Official bulk discovery is a company-anchor feed only. It writes into the
+    # existing Swedish market-signal artifact; it does not create a checkpoint
+    # source, consume search requests, or promote a company into an opportunity.
+    try:
+        sweden_bulk_anchor = collect_and_store_sweden_official_clothing_liquidation_anchors(
+            manifest,
+            root=args.root,
+        )
+    except Exception as exc:
+        sweden_bulk_anchor = {
+            "schema_version": "sweden-official-clothing-liquidation-anchor-1.0",
+            "source_key": "OFFICIAL_SWEDISH_CLOTHING_LIQUIDATION_BULK_ANCHOR_V1",
+            "source_name": "Bolagsverket Värdefulla datamängder",
+            "source_country": "SE",
+            "status": "FAILED_RETRIEVAL",
+            "error_type": type(exc).__name__,
+            "errors": [str(exc)],
+            "accepted_signal_count": 0,
+            "signals": [],
+            "signal_only": True,
+            "anchor_only": True,
+            "anchor_is_qualification_evidence": False,
+            "promotion_to_opportunity_allowed": False,
+            "new_runtime_created": False,
+            "search_requests_made": 0,
+            "exa_query_budget_delta": 0,
+            "automatic_contact": False,
+            "automatic_bid": False,
+            "automatic_purchase": False,
+            "automatic_payment": False,
+        }
+    _write_report(
+        output_dir / "sweden-official-clothing-liquidation-anchor.json",
+        sweden_bulk_anchor,
+    )
+    print(
+        "sweden_official_clothing_liquidation_anchor_status:",
+        sweden_bulk_anchor.get("status"),
+    )
+    print(
+        "sweden_official_clothing_liquidation_anchor_signals:",
+        sweden_bulk_anchor.get("accepted_signal_count", 0),
+    )
+    print(
+        "sweden_official_clothing_liquidation_anchor_search_requests:",
+        sweden_bulk_anchor.get("search_requests_made", 0),
     )
 
     try:
