@@ -85,7 +85,9 @@ def test_brand_name_alone_never_rescues_failed_exact_lot_evidence() -> None:
     assert module._exact_lot_rows({"verified_pages": []}, {"exact_lots": [row]}) == []
 
 
-def test_anchor_stage_runs_only_for_thin_post_recall_yield(monkeypatch, tmp_path: Path) -> None:
+def test_anchor_stage_runs_only_for_broad_thin_post_recall_yield(
+    monkeypatch, tmp_path: Path
+) -> None:
     module = _load_runner()
     searches: list[str] = []
     evaluations = 0
@@ -96,14 +98,16 @@ def test_anchor_stage_runs_only_for_thin_post_recall_yield(monkeypatch, tmp_path
 
         def search(self, query: str, *, count: int):
             searches.append(query)
+            batch = len(searches)
             return [
                 SearchHit(
                     title="Wholesale clothing stock",
-                    url=f"https://example.test/search/{len(searches)}",
+                    url=f"https://example.test/search/{batch}/{index}",
                     description="clothing stock wholesale",
                     provider="exa",
                 )
-            ][:count]
+                for index in range(1, min(count, 4) + 1)
+            ]
 
     def fake_verify(_benchmark, **_kwargs):
         return {"verified_pages": [], "exact_lot_candidate_count": 0}
@@ -115,17 +119,32 @@ def test_anchor_stage_runs_only_for_thin_post_recall_yield(monkeypatch, tmp_path
             rows = []
         elif evaluations == 2:
             rows = [
-                _strict_row("https://example.test/product/100-kleding", module.MARKET_ZERO_YIELD_RECALL_QUERIES["NL"][0]),
-                _strict_row("https://example.test/product/200-kleding", module.MARKET_ZERO_YIELD_RECALL_QUERIES["NL"][0]),
+                _strict_row(
+                    "https://example.test/product/100-kleding",
+                    module.MARKET_ZERO_YIELD_RECALL_QUERIES["NL"][0],
+                ),
+                _strict_row(
+                    "https://example.test/product/200-kleding",
+                    module.MARKET_ZERO_YIELD_RECALL_QUERIES["NL"][0],
+                ),
             ]
         else:
             anchor_query = build_commercial_anchor_queries(
                 market="NL", project_domain=CLOTHING_INVENTORY
             )[0]["query"]
             rows = [
-                _strict_row("https://example.test/product/100-kleding", module.MARKET_ZERO_YIELD_RECALL_QUERIES["NL"][0]),
-                _strict_row("https://example.test/product/200-kleding", module.MARKET_ZERO_YIELD_RECALL_QUERIES["NL"][0]),
-                _strict_row("https://example.test/product/300-kleding", anchor_query),
+                _strict_row(
+                    "https://example.test/product/100-kleding",
+                    module.MARKET_ZERO_YIELD_RECALL_QUERIES["NL"][0],
+                ),
+                _strict_row(
+                    "https://example.test/product/200-kleding",
+                    module.MARKET_ZERO_YIELD_RECALL_QUERIES["NL"][0],
+                ),
+                _strict_row(
+                    "https://example.test/product/300-kleding",
+                    anchor_query,
+                ),
             ]
         return {
             "exact_lots": rows,
@@ -156,6 +175,7 @@ def test_anchor_stage_runs_only_for_thin_post_recall_yield(monkeypatch, tmp_path
     assert report["primary_strict_exact_lot_count"] == 0
     assert report["zero_yield_recall_added_exact_lot_count"] == 2
     assert report["commercial_anchor_expansion_triggered"] is True
+    assert report["commercial_anchor_pre_unique_discovery_hit_count"] == 8
     assert report["commercial_anchor_query_count"] == len(anchor_rows)
     assert report["commercial_anchor_pre_strict_exact_lot_count"] == 2
     assert report["commercial_anchor_added_exact_lot_count"] == 1
@@ -169,6 +189,7 @@ def test_anchor_stage_runs_only_for_thin_post_recall_yield(monkeypatch, tmp_path
         "COMMERCIAL_ANCHOR",
         "COMMERCIAL_ANCHOR",
     ]
+    assert resolution["controlled_commercial_anchor_expansion"]["min_unique_discovery_hits"] == 8
     anchor_meta = [
         row["commercial_anchor"]
         for row in resolution["queries"]
