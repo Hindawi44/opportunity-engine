@@ -116,6 +116,16 @@ _DIRECT_SALE_MARKERS = (
     "veiling",
 )
 
+# Strong seller-side fulfilment language is tracked separately because some B2B
+# wholesalers both buy liquidation stock and sell it from the same page. A
+# verified order-fulfilment phrase may therefore prove the seller side even when
+# buyer/source language such as "wir kaufen" is also present. This never replaces
+# inventory/domain/item/price/quantity gates.
+_SELLER_ORDER_INTENT_MARKERS = (
+    "bearbeitung von bestellungen",
+    "bestellungen werden",
+)
+
 _BUYER_OR_SOURCE_MARKERS = (
     "vi kjøper",
     "kjøper restlager",
@@ -336,7 +346,8 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
     combined_raw = f"{_compact(title)} {_compact(text)}"
     combined = combined_raw.casefold()
     has_inventory = _contains_any(combined, _INVENTORY_MARKERS)
-    has_direct_sale = _contains_any(combined, _DIRECT_SALE_MARKERS)
+    seller_order_intent = _contains_any(combined, _SELLER_ORDER_INTENT_MARKERS)
+    has_direct_sale = _contains_any(combined, _DIRECT_SALE_MARKERS) or seller_order_intent
     has_buyer_source = _contains_any(combined, _BUYER_OR_SOURCE_MARKERS)
     has_info_legal = _contains_any(combined, _INFO_OR_LEGAL_MARKERS)
     has_price = bool(_PRICE_RE.search(combined) or _SCANDINAVIAN_DASH_PRICE_RE.search(combined))
@@ -348,6 +359,7 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
     evidence: dict[str, Any] = {
         "inventory_evidence": has_inventory,
         "direct_sale_evidence": has_direct_sale,
+        "seller_order_intent_evidence": seller_order_intent,
         "buyer_or_source_evidence": has_buyer_source,
         "info_or_legal_evidence": has_info_legal,
         "price_evidence": has_price,
@@ -366,7 +378,12 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
         and item_specific_url
         and not has_info_legal
     )
-    active_shape = has_inventory and has_direct_sale and not has_info_legal and not has_buyer_source
+    active_shape = bool(
+        has_inventory
+        and has_direct_sale
+        and not has_info_legal
+        and (not has_buyer_source or seller_order_intent)
+    )
 
     if (exact_shape or active_shape) and not domain_evidence:
         return OUT_OF_DOMAIN, evidence
