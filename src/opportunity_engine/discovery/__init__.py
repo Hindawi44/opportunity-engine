@@ -88,6 +88,9 @@ from opportunity_engine.discovery.unified_market_intelligence_river_cli_hook imp
 from opportunity_engine.discovery.unified_search_truth_reconciliation_cli_hook import (
     install_unified_search_truth_reconciliation_cli_hook,
 )
+from opportunity_engine.discovery.expansion_route_continuity_v1 import (
+    install_expansion_route_continuity_v1,
+)
 from opportunity_engine.discovery.commercial_anchor_outcome_learning_cli_hook import (
     install_commercial_anchor_outcome_learning_cli_hook,
 )
@@ -151,6 +154,9 @@ install_unified_market_intelligence_river_cli_hook()
 # the runtime has written current six-market search truth. This corrects stale
 # report labels only; it does not create a second search path.
 install_unified_search_truth_reconciliation_cli_hook()
+# Synchronously patch only persistence/route continuity before the existing
+# runtime registers its atexit callback. No search request or runtime is added.
+install_expansion_route_continuity_v1()
 # Registered immediately before Unified Search Runtime. LIFO therefore executes
 # the existing six-market Exa runtime first, then this review-only learner consumes
 # the persisted per-anchor outcomes. It adds no search request or runtime.
