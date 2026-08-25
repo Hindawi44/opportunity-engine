@@ -1,8 +1,8 @@
 {
   "schema_version": "manual-checkpoint-trigger-1.0",
-  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Child Clothing Subject Rescue V1 was merged into the unified search path.",
-  "requested_at_utc": "2026-08-25T04:44:30Z",
-  "requested_for_main_sha": "5acbcf0f327a9ee9fee0cedc8d9ca5ade1ab4079",
+  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Smart Link Priority / Yield-per-Fetch V1 was merged into the unified search path.",
+  "requested_at_utc": "2026-08-25T05:01:30Z",
+  "requested_for_main_sha": "87c818a03ce8d23ce90ee54c229194fa4e033ba8",
   "project_scope": [
     "CLOTHING_INVENTORY",
     "FABRIC_PROCUREMENT"
