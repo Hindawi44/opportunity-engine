@@ -209,10 +209,28 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
     title = _compact(row.get("title")) or _title_from_url(url)
     origin = _compact(row.get("exact_lot_origin")) or "STRICT_EXACT_LOT"
     evidence = row.get("evidence") or {}
+    price_detected = evidence.get("price_evidence") is True
+    quantity_detected = evidence.get("quantity_evidence") is True
     bounded_context = (
-        "Strict Exact-Lot evidence: CLOTHING_INVENTORY subject, item-specific URL, "
-        "inventory, direct sale, price and quantity were all verified on the exact public page."
+        "Strict Exact-Lot evidence: CLOTHING_INVENTORY subject, item-specific URL, inventory, "
+        "direct sale, and source-native numeric price and quantity patterns were verified on the "
+        "exact public page. Source values still require normalization before financial analysis."
     )
+    missing_information = [
+        "normalized source-native price value for financial analysis",
+        "normalized source-native quantity value for financial analysis",
+        "condition",
+        "seller or company identity",
+        "pickup or shipping terms",
+    ]
+    confirmed_information = [
+        "clothing domain",
+        "item-specific page",
+        "inventory evidence",
+        "direct-sale evidence",
+        "source-native numeric price evidence" if price_detected else "price evidence",
+        "source-native numeric quantity evidence" if quantity_detected else "quantity evidence",
+    ]
     return {
         "title": title,
         "scenario": "LARGE_LOT_SALE",
@@ -236,6 +254,9 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "listing_status": ACTIVE,
         "opportunity_identity": url,
         "identity_stable": True,
+        "source_native_price_evidence_detected": price_detected,
+        "source_native_quantity_evidence_detected": quantity_detected,
+        "source_value_normalization_required": True,
         "verification": [
             {
                 "url": url,
@@ -246,6 +267,9 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
                 "identity_stable": True,
                 "clothing_inventory_evidence": evidence.get("project_domain") == CLOTHING_INVENTORY,
                 "sale_evidence": evidence.get("direct_sale_evidence") is True,
+                "price_evidence": price_detected,
+                "quantity_evidence": quantity_detected,
+                "source_value_normalization_required": True,
                 "verification_content_match": True,
                 "bounded_context": bounded_context,
                 "verified": True,
@@ -258,25 +282,13 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "score_breakdown": {"strict_exact_lot_gate": 80},
         "why_opportunity": [
             "Exact public item/lot page was fetched successfully.",
-            "Clothing domain, direct sale, price and quantity evidence are all present.",
+            "Clothing domain, direct sale, and source-native numeric price and quantity evidence are present.",
         ],
-        "confirmed_information": [
-            "clothing domain",
-            "item-specific page",
-            "inventory evidence",
-            "direct-sale evidence",
-            "price evidence",
-            "quantity evidence",
-        ],
-        "missing_information": [
-            "exact numeric price value",
-            "exact numeric quantity value",
-            "condition",
-            "seller or company identity",
-            "pickup or shipping terms",
-        ],
+        "confirmed_information": confirmed_information,
+        "missing_information": missing_information,
         "next_verification_step": (
-            "Extract the commercial values from this same exact page before financial analysis."
+            "Normalize the already verified source-native price and quantity values, then confirm "
+            "condition, seller identity and pickup/shipping terms before financial analysis."
         ),
         "top5_eligible": True,
         "analysis_eligible": False,
@@ -299,7 +311,7 @@ def build_checkpoint_result_from_exact_lots(
         1 for row in exact_lots if row.get("direct_strict_evidence_rescue") == DIRECT_STRICT_EVIDENCE_RESCUE
     )
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.6",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.7",
         "status": "SUCCESS",
         "execution_status": "PASS",
         "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -319,6 +331,15 @@ def build_checkpoint_result_from_exact_lots(
         "direct_strict_evidence_rescue_count": direct_rescue_count,
         "multihop_exact_lot_count": int(multihop.get("exact_lot_candidate_count") or 0),
         "strict_exact_lot_count": len(candidates),
+        "source_native_value_evidence_count": sum(
+            1
+            for candidate in candidates
+            if candidate.get("source_native_price_evidence_detected") is True
+            and candidate.get("source_native_quantity_evidence_detected") is True
+        ),
+        "source_value_normalization_required_count": sum(
+            1 for candidate in candidates if candidate.get("source_value_normalization_required") is True
+        ),
         "currency_conversion_performed": False,
         "tax_calculation_performed": False,
         "customs_calculation_performed": False,
@@ -483,7 +504,7 @@ def run_market(
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.5",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.6",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
@@ -519,6 +540,10 @@ def run_market(
             "multihop": multihop,
             "strict_exact_lot_count": len(exact_lots),
             "strict_exact_lot_urls": [row.get("url") for row in exact_lots],
+            "source_native_value_evidence_count": report["source_native_value_evidence_count"],
+            "source_value_normalization_required_count": report[
+                "source_value_normalization_required_count"
+            ],
             "production_mutation": False,
             "automatic_provider_activation": False,
         },
