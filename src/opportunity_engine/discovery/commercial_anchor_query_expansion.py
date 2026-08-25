@@ -73,7 +73,7 @@ _QUERY_FRAMES: dict[str, dict[str, str]] = {
         "NL": "Nederland kleding clothing {anchor} restpartij groothandel voorraad te koop",
     },
     FABRIC_PROCUREMENT: {
-        "NO": "Norge stoff fabric {anchor} restlager engros rullar till salu",
+        "NO": "Norge stoff fabric {anchor} restlager engros ruller til salgs",
         "SE": "Sverige tyg fabric {anchor} restparti grossist rullar säljes",
         "DE": "Deutschland Stoff fabric {anchor} Restposten Großhandel Rollen zu verkaufen",
         "FR": "France tissu fabric {anchor} déstockage grossiste rouleaux à vendre",
