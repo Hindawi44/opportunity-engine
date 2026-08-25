@@ -3,8 +3,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from opportunity_engine.discovery import checkpoint_state_restore
 from opportunity_engine.discovery import commercial_anchor_outcome_learning_cli_hook as hook
+from opportunity_engine.discovery.commercial_anchor_historical_bootstrap import (
+    DEFAULT_BOOTSTRAP_PATH,
+    load_historical_anchor_bootstrap,
+)
 from opportunity_engine.discovery.commercial_anchor_outcome_learning import (
     MEMORY_FILENAME,
     OUTPUT_FILENAME,
@@ -53,7 +59,7 @@ def test_registration_order_runs_unified_search_runtime_before_anchor_learning()
     assert learner < runtime
 
 
-def test_callback_writes_valid_zero_without_search_when_no_resolution_exists(
+def test_callback_bootstraps_corrected_salzmann_candidate_without_search(
     tmp_path: Path, monkeypatch
 ) -> None:
     input_root = tmp_path / "inputs"
@@ -68,8 +74,112 @@ def test_callback_writes_valid_zero_without_search_when_no_resolution_exists(
     memory = json.loads(
         (input_root / "learning" / MEMORY_FILENAME).read_text(encoding="utf-8")
     )
-    assert report["status"] == "VALID_ZERO"
-    assert memory["status"] == "VALID_ZERO"
+
+    assert report["status"] == "SUCCESS"
     assert report["current_run_observation_count"] == 0
+    assert report["candidate_success_pattern_count"] == 1
+    assert report["proven_success_pattern_count"] == 0
+    assert report["historical_bootstrap"]["status"] == "MERGED"
+    assert report["historical_bootstrap"]["search_requests"] == 0
     assert report["automatic_query_activation"] is False
     assert report["production_mutation"] is False
+
+    salzmann = next(
+        row for row in memory["patterns"] if row.get("anchor_value") == "Salzmann Restwaren"
+    )
+    assert salzmann["pattern_status"] == "CANDIDATE_SUCCESS"
+    assert salzmann["market_code"] == "DE"
+    assert salzmann["route"] == "MULTI_HOP"
+    assert salzmann["verified_exact_lot_url_count"] == 21
+    assert all("/product/" in url for url in salzmann["verified_exact_lot_urls"])
+    assert all("/products/" not in url for url in salzmann["verified_exact_lot_urls"])
+
+
+def _same_day_salzmann_resolution(url: str) -> dict:
+    return {
+        "schema_version": "exa-exact-lot-checkpoint-resolution-1.7",
+        "generated_at": "2026-08-25T21:00:00+00:00",
+        "market": "DE",
+        "project_domain": "CLOTHING_INVENTORY",
+        "provider": "exa",
+        "production_mutation": False,
+        "commercial_anchor_outcome_evidence": {
+            "schema_version": "commercial-anchor-outcome-evidence-1.0",
+            "status": "SUCCESS",
+            "market_code": "DE",
+            "project_domain": "CLOTHING_INVENTORY",
+            "provider": "exa",
+            "outcome_count": 1,
+            "outcomes": [
+                {
+                    "anchor_type": "WHOLESALER",
+                    "anchor_value": "Salzmann Restwaren",
+                    "anchor_origin": "CONTROLLED_COMMERCIAL_ANCHOR_EXPANSION_V1_HISTORICAL",
+                    "query": (
+                        "Deutschland Bekleidung clothing Salzmann Restwaren "
+                        "Restposten Großhandel Lager zu verkaufen"
+                    ),
+                    "outcome": "STRICT_EXACT_LOT_SUCCESS",
+                    "strict_exact_lot_added_count": 1,
+                    "strict_exact_lot_urls": [url],
+                }
+            ],
+            "anchor_is_qualification_evidence": False,
+            "learning_evidence_only": True,
+            "automatic_query_activation": False,
+            "automatic_source_promotion": False,
+            "production_query_mutation": False,
+            "production_mutation": False,
+        },
+        "verification": {"verified_pages": []},
+        "multihop": {"exact_lots": [{"url": url, "final_url": url}]},
+    }
+
+
+def test_same_day_live_success_does_not_turn_historical_candidate_into_proven(
+    tmp_path: Path, monkeypatch
+) -> None:
+    input_root = tmp_path / "inputs"
+    output_dir = tmp_path / "output"
+    de_dir = input_root / "de-exa-exact-lot"
+    de_dir.mkdir(parents=True)
+    bootstrap_rows = load_historical_anchor_bootstrap(ROOT / DEFAULT_BOOTSTRAP_PATH)
+    url = bootstrap_rows[0]["strict_exact_lot_urls"][0]
+    (de_dir / "exa-exact-lot-resolution.json").write_text(
+        json.dumps(_same_day_salzmann_resolution(url), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setenv("INPUT_ROOT", str(input_root))
+    monkeypatch.setenv("OUTPUT_DIR", str(output_dir))
+    monkeypatch.setenv("GITHUB_RUN_ID", "same-day-live-run")
+    hook._run_anchor_outcome_learning()
+
+    report = json.loads((output_dir / OUTPUT_FILENAME).read_text(encoding="utf-8"))
+    memory = json.loads(
+        (input_root / "learning" / MEMORY_FILENAME).read_text(encoding="utf-8")
+    )
+    salzmann = next(
+        row for row in memory["patterns"] if row.get("anchor_value") == "Salzmann Restwaren"
+    )
+
+    assert report["candidate_success_pattern_count"] == 1
+    assert report["proven_success_pattern_count"] == 0
+    assert salzmann["pattern_status"] == "CANDIDATE_SUCCESS"
+    assert salzmann["successful_observation_count"] == 2
+    assert salzmann["checkpoint_run_count"] == 2
+    assert salzmann["checkpoint_day_count"] == 1
+    assert salzmann["checkpoint_days"] == ["2026-08-25"]
+
+
+def test_bootstrap_refuses_reintroduction_of_aggregate_products_url(tmp_path: Path) -> None:
+    payload = json.loads((ROOT / DEFAULT_BOOTSTRAP_PATH).read_text(encoding="utf-8"))
+    observation = payload["observations"][0]
+    observation["strict_exact_lot_urls"][0] = (
+        "https://salzmann-restwaren.de/products/bekleidung/page/3/"
+    )
+    bad = tmp_path / "bad-bootstrap.json"
+    bad.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="aggregate /products/"):
+        load_historical_anchor_bootstrap(bad)

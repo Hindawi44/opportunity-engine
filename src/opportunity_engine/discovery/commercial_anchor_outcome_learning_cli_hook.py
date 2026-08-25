@@ -20,6 +20,9 @@ from pathlib import Path
 import sys
 from typing import Any
 
+from opportunity_engine.discovery.commercial_anchor_historical_bootstrap import (
+    apply_commercial_anchor_historical_bootstrap,
+)
 from opportunity_engine.discovery.commercial_anchor_outcome_learning import (
     MEMORY_FILENAME,
     OUTPUT_FILENAME,
@@ -64,8 +67,15 @@ def _run_id() -> str:
     return _compact(os.environ.get("GITHUB_RUN_ID")) or "LOCAL_CHECKPOINT"
 
 
+def _write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _write_failure_report(output_dir: Path, exc: Exception) -> None:
-    output_dir.mkdir(parents=True, exist_ok=True)
     payload: dict[str, Any] = {
         "schema_version": "commercial-anchor-outcome-learning-1.0",
         "status": "FAILURE",
@@ -76,21 +86,41 @@ def _write_failure_report(output_dir: Path, exc: Exception) -> None:
         "anchor_is_qualification_evidence": False,
         **_SAFETY,
     }
-    (output_dir / OUTPUT_FILENAME).write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    _write_json(output_dir / OUTPUT_FILENAME, payload)
+
+
+def _bootstrap_failure(exc: Exception) -> dict[str, Any]:
+    return {
+        "status": "FAILURE",
+        "error_type": type(exc).__name__,
+        "error": _compact(exc)[:1000],
+        "search_requests": 0,
+        "learning_evidence_only": True,
+        "anchor_is_qualification_evidence": False,
+        **_SAFETY,
+    }
 
 
 def _run_anchor_outcome_learning() -> None:
     """Consume current six-market Exact-Lot outcome evidence without searching."""
+    input_root = _input_root()
     output_dir = _output_dir()
+
+    # Historical bootstrap is evidence-only and must not suppress truthful current
+    # learning if its static reviewed artifact ever becomes invalid.
     try:
-        write_commercial_anchor_outcome_learning(
-            input_root=_input_root(),
+        bootstrap = apply_commercial_anchor_historical_bootstrap(input_root=input_root)
+    except Exception as exc:
+        bootstrap = _bootstrap_failure(exc)
+
+    try:
+        report = write_commercial_anchor_outcome_learning(
+            input_root=input_root,
             output_dir=output_dir,
             run_id=_run_id(),
         )
+        report["historical_bootstrap"] = bootstrap
+        _write_json(output_dir / OUTPUT_FILENAME, report)
     except Exception as exc:  # learning must never break the established checkpoint
         _write_failure_report(output_dir, exc)
 
