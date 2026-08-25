@@ -56,7 +56,7 @@ def _fixtures(tmp_path: Path) -> tuple[Path, Path]:
             {
                 "organisationsidentitet": "5561112222$ORGNR-IDORG",
                 "organisationsnamn": "Nordic Workwear AB$FORETAGSNAMN-ORGNAM$2020-01-01$",
-                "pagandeAvvecklingsEllerOmstruktureringsforfarande": "KK-AVOMFO$Konkurs$2026-08-20",
+                "pagandeAvvecklingsEllerOmstruktureringsforfarande": "KK-AVOMFO$2026-08-20",
             },
             {
                 "organisationsidentitet": "5563334444$ORGNR-IDORG",
@@ -133,6 +133,10 @@ def test_bulk_join_uses_ng1_and_current_kk_li_only(tmp_path: Path) -> None:
         item["evidence"][0]["evidence_type"] == "OFFICIAL_SWEDISH_COMPANY_STATUS"
         for item in signals
     )
+    nordic = next(item for item in signals if item["company_name"] == "Nordic Workwear AB")
+    assert nordic["metadata"]["legal_status_text"] == "Konkurs"
+    assert nordic["metadata"]["from_date"] == "2026-08-20"
+    assert str(nordic["event_date"]).startswith("2026-08-20")
 
 
 def test_bulk_join_merges_into_existing_sweden_signal_artifact(tmp_path: Path) -> None:
