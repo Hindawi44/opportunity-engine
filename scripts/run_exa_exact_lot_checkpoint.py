@@ -43,6 +43,7 @@ from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_ben
 RESULTS_PER_QUERY = 5
 COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD = 3
 COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS = 8
+COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS_BY_MARKET = {"DE": 6}
 DIRECT_STRICT_EVIDENCE_RESCUE = "QUALIFIED_B2B_STRICT_EVIDENCE_V1"
 MARKET_CURRENCIES = {
     "NO": "NOK",
@@ -84,6 +85,18 @@ MARKET_ZERO_YIELD_RECALL_QUERIES: dict[str, tuple[str, ...]] = {
 
 def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
+
+
+def _commercial_anchor_min_unique_discovery_hits(market: str) -> int:
+    """Return the narrow per-market anchor gate without changing global defaults.
+
+    Germany gets a lower gate only because a live, evidence-backed wholesaler
+    anchor (Salzmann Restwaren) has already recovered strict Exact-Lots when the
+    primary discovery route was thin. All other markets retain the global gate.
+    """
+    return COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS_BY_MARKET.get(
+        market.upper(), COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS
+    )
 
 
 def _title_from_url(url: str) -> str:
@@ -417,10 +430,11 @@ def run_market(
     post_recall_strict_exact_lot_count = len(exact_lots)
     anchor_pre_count = post_recall_strict_exact_lot_count
     anchor_pre_unique_hit_count = len(all_hits)
+    anchor_min_unique_hit_count = _commercial_anchor_min_unique_discovery_hits(market)
     anchor_expansion_triggered = bool(
         anchor_queries
         and anchor_pre_count < COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD
-        and anchor_pre_unique_hit_count >= COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS
+        and anchor_pre_unique_hit_count >= anchor_min_unique_hit_count
     )
 
     if anchor_expansion_triggered:
@@ -453,7 +467,7 @@ def run_market(
     report["commercial_anchor_expansion_available"] = bool(anchor_queries)
     report["commercial_anchor_expansion_triggered"] = anchor_expansion_triggered
     report["commercial_anchor_trigger_threshold"] = COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD
-    report["commercial_anchor_min_unique_discovery_hits"] = COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS
+    report["commercial_anchor_min_unique_discovery_hits"] = anchor_min_unique_hit_count
     report["commercial_anchor_pre_unique_discovery_hit_count"] = anchor_pre_unique_hit_count
     report["commercial_anchor_query_count"] = len(anchor_queries) if anchor_expansion_triggered else 0
     report["commercial_anchor_pre_strict_exact_lot_count"] = anchor_pre_count
@@ -486,7 +500,7 @@ def run_market(
                 "available": bool(anchor_queries),
                 "triggered": anchor_expansion_triggered,
                 "threshold": COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD,
-                "min_unique_discovery_hits": COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS,
+                "min_unique_discovery_hits": anchor_min_unique_hit_count,
                 "pre_anchor_unique_discovery_hit_count": anchor_pre_unique_hit_count,
                 "max_queries_per_market": MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
                 "query_count": len(anchor_queries) if anchor_expansion_triggered else 0,
