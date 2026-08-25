@@ -87,6 +87,103 @@ def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
 
 
+def _exact_lot_url_set(rows: list[Mapping[str, Any]]) -> set[str]:
+    return {
+        _compact(row.get("final_url") or row.get("url"))
+        for row in rows
+        if _compact(row.get("final_url") or row.get("url"))
+    }
+
+
+def _commercial_anchor_outcome_evidence(
+    *,
+    market: str,
+    query_rows: list[Mapping[str, Any]],
+    pre_anchor_exact_lots: list[Mapping[str, Any]],
+    final_exact_lots: list[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Attribute only newly added strict Exact-Lots to the anchor query that found them.
+
+    The outcome is evidence for later review-only learning. Anchor identity never
+    contributes to qualification. If query provenance is missing, the new lot is
+    left unattributed instead of granting credit to a brand/company by inference.
+    """
+    pre_urls = _exact_lot_url_set(pre_anchor_exact_lots)
+    final_by_url = {
+        _compact(row.get("final_url") or row.get("url")): row
+        for row in final_exact_lots
+        if _compact(row.get("final_url") or row.get("url"))
+    }
+    added_urls = set(final_by_url) - pre_urls
+    outcomes: list[dict[str, Any]] = []
+    attributed_urls: set[str] = set()
+
+    for raw_query in query_rows:
+        if _compact(raw_query.get("query_stage")) != "COMMERCIAL_ANCHOR":
+            continue
+        query = _compact(raw_query.get("query"))
+        anchor = raw_query.get("commercial_anchor") or {}
+        if not isinstance(anchor, Mapping):
+            anchor = {}
+        matched_urls = sorted(
+            url
+            for url in added_urls
+            if _compact(final_by_url[url].get("query")) == query
+        )
+        attributed_urls.update(matched_urls)
+        outcomes.append(
+            {
+                "market_code": market,
+                "project_domain": CLOTHING_INVENTORY,
+                "provider": "exa",
+                "anchor_type": _compact(anchor.get("type")),
+                "anchor_value": _compact(anchor.get("value")),
+                "anchor_origin": _compact(anchor.get("origin")),
+                "query": query,
+                "outcome": (
+                    "STRICT_EXACT_LOT_SUCCESS"
+                    if matched_urls
+                    else "NO_NEW_STRICT_EXACT_LOT"
+                ),
+                "strict_exact_lot_added_count": len(matched_urls),
+                "strict_exact_lot_urls": matched_urls,
+                "anchor_is_qualification_evidence": False,
+                "learning_evidence_only": True,
+                "automatic_query_activation": False,
+                "automatic_source_promotion": False,
+                "production_query_mutation": False,
+                "production_mutation": False,
+            }
+        )
+
+    unattributed_urls = sorted(added_urls - attributed_urls)
+    return {
+        "schema_version": "commercial-anchor-outcome-evidence-1.0",
+        "status": "SUCCESS" if outcomes else "VALID_ZERO",
+        "market_code": market,
+        "project_domain": CLOTHING_INVENTORY,
+        "provider": "exa",
+        "outcome_count": len(outcomes),
+        "successful_outcome_count": sum(
+            row["outcome"] == "STRICT_EXACT_LOT_SUCCESS" for row in outcomes
+        ),
+        "pre_anchor_strict_exact_lot_count": len(pre_urls),
+        "post_anchor_strict_exact_lot_count": len(final_by_url),
+        "added_strict_exact_lot_count": len(added_urls),
+        "attributed_added_strict_exact_lot_count": len(attributed_urls),
+        "unattributed_added_strict_exact_lot_count": len(unattributed_urls),
+        "unattributed_added_strict_exact_lot_urls": unattributed_urls,
+        "attribution_complete": not unattributed_urls,
+        "outcomes": outcomes,
+        "anchor_is_qualification_evidence": False,
+        "learning_evidence_only": True,
+        "automatic_query_activation": False,
+        "automatic_source_promotion": False,
+        "production_query_mutation": False,
+        "production_mutation": False,
+    }
+
+
 def _commercial_anchor_min_unique_discovery_hits(market: str) -> int:
     """Return the narrow per-market anchor gate without changing global defaults.
 
@@ -386,6 +483,7 @@ def run_market(
         stage: str,
         anchor_type: str = "",
         anchor_value: str = "",
+        anchor_origin: str = "",
     ) -> None:
         if not _market_anchored(query, market):
             raise RuntimeError(f"query not market anchored: {market}: {query}")
@@ -406,6 +504,7 @@ def run_market(
             row["commercial_anchor"] = {
                 "type": _compact(anchor_type),
                 "value": _compact(anchor_value),
+                "origin": _compact(anchor_origin),
                 "qualification_evidence": False,
             }
         query_rows.append(row)
@@ -450,6 +549,7 @@ def run_market(
 
     post_recall_strict_exact_lot_count = len(exact_lots)
     anchor_pre_count = post_recall_strict_exact_lot_count
+    pre_anchor_exact_lots = [dict(row) for row in exact_lots]
     anchor_pre_unique_hit_count = len(all_hits)
     anchor_min_unique_hit_count = _commercial_anchor_min_unique_discovery_hits(market)
     anchor_expansion_triggered = bool(
@@ -465,8 +565,16 @@ def run_market(
                 stage="COMMERCIAL_ANCHOR",
                 anchor_type=anchor["anchor_type"],
                 anchor_value=anchor["anchor_value"],
+                anchor_origin=anchor.get("anchor_origin", ""),
             )
         verification, multihop, exact_lots = evaluate()
+
+    anchor_outcome_evidence = _commercial_anchor_outcome_evidence(
+        market=market,
+        query_rows=query_rows,
+        pre_anchor_exact_lots=pre_anchor_exact_lots,
+        final_exact_lots=exact_lots,
+    )
 
     result = build_checkpoint_result_from_exact_lots(
         exact_lots,
@@ -493,6 +601,13 @@ def run_market(
     report["commercial_anchor_query_count"] = len(anchor_queries) if anchor_expansion_triggered else 0
     report["commercial_anchor_pre_strict_exact_lot_count"] = anchor_pre_count
     report["commercial_anchor_added_exact_lot_count"] = max(0, len(exact_lots) - anchor_pre_count)
+    report["commercial_anchor_outcome_count"] = anchor_outcome_evidence["outcome_count"]
+    report["commercial_anchor_successful_outcome_count"] = anchor_outcome_evidence[
+        "successful_outcome_count"
+    ]
+    report["commercial_anchor_unattributed_added_exact_lot_count"] = anchor_outcome_evidence[
+        "unattributed_added_strict_exact_lot_count"
+    ]
     report["commercial_anchor_is_qualification_evidence"] = False
     report["commercial_anchor_max_queries_per_market"] = MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET
 
@@ -504,7 +619,7 @@ def run_market(
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.6",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.7",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
@@ -530,6 +645,7 @@ def run_market(
                 "final_strict_exact_lot_count": len(exact_lots),
                 "anchor_is_qualification_evidence": False,
             },
+            "commercial_anchor_outcome_evidence": anchor_outcome_evidence,
             "direct_strict_evidence_rescue": {
                 "rule": DIRECT_STRICT_EVIDENCE_RESCUE,
                 "count": len(direct_rescue_urls),
