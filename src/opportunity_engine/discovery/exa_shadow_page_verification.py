@@ -214,6 +214,39 @@ _GENERIC_PRODUCT_CONTAINER_SLUGS = frozenset({
     "abbigliamento",
     "kleding",
 })
+# Some wholesalers expose concrete lot pages below /stock/<category>/<slug>.
+# Bare /stock/ and one-segment /stock/<category>/ routes remain aggregate. The
+# nested stock route supplies URL-specificity evidence only; all domain,
+# inventory, direct-sale, price and quantity gates still apply.
+_STOCK_DETAIL_CONTAINER_RE = re.compile(
+    r"(?:^|/)stock/(?P<category>[^/?#]+)/(?P<slug>[^/?#]+)(?:/|$)",
+    re.IGNORECASE,
+)
+_GENERIC_STOCK_DETAIL_SLUGS = frozenset({
+    "all",
+    "index",
+    "catalog",
+    "catalogue",
+    "category",
+    "categories",
+    "clothing",
+    "clothes",
+    "apparel",
+    "fashion",
+    "footwear",
+    "shoes",
+    "abbigliamento",
+    "calzature",
+    "accessori",
+    "donna",
+    "uomo",
+    "bambini",
+    "bimbo",
+    "intimo",
+    "kleding",
+    "bekleidung",
+    "kleidung",
+})
 # Generic marketplace record-detail shape. The numeric id + meaningful slug is
 # only URL specificity evidence; domain, inventory, sale, price and quantity are
 # still required before Exact-Lot acceptance.
@@ -283,6 +316,11 @@ def _looks_item_specific_url(url: str) -> bool:
         if exact_container_path and slug in _GENERIC_PRODUCT_CONTAINER_SLUGS:
             return False
         if slug not in {"search", "all", "index", "catalog", "catalogue"}:
+            return True
+    stock_match = _STOCK_DETAIL_CONTAINER_RE.search(path)
+    if stock_match:
+        slug = stock_match.group("slug").casefold()
+        if slug not in _GENERIC_STOCK_DETAIL_SLUGS:
             return True
     if _MARKETPLACE_ID_SLUG_RE.search(path):
         return True
