@@ -29,7 +29,10 @@ from opportunity_engine.discovery.commercial_anchor_query_expansion import (
 )
 from opportunity_engine.discovery.exa_exact_lot_shadow_hunt import MARKET_EXACT_LOT_QUERIES
 from opportunity_engine.discovery.exa_search import ExaSearchProvider
-from opportunity_engine.discovery.exa_shadow_page_verification import EXACT_LOT_CANDIDATE
+from opportunity_engine.discovery.exa_shadow_page_verification import (
+    ACTIVE_STOCK_SIGNAL,
+    EXACT_LOT_CANDIDATE,
+)
 from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_exact_lot_multihop
 from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
 from opportunity_engine.discovery.unified_opportunity_report import write_unified_opportunity_report
@@ -40,6 +43,7 @@ from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_ben
 RESULTS_PER_QUERY = 5
 COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD = 3
 COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS = 8
+DIRECT_STRICT_EVIDENCE_RESCUE = "QUALIFIED_B2B_STRICT_EVIDENCE_V1"
 MARKET_CURRENCIES = {
     "NO": "NOK",
     "SE": "SEK",
@@ -125,6 +129,23 @@ def _strict_exact_evidence(*, row: Mapping[str, Any], require_subject_evidence: 
     )
 
 
+def _direct_row_is_rescuable_strict_exact(raw: Mapping[str, Any]) -> bool:
+    """Rescue only a qualified B2B direct page whose strict Exact-Lot proof is complete.
+
+    This does not treat ACTIVE_STOCK_SIGNAL generally as an Exact-Lot. The narrow
+    rescue exists for the verifier path that proves B2B sale evidence after the
+    base classifier has already assigned ACTIVE_STOCK_SIGNAL. Brand or anchor
+    presence is irrelevant and never qualification evidence.
+    """
+    evidence = raw.get("evidence") or {}
+    return bool(
+        raw.get("classification") == ACTIVE_STOCK_SIGNAL
+        and isinstance(evidence, Mapping)
+        and evidence.get("qualified_b2b_sale_evidence") is True
+        and _strict_exact_evidence(row=raw, require_subject_evidence=False)
+    )
+
+
 def _exact_lot_rows(
     verification: Mapping[str, Any], multihop: Mapping[str, Any]
 ) -> list[dict[str, Any]]:
@@ -134,7 +155,9 @@ def _exact_lot_rows(
     for raw in verification.get("verified_pages") or []:
         if not isinstance(raw, Mapping):
             continue
-        if raw.get("classification") != EXACT_LOT_CANDIDATE:
+        classification = raw.get("classification")
+        rescued = _direct_row_is_rescuable_strict_exact(raw)
+        if classification != EXACT_LOT_CANDIDATE and not rescued:
             continue
         if not _strict_exact_evidence(row=raw, require_subject_evidence=False):
             continue
@@ -146,6 +169,8 @@ def _exact_lot_rows(
         row["url"] = url
         row["final_url"] = url
         row["exact_lot_origin"] = "DIRECT_SEARCH_RESULT"
+        if rescued:
+            row["direct_strict_evidence_rescue"] = DIRECT_STRICT_EVIDENCE_RESCUE
         accepted.append(row)
 
     for raw in multihop.get("exact_lots") or []:
@@ -257,8 +282,11 @@ def build_checkpoint_result_from_exact_lots(
     multihop: Mapping[str, Any],
 ) -> dict[str, Any]:
     candidates = [_candidate_from_exact_lot(row, market=market) for row in exact_lots]
+    direct_rescue_count = sum(
+        1 for row in exact_lots if row.get("direct_strict_evidence_rescue") == DIRECT_STRICT_EVIDENCE_RESCUE
+    )
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.5",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.6",
         "status": "SUCCESS",
         "execution_status": "PASS",
         "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -275,6 +303,7 @@ def build_checkpoint_result_from_exact_lots(
         "rejected_results": 0,
         "generic_pages_excluded": int(multihop.get("gateway_page_count") or 0),
         "direct_exact_lot_count": int(verification.get("exact_lot_candidate_count") or 0),
+        "direct_strict_evidence_rescue_count": direct_rescue_count,
         "multihop_exact_lot_count": int(multihop.get("exact_lot_candidate_count") or 0),
         "strict_exact_lot_count": len(candidates),
         "currency_conversion_performed": False,
@@ -432,10 +461,15 @@ def run_market(
     report["commercial_anchor_is_qualification_evidence"] = False
     report["commercial_anchor_max_queries_per_market"] = MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET
 
+    direct_rescue_urls = [
+        row.get("url")
+        for row in exact_lots
+        if row.get("direct_strict_evidence_rescue") == DIRECT_STRICT_EVIDENCE_RESCUE
+    ]
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.4",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.5",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
@@ -460,6 +494,12 @@ def run_market(
                 "added_exact_lot_count": max(0, len(exact_lots) - anchor_pre_count),
                 "final_strict_exact_lot_count": len(exact_lots),
                 "anchor_is_qualification_evidence": False,
+            },
+            "direct_strict_evidence_rescue": {
+                "rule": DIRECT_STRICT_EVIDENCE_RESCUE,
+                "count": len(direct_rescue_urls),
+                "urls": direct_rescue_urls,
+                "brand_or_anchor_is_qualification_evidence": False,
             },
             "verification": verification,
             "multihop": multihop,
