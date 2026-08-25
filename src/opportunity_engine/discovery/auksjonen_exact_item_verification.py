@@ -32,10 +32,17 @@ _IMG_RE = re.compile(r"<img\b[^>]*(?:src|data-src)=[\"'](?P<url>https?://[^\"']+
 _QUANTITY_RES = (
     re.compile(r"\b(?:Antall|Mengde)\s*:?\s*(?P<value>\d{1,5})\b", re.I),
     re.compile(
-        r"\b(?P<value>\d{1,5})\s*(?:stk|plagg|jakker|bukser|kjoler|skjorter|gensere|sko|varer)\b",
+        r"\b(?P<value>\d{1,5})\s*(?:stk|plagg|jakker|bukser|kjoler|skjorter|gensere|sko|varer|par|overaller|overall)\b",
         re.I,
     ),
 )
+_COMPOUND_TITLE_QUANTITY_RE = re.compile(
+    r"\b(?P<value>\d{1,5})\s+"
+    r"(?:(?:[A-Za-zÆØÅæøå-]+)\s+){0,2}"
+    r"(?P<unit>overaller|overall|jakker|bukser|kjoler|skjorter|gensere|sko|plagg)\b",
+    re.I,
+)
+_COMPOUND_CONNECTOR_RE = re.compile(r"(?:\bog\b|\+|&|,)", re.I)
 _QUANTITY_UNKNOWN_RE = re.compile(
     r"(?:\b(?:eksakt\s+)?antall(?:et)?(?:\s+og\s+størrelsesfordeling)?\s+"
     r"(?:er\s+)?(?:ikke\s+(?:kontrollert|oppgitt|kjent)|ukjent)\b|\bukjent\s+antall\b)",
@@ -162,6 +169,21 @@ def _quantity_from_text(text: str) -> int | None:
     return None
 
 
+def _compound_quantity_from_title(title: str) -> int | None:
+    """Sum explicit garment components only when the title joins them as one lot."""
+    matches = list(_COMPOUND_TITLE_QUANTITY_RE.finditer(_compact(title)))
+    if len(matches) < 2:
+        return None
+    for left, right in zip(matches, matches[1:]):
+        connector = title[left.end() : right.start()]
+        if _COMPOUND_CONNECTOR_RE.search(connector) is None:
+            return None
+    values = [int(match.group("value")) for match in matches]
+    if any(value <= 0 for value in values):
+        return None
+    return sum(values)
+
+
 def _quantity_is_explicitly_unknown(text: str) -> bool:
     """Return True when the seller explicitly says the piece count is unknown."""
     return bool(_QUANTITY_UNKNOWN_RE.search(_compact(text)))
@@ -199,8 +221,9 @@ def parse_auksjonen_item_page(html: str, *, fallback_title: str = "") -> dict[st
     quantity_unknown = _quantity_is_explicitly_unknown(quantity_context)
     quantity = None
     if not quantity_unknown:
+        quantity = _compound_quantity_from_title(title or "")
         json_quantity = _first_json_value(objects, ("quantity", "itemCount", "numberOfItems", "amountOfItems"))
-        if json_quantity not in (None, ""):
+        if quantity is None and json_quantity not in (None, ""):
             try:
                 parsed_quantity = int(float(str(json_quantity)))
             except (TypeError, ValueError):
