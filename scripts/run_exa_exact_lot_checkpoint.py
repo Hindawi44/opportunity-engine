@@ -2,9 +2,9 @@
 """Run the unified Exa Exact-Lot + Multi-Hop route as a checkpoint source.
 
 All six clothing markets stay on the same Search -> Verification -> Multi-Hop ->
-Exact-Lot path. A bounded, source-neutral recall query may run only after the
-primary query pack reaches zero strict Exact-Lots. No source-specific domain,
-Brave activation, query promotion, or commercial action is enabled here.
+Exact-Lot path. Generic zero-yield recall and bounded commercial-anchor expansion
+remain query stages inside the same runtime. Commercial anchors are discovery
+hints only; they are never qualification evidence.
 """
 from __future__ import annotations
 
@@ -23,6 +23,10 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     apply_post_verification_top5_hard_gate,
     write_discovery_artifacts,
 )
+from opportunity_engine.discovery.commercial_anchor_query_expansion import (
+    MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
+    build_commercial_anchor_queries,
+)
 from opportunity_engine.discovery.exa_exact_lot_shadow_hunt import MARKET_EXACT_LOT_QUERIES
 from opportunity_engine.discovery.exa_search import ExaSearchProvider
 from opportunity_engine.discovery.exa_shadow_page_verification import EXACT_LOT_CANDIDATE
@@ -34,6 +38,7 @@ from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_ben
 
 
 RESULTS_PER_QUERY = 5
+COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD = 3
 MARKET_CURRENCIES = {
     "NO": "NOK",
     "SE": "SEK",
@@ -63,10 +68,7 @@ MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
     "NL": (MARKET_EXACT_LOT_QUERIES["NL"],),
 }
 
-# Generic, source-neutral recall queries. FR/IT/NL were live-proven in run
-# 32728681986. SE is derived from the live-proven Swedish Restpartier route in
-# run 32737032530 and deliberately describes the commercial page pattern, not
-# a website/domain. None of these queries runs unless primary strict yield = 0.
+# Generic, source-neutral recall. It still runs only after primary strict yield = 0.
 MARKET_ZERO_YIELD_RECALL_QUERIES: dict[str, tuple[str, ...]] = {
     "SE": ("Sverige restpartier kläder grossist säljes parti",),
     "FR": ("France déstockage vêtements grossiste stock lot",),
@@ -255,7 +257,7 @@ def build_checkpoint_result_from_exact_lots(
 ) -> dict[str, Any]:
     candidates = [_candidate_from_exact_lot(row, market=market) for row in exact_lots]
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.4",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.5",
         "status": "SUCCESS",
         "execution_status": "PASS",
         "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -263,7 +265,7 @@ def build_checkpoint_result_from_exact_lots(
         "market_code": market,
         "currency": MARKET_CURRENCIES[market],
         "source_mode": "EXA_EXACT_LOT_MULTIHOP",
-        "query_pack": "SIX_MARKET_EXACT_LOT_ADAPTIVE_RECALL_V2",
+        "query_pack": "SIX_MARKET_EXACT_LOT_CONTROLLED_COMMERCIAL_ANCHORS_V1",
         "queries_submitted": query_count,
         "hits_received": hit_count,
         "merged_candidates": len(candidates),
@@ -304,27 +306,45 @@ def run_market(
 ) -> dict[str, Any]:
     primary_queries = MARKET_EXACT_LOT_QUERY_PACKS[market]
     recall_queries = MARKET_ZERO_YIELD_RECALL_QUERIES.get(market, ())
+    anchor_queries = build_commercial_anchor_queries(
+        market=market,
+        project_domain=CLOTHING_INVENTORY,
+        max_queries=MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
+    )
     provider = ExaSearchProvider(exa_api_key)
     all_hits = []
     seen_urls: set[str] = set()
     query_rows: list[dict[str, Any]] = []
 
-    def collect(query: str, *, stage: str) -> None:
+    def collect(
+        query: str,
+        *,
+        stage: str,
+        anchor_type: str = "",
+        anchor_value: str = "",
+    ) -> None:
         if not _market_anchored(query, market):
             raise RuntimeError(f"query not market anchored: {market}: {query}")
         if classify_project_domain(text=query) != CLOTHING_INVENTORY:
             raise RuntimeError(f"query escaped clothing domain: {market}: {query}")
+        if "site:" in query.casefold():
+            raise RuntimeError(f"source-specific query is forbidden: {market}: {query}")
         hits = list(provider.search(query, count=results_per_query))[:results_per_query]
-        query_rows.append(
-            {
-                "query": query,
-                "query_stage": stage,
-                "hits": [
-                    {"title": hit.title, "url": hit.url, "description": hit.description}
-                    for hit in hits
-                ],
+        row = {
+            "query": query,
+            "query_stage": stage,
+            "hits": [
+                {"title": hit.title, "url": hit.url, "description": hit.description}
+                for hit in hits
+            ],
+        }
+        if stage == "COMMERCIAL_ANCHOR":
+            row["commercial_anchor"] = {
+                "type": _compact(anchor_type),
+                "value": _compact(anchor_value),
+                "qualification_evidence": False,
             }
-        )
+        query_rows.append(row)
         for hit in hits:
             if hit.url in seen_urls:
                 continue
@@ -364,6 +384,23 @@ def run_market(
             collect(query, stage="ZERO_YIELD_RECALL")
         verification, multihop, exact_lots = evaluate()
 
+    post_recall_strict_exact_lot_count = len(exact_lots)
+    anchor_expansion_triggered = bool(
+        anchor_queries
+        and post_recall_strict_exact_lot_count < COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD
+    )
+    anchor_pre_count = post_recall_strict_exact_lot_count
+
+    if anchor_expansion_triggered:
+        for anchor in anchor_queries:
+            collect(
+                anchor["query"],
+                stage="COMMERCIAL_ANCHOR",
+                anchor_type=anchor["anchor_type"],
+                anchor_value=anchor["anchor_value"],
+            )
+        verification, multihop, exact_lots = evaluate()
+
     result = build_checkpoint_result_from_exact_lots(
         exact_lots,
         market=market,
@@ -379,13 +416,21 @@ def run_market(
     report["zero_yield_recall_triggered"] = zero_yield_recall_triggered
     report["zero_yield_recall_query_count"] = len(recall_queries) if zero_yield_recall_triggered else 0
     report["zero_yield_recall_added_exact_lot_count"] = max(
-        0, len(exact_lots) - primary_strict_exact_lot_count
+        0, post_recall_strict_exact_lot_count - primary_strict_exact_lot_count
     )
+    report["commercial_anchor_expansion_available"] = bool(anchor_queries)
+    report["commercial_anchor_expansion_triggered"] = anchor_expansion_triggered
+    report["commercial_anchor_trigger_threshold"] = COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD
+    report["commercial_anchor_query_count"] = len(anchor_queries) if anchor_expansion_triggered else 0
+    report["commercial_anchor_pre_strict_exact_lot_count"] = anchor_pre_count
+    report["commercial_anchor_added_exact_lot_count"] = max(0, len(exact_lots) - anchor_pre_count)
+    report["commercial_anchor_is_qualification_evidence"] = False
+    report["commercial_anchor_max_queries_per_market"] = MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET
 
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.3",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.4",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
@@ -396,7 +441,18 @@ def run_market(
                 "triggered": zero_yield_recall_triggered,
                 "primary_strict_exact_lot_count": primary_strict_exact_lot_count,
                 "recall_query_count": len(recall_queries) if zero_yield_recall_triggered else 0,
+                "post_recall_strict_exact_lot_count": post_recall_strict_exact_lot_count,
+            },
+            "controlled_commercial_anchor_expansion": {
+                "available": bool(anchor_queries),
+                "triggered": anchor_expansion_triggered,
+                "threshold": COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD,
+                "max_queries_per_market": MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
+                "query_count": len(anchor_queries) if anchor_expansion_triggered else 0,
+                "pre_anchor_strict_exact_lot_count": anchor_pre_count,
+                "added_exact_lot_count": max(0, len(exact_lots) - anchor_pre_count),
                 "final_strict_exact_lot_count": len(exact_lots),
+                "anchor_is_qualification_evidence": False,
             },
             "verification": verification,
             "multihop": multihop,
