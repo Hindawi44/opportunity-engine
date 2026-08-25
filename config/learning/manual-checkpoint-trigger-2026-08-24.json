@@ -1,14 +1,14 @@
 {
   "schema_version": "manual-checkpoint-trigger-1.0",
-  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Sweden Adaptive Zero-Yield Recall and zero-Exact-Lot truth reconciliation were merged into the unified search path.",
-  "requested_at_utc": "2026-08-24T20:15:00Z",
-  "requested_for_main_sha": "860dfb59ed39289ccd51d2fa76c3b7b5a4fb8bfd",
+  "purpose": "Trigger the existing Multi-Market Daily Operator Checkpoint after Child Clothing Subject Rescue V1 was merged into the unified search path.",
+  "requested_at_utc": "2026-08-25T04:44:30Z",
+  "requested_for_main_sha": "5acbcf0f327a9ee9fee0cedc8d9ca5ade1ab4079",
   "project_scope": [
     "CLOTHING_INVENTORY",
     "FABRIC_PROCUREMENT"
   ],
   "production_logic_change": true,
-  "query_change": true,
+  "query_change": false,
   "source_change": false,
   "agent_change": false
 }
