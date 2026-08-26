@@ -16,7 +16,7 @@ def test_relevant_main_pushes_dispatch_existing_live_checkpoint() -> None:
     assert "needs: test" in text
     assert "github.event_name == 'push'" in text
     assert "github.ref == 'refs/heads/main'" in text
-    assert "Detect relevant learning, memory or route change" in text
+    assert "Detect relevant learning, memory, route or unified-search change" in text
     assert "config/learning/" in text
     assert "build_domain_market_intelligence_feed" in text
     assert "run_daily_search_success_learning" in text
