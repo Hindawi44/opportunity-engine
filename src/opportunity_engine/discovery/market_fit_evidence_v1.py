@@ -20,13 +20,14 @@ from __future__ import annotations
 
 from collections import Counter
 import re
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 from urllib.parse import urlsplit
 
 from opportunity_engine.discovery import provider_unique_page_verification as verifier
 
 
 VERSION = "MARKET_FIT_EVIDENCE_V1"
+EXACT_LOT_PROPAGATION_VERSION = "MARKET_FIT_EXACT_LOT_PROPAGATION_V1"
 SUPPORTED_MARKETS = ("NO", "SE", "DE", "FR", "IT", "NL")
 SEARCH_REQUESTS_ADDED = 0
 PAGE_FETCHES_ADDED = 0
@@ -34,6 +35,8 @@ QUALIFICATION_EFFECT = False
 _INSTALLED = False
 _UPSTREAM_VERIFY_ROW: Callable[..., tuple[dict[str, Any], bool]] | None = None
 _UPSTREAM_VERIFY_REPORT: Callable[..., dict[str, Any]] | None = None
+_UPSTREAM_TOP5_GATE: Callable[[Mapping[str, Any]], dict[str, Any]] | None = None
+_MARKET_FIT_BY_MARKET_URL: dict[tuple[str, str], dict[str, Any]] = {}
 
 _MARKET_CCTLD = {
     "NO": ".no",
@@ -184,6 +187,139 @@ def _unavailable_evidence(market: str, *, reason: str) -> dict[str, Any]:
     }
 
 
+def _cache_market_fit_evidence(
+    *,
+    market: str,
+    evidence: Mapping[str, Any],
+    urls: list[object],
+) -> None:
+    target = _compact(market).upper()
+    if target not in SUPPORTED_MARKETS:
+        return
+    payload = dict(evidence)
+    for raw_url in urls:
+        url = _compact(raw_url)
+        if url:
+            _MARKET_FIT_BY_MARKET_URL[(target, url)] = payload
+
+
+def _cached_market_fit_for_candidate(
+    candidate: Mapping[str, Any],
+    *,
+    fallback_market: str,
+) -> tuple[dict[str, Any], bool]:
+    market = _compact(candidate.get("market_code") or fallback_market).upper()
+    urls: list[object] = []
+    urls.extend(candidate.get("canonical_urls") or [])
+    urls.extend(candidate.get("source_urls") or [])
+    urls.append(candidate.get("opportunity_identity"))
+    for raw_url in urls:
+        url = _compact(raw_url)
+        cached = _MARKET_FIT_BY_MARKET_URL.get((market, url))
+        if cached is not None:
+            return dict(cached), True
+    return _unavailable_evidence(market, reason="NO_REUSED_PAGE_EVIDENCE"), False
+
+
+def _annotate_exact_lot_candidate(
+    candidate: dict[str, Any],
+    *,
+    fallback_market: str,
+) -> tuple[str, bool]:
+    evidence, reused = _cached_market_fit_for_candidate(
+        candidate,
+        fallback_market=fallback_market,
+    )
+    candidate["market_fit_evidence"] = evidence
+    candidate["market_fit_evidence_reused_from_verification"] = reused
+    candidate["market_fit_is_qualification_evidence"] = False
+    candidate["exact_lot_decision_changed_by_market_fit"] = False
+    for verification_row in candidate.get("verification") or []:
+        if isinstance(verification_row, dict):
+            verification_row["market_fit_evidence"] = dict(evidence)
+            verification_row["market_fit_is_qualification_evidence"] = False
+            verification_row["exact_lot_decision_changed_by_market_fit"] = False
+    return _compact(evidence.get("status")) or "MISSING", reused
+
+
+def _apply_reused_market_fit_to_exact_lot_result(
+    result: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Propagate already-captured page evidence after the existing hard gate.
+
+    This wrapper is intentionally post-decision. It cannot alter Exact-Lot or Top 5
+    eligibility because the upstream hard gate runs first. Only the established
+    Exa Exact-Lot + Multi-Hop result shape is annotated; all other discovery
+    result families pass through untouched.
+    """
+    upstream = _UPSTREAM_TOP5_GATE
+    if upstream is None:
+        raise RuntimeError("upstream Top 5 hard gate is unavailable")
+    corrected = upstream(result)
+    report = corrected.get("search_run_report")
+    candidates = corrected.get("all_discovered_candidates")
+    if not isinstance(report, dict) or not isinstance(candidates, list):
+        return corrected
+    if _compact(report.get("source_mode")) != "EXA_EXACT_LOT_MULTIHOP":
+        return corrected
+
+    fallback_market = _compact(report.get("market_code")).upper()
+    status_counts: Counter[str] = Counter()
+    reused_count = 0
+    by_identity: dict[str, dict[str, Any]] = {}
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        status, reused = _annotate_exact_lot_candidate(
+            candidate,
+            fallback_market=fallback_market,
+        )
+        status_counts[status] += 1
+        reused_count += int(reused)
+        identity = _compact(candidate.get("opportunity_identity"))
+        if identity:
+            by_identity[identity] = candidate
+
+    top5 = corrected.get("discovery_top5")
+    if isinstance(top5, list):
+        for candidate in top5:
+            if not isinstance(candidate, dict):
+                continue
+            identity = _compact(candidate.get("opportunity_identity"))
+            source = by_identity.get(identity)
+            if source is not None:
+                candidate["market_fit_evidence"] = dict(source["market_fit_evidence"])
+                candidate["market_fit_evidence_reused_from_verification"] = source[
+                    "market_fit_evidence_reused_from_verification"
+                ]
+                candidate["market_fit_is_qualification_evidence"] = False
+                candidate["exact_lot_decision_changed_by_market_fit"] = False
+                for verification_row in candidate.get("verification") or []:
+                    if isinstance(verification_row, dict):
+                        verification_row["market_fit_evidence"] = dict(
+                            source["market_fit_evidence"]
+                        )
+                        verification_row["market_fit_is_qualification_evidence"] = False
+                        verification_row["exact_lot_decision_changed_by_market_fit"] = False
+
+    report.update(
+        {
+            "market_fit_exact_lot_propagation_version": EXACT_LOT_PROPAGATION_VERSION,
+            "market_fit_exact_lot_shadow_only": True,
+            "market_fit_exact_lot_candidate_count": len(candidates),
+            "market_fit_exact_lot_reused_evidence_count": reused_count,
+            "market_fit_exact_lot_unavailable_count": len(candidates) - reused_count,
+            "market_fit_status_counts": dict(sorted(status_counts.items())),
+            "market_fit_is_qualification_evidence": False,
+            "market_fit_changes_exact_lot_decision": False,
+            "search_requests_added_by_market_fit": SEARCH_REQUESTS_ADDED,
+            "page_fetches_added_by_market_fit": PAGE_FETCHES_ADDED,
+            "production_mutation": False,
+        }
+    )
+    return corrected
+
+
 def _verify_row_with_market_fit(
     candidate: dict[str, str],
     *,
@@ -221,6 +357,16 @@ def _verify_row_with_market_fit(
             market,
             reason="PAGE_FETCH_NOT_SUCCESSFUL",
         )
+    _cache_market_fit_evidence(
+        market=market,
+        evidence=output["market_fit_evidence"],
+        urls=[
+            candidate.get("url"),
+            output.get("url"),
+            output.get("final_url"),
+            getattr(fetched, "final_url", None) if fetched is not None else None,
+        ],
+    )
     output["market_fit_is_qualification_evidence"] = False
     output["exact_lot_decision_changed_by_market_fit"] = False
     return output, ok
@@ -252,13 +398,19 @@ def _verify_report_with_market_fit(*args, **kwargs) -> dict[str, Any]:
 
 
 def install_market_fit_evidence_v1() -> bool:
-    """Patch only evidence annotation around the established verifier."""
-    global _INSTALLED, _UPSTREAM_VERIFY_ROW, _UPSTREAM_VERIFY_REPORT
+    """Patch evidence annotation and post-gate metadata propagation only."""
+    global _INSTALLED, _UPSTREAM_VERIFY_ROW, _UPSTREAM_VERIFY_REPORT, _UPSTREAM_TOP5_GATE
     if _INSTALLED:
         return False
+    from opportunity_engine.discovery import clothing_inventory_search as clothing_search
+
     _UPSTREAM_VERIFY_ROW = verifier._verify_fetched_candidate
     _UPSTREAM_VERIFY_REPORT = verifier.verify_provider_unique_pages
+    _UPSTREAM_TOP5_GATE = clothing_search.apply_post_verification_top5_hard_gate
     verifier._verify_fetched_candidate = _verify_row_with_market_fit
     verifier.verify_provider_unique_pages = _verify_report_with_market_fit
+    clothing_search.apply_post_verification_top5_hard_gate = (
+        _apply_reused_market_fit_to_exact_lot_result
+    )
     _INSTALLED = True
     return True
