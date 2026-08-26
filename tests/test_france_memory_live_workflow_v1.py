@@ -8,7 +8,7 @@ TESTS_WORKFLOW = WORKFLOWS / "tests.yml"
 
 def test_france_reuses_existing_schedule_and_does_not_add_scheduler() -> None:
     workflow_files = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
-    assert len(workflow_files) == 6
+    assert len(workflow_files) == 4
     scheduled = []
     for path in workflow_files:
         live_lines = [

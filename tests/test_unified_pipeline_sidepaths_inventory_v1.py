@@ -37,22 +37,25 @@ def test_exactly_one_governing_daily_pipeline_exists() -> None:
     assert inventory["governing_pipeline"]["markets"] == ["NO", "SE", "DE", "FR", "IT", "NL"]
 
 
-def test_manual_country_diagnostics_have_no_schedule_authority() -> None:
+def test_country_diagnostics_are_archived_and_have_no_schedule_authority() -> None:
     inventory = _load()
-    diagnostics = [
+    active_diagnostics = [
         item
         for item in inventory["workflow_inventory"]
         if item["role"] == "MANUAL_DIAGNOSTIC"
     ]
-    assert {item["path"] for item in diagnostics} == {
-        ".github/workflows/sweden-clothing-inventory-live.yaml",
-        ".github/workflows/germany-clothing-inventory-live.yaml",
+    assert active_diagnostics == []
+
+    archived = inventory["archived_workflow_inventory"]
+    assert {item["path"] for item in archived} == {
+        "docs/workflow-archive/sweden-clothing-inventory-live.yaml",
+        "docs/workflow-archive/germany-clothing-inventory-live.yaml",
     }
-    for item in diagnostics:
+    for item in archived:
         text = (ROOT / item["path"]).read_text(encoding="utf-8")
         assert "workflow_dispatch:" in text
-        assert "schedule:" not in text
-        assert "NO_PARALLEL_PRODUCTION_AUTHORITY" in item["decision"]
+        assert "\n  schedule:" not in text
+        assert "ARCHIVED_REDUNDANT_ENTRY_POINT" in item["decision"]
 
 
 def test_side_families_cannot_create_parallel_decision_authority() -> None:

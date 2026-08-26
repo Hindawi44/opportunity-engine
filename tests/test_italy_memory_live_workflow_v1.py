@@ -8,7 +8,7 @@ TESTS_WORKFLOW = WORKFLOWS / "tests.yml"
 
 def test_italy_memory_reuses_the_only_existing_schedule_owner() -> None:
     workflow_files = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
-    assert len(workflow_files) == 6
+    assert len(workflow_files) == 4
 
     scheduled = []
     for path in workflow_files:

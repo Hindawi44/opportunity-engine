@@ -8,7 +8,7 @@ WORKFLOW_DIR = ROOT / ".github/workflows"
 
 def test_targeted_stage_reuses_existing_workflow_inventory() -> None:
     active = sorted(path.name for path in WORKFLOW_DIR.iterdir() if path.suffix in {".yml", ".yaml"})
-    assert len(active) == 6
+    assert len(active) == 4
     assert "mind-forge-live-research-launcher.yaml" in active
     assert "multi-market-daily-operator-checkpoint.yaml" in active
     assert "one-opportunity-commercial-analysis.yaml" in active

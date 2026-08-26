@@ -29,14 +29,14 @@ ARCHIVED = {
     "v3.5-opportunity-alert-review-queue.yml",
     "v3.6-multi-source-ingestion.yml",
     "v3.7-production-pilot.yml",
+    "sweden-clothing-inventory-live.yaml",
+    "germany-clothing-inventory-live.yaml",
 }
 
 EXPECTED_LIVE = {
-    "germany-clothing-inventory-live.yaml",
     "mind-forge-live-research-launcher.yaml",
     "multi-market-daily-operator-checkpoint.yaml",
     "one-opportunity-commercial-analysis.yaml",
-    "sweden-clothing-inventory-live.yaml",
     "tests.yml",
 }
 
