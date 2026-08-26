@@ -100,6 +100,9 @@ from opportunity_engine.discovery.commercial_anchor_outcome_learning_cli_hook im
 from opportunity_engine.discovery.unified_search_runtime_cli_hook import (
     install_unified_search_runtime_cli_hook,
 )
+from opportunity_engine.discovery.six_market_fabric_coverage_rotation_v1 import (
+    install_six_market_fabric_coverage_rotation_v1,
+)
 from opportunity_engine.discovery.automatic_query_gap_miss_scout_cli_hook import (
     install_automatic_query_gap_miss_scout_cli_hook,
 )
@@ -168,9 +171,14 @@ install_fair_proven_route_recovery_v1()
 # the existing six-market Exa runtime first, then this review-only learner consumes
 # the persisted per-anchor outcomes. It adds no search request or runtime.
 install_commercial_anchor_outcome_learning_cli_hook()
+# Extend FABRIC_PROCUREMENT coverage over all six fixed markets without changing
+# the existing three-request per-run search budget. Two complementary cohorts
+# alternate by GitHub run number; this remains the same Unified Search Runtime.
+install_six_market_fabric_coverage_rotation_v1()
 # Registered immediately after the river. LIFO lets the established fabric
-# hooks write first, then this hook merges Exa FR/IT/NL and rewrites the unified
-# operator search view before the river consumes final fabric truth.
+# hooks write first, then this hook merges the scheduled 3/6 Exa fabric cohort
+# and rewrites the unified operator search view before the river consumes final
+# fabric truth.
 install_unified_search_runtime_cli_hook()
 # Registered after the river but before Stocklear. LIFO execution is therefore:
 # Stocklear -> independent QUERY_GAP scout -> river/capture -> daily learner.
@@ -182,7 +190,7 @@ install_openai_fabric_procurement_cli_hook()
 install_fabric_procurement_watch_cli_hook()
 # Registered last so the legacy six-market authority is emitted first at atexit.
 # Unified Search Runtime later augments it with both project domains and removes
-# the operational FR/IT/NL search gap without enabling automatic actions.
+# the operational fabric coverage gap without enabling automatic actions.
 install_unified_six_market_runtime_cli_hook()
 
 __all__ = [
