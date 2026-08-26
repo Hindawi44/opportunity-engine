@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from types import SimpleNamespace
 
 from opportunity_engine.discovery import market_fit_evidence_v1 as market_fit
@@ -62,6 +63,8 @@ def test_shared_euro_symbol_is_not_country_identity_evidence() -> None:
 
 
 def test_row_annotation_preserves_upstream_classification_and_tool_learning(monkeypatch) -> None:
+    market_fit._MARKET_FIT_BY_MARKET_URL.clear()
+
     def upstream(candidate, *, page_fetcher, allow_tool_learning_credit):
         fetched = page_fetcher(candidate["url"])
         assert fetched.ok is True
@@ -98,6 +101,9 @@ def test_row_annotation_preserves_upstream_classification_and_tool_learning(monk
     assert row["tool_learning_useful"] is True
     assert row["market_fit_evidence"]["status"] == "SUPPORTED_MARKET_FIT"
     assert row["exact_lot_decision_changed_by_market_fit"] is False
+    assert market_fit._MARKET_FIT_BY_MARKET_URL[
+        ("NO", "https://stock.example.no/parti/1")
+    ]["status"] == "SUPPORTED_MARKET_FIT"
 
 
 def test_report_annotation_adds_zero_budget_and_no_qualification_effect(monkeypatch) -> None:
@@ -123,3 +129,97 @@ def test_report_annotation_adds_zero_budget_and_no_qualification_effect(monkeypa
     assert report["page_fetches_added_by_market_fit"] == 0
     assert report["market_fit_is_qualification_evidence"] is False
     assert report["market_fit_changes_exact_lot_decision"] is False
+
+
+def test_exact_lot_result_reuses_existing_market_fit_after_hard_gate(monkeypatch) -> None:
+    market_fit._MARKET_FIT_BY_MARKET_URL.clear()
+    url = "https://stock.example.se/parti/640"
+    evidence = market_fit.assess_market_fit_evidence(
+        market="SE",
+        url=url,
+        title="Sverige klädparti",
+        text="Sverige lager. Ring +46 8 123456. Pris 1000 SEK.",
+    )
+    market_fit._cache_market_fit_evidence(market="SE", evidence=evidence, urls=[url])
+    monkeypatch.setattr(
+        market_fit,
+        "_UPSTREAM_TOP5_GATE",
+        lambda result: deepcopy(dict(result)),
+    )
+
+    candidate = {
+        "market_code": "SE",
+        "source_urls": [url],
+        "canonical_urls": [url],
+        "opportunity_identity": url,
+        "verification": [{"verified": True}],
+        "top5_eligible": True,
+        "analysis_eligible": False,
+    }
+    result = {
+        "search_run_report": {
+            "source_mode": "EXA_EXACT_LOT_MULTIHOP",
+            "market_code": "SE",
+            "strict_exact_lot_count": 1,
+        },
+        "all_discovered_candidates": [candidate],
+        "discovery_top5": [deepcopy(candidate)],
+    }
+
+    corrected = market_fit._apply_reused_market_fit_to_exact_lot_result(result)
+    report = corrected["search_run_report"]
+    row = corrected["all_discovered_candidates"][0]
+
+    assert report["strict_exact_lot_count"] == 1
+    assert report["market_fit_exact_lot_reused_evidence_count"] == 1
+    assert report["market_fit_exact_lot_unavailable_count"] == 0
+    assert report["market_fit_status_counts"] == {"SUPPORTED_MARKET_FIT": 1}
+    assert report["search_requests_added_by_market_fit"] == 0
+    assert report["page_fetches_added_by_market_fit"] == 0
+    assert report["market_fit_changes_exact_lot_decision"] is False
+    assert row["market_fit_evidence"]["status"] == "SUPPORTED_MARKET_FIT"
+    assert row["market_fit_evidence_reused_from_verification"] is True
+    assert row["top5_eligible"] is True
+    assert corrected["discovery_top5"][0]["market_fit_evidence"]["status"] == (
+        "SUPPORTED_MARKET_FIT"
+    )
+
+
+def test_exact_lot_result_marks_missing_reused_page_evidence_without_refetch(monkeypatch) -> None:
+    market_fit._MARKET_FIT_BY_MARKET_URL.clear()
+    monkeypatch.setattr(
+        market_fit,
+        "_UPSTREAM_TOP5_GATE",
+        lambda result: deepcopy(dict(result)),
+    )
+    url = "https://example.com/lot/1"
+    candidate = {
+        "market_code": "NL",
+        "source_urls": [url],
+        "canonical_urls": [url],
+        "opportunity_identity": url,
+        "verification": [{"verified": True}],
+        "top5_eligible": True,
+        "analysis_eligible": False,
+    }
+    result = {
+        "search_run_report": {
+            "source_mode": "EXA_EXACT_LOT_MULTIHOP",
+            "market_code": "NL",
+            "strict_exact_lot_count": 1,
+        },
+        "all_discovered_candidates": [candidate],
+        "discovery_top5": [deepcopy(candidate)],
+    }
+
+    corrected = market_fit._apply_reused_market_fit_to_exact_lot_result(result)
+    row = corrected["all_discovered_candidates"][0]
+    report = corrected["search_run_report"]
+
+    assert row["market_fit_evidence"]["status"] == "UNAVAILABLE"
+    assert row["market_fit_evidence"]["reason"] == "NO_REUSED_PAGE_EVIDENCE"
+    assert row["market_fit_evidence_reused_from_verification"] is False
+    assert report["market_fit_exact_lot_reused_evidence_count"] == 0
+    assert report["market_fit_exact_lot_unavailable_count"] == 1
+    assert report["search_requests_added_by_market_fit"] == 0
+    assert report["page_fetches_added_by_market_fit"] == 0
