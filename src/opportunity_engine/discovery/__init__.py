@@ -94,6 +94,9 @@ from opportunity_engine.discovery.expansion_route_continuity_v1 import (
 from opportunity_engine.discovery.fair_proven_route_recovery_v1 import (
     install_fair_proven_route_recovery_v1,
 )
+from opportunity_engine.discovery.direct_exact_lot_parser_recovery_v1 import (
+    install_direct_exact_lot_parser_recovery_v1,
+)
 from opportunity_engine.discovery.market_fit_evidence_v1 import (
     install_market_fit_evidence_v1,
 )
@@ -170,6 +173,10 @@ install_expansion_route_continuity_v1()
 # pool exceeds the existing recovery slots. This keeps 12 recovery fetches and
 # the 30-page global cap unchanged while rotating oversubscribed routes fairly.
 install_fair_proven_route_recovery_v1()
+# Recover direct Exact-Lot evidence already present on fetched pages: European
+# number-then-euro prices and conservative lot-intent slug + numeric-record URL
+# shapes. No query, page fetch, source, market or qualification gate is added.
+install_direct_exact_lot_parser_recovery_v1()
 # Add shadow-only evidence that distinguishes the search market from page-level
 # country/market signals. It does not change classification, Exact-Lot rules,
 # search/page-fetch budgets, or qualification evidence.
