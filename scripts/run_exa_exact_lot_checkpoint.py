@@ -67,7 +67,7 @@ MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
     "DE": (
         "Deutschland Restposten Bekleidung Großhandel Lager",
         "Deutschland Sonderposten Kleidung zu verkaufen Großhandel",
-        "Deutschland Warenlager Mode Restposten Bekleidung",
+        "Deutschland Bekleidung Restposten Stück Preis Großhandel Angebot",
     ),
     "FR": (MARKET_EXACT_LOT_QUERIES["FR"],),
     "IT": (MARKET_EXACT_LOT_QUERIES["IT"],),
