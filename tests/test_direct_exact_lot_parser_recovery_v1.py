@@ -53,7 +53,7 @@ def test_lot_intent_html_slug_with_stable_record_id_is_item_specific() -> None:
     classification, evidence = verification._classify_page(
         title="Mixposten Textilien Damen Herren Restposten Kleidung Großhandel",
         text=(
-            "Restposten Kleidung zu verkaufen. Bestand 500 Stück. "
+            "Restposten Kleidung zu verkaufen. Menge 500 pcs. "
             "Preis 3,50 € pro Stück."
         ),
         url=url,
