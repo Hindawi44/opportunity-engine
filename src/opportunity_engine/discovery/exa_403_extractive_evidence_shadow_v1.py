@@ -14,7 +14,9 @@ provider, source, runtime, market or automatic action is added here.
 from __future__ import annotations
 
 from collections import Counter
+import re
 from typing import Any, Callable
+from urllib.parse import urlsplit
 
 from opportunity_engine.discovery import provider_unique_page_verification as _verification
 from opportunity_engine.discovery.exa_shadow_page_verification import (
@@ -24,10 +26,29 @@ from opportunity_engine.discovery.exa_shadow_page_verification import (
 )
 
 
-VERSION = "EXA_403_EXTRACTIVE_EVIDENCE_SHADOW_V1"
+VERSION = "EXA_403_EXTRACTIVE_EVIDENCE_SHADOW_V1_1"
 EXA_HIGHLIGHT_DESCRIPTION_PREFIX = "EXA_SEARCH_HIGHLIGHTS_V1::"
 _INSTALLED = False
 _UPSTREAM_VERIFY: Callable[..., dict[str, Any]] | None = None
+_NUMERIC_PRODUCT_RECORD_ID_RE = re.compile(r"^\d{5,}$")
+_GENERIC_PRODUCT_SLUGS = frozenset(
+    {
+        "all",
+        "apparel",
+        "catalog",
+        "catalogue",
+        "clothes",
+        "clothing",
+        "fashion",
+        "footwear",
+        "index",
+        "klaer",
+        "klær",
+        "products",
+        "search",
+        "shoes",
+    }
+)
 
 
 def _compact(value: object) -> str:
@@ -55,6 +76,54 @@ def _extract_highlight_text(description: str) -> str:
     return _compact(description[len(EXA_HIGHLIGHT_DESCRIPTION_PREFIX) :])
 
 
+def _looks_numeric_product_detail_url(url: str) -> bool:
+    """Recognize only stable-looking product-detail routes for shadow diagnosis.
+
+    This is intentionally narrower than a general URL parser. A route must end
+    with ``/product(s)/<descriptive-slug>/<5+ digit id>``. Generic collection
+    slugs and year-like ids fail closed. The result is shadow URL evidence only.
+    """
+    try:
+        path = (urlsplit(_compact(url)).path or "").casefold().rstrip("/")
+    except ValueError:
+        return False
+    segments = [segment for segment in path.split("/") if segment]
+    if len(segments) < 3:
+        return False
+    container, slug, record_id = segments[-3:]
+    if container not in {"product", "products"}:
+        return False
+    if slug in _GENERIC_PRODUCT_SLUGS or len(slug) < 8 or "-" not in slug:
+        return False
+    return bool(_NUMERIC_PRODUCT_RECORD_ID_RE.fullmatch(record_id))
+
+
+def _promote_shadow_shape_from_numeric_product_detail(
+    *, classification: str, evidence: dict[str, Any], url: str
+) -> tuple[str, dict[str, Any], bool]:
+    """Add URL-specificity to shadow evidence only, never to primary verification."""
+    if evidence.get("item_specific_url_evidence") is True:
+        return classification, evidence, False
+    if not _looks_numeric_product_detail_url(url):
+        return classification, evidence, False
+
+    updated = dict(evidence)
+    updated["item_specific_url_evidence"] = True
+    updated["provider_extractive_403_shadow_item_specific_url_recovery"] = (
+        "NUMERIC_PRODUCT_DETAIL_ROUTE"
+    )
+
+    exact_shape = bool(
+        updated.get("inventory_evidence") is True
+        and updated.get("direct_sale_evidence") is True
+        and updated.get("price_evidence") is True
+        and updated.get("quantity_evidence") is True
+        and updated.get("domain_evidence") is True
+        and updated.get("info_or_legal_evidence") is not True
+    )
+    return (EXACT_LOT_CANDIDATE if exact_shape else classification), updated, True
+
+
 def _attach_shadow_assessment(
     row: dict[str, Any], *, description: str
 ) -> tuple[dict[str, Any], str | None]:
@@ -66,6 +135,7 @@ def _attach_shadow_assessment(
     updated["provider_extractive_403_shadow_is_qualification_evidence"] = False
     updated["provider_extractive_403_shadow_changes_primary_classification"] = False
     updated["provider_extractive_403_shadow_changes_tool_learning"] = False
+    updated["provider_extractive_403_shadow_numeric_product_detail_recovery"] = False
 
     if row.get("classification") != FETCH_FAILED or row.get("status_code") != 403:
         return updated, None
@@ -83,11 +153,17 @@ def _attach_shadow_assessment(
         title=title,
         text=text,
     )
+    classification, evidence, recovered = _promote_shadow_shape_from_numeric_product_detail(
+        classification=classification,
+        evidence=evidence,
+        url=url,
+    )
 
     updated["provider_extractive_403_shadow_used"] = True
     updated["provider_extractive_403_shadow_source"] = "EXA_SEARCH_HIGHLIGHTS"
     updated["provider_extractive_403_shadow_classification"] = classification
     updated["provider_extractive_403_shadow_evidence"] = evidence
+    updated["provider_extractive_403_shadow_numeric_product_detail_recovery"] = recovered
     return updated, classification
 
 
@@ -115,6 +191,7 @@ def _verify_provider_unique_pages_with_403_shadow(
     shadow_classifications: list[str] = []
     http_403_count = 0
     highlight_available_count = 0
+    numeric_product_detail_recovery_count = 0
     for raw in report.get("verified_pages") or []:
         if not isinstance(raw, dict):
             continue
@@ -127,6 +204,8 @@ def _verify_provider_unique_pages_with_403_shadow(
         )
         if updated.get("provider_extractive_403_shadow_used") is True:
             highlight_available_count += 1
+        if updated.get("provider_extractive_403_shadow_numeric_product_detail_recovery") is True:
+            numeric_product_detail_recovery_count += 1
         if shadow_classification:
             shadow_classifications.append(shadow_classification)
         rows.append(updated)
@@ -139,6 +218,7 @@ def _verify_provider_unique_pages_with_403_shadow(
         "status": "SUCCESS" if highlight_available_count else "VALID_ZERO",
         "http_403_row_count": http_403_count,
         "highlight_evidence_available_count": highlight_available_count,
+        "numeric_product_detail_url_recovery_count": numeric_product_detail_recovery_count,
         "shadow_classification_counts": dict(sorted(counts.items())),
         "shadow_exact_lot_candidate_count": counts[EXACT_LOT_CANDIDATE],
         "search_requests_added": 0,
@@ -154,7 +234,7 @@ def _verify_provider_unique_pages_with_403_shadow(
         "automatic_purchase": False,
         "automatic_payment": False,
         "interpretation_guard": (
-            "Exa highlights are diagnostic cached/extractive evidence only. HTTP 403 rows remain FETCH_FAILED and cannot become Exact-Lot or Tool Learning credit through this shadow."
+            "Exa highlights and numeric product-detail URL recovery are diagnostic shadow evidence only. HTTP 403 rows remain FETCH_FAILED and cannot become Exact-Lot or Tool Learning credit through this shadow."
         ),
     }
     return output

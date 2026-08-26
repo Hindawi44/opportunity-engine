@@ -11,9 +11,17 @@ from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
 
 
 URL = "https://merkandi.no/products/restparti-klaer-500-stk/1572644"
+NUMERIC_PRODUCT_URL = (
+    "https://merkandi.no/products/klaer-og-fottoy-eksport-miks-bare-1-99/480248"
+)
 
 
-def _benchmark(description: str) -> dict:
+def _benchmark(
+    description: str,
+    *,
+    url: str = URL,
+    title: str = "Restparti klær 500 stk til salgs",
+) -> dict:
     return {
         "schema_version": "search-experiment-benchmark-1.0",
         "status": "SUCCESS",
@@ -28,8 +36,8 @@ def _benchmark(description: str) -> dict:
                 "exa": {
                     "results": [
                         {
-                            "title": "Restparti klær 500 stk til salgs",
-                            "url": URL,
+                            "title": title,
+                            "url": url,
                             "domain": "merkandi.no",
                             "description": description,
                             "provider": "Exa",
@@ -95,6 +103,64 @@ def test_http_403_highlight_shadow_detects_strict_shape_without_promoting_it() -
     assert shadow["exact_lot_decision_changes"] == 0
     assert shadow["tool_learning_decision_changes"] == 0
     assert shadow["qualification_evidence"] is False
+
+
+def test_numeric_product_detail_route_recovers_shadow_url_specificity_only() -> None:
+    description = EXA_HIGHLIGHT_DESCRIPTION_PREFIX + (
+        "Restlager klær og sko til salgs for grossister. Lager 600 stk. "
+        "Pris 1,99 EUR per stk. Tilgjengelig for kjøp."
+    )
+    report = verification.verify_provider_unique_pages(
+        _benchmark(
+            description,
+            url=NUMERIC_PRODUCT_URL,
+            title="Klær og sko eksport miks kun 1,99 EUR",
+        ),
+        provider="exa",
+        page_fetcher=_failed(403),
+        max_page_fetches=1,
+    )
+
+    assert report["exact_lot_candidate_count"] == 0
+    row = report["verified_pages"][0]
+    assert row["classification"] == FETCH_FAILED
+    assert row["tool_learning_useful"] is False
+    assert row["provider_extractive_403_shadow_classification"] == EXACT_LOT_CANDIDATE
+    assert row["provider_extractive_403_shadow_numeric_product_detail_recovery"] is True
+    evidence = row["provider_extractive_403_shadow_evidence"]
+    assert evidence["item_specific_url_evidence"] is True
+    assert (
+        evidence["provider_extractive_403_shadow_item_specific_url_recovery"]
+        == "NUMERIC_PRODUCT_DETAIL_ROUTE"
+    )
+    shadow = report["provider_extractive_403_shadow"]
+    assert shadow["numeric_product_detail_url_recovery_count"] == 1
+    assert shadow["shadow_exact_lot_candidate_count"] == 1
+    assert shadow["exact_lot_decision_changes"] == 0
+    assert shadow["qualification_evidence"] is False
+
+
+def test_numeric_product_detail_recovery_rejects_generic_slug_and_year_like_id() -> None:
+    description = EXA_HIGHLIGHT_DESCRIPTION_PREFIX + (
+        "Restlager klær til salgs. Lager 500 stk. Pris 2,10 EUR per stk."
+    )
+    urls = (
+        "https://example.no/products/klaer/480248",
+        "https://example.no/products/klaer-og-sko-restlager/2026",
+    )
+    for url in urls:
+        report = verification.verify_provider_unique_pages(
+            _benchmark(description, url=url),
+            provider="exa",
+            page_fetcher=_failed(403),
+            max_page_fetches=1,
+        )
+        row = report["verified_pages"][0]
+        assert row["classification"] == FETCH_FAILED
+        assert row["provider_extractive_403_shadow_numeric_product_detail_recovery"] is False
+        assert report["provider_extractive_403_shadow"][
+            "numeric_product_detail_url_recovery_count"
+        ] == 0
 
 
 def test_ordinary_untagged_description_cannot_enter_403_shadow() -> None:
