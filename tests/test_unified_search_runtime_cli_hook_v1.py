@@ -5,15 +5,30 @@ from pathlib import Path
 
 from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.discovery import unified_search_runtime_cli_hook as runtime
+from opportunity_engine.discovery import six_market_fabric_coverage_rotation_v1 as coverage
 from opportunity_engine.project_domain_boundary import FABRIC_PROCUREMENT, classify_project_domain
 
 
-def test_fabric_exa_queries_cover_fr_it_nl_and_stay_in_fabric_domain() -> None:
-    assert tuple(runtime.FABRIC_EXA_QUERIES) == ("FR", "IT", "NL")
+def test_fabric_exa_queries_cover_all_six_while_runtime_budget_stays_three() -> None:
+    assert tuple(runtime.FABRIC_EXA_QUERIES) == runtime.SIX_MARKETS
+    assert len(runtime.FABRIC_MARKETS) == coverage.FIXED_QUERY_BUDGET_PER_RUN == 3
+    assert set(runtime.FABRIC_MARKETS).issubset(set(runtime.SIX_MARKETS))
     for market, query in runtime.FABRIC_EXA_QUERIES.items():
-        assert market in runtime.FABRIC_MARKETS
+        assert market in runtime.SIX_MARKETS
         assert classify_project_domain(text=query) == FABRIC_PROCUREMENT
         assert "site:" not in query.casefold()
+
+
+def test_fabric_rotation_covers_all_six_in_two_consecutive_seeds_without_budget_growth() -> None:
+    first = coverage.select_fabric_market_cohort(seed=0)
+    second = coverage.select_fabric_market_cohort(seed=1)
+
+    assert len(first) == len(second) == 3
+    assert set(first).isdisjoint(set(second))
+    assert set(first) | set(second) == set(runtime.SIX_MARKETS)
+    assert coverage.SEARCH_REQUESTS_ADDED_PER_RUN == 0
+    assert coverage.PAGE_RESULT_BUDGET_ADDED_PER_RUN == 0
+    assert coverage.FIXED_RESULTS_PER_QUERY == runtime.FABRIC_RESULTS_PER_MARKET == 5
 
 
 def test_france_and_netherlands_not_implemented_truth_is_replaced_by_exa_exact_lot(tmp_path: Path) -> None:
@@ -93,13 +108,16 @@ def test_italy_existing_positive_exact_lot_is_not_downgraded_by_exa_zero(tmp_pat
     assert cycle["commercial_qualification"]["qualification_count"] == 1
 
 
-def test_generic_exa_fabric_search_uses_three_markets_and_verified_page_gate(monkeypatch) -> None:
+def test_generic_exa_fabric_search_uses_rotated_three_market_budget_and_verified_page_gate(monkeypatch) -> None:
     class FakeProvider:
         def __init__(self, _key: str):
             pass
 
         def search(self, query: str, *, count: int):
-            market = "FR" if query.startswith("France") else "IT" if query.startswith("Italia") else "NL"
+            market = next(
+                code for code, configured_query in runtime.FABRIC_EXA_QUERIES.items()
+                if configured_query == query
+            )
             return [
                 SearchHit(
                     title=f"{market} fabric stock",
@@ -130,13 +148,47 @@ def test_generic_exa_fabric_search_uses_three_markets_and_verified_page_gate(mon
     report = runtime._run_fabric_exa_search()
 
     assert report["status"] == "SUCCESS"
-    assert report["market_coverage"] == ["FR", "IT", "NL"]
+    assert report["market_coverage"] == list(runtime.FABRIC_MARKETS)
+    assert report["scheduled_market_coverage"] == list(runtime.FABRIC_MARKETS)
+    assert report["all_market_coverage"] == list(runtime.SIX_MARKETS)
+    assert report["query_budget_total"] == 3
+    assert report["query_budget_unchanged"] is True
+    assert report["search_requests_added_by_coverage_rotation"] == 0
     assert report["requests_made"] == 3
     assert report["candidate_count"] == 3
-    assert {row["source_country"] for row in report["candidates"]} == {"FR", "IT", "NL"}
+    assert {row["source_country"] for row in report["candidates"]} == set(runtime.FABRIC_MARKETS)
     assert all(row["project_domain"] == "FABRIC_PROCUREMENT" for row in report["candidates"])
     assert all(row["top5_eligible"] is False for row in report["candidates"])
     assert all(row["automatic_purchase"] is False for row in report["candidates"])
+
+
+def test_reconciliation_summary_exposes_all_six_fabric_markets_and_schedule_state() -> None:
+    scheduled = tuple(runtime.FABRIC_MARKETS)
+    ledger = {
+        "search_runtime": {
+            "CLOTHING_INVENTORY": {
+                "markets": {
+                    code: {"status": "SUCCESS", "hits_received": 1, "strict_exact_lot_count": 1}
+                    for code in runtime.SIX_MARKETS
+                }
+            },
+            "FABRIC_PROCUREMENT": {
+                "market_coverage": list(scheduled),
+                "scheduled_market_coverage": list(scheduled),
+                "markets": {
+                    code: {"status": "SUCCESS", "hits_received": 1, "candidate_count": 1}
+                    for code in scheduled
+                },
+            },
+        }
+    }
+
+    text = coverage._render_search_runtime_section_all_six(ledger)
+
+    for code in runtime.SIX_MARKETS:
+        assert f"{code} ملابس:" in text
+        assert f"{code} أقمشة:" in text
+    assert "3/6 أسواق في كل تشغيل" in text
 
 
 def test_unified_operator_artifact_contains_both_domains_without_mixing_top5(tmp_path: Path) -> None:
