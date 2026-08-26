@@ -12,6 +12,11 @@ ARCHIVED_SOURCES = {
     "dpv-active-clothing-watch.yaml": "scripts/run_dpv_active_discovery.py",
 }
 
+ARCHIVED_COUNTRY_DIAGNOSTICS = (
+    "sweden-clothing-inventory-live.yaml",
+    "germany-clothing-inventory-live.yaml",
+)
+
 
 def test_redundant_german_source_workflows_are_archived() -> None:
     for name in ARCHIVED_SOURCES:
@@ -25,12 +30,12 @@ def test_checkpoint_owns_archived_source_execution() -> None:
         assert script in text
 
 
-def test_remaining_country_diagnostics_are_manual_only() -> None:
-    for name in (
-        "sweden-clothing-inventory-live.yaml",
-        "germany-clothing-inventory-live.yaml",
-    ):
-        text = (WORKFLOWS / name).read_text(encoding="utf-8")
+def test_country_diagnostic_workflows_are_archived() -> None:
+    for name in ARCHIVED_COUNTRY_DIAGNOSTICS:
+        assert not (WORKFLOWS / name).exists(), name
+        archived = ARCHIVE / name
+        assert archived.exists(), name
+        text = archived.read_text(encoding="utf-8")
         assert "workflow_dispatch:" in text
         assert "\n  pull_request:" not in text
         assert "\n  schedule:" not in text
