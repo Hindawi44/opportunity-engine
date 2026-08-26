@@ -51,6 +51,27 @@ def test_area_rate_does_not_replace_roll_total_when_pairing_with_linear_quantity
     assert evidence["commercial_evidence_complete"] is True
 
 
+def test_live_molton_cross_sell_accessory_pair_cannot_replace_primary_roll() -> None:
+    evidence = normalize_fabric_commercial_evidence(
+        "Dekomolton GREENLINE Stoffballen schwarz 300 cm, 180 g/m², 30 lfm. "
+        "Sofort lieferbar. Lagerbestand Stück. Versandgewicht 16.2 kg je Stück. "
+        "319,00 € brutto, 3,54 € pro m². 268,07 € netto, 2,98 € pro m². "
+        "Beschreibung: Die Stoffbahn wird mit 30 Laufmetern am Stück geliefert. "
+        "Länge am Stück: 30 lfm, entspricht 90m² pro Ballen. "
+        "Zu diesem Produkt empfehlen wir Ihnen: Doppelseitiges Klebeband, "
+        "50 mm x 25m, wasserfest. 8,50 € 0,34 € pro lfm.",
+        market="DE",
+    )
+
+    assert evidence["price"] == 319.0
+    assert evidence["price_text"] == "319,00 €"
+    assert evidence["quantity"] == 30.0
+    assert evidence["quantity_unit"] == "lfm"
+    assert evidence["price"] != 0.34
+    assert evidence["quantity"] != 25.0
+    assert evidence["commercial_evidence_complete"] is True
+
+
 def test_prefix_price_without_local_quantity_pair_is_not_promoted_as_purchase_price() -> None:
     evidence = normalize_fabric_commercial_evidence(
         "Gratis verzending vanaf € 100. Fabric wholesale stock available.",
