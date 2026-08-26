@@ -43,6 +43,29 @@ def test_lot_intent_slug_followed_by_numeric_record_id_is_item_specific() -> Non
     ) is True
 
 
+def test_lot_intent_html_slug_with_stable_record_id_is_item_specific() -> None:
+    url = (
+        "https://www.restposten.de/p/"
+        "mixposten-textilien-damen-herren-restposten-kleidung-grosshandel-16083444.html"
+    )
+    assert verification._looks_item_specific_url(url) is True
+
+    classification, evidence = verification._classify_page(
+        title="Mixposten Textilien Damen Herren Restposten Kleidung Großhandel",
+        text=(
+            "Restposten Kleidung zu verkaufen. Bestand 500 Stück. "
+            "Preis 3,50 € pro Stück."
+        ),
+        url=url,
+    )
+    assert classification == verification.EXACT_LOT_CANDIDATE
+    assert evidence["item_specific_url_evidence"] is True
+    assert evidence["inventory_evidence"] is True
+    assert evidence["direct_sale_evidence"] is True
+    assert evidence["price_evidence"] is True
+    assert evidence["quantity_evidence"] is True
+
+
 def test_bare_category_followed_by_numeric_id_stays_aggregate() -> None:
     assert (
         verification._looks_item_specific_url(
@@ -66,6 +89,21 @@ def test_bare_year_in_slug_is_not_lot_intent_for_numeric_tail() -> None:
     assert (
         verification._looks_item_specific_url(
             "https://example.com/kleding/summer-sale-2026/12345"
+        )
+        is False
+    )
+
+
+def test_generic_html_record_id_without_lot_intent_stays_non_item_specific() -> None:
+    assert (
+        verification._looks_item_specific_url(
+            "https://example.com/p/summer-fashion-collection-16083444.html"
+        )
+        is False
+    )
+    assert (
+        verification._looks_item_specific_url(
+            "https://example.com/suche-Kleidung.html"
         )
         is False
     )
