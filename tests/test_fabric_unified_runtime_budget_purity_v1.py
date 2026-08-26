@@ -3,13 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from opportunity_engine.discovery import fabric_procurement_watch_cli_hook as legacy_watch
 from opportunity_engine.discovery import six_market_fabric_coverage_rotation_v1 as coverage
 from opportunity_engine.discovery import unified_search_runtime_cli_hook as runtime
 
 
 def test_daily_legacy_fabric_watch_is_zero_request_placeholder(tmp_path: Path) -> None:
-    report = legacy_watch.write_daily_fabric_procurement_watch(
+    report = coverage._legacy_daily_watch_deferred(
         tmp_path,
         environment={"BRAVE_SEARCH_API_KEY": "would-have-been-used"},
     )
