@@ -1,15 +1,17 @@
 """General parser recovery for direct Exact-Lot pages already found by search.
 
-This patch is deliberately source-neutral and budget-neutral. It fixes two
+This patch is deliberately source-neutral and budget-neutral. It fixes
 conservative evidence-parsing gaps observed in live six-market runs:
 
 * European prices written as ``306,50 €`` were not detected by the direct-page
   price regex because the old expression required a word boundary after ``€``.
 * Some B2B marketplaces expose a descriptive lot slug followed by a stable
-  numeric record id, for example ``.../restpartij-...-76-stuks/37463``. The
-  descriptive slug is strong URL-specificity evidence, while a bare category
-  route such as ``.../kleding/43`` must remain aggregate.
+  numeric record id, for example ``.../restpartij-...-76-stuks/37463``.
+* Other marketplaces encode the same stable record id at the end of a descriptive
+  HTML detail slug, for example ``.../mixposten-textilien-16083444.html``.
 
+The descriptive slug must still prove explicit lot/bulk intent. Bare category,
+search, blog and generic year/id routes remain aggregate or non-item-specific.
 The recovery changes URL/price evidence only. CLOTHING_INVENTORY, inventory,
 direct-sale, price, quantity and all existing Exact-Lot gates remain required.
 No search request, page fetch, provider, source, runtime, market or commercial
@@ -23,7 +25,7 @@ from urllib.parse import urlsplit
 from opportunity_engine.discovery import exa_shadow_page_verification as _verification
 
 
-VERSION = "DIRECT_EXACT_LOT_PARSER_RECOVERY_V1"
+VERSION = "DIRECT_EXACT_LOT_PARSER_RECOVERY_V1_1"
 
 # Preserve every old price form while fixing the symbol-suffix form. Word
 # currencies retain a trailing word boundary; the non-word euro symbol does not.
@@ -36,6 +38,10 @@ _PRICE_RE_V2 = re.compile(
     re.IGNORECASE,
 )
 _NUMERIC_RECORD_ID_RE = re.compile(r"^\d{3,}$")
+_HTML_RECORD_SLUG_RE = re.compile(
+    r"^(?P<slug>.+)-(?P<record_id>\d{5,})\.html?$",
+    re.IGNORECASE,
+)
 _UNIT_QUANTITY_TOKEN_RE = re.compile(
     r"^\d{2,}(?:kg|stk|stuks|pcs|pieces|pièces|pezzi|units)$",
     re.IGNORECASE,
@@ -64,7 +70,7 @@ def _slug_has_explicit_lot_intent(slug: str) -> bool:
 
 
 def _looks_item_specific_url_v2(url: str) -> bool:
-    """Extend URL specificity only for lot-intent slug + numeric record id."""
+    """Extend specificity only for lot-intent slugs with stable record ids."""
     if _UPSTREAM_LOOKS_ITEM_SPECIFIC_URL(url):
         return True
 
@@ -80,11 +86,19 @@ def _looks_item_specific_url_v2(url: str) -> bool:
         return False
 
     segments = [segment for segment in path.strip("/").split("/") if segment]
-    if len(segments) < 2 or not _NUMERIC_RECORD_ID_RE.fullmatch(segments[-1]):
+    if not segments:
         return False
 
-    descriptive_slug = segments[-2]
-    return _slug_has_explicit_lot_intent(descriptive_slug)
+    # Shape A: .../<descriptive-lot-slug>/<numeric-record-id>
+    if len(segments) >= 2 and _NUMERIC_RECORD_ID_RE.fullmatch(segments[-1]):
+        return _slug_has_explicit_lot_intent(segments[-2])
+
+    # Shape B: .../<descriptive-lot-slug>-<numeric-record-id>.html
+    html_match = _HTML_RECORD_SLUG_RE.fullmatch(segments[-1])
+    if html_match:
+        return _slug_has_explicit_lot_intent(html_match.group("slug"))
+
+    return False
 
 
 def install_direct_exact_lot_parser_recovery_v1() -> None:
