@@ -10,7 +10,7 @@ from opportunity_engine.search_experiment_execution_bridge_v1 import _market_anc
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/run_exa_exact_lot_checkpoint.py"
 EXPECTED_QUERY = (
-    "Nederland kleding groothandel partij pakket pallet te koop prijs per stuk voorraad"
+    "Nederland kleding groothandel partij pakket pallet te koop prijs stuks voorraad"
 )
 
 
@@ -44,6 +44,6 @@ def test_netherlands_diversity_query_stays_source_neutral_and_exact_lot_shaped()
     assert "marktplaats" not in folded
     assert "te koop" in folded
     assert "prijs" in folded
-    assert "stuk" in folded
+    assert "stuks" in folded
     assert "pakket" in folded
     assert "pallet" in folded
