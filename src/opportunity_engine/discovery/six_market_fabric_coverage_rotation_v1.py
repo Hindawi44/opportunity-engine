@@ -336,14 +336,13 @@ def install_six_market_fabric_coverage_rotation_v1() -> bool:
     _UPSTREAM_FABRIC_RUNTIME = runtime._fabric_runtime
     _UPSTREAM_FABRIC_MERGER = runtime._merge_fabric_report
 
-    # The old daily Fabric watch is retained for manual/backward-compatible use,
-    # but its production callback is redirected to a zero-request placeholder.
-    # The Unified Search Runtime later overwrites that placeholder with the Exa
-    # cohort output in the same daily execution.
-    from opportunity_engine.discovery import fabric_procurement_watch_cli_hook as legacy_watch
+    # Keep the legacy writer callable for tests/manual use. Only the real daily
+    # bulletin CLI gets redirected to the zero-request compatibility placeholder.
+    if Path(runtime.sys.argv[0]).name == runtime.DAILY_BULLETIN_CLI:
+        from opportunity_engine.discovery import fabric_procurement_watch_cli_hook as legacy_watch
 
-    _UPSTREAM_LEGACY_DAILY_WRITER = legacy_watch.write_daily_fabric_procurement_watch
-    legacy_watch.write_daily_fabric_procurement_watch = _legacy_daily_watch_deferred
+        _UPSTREAM_LEGACY_DAILY_WRITER = legacy_watch.write_daily_fabric_procurement_watch
+        legacy_watch.write_daily_fabric_procurement_watch = _legacy_daily_watch_deferred
 
     scheduled = select_fabric_market_cohort()
     runtime.FABRIC_MARKETS = scheduled
