@@ -106,6 +106,9 @@ from opportunity_engine.discovery.commercial_anchor_outcome_learning_cli_hook im
 from opportunity_engine.discovery.unified_search_runtime_cli_hook import (
     install_unified_search_runtime_cli_hook,
 )
+from opportunity_engine.discovery.fabric_route_commercial_evidence_normalization_v1 import (
+    install_fabric_route_commercial_evidence_normalization_v1,
+)
 from opportunity_engine.discovery.six_market_fabric_coverage_rotation_v1 import (
     install_six_market_fabric_coverage_rotation_v1,
 )
@@ -189,6 +192,10 @@ install_commercial_anchor_outcome_learning_cli_hook()
 # the existing three-request per-run search budget. Two complementary cohorts
 # alternate by GitHub run number; this remains the same Unified Search Runtime.
 install_six_market_fabric_coverage_rotation_v1()
+# Normalize price + quantity from the already-fetched verified fabric page.
+# This is same-runtime evidence structuring only: zero added searches/fetches and
+# fabric remains separate from the clothing Top5.
+install_fabric_route_commercial_evidence_normalization_v1()
 # Registered immediately after the river. LIFO lets the established fabric
 # hooks write first, then this hook merges the scheduled 3/6 Exa fabric cohort
 # and rewrites the unified operator search view before the river consumes final
