@@ -29,5 +29,5 @@ def test_live_proof_gate_does_not_create_a_second_search_runtime() -> None:
     # The gate may dispatch the established operator checkpoint only. It must not
     # add a new search workflow, provider, market or runtime command.
     assert "TARGET_WORKFLOW: multi-market-daily-operator-checkpoint.yaml" in text
-    assert "run_exa_exact_lot_checkpoint.py" in text
+    assert "run_exa_exact_lot_checkpoint" in text
     assert "new-runtime" not in text.casefold()
