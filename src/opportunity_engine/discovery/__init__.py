@@ -94,6 +94,9 @@ from opportunity_engine.discovery.expansion_route_continuity_v1 import (
 from opportunity_engine.discovery.fair_proven_route_recovery_v1 import (
     install_fair_proven_route_recovery_v1,
 )
+from opportunity_engine.discovery.market_fit_evidence_v1 import (
+    install_market_fit_evidence_v1,
+)
 from opportunity_engine.discovery.commercial_anchor_outcome_learning_cli_hook import (
     install_commercial_anchor_outcome_learning_cli_hook,
 )
@@ -167,6 +170,10 @@ install_expansion_route_continuity_v1()
 # pool exceeds the existing recovery slots. This keeps 12 recovery fetches and
 # the 30-page global cap unchanged while rotating oversubscribed routes fairly.
 install_fair_proven_route_recovery_v1()
+# Add shadow-only evidence that distinguishes the search market from page-level
+# country/market signals. It does not change classification, Exact-Lot rules,
+# search/page-fetch budgets, or qualification evidence.
+install_market_fit_evidence_v1()
 # Registered immediately before Unified Search Runtime. LIFO therefore executes
 # the existing six-market Exa runtime first, then this review-only learner consumes
 # the persisted per-anchor outcomes. It adds no search request or runtime.
