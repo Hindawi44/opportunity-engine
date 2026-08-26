@@ -35,6 +35,20 @@ def test_area_and_weight_are_not_misread_as_procurement_quantity() -> None:
     assert evidence["commercial_evidence_complete"] is False
 
 
+def test_french_accented_metres_are_normalized_from_live_category_shape() -> None:
+    evidence = normalize_fabric_commercial_evidence(
+        "Tissu Jersey Paille En Gros À Partir de 30 Mètres (3.00 €/Mètre) 3.00 € H.T. En stock",
+        market="FR",
+    )
+
+    assert evidence["price"] == 3.0
+    assert evidence["price_text"] == "3.00 €"
+    assert evidence["currency"] == "EUR"
+    assert evidence["quantity"] == 30.0
+    assert evidence["quantity_unit"] == "mètres"
+    assert evidence["commercial_evidence_complete"] is True
+
+
 def test_verified_page_is_reused_once_and_runtime_candidate_becomes_analysis_eligible() -> None:
     calls: list[str] = []
 

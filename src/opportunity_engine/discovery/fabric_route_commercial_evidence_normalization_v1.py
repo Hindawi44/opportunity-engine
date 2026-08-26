@@ -26,7 +26,7 @@ _PRICE_RE = re.compile(
 )
 _QUANTITY_RE = re.compile(
     r"(?<![\d.,])(?P<quantity>\d{1,7}(?:[.,]\d{1,2})?)\s*"
-    r"(?P<unit>lfm|laufmeter(?:n)?|meters?|metres?|metri|"
+    r"(?P<unit>lfm|laufmeter(?:n)?|meters?|metres?|mètres?|metri|"
     r"m(?![²2])|rolls?|rollen?|rotoli|rouleaux?|st(?:ü|u)ck|stuks?|pcs?|pezzi)\b",
     re.IGNORECASE,
 )
