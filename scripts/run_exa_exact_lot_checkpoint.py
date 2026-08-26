@@ -55,7 +55,7 @@ MARKET_CURRENCIES = {
 }
 MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
     "NO": (
-        "Norge restlager klær grossist parti",
+        "Norge klær vareparti nettauksjon auksjon plagg til salgs pris stk",
         "Norge overskuddslager klær til salgs vareparti",
         "Norge kleslager restparti engros mote",
     ),
