@@ -37,7 +37,7 @@ def test_auto_dispatch_does_not_expand_workflow_inventory() -> None:
         for path in WORKFLOWS.iterdir()
         if path.suffix in {".yml", ".yaml"}
     ]
-    assert len(live) == 6
+    assert len(live) == 4
     assert not (WORKFLOWS / "auto-live-checkpoint-on-main.yaml").exists()
 
 
