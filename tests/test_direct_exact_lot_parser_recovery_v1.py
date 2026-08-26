@@ -62,6 +62,15 @@ def test_bare_category_followed_by_numeric_id_stays_aggregate() -> None:
     assert evidence["item_specific_url_evidence"] is False
 
 
+def test_bare_year_in_slug_is_not_lot_intent_for_numeric_tail() -> None:
+    assert (
+        verification._looks_item_specific_url(
+            "https://example.com/kleding/summer-sale-2026/12345"
+        )
+        is False
+    )
+
+
 def test_existing_currency_prefix_price_form_still_works() -> None:
     classification, evidence = verification._classify_page(
         title="Restpartij kleding",
