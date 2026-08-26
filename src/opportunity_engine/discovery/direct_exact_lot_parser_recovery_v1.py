@@ -36,9 +36,31 @@ _PRICE_RE_V2 = re.compile(
     re.IGNORECASE,
 )
 _NUMERIC_RECORD_ID_RE = re.compile(r"^\d{3,}$")
+_UNIT_QUANTITY_TOKEN_RE = re.compile(
+    r"^\d{2,}(?:kg|stk|stuks|pcs|pieces|pièces|pezzi|units)$",
+    re.IGNORECASE,
+)
 
 _UPSTREAM_LOOKS_ITEM_SPECIFIC_URL = _verification._looks_item_specific_url
 _INSTALLED = False
+
+
+def _slug_has_explicit_lot_intent(slug: str) -> bool:
+    """Require explicit lot/bulk language, not a bare number such as a year."""
+    tokens = [
+        token
+        for token in re.split(r"[-_]+", _verification._compact(slug).casefold())
+        if token
+    ]
+    if any(token in _verification._LOCAL_LOT_PRODUCT_TERMS for token in tokens):
+        return True
+    if any(
+        token.startswith(prefix)
+        for token in tokens
+        for prefix in _verification._LOCAL_LOT_PRODUCT_PREFIXES
+    ):
+        return True
+    return any(_UNIT_QUANTITY_TOKEN_RE.fullmatch(token) for token in tokens)
 
 
 def _looks_item_specific_url_v2(url: str) -> bool:
@@ -62,7 +84,7 @@ def _looks_item_specific_url_v2(url: str) -> bool:
         return False
 
     descriptive_slug = segments[-2]
-    return _verification._product_slug_has_local_lot_intent(descriptive_slug)
+    return _slug_has_explicit_lot_intent(descriptive_slug)
 
 
 def install_direct_exact_lot_parser_recovery_v1() -> None:
