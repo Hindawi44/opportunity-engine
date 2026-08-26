@@ -23,7 +23,7 @@ MARKET_EXACT_LOT_QUERIES = {
     "DE": "Deutschland Kleidung Mode Restposten zu verkaufen Preis Stück Warenlager aktuell",
     "FR": "France vêtements mode lot de marchandises à vendre prix quantité stock déstockage disponible",
     "IT": "Italia abbigliamento moda lotto stock in vendita prezzo pezzi magazzino disponibile",
-    "NL": "Nederland kleding mode restpartij te koop prijs stuks voorraad beschikbaar",
+    "NL": "Nederland kleding groothandel partij pakket pallet te koop prijs per stuk voorraad",
 }
 
 
