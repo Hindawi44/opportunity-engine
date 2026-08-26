@@ -9,6 +9,8 @@ def test_auto_dispatch_gate_covers_unified_search_runtime_changes() -> None:
 
     required_paths = (
         "automatic_query_gap_miss_scout_cli_hook",
+        "exa_403_extractive_evidence_shadow_v1",
+        "exa_search",
         "market_fit_evidence_v1",
         "provider_unique_page_verification",
         "six_market_fabric_coverage_rotation_v1",
