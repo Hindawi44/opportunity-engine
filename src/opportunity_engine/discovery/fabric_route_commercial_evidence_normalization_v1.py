@@ -71,6 +71,17 @@ _AREA_PRICE_AFTER_REJECT = (
     "g/m²",
     "g/m2",
 )
+# Cross-sell sections can contain internally coherent price/quantity pairs for
+# accessories or related products. They are not evidence for the verified page's
+# primary product. Truncate only at explicit section headings already present in
+# the fetched page text; no extra fetch or source-specific hostname rule is used.
+_CROSS_SELL_SECTION_MARKERS = (
+    "zu diesem produkt empfehlen wir",
+    "kunden, welche diesen artikel bestellten",
+    "related products",
+    "you may also like",
+    "customers also bought",
+)
 _PAIR_MAX_DISTANCE = 90
 
 
@@ -101,6 +112,19 @@ def _currency(raw: str, *, market: str | None) -> str | None:
     if value == "KR":
         return _MARKET_CURRENCY.get(str(market or "").upper())
     return None
+
+
+def _primary_product_body(body: str) -> str:
+    """Exclude explicit cross-sell sections from primary-product evidence."""
+    folded = body.casefold()
+    cut_points = [
+        folded.find(marker)
+        for marker in _CROSS_SELL_SECTION_MARKERS
+        if folded.find(marker) > 0
+    ]
+    if not cut_points:
+        return body
+    return body[: min(cut_points)].rstrip()
 
 
 def _price_candidates(body: str, *, market: str | None) -> list[dict[str, Any]]:
@@ -236,6 +260,7 @@ def normalize_fabric_commercial_evidence(
 ) -> dict[str, Any]:
     """Extract conservative structured evidence from already-fetched page text."""
     body = " ".join(str(text or "").split())
+    body = _primary_product_body(body)
 
     prices = _price_candidates(body, market=market)
     quantities = _quantity_candidates(body)
