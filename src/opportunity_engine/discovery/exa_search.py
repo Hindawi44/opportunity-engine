@@ -189,3 +189,13 @@ def _parse_hits(payload: Any) -> list[SearchHit]:
             )
         )
     return hits
+
+
+# Keep this Exa-specific experiment isolated from provider-neutral verification.
+# Importing the adapter installs only a read-only post-verification shadow: it
+# never changes FETCH_FAILED, Exact-Lot, Tool Learning, Top5 or commercial state.
+from opportunity_engine.discovery.exa_403_extractive_evidence_shadow_v1 import (  # noqa: E402
+    install_exa_403_extractive_evidence_shadow_v1,
+)
+
+install_exa_403_extractive_evidence_shadow_v1()
