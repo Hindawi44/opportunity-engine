@@ -11,6 +11,7 @@ from urllib.request import Request, urlopen
 from opportunity_engine.discovery.search_provider import SearchHit
 
 EXA_SEARCH_ENDPOINT = "https://api.exa.ai/search"
+EXA_HIGHLIGHT_DESCRIPTION_PREFIX = "EXA_SEARCH_HIGHLIGHTS_V1::"
 Transport = Callable[[Request, float], bytes]
 
 
@@ -29,18 +30,7 @@ def _http_error_message(exc: HTTPError) -> str:
     return f"Exa Search returned HTTP {exc.code}{suffix}"
 
 
-def _description(item: dict[str, Any]) -> str:
-    values: list[str] = []
-    highlights = item.get("highlights")
-    if isinstance(highlights, list):
-        values.extend(value for value in highlights[:5] if isinstance(value, str))
-    text = item.get("text")
-    if isinstance(text, str):
-        values.append(text)
-    summary = item.get("summary")
-    if isinstance(summary, str):
-        values.append(summary)
-
+def _clean_values(values: list[str]) -> str:
     cleaned: list[str] = []
     seen: set[str] = set()
     for value in values:
@@ -51,6 +41,33 @@ def _description(item: dict[str, Any]) -> str:
         seen.add(marker)
         cleaned.append(compact)
     return " | ".join(cleaned)[:6000]
+
+
+def _description(item: dict[str, Any]) -> str:
+    """Return search context while preserving explicit Exa-highlight provenance.
+
+    Requested highlights are extractive provider-native source passages and are
+    tagged so downstream 403 diagnostics can distinguish them from ordinary
+    snippets, summaries, or synthetic test descriptions. If Exa returns no
+    highlights, the historical text/summary fallback remains untagged and can
+    never qualify for the 403 extractive-evidence shadow path.
+    """
+    highlights = item.get("highlights")
+    if isinstance(highlights, list):
+        highlight_text = _clean_values(
+            [value for value in highlights[:5] if isinstance(value, str)]
+        )
+        if highlight_text:
+            return f"{EXA_HIGHLIGHT_DESCRIPTION_PREFIX}{highlight_text}"
+
+    values: list[str] = []
+    text = item.get("text")
+    if isinstance(text, str):
+        values.append(text)
+    summary = item.get("summary")
+    if isinstance(summary, str):
+        values.append(summary)
+    return _clean_values(values)
 
 
 class ExaSearchProvider:
@@ -98,6 +115,7 @@ class ExaSearchProvider:
             "query": clean_query,
             "numResults": count,
             "type": "auto",
+            "contents": {"highlights": True},
         }
         request = Request(
             EXA_SEARCH_ENDPOINT,
