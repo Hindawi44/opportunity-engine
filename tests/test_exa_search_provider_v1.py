@@ -5,7 +5,11 @@ from urllib.error import HTTPError
 
 import pytest
 
-from opportunity_engine.discovery.exa_search import EXA_SEARCH_ENDPOINT, ExaSearchProvider
+from opportunity_engine.discovery.exa_search import (
+    EXA_HIGHLIGHT_DESCRIPTION_PREFIX,
+    EXA_SEARCH_ENDPOINT,
+    ExaSearchProvider,
+)
 
 
 def test_exa_requires_api_key() -> None:
@@ -54,13 +58,36 @@ def test_exa_search_posts_bounded_auto_search_and_normalizes_hits() -> None:
         "query": "deadstock liquidation Europe",
         "numResults": 5,
         "type": "auto",
+        "contents": {"highlights": True},
     }
     assert captured["timeout"] == 7.5
     assert len(hits) == 1
     assert hits[0].title == "Verified liquidation stock lot"
     assert hits[0].url == "https://example.eu/lot/1"
-    assert hits[0].description == "Business closure with remaining inventory for sale."
+    assert hits[0].description == (
+        EXA_HIGHLIGHT_DESCRIPTION_PREFIX
+        + "Business closure with remaining inventory for sale."
+    )
     assert hits[0].provider == "Exa"
+
+
+def test_exa_search_without_highlights_keeps_untagged_historical_context() -> None:
+    def transport(request, timeout):
+        return json.dumps(
+            {
+                "results": [
+                    {
+                        "title": "Fallback context",
+                        "url": "https://example.eu/product/2",
+                        "summary": "Ordinary provider summary, not extractive highlight evidence.",
+                    }
+                ]
+            }
+        ).encode("utf-8")
+
+    hit = ExaSearchProvider("secret", transport=transport).search("stock lot", count=1)[0]
+    assert hit.description == "Ordinary provider summary, not extractive highlight evidence."
+    assert not hit.description.startswith(EXA_HIGHLIGHT_DESCRIPTION_PREFIX)
 
 
 def test_exa_search_validates_query_and_count() -> None:
