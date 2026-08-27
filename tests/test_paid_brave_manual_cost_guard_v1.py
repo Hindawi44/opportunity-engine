@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import json
 from pathlib import Path
+import sys
 
 import pytest
 
 from opportunity_engine.cost_guard import (
-    AUTOMATED_CHECKPOINT_BOUNDED_SOURCE_BUDGETS,
     MANUAL_PAID_BRAVE_BLOCK_REASON,
     ensure_paid_brave_allowed,
     manual_paid_brave_block_reason,
@@ -14,6 +15,7 @@ from opportunity_engine.cost_guard import (
 from opportunity_engine.discovery.brave_market_signal_continuity import (
     collect_manifest_brave_market_signals,
 )
+from scripts import run_market_clothing_inventory_discovery as market_runner
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,30 +52,19 @@ def test_schedule_and_explicit_override_remain_available() -> None:
     )
 
 
-def test_auto_checkpoint_allows_only_existing_bounded_direct_source_budgets() -> None:
-    assert AUTOMATED_CHECKPOINT_BOUNDED_SOURCE_BUDGETS == {
-        ("SE", "blinto"): 8,
-        ("SE", "klaravik"): 8,
-        ("SE", "psauction"): 8,
-        ("DE", "sen-sen"): 6,
-    }
-
-    for (market, source), max_budget in AUTOMATED_CHECKPOINT_BOUNDED_SOURCE_BUDGETS.items():
+def test_auto_checkpoint_blocks_bounded_direct_source_budgets() -> None:
+    for market, source, budget in (
+        ("SE", "blinto", 8),
+        ("SE", "klaravik", 8),
+        ("SE", "psauction", 8),
+        ("DE", "sen-sen", 6),
+    ):
         assert (
             manual_paid_brave_block_reason(
                 AUTOMATED_CHECKPOINT_ENV,
                 market=market,
                 source=source,
-                query_budget=max_budget,
-            )
-            is None
-        )
-        assert (
-            manual_paid_brave_block_reason(
-                AUTOMATED_CHECKPOINT_ENV,
-                market=market,
-                source=source,
-                query_budget=max_budget + 1,
+                query_budget=budget,
             )
             == MANUAL_PAID_BRAVE_BLOCK_REASON
         )
@@ -95,7 +86,7 @@ def test_auto_checkpoint_identity_is_not_a_global_brave_bypass() -> None:
     )
 
 
-def test_manual_actor_stays_blocked_even_for_an_allowed_source_and_budget() -> None:
+def test_manual_actor_stays_blocked_even_for_a_bounded_source_and_budget() -> None:
     env = {**AUTOMATED_CHECKPOINT_ENV, "GITHUB_ACTOR": "Hindawi44"}
     assert (
         manual_paid_brave_block_reason(
@@ -198,6 +189,49 @@ def test_auto_checkpoint_does_not_unlock_brave_radar_without_source_scope(
     assert report["status_counts"] == {"SKIPPED_COST_GUARD": 3}
 
 
+def test_auto_checkpoint_market_runner_emits_zero_cost_valid_zero(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    output_dir = tmp_path / "se-blinto"
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "workflow_dispatch")
+    monkeypatch.setenv("GITHUB_WORKFLOW", "Multi-Market Daily Operator Checkpoint")
+    monkeypatch.setenv("GITHUB_JOB", "operator-read-only-checkpoint")
+    monkeypatch.setenv("GITHUB_ACTOR", "github-actions[bot]")
+    monkeypatch.setenv("BRAVE_SEARCH_API_KEY", "would-be-paid-key")
+    monkeypatch.setattr(
+        market_runner,
+        "select_market_runner",
+        lambda market: (_ for _ in ()).throw(
+            AssertionError("paid market runner must not be selected")
+        ),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_market_clothing_inventory_discovery.py",
+            "--market",
+            "SE",
+            "--source",
+            "blinto",
+            "--query-budget",
+            "8",
+            "--output-dir",
+            str(output_dir),
+        ],
+    )
+
+    assert market_runner.main() == 0
+    report = json.loads((output_dir / "search-run-report.json").read_text())
+    assert report["status"] == "SUCCESS"
+    assert report["cost_guard_status"] == "SKIPPED_COST_GUARD"
+    assert report["paid_brave_requests"] == 0
+    assert report["queries_submitted"] == 0
+    assert json.loads((output_dir / "all-discovered-candidates.json").read_text()) == []
+    assert json.loads((output_dir / "discovery-top5.json").read_text()) == []
+
+
 def test_market_runner_passes_bounded_scope_before_paid_source_selection() -> None:
     script = (ROOT / "scripts/run_market_clothing_inventory_discovery.py").read_text(
         encoding="utf-8"
@@ -208,3 +242,4 @@ def test_market_runner_passes_bounded_scope_before_paid_source_selection() -> No
     assert guard_index < runner_index
     assert "source=paid_scope.source" in script
     assert "query_budget=paid_scope.query_budget" in script
+    assert "Paid Brave requests: 0" in script
