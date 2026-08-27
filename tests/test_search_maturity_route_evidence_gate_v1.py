@@ -93,7 +93,7 @@ def _fabric_report(markets: list[str], *, molton_primary: bool = False) -> dict:
                 "quantity_unit": "lfm",
                 "commercial_evidence_complete": True,
                 "commercial_evidence_normalized": True,
-                "commercial_evidence_pairing_mode": "CONTEXTUAL_PRICE_QUANTITY_PAIR",
+                "commercial_evidence_pairing_mode": "INDEPENDENT_SINGLE_EVIDENCE",
             }
         )
     return {
@@ -164,7 +164,10 @@ def test_gate_declares_mature_only_from_existing_six_market_evidence(tmp_path: P
     assert result["search_engine_v1_mature"] is True
     assert result["blocking_reasons"] == []
     assert result["fabric"]["covered_markets"] == ["DE", "FR", "IT", "NL", "NO", "SE"]
-    assert result["fabric"]["molton_primary_product_proof"]["status"] == "PROVEN"
+    molton = result["fabric"]["molton_primary_product_proof"]
+    assert molton["status"] == "PROVEN"
+    assert molton["observed"][0]["pairing_mode"] == "INDEPENDENT_SINGLE_EVIDENCE"
+    assert molton["observed"][0]["primary_roll_evidence"] is True
     assert result["gate_search_requests_made"] == 0
     assert result["gate_page_fetches_made"] == 0
     assert result["new_runtime_added"] is False
@@ -189,6 +192,7 @@ def test_gate_blocks_molton_cross_sell_accessory_pair(tmp_path: Path) -> None:
 
     assert result["decision"] == "BLOCKED"
     assert "MOLTON_PRIMARY_PRODUCT_EVIDENCE_NOT_PROVEN" in result["blocking_reasons"]
+    assert result["fabric"]["molton_primary_product_proof"]["observed"][0]["primary_roll_evidence"] is False
 
 
 def test_gate_requires_both_fixed_fabric_cohorts(tmp_path: Path) -> None:
