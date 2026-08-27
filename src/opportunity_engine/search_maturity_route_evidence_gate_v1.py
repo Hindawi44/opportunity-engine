@@ -18,6 +18,10 @@ SIX_MARKETS = ("NO", "SE", "DE", "FR", "IT", "NL")
 CORE_MARKETS = ("NO", "SE", "DE")
 EXPANSION_MARKETS = ("FR", "IT", "NL")
 EXPECTED_FABRIC_COHORTS = {frozenset(CORE_MARKETS), frozenset(EXPANSION_MARKETS)}
+_MOLTON_PRIMARY_PAIRING_MODES = {
+    "CONTEXTUAL_PRICE_QUANTITY_PAIR",
+    "INDEPENDENT_SINGLE_EVIDENCE",
+}
 _AUTOMATIC_SAFETY_KEYS = (
     "production_mutation",
     "automatic_query_activation",
@@ -64,6 +68,17 @@ def _contextual_pair_ok(candidate: Mapping[str, Any]) -> bool:
         and candidate.get("commercial_evidence_normalized") is True
         and candidate.get("commercial_evidence_pairing_mode")
         == "CONTEXTUAL_PRICE_QUANTITY_PAIR"
+        and _positive_number(candidate.get("price"))
+        and _positive_number(candidate.get("quantity"))
+    )
+
+
+def _molton_primary_evidence_ok(candidate: Mapping[str, Any]) -> bool:
+    return (
+        candidate.get("commercial_evidence_complete") is True
+        and candidate.get("commercial_evidence_normalized") is True
+        and candidate.get("commercial_evidence_pairing_mode")
+        in _MOLTON_PRIMARY_PAIRING_MODES
         and _positive_number(candidate.get("price"))
         and _positive_number(candidate.get("quantity"))
     )
@@ -168,7 +183,7 @@ def _molton_primary_product_proof(reports: Iterable[Mapping[str, Any]]) -> dict[
             unit = str(row.get("quantity_unit") or "").casefold()
             price = row.get("price")
             primary_roll = (
-                _contextual_pair_ok(row)
+                _molton_primary_evidence_ok(row)
                 and abs(float(quantity or 0) - 30.0) < 1e-9
                 and unit in {"lfm", "laufmeter", "meter", "metre", "m"}
                 and float(price or 0) >= 100.0
