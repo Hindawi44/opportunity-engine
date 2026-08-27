@@ -18,6 +18,14 @@ Transport = Callable[[Request, float], bytes]
 _FRESHNESS_PRESETS = frozenset({"pd", "pw", "pm", "py"})
 _CUSTOM_FRESHNESS = re.compile(r"^(\d{4}-\d{2}-\d{2})to(\d{4}-\d{2}-\d{2})$")
 _COUNTRY_CODE = re.compile(r"^[A-Z]{2}$")
+# A Brave monthly/account usage-limit response cannot recover inside the same
+# process. Once the live transport receives HTTP 402, stop making subsequent
+# network calls and let downstream paths fail fast instead of multiplying waste.
+_USAGE_LIMIT_CIRCUIT_OPEN = False
+_USAGE_LIMIT_CIRCUIT_MESSAGE = (
+    "Brave Search usage limit circuit open after HTTP 402; "
+    "subsequent requests skipped for this process"
+)
 # Exact PS Auction item-ID lookups are verification/status queries, not fresh
 # discovery. Applying a page-age filter can hide the historical item page that
 # proves an already-discovered candidate is ENDED, leaving stale lots unresolved.
@@ -30,6 +38,17 @@ _PSAUCTION_EXACT_ITEM_STATUS_LOOKUP = re.compile(
 def _default_transport(request: Request, timeout: float) -> bytes:
     with urlopen(request, timeout=timeout) as response:  # noqa: S310 - fixed HTTPS API endpoint
         return response.read()
+
+
+def _open_usage_limit_circuit() -> None:
+    global _USAGE_LIMIT_CIRCUIT_OPEN
+    _USAGE_LIMIT_CIRCUIT_OPEN = True
+
+
+def _reset_usage_limit_circuit_for_tests() -> None:
+    """Reset process-local provider state for deterministic isolated tests."""
+    global _USAGE_LIMIT_CIRCUIT_OPEN
+    _USAGE_LIMIT_CIRCUIT_OPEN = False
 
 
 def _http_error_message(exc: HTTPError) -> str:
@@ -122,6 +141,7 @@ class BraveSearchProvider:
             raise ValueError("retry_base_seconds must not be negative")
         self._api_key = token
         self._timeout = timeout
+        self._uses_default_transport = transport is None
         self._transport = transport or _default_transport
         self._max_retries = max_retries
         self._retry_base_seconds = retry_base_seconds
@@ -136,6 +156,8 @@ class BraveSearchProvider:
             raise ValueError("search query must not be empty")
         if not 1 <= count <= 20:
             raise ValueError("count must be between 1 and 20")
+        if self._uses_default_transport and _USAGE_LIMIT_CIRCUIT_OPEN:
+            raise RuntimeError(_USAGE_LIMIT_CIRCUIT_MESSAGE)
 
         # Market intent exists in the selected market query terms. Brave's
         # language parameters are strict enums, so geographic targeting remains
@@ -183,6 +205,8 @@ class BraveSearchProvider:
                         wait_seconds = self._retry_base_seconds * (2**attempt)
                     time.sleep(max(0.0, wait_seconds))
                     continue
+                if exc.code == 402 and self._uses_default_transport:
+                    _open_usage_limit_circuit()
                 raise RuntimeError(_http_error_message(exc)) from exc
             except URLError as exc:
                 raise RuntimeError(f"Brave Search request failed: {exc.reason}") from exc
