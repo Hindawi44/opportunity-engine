@@ -126,12 +126,41 @@ def _pattern_status(pattern: Mapping[str, Any]) -> str:
     return ""
 
 
+def _fabric_source_outcome_patterns(
+    *,
+    market: str,
+    domain: str,
+    slot_id: str,
+    source_patterns: list[Mapping[str, Any]],
+) -> list[Mapping[str, Any]]:
+    """Return only independently-proven verified fabric procurement outcomes.
+
+    Unified Memory V2 already requires at least two independent checkpoint days
+    plus distinct evidence before SOURCE_OUTCOME becomes PROVEN. The portfolio
+    may therefore reuse that proof for the single FABRIC_PROCUREMENT route slot
+    without inventing a parallel search route or hard-coding a supplier domain.
+    """
+    if slot_id != "FABRIC_PROCUREMENT" or domain != FABRIC_PROCUREMENT:
+        return []
+    return [
+        row
+        for row in source_patterns
+        if _upper(row.get("market_code")) == market
+        and _upper(row.get("project_domain")) == FABRIC_PROCUREMENT
+        and _upper(row.get("result_type")) == "FABRIC_PROCUREMENT_ITEM"
+        and _upper(row.get("outcome")) == "VERIFIED_COMMERCIAL_FABRIC_PAGE"
+        and _pattern_status(row) in _PROOF_STATUSES
+    ]
+
+
 def _slot_status(
     *,
     market: str,
     domain: str,
+    slot_id: str,
     plan: Mapping[str, Any],
     patterns: list[Mapping[str, Any]],
+    source_patterns: list[Mapping[str, Any]],
     evidence: list[Mapping[str, Any]],
 ) -> dict[str, Any]:
     pattern_keys = {
@@ -144,7 +173,14 @@ def _slot_status(
         and _upper(row.get("project_domain")) == domain
         and _text(row.get("pattern_key")) in pattern_keys
     ]
-    proof_statuses = [_pattern_status(row) for row in matching_patterns]
+    fabric_source_patterns = _fabric_source_outcome_patterns(
+        market=market,
+        domain=domain,
+        slot_id=slot_id,
+        source_patterns=source_patterns,
+    )
+    proof_patterns = [*matching_patterns, *fabric_source_patterns]
+    proof_statuses = [_pattern_status(row) for row in proof_patterns]
     proof_statuses = [status for status in proof_statuses if status]
     status = (
         max(proof_statuses, key=lambda value: _STATUS_RANK[value])
@@ -189,17 +225,18 @@ def _slot_status(
     return {
         "status": status,
         "tracked_targets": tracked_targets,
-        "proof_pattern_count": len(matching_patterns),
+        "proof_pattern_count": len(proof_patterns),
         "proof_pattern_ids": sorted(
             _text(row.get("pattern_id"))
-            for row in matching_patterns
+            for row in proof_patterns
             if _text(row.get("pattern_id"))
         ),
         "proof_pattern_keys": sorted(
             _text(row.get("pattern_key"))
-            for row in matching_patterns
+            for row in proof_patterns
             if _text(row.get("pattern_key"))
         ),
+        "fabric_source_outcome_proof_count": len(fabric_source_patterns),
         "evidence_observation_count": len(evidence_matches),
         "evidence_ids": sorted(
             _text(row.get("learning_evidence_id"))
@@ -224,6 +261,9 @@ def build_market_route_portfolio_v1(
     evidence = _rows(memory.get("evidence_memory"))
     route_patterns = [
         row for row in patterns if _upper(row.get("pattern_type")) == "ROUTE_SUCCESS"
+    ]
+    source_patterns = [
+        row for row in patterns if _upper(row.get("pattern_type")) == "SOURCE_OUTCOME"
     ]
     slot_defs = {
         _upper(slot.get("slot_id")): dict(slot)
@@ -250,11 +290,17 @@ def build_market_route_portfolio_v1(
             resolved = _slot_status(
                 market=market,
                 domain=domain,
+                slot_id=slot_id,
                 plan=_mapping(market_plan.get(slot_id)),
                 patterns=route_patterns,
+                source_patterns=source_patterns,
                 evidence=evidence,
             )
-            matched_pattern_keys.update(resolved["proof_pattern_keys"])
+            matched_pattern_keys.update(
+                key
+                for key in resolved["proof_pattern_keys"]
+                if key.startswith("ROUTE_SUCCESS|")
+            )
             route_rows.append(
                 {
                     "slot_id": slot_id,
