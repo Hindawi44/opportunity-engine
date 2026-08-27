@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 from typing import Any
 
+from opportunity_engine.cost_guard import manual_paid_brave_block_reason
 from opportunity_engine.discovery.merkandi_b2b_liquidation_feed import (
     collect_merkandi_b2b_liquidation_feed,
 )
@@ -106,16 +107,26 @@ def _targeted_enrichment_enabled() -> bool:
     return value in {"1", "true", "yes", "on"}
 
 
+def _manual_brave_cost_guard_active() -> bool:
+    """Return whether this process must suppress paid Brave on manual runs."""
+    return manual_paid_brave_block_reason(os.environ) is not None
+
+
 def _apply_cost_isolation() -> bool:
-    """Defer paid/model-driven enrichment without weakening daily discovery."""
+    """Defer paid/model-driven enrichment and enforce the manual Brave guard."""
     enabled = _targeted_enrichment_enabled()
-    if enabled:
-        return True
-    os.environ.pop("OPENAI_API_KEY", None)
-    # Keep BRAVE_SEARCH_API_KEY available for daily discovery radars. Setting the
-    # follow-up case budget to zero prevents model-directed Brave searches only.
-    os.environ[_TARGETED_FOLLOWUP_MAX_CASES_ENV] = "0"
-    return False
+    if not enabled:
+        os.environ.pop("OPENAI_API_KEY", None)
+        os.environ[_TARGETED_FOLLOWUP_MAX_CASES_ENV] = "0"
+
+    # The bulletin fans into several Brave-backed side feeds (market radar,
+    # source-gap, bridal, FR/IT/NL discovery and follow-up) inside this one
+    # process. A manual workflow must therefore remove both accepted Brave key
+    # aliases before any of those collectors can initialize a paid provider.
+    if _manual_brave_cost_guard_active():
+        os.environ.pop("BRAVE_SEARCH_API_KEY", None)
+        os.environ.pop("BRAVE_API_KEY", None)
+    return enabled
 
 
 def _load_core_module():
@@ -469,16 +480,19 @@ def _run_daily_b2b_watch(output_dir: Path) -> None:
 
 
 def _attach_cost_isolation_metadata(output_dir: Path, *, targeted_enabled: bool) -> None:
+    manual_brave_guard = _manual_brave_cost_guard_active()
     brief_path = output_dir / "domain-market-intelligence-brief.json"
     brief = _read_json(brief_path)
     if brief is not None:
         brief["cost_isolation"] = {
-            "schema_version": "daily-cost-isolation-1.0",
+            "schema_version": "daily-cost-isolation-1.1",
             "stage": "TARGETED_ENRICHMENT" if targeted_enabled else "CORE_DAILY",
             "targeted_enrichment_enabled": targeted_enabled,
             "openai_hunt_deferred": not targeted_enabled,
-            "targeted_brave_followup_deferred": not targeted_enabled,
-            "daily_brave_discovery_preserved": True,
+            "targeted_brave_followup_deferred": (not targeted_enabled) or manual_brave_guard,
+            "manual_brave_cost_guard_applied": manual_brave_guard,
+            "manual_brave_requests_allowed": not manual_brave_guard,
+            "daily_brave_discovery_preserved": not manual_brave_guard,
             "commercial_analysis_stage": "SEPARATE_MANUAL_WORKFLOW",
         }
         _write_json(brief_path, brief)
@@ -488,6 +502,7 @@ def _attach_cost_isolation_metadata(output_dir: Path, *, targeted_enabled: bool)
             "COST ISOLATION",
             f"stage: {'TARGETED_ENRICHMENT' if targeted_enabled else 'CORE_DAILY'}",
             f"targeted_enrichment_enabled: {str(targeted_enabled).lower()}",
+            f"manual_brave_cost_guard_applied: {str(manual_brave_guard).lower()}",
         ],
     )
 
