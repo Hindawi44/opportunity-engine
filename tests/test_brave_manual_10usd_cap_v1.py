@@ -19,6 +19,7 @@ def _manual_test_env(monkeypatch, tmp_path: Path, *, attempt: str = "1") -> None
     monkeypatch.setenv("GITHUB_RUN_ID", "123456")
     monkeypatch.setenv("OUTPUT_DIR", str(tmp_path))
     monkeypatch.delenv(cost_guard.MANUAL_PAID_BRAVE_OVERRIDE, raising=False)
+    monkeypatch.delenv(cost_guard.PUSH_PAID_BRAVE_OVERRIDE, raising=False)
 
 
 def _success_transport_payload() -> bytes:
@@ -82,6 +83,56 @@ def test_unauthorized_manual_default_transport_is_blocked_before_network(
         ):
             provider.search("France clothing liquidation stock")
         assert calls["count"] == 0
+    finally:
+        brave_search._reset_usage_limit_circuit_for_tests()
+
+
+def test_unauthorized_push_default_transport_is_blocked_before_network(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "push")
+    monkeypatch.setenv("GITHUB_REF_NAME", "main")
+    monkeypatch.setenv("OUTPUT_DIR", str(tmp_path))
+    monkeypatch.delenv(cost_guard.PUSH_PAID_BRAVE_OVERRIDE, raising=False)
+    calls = {"count": 0}
+
+    def transport(request, timeout):
+        calls["count"] += 1
+        return _success_transport_payload()
+
+    brave_search._reset_usage_limit_circuit_for_tests()
+    monkeypatch.setattr(brave_search, "_default_transport", transport)
+    try:
+        provider = brave_search.BraveSearchProvider("secret", max_retries=0)
+        with pytest.raises(
+            RuntimeError,
+            match=cost_guard.PUSH_PAID_BRAVE_BLOCK_REASON,
+        ):
+            provider.search("France clothing liquidation stock")
+        assert calls["count"] == 0
+    finally:
+        brave_search._reset_usage_limit_circuit_for_tests()
+
+
+def test_explicit_push_override_allows_default_transport(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "push")
+    monkeypatch.setenv("GITHUB_REF_NAME", "main")
+    monkeypatch.setenv("OUTPUT_DIR", str(tmp_path))
+    monkeypatch.setenv(cost_guard.PUSH_PAID_BRAVE_OVERRIDE, "true")
+    calls = {"count": 0}
+
+    def transport(request, timeout):
+        calls["count"] += 1
+        return _success_transport_payload()
+
+    brave_search._reset_usage_limit_circuit_for_tests()
+    monkeypatch.setattr(brave_search, "_default_transport", transport)
+    try:
+        provider = brave_search.BraveSearchProvider("secret", max_retries=0)
+        assert len(provider.search("France clothing liquidation stock")) == 1
+        assert calls["count"] == 1
     finally:
         brave_search._reset_usage_limit_circuit_for_tests()
 
