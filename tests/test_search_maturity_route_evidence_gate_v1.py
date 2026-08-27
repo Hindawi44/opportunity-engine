@@ -65,19 +65,20 @@ def _fabric_report(markets: list[str], *, molton_primary: bool = False) -> dict:
                 "accepted_candidate_count": 1,
             }
         )
+    is_core_cohort = set(markets) == {"NO", "SE", "DE"}
     pair_market = markets[0]
     candidates.append(
         {
             "source_country": pair_market,
             "source_name": "example-fabric.test",
             "source_url": f"https://example-fabric.test/{pair_market.lower()}",
-            "price": 6.5,
-            "price_text": "€ 6.50",
-            "quantity": 6.0,
-            "quantity_unit": "meter",
-            "commercial_evidence_complete": True,
-            "commercial_evidence_normalized": True,
-            "commercial_evidence_pairing_mode": "CONTEXTUAL_PRICE_QUANTITY_PAIR",
+            "price": None if is_core_cohort else 6.5,
+            "price_text": None if is_core_cohort else "€ 6.50",
+            "quantity": None if is_core_cohort else 6.0,
+            "quantity_unit": None if is_core_cohort else "meter",
+            "commercial_evidence_complete": not is_core_cohort,
+            "commercial_evidence_normalized": not is_core_cohort,
+            "commercial_evidence_pairing_mode": None if is_core_cohort else "CONTEXTUAL_PRICE_QUANTITY_PAIR",
         }
     )
     if "DE" in markets:
@@ -164,6 +165,9 @@ def test_gate_declares_mature_only_from_existing_six_market_evidence(tmp_path: P
     assert result["search_engine_v1_mature"] is True
     assert result["blocking_reasons"] == []
     assert result["fabric"]["covered_markets"] == ["DE", "FR", "IT", "NL", "NO", "SE"]
+    core_report = next(report for report in result["fabric"]["reports"] if set(report["coverage"]) == {"NO", "SE", "DE"})
+    assert core_report["contextual_pair_markets"] == []
+    assert core_report["complete_price_quantity_markets"] == ["DE"]
     molton = result["fabric"]["molton_primary_product_proof"]
     assert molton["status"] == "PROVEN"
     assert molton["observed"][0]["pairing_mode"] == "INDEPENDENT_SINGLE_EVIDENCE"
