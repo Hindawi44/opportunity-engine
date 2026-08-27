@@ -1,0 +1,18 @@
+{
+  "schema_version": "provider-role-routing-live-proof-v1",
+  "purpose": "LIVE_PROOF_REQUEST",
+  "target_branch": "main",
+  "provider_roles": {
+    "exa": "PRIMARY_SEARCH",
+    "brave": "SECONDARY_SIGNAL_ONLY"
+  },
+  "required_live_path": [
+    "BRAVE_SIGNAL",
+    "EXA_SEARCH",
+    "VERIFICATION",
+    "MULTI_HOP",
+    "EXACT_LOT"
+  ],
+  "commercial_actions_enabled": false,
+  "production_mutation": false
+}
