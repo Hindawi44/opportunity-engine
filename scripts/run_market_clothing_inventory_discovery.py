@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Callable, Sequence
+from datetime import datetime, timezone
+import json
 import os
 from pathlib import Path
 import sys
@@ -16,7 +18,10 @@ for path in (ROOT, SRC):
     if text not in sys.path:
         sys.path.insert(0, text)
 
-from opportunity_engine.cost_guard import ensure_paid_brave_allowed
+from opportunity_engine.cost_guard import (
+    MANUAL_PAID_BRAVE_BLOCK_REASON,
+    ensure_paid_brave_allowed,
+)
 
 
 def select_market_runner(market: str) -> Callable[[], int]:
@@ -61,6 +66,61 @@ def _paid_brave_scope_args(argv: Sequence[str]) -> argparse.Namespace:
     return parsed
 
 
+def _write_zero_cost_blocked_discovery(
+    *,
+    market: str,
+    source: str,
+    query_budget: int,
+    output_dir: str | Path,
+) -> dict[str, Path]:
+    """Write canonical empty discovery inputs without making any paid request."""
+    directory = Path(output_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    discovered_at = datetime.now(timezone.utc).isoformat()
+    normalized_source = str(source or "open-web").strip().upper().replace("-", "_")
+    report = {
+        "status": "SUCCESS",
+        "discovered_at": discovered_at,
+        "domain": "CLOTHING_INVENTORY",
+        "market_code": market.strip().upper(),
+        "source_mode": normalized_source,
+        "queries_submitted": 0,
+        "query_budget": int(query_budget or 0),
+        "top5_count": 0,
+        "cost_guard_status": "SKIPPED_COST_GUARD",
+        "cost_guard_reason": MANUAL_PAID_BRAVE_BLOCK_REASON,
+        "paid_brave_requests": 0,
+        "currency_conversion_performed": False,
+        "tax_calculation_performed": False,
+        "customs_calculation_performed": False,
+        "logistics_calculation_performed": False,
+    }
+    payloads = {
+        "search-run-report.json": report,
+        "all-discovered-candidates.json": [],
+        "discovery-top5.json": [],
+    }
+    paths: dict[str, Path] = {}
+    for filename, payload in payloads.items():
+        path = directory / filename
+        path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        paths[filename] = path
+    summary = directory / "operator-summary.txt"
+    summary.write_text(
+        "Status: VALID_ZERO_COST_GUARD\n"
+        f"Market: {market.strip().upper()}\n"
+        f"Source: {normalized_source}\n"
+        "Paid Brave requests: 0\n"
+        f"Reason: {MANUAL_PAID_BRAVE_BLOCK_REASON}\n",
+        encoding="utf-8",
+    )
+    paths["operator-summary.txt"] = summary
+    return paths
+
+
 def _write_post_persistence_report(
     *,
     database_url: str,
@@ -96,19 +156,36 @@ def main() -> int:
     selector.add_argument("--market", choices=("NO", "SE", "DE"), default="NO")
     selected, remaining = selector.parse_known_args()
     paid_scope = _paid_brave_scope_args(remaining)
+    persistence = _persistence_output_args(remaining)
 
-    # Manual GitHub workflow runs remain zero-cost by default. The cost guard may
-    # allow only one already-bounded direct-source scope when this process belongs
-    # to the repository's auto-dispatched operator checkpoint. All other callers
-    # and any budget above the existing cap still fail closed.
-    ensure_paid_brave_allowed(
-        market=selected.market,
-        source=paid_scope.source,
-        query_budget=paid_scope.query_budget,
-    )
+    # workflow_dispatch executions, including bot-triggered merge/live-proof runs,
+    # are zero-cost by default. Scheduled production runs remain paid-capable.
+    try:
+        ensure_paid_brave_allowed(
+            market=selected.market,
+            source=paid_scope.source,
+            query_budget=paid_scope.query_budget,
+        )
+    except RuntimeError as exc:
+        if MANUAL_PAID_BRAVE_BLOCK_REASON not in str(exc):
+            raise
+        paths = _write_zero_cost_blocked_discovery(
+            market=selected.market,
+            source=paid_scope.source,
+            query_budget=paid_scope.query_budget,
+            output_dir=persistence.output_dir,
+        )
+        print("Status: VALID_ZERO_COST_GUARD")
+        print(f"Market: {selected.market}")
+        print(f"Source: {paid_scope.source or 'open-web'}")
+        print("Queries: 0")
+        print("Top opportunities: 0")
+        print("Paid Brave requests: 0")
+        for name, path in paths.items():
+            print(f"{name}: {path}")
+        return 0
 
     runner = select_market_runner(selected.market)
-    persistence = _persistence_output_args(remaining)
     sys.argv = [sys.argv[0], *remaining]
     exit_code = runner()
     if exit_code != 0 or not persistence.persist_unified:
