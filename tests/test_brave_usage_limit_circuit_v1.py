@@ -5,6 +5,7 @@ from urllib.error import HTTPError
 
 import pytest
 
+import opportunity_engine.cost_guard as cost_guard
 import opportunity_engine.discovery.brave_search as brave_search
 from opportunity_engine.discovery.search_provider import SearchHit
 
@@ -37,6 +38,10 @@ def test_live_402_opens_process_circuit_and_skips_later_network_calls(monkeypatc
         calls["count"] += 1
         raise _usage_limit_error()
 
+    # This test intentionally exercises the default transport. CI itself runs
+    # under a GitHub push event, which is fail-closed by the paid-search guard,
+    # so explicitly authorize only this simulated transport test.
+    monkeypatch.setenv(cost_guard.PUSH_PAID_BRAVE_OVERRIDE, "true")
     brave_search._reset_usage_limit_circuit_for_tests()
     monkeypatch.setattr(brave_search, "_default_transport", capped_transport)
     try:
