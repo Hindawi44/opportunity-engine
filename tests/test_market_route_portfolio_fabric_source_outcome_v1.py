@@ -97,6 +97,7 @@ def test_proven_verified_fabric_source_outcome_counts_as_fabric_route_proof() ->
 
     assert route["status"] == "PROVEN"
     assert route["fabric_source_outcome_proof_count"] == 1
+    assert route["fabric_source_outcome_pending_proof_count"] == 0
     assert route["proof_pattern_ids"] == ["fabric-source-proof"]
     assert france["proven_fabric_procurement_route_family_count"] == 1
     assert "FABRIC_PROCUREMENT:0/1" not in france["next_priority_gaps"]
@@ -104,7 +105,7 @@ def test_proven_verified_fabric_source_outcome_counts_as_fabric_route_proof() ->
     assert portfolio["automatic_purchase"] is False
 
 
-def test_repeated_fabric_source_outcome_does_not_fake_route_proof() -> None:
+def test_repeated_fabric_source_outcome_is_candidate_but_does_not_fake_route_proof() -> None:
     portfolio = build_market_route_portfolio_v1(
         unified_memory=_memory("REPEATED"),
         config=_config(),
@@ -112,13 +113,30 @@ def test_repeated_fabric_source_outcome_does_not_fake_route_proof() -> None:
     france = portfolio["markets"][0]
     route = _fabric_route(portfolio)
 
-    assert route["status"] == "GAP"
+    assert route["status"] == "CANDIDATE"
     assert route["fabric_source_outcome_proof_count"] == 0
+    assert route["fabric_source_outcome_pending_proof_count"] == 1
+    assert route["fabric_source_outcome_pending_pattern_ids"] == ["fabric-source-proof"]
     assert france["proven_fabric_procurement_route_family_count"] == 0
     assert "FABRIC_PROCUREMENT:0/1" in france["next_priority_gaps"]
 
 
-def test_out_of_domain_source_outcome_cannot_prove_fabric_route() -> None:
+def test_observed_fabric_source_outcome_is_candidate_pending_independent_proof() -> None:
+    portfolio = build_market_route_portfolio_v1(
+        unified_memory=_memory("OBSERVED"),
+        config=_config(),
+    )
+    france = portfolio["markets"][0]
+    route = _fabric_route(portfolio)
+
+    assert route["status"] == "CANDIDATE"
+    assert route["fabric_source_outcome_proof_count"] == 0
+    assert route["fabric_source_outcome_pending_proof_count"] == 1
+    assert france["proven_fabric_procurement_route_family_count"] == 0
+    assert "FABRIC_PROCUREMENT:0/1" in france["next_priority_gaps"]
+
+
+def test_out_of_domain_source_outcome_cannot_prove_or_seed_fabric_route() -> None:
     portfolio = build_market_route_portfolio_v1(
         unified_memory=_memory("PROVEN", project_domain="CLOTHING_INVENTORY"),
         config=_config(),
@@ -127,3 +145,4 @@ def test_out_of_domain_source_outcome_cannot_prove_fabric_route() -> None:
 
     assert route["status"] == "GAP"
     assert route["fabric_source_outcome_proof_count"] == 0
+    assert route["fabric_source_outcome_pending_proof_count"] == 0

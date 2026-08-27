@@ -17,6 +17,7 @@ DEFAULT_CONFIG_PATH = Path("config/learning/market-route-portfolio-v1.json")
 
 _ALLOWED_DOMAINS = {CLOTHING_INVENTORY, FABRIC_PROCUREMENT}
 _PROOF_STATUSES = {"PROVEN", "FIXED_RULE_ACTIVE"}
+_PENDING_FABRIC_SOURCE_STATUSES = {"OBSERVED", "REPEATED", "CANDIDATE"}
 _STATUS_RANK = {
     "GAP": 0,
     "TRACKED_NO_ROUTE_PROOF": 1,
@@ -133,12 +134,14 @@ def _fabric_source_outcome_patterns(
     slot_id: str,
     source_patterns: list[Mapping[str, Any]],
 ) -> list[Mapping[str, Any]]:
-    """Return only independently-proven verified fabric procurement outcomes.
+    """Return verified fabric-procurement source outcomes at any proof maturity.
 
-    Unified Memory V2 already requires at least two independent checkpoint days
-    plus distinct evidence before SOURCE_OUTCOME becomes PROVEN. The portfolio
-    may therefore reuse that proof for the single FABRIC_PROCUREMENT route slot
-    without inventing a parallel search route or hard-coding a supplier domain.
+    Unified Memory V2 remains authoritative for whether a SOURCE_OUTCOME is
+    OBSERVED, REPEATED, or PROVEN. The portfolio may recognize an exact-shape
+    unproven outcome as a pending route candidate, but only a PROVEN outcome may
+    satisfy the FABRIC_PROCUREMENT completion gate. This prevents an already
+    discovered verified route from being mislabeled as a novel GAP while keeping
+    the independent-proof requirement unchanged.
     """
     if slot_id != "FABRIC_PROCUREMENT" or domain != FABRIC_PROCUREMENT:
         return []
@@ -149,7 +152,6 @@ def _fabric_source_outcome_patterns(
         and _upper(row.get("project_domain")) == FABRIC_PROCUREMENT
         and _upper(row.get("result_type")) == "FABRIC_PROCUREMENT_ITEM"
         and _upper(row.get("outcome")) == "VERIFIED_COMMERCIAL_FABRIC_PAGE"
-        and _pattern_status(row) in _PROOF_STATUSES
     ]
 
 
@@ -173,12 +175,22 @@ def _slot_status(
         and _upper(row.get("project_domain")) == domain
         and _text(row.get("pattern_key")) in pattern_keys
     ]
-    fabric_source_patterns = _fabric_source_outcome_patterns(
+    all_fabric_source_patterns = _fabric_source_outcome_patterns(
         market=market,
         domain=domain,
         slot_id=slot_id,
         source_patterns=source_patterns,
     )
+    fabric_source_patterns = [
+        row
+        for row in all_fabric_source_patterns
+        if _pattern_status(row) in _PROOF_STATUSES
+    ]
+    pending_fabric_source_patterns = [
+        row
+        for row in all_fabric_source_patterns
+        if _upper(row.get("pattern_status")) in _PENDING_FABRIC_SOURCE_STATUSES
+    ]
     proof_patterns = [*matching_patterns, *fabric_source_patterns]
     proof_statuses = [_pattern_status(row) for row in proof_patterns]
     proof_statuses = [status for status in proof_statuses if status]
@@ -215,7 +227,9 @@ def _slot_status(
         _text(item) for item in plan.get("tracked_targets") or [] if _text(item)
     ]
     if not status:
-        if evidence_matches:
+        if pending_fabric_source_patterns:
+            status = "CANDIDATE"
+        elif evidence_matches:
             status = "OBSERVED_NO_ROUTE_PROOF"
         elif tracked_targets:
             status = "TRACKED_NO_ROUTE_PROOF"
@@ -237,6 +251,12 @@ def _slot_status(
             if _text(row.get("pattern_key"))
         ),
         "fabric_source_outcome_proof_count": len(fabric_source_patterns),
+        "fabric_source_outcome_pending_proof_count": len(pending_fabric_source_patterns),
+        "fabric_source_outcome_pending_pattern_ids": sorted(
+            _text(row.get("pattern_id"))
+            for row in pending_fabric_source_patterns
+            if _text(row.get("pattern_id"))
+        ),
         "evidence_observation_count": len(evidence_matches),
         "evidence_ids": sorted(
             _text(row.get("learning_evidence_id"))
