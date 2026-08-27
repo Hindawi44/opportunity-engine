@@ -73,18 +73,26 @@ def _manual_bounded_test_branch_allowed(env: Mapping[str, str]) -> bool:
 def manual_paid_brave_incremental_budget(
     environment: Mapping[str, str] | None = None,
 ) -> dict[str, Any] | None:
-    """Return the fixed $10 manual-run budget when paid Brave is explicitly enabled.
+    """Return the fixed $10 manual-run budget or fail closed before transport.
 
     The budget applies only to workflow_dispatch executions that are intentionally
     paid: either the explicit override or the dedicated first-attempt comparison
     branch. Scheduled runs are not part of this one-shot test budget.
+
+    This function is also called immediately before every default Brave transport
+    attempt. Therefore an unauthorized workflow_dispatch must raise here rather
+    than return ``None``; otherwise a caller that forgot the higher-level guard
+    could still leak paid requests.
     """
     env = _environment(environment)
     event_name = str(env.get("GITHUB_EVENT_NAME") or "").strip().casefold()
     if event_name != "workflow_dispatch":
         return None
     if not (_manual_override_enabled(env) or _manual_bounded_test_branch_allowed(env)):
-        return None
+        raise RuntimeError(
+            f"{MANUAL_PAID_BRAVE_BLOCK_REASON}: manual GitHub runs are zero-cost by default; "
+            f"set {MANUAL_PAID_BRAVE_OVERRIDE}=true only for an intentional paid run"
+        )
     return {
         "budget_id": MANUAL_PAID_BRAVE_TEST_BUDGET_ID,
         "max_requests": MANUAL_PAID_BRAVE_TEST_MAX_REQUESTS,
