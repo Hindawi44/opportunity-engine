@@ -1,0 +1,107 @@
+name: Brave Exa Controlled Comparison Temp
+
+on:
+  push:
+    branches:
+      - brave-paid-10usd-test-v1
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      OUTPUT_DIR: artifacts/brave-exa-controlled-comparison
+
+    steps:
+      - name: Check out dedicated test branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Enforce branch and request ceiling
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "brave-paid-10usd-test-v1"
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          test -n "$BRAVE_SEARCH_API_KEY"
+          test -n "$EXA_API_KEY"
+          echo "This comparison issues exactly 12 logical Brave searches total: 6 discovery + 6 exact-lot."
+          echo "Even with the provider's maximum 3 retries, worst-case outbound attempts are 48."
+          echo "At the observed $0.005/request economics, that is about $0.24, far below the approved $10 ceiling."
+
+      - name: Run six-market discovery comparison
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_exa_brave_shadow_benchmark.py \
+            --output "$OUTPUT_DIR/discovery.json" \
+            --markets NO,SE,DE,FR,IT,NL \
+            --results-per-query 5 \
+            --provider-mode both \
+            --query-mode discovery
+
+      - name: Run six-market exact-lot comparison
+        run: |
+          python scripts/run_exa_brave_shadow_benchmark.py \
+            --output "$OUTPUT_DIR/exact-lot.json" \
+            --markets NO,SE,DE,FR,IT,NL \
+            --results-per-query 5 \
+            --provider-mode both \
+            --query-mode exact_lot
+
+      - name: Build compact comparison summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/brave-exa-controlled-comparison")
+          output = {
+              "schema_version": "brave-exa-controlled-comparison-temp-1.0",
+              "markets": ["NO", "SE", "DE", "FR", "IT", "NL"],
+              "observed_brave_unit_cost_usd": 0.005,
+              "approved_incremental_brave_ceiling_usd": 10.0,
+              "logical_brave_request_ceiling": 12,
+              "worst_case_brave_outbound_attempts_with_retries": 48,
+              "worst_case_estimated_brave_cost_at_observed_rate_usd": 0.24,
+              "modes": {},
+          }
+          for name, file_name in (("discovery", "discovery.json"), ("exact_lot", "exact-lot.json")):
+              report = json.loads((root / file_name).read_text(encoding="utf-8"))
+              rows = report.get("market_results") or []
+              mode = {
+                  "exa_requests": report.get("exa_request_count", 0),
+                  "brave_requests": report.get("brave_request_count", 0),
+                  "exa_results": sum(int((row.get("exa") or {}).get("result_count") or 0) for row in rows),
+                  "brave_results": sum(int((row.get("brave") or {}).get("result_count") or 0) for row in rows),
+                  "exa_unique_domains": sum(int((row.get("exa") or {}).get("unique_domain_count") or 0) for row in rows),
+                  "brave_unique_domains": sum(int((row.get("brave") or {}).get("unique_domain_count") or 0) for row in rows),
+                  "shared_urls": sum(int((row.get("comparison") or {}).get("shared_url_count") or 0) for row in rows),
+                  "exa_unique_urls": sum(int((row.get("comparison") or {}).get("exa_unique_url_count") or 0) for row in rows),
+                  "brave_unique_urls": sum(int((row.get("comparison") or {}).get("brave_unique_url_count") or 0) for row in rows),
+              }
+              output["modes"][name] = mode
+          (root / "summary.json").write_text(json.dumps(output, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(json.dumps(output, ensure_ascii=False, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload controlled comparison evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brave-exa-controlled-comparison
+          path: artifacts/brave-exa-controlled-comparison/
+          if-no-files-found: error
+          retention-days: 7
