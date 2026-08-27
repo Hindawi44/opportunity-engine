@@ -1,1 +1,216 @@
-{"schema_version":"market-route-portfolio-1.0","purpose":"Prevent a market from being treated as route-complete because one source or one proven route works.","markets":["NO","SE","DE","FR","NL","IT"],"completion_gate":{"minimum_proven_clothing_commercial_route_families":2,"minimum_proven_fabric_procurement_route_families":1,"unclassified_route_patterns_must_be_zero":true},"route_slots":[{"slot_id":"AUCTION","axis":"COMMERCIAL_ROUTE","project_domain":"CLOTHING_INVENTORY"},{"slot_id":"DIRECT_INVENTORY","axis":"COMMERCIAL_ROUTE","project_domain":"CLOTHING_INVENTORY"},{"slot_id":"LIQUIDATION_BANKRUPTCY","axis":"COMMERCIAL_ROUTE","project_domain":"CLOTHING_INVENTORY"},{"slot_id":"WHOLESALE_STOCK_LOTS","axis":"COMMERCIAL_ROUTE","project_domain":"CLOTHING_INVENTORY"},{"slot_id":"FABRIC_PROCUREMENT","axis":"COMMERCIAL_ROUTE","project_domain":"FABRIC_PROCUREMENT"},{"slot_id":"SEARCH_PROVIDER_ROUTE","axis":"DISCOVERY_CHANNEL","project_domain":"CLOTHING_INVENTORY"}],"market_routes":{"NO":{"AUCTION":{"tracked_targets":["Auksjonen.no"],"pattern_keys":["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|direct_public_source|PUBLIC_CATEGORY_TO_EXACT_ITEM|auksjonen.no","ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"],"evidence_source_terms":["Auksjonen.no","auksjonen.no"]},"DIRECT_INVENTORY":{"tracked_targets":["FINN saved-search email"],"evidence_source_terms":["FINN saved-search email"],"pattern_keys":["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]},"LIQUIDATION_BANKRUPTCY":{"tracked_targets":["Konkurs.app","Norway cross-source verification"],"pattern_keys":["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]},"WHOLESALE_STOCK_LOTS":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]},"FABRIC_PROCUREMENT":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|NO|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]},"SEARCH_PROVIDER_ROUTE":{"tracked_targets":["Exa","Brave Search"],"evidence_source_terms":["Brave Search"],"pattern_keys":["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]}},"SE":{"AUCTION":{"tracked_targets":["Blinto","Klaravik","PS Auction"],"evidence_source_terms":["Blinto","Klaravik","PS Auction"],"pattern_keys":["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]},"DIRECT_INVENTORY":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]},"LIQUIDATION_BANKRUPTCY":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]},"WHOLESALE_STOCK_LOTS":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]},"FABRIC_PROCUREMENT":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|SE|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]},"SEARCH_PROVIDER_ROUTE":{"tracked_targets":["Exa","Brave Search"],"evidence_source_terms":["Brave Search"],"pattern_keys":["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]}},"DE":{"AUCTION":{"tracked_targets":["Riegermann","VENTA Industrieversteigerungen","Deutsche Pfandverwertung"],"evidence_source_terms":["Riegermann","VENTA","Deutsche Pfandverwertung"],"pattern_keys":["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]},"DIRECT_INVENTORY":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]},"LIQUIDATION_BANKRUPTCY":{"tracked_targets":["Sen & Sen"],"pattern_keys":["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]},"WHOLESALE_STOCK_LOTS":{"tracked_targets":["Sen & Sen"],"pattern_keys":["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]},"FABRIC_PROCUREMENT":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|DE|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]},"SEARCH_PROVIDER_ROUTE":{"tracked_targets":["Exa","Brave Search"],"evidence_source_terms":["Brave Search"],"pattern_keys":["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]}},"FR":{"AUCTION":{"tracked_targets":["Interencheres"],"evidence_source_terms":["Interencheres"],"pattern_keys":["ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]},"DIRECT_INVENTORY":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]},"LIQUIDATION_BANKRUPTCY":{"tracked_targets":["BODACC"],"evidence_source_terms":["BODACC"],"pattern_keys":["ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]},"WHOLESALE_STOCK_LOTS":{"tracked_targets":["Friptadium"],"pattern_keys":["ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|friptadium.com","ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"],"evidence_source_terms":["friptadium.com"]},"FABRIC_PROCUREMENT":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|FR|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]},"SEARCH_PROVIDER_ROUTE":{"tracked_targets":["Exa","Brave Search"],"pattern_keys":["ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|friptadium.com","ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"],"evidence_source_terms":["friptadium.com"]}},"NL":{"AUCTION":{"tracked_targets":["veiling.belastingdienst.nl"],"pattern_keys":["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]},"DIRECT_INVENTORY":{"tracked_targets":["BUSINESS_CLOSURE","BRIDAL_LIQUIDATION"],"pattern_keys":["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]},"LIQUIDATION_BANKRUPTCY":{"tracked_targets":["insolventies.rechtspraak.nl","INSOLVENCY_LIQUIDATION"],"pattern_keys":["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]},"WHOLESALE_STOCK_LOTS":{"tracked_targets":["STOCKLOT_WHOLESALE","WAREHOUSE_CLEARANCE"],"pattern_keys":["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]},"FABRIC_PROCUREMENT":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|NL|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]},"SEARCH_PROVIDER_ROUTE":{"tracked_targets":["Brave Search"],"pattern_keys":["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]}},"IT":{"AUCTION":{"tracked_targets":["pvp.giustizia.it","AUCTION_LOTS"],"pattern_keys":["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]},"DIRECT_INVENTORY":{"tracked_targets":["BUSINESS_CLOSURE","BRIDAL_LIQUIDATION"],"pattern_keys":["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]},"LIQUIDATION_BANKRUPTCY":{"tracked_targets":["INSOLVENCY_LIQUIDATION"],"pattern_keys":["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]},"WHOLESALE_STOCK_LOTS":{"tracked_targets":["STOCKLOT_WHOLESALE","WAREHOUSE_CLEARANCE"],"pattern_keys":["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]},"FABRIC_PROCUREMENT":{"tracked_targets":[],"pattern_keys":["ROUTE_SUCCESS|IT|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]},"SEARCH_PROVIDER_ROUTE":{"tracked_targets":["Brave Search"],"pattern_keys":["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]}}},"project_domain_gate_enforced":true,"automatic_query_activation":false,"automatic_provider_activation":false,"automatic_source_promotion":false,"automatic_code_change":false,"production_query_mutation":false,"production_mutation":false,"automatic_contact":false,"automatic_bid":false,"automatic_reservation":false,"automatic_purchase":false,"automatic_payment":false}
+{
+  "schema_version": "market-route-portfolio-1.0",
+  "purpose": "Prevent a market from being treated as route-complete because one source or one proven route works.",
+  "markets": ["NO", "SE", "DE", "FR", "NL", "IT"],
+  "completion_gate": {
+    "minimum_proven_clothing_commercial_route_families": 2,
+    "minimum_proven_fabric_procurement_route_families": 1,
+    "unclassified_route_patterns_must_be_zero": true
+  },
+  "route_slots": [
+    {"slot_id": "AUCTION", "axis": "COMMERCIAL_ROUTE", "project_domain": "CLOTHING_INVENTORY"},
+    {"slot_id": "DIRECT_INVENTORY", "axis": "COMMERCIAL_ROUTE", "project_domain": "CLOTHING_INVENTORY"},
+    {"slot_id": "LIQUIDATION_BANKRUPTCY", "axis": "COMMERCIAL_ROUTE", "project_domain": "CLOTHING_INVENTORY"},
+    {"slot_id": "WHOLESALE_STOCK_LOTS", "axis": "COMMERCIAL_ROUTE", "project_domain": "CLOTHING_INVENTORY"},
+    {"slot_id": "FABRIC_PROCUREMENT", "axis": "COMMERCIAL_ROUTE", "project_domain": "FABRIC_PROCUREMENT"},
+    {"slot_id": "SEARCH_PROVIDER_ROUTE", "axis": "DISCOVERY_CHANNEL", "project_domain": "CLOTHING_INVENTORY"}
+  ],
+  "market_routes": {
+    "NO": {
+      "AUCTION": {
+        "tracked_targets": ["Auksjonen.no"],
+        "pattern_keys": [
+          "ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|direct_public_source|PUBLIC_CATEGORY_TO_EXACT_ITEM|auksjonen.no",
+          "ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"
+        ],
+        "evidence_source_terms": ["Auksjonen.no", "auksjonen.no"]
+      },
+      "DIRECT_INVENTORY": {
+        "tracked_targets": ["FINN saved-search email"],
+        "evidence_source_terms": ["FINN saved-search email"],
+        "pattern_keys": ["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]
+      },
+      "LIQUIDATION_BANKRUPTCY": {
+        "tracked_targets": ["Konkurs.app", "Norway cross-source verification"],
+        "pattern_keys": ["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]
+      },
+      "WHOLESALE_STOCK_LOTS": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]
+      },
+      "FABRIC_PROCUREMENT": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|NO|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]
+      },
+      "SEARCH_PROVIDER_ROUTE": {
+        "tracked_targets": ["Exa", "Brave Search"],
+        "evidence_source_terms": ["Brave Search"],
+        "pattern_keys": ["ROUTE_SUCCESS|NO|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]
+      }
+    },
+    "SE": {
+      "AUCTION": {
+        "tracked_targets": ["Blinto", "Klaravik", "PS Auction"],
+        "evidence_source_terms": ["Blinto", "Klaravik", "PS Auction"],
+        "pattern_keys": ["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]
+      },
+      "DIRECT_INVENTORY": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]
+      },
+      "LIQUIDATION_BANKRUPTCY": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]
+      },
+      "WHOLESALE_STOCK_LOTS": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]
+      },
+      "FABRIC_PROCUREMENT": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|SE|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]
+      },
+      "SEARCH_PROVIDER_ROUTE": {
+        "tracked_targets": ["Exa", "Brave Search"],
+        "evidence_source_terms": ["Brave Search"],
+        "pattern_keys": ["ROUTE_SUCCESS|SE|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]
+      }
+    },
+    "DE": {
+      "AUCTION": {
+        "tracked_targets": ["Riegermann", "VENTA Industrieversteigerungen", "Deutsche Pfandverwertung"],
+        "evidence_source_terms": ["Riegermann", "VENTA", "Deutsche Pfandverwertung"],
+        "pattern_keys": ["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]
+      },
+      "DIRECT_INVENTORY": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]
+      },
+      "LIQUIDATION_BANKRUPTCY": {
+        "tracked_targets": ["Sen & Sen"],
+        "pattern_keys": ["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]
+      },
+      "WHOLESALE_STOCK_LOTS": {
+        "tracked_targets": ["Sen & Sen"],
+        "pattern_keys": ["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]
+      },
+      "FABRIC_PROCUREMENT": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|DE|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]
+      },
+      "SEARCH_PROVIDER_ROUTE": {
+        "tracked_targets": ["Exa", "Brave Search"],
+        "evidence_source_terms": ["Brave Search"],
+        "pattern_keys": ["ROUTE_SUCCESS|DE|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]
+      }
+    },
+    "FR": {
+      "AUCTION": {
+        "tracked_targets": ["Interencheres"],
+        "evidence_source_terms": ["Interencheres"],
+        "pattern_keys": ["ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]
+      },
+      "DIRECT_INVENTORY": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]
+      },
+      "LIQUIDATION_BANKRUPTCY": {
+        "tracked_targets": ["BODACC"],
+        "evidence_source_terms": ["BODACC"],
+        "pattern_keys": ["ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]
+      },
+      "WHOLESALE_STOCK_LOTS": {
+        "tracked_targets": ["Friptadium", "Vinqa Grossiste", "Stocklots24 France", "SDPIE", "Destockplus"],
+        "pattern_keys": [
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|friptadium.com",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|vinqa-grossiste.com",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|www.destockplus.com",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|www.sdpie.com",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|DIRECT_RESULT|stocklots24.fr",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"
+        ],
+        "evidence_source_terms": ["friptadium.com", "vinqa-grossiste.com", "destockplus.com", "sdpie.com", "stocklots24.fr"]
+      },
+      "FABRIC_PROCUREMENT": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|FR|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]
+      },
+      "SEARCH_PROVIDER_ROUTE": {
+        "tracked_targets": ["Exa", "Brave Search"],
+        "pattern_keys": [
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|friptadium.com",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|vinqa-grossiste.com",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|www.destockplus.com",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|AGGREGATE_CHILD|www.sdpie.com",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|DIRECT_RESULT|stocklots24.fr",
+          "ROUTE_SUCCESS|FR|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"
+        ],
+        "evidence_source_terms": ["friptadium.com", "vinqa-grossiste.com", "destockplus.com", "sdpie.com", "stocklots24.fr"]
+      }
+    },
+    "NL": {
+      "AUCTION": {
+        "tracked_targets": ["veiling.belastingdienst.nl"],
+        "pattern_keys": ["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]
+      },
+      "DIRECT_INVENTORY": {
+        "tracked_targets": ["BUSINESS_CLOSURE", "BRIDAL_LIQUIDATION"],
+        "pattern_keys": ["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]
+      },
+      "LIQUIDATION_BANKRUPTCY": {
+        "tracked_targets": ["insolventies.rechtspraak.nl", "INSOLVENCY_LIQUIDATION"],
+        "pattern_keys": ["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]
+      },
+      "WHOLESALE_STOCK_LOTS": {
+        "tracked_targets": ["STOCKLOT_WHOLESALE", "WAREHOUSE_CLEARANCE"],
+        "pattern_keys": ["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]
+      },
+      "FABRIC_PROCUREMENT": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|NL|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]
+      },
+      "SEARCH_PROVIDER_ROUTE": {
+        "tracked_targets": ["Brave Search"],
+        "pattern_keys": ["ROUTE_SUCCESS|NL|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]
+      }
+    },
+    "IT": {
+      "AUCTION": {
+        "tracked_targets": ["pvp.giustizia.it", "AUCTION_LOTS"],
+        "pattern_keys": ["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_AUCTION|search-experiment:auction"]
+      },
+      "DIRECT_INVENTORY": {
+        "tracked_targets": ["BUSINESS_CLOSURE", "BRIDAL_LIQUIDATION"],
+        "pattern_keys": ["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_DIRECT_INVENTORY|search-experiment:direct_inventory"]
+      },
+      "LIQUIDATION_BANKRUPTCY": {
+        "tracked_targets": ["INSOLVENCY_LIQUIDATION"],
+        "pattern_keys": ["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_LIQUIDATION_BANKRUPTCY|search-experiment:liquidation_bankruptcy"]
+      },
+      "WHOLESALE_STOCK_LOTS": {
+        "tracked_targets": ["STOCKLOT_WHOLESALE", "WAREHOUSE_CLEARANCE"],
+        "pattern_keys": ["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_EXPERIMENT_WHOLESALE_STOCK_LOTS|search-experiment:wholesale_stock_lots"]
+      },
+      "FABRIC_PROCUREMENT": {
+        "tracked_targets": [],
+        "pattern_keys": ["ROUTE_SUCCESS|IT|FABRIC_PROCUREMENT|exa|SEARCH_TO_FABRIC_COMMERCIAL_PAGE|search-experiment:fabric_procurement"]
+      },
+      "SEARCH_PROVIDER_ROUTE": {
+        "tracked_targets": ["Brave Search"],
+        "pattern_keys": ["ROUTE_SUCCESS|IT|CLOTHING_INVENTORY|exa|SEARCH_PROVIDER_EXACT_LOT|search-experiment:search_provider_route"]
+      }
+    }
+  },
+  "project_domain_gate_enforced": true,
+  "automatic_query_activation": false,
+  "automatic_provider_activation": false,
+  "automatic_source_promotion": false,
+  "automatic_code_change": false,
+  "production_query_mutation": false,
+  "production_mutation": false,
+  "automatic_contact": false,
+  "automatic_bid": false,
+  "automatic_reservation": false,
+  "automatic_purchase": false,
+  "automatic_payment": false
+}
