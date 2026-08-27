@@ -226,13 +226,15 @@ def apply_route_attribution_gate(
     fetch_attempts = 0
     fetch_successes = 0
 
-    for index, url in enumerate(original_urls):
+    for url in original_urls:
         if fetch_attempts >= max_page_fetches:
             reason = "ATTRIBUTION_FETCH_CAP_REACHED"
             rejection_reasons[reason] += 1
             audit.append(
                 {
                     "url": url,
+                    "result_domain": _domain(url) or None,
+                    "project_domain": domain,
                     "fetch_ok": False,
                     "detected_route_family": None,
                     "verification_decision": "REJECT",
@@ -245,6 +247,7 @@ def apply_route_attribution_gate(
         fetch_attempts += 1
         fetched = page_fetcher(url)
         final_url = _text(fetched.final_url or url)
+        result_domain = _domain(final_url) or None
         if not fetched.ok:
             reason = "FETCH_FAILED"
             rejection_reasons[reason] += 1
@@ -252,6 +255,8 @@ def apply_route_attribution_gate(
                 {
                     "url": url,
                     "final_url": final_url,
+                    "result_domain": result_domain,
+                    "project_domain": domain,
                     "fetch_ok": False,
                     "status_code": fetched.status_code,
                     "fetch_error": _text(fetched.error) or None,
@@ -274,14 +279,15 @@ def apply_route_attribution_gate(
             rejection_reasons[reason] += 1
         if accepted and final_url not in accepted_urls:
             accepted_urls.append(final_url)
-            host = _domain(final_url)
-            if host:
-                accepted_domains.add(host)
+            if result_domain:
+                accepted_domains.add(result_domain)
 
         audit.append(
             {
                 "url": url,
                 "final_url": final_url,
+                "result_domain": result_domain,
+                "project_domain": domain,
                 "title": _text(fetched.title)[:500] or None,
                 "fetch_ok": True,
                 "status_code": fetched.status_code,
@@ -315,6 +321,9 @@ def apply_route_attribution_gate(
             "route_attribution_rejected_count": sum(rejection_reasons.values()),
             "route_attribution_rejection_reason_counts": dict(sorted(rejection_reasons.items())),
             "route_attribution_audit": audit,
+            # Reuse the existing experiment audit channel so Unified Memory V2
+            # persists route-family mismatches instead of losing the evidence.
+            "search_hit_audit": audit,
             "route_attribution_query_is_evidence": False,
             "route_attribution_source_or_domain_pinning": False,
             "search_requests_added_by_route_attribution": 0,
