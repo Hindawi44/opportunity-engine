@@ -1,12 +1,16 @@
-"""Fail-closed guard for paid Brave discovery during manual GitHub runs.
+"""Fail-closed guard for paid Brave discovery during GitHub automation.
 
-Scheduled production discovery remains enabled. A workflow_dispatch run is
-considered diagnostic/manual and must not spend Brave credit unless an operator
+Scheduled production discovery remains enabled. Diagnostic/manual
+``workflow_dispatch`` runs must not spend Brave credit unless an operator
 explicitly opts in or the run is the dedicated bounded $10 Brave test branch.
+
+Repository ``push`` runs are also zero-cost by default. A push may use Brave only
+when the specific job sets the explicit push override. This prevents commit or
+merge-message based CI validation from silently consuming Brave credit.
 
 Auto-dispatched live-proof/checkpoint runs are intentionally zero-cost. They are
 workflow_dispatch executions too, so they remain blocked exactly like any other
-manual run. This prevents repository merges from silently consuming Brave credit.
+manual run.
 """
 from __future__ import annotations
 
@@ -16,6 +20,8 @@ from typing import Any, Mapping
 
 MANUAL_PAID_BRAVE_OVERRIDE = "OPPORTUNITY_ALLOW_PAID_BRAVE_MANUAL"
 MANUAL_PAID_BRAVE_BLOCK_REASON = "MANUAL_WORKFLOW_PAID_BRAVE_BLOCKED"
+PUSH_PAID_BRAVE_OVERRIDE = "OPPORTUNITY_ALLOW_PAID_BRAVE_PUSH"
+PUSH_PAID_BRAVE_BLOCK_REASON = "PUSH_WORKFLOW_PAID_BRAVE_BLOCKED"
 AUTOMATED_CHECKPOINT_WORKFLOW = "Multi-Market Daily Operator Checkpoint"
 AUTOMATED_CHECKPOINT_JOB = "operator-read-only-checkpoint"
 
@@ -37,9 +43,17 @@ def _environment(environment: Mapping[str, str] | None = None) -> Mapping[str, s
     return environment if environment is not None else os.environ
 
 
-def _manual_override_enabled(env: Mapping[str, str]) -> bool:
-    value = str(env.get(MANUAL_PAID_BRAVE_OVERRIDE) or "").strip().casefold()
+def _truthy_env(env: Mapping[str, str], name: str) -> bool:
+    value = str(env.get(name) or "").strip().casefold()
     return value in _TRUTHY
+
+
+def _manual_override_enabled(env: Mapping[str, str]) -> bool:
+    return _truthy_env(env, MANUAL_PAID_BRAVE_OVERRIDE)
+
+
+def _push_override_enabled(env: Mapping[str, str]) -> bool:
+    return _truthy_env(env, PUSH_PAID_BRAVE_OVERRIDE)
 
 
 def _ref_name(env: Mapping[str, str]) -> str:
@@ -70,29 +84,43 @@ def _manual_bounded_test_branch_allowed(env: Mapping[str, str]) -> bool:
     return attempt == 1
 
 
+def _blocked_message(reason: str) -> str:
+    if reason == PUSH_PAID_BRAVE_BLOCK_REASON:
+        return (
+            f"{reason}: GitHub push runs are zero-cost by default; set "
+            f"{PUSH_PAID_BRAVE_OVERRIDE}=true only in an explicitly authorized paid-live job"
+        )
+    return (
+        f"{reason}: manual GitHub runs are zero-cost by default; set "
+        f"{MANUAL_PAID_BRAVE_OVERRIDE}=true only for an intentional paid run"
+    )
+
+
 def manual_paid_brave_incremental_budget(
     environment: Mapping[str, str] | None = None,
 ) -> dict[str, Any] | None:
-    """Return the fixed $10 manual-run budget or fail closed before transport.
+    """Return the fixed manual budget or fail closed before Brave transport.
 
-    The budget applies only to workflow_dispatch executions that are intentionally
-    paid: either the explicit override or the dedicated first-attempt comparison
-    branch. Scheduled runs are not part of this one-shot test budget.
+    ``workflow_dispatch`` executions are paid only via the explicit manual
+    override or the dedicated first-attempt comparison branch. ``push`` runs are
+    blocked unless their job explicitly opts in via ``PUSH_PAID_BRAVE_OVERRIDE``.
+    Scheduled production runs are intentionally unaffected.
 
-    This function is also called immediately before every default Brave transport
-    attempt. Therefore an unauthorized workflow_dispatch must raise here rather
-    than return ``None``; otherwise a caller that forgot the higher-level guard
-    could still leak paid requests.
+    This function is called immediately before every default Brave transport
+    attempt, so an unauthorized workflow cannot bypass higher-level guards.
     """
     env = _environment(environment)
     event_name = str(env.get("GITHUB_EVENT_NAME") or "").strip().casefold()
+
+    if event_name == "push":
+        if not _push_override_enabled(env):
+            raise RuntimeError(_blocked_message(PUSH_PAID_BRAVE_BLOCK_REASON))
+        return None
+
     if event_name != "workflow_dispatch":
         return None
     if not (_manual_override_enabled(env) or _manual_bounded_test_branch_allowed(env)):
-        raise RuntimeError(
-            f"{MANUAL_PAID_BRAVE_BLOCK_REASON}: manual GitHub runs are zero-cost by default; "
-            f"set {MANUAL_PAID_BRAVE_OVERRIDE}=true only for an intentional paid run"
-        )
+        raise RuntimeError(_blocked_message(MANUAL_PAID_BRAVE_BLOCK_REASON))
     return {
         "budget_id": MANUAL_PAID_BRAVE_TEST_BUDGET_ID,
         "max_requests": MANUAL_PAID_BRAVE_TEST_MAX_REQUESTS,
@@ -111,10 +139,14 @@ def manual_paid_brave_block_reason(
     source: str | None = None,
     query_budget: int | None = None,
 ) -> str | None:
-    """Return a block reason only for non-authorized workflow_dispatch runs."""
+    """Return a block reason for non-authorized manual or push GitHub runs."""
     del market, source, query_budget
     env = _environment(environment)
     event_name = str(env.get("GITHUB_EVENT_NAME") or "").strip().casefold()
+
+    if event_name == "push":
+        return None if _push_override_enabled(env) else PUSH_PAID_BRAVE_BLOCK_REASON
+
     if event_name != "workflow_dispatch":
         return None
 
@@ -143,7 +175,4 @@ def ensure_paid_brave_allowed(
     )
     if reason is None:
         return
-    raise RuntimeError(
-        f"{reason}: manual GitHub runs are zero-cost by default; "
-        f"set {MANUAL_PAID_BRAVE_OVERRIDE}=true only for an intentional paid run"
-    )
+    raise RuntimeError(_blocked_message(reason))
