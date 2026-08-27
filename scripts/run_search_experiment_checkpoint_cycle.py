@@ -15,6 +15,9 @@ from opportunity_engine.search_experiment_execution_bridge_v1 import (
     merge_experiment_result_into_memory,
     write_json,
 )
+from opportunity_engine.search_experiment_route_attribution_v1 import (
+    apply_route_attribution_gate,
+)
 
 
 def _text(value: object) -> str:
@@ -210,7 +213,12 @@ def run_checkpoint_cycle(
             "automatic_payment": False,
         }
 
-    result = execute_search_experiment_spec(selected, exa_api_key=exa_api_key, run_id=run_id)
+    raw_result = execute_search_experiment_spec(
+        selected,
+        exa_api_key=exa_api_key,
+        run_id=run_id,
+    )
+    result = apply_route_attribution_gate(raw_result)
     updated = merge_experiment_result_into_memory(
         existing_memory=memory,
         result=result,
@@ -230,6 +238,10 @@ def run_checkpoint_cycle(
         "successful_route": result.get("successful_route"),
         "verified_result_count": result.get("successful_result_count", 0),
         "verified_result_domains": result.get("verified_result_domains", []),
+        "route_attribution_gate_enforced": result.get("route_attribution_gate_enforced", False),
+        "route_attribution_gate_status": result.get("route_attribution_gate_status"),
+        "route_attribution_slot_id": result.get("route_attribution_slot_id"),
+        "route_attribution_rejected_count": result.get("route_attribution_rejected_count", 0),
         "memory": updated,
         "automatic_query_activation": False,
         "automatic_provider_activation": False,
