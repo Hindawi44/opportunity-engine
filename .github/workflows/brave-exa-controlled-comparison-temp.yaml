@@ -38,9 +38,9 @@ jobs:
           test "$GITHUB_RUN_ATTEMPT" = "1"
           test -n "$BRAVE_SEARCH_API_KEY"
           test -n "$EXA_API_KEY"
-          echo "This comparison issues exactly 12 logical Brave searches total: 6 discovery + 6 exact-lot."
-          echo "Even with the provider's maximum 3 retries, worst-case outbound attempts are 48."
-          echo "At the observed $0.005/request economics, that is about $0.24, far below the approved $10 ceiling."
+          echo 'This comparison issues exactly 12 logical Brave searches total: 6 discovery + 6 exact-lot.'
+          echo 'Even with the provider maximum 3 retries, worst-case outbound attempts are 48.'
+          echo 'At the observed 0.005 USD/request economics, that is about 0.24 USD, far below the approved 10 USD ceiling.'
 
       - name: Run six-market discovery comparison
         run: |
