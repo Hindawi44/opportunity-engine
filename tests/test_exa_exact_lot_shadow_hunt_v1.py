@@ -30,6 +30,21 @@ def test_exact_lot_queries_cover_all_six_markets_with_commercial_specificity() -
             assert term.casefold() in query
 
 
+def test_france_exact_lot_query_targets_second_route_without_site_pinning() -> None:
+    query = MARKET_EXACT_LOT_QUERIES["FR"].casefold()
+    for term in (
+        "liquidation judiciaire",
+        "vente aux enchères",
+        "vêtements",
+        "stock",
+        "lot",
+        "prix",
+        "quantité",
+    ):
+        assert term.casefold() in query
+    assert "site:" not in query
+
+
 def test_exact_lot_hunt_runs_one_exa_query_per_market_then_direct_page_verification() -> None:
     searched: list[tuple[str, int]] = []
 
