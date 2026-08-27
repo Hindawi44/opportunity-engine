@@ -21,7 +21,7 @@ MARKET_EXACT_LOT_QUERIES = {
     "NO": "Norge klær mote vareparti til salgs pris stk restlager lager nå",
     "SE": "Sverige kläder mode restparti säljes pris st överskottslager lager nu",
     "DE": "Deutschland Kleidung Mode Restposten zu verkaufen Preis Stück Warenlager aktuell",
-    "FR": "France vêtements mode lot de marchandises à vendre prix quantité stock déstockage disponible",
+    "FR": "France liquidation judiciaire vêtements stock lot à vendre vente aux enchères prix quantité pièces disponible",
     "IT": "Italia abbigliamento moda lotto stock in vendita prezzo pezzi magazzino disponibile",
     "NL": "Nederland kleding groothandel partij pakket pallet te koop prijs stuks voorraad",
 }
