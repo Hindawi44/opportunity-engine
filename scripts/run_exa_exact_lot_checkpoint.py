@@ -2,9 +2,10 @@
 """Run the unified Exa Exact-Lot + Multi-Hop route as a checkpoint source.
 
 All six clothing markets stay on the same Search -> Verification -> Multi-Hop ->
-Exact-Lot path. Generic zero-yield recall and bounded commercial-anchor expansion
-remain query stages inside the same runtime. Commercial anchors are discovery
-hints only; they are never qualification evidence.
+Exact-Lot path. Generic recall and bounded commercial-anchor expansion remain
+query stages inside the same runtime. Recovery memory may assist navigation, but
+it must never make weak fresh search coverage look sufficient. Commercial anchors
+are discovery hints only; they are never qualification evidence.
 """
 from __future__ import annotations
 
@@ -44,6 +45,8 @@ RESULTS_PER_QUERY = 5
 COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD = 3
 COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS = 8
 COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS_BY_MARKET = {"DE": 6}
+FRESH_RECALL_MIN_CURRENT_EXACT_LOTS = 3
+FRESH_RECALL_MIN_CURRENT_ROUTE_HOSTS = 2
 DIRECT_STRICT_EVIDENCE_RESCUE = "QUALIFIED_B2B_STRICT_EVIDENCE_V1"
 MARKET_CURRENCIES = {
     "NO": "NOK",
@@ -74,7 +77,8 @@ MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
     "NL": (MARKET_EXACT_LOT_QUERIES["NL"],),
 }
 
-# Generic, source-neutral recall. It still runs only after primary strict yield = 0.
+# Generic, source-neutral recall. It runs after a true zero yield and also when
+# recovered route memory would otherwise hide weak fresh-search coverage.
 MARKET_ZERO_YIELD_RECALL_QUERIES: dict[str, tuple[str, ...]] = {
     "SE": ("Sverige restpartier kläder grossist säljes parti",),
     "FR": ("France déstockage vêtements grossiste stock lot",),
@@ -93,6 +97,66 @@ def _exact_lot_url_set(rows: list[Mapping[str, Any]]) -> set[str]:
         for row in rows
         if _compact(row.get("final_url") or row.get("url"))
     }
+
+
+def _is_recovery_exact_lot(row: Mapping[str, Any]) -> bool:
+    """Return True only for a freshly reverified route-memory Exact-Lot.
+
+    Search provenance integrity annotates recovery rows before this runner makes
+    its adaptive query decision. Provider fallback is retained for compatibility
+    with direct verifier tests. Memory remains navigation evidence only.
+    """
+    return bool(
+        _compact(row.get("retrieval_provenance")).upper() == "PROVEN_ROUTE_RECOVERY"
+        or _compact(row.get("provider")).casefold() == "proven_route_recovery"
+        or row.get("route_memory_reverified") is True
+    )
+
+
+def _fresh_current_exact_lots(rows: list[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+    return [row for row in rows if not _is_recovery_exact_lot(row)]
+
+
+def _exact_lot_route_hosts(rows: list[Mapping[str, Any]]) -> set[str]:
+    hosts: set[str] = set()
+    for row in rows:
+        url = _compact(row.get("final_url") or row.get("url"))
+        if not url:
+            continue
+        try:
+            host = (urlsplit(url).hostname or "").casefold().removeprefix("www.")
+        except ValueError:
+            host = ""
+        if host:
+            hosts.add(host)
+    return hosts
+
+
+def _fresh_coverage_snapshot(rows: list[Mapping[str, Any]]) -> dict[str, Any]:
+    fresh = _fresh_current_exact_lots(rows)
+    recovery_count = max(0, len(rows) - len(fresh))
+    route_hosts = _exact_lot_route_hosts(fresh)
+    return {
+        "total_strict_exact_lot_count": len(rows),
+        "fresh_current_strict_exact_lot_count": len(fresh),
+        "reverified_recovery_strict_exact_lot_count": recovery_count,
+        "fresh_current_route_host_count": len(route_hosts),
+        "fresh_current_route_hosts": sorted(route_hosts),
+    }
+
+
+def _recovery_masks_fresh_coverage(snapshot: Mapping[str, Any]) -> bool:
+    """Recovery must not be allowed to satisfy the fresh-search stopping rule."""
+    recovery = int(snapshot.get("reverified_recovery_strict_exact_lot_count") or 0)
+    fresh = int(snapshot.get("fresh_current_strict_exact_lot_count") or 0)
+    routes = int(snapshot.get("fresh_current_route_host_count") or 0)
+    return bool(
+        recovery > 0
+        and (
+            fresh < FRESH_RECALL_MIN_CURRENT_EXACT_LOTS
+            or routes < FRESH_RECALL_MIN_CURRENT_ROUTE_HOSTS
+        )
+    )
 
 
 def _commercial_anchor_outcome_evidence(
@@ -408,7 +472,7 @@ def build_checkpoint_result_from_exact_lots(
         1 for row in exact_lots if row.get("direct_strict_evidence_rescue") == DIRECT_STRICT_EVIDENCE_RESCUE
     )
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.7",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.8",
         "status": "SUCCESS",
         "execution_status": "PASS",
         "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -539,22 +603,46 @@ def run_market(
         collect(query, stage="PRIMARY")
 
     verification, multihop, exact_lots = evaluate()
+    primary_snapshot = _fresh_coverage_snapshot(exact_lots)
     primary_strict_exact_lot_count = len(exact_lots)
+    primary_fresh_current_strict_exact_lot_count = int(
+        primary_snapshot["fresh_current_strict_exact_lot_count"]
+    )
+    primary_recovery_strict_exact_lot_count = int(
+        primary_snapshot["reverified_recovery_strict_exact_lot_count"]
+    )
     zero_yield_recall_triggered = not exact_lots and bool(recall_queries)
+    recovery_masked_fresh_recall_triggered = bool(
+        recall_queries and _recovery_masks_fresh_coverage(primary_snapshot)
+    )
+    fresh_recall_triggered = bool(
+        recall_queries
+        and (zero_yield_recall_triggered or recovery_masked_fresh_recall_triggered)
+    )
 
-    if zero_yield_recall_triggered:
+    if fresh_recall_triggered:
+        recall_stage = "ZERO_YIELD_RECALL" if zero_yield_recall_triggered else "FRESH_RECALL"
         for query in recall_queries:
-            collect(query, stage="ZERO_YIELD_RECALL")
+            collect(query, stage=recall_stage)
         verification, multihop, exact_lots = evaluate()
 
+    post_recall_snapshot = _fresh_coverage_snapshot(exact_lots)
     post_recall_strict_exact_lot_count = len(exact_lots)
+    post_recall_fresh_current_strict_exact_lot_count = int(
+        post_recall_snapshot["fresh_current_strict_exact_lot_count"]
+    )
     anchor_pre_count = post_recall_strict_exact_lot_count
+    anchor_pre_fresh_count = post_recall_fresh_current_strict_exact_lot_count
     pre_anchor_exact_lots = [dict(row) for row in exact_lots]
     anchor_pre_unique_hit_count = len(all_hits)
     anchor_min_unique_hit_count = _commercial_anchor_min_unique_discovery_hits(market)
+    anchor_fresh_coverage_gap = bool(
+        anchor_pre_count < COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD
+        or _recovery_masks_fresh_coverage(post_recall_snapshot)
+    )
     anchor_expansion_triggered = bool(
         anchor_queries
-        and anchor_pre_count < COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD
+        and anchor_fresh_coverage_gap
         and anchor_pre_unique_hit_count >= anchor_min_unique_hit_count
     )
 
@@ -569,6 +657,7 @@ def run_market(
             )
         verification, multihop, exact_lots = evaluate()
 
+    final_snapshot = _fresh_coverage_snapshot(exact_lots)
     anchor_outcome_evidence = _commercial_anchor_outcome_evidence(
         market=market,
         query_rows=query_rows,
@@ -585,21 +674,56 @@ def run_market(
         multihop=multihop,
     )
     report = result["search_run_report"]
+    report["fresh_recall_trigger_version"] = "FRESH_RECALL_TRIGGER_V1"
+    report["fresh_recall_min_current_exact_lots"] = FRESH_RECALL_MIN_CURRENT_EXACT_LOTS
+    report["fresh_recall_min_current_route_hosts"] = FRESH_RECALL_MIN_CURRENT_ROUTE_HOSTS
     report["primary_query_count"] = len(primary_queries)
     report["primary_strict_exact_lot_count"] = primary_strict_exact_lot_count
+    report["primary_fresh_current_strict_exact_lot_count"] = (
+        primary_fresh_current_strict_exact_lot_count
+    )
+    report["primary_reverified_recovery_strict_exact_lot_count"] = (
+        primary_recovery_strict_exact_lot_count
+    )
+    report["primary_fresh_current_route_host_count"] = int(
+        primary_snapshot["fresh_current_route_host_count"]
+    )
     report["zero_yield_recall_available"] = bool(recall_queries)
     report["zero_yield_recall_triggered"] = zero_yield_recall_triggered
-    report["zero_yield_recall_query_count"] = len(recall_queries) if zero_yield_recall_triggered else 0
-    report["zero_yield_recall_added_exact_lot_count"] = max(
+    report["zero_yield_recall_query_count"] = (
+        len(recall_queries) if zero_yield_recall_triggered else 0
+    )
+    report["zero_yield_recall_added_exact_lot_count"] = (
+        max(0, post_recall_strict_exact_lot_count - primary_strict_exact_lot_count)
+        if zero_yield_recall_triggered
+        else 0
+    )
+    report["fresh_recall_triggered"] = fresh_recall_triggered
+    report["fresh_recall_recovery_mask_triggered"] = recovery_masked_fresh_recall_triggered
+    report["fresh_recall_query_count"] = len(recall_queries) if fresh_recall_triggered else 0
+    report["fresh_recall_added_exact_lot_count"] = max(
         0, post_recall_strict_exact_lot_count - primary_strict_exact_lot_count
+    )
+    report["fresh_recall_added_fresh_current_exact_lot_count"] = max(
+        0,
+        post_recall_fresh_current_strict_exact_lot_count
+        - primary_fresh_current_strict_exact_lot_count,
+    )
+    report["post_recall_fresh_current_route_host_count"] = int(
+        post_recall_snapshot["fresh_current_route_host_count"]
     )
     report["commercial_anchor_expansion_available"] = bool(anchor_queries)
     report["commercial_anchor_expansion_triggered"] = anchor_expansion_triggered
     report["commercial_anchor_trigger_threshold"] = COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD
+    report["commercial_anchor_fresh_coverage_gap"] = anchor_fresh_coverage_gap
     report["commercial_anchor_min_unique_discovery_hits"] = anchor_min_unique_hit_count
     report["commercial_anchor_pre_unique_discovery_hit_count"] = anchor_pre_unique_hit_count
     report["commercial_anchor_query_count"] = len(anchor_queries) if anchor_expansion_triggered else 0
     report["commercial_anchor_pre_strict_exact_lot_count"] = anchor_pre_count
+    report["commercial_anchor_pre_fresh_current_strict_exact_lot_count"] = anchor_pre_fresh_count
+    report["commercial_anchor_pre_fresh_current_route_host_count"] = int(
+        post_recall_snapshot["fresh_current_route_host_count"]
+    )
     report["commercial_anchor_added_exact_lot_count"] = max(0, len(exact_lots) - anchor_pre_count)
     report["commercial_anchor_outcome_count"] = anchor_outcome_evidence["outcome_count"]
     report["commercial_anchor_successful_outcome_count"] = anchor_outcome_evidence[
@@ -610,6 +734,15 @@ def run_market(
     ]
     report["commercial_anchor_is_qualification_evidence"] = False
     report["commercial_anchor_max_queries_per_market"] = MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET
+    report["final_fresh_current_strict_exact_lot_count"] = int(
+        final_snapshot["fresh_current_strict_exact_lot_count"]
+    )
+    report["final_reverified_recovery_strict_exact_lot_count"] = int(
+        final_snapshot["reverified_recovery_strict_exact_lot_count"]
+    )
+    report["final_fresh_current_route_host_count"] = int(
+        final_snapshot["fresh_current_route_host_count"]
+    )
 
     direct_rescue_urls = [
         row.get("url")
@@ -619,7 +752,7 @@ def run_market(
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.7",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.8",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
@@ -632,17 +765,39 @@ def run_market(
                 "recall_query_count": len(recall_queries) if zero_yield_recall_triggered else 0,
                 "post_recall_strict_exact_lot_count": post_recall_strict_exact_lot_count,
             },
+            "adaptive_fresh_recall": {
+                "version": "FRESH_RECALL_TRIGGER_V1",
+                "available": bool(recall_queries),
+                "triggered": fresh_recall_triggered,
+                "recovery_mask_triggered": recovery_masked_fresh_recall_triggered,
+                "min_current_exact_lots": FRESH_RECALL_MIN_CURRENT_EXACT_LOTS,
+                "min_current_route_hosts": FRESH_RECALL_MIN_CURRENT_ROUTE_HOSTS,
+                "primary": primary_snapshot,
+                "post_recall": post_recall_snapshot,
+                "recovery_is_stopping_evidence": False,
+            },
             "controlled_commercial_anchor_expansion": {
                 "available": bool(anchor_queries),
                 "triggered": anchor_expansion_triggered,
                 "threshold": COMMERCIAL_ANCHOR_THIN_YIELD_THRESHOLD,
+                "fresh_coverage_gap": anchor_fresh_coverage_gap,
                 "min_unique_discovery_hits": anchor_min_unique_hit_count,
                 "pre_anchor_unique_discovery_hit_count": anchor_pre_unique_hit_count,
+                "pre_anchor_fresh_current_exact_lot_count": anchor_pre_fresh_count,
+                "pre_anchor_fresh_current_route_host_count": int(
+                    post_recall_snapshot["fresh_current_route_host_count"]
+                ),
                 "max_queries_per_market": MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
                 "query_count": len(anchor_queries) if anchor_expansion_triggered else 0,
                 "pre_anchor_strict_exact_lot_count": anchor_pre_count,
                 "added_exact_lot_count": max(0, len(exact_lots) - anchor_pre_count),
                 "final_strict_exact_lot_count": len(exact_lots),
+                "final_fresh_current_exact_lot_count": int(
+                    final_snapshot["fresh_current_strict_exact_lot_count"]
+                ),
+                "final_fresh_current_route_host_count": int(
+                    final_snapshot["fresh_current_route_host_count"]
+                ),
                 "anchor_is_qualification_evidence": False,
             },
             "commercial_anchor_outcome_evidence": anchor_outcome_evidence,
