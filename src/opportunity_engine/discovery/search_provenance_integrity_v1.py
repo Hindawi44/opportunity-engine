@@ -31,7 +31,11 @@ from opportunity_engine.discovery import unified_opportunity_adapter
 from opportunity_engine.discovery import unified_search_runtime_cli_hook as search_runtime
 from opportunity_engine.discovery import unified_search_truth_reconciliation_cli_hook as reconciliation
 from opportunity_engine.discovery import unified_six_market_runtime_cli_hook as six_market_runtime
-from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY, classify_project_domain
+from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    FABRIC_PROCUREMENT,
+    classify_project_domain,
+)
 
 
 VERSION = "SEARCH_PROVENANCE_INTEGRITY_V1"
@@ -48,8 +52,6 @@ _ORIGINAL_TOP5_GATE = clothing_inventory_search.apply_post_verification_top5_har
 _ORIGINAL_METADATA = unified_opportunity_adapter._metadata
 _ORIGINAL_SIX_MARKET_BUILD = six_market_runtime.build_unified_six_market_pipeline
 _ORIGINAL_CLOTHING_RUNTIME = search_runtime._clothing_runtime
-_ORIGINAL_ROUTE_INDEX = commercial_anchor_outcome_learning._resolution_route_index
-_ORIGINAL_RENDER_SEARCH_RUNTIME = reconciliation._render_search_runtime_section
 
 
 def _compact(value: object) -> str:
@@ -128,34 +130,42 @@ def _provenance_from_candidate(candidate: Mapping[str, Any]) -> str:
     return "STRICT_EXACT_LOT"
 
 
+def _annotate_candidate(candidate: dict[str, Any], provenance: str) -> None:
+    candidate["search_provider"] = "EXA"
+    candidate["retrieval_provenance"] = provenance
+    candidate["exact_lot_origin"] = provenance
+    candidate["route_memory_reverified"] = provenance == "PROVEN_ROUTE_RECOVERY"
+    candidate["query_provenance_preserved"] = provenance != "PROVEN_ROUTE_RECOVERY"
+    for verification in candidate.get("verification") or []:
+        if isinstance(verification, dict):
+            verification["search_provider"] = "EXA"
+            verification["retrieval_provenance"] = provenance
+            verification["route_memory_reverified"] = provenance == "PROVEN_ROUTE_RECOVERY"
+
+
 def _top5_with_truthful_provenance(result: Mapping[str, Any]) -> dict[str, Any]:
     gated = _ORIGINAL_TOP5_GATE(result)
     candidates = gated.get("all_discovered_candidates") or []
     provenance_counts: dict[str, int] = {}
+    by_url: dict[str, str] = {}
     for candidate in candidates:
         if not isinstance(candidate, dict):
             continue
         provenance = _provenance_from_candidate(candidate)
         provenance_counts[provenance] = provenance_counts.get(provenance, 0) + 1
-        candidate["search_provider"] = "EXA"
-        candidate["retrieval_provenance"] = provenance
-        candidate["exact_lot_origin"] = provenance
-        candidate["route_memory_reverified"] = provenance == "PROVEN_ROUTE_RECOVERY"
-        candidate["query_provenance_preserved"] = provenance != "PROVEN_ROUTE_RECOVERY"
-        for verification in candidate.get("verification") or []:
-            if isinstance(verification, dict):
-                verification["search_provider"] = "EXA"
-                verification["retrieval_provenance"] = provenance
-                verification["route_memory_reverified"] = (
-                    provenance == "PROVEN_ROUTE_RECOVERY"
-                )
+        url = _candidate_url(candidate)
+        if url:
+            by_url[url] = provenance
+        _annotate_candidate(candidate, provenance)
 
-    # discovery_top5 contains the same dict instances in the existing gate. Even
-    # if a caller copied them, rebuild from the now-truthful candidate order.
-    gated["discovery_top5"] = [
-        dict(row) if isinstance(row, Mapping) else row
-        for row in candidates[:5]
-    ]
+    # Preserve the hard gate's exact Top5 selection and ordering. Additive
+    # provenance must never promote, demote, reorder, or synthesize a Top5 row.
+    for candidate in gated.get("discovery_top5") or []:
+        if not isinstance(candidate, dict):
+            continue
+        provenance = by_url.get(_candidate_url(candidate)) or _provenance_from_candidate(candidate)
+        _annotate_candidate(candidate, provenance)
+
     report = gated.get("search_run_report")
     if isinstance(report, dict):
         recovery = int(provenance_counts.get("PROVEN_ROUTE_RECOVERY", 0))
@@ -282,7 +292,7 @@ def _route_index_with_recovery_truth(resolution: Mapping[str, Any]) -> dict[str,
 def _render_search_runtime_with_provenance(ledger: Mapping[str, Any]) -> str:
     runtime = ledger.get("search_runtime") or {}
     clothing = runtime.get(CLOTHING_INVENTORY) or {} if isinstance(runtime, Mapping) else {}
-    fabric = runtime.get("FABRIC_PROCUREMENT") or {} if isinstance(runtime, Mapping) else {}
+    fabric = runtime.get(FABRIC_PROCUREMENT) or {} if isinstance(runtime, Mapping) else {}
     lines = ["", "حقيقة البحث الموحد"]
     clothing_markets = clothing.get("markets") or {} if isinstance(clothing, Mapping) else {}
     for code in ("NO", "SE", "DE", "FR", "IT", "NL"):
