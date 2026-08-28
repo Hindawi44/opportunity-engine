@@ -19,6 +19,7 @@ from urllib.parse import parse_qs, quote, urlencode, urlparse, urlunparse
 from urllib.request import Request, urlopen
 
 DEFAULT_CATEGORY_ID = "10110508"
+WORKWEAR_CATEGORY_ID = "90010"
 DEFAULT_PAGE_SIZE = 30
 MAX_PAGE_SIZE = 30
 MAX_PAGES = 10
@@ -38,7 +39,7 @@ _CLOTHING_PATTERN = re.compile(
 _LOT_PATTERN = re.compile(
     r"\b(?:vareparti|restlager|konkursbo|lagerbeholdning|varelager|parti|bulk|"
     r"samlet|pall(?:er)?|pakke\s+med|eske\s+med|flere\s+(?:stk|plagg|varer)|"
-    r"\d+\s*(?:stk|plagg|jakker|bukser|kjoler|skjorter|gensere|sko|varer))\b",
+    r"\d+\s*(?:stk|plagg|jakker|bukser|kjoler|skjorter|gensere|sko|varer|artikler))\b",
     re.I,
 )
 
@@ -191,7 +192,11 @@ def normalize_public_api_item(
     """Convert one observed API object into a verified active clothing item."""
     now = now or datetime.now(timezone.utc)
     title = _compact(item.get("title"))
-    if not title or not _CLOTHING_PATTERN.search(title):
+    category2 = _compact(item.get("category2"))
+    page_native_clothing_evidence = category2 == WORKWEAR_CATEGORY_ID
+    if not title or (
+        not page_native_clothing_evidence and not _CLOTHING_PATTERN.search(title)
+    ):
         return None
 
     status = _compact(item.get("status")).upper()
