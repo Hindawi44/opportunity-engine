@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Apply explicit commercial inputs to the latest selected opportunity."""
+"""Apply explicit VAT-aware commercial inputs to the latest selected opportunity."""
 from __future__ import annotations
 
 import argparse
 import json
 from pathlib import Path
 
-from opportunity_engine.discovery.one_opportunity_commercial_analysis import (
-    apply_commercial_inputs,
-    render_commercial_analysis,
+from opportunity_engine.discovery.one_opportunity_commercial_vat_basis_v1 import (
+    apply_commercial_inputs_with_vat_basis,
+    render_commercial_analysis_with_vat_basis,
 )
 
 
@@ -30,8 +30,10 @@ def parse_args() -> argparse.Namespace:
         required=True,
     )
     parser.add_argument("--final-payable-price-nok", required=True)
+    parser.add_argument("--recoverable-input-vat-nok", required=True)
     parser.add_argument("--transport-nok", required=True)
     parser.add_argument("--conservative-resale-nok", required=True)
+    parser.add_argument("--resale-output-vat-nok", required=True)
     parser.add_argument("--resale-comparable-count", required=True)
     parser.add_argument("--review-note", default="")
     return parser.parse_args()
@@ -39,13 +41,15 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    report = apply_commercial_inputs(
+    report = apply_commercial_inputs_with_vat_basis(
         _load(args.analysis),
         opportunity_identity=args.opportunity_id,
         quantity_condition_confirmed=args.quantity_condition_status == "CONFIRMED",
         final_payable_price_nok=args.final_payable_price_nok,
+        recoverable_input_vat_nok=args.recoverable_input_vat_nok,
         transport_nok=args.transport_nok,
         conservative_resale_nok=args.conservative_resale_nok,
+        resale_output_vat_nok=args.resale_output_vat_nok,
         resale_comparable_count=args.resale_comparable_count,
         review_note=args.review_note,
     )
@@ -57,7 +61,10 @@ def main() -> int:
         json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    text_path.write_text(render_commercial_analysis(report), encoding="utf-8")
+    text_path.write_text(
+        render_commercial_analysis_with_vat_basis(report),
+        encoding="utf-8",
+    )
     print(text_path.read_text(encoding="utf-8"))
     return 0
 
