@@ -9,6 +9,8 @@ existing unified Exa runtime executes:
 * restores that query onto verified pages before Multi-Hop inherits it;
 * marks freshly reverified route-memory pages as PROVEN_ROUTE_RECOVERY instead
   of allowing downstream reports to imply a direct current Exa discovery;
+* scopes transient provenance memory by market + URL so the same cross-border
+  page can never leak query/recovery attribution between fixed markets;
 * separates current-search Exact-Lots from freshly reverified recovery lots in
   the source report and unified six-market search runtime;
 * preserves provenance in canonical opportunity metadata;
@@ -36,6 +38,7 @@ from opportunity_engine.project_domain_boundary import (
     FABRIC_PROCUREMENT,
     classify_project_domain,
 )
+from opportunity_engine.search_experiment_execution_bridge_v1 import _market_anchored
 
 
 VERSION = "SEARCH_PROVENANCE_INTEGRITY_V1"
@@ -43,8 +46,11 @@ SEARCH_REQUESTS_ADDED = 0
 PAGE_FETCHES_ADDED = 0
 _INSTALLED = False
 
-_QUERY_BY_URL: dict[str, str] = {}
-_RECOVERY_URLS: set[str] = set()
+# Transient same-process provenance is market-scoped. A cross-border wholesale
+# URL may legitimately appear in several market searches, and one market must
+# never inherit the query or recovery state observed in another market.
+_QUERY_BY_MARKET_URL: dict[tuple[str, str], str] = {}
+_RECOVERY_MARKET_URLS: set[tuple[str, str]] = set()
 
 _ORIGINAL_EXA_SEARCH = exa_search.ExaSearchProvider.search
 _ORIGINAL_VERIFY = verifier.verify_provider_unique_pages
@@ -56,6 +62,16 @@ _ORIGINAL_CLOTHING_RUNTIME = search_runtime._clothing_runtime
 
 def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
+
+
+def _market(value: object) -> str:
+    code = _compact(value).upper()
+    return code if code in search_runtime.SIX_MARKETS else ""
+
+
+def _query_market(query: str) -> str:
+    matches = [market for market in search_runtime.SIX_MARKETS if _market_anchored(query, market)]
+    return matches[0] if len(matches) == 1 else ""
 
 
 def _candidate_url(candidate: Mapping[str, Any]) -> str:
@@ -72,12 +88,15 @@ def _query_preserving_search(self, query: str, *, count: int = 10):  # type: ign
     hits = _ORIGINAL_EXA_SEARCH(self, query, count=count)
     if classify_project_domain(text=query) == CLOTHING_INVENTORY:
         clean_query = _compact(query)
-        for hit in hits:
-            url = _compact(getattr(hit, "url", ""))
-            if url:
-                # First discovery wins. A later anchor seeing the same URL must
-                # never receive success credit for a URL already found earlier.
-                _QUERY_BY_URL.setdefault(url, clean_query)
+        market = _query_market(clean_query)
+        if market:
+            for hit in hits:
+                url = _compact(getattr(hit, "url", ""))
+                if url:
+                    # First discovery wins within one market. A later anchor in
+                    # that market cannot steal credit, while another market can
+                    # independently discover the same cross-border URL.
+                    _QUERY_BY_MARKET_URL.setdefault((market, url), clean_query)
     return hits
 
 
@@ -87,14 +106,15 @@ def _verify_with_query_and_recovery_provenance(*args, **kwargs):  # type: ignore
     for raw in pages:
         if not isinstance(raw, dict):
             continue
+        market = _market(raw.get("market_code"))
         source_url = _compact(raw.get("url"))
         final_url = _compact(raw.get("final_url") or source_url)
         provider = _compact(raw.get("provider")).casefold()
         if provider == verifier.PROVEN_ROUTE_RECOVERY_PROVIDER:
-            if final_url:
-                _RECOVERY_URLS.add(final_url)
-            if source_url:
-                _RECOVERY_URLS.add(source_url)
+            if market and final_url:
+                _RECOVERY_MARKET_URLS.add((market, final_url))
+            if market and source_url:
+                _RECOVERY_MARKET_URLS.add((market, source_url))
             raw["route_memory_search_context"] = _compact(raw.get("query")) or None
             # Recovery is fresh page verification of remembered navigation. It
             # must not be credited to whichever live query happened to run now.
@@ -105,22 +125,23 @@ def _verify_with_query_and_recovery_provenance(*args, **kwargs):  # type: ignore
             raw["fresh_page_verification_required"] = True
             continue
 
-        original_query = _QUERY_BY_URL.get(source_url)
+        original_query = _QUERY_BY_MARKET_URL.get((market, source_url)) if market else None
         if original_query:
             raw["query"] = original_query
             raw["query_provenance_source"] = "ORIGINAL_EXA_RESULT_QUERY"
             raw["query_provenance_preserved"] = True
         raw["retrieval_provenance"] = "DIRECT_SEARCH_RESULT"
     report["query_provenance_preserved"] = True
+    report["provenance_scope"] = "MARKET_PLUS_URL"
     report["recovery_query_credit_blocked"] = True
     report["search_requests_added_by_provenance_integrity"] = SEARCH_REQUESTS_ADDED
     report["page_fetches_added_by_provenance_integrity"] = PAGE_FETCHES_ADDED
     return report
 
 
-def _provenance_from_candidate(candidate: Mapping[str, Any]) -> str:
+def _provenance_from_candidate(candidate: Mapping[str, Any], *, market: str) -> str:
     url = _candidate_url(candidate)
-    if url and url in _RECOVERY_URLS:
+    if market and url and (market, url) in _RECOVERY_MARKET_URLS:
         return "PROVEN_ROUTE_RECOVERY"
     reason = _compact(candidate.get("reason")).upper()
     if "MULTI_HOP" in reason:
@@ -136,22 +157,26 @@ def _annotate_candidate(candidate: dict[str, Any], provenance: str) -> None:
     candidate["exact_lot_origin"] = provenance
     candidate["route_memory_reverified"] = provenance == "PROVEN_ROUTE_RECOVERY"
     candidate["query_provenance_preserved"] = provenance != "PROVEN_ROUTE_RECOVERY"
+    candidate["provenance_scope"] = "MARKET_PLUS_URL"
     for verification in candidate.get("verification") or []:
         if isinstance(verification, dict):
             verification["search_provider"] = "EXA"
             verification["retrieval_provenance"] = provenance
             verification["route_memory_reverified"] = provenance == "PROVEN_ROUTE_RECOVERY"
+            verification["provenance_scope"] = "MARKET_PLUS_URL"
 
 
 def _top5_with_truthful_provenance(result: Mapping[str, Any]) -> dict[str, Any]:
     gated = _ORIGINAL_TOP5_GATE(result)
+    report = gated.get("search_run_report")
+    market = _market(report.get("market_code")) if isinstance(report, Mapping) else ""
     candidates = gated.get("all_discovered_candidates") or []
     provenance_counts: dict[str, int] = {}
     by_url: dict[str, str] = {}
     for candidate in candidates:
         if not isinstance(candidate, dict):
             continue
-        provenance = _provenance_from_candidate(candidate)
+        provenance = _provenance_from_candidate(candidate, market=market)
         provenance_counts[provenance] = provenance_counts.get(provenance, 0) + 1
         url = _candidate_url(candidate)
         if url:
@@ -163,10 +188,11 @@ def _top5_with_truthful_provenance(result: Mapping[str, Any]) -> dict[str, Any]:
     for candidate in gated.get("discovery_top5") or []:
         if not isinstance(candidate, dict):
             continue
-        provenance = by_url.get(_candidate_url(candidate)) or _provenance_from_candidate(candidate)
+        provenance = by_url.get(_candidate_url(candidate)) or _provenance_from_candidate(
+            candidate, market=market
+        )
         _annotate_candidate(candidate, provenance)
 
-    report = gated.get("search_run_report")
     if isinstance(report, dict):
         recovery = int(provenance_counts.get("PROVEN_ROUTE_RECOVERY", 0))
         current = sum(
@@ -180,6 +206,7 @@ def _top5_with_truthful_provenance(result: Mapping[str, Any]) -> dict[str, Any]:
         report["exact_lot_provenance_counts"] = dict(sorted(provenance_counts.items()))
         report["search_provider"] = "EXA"
         report["query_provenance_preserved"] = True
+        report["provenance_scope"] = "MARKET_PLUS_URL"
         report["recovery_query_credit_blocked"] = True
         report["search_requests_added_by_provenance_integrity"] = SEARCH_REQUESTS_ADDED
         report["page_fetches_added_by_provenance_integrity"] = PAGE_FETCHES_ADDED
@@ -195,6 +222,7 @@ def _metadata_with_search_provenance(candidate: Mapping[str, Any]) -> dict[str, 
             "exact_lot_origin": candidate.get("exact_lot_origin"),
             "route_memory_reverified": candidate.get("route_memory_reverified") is True,
             "query_provenance_preserved": candidate.get("query_provenance_preserved") is True,
+            "provenance_scope": candidate.get("provenance_scope"),
         }
     )
     return metadata
@@ -255,8 +283,10 @@ def _clothing_runtime_with_provenance(input_root):  # type: ignore[no-untyped-de
         row["current_exa_discovery_strict_exact_lot_count"] = current
         row["freshly_reverified_recovery_exact_lot_count"] = recovery
         row["strict_exact_lot_count_includes_reverified_recovery"] = recovery > 0
+        row["provenance_scope"] = "MARKET_PLUS_URL"
         row["provenance_integrity_version"] = VERSION
     runtime["exact_lot_provenance_separated"] = True
+    runtime["provenance_scope"] = "MARKET_PLUS_URL"
     return runtime
 
 
@@ -314,6 +344,7 @@ def _render_search_runtime_with_provenance(ledger: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "Exact-Lot الحالي منفصل عن الصفحات المستعادة من الذاكرة والمعاد تحققها.",
+            "Provenance مفصول حسب السوق + الرابط لمنع التلوث بين الأسواق.",
             "تطوير البحث: نفس المسار الموحد فقط؛ لا مسارات دول منفصلة.",
             "لا شراء، لا مزايدة، لا اتصال، ولا دفع تلقائي.",
         ]
