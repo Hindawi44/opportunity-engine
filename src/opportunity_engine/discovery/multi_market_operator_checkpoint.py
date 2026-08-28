@@ -342,12 +342,15 @@ def _load_source(spec: Mapping[str, Any], root: Path) -> dict[str, Any]:
     if exit_code not in (None, 0):
         source_success = False
 
+    cost_guard_status = _compact((report or {}).get("cost_guard_status")).upper()
     failure: str | None = None
     if not source_success:
         failure = _compact(execution.get("error")) or (
             "source report missing or source execution did not complete successfully"
         )
         execution_status = "FAILURE"
+    elif cost_guard_status == "SKIPPED_COST_GUARD":
+        execution_status = "SKIPPED_COST_GUARD"
     elif records:
         execution_status = "SUCCESS"
     else:
@@ -695,6 +698,7 @@ def render_phone_summary(report: Mapping[str, Any]) -> str:
             "المصادر: "
             f"نجاح {source_counts.get('SUCCESS', 0)} | "
             f"صفر صحيح {source_counts.get('VALID_ZERO_RESULT', 0)} | "
+            f"تخطي حماية التكلفة {source_counts.get('SKIPPED_COST_GUARD', 0)} | "
             f"فشل {source_counts.get('FAILURE', 0)} | "
             f"محجوب {source_counts.get('BLOCKED', 0)}"
         ),
