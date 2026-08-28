@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Apply explicit VAT-aware commercial inputs to the latest selected opportunity."""
+"""Apply explicit VAT-aware commercial inputs to one eligible checkpoint opportunity."""
 from __future__ import annotations
 
 import argparse
 import json
 from pathlib import Path
 
+from opportunity_engine.discovery.commercial_candidate_selection_v1 import (
+    select_eligible_commercial_analysis,
+)
 from opportunity_engine.discovery.one_opportunity_commercial_vat_basis_v1 import (
     apply_commercial_inputs_with_vat_basis,
     render_commercial_analysis_with_vat_basis,
@@ -22,6 +25,7 @@ def _load(path: str | Path) -> dict:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--analysis", required=True)
+    parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--opportunity-id", required=True)
     parser.add_argument(
@@ -41,8 +45,13 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    report = apply_commercial_inputs_with_vat_basis(
+    routed_analysis = select_eligible_commercial_analysis(
         _load(args.analysis),
+        _load(args.checkpoint),
+        opportunity_identity=args.opportunity_id,
+    )
+    report = apply_commercial_inputs_with_vat_basis(
+        routed_analysis,
         opportunity_identity=args.opportunity_id,
         quantity_condition_confirmed=args.quantity_condition_status == "CONFIRMED",
         final_payable_price_nok=args.final_payable_price_nok,

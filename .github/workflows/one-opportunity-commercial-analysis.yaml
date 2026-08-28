@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       opportunity_identity:
-        description: Exact opportunity identity from one-opportunity-daily-analysis.json
+        description: Exact active analysis-eligible opportunity identity from the latest checkpoint
         required: true
         type: string
       quantity_condition_status:
@@ -58,9 +58,11 @@ on:
       - "src/opportunity_engine/discovery/latest_checkpoint_analysis.py"
       - "src/opportunity_engine/discovery/one_opportunity_commercial_analysis.py"
       - "src/opportunity_engine/discovery/one_opportunity_commercial_vat_basis_v1.py"
+      - "src/opportunity_engine/discovery/commercial_candidate_selection_v1.py"
       - "tests/test_latest_checkpoint_analysis_v1.py"
       - "tests/test_one_opportunity_commercial_analysis_v1.py"
       - "tests/test_one_opportunity_commercial_vat_basis_v1.py"
+      - "tests/test_commercial_candidate_selection_v1.py"
       - "tests/test_one_opportunity_commercial_analysis_workflow.py"
       - "tests/test_targeted_market_enrichment_v1.py"
       - "tests/test_targeted_market_enrichment_workflow_v1.py"
@@ -91,6 +93,7 @@ jobs:
           pytest tests/test_latest_checkpoint_analysis_v1.py -q
           pytest tests/test_one_opportunity_commercial_analysis_v1.py -q
           pytest tests/test_one_opportunity_commercial_vat_basis_v1.py -q
+          pytest tests/test_commercial_candidate_selection_v1.py -q
           pytest tests/test_one_opportunity_commercial_analysis_workflow.py -q
           pytest tests/test_one_opportunity_daily_analysis_v1.py -q
           pytest tests/test_targeted_market_enrichment_v1.py -q
@@ -282,6 +285,7 @@ jobs:
         run: |
           python scripts/apply_one_opportunity_commercial_inputs.py \
             --analysis "$INPUT_DIR/one-opportunity-daily-analysis.json" \
+            --checkpoint "$INPUT_DIR/multi-market-daily-checkpoint.json" \
             --output-dir "$OUTPUT_DIR" \
             --opportunity-id "$COMMERCIAL_OPPORTUNITY_ID" \
             --quantity-condition-status "$QUANTITY_CONDITION_STATUS" \
@@ -293,7 +297,7 @@ jobs:
             --resale-comparable-count "$RESALE_COMPARABLE_COUNT" \
             --review-note "$COMMERCIAL_REVIEW_NOTE"
 
-      - name: Validate identity, VAT basis, safety and financial output
+      - name: Validate identity, candidate eligibility, VAT basis, safety and financial output
         env:
           EXPECTED_OPPORTUNITY_ID: ${{ github.event.inputs.opportunity_identity }}
           QUANTITY_CONDITION_STATUS: ${{ github.event.inputs.quantity_condition_status }}
@@ -314,6 +318,15 @@ jobs:
           selected = (report.get("selected_opportunity") or {}).get("opportunity_identity")
           if selected != expected:
               raise SystemExit("Commercial analysis targeted a different opportunity")
+
+          candidate_selection = report.get("commercial_candidate_selection") or {}
+          if candidate_selection.get("checkpoint_eligibility_verified") is not True:
+              raise SystemExit("Commercial opportunity was not verified against the checkpoint eligible set")
+          if candidate_selection.get("selection_mode") == "MANUAL_ELIGIBLE_CANDIDATE_OVERRIDE":
+              if int(candidate_selection.get("search_requests_made") or 0) != 0:
+                  raise SystemExit("Commercial candidate override may not make search requests")
+              if int(candidate_selection.get("page_fetches_made") or 0) != 0:
+                  raise SystemExit("Commercial candidate override may not fetch pages")
 
           vat_basis = report.get("vat_basis") or {}
           if vat_basis.get("explicit") is not True:
