@@ -21,7 +21,11 @@ on:
           - NOT_CONFIRMED
           - CONFIRMED
       final_payable_price_nok:
-        description: Final payable price including auction fees and VAT (NOK)
+        description: Final cash payable price including auction fees and VAT (NOK)
+        required: true
+        type: string
+      recoverable_input_vat_nok:
+        description: Explicit input VAT amount confirmed recoverable for this purchase (NOK; zero allowed)
         required: true
         type: string
       transport_nok:
@@ -29,7 +33,11 @@ on:
         required: true
         type: string
       conservative_resale_nok:
-        description: Conservative total resale value for the full lot (NOK)
+        description: Conservative gross total resale value for the full lot (NOK)
+        required: true
+        type: string
+      resale_output_vat_nok:
+        description: Explicit output VAT included in conservative gross resale (NOK; zero allowed)
         required: true
         type: string
       resale_comparable_count:
@@ -37,7 +45,7 @@ on:
         required: true
         type: string
       commercial_review_note:
-        description: Optional note about condition, sizes, price evidence, or risk
+        description: Optional note about condition, sizes, price evidence, tax basis, or risk
         required: false
         type: string
         default: ""
@@ -49,8 +57,10 @@ on:
       - "scripts/run_targeted_market_enrichment.py"
       - "src/opportunity_engine/discovery/latest_checkpoint_analysis.py"
       - "src/opportunity_engine/discovery/one_opportunity_commercial_analysis.py"
+      - "src/opportunity_engine/discovery/one_opportunity_commercial_vat_basis_v1.py"
       - "tests/test_latest_checkpoint_analysis_v1.py"
       - "tests/test_one_opportunity_commercial_analysis_v1.py"
+      - "tests/test_one_opportunity_commercial_vat_basis_v1.py"
       - "tests/test_one_opportunity_commercial_analysis_workflow.py"
       - "tests/test_targeted_market_enrichment_v1.py"
       - "tests/test_targeted_market_enrichment_workflow_v1.py"
@@ -80,6 +90,7 @@ jobs:
         run: |
           pytest tests/test_latest_checkpoint_analysis_v1.py -q
           pytest tests/test_one_opportunity_commercial_analysis_v1.py -q
+          pytest tests/test_one_opportunity_commercial_vat_basis_v1.py -q
           pytest tests/test_one_opportunity_commercial_analysis_workflow.py -q
           pytest tests/test_one_opportunity_daily_analysis_v1.py -q
           pytest tests/test_targeted_market_enrichment_v1.py -q
@@ -262,8 +273,10 @@ jobs:
           COMMERCIAL_OPPORTUNITY_ID: ${{ github.event.inputs.opportunity_identity }}
           QUANTITY_CONDITION_STATUS: ${{ github.event.inputs.quantity_condition_status }}
           FINAL_PAYABLE_PRICE_NOK: ${{ github.event.inputs.final_payable_price_nok }}
+          RECOVERABLE_INPUT_VAT_NOK: ${{ github.event.inputs.recoverable_input_vat_nok }}
           TRANSPORT_NOK: ${{ github.event.inputs.transport_nok }}
           CONSERVATIVE_RESALE_NOK: ${{ github.event.inputs.conservative_resale_nok }}
+          RESALE_OUTPUT_VAT_NOK: ${{ github.event.inputs.resale_output_vat_nok }}
           RESALE_COMPARABLE_COUNT: ${{ github.event.inputs.resale_comparable_count }}
           COMMERCIAL_REVIEW_NOTE: ${{ github.event.inputs.commercial_review_note }}
         run: |
@@ -273,15 +286,19 @@ jobs:
             --opportunity-id "$COMMERCIAL_OPPORTUNITY_ID" \
             --quantity-condition-status "$QUANTITY_CONDITION_STATUS" \
             --final-payable-price-nok "$FINAL_PAYABLE_PRICE_NOK" \
+            --recoverable-input-vat-nok "$RECOVERABLE_INPUT_VAT_NOK" \
             --transport-nok "$TRANSPORT_NOK" \
             --conservative-resale-nok "$CONSERVATIVE_RESALE_NOK" \
+            --resale-output-vat-nok "$RESALE_OUTPUT_VAT_NOK" \
             --resale-comparable-count "$RESALE_COMPARABLE_COUNT" \
             --review-note "$COMMERCIAL_REVIEW_NOTE"
 
-      - name: Validate identity, safety and financial output
+      - name: Validate identity, VAT basis, safety and financial output
         env:
           EXPECTED_OPPORTUNITY_ID: ${{ github.event.inputs.opportunity_identity }}
           QUANTITY_CONDITION_STATUS: ${{ github.event.inputs.quantity_condition_status }}
+          EXPECTED_RECOVERABLE_INPUT_VAT_NOK: ${{ github.event.inputs.recoverable_input_vat_nok }}
+          EXPECTED_RESALE_OUTPUT_VAT_NOK: ${{ github.event.inputs.resale_output_vat_nok }}
         run: |
           python - <<'PY'
           import json
@@ -297,6 +314,19 @@ jobs:
           selected = (report.get("selected_opportunity") or {}).get("opportunity_identity")
           if selected != expected:
               raise SystemExit("Commercial analysis targeted a different opportunity")
+
+          vat_basis = report.get("vat_basis") or {}
+          if vat_basis.get("explicit") is not True:
+              raise SystemExit("Commercial financial decision is missing explicit VAT basis")
+          if vat_basis.get("inferred_vat_rate") is not None:
+              raise SystemExit("Commercial workflow may not infer a VAT rate")
+          if vat_basis.get("decision_basis") != "ECONOMIC_NET_OF_EXPLICIT_VAT":
+              raise SystemExit("Commercial decision did not use the explicit economic VAT basis")
+          if float(vat_basis.get("recoverable_input_vat_nok")) != float(os.environ["EXPECTED_RECOVERABLE_INPUT_VAT_NOK"]):
+              raise SystemExit("Recoverable input VAT does not match the explicit workflow input")
+          if float(vat_basis.get("resale_output_vat_nok")) != float(os.environ["EXPECTED_RESALE_OUTPUT_VAT_NOK"]):
+              raise SystemExit("Resale output VAT does not match the explicit workflow input")
+
           for key in (
               "automatic_contact",
               "automatic_bid",
@@ -310,8 +340,11 @@ jobs:
           if os.environ["QUANTITY_CONDITION_STATUS"] == "CONFIRMED":
               if report.get("analysis_state") != "FINANCIAL_DECISION_COMPLETE":
                   raise SystemExit("Complete explicit inputs did not produce a financial decision")
-              if (report.get("financial_readiness") or {}).get("ready_for_financial_engine") is not True:
+              readiness = report.get("financial_readiness") or {}
+              if readiness.get("ready_for_financial_engine") is not True:
                   raise SystemExit("Financial readiness did not become true")
+              if readiness.get("maximum_final_cash_payable_price_nok") is not None:
+                  raise SystemExit("Workflow must not infer a maximum cash payable price")
           print(summary)
           PY
 
