@@ -126,8 +126,25 @@ def test_inventory_lot_signal_requires_explicit_multi_item_evidence():
     assert has_inventory_lot_signal("Vareparti med arbeidsklær samlet")
     assert has_inventory_lot_signal("Restlager: 25 stk jakker")
     assert has_inventory_lot_signal("Flere plagg og bukser")
+    assert has_inventory_lot_signal(
+        "Blåkläder, Jallas, Sievi - Veil. 817.000,- 461 artikler"
+    )
     assert not has_inventory_lot_signal("Fxr jakke snøscooter, strl XL")
     assert not has_inventory_lot_signal("2026 Ny Klim jakke, large")
+
+
+def test_workwear_category_is_page_native_clothing_evidence_for_brand_only_lot():
+    title = "Blåkläder, Jallas, Sievi - Veil. 817.000,- 461 artikler"
+
+    assert normalize_public_api_item(live_item(title=title), now=NOW) is None
+
+    normalized = normalize_public_api_item(
+        live_item(title=title, category2=90010),
+        now=NOW,
+    )
+    assert normalized is not None
+    assert normalized.title == title
+    assert normalized.inventory_lot_signal is True
 
 
 def test_inventory_lot_signal_is_preserved_without_inventing_quantity():
