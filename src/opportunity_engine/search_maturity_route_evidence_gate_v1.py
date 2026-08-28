@@ -4,6 +4,11 @@ The gate does not search, fetch pages, mutate production queries, or create a
 second runtime. It reconciles already-produced CLOTHING_INVENTORY and
 FABRIC_PROCUREMENT artifacts across the fixed six markets and returns one
 explicit maturity decision.
+
+Exact-Lot maturity evidence keeps current Exa discovery separate from freshly
+reverified Proven-Route Recovery. Recovery may remain valid strict inventory
+evidence after a fresh page verification, but it is never mislabeled as a direct
+current-search discovery.
 """
 from __future__ import annotations
 
@@ -55,6 +60,25 @@ def _safety_ok(payload: Mapping[str, Any]) -> bool:
         if key in payload and payload.get(key) is not False:
             return False
     return True
+
+
+def _clothing_provenance_assessment(report: Mapping[str, Any]) -> dict[str, Any]:
+    total = int(report.get("strict_exact_lot_count") or 0)
+    separated = (
+        "current_exa_discovery_strict_exact_lot_count" in report
+        and "freshly_reverified_recovery_exact_lot_count" in report
+    )
+    current = int(report.get("current_exa_discovery_strict_exact_lot_count") or 0)
+    recovery = int(report.get("freshly_reverified_recovery_exact_lot_count") or 0)
+    consistent = separated and current >= 0 and recovery >= 0 and current + recovery == total
+    return {
+        "strict_exact_lot_count": total,
+        "current_exa_discovery_strict_exact_lot_count": current,
+        "freshly_reverified_recovery_exact_lot_count": recovery,
+        "provenance_separated": separated,
+        "provenance_counts_consistent": consistent,
+        "recovery_present": recovery > 0,
+    }
 
 
 def _fabric_candidates(report: Mapping[str, Any]) -> list[Mapping[str, Any]]:
@@ -137,7 +161,11 @@ def _fabric_report_assessment(report: Mapping[str, Any]) -> dict[str, Any]:
         blockers.append("SITE_PINNING_PRESENT")
     if int(report.get("legacy_search_requests_made") or 0) != 0:
         blockers.append("LEGACY_SEARCH_REQUESTS_PRESENT")
-    if int(report.get("search_requests_added_by_coverage_rotation") or runtime.get("search_requests_added_by_coverage_rotation") or 0) != 0:
+    if int(
+        report.get("search_requests_added_by_coverage_rotation")
+        or runtime.get("search_requests_added_by_coverage_rotation")
+        or 0
+    ) != 0:
         blockers.append("COVERAGE_ROTATION_ADDED_SEARCH_REQUESTS")
     for key in (
         "new_runtime_added",
@@ -226,22 +254,34 @@ def evaluate_search_maturity(
     clothing: dict[str, Any] = {}
 
     for market in CORE_MARKETS:
-        report = _load_json(input_root / f"{market.casefold()}-exa-exact-lot" / "search-run-report.json")
-        strict_count = int(report.get("strict_exact_lot_count") or 0)
+        report = _load_json(
+            input_root / f"{market.casefold()}-exa-exact-lot" / "search-run-report.json"
+        )
+        provenance = _clothing_provenance_assessment(report)
+        strict_count = provenance["strict_exact_lot_count"]
         passed = (
             report.get("status") == "SUCCESS"
             and report.get("execution_status") == "PASS"
             and report.get("domain") == "CLOTHING_INVENTORY"
             and report.get("source_mode") == "EXA_EXACT_LOT_MULTIHOP"
             and strict_count > 0
+            and provenance["provenance_separated"] is True
+            and provenance["provenance_counts_consistent"] is True
             and _safety_ok(report)
         )
-        clothing[market] = {"strict_exact_lot_count": strict_count, "passed": passed}
+        clothing[market] = {**provenance, "passed": passed}
+        if not provenance["provenance_separated"]:
+            blockers.append(f"CLOTHING_{market}_EXACT_LOT_PROVENANCE_NOT_SEPARATED")
+        elif not provenance["provenance_counts_consistent"]:
+            blockers.append(f"CLOTHING_{market}_EXACT_LOT_PROVENANCE_INCONSISTENT")
         if not passed:
             blockers.append(f"CLOTHING_{market}_STRICT_EXACT_LOT_NOT_PROVEN")
 
     expansion = _load_json(output_dir / "unified-six-market-exa-runtime.json")
-    if expansion.get("status") != "SUCCESS" or expansion.get("project_domain") != "CLOTHING_INVENTORY":
+    if (
+        expansion.get("status") != "SUCCESS"
+        or expansion.get("project_domain") != "CLOTHING_INVENTORY"
+    ):
         blockers.append("CLOTHING_EXPANSION_RUNTIME_NOT_SUCCESS")
     if not _safety_ok(expansion):
         blockers.append("CLOTHING_EXPANSION_AUTOMATIC_SAFETY_CHANGED")
@@ -251,9 +291,26 @@ def evaluate_search_maturity(
     for market in EXPANSION_MARKETS:
         row = expansion_markets.get(market) if isinstance(expansion_markets, Mapping) else None
         row = row if isinstance(row, Mapping) else {}
-        strict_count = int(row.get("strict_exact_lot_count") or 0)
-        passed = row.get("status") == "SUCCESS" and strict_count > 0
-        clothing[market] = {"strict_exact_lot_count": strict_count, "passed": passed}
+        report = _load_json(
+            input_root / f"{market.casefold()}-exa-exact-lot" / "search-run-report.json"
+        )
+        provenance = _clothing_provenance_assessment(report)
+        strict_count = provenance["strict_exact_lot_count"]
+        passed = (
+            row.get("status") == "SUCCESS"
+            and report.get("status") == "SUCCESS"
+            and report.get("domain") == "CLOTHING_INVENTORY"
+            and report.get("source_mode") == "EXA_EXACT_LOT_MULTIHOP"
+            and strict_count > 0
+            and provenance["provenance_separated"] is True
+            and provenance["provenance_counts_consistent"] is True
+            and _safety_ok(report)
+        )
+        clothing[market] = {**provenance, "passed": passed}
+        if not provenance["provenance_separated"]:
+            blockers.append(f"CLOTHING_{market}_EXACT_LOT_PROVENANCE_NOT_SEPARATED")
+        elif not provenance["provenance_counts_consistent"]:
+            blockers.append(f"CLOTHING_{market}_EXACT_LOT_PROVENANCE_INCONSISTENT")
         if not passed:
             blockers.append(f"CLOTHING_{market}_STRICT_EXACT_LOT_NOT_PROVEN")
 
@@ -278,13 +335,20 @@ def evaluate_search_maturity(
 
     blockers = sorted(set(blockers))
     mature = not blockers
+    provenance_integrity = all(
+        row.get("provenance_separated") is True
+        and row.get("provenance_counts_consistent") is True
+        for row in clothing.values()
+    ) and set(clothing) == set(SIX_MARKETS)
     return {
-        "schema_version": "search-maturity-route-evidence-gate-1.0",
+        "schema_version": "search-maturity-route-evidence-gate-1.1",
         "decision": "MATURE" if mature else "BLOCKED",
         "search_engine_v1_mature": mature,
         "project_domains": ["CLOTHING_INVENTORY", "FABRIC_PROCUREMENT"],
         "fixed_markets": list(SIX_MARKETS),
         "clothing": clothing,
+        "exact_lot_provenance_integrity_proven": provenance_integrity,
+        "current_search_and_reverified_recovery_separated": provenance_integrity,
         "fabric": {
             "covered_markets": covered_fabric_markets,
             "reports": fabric_assessments,
@@ -303,11 +367,16 @@ def evaluate_search_maturity(
 
 def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Evaluate Search Engine V1 maturity from existing artifacts only")
+    parser = argparse.ArgumentParser(
+        description="Evaluate Search Engine V1 maturity from existing artifacts only"
+    )
     parser.add_argument("--input-root", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--prior-fabric-report", type=Path, action="append", default=[])
