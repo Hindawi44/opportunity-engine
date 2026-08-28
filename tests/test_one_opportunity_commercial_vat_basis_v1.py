@@ -79,7 +79,7 @@ def test_vat_registered_style_inputs_use_net_economic_basis() -> None:
     assert readiness["ready_for_financial_engine"] is True
     assert readiness["total_cost_nok"] == 110000.0
     assert readiness["expected_profit_nok"] == 90000.0
-    assert readiness["roi"] == pytest.approx(90000 / 110000)
+    assert readiness["roi"] == 0.8182
     assert readiness["maximum_final_cash_payable_price_nok"] is None
     assert readiness["maximum_economic_acquisition_price_nok"] is not None
     assert report["financial_decision"]["decision"] == "BUY"
