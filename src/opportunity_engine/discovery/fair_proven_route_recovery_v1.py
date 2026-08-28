@@ -170,5 +170,14 @@ def install_fair_proven_route_recovery_v1() -> bool:
         return False
     _UPSTREAM_ROUTE_LOADER = verifier._load_proven_route_recovery_candidates
     verifier._load_proven_route_recovery_candidates = _fair_route_loader
+
+    # Install the provenance-only compatibility layer after the final recovery
+    # loader is in place, so it observes the real provider/recovery truth without
+    # changing any search request, page-fetch budget, or Exact-Lot gate.
+    from opportunity_engine.discovery.search_provenance_integrity_v1 import (
+        install_search_provenance_integrity_v1,
+    )
+
+    install_search_provenance_integrity_v1()
     _INSTALLED = True
     return True
