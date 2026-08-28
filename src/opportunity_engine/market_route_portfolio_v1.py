@@ -384,6 +384,8 @@ def build_market_route_portfolio_v1(
                 "portfolio_status": portfolio_status,
                 "route_portfolio_complete": complete,
                 "must_continue_discovery": not complete,
+                "route_learning_continues": not complete,
+                "blocks_search_engine_v1_exit": False,
                 "single_route_dependency": len(clothing_proven) < min_clothing,
                 "proven_clothing_commercial_route_family_count": len(clothing_proven),
                 "proven_fabric_procurement_route_family_count": len(fabric_proven),
@@ -404,6 +406,9 @@ def build_market_route_portfolio_v1(
     return {
         "schema_version": SCHEMA_VERSION,
         "status": "SUCCESS",
+        "portfolio_role": "ROUTE_DIVERSITY_LEARNING_ONLY",
+        "blocks_search_engine_v1_exit": False,
+        "search_engine_exit_authority": "SEARCH_MATURITY_ROUTE_EVIDENCE_GATE_V1",
         "generated_from_memory_run_id": _text(memory.get("current_run_id")) or None,
         "generated_from_memory_run_count": int(memory.get("memory_run_count") or 0),
         "market_count": len(market_rows),
@@ -422,7 +427,9 @@ def build_market_route_portfolio_v1(
         "portfolio_contract": (
             "A proven or fixed route solves only that exact route. It never closes a market. "
             "Market route completion requires diversified proven clothing routes plus a proven "
-            "fabric-procurement route; discovery must continue while that gate is unmet."
+            "fabric-procurement route. Unmet route diversity may continue as review-only learning "
+            "during commercial operation; this portfolio never blocks Search Engine V1 exit or "
+            "requires new search-engine development."
         ),
         "project_domain_gate_enforced": True,
         **{field: False for field in _SAFETY_FALSE_FIELDS},
@@ -444,6 +451,7 @@ def render_market_route_portfolio_v1(portfolio: Mapping[str, Any]) -> str:
             f">={min_clothing} proven clothing commercial route families + "
             f">={min_fabric} proven fabric-procurement route."
         ),
+        "Scope: route-diversity learning only; this portfolio does not block Search Engine V1 exit.",
         "",
     ]
     for market in _rows(portfolio.get("markets")):
@@ -452,7 +460,8 @@ def render_market_route_portfolio_v1(portfolio: Mapping[str, Any]) -> str:
             f"{_upper(market.get('portfolio_status'))} | "
             f"clothing={int(market.get('proven_clothing_commercial_route_family_count') or 0)}/{min_clothing} | "
             f"fabric={int(market.get('proven_fabric_procurement_route_family_count') or 0)}/{min_fabric} | "
-            f"continue_discovery={str(bool(market.get('must_continue_discovery'))).lower()}"
+            f"continue_route_learning={str(bool(market.get('route_learning_continues', market.get('must_continue_discovery')))).lower()} | "
+            "blocks_search_exit=false"
         )
         for route in _rows(market.get("routes")):
             lines.append(
@@ -461,7 +470,8 @@ def render_market_route_portfolio_v1(portfolio: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "A fixed rule handles one exact solved route only; it does not stop discovery.",
+            "A fixed rule handles one exact solved route only; it does not stop route learning.",
+            "Unmet route diversity may continue during commercial operation; it is not a Search Engine V1 development blocker.",
             "No automatic query/provider/source activation or commercial action is allowed.",
         ]
     )
