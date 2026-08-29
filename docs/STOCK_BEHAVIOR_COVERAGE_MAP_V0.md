@@ -126,39 +126,46 @@ Development status: `COVERED_FOR_RESEARCH / DEAL_SPECIFIC_BUYER_FIT_REQUIRED`
 ### 6. SINGLE-SIZE / SINGLE-MODEL STOCK
 
 ```text
-marketability_evidence: MODERATE_TO_STRONG
-buyer_family_evidence: WEAK_TO_MODERATE
-current_level: E1 sales-channel evidence; direct-buyer evidence still weak
+marketability_evidence: STRONG
+buyer_family_evidence: MODERATE
+current_level: E1 current buyer/operational evidence; exact concentrated-lot acceptance still unconfirmed
 ```
 
 Evidence observed:
-- Easy USA publicly sells wholesale footwear by case in single-size configurations, including a 36-pair case where buyers can select a single size.
+- Easy USA publicly sells wholesale footwear by case in single-size configurations, including cases where the buyer selects one size.
+- Yneck currently operates an overstock trade desk that buys footwear/streetwear lots outright, including cancelled orders, end-of-run, returns and damaged-box stock.
+- Yneck states that most of its retail listings are a single unit in a single size, demonstrating an operational resale model that can break acquired overstock into single-size units.
+- Guinn's Shoes publicly buys footwear liquidations, overstock, store stock, returns, defects and samples in quantities from 1 to 10,000 pairs.
+- Enviro Clear publicly buys footwear overstock/end-of-line/returns and states no minimum quantity for its stock-buying model.
 
 Interpretation:
-- single-size stock is demonstrably a tradable wholesale shape;
-- this proves `SINGLE_SIZE != UNSALEABLE`;
-- it does **not** yet prove a strong current direct-liquidator buying route for arbitrary single-size stock.
+- single-size stock is demonstrably a tradable shape;
+- direct buyers exist that can buy footwear in small or large quantities and downstream operations exist that retail single-size inventory;
+- however, we still do **not** have a current European/Norwegian direct buyer explicitly stating that it will buy an arbitrary lot concentrated entirely in one size/model.
 
-Development status: `MARKETABILITY_PROVEN / DIRECT_BUYER_GAP`
+Development status: `MARKETABILITY_PROVEN / DIRECT_BUYER_FAMILY_EVIDENCED / EXACT_SINGLE-SIZE_ACCEPTANCE_GAP`
 
 ---
 
 ### 7. SINGLE-SKU / VERY LOW QUANTITY PER SKU
 
 ```text
-marketability_evidence: MODERATE
-buyer_family_evidence: MODERATE historical footwear evidence
-current_level: E4 external historical for <100-pair SKU clearance
+marketability_evidence: MODERATE_TO_STRONG
+buyer_family_evidence: MODERATE
+current_level: E1 current low-minimum buyers + E4 historical footwear evidence
 ```
 
 Evidence observed:
 - adidas/Nafta `Hash Footwear` included SKUs containing fewer than 100 pairs.
+- Guinn's Shoes publicly states it buys from 1 to 10,000 pairs.
+- Enviro Clear publicly states there is no minimum quantity for its stock-buying model.
 
 Interpretation:
 - low quantity per SKU can be a recognized clearance-stock behavior;
-- exact acceptance depends on product category, buyer, geography and economics.
+- very low quantity is not automatically disqualifying;
+- exact acceptance still depends on product category, buyer, geography and economics.
 
-Development status: `BEHAVIOR_PROVEN / CURRENT_DIRECT_BUYER_GAP`
+Development status: `BEHAVIOR_PROVEN / DEAL_SPECIFIC_FIT_REQUIRED`
 
 ---
 
@@ -197,18 +204,37 @@ Development status: `COVERED_FOR_RESEARCH`
 
 ---
 
+## Norway / Scandinavia route evidence
+
+Current Norway-specific evidence is now stronger at the **general restlager buyer** level:
+
+- Miko Trading states it buys both small and large lots, including non-food, restlager, overproduction, damaged packaging and other irregular stock; its Havaristen channel actively sells clothing and footwear.
+- Varekompaniet states it buys varepartier, restlager and konkursbo and resells to consumers and other physical/online stores.
+- Partilageret states it buys unused surplus goods and restpartier and invites suppliers with restlager to submit stock.
+- Verdioutlet states it buys goods from konkursbo and restlager and resells directly.
+- Partihandel states it buys excess inventory/restpartier and currently sells apparel/footwear-related stock.
+
+Interpretation:
+- Norway has real direct-buyer/downstream routes for restlager and irregular inventory;
+- these companies are `E1+ buyer-route evidence`, not yet deal-specific buyers for Case 001 or Case 002;
+- none of the public evidence above explicitly proves acceptance of an arbitrary single-size footwear lot.
+
+Development status: `NORWAY_GENERAL_ROUTE_PROVEN / AWKWARD-SHAPE_FIT_STILL_CASE_SPECIFIC`
+
+---
+
 ## Current weakest gaps
 
 Future buyer-side research should prioritize only these gaps unless a real case introduces a new stock behavior:
 
 ```text
-GAP A — current direct buyers that explicitly buy SINGLE_SIZE / SINGLE_MODEL lots
-GAP B — current direct buyers that explicitly buy VERY LOW QUANTITY PER SKU where this matters
-GAP C — Norway/Scandinavia-specific buyers for awkward stock shapes
+GAP A — current Europe/Norway direct buyer explicitly accepting a FULL LOT concentrated in SINGLE_SIZE / SINGLE_MODEL
+GAP B — Norway/Scandinavia-specific evidence for awkward stock shapes beyond generic restlager buying
+GAP C — deal-specific absorbable quantity
 GAP D — deal-specific price evidence, not just marketability
 ```
 
-`BROKEN_SIZE_RUN` is no longer a category-level buyer-evidence gap because a current direct buyer explicitly accepts broken-size footwear.
+`BROKEN_SIZE_RUN` and `VERY_LOW_QUANTITY_PER_SKU` are no longer category-level marketability gaps.
 
 Do not spend time repeatedly proving already-covered behaviors such as returns, B-stock, generic stock, old-season stock, large mixed lots or broken-size footwear unless new evidence contradicts current understanding.
 
