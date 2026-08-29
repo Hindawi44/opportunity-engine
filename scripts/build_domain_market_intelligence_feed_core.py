@@ -63,6 +63,29 @@ def _write_report(path: Path, payload: dict[str, Any]) -> None:
     )
 
 
+def _annotate_intentional_cost_isolation(
+    report: dict[str, Any],
+    *,
+    expected_status: str,
+) -> dict[str, Any]:
+    """Distinguish deliberate core-daily isolation from a missing credential.
+
+    The wrapper intentionally removes paid-provider credentials in CORE_DAILY and
+    sets HUNT_FOLLOWUP_MAX_CASES=0. Downstream collectors historically report
+    that as SKIPPED_NO_* because they only see the isolated environment. Keep
+    the legacy status for compatibility, but add an explicit diagnostic so the
+    operator does not mistake a cost guard for a secret/configuration failure.
+    """
+    if str(os.environ.get("HUNT_FOLLOWUP_MAX_CASES") or "").strip() != "0":
+        return report
+    if str(report.get("status") or "") != expected_status:
+        return report
+    report["diagnostic_status"] = "SKIPPED_INTENTIONAL_COST_ISOLATION"
+    report["skip_reason"] = "CORE_DAILY_COST_ISOLATION"
+    report["credential_error"] = False
+    return report
+
+
 def _rewrite_source_artifact(
     report: dict[str, Any],
     *,
@@ -335,6 +358,10 @@ def main() -> int:
         brief,
         environment=os.environ,
     )
+    hunt_case_enrichment = _annotate_intentional_cost_isolation(
+        hunt_case_enrichment,
+        expected_status="SKIPPED_NO_API_KEY",
+    )
     write_openai_hunt_case_artifacts(
         hunt_case_enrichment,
         json_path=output_dir / "openai-hunt-case-enrichment.json",
@@ -345,6 +372,10 @@ def main() -> int:
         hunt_case_enrichment,
         brief,
         environment=os.environ,
+    )
+    targeted_followup = _annotate_intentional_cost_isolation(
+        targeted_followup,
+        expected_status="SKIPPED_NO_BRAVE_KEY",
     )
     write_hunt_case_targeted_followup_artifacts(
         targeted_followup,
@@ -359,6 +390,10 @@ def main() -> int:
         hunt_case_enrichment.get("status"),
     )
     print(
+        "openai_hunt_case_enrichment_diagnostic:",
+        hunt_case_enrichment.get("diagnostic_status", hunt_case_enrichment.get("status")),
+    )
+    print(
         "openai_hunt_case_api_requests:",
         hunt_case_enrichment.get("api_request_count", 0),
     )
@@ -369,6 +404,10 @@ def main() -> int:
     print(
         "hunt_case_targeted_followup_status:",
         targeted_followup.get("status"),
+    )
+    print(
+        "hunt_case_targeted_followup_diagnostic:",
+        targeted_followup.get("diagnostic_status", targeted_followup.get("status")),
     )
     print(
         "hunt_case_targeted_followup_requests:",
