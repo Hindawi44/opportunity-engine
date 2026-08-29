@@ -27,9 +27,6 @@ from opportunity_engine.project_domain_boundary import (
     FABRIC_PROCUREMENT,
     classify_project_domain,
 )
-from opportunity_engine.search_experiment_execution_bridge_v1 import (
-    _fabric_page_candidate,
-)
 
 
 SIX_MARKETS = ("NO", "SE", "DE", "FR", "IT", "NL")
@@ -289,6 +286,20 @@ def _fabric_candidate(*, market: str, row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _fabric_page_candidate(hit, *, page_fetcher):
+    """Resolve the bridge verifier only when verification actually runs.
+
+    Keeping this symbol module-level preserves the established monkeypatch and
+    normalization hooks without importing the experiment bridge during package
+    initialization.
+    """
+    from opportunity_engine.search_experiment_execution_bridge_v1 import (
+        _fabric_page_candidate as bridge_fabric_page_candidate,
+    )
+
+    return bridge_fabric_page_candidate(hit, page_fetcher=page_fetcher)
+
+
 def _run_fabric_exa_search() -> dict[str, Any]:
     api_key = _compact(os.environ.get("EXA_API_KEY"))
     report: dict[str, Any] = {
@@ -334,9 +345,6 @@ def _run_fabric_exa_search() -> dict[str, Any]:
             ]
             report["requests_made"] += 1
             market_row["hits_received"] = len(hits)
-            audit = [_fabric_page_candidate(hit, page_fetcher=None) for hit in []]
-            # _fabric_page_candidate defaults are not exposed; pass the canonical
-            # page fetcher by importing it lazily to keep this hook bounded.
             from opportunity_engine.discovery.keyword_shadow_verification import fetch_public_page
 
             audit = [
