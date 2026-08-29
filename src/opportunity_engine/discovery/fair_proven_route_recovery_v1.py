@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 import os
+import sys
 from typing import Callable
 
 from opportunity_engine.discovery import provider_unique_page_verification as verifier
@@ -163,6 +164,19 @@ def _fair_route_loader(
     return fair_select_recovery_candidates(pool, limit=limit)
 
 
+def _bridge_is_initializing() -> bool:
+    """Return true only for a bridge-first clean import.
+
+    MIND FORGE imports the search experiment bridge before the discovery package
+    has finished initializing. Pulling the daily provenance compatibility layer
+    back into that half-built bridge creates a circular import. Daily checkpoint
+    imports do not enter through the bridge, so their provenance installation is
+    unchanged.
+    """
+    bridge = sys.modules.get("opportunity_engine.search_experiment_execution_bridge_v1")
+    return bridge is not None and not hasattr(bridge, "_market_anchored")
+
+
 def install_fair_proven_route_recovery_v1() -> bool:
     """Wrap the already-installed recovery loader without changing its eligibility rules."""
     global _INSTALLED, _UPSTREAM_ROUTE_LOADER
@@ -171,13 +185,15 @@ def install_fair_proven_route_recovery_v1() -> bool:
     _UPSTREAM_ROUTE_LOADER = verifier._load_proven_route_recovery_candidates
     verifier._load_proven_route_recovery_candidates = _fair_route_loader
 
-    # Install the provenance-only compatibility layer after the final recovery
-    # loader is in place, so it observes the real provider/recovery truth without
-    # changing any search request, page-fetch budget, or Exact-Lot gate.
-    from opportunity_engine.discovery.search_provenance_integrity_v1 import (
-        install_search_provenance_integrity_v1,
-    )
+    # The provenance compatibility layer belongs to the established daily search
+    # runtime. Do not back-import it while MIND FORGE is still constructing the
+    # bridge module itself; that path needs only the bounded search experiment.
+    if not _bridge_is_initializing():
+        from opportunity_engine.discovery.search_provenance_integrity_v1 import (
+            install_search_provenance_integrity_v1,
+        )
 
-    install_search_provenance_integrity_v1()
+        install_search_provenance_integrity_v1()
+
     _INSTALLED = True
     return True
