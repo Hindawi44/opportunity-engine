@@ -105,20 +105,21 @@ Development status: `COVERED_FOR_RESEARCH`
 
 ```text
 marketability_evidence: STRONG
-buyer_family_evidence: STRONG_HISTORICAL_CONTRACT_EVIDENCE
-current_level: E4 external historical
+buyer_family_evidence: STRONG
+current_level: E1 current direct-buyer evidence + E4 historical contract evidence
 ```
 
 Evidence observed:
+- Pay For Clearance currently states that it buys footwear in bulk and explicitly accepts both full size runs and broken size stock.
 - In Nafta Traders Inc. v. adidas America Inc., the court described the adidas/Nafta clearance agreement as including `Hash Footwear`, defined as SKUs containing fewer than 100 pairs or incomplete size runs of specified footwear.
-- The agreement involved a merchandise liquidator/reseller purchasing clearance footwear categories from adidas.
+- The adidas/Nafta agreement involved a merchandise liquidator/reseller purchasing clearance footwear categories.
 
 Interpretation:
 - incomplete size runs are a documented commercial clearance category, not inherently unsaleable stock;
-- this is strong evidence that specialist liquidator/reseller routes can exist for broken-size footwear;
-- it does **not** prove that the same buyer or economics apply to Case 001 today.
+- a current direct buyer explicitly accepts broken-size footwear;
+- the remaining uncertainty is now deal-specific: product, quantity, geography, condition, price and logistics.
 
-Development status: `BEHAVIOR_PROVEN / DEAL_SPECIFIC_BUYER_STILL_REQUIRED`
+Development status: `COVERED_FOR_RESEARCH / DEAL_SPECIFIC_BUYER_FIT_REQUIRED`
 
 ---
 
@@ -136,7 +137,7 @@ Evidence observed:
 Interpretation:
 - single-size stock is demonstrably a tradable wholesale shape;
 - this proves `SINGLE_SIZE != UNSALEABLE`;
-- it does **not** yet prove a strong direct-liquidator buying route for arbitrary single-size stock.
+- it does **not** yet prove a strong current direct-liquidator buying route for arbitrary single-size stock.
 
 Development status: `MARKETABILITY_PROVEN / DIRECT_BUYER_GAP`
 
@@ -202,12 +203,14 @@ Future buyer-side research should prioritize only these gaps unless a real case 
 
 ```text
 GAP A — current direct buyers that explicitly buy SINGLE_SIZE / SINGLE_MODEL lots
-GAP B — current direct buyers that explicitly buy LOW-QUANTITY-PER-SKU / BROKEN-SIZE lots
-GAP C — Norway/Scandinavia-specific buyers for these awkward stock shapes
+GAP B — current direct buyers that explicitly buy VERY LOW QUANTITY PER SKU where this matters
+GAP C — Norway/Scandinavia-specific buyers for awkward stock shapes
 GAP D — deal-specific price evidence, not just marketability
 ```
 
-Do not spend time repeatedly proving already-covered behaviors such as returns, B-stock, generic stock, old-season stock, or large mixed lots unless new evidence contradicts current understanding.
+`BROKEN_SIZE_RUN` is no longer a category-level buyer-evidence gap because a current direct buyer explicitly accepts broken-size footwear.
+
+Do not spend time repeatedly proving already-covered behaviors such as returns, B-stock, generic stock, old-season stock, large mixed lots or broken-size footwear unless new evidence contradicts current understanding.
 
 ---
 
