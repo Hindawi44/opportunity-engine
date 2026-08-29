@@ -38,7 +38,11 @@ _BLOCKED_CATEGORIES = frozenset({
 _CLOTHING_INDUSTRY_PREFIXES = ("14.", "46.42", "47.71")
 
 _CLOTHING_MARKERS = (
-    "apparel", "clothing", "clothes", "garment", "garments", "fashion",
+    "apparel", "clothing", "clothes", "garment", "garments",
+    # Generic "fashion" is intentionally not sufficient text evidence by itself:
+    # watches, jewellery and other accessories frequently use it in product titles.
+    # Explicit FASHION category metadata remains allowed above, while page text must
+    # contain a garment/footwear-specific marker to enter CLOTHING_INVENTORY.
     "footwear", "shoes", "sportswear", "workwear", "menswear", "womenswear",
     "kidswear", "jacket", "jackets", "shirt", "shirts", "trouser", "trousers",
     "dress", "dresses", "jeans", "skirt", "skirts", "coat", "coats", "bridal",
