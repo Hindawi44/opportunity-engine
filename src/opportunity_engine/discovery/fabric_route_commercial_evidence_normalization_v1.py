@@ -10,11 +10,7 @@ from __future__ import annotations
 import re
 from typing import Any, Mapping
 
-from opportunity_engine.search_experiment_execution_bridge_v1 import (
-    _fabric_page_candidate as _base_fabric_page_candidate,
-)
 from opportunity_engine.discovery import unified_search_runtime_cli_hook as _runtime
-import opportunity_engine.search_experiment_execution_bridge_v1 as _bridge
 
 
 _INSTALLED = False
@@ -308,6 +304,12 @@ def normalize_fabric_commercial_evidence(
     }
 
 
+# Capture the runtime's clean lazy bridge resolver before replacing the runtime
+# hook with normalized evidence. The captured resolver imports the experiment
+# bridge only when a page is actually verified, after package initialization.
+_BASE_FABRIC_PAGE_CANDIDATE = _runtime._fabric_page_candidate
+
+
 def _normalized_page_candidate(hit, *, page_fetcher):
     captured: dict[str, Any] = {}
 
@@ -316,7 +318,7 @@ def _normalized_page_candidate(hit, *, page_fetcher):
         captured["page"] = fetched
         return fetched
 
-    row = dict(_base_fabric_page_candidate(hit, page_fetcher=capture))
+    row = dict(_BASE_FABRIC_PAGE_CANDIDATE(hit, page_fetcher=capture))
     fetched = captured.get("page")
     if fetched is None or row.get("commercial_fabric_page") is not True:
         return row
@@ -374,11 +376,15 @@ _BASE_RUNTIME_FABRIC_CANDIDATE = _runtime._fabric_candidate
 
 
 def install_fabric_route_commercial_evidence_normalization_v1() -> bool:
-    """Patch only the established fabric verification/candidate functions."""
+    """Patch only the established runtime fabric verification/candidate hooks.
+
+    The Search Experiment bridge keeps its own conservative verifier. Avoiding
+    an eager back-import here prevents clean-interpreter circular imports while
+    preserving normalized evidence on the unified production runtime.
+    """
     global _INSTALLED
     if _INSTALLED:
         return False
-    _bridge._fabric_page_candidate = _normalized_page_candidate
     _runtime._fabric_page_candidate = _normalized_page_candidate
     _runtime._fabric_candidate = _normalized_runtime_candidate
     _INSTALLED = True
