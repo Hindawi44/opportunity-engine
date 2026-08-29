@@ -208,6 +208,109 @@ It is a hypothesis until our own buyer/seller interaction or transaction evidenc
 
 ---
 
+## Seller Source Roles — hunter-first rule
+
+Before a discovered lot is promoted into a commercial case, classify the **seller/source role** separately from the buyer route.
+
+```text
+ORIGINAL_STOCK_OWNER
+LIQUIDATION_INSOLVENCY_SOURCE
+BROKER_AUCTION_MARKETPLACE
+STOCK_TRADER_RESELLER
+UNKNOWN
+```
+
+### ORIGINAL_STOCK_OWNER
+
+The company or operator that owns the stock because it arose from its own normal business, production, retail, import, cancelled orders, overproduction, surplus, store closure, warehouse reduction or similar evidenced origin.
+
+This is a **primary hunting target**.
+
+### LIQUIDATION_INSOLVENCY_SOURCE
+
+A liquidator, insolvency estate, bankruptcy administrator, closure sale or equivalent source disposing of stock from the original business.
+
+This is also a **primary hunting target**, even when an auction platform is used as the sales channel.
+
+### BROKER_AUCTION_MARKETPLACE
+
+An intermediary or platform that exposes stock but does not itself prove original ownership of the goods.
+
+This can be a useful discovery route, but the project should identify the underlying stock owner or liquidation context when possible.
+
+### STOCK_TRADER_RESELLER
+
+A stocklot/restposten trader that buys surplus, liquidation, returns, overstock or similar goods and resells them from its own inventory.
+
+This is **not the preferred prey/source** for the project because another stock trader has already entered the chain and may already have added margin.
+
+A stock trader may still be valuable as:
+
+```text
+DIRECT_BUYER
+WHOLESALER / RESELLER
+CLEARANCE_ROUTE
+PRICE_REFERENCE
+MARKET_BEHAVIOR_EVIDENCE
+```
+
+Do not automatically reject an exceptional arbitrage opportunity from a stock trader, but require stronger deal-specific economics before treating it as a hunting case.
+
+### UNKNOWN
+
+If the seller/source role cannot be evidenced, keep it `UNKNOWN`.
+
+```text
+UNKNOWN != ORIGINAL_STOCK_OWNER
+UNKNOWN != REJECTED
+```
+
+Do not infer original ownership from stock size, low price, location, company name or listing language alone.
+
+### Hunter-first operating rule
+
+The preferred commercial chain is:
+
+```text
+ORIGINAL STOCK OWNER / LIQUIDATION SOURCE
+→ OUR EARLY DISCOVERY + STOCK DEFINITION
+→ QUALIFIED BUYER / ROUTE
+→ COMMERCIAL MATCH
+```
+
+Avoid making this the default chain:
+
+```text
+ORIGINAL STOCK OWNER
+→ STOCK TRADER RESELLER
+→ US
+→ NEXT BUYER
+```
+
+because it usually means we are buying from another hunter rather than discovering the prey/source earlier.
+
+For every case record both fields independently:
+
+```text
+seller_source_role:
+ORIGINAL_STOCK_OWNER | LIQUIDATION_INSOLVENCY_SOURCE | BROKER_AUCTION_MARKETPLACE | STOCK_TRADER_RESELLER | UNKNOWN
+
+commercial_route_role:
+DIRECT_BUYER | CLEARANCE_BROKER | MARKETPLACE | WHOLESALER | EXPORTER | SPECIALIST_BUYER
+```
+
+Example from current research:
+
+```text
+Salzmann Restwaren GmbH
+seller_source_role: STOCK_TRADER_RESELLER
+case-use: buyer/route/price-reference evidence, not preferred original-stock prey
+```
+
+This classification is descriptive and routing-oriented. It does not itself create an automated BUY/REJECT decision.
+
+---
+
 ## Evidence discipline
 
 For every named company record:
