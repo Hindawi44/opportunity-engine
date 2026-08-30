@@ -1,0 +1,44 @@
+name: Patch Daily Checkpoint Schedule
+
+on:
+  push:
+    branches:
+      - fix-daily-checkpoint-0800-oslo
+
+permissions:
+  contents: write
+
+jobs:
+  patch-schedule:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix-daily-checkpoint-0800-oslo
+
+      - name: Patch schedule for an 08:00 Oslo-ready checkpoint
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/multi-market-daily-operator-checkpoint.yaml')
+          text = path.read_text(encoding='utf-8')
+          old = '  schedule:\n    - cron: "17 5 * * *"\n'
+          new = (
+              '  schedule:\n'
+              '    # Start with buffer so the daily checkpoint is normally ready before 08:00 Europe/Oslo.\n'
+              '    - cron: "47 6 * * *"\n'
+              '      timezone: "Europe/Oslo"\n'
+          )
+          if old not in text:
+              raise SystemExit('Expected current schedule was not found; refusing to patch')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
+          rm .github/workflows/patch-daily-checkpoint-schedule.yml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/multi-market-daily-operator-checkpoint.yaml .github/workflows/patch-daily-checkpoint-schedule.yml
+          git commit -m "Fix daily checkpoint Oslo schedule"
+          git push origin HEAD:fix-daily-checkpoint-0800-oslo
