@@ -2,7 +2,9 @@ name: Multi-Market Daily Operator Checkpoint
 
 on:
   schedule:
-    - cron: "17 5 * * *"
+    # Start with buffer so the daily checkpoint is normally ready before 08:00 Europe/Oslo.
+    - cron: "47 6 * * *"
+      timezone: "Europe/Oslo"
   workflow_dispatch:
     inputs:
       sweden_query_budget:
