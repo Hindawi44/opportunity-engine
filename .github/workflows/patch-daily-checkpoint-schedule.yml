@@ -16,7 +16,9 @@ jobs:
         with:
           ref: fix-daily-checkpoint-0800-oslo
 
-      - name: Patch schedule for an 08:00 Oslo-ready checkpoint
+      - name: Build modified workflow blob
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -35,10 +37,6 @@ jobs:
           path.write_text(text.replace(old, new, 1), encoding='utf-8')
           PY
 
-          rm .github/workflows/patch-daily-checkpoint-schedule.yml
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/multi-market-daily-operator-checkpoint.yaml .github/workflows/patch-daily-checkpoint-schedule.yml
-          git commit -m "Fix daily checkpoint Oslo schedule"
-          git push origin HEAD:fix-daily-checkpoint-0800-oslo
+          B64="$(base64 -w0 .github/workflows/multi-market-daily-operator-checkpoint.yaml)"
+          BLOB_SHA="$(gh api --method POST repos/${GITHUB_REPOSITORY}/git/blobs -f content="$B64" -f encoding=base64 --jq .sha)"
+          echo "MODIFIED_BLOB_SHA=$BLOB_SHA"
