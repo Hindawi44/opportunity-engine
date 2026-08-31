@@ -1,4 +1,4 @@
-name: Sweden Query Raw Probe V1
+name: Sweden Query Replacement Gate V1
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  raw-probe:
+  replacement-gate:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src:.
@@ -25,22 +25,49 @@ jobs:
           python-version: "3.11"
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
-      - name: Run one bounded Exa query
+      - name: Run bounded Sweden replacement gate
         run: |
           python - <<'PY'
+          import importlib.util
           import json
           import os
-          from opportunity_engine.discovery.exa_search import ExaSearchProvider
+          from pathlib import Path
 
-          query = "Sverige kläder varulager auktion parti pris antal plagg"
-          hits = ExaSearchProvider(os.environ["EXA_API_KEY"]).search(query, count=20)
-          print("SWEDEN_RAW_PROBE_QUERY:", query)
-          print("SWEDEN_RAW_PROBE_HIT_COUNT:", len(hits))
-          for i, hit in enumerate(hits, 1):
-              print(json.dumps({
-                  "rank": i,
-                  "title": hit.title,
-                  "url": hit.url,
-                  "description": hit.description,
-              }, ensure_ascii=False))
+          path = Path("scripts/run_exa_exact_lot_checkpoint.py")
+          spec = importlib.util.spec_from_file_location("sweden_gate_runner", path)
+          runner = importlib.util.module_from_spec(spec)
+          assert spec and spec.loader
+          spec.loader.exec_module(runner)
+
+          runner.MARKET_EXACT_LOT_QUERY_PACKS["SE"] = (
+              "Sverige restparti kläder grossist lager",
+              "Sverige överskottslager kläder till salu parti",
+              "Sverige kläder varulager auktion parti pris antal plagg",
+          )
+
+          out = Path("artifacts/sweden-query-replacement-gate-v1")
+          result = runner.run_market(
+              market="SE",
+              exa_api_key=os.environ["EXA_API_KEY"],
+              output_dir=out,
+              results_per_query=5,
+          )
+          report = result["search_run_report"]
+          print(
+              "SE_REPLACEMENT_RESULT:",
+              f"queries={report.get('queries_submitted')}",
+              f"primary_queries={report.get('primary_query_count')}",
+              f"primary_exact={report.get('primary_strict_exact_lot_count')}",
+              f"strict_exact={report.get('strict_exact_lot_count')}",
+              f"fresh={report.get('final_fresh_current_strict_exact_lot_count')}",
+              f"hosts={report.get('final_fresh_current_route_host_count')}",
+              f"fresh_recall={report.get('fresh_recall_triggered')}",
+              f"anchor_triggered={report.get('commercial_anchor_expansion_triggered')}",
+              f"anchor_queries={report.get('commercial_anchor_query_count')}",
+          )
+          resolution = json.loads((out / "exa-exact-lot-resolution.json").read_text(encoding="utf-8"))
+          for url in resolution.get("strict_exact_lot_urls") or []:
+              print("SE_EXACT_URL:", url)
+          for row in resolution.get("queries") or []:
+              print("SE_QUERY_STAGE:", row.get("query_stage"), row.get("query"), "hits=", len(row.get("hits") or []))
           PY
