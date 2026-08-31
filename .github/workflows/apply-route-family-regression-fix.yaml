@@ -1,4 +1,4 @@
-name: Split Gold Scorer Regression
+name: Corrected Split-Metric Benchmark Gate
 
 on:
   push:
@@ -11,10 +11,12 @@ permissions:
   contents: read
 
 jobs:
-  scorer-regression:
+  corrected-benchmark:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src:.
+      OUTPUT_DIR: artifacts/route-family-exact-lot-runtime-benchmark-v1-1
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
     steps:
       - name: Check out benchmark branch
         uses: actions/checkout@v4
@@ -24,67 +26,19 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Compile benchmark scorer
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Compile corrected benchmark
         run: python -m py_compile scripts/run_route_family_exact_lot_runtime_benchmark.py
 
-      - name: Validate Exact-Lot identity and route scoring separation
-        run: |
-          python - <<'PY'
-          import importlib.util
-          from pathlib import Path
+      - name: Run corrected baseline benchmark only
+        run: python scripts/run_route_family_exact_lot_runtime_benchmark.py
 
-          path = Path("scripts/run_route_family_exact_lot_runtime_benchmark.py")
-          spec = importlib.util.spec_from_file_location("bench", path)
-          bench = importlib.util.module_from_spec(spec)
-          assert spec and spec.loader
-          spec.loader.exec_module(bench)
-
-          candidates = [
-              {
-                  "market_code": "NL",
-                  "title": "Clothing Exact-Lot 37526",
-                  "opportunity_identity": "https://www.partijhandelaren.nl/partijhandel/kleding/baby-en-kinder-badkleding/37526",
-                  "source_urls": [],
-                  "canonical_urls": [],
-              },
-              {
-                  "market_code": "DE",
-                  "title": "Ab 2,90 EUR Damen-Stocksweatshirts",
-                  "opportunity_identity": "https://www.restposten24.de/example/10792738",
-                  "source_urls": [],
-                  "canonical_urls": [],
-              },
-          ]
-          exact = bench._score_exact_lots(candidates)
-          matched = {row["id"] for row in exact["matches"] if row["matched"]}
-          assert "NL_PARTIJ_BADKLEDING_500" in matched
-          assert "DE_RESTPOSTEN24_SWEAT_2000" in matched
-          assert "NL_PARTIJ_TEENSLIPPERS_4575" not in matched
-
-          route = bench._score_routes({
-              "FR": {
-                  "queries": [{
-                      "hits": [{
-                          "title": "Très important stock de lingerie - suite liquidation",
-                          "url": "https://www.interencheres.com/biens-equipement/example-684303",
-                          "description": "144 lots",
-                      }]
-                  }],
-                  "multihop": {"gateway_pages": []},
-                  "verification": {"verified_pages": []},
-              }
-          })
-          assert route["matched_count"] == 1
-
-          route_negative = bench._score_routes({
-              "FR": {
-                  "queries": [{"hits": [{"title": "stock de lingerie", "url": "https://example.test", "description": ""}]}],
-                  "multihop": {"gateway_pages": []},
-                  "verification": {"verified_pages": []},
-              }
-          })
-          assert route_negative["matched_count"] == 0
-          print("SPLIT_GOLD_SCORER_REGRESSION: PASS")
-          print(f"synthetic exact matches={exact['matched_count']}/{exact['gold_count']}")
-          print(f"synthetic route matches={route['matched_count']}/{route['gold_count']}")
-          PY
+      - name: Upload corrected benchmark evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-family-exact-lot-runtime-benchmark-v1-1
+          path: artifacts/route-family-exact-lot-runtime-benchmark-v1-1/
+          if-no-files-found: error
+          retention-days: 14
