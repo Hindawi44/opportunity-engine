@@ -1,0 +1,47 @@
+name: Search Maturity Blind Benchmark One Shot
+
+on:
+  push:
+    branches:
+      - brave-maturity-benchmark-v1
+    paths:
+      - .github/workflows/search-maturity-blind-benchmark.yaml
+      - scripts/run_search_maturity_blind_benchmark.py
+
+permissions:
+  contents: read
+
+jobs:
+  blind-benchmark:
+    if: ${{ github.ref_name == 'brave-maturity-benchmark-v1' && github.run_attempt == 1 }}
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src:.
+      OUTPUT_DIR: artifacts/search-maturity-blind-benchmark
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      # Branch-only one-shot benchmark. The runner itself has exactly 12 generic
+      # queries/provider, max_retries=0, so Brave can make at most 12 attempts.
+      OPPORTUNITY_ALLOW_PAID_BRAVE_PUSH: "true"
+    steps:
+      - name: Check out benchmark branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile benchmark runner
+        run: python -m py_compile scripts/run_search_maturity_blind_benchmark.py
+
+      - name: Run isolated Brave vs Exa benchmark
+        run: python scripts/run_search_maturity_blind_benchmark.py
+
+      - name: Upload benchmark evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: search-maturity-blind-benchmark
+          path: artifacts/search-maturity-blind-benchmark/
+          if-no-files-found: error
+          retention-days: 14
