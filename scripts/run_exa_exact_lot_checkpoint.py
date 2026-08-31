@@ -58,9 +58,8 @@ MARKET_CURRENCIES = {
 }
 MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
     "NO": (
-        "Norge klær vareparti nettauksjon auksjon plagg til salgs pris stk",
-        "Norge overskuddslager klær til salgs vareparti",
-        "Norge kleslager restparti engros mote",
+        "Norge klær vareparti nettauksjon konkursbo lager pris antall stk",
+        "Norge arbeidsklær overskuddsvarer auksjon høyeste bud stk",
     ),
     "SE": (
         "Sverige restparti kläder grossist lager",
@@ -68,9 +67,8 @@ MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
         "Sverige klädlager restposten grossist mode",
     ),
     "DE": (
-        "Deutschland Restposten Bekleidung Großhandel Lager",
-        "Deutschland Sonderposten Kleidung zu verkaufen Großhandel",
-        "Deutschland Bekleidung Restposten Stück Preis Großhandel Angebot",
+        "Deutschland Lagerware Bekleidung Mindestabnahme angebotene Menge Nettopreis Stück",
+        "Deutschland Bekleidung Restposten Großhandel Sonderposten Preis Menge Stück",
     ),
     "FR": (MARKET_EXACT_LOT_QUERIES["FR"],),
     "IT": (MARKET_EXACT_LOT_QUERIES["IT"],),

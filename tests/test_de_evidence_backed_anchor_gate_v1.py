@@ -62,7 +62,7 @@ def test_de_anchor_runs_with_seven_unique_hits_and_zero_exact_lots(
 
         def search(self, query: str, *, count: int):
             searches.append(query)
-            batch_sizes = (3, 2, 2, 2, 2)
+            batch_sizes = (4, 3, 2, 2)
             batch = len(searches) - 1
             size = min(count, batch_sizes[batch])
             return [
