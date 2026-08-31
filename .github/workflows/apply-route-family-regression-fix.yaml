@@ -91,19 +91,10 @@ jobs:
           PY
 
       - name: Compile changed runtime
-        run: |
-          python -m py_compile \
-            src/opportunity_engine/discovery/exa_shadow_page_verification.py \
-            src/opportunity_engine/discovery/exact_lot_child_link_resolution.py \
-            src/opportunity_engine/discovery/exact_lot_multihop_resolution.py \
-            scripts/run_route_family_exact_lot_runtime_benchmark.py
+        run: python -m py_compile src/opportunity_engine/discovery/exa_shadow_page_verification.py src/opportunity_engine/discovery/exact_lot_child_link_resolution.py src/opportunity_engine/discovery/exact_lot_multihop_resolution.py scripts/run_route_family_exact_lot_runtime_benchmark.py
 
       - name: Run focused regression tests
-        run: pytest -q \
-          tests/test_partijhandel_detail_evidence_v1.py \
-          tests/test_route_family_regression_fix_v1.py \
-          tests/test_item_specific_url_guard_v1.py \
-          tests/test_stock_container_detail_navigation_v1.py
+        run: pytest -q tests/test_partijhandel_detail_evidence_v1.py tests/test_route_family_regression_fix_v1.py tests/test_item_specific_url_guard_v1.py tests/test_stock_container_detail_navigation_v1.py
 
       - name: Live pre-benchmark check of badkleding detail
         run: |
@@ -133,10 +124,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            src/opportunity_engine/discovery/exa_shadow_page_verification.py \
-            src/opportunity_engine/discovery/exact_lot_child_link_resolution.py \
-            tests/test_partijhandel_detail_evidence_v1.py
+          git add src/opportunity_engine/discovery/exa_shadow_page_verification.py src/opportunity_engine/discovery/exact_lot_child_link_resolution.py tests/test_partijhandel_detail_evidence_v1.py
           if git diff --cached --quiet; then
             echo "No source changes to commit"
           else
