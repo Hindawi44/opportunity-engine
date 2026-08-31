@@ -56,6 +56,9 @@ MAX_CHILD_PAGE_FETCHES = 30
 MAX_RESPONSE_BYTES = 800_000
 
 _EURO_AFTER_NUMBER_RE = re.compile(r"(?<=\d)\s*€")
+# Some legacy pages expose a CP1252 euro byte decoded as C1 \x80.
+# Normalize only when it directly precedes a numeric price.
+_MISDECODED_EURO_BEFORE_NUMBER_RE = re.compile(r"\x80\s*(?=\d)")
 _CANONICAL_PRODUCT_DETAIL_RE = re.compile(
     r"(?:^|/)products?/(?P<slug>[^/?#]+)/*$",
     re.IGNORECASE,
@@ -282,7 +285,8 @@ def _mixed_general_merchandise_subject(subject: str) -> bool:
 
 def _normalize_child_price_text(text: str) -> str:
     """Normalize number-followed-by-euro-symbol prices without inventing values."""
-    return _EURO_AFTER_NUMBER_RE.sub(" EUR", str(text or ""))
+    normalized = _EURO_AFTER_NUMBER_RE.sub(" EUR", str(text or ""))
+    return _MISDECODED_EURO_BEFORE_NUMBER_RE.sub("€ ", normalized)
 
 
 def _looks_canonical_product_detail_url(url: str) -> bool:

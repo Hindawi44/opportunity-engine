@@ -307,6 +307,12 @@ _MARKETPLACE_ID_SLUG_RE = re.compile(
     r"(?:^|/)(?:c|listing|annonce|annuncio)-\d{2,}-[^/?#]+(?:\.html?)?(?:/|$)",
     re.IGNORECASE,
 )
+# Dutch stock-market detail route: category + descriptive slug + numeric record id.
+# This is URL-specificity evidence only; all commercial/domain gates remain required.
+_PARTIJHANDEL_DETAIL_RE = re.compile(
+    r"^/partijhandel/[^/?#]+/[^/?#]+/\d{2,}$",
+    re.IGNORECASE,
+)
 # Some B2B catalogues use a commerce-category segment followed by a numeric
 # product id and a descriptive .html slug instead of /product/<slug>. Keep this
 # deliberately narrow: the parent segment must itself look commercial, the id
@@ -397,6 +403,8 @@ def _looks_item_specific_url(url: str) -> bool:
         slug = stock_match.group("slug").casefold()
         if slug not in _GENERIC_STOCK_DETAIL_SLUGS:
             return True
+    if _PARTIJHANDEL_DETAIL_RE.fullmatch(path):
+        return True
     if _MARKETPLACE_ID_SLUG_RE.search(path):
         return True
     if _NUMERIC_HTML_COMMERCE_DETAIL_RE.search(path):
