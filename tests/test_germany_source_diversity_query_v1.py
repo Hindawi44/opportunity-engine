@@ -6,7 +6,6 @@ from pathlib import Path
 from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY, classify_project_domain
 from opportunity_engine.search_experiment_execution_bridge_v1 import _market_anchored
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/run_exa_exact_lot_checkpoint.py"
 
@@ -19,25 +18,22 @@ def _load_script():
     return module
 
 
-def test_germany_keeps_three_primary_queries_with_one_evidence_shaped_slot() -> None:
-    module = _load_script()
-    queries = module.MARKET_EXACT_LOT_QUERY_PACKS["DE"]
-
-    assert len(queries) == 3
-    assert queries[:2] == (
-        "Deutschland Restposten Bekleidung Großhandel Lager",
-        "Deutschland Sonderposten Kleidung zu verkaufen Großhandel",
+def test_germany_uses_two_proven_source_neutral_primary_queries() -> None:
+    queries = _load_script().MARKET_EXACT_LOT_QUERY_PACKS["DE"]
+    assert queries == (
+        "Deutschland Lagerware Bekleidung Mindestabnahme angebotene Menge Nettopreis Stück",
+        "Deutschland Bekleidung Restposten Großhandel Sonderposten Preis Menge Stück",
     )
-    assert queries[2] == "Deutschland Bekleidung Restposten Stück Preis Großhandel Angebot"
 
 
-def test_germany_diversity_query_stays_market_domain_and_source_neutral() -> None:
-    module = _load_script()
-    query = module.MARKET_EXACT_LOT_QUERY_PACKS["DE"][2]
-
-    assert _market_anchored(query, "DE")
-    assert classify_project_domain(text=query) == CLOTHING_INVENTORY
-    assert "site:" not in query.casefold()
-    assert "stück" in query.casefold()
-    assert "preis" in query.casefold()
-    assert "angebot" in query.casefold()
+def test_germany_queries_stay_market_domain_and_source_neutral() -> None:
+    queries = _load_script().MARKET_EXACT_LOT_QUERY_PACKS["DE"]
+    assert len(queries) == 2
+    for query in queries:
+        assert _market_anchored(query, "DE")
+        assert classify_project_domain(text=query) == CLOTHING_INVENTORY
+        assert "site:" not in query.casefold()
+        assert "restposten24" not in query.casefold()
+        assert "grosshandel24" not in query.casefold()
+    assert all(token in queries[0].casefold() for token in ("mindestabnahme", "menge", "nettopreis", "stück"))
+    assert all(token in queries[1].casefold() for token in ("restposten", "grosshandel", "sonderposten", "preis", "menge"))
