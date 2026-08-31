@@ -47,8 +47,12 @@ def test_target_live_checkpoint_still_supports_manual_and_daily_runs() -> None:
     assert "name: Multi-Market Daily Operator Checkpoint" in text
     assert "workflow_dispatch:" in text
     assert "schedule:" in text
-    assert 'cron: "47 6 * * *"' in text
+    assert 'cron: "47 0-6 * * *"' in text
     assert 'timezone: "Europe/Oslo"' in text
+    assert "daily-schedule-guard:" in text
+    assert "needs: daily-schedule-guard" in text
+    assert "needs.daily-schedule-guard.outputs.should_run == 'true'" in text
+    assert "cancel-in-progress: false" in text
     assert "operator-read-only-checkpoint:" in text
     assert "production_mutation" in text
     assert "automatic_purchase" in text
