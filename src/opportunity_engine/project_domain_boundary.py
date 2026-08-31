@@ -54,6 +54,8 @@ _CLOTHING_MARKERS = (
     "næringsmiddelklær",
     "mote", "jakke", "jakker", "bukser", "skjorter", "kjoler", "sko",
     "brudekjole", "korsett", "korsettsalong", "kläder", "klader", "klädlager",
+    # Swedish compound garment noun confirmed by a verified Exact-Lot.
+    "fritidskläder", "fritidsklader",
     "kladlager", "klädbutik", "kladbutik", "klädbutiken", "kladbutiken",
     "jackor", "byxor", "skjortor", "klänningar", "klanningar",
     "bröllopsklänning", "brollopsklanning", "kleidung", "bekleidung",

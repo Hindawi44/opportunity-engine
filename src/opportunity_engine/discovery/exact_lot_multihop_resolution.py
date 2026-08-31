@@ -85,6 +85,19 @@ _MARKETPLACE_ID_SLUG_RE = re.compile(
 )
 
 
+# Source-neutral Dutch stock-market route family. Category/pagination pages are
+# navigation only; only a fetched detail page with strict clothing, sale, price
+# and quantity evidence can become an Exact-Lot.
+_PARTIJHANDEL_DETAIL_RE = re.compile(
+    r"^/partijhandel/[^/]+/[^/]+/\d{2,}$",
+    re.IGNORECASE,
+)
+_PARTIJHANDEL_CATEGORY_RE = re.compile(
+    r"^/partijhandel/[^/]+(?:/\d+)?$",
+    re.IGNORECASE,
+)
+
+
 def _host(url: str) -> str:
     try:
         return (urlsplit(_compact(url)).hostname or "").casefold()
@@ -116,6 +129,11 @@ def _commercial_url_role(url: str) -> str | None:
     # item pages. Treat the hierarchy as navigation only before the generic
     # item-specific guard can mistake a nested category for a product detail.
     if path == "/products/bekleidung" or path.startswith("/products/bekleidung/"):
+        return "CATEGORY"
+
+    if _PARTIJHANDEL_DETAIL_RE.fullmatch(path):
+        return "PRODUCT_DETAIL"
+    if _PARTIJHANDEL_CATEGORY_RE.fullmatch(path):
         return "CATEGORY"
 
     # Use the canonical item-specific guard for singular /product/, /lot/, etc.
