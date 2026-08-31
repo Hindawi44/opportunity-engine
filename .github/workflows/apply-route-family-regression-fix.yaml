@@ -1,4 +1,4 @@
-name: Diagnose Partijhandel Exact-Lot Gap
+name: Validate Partijhandel Detail Evidence Fix
 
 on:
   push:
@@ -8,13 +8,15 @@ on:
       - .github/workflows/apply-route-family-regression-fix.yaml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose-badkleding:
+  apply-test-benchmark:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src:.
+      OUTPUT_DIR: artifacts/route-family-exact-lot-runtime-benchmark
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
     steps:
       - name: Check out benchmark branch
         uses: actions/checkout@v4
@@ -27,38 +29,117 @@ jobs:
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Diagnose current detail and category evidence
+      - name: Apply narrow detail-evidence fixes
         run: |
           python - <<'PY'
-          import re
-          from opportunity_engine.discovery.keyword_shadow_verification import fetch_public_page
-          from opportunity_engine.discovery.exact_lot_child_link_resolution import fetch_public_html, _classify_child_page
-          from opportunity_engine.discovery.exa_shadow_page_verification import _looks_item_specific_url
+          from pathlib import Path
 
-          detail = "https://www.partijhandelaren.nl/partijhandel/kleding/baby-en-kinder-badkleding/37526"
-          category = "https://www.partijhandelaren.nl/partijhandel/kleding"
+          exa_path = Path("src/opportunity_engine/discovery/exa_shadow_page_verification.py")
+          exa = exa_path.read_text(encoding="utf-8")
+          insert_anchor = "# Some B2B catalogues use a commerce-category segment followed by a numeric\n"
+          route_re = (
+              "# Dutch stock-market detail route: category + descriptive slug + numeric record id.\n"
+              "# This is URL-specificity evidence only; all commercial/domain gates remain required.\n"
+              "_PARTIJHANDEL_DETAIL_RE = re.compile(\n"
+              "    r\"^/partijhandel/[^/?#]+/[^/?#]+/\\d{2,}$\",\n"
+              "    re.IGNORECASE,\n"
+              ")\n"
+          )
+          if insert_anchor not in exa:
+              raise SystemExit("exa route insert anchor missing")
+          if "_PARTIJHANDEL_DETAIL_RE" not in exa:
+              exa = exa.replace(insert_anchor, route_re + insert_anchor, 1)
 
-          page = fetch_public_page(detail)
-          print("DETAIL_FETCH", page.ok, page.status_code, page.final_url, page.error, page.truncated)
-          print("DETAIL_TITLE", page.title)
-          print("DETAIL_ITEM_SPECIFIC", _looks_item_specific_url(page.final_url or detail))
-          print("DETAIL_TEXT_LEN", len(page.text or ""))
-          low = (page.text or "").casefold()
-          for token in ("500", "badkleding", "2000", "€", "eur", "te koop"):
-              idx = low.find(token.casefold())
-              snippet = "" if idx < 0 else (page.text or "")[max(0, idx-160):idx+260]
-              print("DETAIL_TOKEN", repr(token), idx, repr(snippet))
-          classification, evidence = _classify_child_page(title=page.title, text=page.text, url=page.final_url or detail)
-          print("DETAIL_CLASSIFICATION", classification)
-          print("DETAIL_EVIDENCE", evidence)
+          item_anchor = "    if _MARKETPLACE_ID_SLUG_RE.search(path):\n        return True\n"
+          item_patch = (
+              "    if _PARTIJHANDEL_DETAIL_RE.fullmatch(path):\n"
+              "        return True\n"
+              + item_anchor
+          )
+          if item_anchor not in exa:
+              raise SystemExit("exa item-specific anchor missing")
+          if "if _PARTIJHANDEL_DETAIL_RE.fullmatch(path):" not in exa:
+              exa = exa.replace(item_anchor, item_patch, 1)
+          exa_path.write_text(exa, encoding="utf-8")
 
-          html = fetch_public_html(category)
-          print("CATEGORY_FETCH", html.ok, html.status_code, html.final_url, html.error, html.truncated)
-          print("CATEGORY_HTML_LEN", len(html.html or ""))
-          raw = html.html or ""
-          low_html = raw.casefold()
-          for token in ("37526", "baby-en-kinder-badkleding", "500 stuks", "€ 2000", "€2000", "2000"):
-              idx = low_html.find(token.casefold())
-              snippet = "" if idx < 0 else raw[max(0, idx-500):idx+700]
-              print("CATEGORY_TOKEN", repr(token), idx, repr(snippet))
+          child_path = Path("src/opportunity_engine/discovery/exact_lot_child_link_resolution.py")
+          child = child_path.read_text(encoding="utf-8")
+          euro_anchor = '_EURO_AFTER_NUMBER_RE = re.compile(r"(?<=\\d)\\s*€")\n'
+          euro_patch = (
+              euro_anchor
+              + '# Some legacy pages expose a CP1252 euro byte decoded as C1 \\x80.\n'
+              + '# Normalize only when it directly precedes a numeric price.\n'
+              + '_MISDECODED_EURO_BEFORE_NUMBER_RE = re.compile(r"\\x80\\s*(?=\\d)")\n'
+          )
+          if euro_anchor not in child:
+              raise SystemExit("child euro regex anchor missing")
+          if "_MISDECODED_EURO_BEFORE_NUMBER_RE" not in child:
+              child = child.replace(euro_anchor, euro_patch, 1)
+
+          normalize_anchor = '    return _EURO_AFTER_NUMBER_RE.sub(" EUR", str(text or ""))\n'
+          normalize_patch = (
+              '    normalized = _EURO_AFTER_NUMBER_RE.sub(" EUR", str(text or ""))\n'
+              '    return _MISDECODED_EURO_BEFORE_NUMBER_RE.sub("€ ", normalized)\n'
+          )
+          if normalize_anchor not in child:
+              raise SystemExit("child price normalize anchor missing")
+          child = child.replace(normalize_anchor, normalize_patch, 1)
+          child_path.write_text(child, encoding="utf-8")
+
+          test_path = Path("tests/test_partijhandel_detail_evidence_v1.py")
+          test_path.write_text('''from opportunity_engine.discovery.exa_shadow_page_verification import (\n    EXACT_LOT_CANDIDATE,\n    _looks_item_specific_url,\n)\nfrom opportunity_engine.discovery.exact_lot_child_link_resolution import _classify_child_page\n\n\ndef test_partijhandel_numeric_record_route_is_item_specific_only_for_detail_shape() -> None:\n    detail = "https://example.test/partijhandel/kleding/baby-en-kinder-badkleding/37526"\n    category = "https://example.test/partijhandel/kleding"\n    pagination = "https://example.test/partijhandel/kleding/2"\n    unrelated = "https://example.test/archive/kleding/baby-en-kinder-badkleding/37526"\n\n    assert _looks_item_specific_url(detail) is True\n    assert _looks_item_specific_url(category) is False\n    assert _looks_item_specific_url(pagination) is False\n    assert _looks_item_specific_url(unrelated) is False\n\n\ndef test_misdecoded_cp1252_euro_price_recovers_strict_exact_lot() -> None:\n    url = "https://example.test/partijhandel/kleding/baby-en-kinder-badkleding/37526"\n    title = "Baby en kinder badkleding - Partijhandel"\n    text = (\n        "Voor verkoop. Baby en kinder badkleding \\x80 2000 exclusief BTW. "\n        "Omschrijving 500 stuks baby en kinder badkleding diverse merken."\n    )\n\n    classification, evidence = _classify_child_page(title=title, text=text, url=url)\n\n    assert classification == EXACT_LOT_CANDIDATE\n    assert evidence["item_specific_url_evidence"] is True\n    assert evidence["price_evidence"] is True\n    assert evidence["quantity_evidence"] is True\n    assert evidence["project_domain"] == "CLOTHING_INVENTORY"\n\n\ndef test_misdecoded_euro_normalization_does_not_create_price_without_number() -> None:\n    url = "https://example.test/partijhandel/kleding/baby-en-kinder-badkleding/37526"\n    classification, evidence = _classify_child_page(\n        title="Baby en kinder badkleding",\n        text="Voor verkoop. Restpartij 500 stuks baby badkleding. Los teken \\x80 zonder prijs.",\n        url=url,\n    )\n    assert evidence["price_evidence"] is False\n    assert classification != EXACT_LOT_CANDIDATE\n''', encoding="utf-8")
           PY
+
+      - name: Compile changed runtime
+        run: |
+          python -m py_compile \
+            src/opportunity_engine/discovery/exa_shadow_page_verification.py \
+            src/opportunity_engine/discovery/exact_lot_child_link_resolution.py \
+            src/opportunity_engine/discovery/exact_lot_multihop_resolution.py \
+            scripts/run_route_family_exact_lot_runtime_benchmark.py
+
+      - name: Run focused regression tests
+        run: pytest -q \
+          tests/test_partijhandel_detail_evidence_v1.py \
+          tests/test_route_family_regression_fix_v1.py \
+          tests/test_item_specific_url_guard_v1.py \
+          tests/test_stock_container_detail_navigation_v1.py
+
+      - name: Live pre-benchmark check of badkleding detail
+        run: |
+          python - <<'PY'
+          from opportunity_engine.discovery.keyword_shadow_verification import fetch_public_page
+          from opportunity_engine.discovery.exact_lot_child_link_resolution import _classify_child_page
+          u = "https://www.partijhandelaren.nl/partijhandel/kleding/baby-en-kinder-badkleding/37526"
+          p = fetch_public_page(u)
+          c, e = _classify_child_page(title=p.title, text=p.text, url=p.final_url or u)
+          print("BADKLEDING_LIVE", p.ok, c, e)
+          if not (p.ok and c == "EXACT_LOT_CANDIDATE" and e.get("price_evidence") is True and e.get("item_specific_url_evidence") is True):
+              raise SystemExit("live badkleding detail did not pass strict evidence after fix")
+          PY
+
+      - name: Run same Route-Family Exact-Lot benchmark
+        run: python scripts/run_route_family_exact_lot_runtime_benchmark.py
+
+      - name: Upload validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-family-exact-lot-runtime-benchmark-detail-fix
+          path: artifacts/route-family-exact-lot-runtime-benchmark/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Commit validated source fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/opportunity_engine/discovery/exa_shadow_page_verification.py \
+            src/opportunity_engine/discovery/exact_lot_child_link_resolution.py \
+            tests/test_partijhandel_detail_evidence_v1.py
+          if git diff --cached --quiet; then
+            echo "No source changes to commit"
+          else
+            git commit -m "Recover Partijhandel detail price evidence"
+            git push origin HEAD:brave-maturity-benchmark-v1
+          fi
