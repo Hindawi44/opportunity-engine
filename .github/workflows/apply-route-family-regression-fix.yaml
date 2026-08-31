@@ -1,0 +1,170 @@
+name: Apply Route Family Regression Fix
+
+on:
+  push:
+    branches:
+      - brave-maturity-benchmark-v1
+    paths:
+      - .github/workflows/apply-route-family-regression-fix.yaml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src:.
+      OUTPUT_DIR: artifacts/route-family-exact-lot-runtime-benchmark
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+    steps:
+      - name: Check out benchmark branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Apply narrow regression fixes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          domain_path = Path("src/opportunity_engine/project_domain_boundary.py")
+          domain = domain_path.read_text(encoding="utf-8")
+          old = '    "brudekjole", "korsett", "korsettsalong", "kläder", "klader", "klädlager",\n'
+          new = (
+              '    "brudekjole", "korsett", "korsettsalong", "kläder", "klader", "klädlager",\n'
+              '    # Swedish compound garment noun confirmed by a verified Exact-Lot.\n'
+              '    "fritidskläder", "fritidsklader",\n'
+          )
+          if old not in domain:
+              raise SystemExit("project-domain patch anchor missing")
+          domain_path.write_text(domain.replace(old, new, 1), encoding="utf-8")
+
+          multihop_path = Path("src/opportunity_engine/discovery/exact_lot_multihop_resolution.py")
+          multihop = multihop_path.read_text(encoding="utf-8")
+          marker = "_MARKETPLACE_ID_SLUG_RE = re.compile("
+          start = multihop.index(marker)
+          insert_at = multihop.index("\n\ndef _host", start)
+          route_shapes = r'''
+
+# Source-neutral Dutch stock-market route family. Category/pagination pages are
+# navigation only; only a fetched detail page with strict clothing, sale, price
+# and quantity evidence can become an Exact-Lot.
+_PARTIJHANDEL_DETAIL_RE = re.compile(
+    r"^/partijhandel/[^/]+/[^/]+/\d{2,}$",
+    re.IGNORECASE,
+)
+_PARTIJHANDEL_CATEGORY_RE = re.compile(
+    r"^/partijhandel/[^/]+(?:/\d+)?$",
+    re.IGNORECASE,
+)
+'''
+          if "_PARTIJHANDEL_DETAIL_RE" not in multihop:
+              multihop = multihop[:insert_at] + route_shapes + multihop[insert_at:]
+
+          role_anchor = "    # Use the canonical item-specific guard for singular /product/, /lot/, etc.\n"
+          role_patch = (
+              "    if _PARTIJHANDEL_DETAIL_RE.fullmatch(path):\n"
+              "        return \"PRODUCT_DETAIL\"\n"
+              "    if _PARTIJHANDEL_CATEGORY_RE.fullmatch(path):\n"
+              "        return \"CATEGORY\"\n\n"
+          )
+          if role_anchor not in multihop:
+              raise SystemExit("multi-hop role patch anchor missing")
+          if role_patch not in multihop:
+              multihop = multihop.replace(role_anchor, role_patch + role_anchor, 1)
+          multihop_path.write_text(multihop, encoding="utf-8")
+
+          test_path = Path("tests/test_route_family_regression_fix_v1.py")
+          test_path.write_text(r'''from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    classify_project_domain,
+)
+from opportunity_engine.discovery.exact_lot_multihop_resolution import (
+    _commercial_url_role,
+    _extract_navigation_links,
+)
+
+
+def test_verified_swedish_compound_clothing_subject_survives_domain_gate() -> None:
+    subject = "Parti fritidskläder för MC-intresserade, 170 plagg"
+    assert classify_project_domain(text=subject) == CLOTHING_INVENTORY
+
+
+def test_partijhandel_route_family_distinguishes_category_and_detail() -> None:
+    category = "https://example.test/partijhandel/kleding"
+    pagination = "https://example.test/partijhandel/kleding/2"
+    detail = "https://example.test/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514"
+    unrelated = "https://example.test/archive/kleding/teenslippers/37514"
+
+    assert _commercial_url_role(category) == "CATEGORY"
+    assert _commercial_url_role(pagination) == "CATEGORY"
+    assert _commercial_url_role(detail) == "PRODUCT_DETAIL"
+    assert _commercial_url_role(unrelated) is None
+
+
+def test_partijhandel_category_exposes_exact_lot_detail_links_to_multihop() -> None:
+    category = "https://example.test/partijhandel/kleding"
+    badkleding = "https://example.test/partijhandel/kleding/baby-en-kinder-badkleding/37526"
+    teenslippers = "https://example.test/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514"
+    html = (
+        '<a href="/partijhandel/kleding/baby-en-kinder-badkleding/37526">Baby en kinder badkleding</a>'
+        '<a href="/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514">Teenslippers</a>'
+        '<a href="/partijhandel/kleding/2">Volgende pagina</a>'
+        '<a href="/contact">Contact</a>'
+    )
+
+    links = _extract_navigation_links(
+        page_url=category,
+        root_host="example.test",
+        html_text=html,
+        max_links=12,
+    )
+
+    assert badkleding in links
+    assert teenslippers in links
+    assert "https://example.test/contact" not in links
+''', encoding="utf-8")
+          PY
+
+      - name: Compile changed runtime
+        run: |
+          python -m py_compile \
+            src/opportunity_engine/project_domain_boundary.py \
+            src/opportunity_engine/discovery/exact_lot_multihop_resolution.py \
+            scripts/run_route_family_exact_lot_runtime_benchmark.py
+
+      - name: Run focused regression tests
+        run: pytest -q tests/test_route_family_regression_fix_v1.py tests/test_stock_container_detail_navigation_v1.py
+
+      - name: Run same Route-Family Exact-Lot benchmark
+        run: python scripts/run_route_family_exact_lot_runtime_benchmark.py
+
+      - name: Upload validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-family-exact-lot-runtime-benchmark-fix-validation
+          path: artifacts/route-family-exact-lot-runtime-benchmark/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Commit validated source fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/opportunity_engine/project_domain_boundary.py \
+            src/opportunity_engine/discovery/exact_lot_multihop_resolution.py \
+            tests/test_route_family_regression_fix_v1.py
+          if git diff --cached --quiet; then
+            echo "No source changes to commit"
+          else
+            git commit -m "Fix route-family Exact-Lot recall gates"
+            git push origin HEAD:brave-maturity-benchmark-v1
+          fi
