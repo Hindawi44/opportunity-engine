@@ -1,4 +1,4 @@
-name: Source-Neutral Query Challenger Probe
+name: Source-Neutral Query Strict-Yield Probe
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  query-probe:
+  strict-yield-probe:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src:.
@@ -28,45 +28,69 @@ jobs:
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Probe three source-neutral challenger queries
+      - name: Run bounded strict-yield probe
         run: |
           python - <<'PY'
+          import importlib.util
           import os
+          from pathlib import Path
+
           from opportunity_engine.discovery.exa_search import ExaSearchProvider
+          from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
+          from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_exact_lot_multihop
+          from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
+          from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_benchmark
+
+          runner_path = Path("scripts/run_exa_exact_lot_checkpoint.py")
+          spec = importlib.util.spec_from_file_location("probe_runner", runner_path)
+          runner = importlib.util.module_from_spec(spec)
+          assert spec and spec.loader
+          spec.loader.exec_module(runner)
 
           queries = {
               "NO": "Norge arbeidsklær overskuddsvarer auksjon høyeste bud stk",
               "DE": "Deutschland Lagerware Bekleidung Mindestabnahme angebotene Menge Nettopreis Stück",
               "FR": "France vente aux enchères vêtements stock lots estimation marchandise neuve",
           }
-          scoring = {
-              "NO": (
-                  ("BLAKLADER_22", ("blåkläder", "22 stk")),
-                  ("BOSCH_32", ("bosch car service", "32 stk")),
-                  ("BJORNKLADER_12", ("björnkläder", "12 stk")),
-              ),
-              "DE": (("STOCKSWEAT_2000", ("damen-stocksweatshirts", "2000")),),
-              "FR": (("LINGERIE_144", ("stock de lingerie", "144 lots")),),
-          }
-
           provider = ExaSearchProvider(os.environ["EXA_API_KEY"])
-          total = 0
+
+          total_exact = 0
           for market, query in queries.items():
-              hits = provider.search(query, count=20)
-              print(f"QUERY {market}: {query}")
-              print(f"HITS {market}: {len(hits)}")
-              surfaces = []
-              for index, hit in enumerate(hits, 1):
-                  surface = " ".join((hit.title, hit.url, hit.description or "")).casefold()
-                  surfaces.append(surface)
-                  print(f"{market} #{index}: {hit.title} | {hit.url}")
-              matched = []
-              for gold_id, needles in scoring[market]:
-                  if any(all(needle.casefold() in surface for needle in needles) for surface in surfaces):
-                      matched.append(gold_id)
-              total += len(matched)
-              print(f"MATCHES {market}: {','.join(matched) if matched else 'NONE'}")
+              hits = list(provider.search(query, count=20))
+              benchmark = _custom_benchmark(
+                  market=market,
+                  query=query,
+                  hits=hits,
+                  project_domain=CLOTHING_INVENTORY,
+              )
+              verification = verify_provider_unique_pages(
+                  benchmark,
+                  provider="exa",
+                  max_page_fetches=min(15, max(1, len(hits))),
+              )
+              multihop = resolve_exact_lot_multihop(
+                  verification,
+                  max_root_parents=4,
+                  max_navigation_depth=3,
+                  max_links_per_page=10,
+                  max_navigation_page_fetches=15,
+              )
+              exact = runner._exact_lot_rows(verification, multihop)
+              total_exact += len(exact)
+              print(f"STRICT_YIELD {market}: hits={len(hits)} exact={len(exact)}")
+              for row in exact:
+                  print(
+                      "EXACT",
+                      market,
+                      row.get("classification"),
+                      row.get("final_url") or row.get("url"),
+                  )
+              print(
+                  f"GATE_COUNTS {market}: direct={verification.get('exact_lot_candidate_count')} "
+                  f"multihop={multihop.get('exact_lot_candidate_count')}"
+              )
               print()
-          print(f"CHALLENGER_QUERY_MATCH_TOTAL: {total}/5")
-          print("Gold signatures are scoring-only and never enter query text.")
+
+          print(f"STRICT_YIELD_TOTAL: {total_exact}")
+          print("No query contains Gold brand, company, source-domain, or exact-lot identifiers.")
           PY
