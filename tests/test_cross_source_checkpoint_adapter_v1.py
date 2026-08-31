@@ -102,5 +102,5 @@ def test_daily_checkpoint_keeps_norway_cross_source_with_thirteen_bounded_source
     assert '"source_name": "Exa Exact-Lot NO"' in text
     assert '"source_name": "Exa Exact-Lot SE"' in text
     assert '"source_name": "Exa Exact-Lot DE"' in text
-    assert 'cron: "47 6 * * *"' in text
+    assert 'cron: "47 0-6 * * *"' in text
     assert 'timezone: "Europe/Oslo"' in text
