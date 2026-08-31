@@ -1,4 +1,4 @@
-name: Corrected Split-Metric Benchmark Gate
+name: Norway Zero-Cost Query Replacement Gate
 
 on:
   push:
@@ -11,11 +11,10 @@ permissions:
   contents: read
 
 jobs:
-  corrected-benchmark:
+  no-query-replacement:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src:.
-      OUTPUT_DIR: artifacts/route-family-exact-lot-runtime-benchmark-v1-1
       EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
     steps:
       - name: Check out benchmark branch
@@ -29,16 +28,98 @@ jobs:
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Compile corrected benchmark
-        run: python -m py_compile scripts/run_route_family_exact_lot_runtime_benchmark.py
+      - name: Run Norway replacement through strict Exact-Lot pipeline
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import json
+          import os
+          from pathlib import Path
+          from urllib.parse import unquote
 
-      - name: Run corrected baseline benchmark only
-        run: python scripts/run_route_family_exact_lot_runtime_benchmark.py
+          from opportunity_engine.discovery.exa_search import ExaSearchProvider
+          from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
+          from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_exact_lot_multihop
+          from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
+          from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_benchmark
 
-      - name: Upload corrected benchmark evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: route-family-exact-lot-runtime-benchmark-v1-1
-          path: artifacts/route-family-exact-lot-runtime-benchmark-v1-1/
-          if-no-files-found: error
-          retention-days: 14
+          runner_path = Path("scripts/run_exa_exact_lot_checkpoint.py")
+          spec = importlib.util.spec_from_file_location("no_replacement_runner", runner_path)
+          runner = importlib.util.module_from_spec(spec)
+          assert spec and spec.loader
+          spec.loader.exec_module(runner)
+
+          queries = (
+              "Norge klær vareparti nettauksjon konkursbo lager pris antall stk",
+              "Norge arbeidsklær overskuddsvarer auksjon høyeste bud stk",
+          )
+          provider = ExaSearchProvider(os.environ["EXA_API_KEY"])
+          hits = []
+          seen = set()
+          for query in queries:
+              rows = list(provider.search(query, count=20))
+              print(f"QUERY {query!r}: hits={len(rows)}")
+              for hit in rows:
+                  if hit.url in seen:
+                      continue
+                  seen.add(hit.url)
+                  hits.append(hit)
+
+          benchmark = _custom_benchmark(
+              market="NO",
+              query=" | ".join(queries),
+              hits=hits,
+              project_domain=CLOTHING_INVENTORY,
+          )
+          verification = verify_provider_unique_pages(
+              benchmark,
+              provider="exa",
+              max_page_fetches=min(30, max(1, len(hits))),
+          )
+          multihop = resolve_exact_lot_multihop(
+              verification,
+              max_root_parents=6,
+              max_navigation_depth=3,
+              max_links_per_page=12,
+              max_navigation_page_fetches=30,
+          )
+          exact = runner._exact_lot_rows(verification, multihop)
+
+          def norm(value):
+              return " ".join(unquote(str(value or "")).casefold().replace(".", " ").split())
+
+          gold = (
+              ("NO_AUKSJONEN_BLAKLADER_22", (("574797",), ("blåkläder", "22 stk"))),
+              ("NO_AUKSJONEN_BOSCH_32", (("bosch car service", "32 stk"),)),
+              ("NO_AUKSJONEN_BJORNKLADER_12", (("513083",), ("björnkläder", "12 stk"))),
+          )
+          surfaces = []
+          for row in exact:
+              url = row.get("final_url") or row.get("url") or ""
+              title = row.get("title") or ""
+              surface = norm(f"{title} {url}")
+              surfaces.append((surface, url, title))
+              print(f"EXACT: {title} | {url}")
+
+          matches = []
+          for gold_id, options in gold:
+              found = None
+              for surface, url, title in surfaces:
+                  if any(all(norm(needle) in surface for needle in option) for option in options):
+                      found = (url, title)
+                      break
+              matches.append((gold_id, found))
+
+          matched_count = sum(found is not None for _, found in matches)
+          print(f"NO_REPLACEMENT_RESULT: unique_hits={len(hits)} strict_exact={len(exact)} gold={matched_count}/3")
+          print("NO_REPLACEMENT_MATCHES:", ", ".join(gold_id for gold_id, found in matches if found) or "NONE")
+          for gold_id, found in matches:
+              if found:
+                  print(f"MATCH {gold_id}: {found[1]} | {found[0]}")
+              else:
+                  print(f"MISS {gold_id}")
+          print(f"VERIFICATION exact={verification.get('exact_lot_candidate_count')} fetch_failed={verification.get('fetch_failed_count')} budget_exhausted={verification.get('budget_exhausted_count')}")
+          print(f"MULTIHOP exact={multihop.get('exact_lot_candidate_count')} gateways={multihop.get('gateway_page_count')} fetches={multihop.get('navigation_page_fetches_attempted')}")
+          print("Reference from immediately preceding corrected baseline: strict_exact=6, Gold NO=0/3, query_count=2.")
+          print("Replacement query count remains 2. No site: query, Brave, Gold identifier, or source domain appears in query text.")
+          PY
