@@ -1,0 +1,44 @@
+name: Sweden Query Raw Probe V1
+
+on:
+  push:
+    branches:
+      - sweden-query-replacement-v1
+    paths:
+      - .github/workflows/sweden-query-raw-probe-v1.yaml
+
+permissions:
+  contents: read
+
+jobs:
+  raw-probe:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src:.
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sweden-query-replacement-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run one bounded Exa query
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from opportunity_engine.discovery.exa_search import ExaSearchProvider
+
+          query = "Sverige kläder varulager auktion parti pris antal plagg"
+          hits = ExaSearchProvider(os.environ["EXA_API_KEY"]).search(query, count=20)
+          print("SWEDEN_RAW_PROBE_QUERY:", query)
+          print("SWEDEN_RAW_PROBE_HIT_COUNT:", len(hits))
+          for i, hit in enumerate(hits, 1):
+              print(json.dumps({
+                  "rank": i,
+                  "title": hit.title,
+                  "url": hit.url,
+                  "description": hit.description,
+              }, ensure_ascii=False))
+          PY
