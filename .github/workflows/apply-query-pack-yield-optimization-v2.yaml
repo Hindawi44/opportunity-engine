@@ -1,0 +1,50 @@
+name: Apply Query Pack Yield Optimization V2
+
+on:
+  push:
+    branches:
+      - query-pack-yield-optimization-v1
+    paths:
+      - .github/workflows/apply-query-pack-yield-optimization-v2.yaml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-test-commit:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src:.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: query-pack-yield-optimization-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+      - name: Apply bounded production candidate
+        run: python scripts/tmp_apply_query_pack_yield_optimization.py
+      - name: Compile runtime
+        run: python -m py_compile scripts/run_exa_exact_lot_checkpoint.py
+      - name: Focused tests
+        run: |
+          pytest -q \
+            tests/test_norway_alternative_route_discovery_v1.py \
+            tests/test_germany_source_diversity_query_v1.py \
+            tests/test_exa_exact_lot_checkpoint_bridge_v1.py \
+            tests/test_controlled_commercial_anchor_expansion_v1.py \
+            tests/test_de_evidence_backed_anchor_gate_v1.py
+      - name: Full test suite
+        run: pytest -q
+      - name: Commit production candidate only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/run_exa_exact_lot_checkpoint.py \
+                  tests/test_norway_alternative_route_discovery_v1.py \
+                  tests/test_germany_source_diversity_query_v1.py \
+                  tests/test_de_evidence_backed_anchor_gate_v1.py
+          git commit -m "Optimize NO and DE Exact-Lot query packs"
+          git push origin HEAD:query-pack-yield-optimization-v1
