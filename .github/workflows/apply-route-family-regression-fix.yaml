@@ -25,6 +25,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install runtime dependency
+        run: python -m pip install requests
+
       - name: Probe three source-neutral challenger queries
         run: |
           python - <<'PY'
