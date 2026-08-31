@@ -43,6 +43,25 @@ def _strict_se_row() -> dict:
     }
 
 
+def test_sweden_primary_query_pack_uses_proven_source_neutral_auction_query() -> None:
+    module = _load_runner()
+    queries = module.MARKET_EXACT_LOT_QUERY_PACKS["SE"]
+    assert queries == (
+        "Sverige restparti kläder grossist lager",
+        "Sverige överskottslager kläder till salu parti",
+        "Sverige kläder varulager auktion parti pris antal plagg",
+    )
+    assert len(queries) == 3
+    for query in queries:
+        assert _market_anchored(query, "SE")
+        assert classify_project_domain(text=query) == CLOTHING_INVENTORY
+        assert "site:" not in query.casefold()
+        assert "psauction" not in query.casefold()
+        assert "budi" not in query.casefold()
+        assert "klaravik" not in query.casefold()
+    assert all(token in queries[2].casefold() for token in ("varulager", "auktion", "parti", "pris", "antal", "plagg"))
+
+
 def test_sweden_has_one_source_neutral_zero_yield_recall_query() -> None:
     module = _load_runner()
     assert len(module.MARKET_ZERO_YIELD_RECALL_QUERIES["SE"]) == 1
