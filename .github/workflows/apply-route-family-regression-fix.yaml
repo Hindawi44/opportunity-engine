@@ -1,4 +1,4 @@
-name: Source-Neutral Query Strict-Yield Probe
+name: Baseline vs Challenger Exact-Lot Yield
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  strict-yield-probe:
+  compare-yield:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src:.
@@ -28,7 +28,7 @@ jobs:
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Run bounded strict-yield probe
+      - name: Compare baseline with one challenger per market
         run: |
           python - <<'PY'
           import importlib.util
@@ -42,55 +42,114 @@ jobs:
           from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_benchmark
 
           runner_path = Path("scripts/run_exa_exact_lot_checkpoint.py")
-          spec = importlib.util.spec_from_file_location("probe_runner", runner_path)
+          spec = importlib.util.spec_from_file_location("compare_runner", runner_path)
           runner = importlib.util.module_from_spec(spec)
           assert spec and spec.loader
           spec.loader.exec_module(runner)
 
-          queries = {
+          baseline = {
+              "NO": (
+                  "Norge klær vareparti nettauksjon konkursbo lager pris antall stk",
+                  "Norge restlager klær grossist restparti overskuddslager pris antall",
+              ),
+              "DE": (
+                  "Deutschland Bekleidung Insolvenz Auktion Warenlager Posten Preis Stück",
+                  "Deutschland Bekleidung Restposten Großhandel Sonderposten Preis Menge Stück",
+              ),
+              "FR": (
+                  "France vêtements liquidation judiciaire enchères stock lot prix quantité",
+                  "France vêtements déstockage grossiste lot stock prix quantité",
+              ),
+          }
+          challenger = {
               "NO": "Norge arbeidsklær overskuddsvarer auksjon høyeste bud stk",
               "DE": "Deutschland Lagerware Bekleidung Mindestabnahme angebotene Menge Nettopreis Stück",
               "FR": "France vente aux enchères vêtements stock lots estimation marchandise neuve",
           }
+
           provider = ExaSearchProvider(os.environ["EXA_API_KEY"])
 
-          total_exact = 0
-          for market, query in queries.items():
-              hits = list(provider.search(query, count=20))
+          def collect(query_list):
+              merged = []
+              seen = set()
+              for query in query_list:
+                  hits = list(provider.search(query, count=20))
+                  print(f"SEARCH query={query!r} hits={len(hits)}")
+                  for hit in hits:
+                      if hit.url in seen:
+                          continue
+                      seen.add(hit.url)
+                      merged.append(hit)
+              return merged
+
+          def evaluate(market, query_list, hits):
               benchmark = _custom_benchmark(
                   market=market,
-                  query=query,
+                  query=" | ".join(query_list),
                   hits=hits,
                   project_domain=CLOTHING_INVENTORY,
               )
               verification = verify_provider_unique_pages(
                   benchmark,
                   provider="exa",
-                  max_page_fetches=min(15, max(1, len(hits))),
+                  max_page_fetches=min(30, max(1, len(hits))),
               )
               multihop = resolve_exact_lot_multihop(
                   verification,
-                  max_root_parents=4,
+                  max_root_parents=6,
                   max_navigation_depth=3,
-                  max_links_per_page=10,
-                  max_navigation_page_fetches=15,
+                  max_links_per_page=12,
+                  max_navigation_page_fetches=30,
               )
               exact = runner._exact_lot_rows(verification, multihop)
-              total_exact += len(exact)
-              print(f"STRICT_YIELD {market}: hits={len(hits)} exact={len(exact)}")
-              for row in exact:
-                  print(
-                      "EXACT",
-                      market,
-                      row.get("classification"),
-                      row.get("final_url") or row.get("url"),
-                  )
+              urls = {
+                  str(row.get("final_url") or row.get("url") or "").strip()
+                  for row in exact
+                  if str(row.get("final_url") or row.get("url") or "").strip()
+              }
+              return exact, urls
+
+          total_baseline = 0
+          total_extended = 0
+          total_added = 0
+
+          for market in ("NO", "DE", "FR"):
+              base_queries = baseline[market]
+              challenger_query = challenger[market]
+
+              base_hits = collect(base_queries)
+              challenger_hits = collect((challenger_query,))
+              union_hits = list(base_hits)
+              seen_urls = {hit.url for hit in union_hits}
+              for hit in challenger_hits:
+                  if hit.url not in seen_urls:
+                      seen_urls.add(hit.url)
+                      union_hits.append(hit)
+
+              base_exact, base_urls = evaluate(market, base_queries, base_hits)
+              ext_queries = base_queries + (challenger_query,)
+              ext_exact, ext_urls = evaluate(market, ext_queries, union_hits)
+
+              added = sorted(ext_urls - base_urls)
+              lost = sorted(base_urls - ext_urls)
+              total_baseline += len(base_urls)
+              total_extended += len(ext_urls)
+              total_added += len(added)
+
               print(
-                  f"GATE_COUNTS {market}: direct={verification.get('exact_lot_candidate_count')} "
-                  f"multihop={multihop.get('exact_lot_candidate_count')}"
+                  f"COMPARE {market}: baseline_hits={len(base_hits)} challenger_hits={len(challenger_hits)} "
+                  f"union_hits={len(union_hits)} baseline_exact={len(base_urls)} extended_exact={len(ext_urls)} "
+                  f"net={len(ext_urls)-len(base_urls):+d} added={len(added)} lost={len(lost)}"
               )
+              for url in added:
+                  print(f"ADDED {market}: {url}")
+              for url in lost:
+                  print(f"LOST {market}: {url}")
               print()
 
-          print(f"STRICT_YIELD_TOTAL: {total_exact}")
-          print("No query contains Gold brand, company, source-domain, or exact-lot identifiers.")
+          print(
+              f"TOTAL_COMPARE: baseline_exact={total_baseline} extended_exact={total_extended} "
+              f"net={total_extended-total_baseline:+d} added_unique={total_added}"
+          )
+          print("Source-neutral queries only. No Gold identifiers or site: constraints are used.")
           PY
