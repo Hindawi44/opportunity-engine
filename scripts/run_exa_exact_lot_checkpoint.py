@@ -89,6 +89,28 @@ def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
 
 
+def _exact_lot_identity_key(value: object) -> str:
+    """Normalize cosmetic URL variants without collapsing distinct listing queries."""
+    raw = _compact(value)
+    if not raw:
+        return ""
+    try:
+        parsed = urlsplit(raw)
+        host = (parsed.hostname or "").casefold().removeprefix("www.")
+        if not host:
+            return raw
+        port = parsed.port
+    except ValueError:
+        return raw
+
+    scheme = (parsed.scheme or "https").casefold()
+    default_port = (scheme == "https" and port == 443) or (scheme == "http" and port == 80)
+    netloc = host if port is None or default_port else f"{host}:{port}"
+    path = (parsed.path or "/").rstrip("/") or "/"
+    query = f"?{parsed.query}" if parsed.query else ""
+    return f"{scheme}://{netloc}{path}{query}"
+
+
 def _exact_lot_url_set(rows: list[Mapping[str, Any]]) -> set[str]:
     return {
         _compact(row.get("final_url") or row.get("url"))
@@ -335,9 +357,10 @@ def _exact_lot_rows(
             continue
         row = dict(raw)
         url = _compact(row.get("final_url") or row.get("url"))
-        if not url or url in seen:
+        identity_key = _exact_lot_identity_key(url)
+        if not url or identity_key in seen:
             continue
-        seen.add(url)
+        seen.add(identity_key)
         row["url"] = url
         row["final_url"] = url
         row["exact_lot_origin"] = "DIRECT_SEARCH_RESULT"
@@ -352,9 +375,10 @@ def _exact_lot_rows(
             continue
         row = dict(raw)
         url = _compact(row.get("final_url") or row.get("url"))
-        if not url or url in seen:
+        identity_key = _exact_lot_identity_key(url)
+        if not url or identity_key in seen:
             continue
-        seen.add(url)
+        seen.add(identity_key)
         row["url"] = url
         row["final_url"] = url
         row["exact_lot_origin"] = "MULTI_HOP"
