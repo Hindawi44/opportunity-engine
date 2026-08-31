@@ -46,6 +46,7 @@ MANUAL_PAID_BRAVE_OBSERVED_UNIT_COST_USD = 0.005
 MANUAL_PAID_BRAVE_BENCHMARK_BRANCH = "brave-maturity-benchmark-v1"
 MANUAL_PAID_BRAVE_BENCHMARK_BUDGET_ID = "BRAVE_MANUAL_MATURITY_BENCHMARK_V1"
 MANUAL_PAID_BRAVE_BENCHMARK_MAX_REQUESTS = 60
+BENCHMARK_ALLOWED_ACTORS = frozenset({"hindawi44", "github-actions[bot]"})
 
 _TRUTHY = frozenset({"1", "true", "yes", "on"})
 
@@ -112,7 +113,8 @@ def _manual_bounded_benchmark_allowed(env: Mapping[str, str]) -> bool:
         return False
     if str(env.get("GITHUB_JOB") or "").strip() != AUTOMATED_CHECKPOINT_JOB:
         return False
-    if str(env.get("GITHUB_ACTOR") or "").strip().casefold() != MANUAL_PAID_BRAVE_TEST_ACTOR:
+    actor = str(env.get("GITHUB_ACTOR") or "").strip().casefold()
+    if actor not in BENCHMARK_ALLOWED_ACTORS:
         return False
     if explicit_opt_in and ref_name not in {"main", MANUAL_PAID_BRAVE_BENCHMARK_BRANCH}:
         return False
