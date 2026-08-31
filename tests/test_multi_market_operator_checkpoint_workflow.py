@@ -14,10 +14,14 @@ def test_checkpoint_workflow_is_daily_and_read_only() -> None:
     assert "name: Multi-Market Daily Operator Checkpoint" in text
     assert "workflow_dispatch:" in text
     assert "schedule:" in text
-    assert 'cron: "47 6 * * *"' in text
+    assert 'cron: "47 0-6 * * *"' in text
     assert 'timezone: "Europe/Oslo"' in text
+    assert "daily-schedule-guard:" in text
+    assert "actions: write" in text
+    assert "cancel-in-progress: false" in text
+    assert "needs: daily-schedule-guard" in text
+    assert "needs.daily-schedule-guard.outputs.should_run == 'true'" in text
     assert "operator-read-only-checkpoint:" in text
-    assert "github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'" in text
     assert "permissions:\n  contents: read\n  actions: read" in text
     assert "automatic_purchase" in text
     assert "automatic_payment" in text
