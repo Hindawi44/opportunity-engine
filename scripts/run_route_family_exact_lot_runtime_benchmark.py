@@ -15,14 +15,14 @@ MARKETS = ("NO", "SE", "DE", "FR", "IT", "NL")
 ROUTE_FAMILY_CLOTHING_QUERIES = {
     "NO": (
         "Norge klær vareparti nettauksjon konkursbo lager pris antall stk",
-        "Norge restlager klær grossist restparti overskuddslager pris antall",
+        "Norge arbeidsklær overskuddsvarer auksjon høyeste bud stk",
     ),
     "SE": (
         "Sverige kläder konkursauktion varulager parti pris antal",
         "Sverige restparti kläder grossist överskottslager parti pris antal",
     ),
     "DE": (
-        "Deutschland Bekleidung Insolvenz Auktion Warenlager Posten Preis Stück",
+        "Deutschland Lagerware Bekleidung Mindestabnahme angebotene Menge Nettopreis Stück",
         "Deutschland Bekleidung Restposten Großhandel Sonderposten Preis Menge Stück",
     ),
     "FR": (
@@ -199,7 +199,7 @@ def main() -> int:
     exact_score = _score_exact_lots(all_candidates)
     route_score = _score_routes(resolutions)
     payload = {
-        "schema_version": "route-family-exact-lot-runtime-benchmark-1.1",
+        "schema_version": "route-family-exact-lot-runtime-benchmark-1.2",
         "project_domain": CLOTHING_INVENTORY,
         "provider": "exa",
         "production_mutation": False,
@@ -220,7 +220,7 @@ def main() -> int:
     )
 
     lines = [
-        "ROUTE-FAMILY EXACT-LOT RUNTIME BENCHMARK V1.1",
+        "ROUTE-FAMILY EXACT-LOT RUNTIME BENCHMARK V1.2",
         f"provider: Exa | results/query: {RESULTS_PER_QUERY}",
         f"queries submitted: {total_queries}",
         f"strict Exact-Lots: {total_exact}",
