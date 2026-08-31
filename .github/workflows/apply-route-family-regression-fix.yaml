@@ -33,6 +33,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import textwrap
 
           domain_path = Path("src/opportunity_engine/project_domain_boundary.py")
           domain = domain_path.read_text(encoding="utf-8")
@@ -51,20 +52,20 @@ jobs:
           marker = "_MARKETPLACE_ID_SLUG_RE = re.compile("
           start = multihop.index(marker)
           insert_at = multihop.index("\n\ndef _host", start)
-          route_shapes = r'''
+          route_shapes = textwrap.dedent(r'''
 
-# Source-neutral Dutch stock-market route family. Category/pagination pages are
-# navigation only; only a fetched detail page with strict clothing, sale, price
-# and quantity evidence can become an Exact-Lot.
-_PARTIJHANDEL_DETAIL_RE = re.compile(
-    r"^/partijhandel/[^/]+/[^/]+/\d{2,}$",
-    re.IGNORECASE,
-)
-_PARTIJHANDEL_CATEGORY_RE = re.compile(
-    r"^/partijhandel/[^/]+(?:/\d+)?$",
-    re.IGNORECASE,
-)
-'''
+          # Source-neutral Dutch stock-market route family. Category/pagination pages are
+          # navigation only; only a fetched detail page with strict clothing, sale, price
+          # and quantity evidence can become an Exact-Lot.
+          _PARTIJHANDEL_DETAIL_RE = re.compile(
+              r"^/partijhandel/[^/]+/[^/]+/\d{2,}$",
+              re.IGNORECASE,
+          )
+          _PARTIJHANDEL_CATEGORY_RE = re.compile(
+              r"^/partijhandel/[^/]+(?:/\d+)?$",
+              re.IGNORECASE,
+          )
+          ''')
           if "_PARTIJHANDEL_DETAIL_RE" not in multihop:
               multihop = multihop[:insert_at] + route_shapes + multihop[insert_at:]
 
@@ -81,56 +82,57 @@ _PARTIJHANDEL_CATEGORY_RE = re.compile(
               multihop = multihop.replace(role_anchor, role_patch + role_anchor, 1)
           multihop_path.write_text(multihop, encoding="utf-8")
 
-          test_path = Path("tests/test_route_family_regression_fix_v1.py")
-          test_path.write_text(r'''from opportunity_engine.project_domain_boundary import (
-    CLOTHING_INVENTORY,
-    classify_project_domain,
-)
-from opportunity_engine.discovery.exact_lot_multihop_resolution import (
-    _commercial_url_role,
-    _extract_navigation_links,
-)
+          test_source = textwrap.dedent(r'''
+          from opportunity_engine.project_domain_boundary import (
+              CLOTHING_INVENTORY,
+              classify_project_domain,
+          )
+          from opportunity_engine.discovery.exact_lot_multihop_resolution import (
+              _commercial_url_role,
+              _extract_navigation_links,
+          )
 
 
-def test_verified_swedish_compound_clothing_subject_survives_domain_gate() -> None:
-    subject = "Parti fritidskläder för MC-intresserade, 170 plagg"
-    assert classify_project_domain(text=subject) == CLOTHING_INVENTORY
+          def test_verified_swedish_compound_clothing_subject_survives_domain_gate() -> None:
+              subject = "Parti fritidskläder för MC-intresserade, 170 plagg"
+              assert classify_project_domain(text=subject) == CLOTHING_INVENTORY
 
 
-def test_partijhandel_route_family_distinguishes_category_and_detail() -> None:
-    category = "https://example.test/partijhandel/kleding"
-    pagination = "https://example.test/partijhandel/kleding/2"
-    detail = "https://example.test/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514"
-    unrelated = "https://example.test/archive/kleding/teenslippers/37514"
+          def test_partijhandel_route_family_distinguishes_category_and_detail() -> None:
+              category = "https://example.test/partijhandel/kleding"
+              pagination = "https://example.test/partijhandel/kleding/2"
+              detail = "https://example.test/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514"
+              unrelated = "https://example.test/archive/kleding/teenslippers/37514"
 
-    assert _commercial_url_role(category) == "CATEGORY"
-    assert _commercial_url_role(pagination) == "CATEGORY"
-    assert _commercial_url_role(detail) == "PRODUCT_DETAIL"
-    assert _commercial_url_role(unrelated) is None
+              assert _commercial_url_role(category) == "CATEGORY"
+              assert _commercial_url_role(pagination) == "CATEGORY"
+              assert _commercial_url_role(detail) == "PRODUCT_DETAIL"
+              assert _commercial_url_role(unrelated) is None
 
 
-def test_partijhandel_category_exposes_exact_lot_detail_links_to_multihop() -> None:
-    category = "https://example.test/partijhandel/kleding"
-    badkleding = "https://example.test/partijhandel/kleding/baby-en-kinder-badkleding/37526"
-    teenslippers = "https://example.test/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514"
-    html = (
-        '<a href="/partijhandel/kleding/baby-en-kinder-badkleding/37526">Baby en kinder badkleding</a>'
-        '<a href="/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514">Teenslippers</a>'
-        '<a href="/partijhandel/kleding/2">Volgende pagina</a>'
-        '<a href="/contact">Contact</a>'
-    )
+          def test_partijhandel_category_exposes_exact_lot_detail_links_to_multihop() -> None:
+              category = "https://example.test/partijhandel/kleding"
+              badkleding = "https://example.test/partijhandel/kleding/baby-en-kinder-badkleding/37526"
+              teenslippers = "https://example.test/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514"
+              html = (
+                  '<a href="/partijhandel/kleding/baby-en-kinder-badkleding/37526">Baby en kinder badkleding</a>'
+                  '<a href="/partijhandel/kleding/teenslippers-4575-stuks-diverse-kleuren/37514">Teenslippers</a>'
+                  '<a href="/partijhandel/kleding/2">Volgende pagina</a>'
+                  '<a href="/contact">Contact</a>'
+              )
 
-    links = _extract_navigation_links(
-        page_url=category,
-        root_host="example.test",
-        html_text=html,
-        max_links=12,
-    )
+              links = _extract_navigation_links(
+                  page_url=category,
+                  root_host="example.test",
+                  html_text=html,
+                  max_links=12,
+              )
 
-    assert badkleding in links
-    assert teenslippers in links
-    assert "https://example.test/contact" not in links
-''', encoding="utf-8")
+              assert badkleding in links
+              assert teenslippers in links
+              assert "https://example.test/contact" not in links
+          ''').lstrip()
+          Path("tests/test_route_family_regression_fix_v1.py").write_text(test_source, encoding="utf-8")
           PY
 
       - name: Compile changed runtime
