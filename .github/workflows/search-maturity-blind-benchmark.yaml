@@ -6,7 +6,7 @@ on:
       - brave-maturity-benchmark-v1
     paths:
       - .github/workflows/search-maturity-blind-benchmark.yaml
-      - scripts/run_dynamic_source_route_expansion_benchmark.py
+      - scripts/run_route_family_query_pack_benchmark.py
 
 permissions:
   contents: read
@@ -17,12 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src:.
-      OUTPUT_DIR: artifacts/dynamic-source-route-expansion-benchmark
+      OUTPUT_DIR: artifacts/route-family-query-pack-benchmark
       BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
       EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
-      # Benchmark branch only. Stage 1 uses 12 source-neutral queries. Stage 2
-      # derives at most two source domains from each provider result set and
-      # makes bounded site-scoped follow-ups. No Gold-Set domain is pinned.
+      # Benchmark branch only. 24 source-neutral route-family queries/provider,
+      # no retries and no source/domain pins from the scoring Gold Set.
       OPPORTUNITY_ALLOW_PAID_BRAVE_PUSH: "true"
     steps:
       - name: Check out benchmark branch
@@ -37,15 +36,15 @@ jobs:
         run: python -m pip install -r requirements.txt
 
       - name: Compile benchmark runner
-        run: python -m py_compile scripts/run_dynamic_source_route_expansion_benchmark.py
+        run: python -m py_compile scripts/run_route_family_query_pack_benchmark.py
 
-      - name: Run dynamic source-route benchmark
-        run: python scripts/run_dynamic_source_route_expansion_benchmark.py
+      - name: Run route-family query benchmark
+        run: python scripts/run_route_family_query_pack_benchmark.py
 
       - name: Upload benchmark evidence
         uses: actions/upload-artifact@v4
         with:
-          name: dynamic-source-route-expansion-benchmark
-          path: artifacts/dynamic-source-route-expansion-benchmark/
+          name: route-family-query-pack-benchmark
+          path: artifacts/route-family-query-pack-benchmark/
           if-no-files-found: error
           retention-days: 14
