@@ -49,7 +49,7 @@ _QUANTITY_UNKNOWN_RE = re.compile(
     re.I,
 )
 _CONDITION_RE = re.compile(
-    r"\b(?:Tilstand|Condition)\s*:?\s*(?P<value>Ny|Nytt|Nye|Ubrukt|Uåpnet|Uåpnede|Brukt|New|Used)\b",
+    r"\b(?:Tilstand(?:\s+og\s+egenerklæring)?|Condition)\s*:?\s*(?P<value>Ny|Nytt|Nye|Ubrukt|Uåpnet|Uåpnede|Brukt|New|Used)\b",
     re.I,
 )
 _POSTAL_CITY_RE = re.compile(r"\b(?P<postal>\d{4})\s+(?P<city>[A-ZÆØÅ][A-Za-zÆØÅæøå .'-]{1,80})")
