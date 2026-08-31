@@ -1,0 +1,25 @@
+name: Trigger Brave Maturity Benchmark One Shot
+
+on:
+  push:
+    branches:
+      - brave-maturity-benchmark-v1
+    paths:
+      - .github/workflows/brave-maturity-benchmark-trigger.yaml
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-benchmark:
+    if: ${{ github.ref_name == 'brave-maturity-benchmark-v1' && github.run_attempt == 1 }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch existing production checkpoint on benchmark branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run multi-market-daily-operator-checkpoint.yaml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref brave-maturity-benchmark-v1
