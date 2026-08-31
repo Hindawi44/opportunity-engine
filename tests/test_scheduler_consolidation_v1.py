@@ -31,8 +31,11 @@ def test_legacy_schedulers_are_manual_only() -> None:
 def test_multi_market_checkpoint_keeps_automatic_schedule() -> None:
     workflow = _text(AUTOMATIC_SCHEDULE_OWNER)
     assert "\n  schedule:" in workflow
-    assert 'cron: "47 6 * * *"' in workflow
+    assert 'cron: "47 0-6 * * *"' in workflow
     assert 'timezone: "Europe/Oslo"' in workflow
+    assert "daily-schedule-guard:" in workflow
+    assert "needs.daily-schedule-guard.outputs.should_run == 'true'" in workflow
+    assert "cancel-in-progress: false" in workflow
     assert "workflow_dispatch:" in workflow
 
 
