@@ -39,17 +39,25 @@ ROUTE_FAMILY_CLOTHING_QUERIES = {
     ),
 }
 
-# Clothing-only subset of the independently confirmed scoring set. It is never
-# used to construct the route-family queries above.
-GOLD = (
-    {"id": "NO_AUKSJONEN_BLAKLADER_22", "market": "NO", "needles": ("blåkläder", "22 stk")},
-    {"id": "NO_AUKSJONEN_BOSCH_32", "market": "NO", "needles": ("bosch car service", "32 stk")},
-    {"id": "NO_AUKSJONEN_BJORNKLADER_12", "market": "NO", "needles": ("björnkläder", "12 stk")},
-    {"id": "SE_BUDI_MC_170", "market": "SE", "needles": ("mc-intresserade", "170 plagg")},
-    {"id": "DE_RESTPOSTEN24_SWEAT_2000", "market": "DE", "needles": ("damen-stocksweatshirts", "2000")},
-    {"id": "FR_INTERENCHERES_LINGERIE_144", "market": "FR", "needles": ("stock de lingerie", "144 lots")},
-    {"id": "NL_PARTIJ_BADKLEDING_500", "market": "NL", "needles": ("500 stuks", "badkleding")},
-    {"id": "NL_PARTIJ_TEENSLIPPERS_4575", "market": "NL", "needles": ("4575", "teenslippers")},
+# Gold anchors are scoring-only. Item listings and aggregate sale/gateway pages
+# are intentionally scored separately because they represent different stages
+# of Search -> Verification -> Multi-Hop -> Exact-Lot.
+EXACT_LOT_GOLD = (
+    {"id": "NO_AUKSJONEN_BLAKLADER_22", "market": "NO", "identity": ("blåkläder", "22 stk")},
+    {"id": "NO_AUKSJONEN_BOSCH_32", "market": "NO", "identity": ("bosch car service", "32 stk")},
+    {"id": "NO_AUKSJONEN_BJORNKLADER_12", "market": "NO", "identity": ("björnkläder", "12 stk")},
+    {"id": "SE_BUDI_MC_170", "market": "SE", "identity": ("mc-intresserade", "170 plagg")},
+    {"id": "DE_RESTPOSTEN24_SWEAT_2000", "market": "DE", "identity": ("10792738",)},
+    {"id": "NL_PARTIJ_BADKLEDING_500", "market": "NL", "identity": ("37526",)},
+    {"id": "NL_PARTIJ_TEENSLIPPERS_4575", "market": "NL", "identity": ("37514",)},
+)
+
+ROUTE_GOLD = (
+    {
+        "id": "FR_INTERENCHERES_LINGERIE_144",
+        "market": "FR",
+        "identity_options": (("684303",), ("stock de lingerie", "144 lots")),
+    },
 )
 
 
@@ -74,15 +82,15 @@ def _candidate_text(candidate: dict) -> str:
     return _norm(" ".join(str(part or "") for part in parts))
 
 
-def _score(all_candidates: list[dict]) -> dict:
+def _score_exact_lots(all_candidates: list[dict]) -> dict:
     matches = []
-    for anchor in GOLD:
+    for anchor in EXACT_LOT_GOLD:
         found = None
         for candidate in all_candidates:
             if candidate.get("market_code") != anchor["market"]:
                 continue
             text = _candidate_text(candidate)
-            if all(_norm(needle) in text for needle in anchor["needles"]):
+            if all(_norm(needle) in text for needle in anchor["identity"]):
                 found = candidate
                 break
         matches.append({
@@ -91,6 +99,45 @@ def _score(all_candidates: list[dict]) -> dict:
             "matched": found is not None,
             "matched_url": found.get("opportunity_identity") if found else None,
             "matched_title": found.get("title") if found else None,
+        })
+    matched = sum(item["matched"] for item in matches)
+    return {
+        "gold_count": len(matches),
+        "matched_count": matched,
+        "recall": round(matched / len(matches), 4),
+        "matches": matches,
+    }
+
+
+def _route_surface(resolution: dict) -> str:
+    query_hits = []
+    for row in resolution.get("queries") or []:
+        query_hits.extend(row.get("hits") or [])
+    multihop = resolution.get("multihop") or {}
+    verification = resolution.get("verification") or {}
+    surface = {
+        "query_hits": query_hits,
+        "gateway_pages": multihop.get("gateway_pages") or [],
+        "navigation_results": multihop.get("navigation_results") or [],
+        "verified_pages": verification.get("verified_pages") or [],
+    }
+    return _norm(json.dumps(surface, ensure_ascii=False, sort_keys=True))
+
+
+def _score_routes(resolutions: dict[str, dict]) -> dict:
+    matches = []
+    for anchor in ROUTE_GOLD:
+        surface = _route_surface(resolutions.get(anchor["market"], {}))
+        matched_identity = None
+        for option in anchor["identity_options"]:
+            if all(_norm(needle) in surface for needle in option):
+                matched_identity = option
+                break
+        matches.append({
+            "id": anchor["id"],
+            "market": anchor["market"],
+            "matched": matched_identity is not None,
+            "matched_identity": list(matched_identity) if matched_identity else None,
         })
     matched = sum(item["matched"] for item in matches)
     return {
@@ -112,6 +159,7 @@ def main() -> int:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     market_reports = {}
     all_candidates = []
+    resolutions: dict[str, dict] = {}
     total_queries = 0
     total_hits = 0
     total_exact = 0
@@ -129,6 +177,8 @@ def main() -> int:
         for candidate in candidates:
             candidate["market_code"] = market
         all_candidates.extend(candidates)
+        resolution_path = market_dir / "exa-exact-lot-resolution.json"
+        resolutions[market] = json.loads(resolution_path.read_text(encoding="utf-8"))
         total_queries += int(report.get("queries_submitted") or 0)
         total_hits += int(report.get("hits_received") or 0)
         total_exact += int(report.get("strict_exact_lot_count") or 0)
@@ -142,15 +192,14 @@ def main() -> int:
             "multihop_exact_lot_count": report.get("multihop_exact_lot_count"),
             "fresh_current_exact_lot_count": report.get("final_fresh_current_strict_exact_lot_count"),
             "fresh_route_host_count": report.get("final_fresh_current_route_host_count"),
-            "zero_yield_recall_triggered": report.get("zero_yield_recall_triggered"),
-            "commercial_anchor_expansion_triggered": report.get("commercial_anchor_expansion_triggered"),
             "exact_lot_urls": [candidate.get("opportunity_identity") for candidate in candidates],
         }
         runner.write_discovery_artifacts(result, market_dir)
 
-    score = _score(all_candidates)
+    exact_score = _score_exact_lots(all_candidates)
+    route_score = _score_routes(resolutions)
     payload = {
-        "schema_version": "route-family-exact-lot-runtime-benchmark-1.0",
+        "schema_version": "route-family-exact-lot-runtime-benchmark-1.1",
         "project_domain": CLOTHING_INVENTORY,
         "provider": "exa",
         "production_mutation": False,
@@ -161,19 +210,22 @@ def main() -> int:
         "total_queries_submitted": total_queries,
         "total_hits_received": total_hits,
         "total_strict_exact_lots": total_exact,
-        "score": score,
-        "gold": list(GOLD),
+        "exact_lot_gold_score": exact_score,
+        "route_gold_score": route_score,
+        "exact_lot_gold": list(EXACT_LOT_GOLD),
+        "route_gold": list(ROUTE_GOLD),
     }
     (OUTPUT_DIR / "route-family-exact-lot-runtime-benchmark.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
     lines = [
-        "ROUTE-FAMILY EXACT-LOT RUNTIME BENCHMARK V1",
+        "ROUTE-FAMILY EXACT-LOT RUNTIME BENCHMARK V1.1",
         f"provider: Exa | results/query: {RESULTS_PER_QUERY}",
         f"queries submitted: {total_queries}",
         f"strict Exact-Lots: {total_exact}",
-        f"Gold clothing recall after Verification -> Multi-Hop -> Exact-Lot: {score['matched_count']}/{score['gold_count']} = {score['recall']:.1%}",
+        f"Exact-Lot identity recall: {exact_score['matched_count']}/{exact_score['gold_count']} = {exact_score['recall']:.1%}",
+        f"Route/Gateway recall: {route_score['matched_count']}/{route_score['gold_count']} = {route_score['recall']:.1%}",
         "",
     ]
     for market in MARKETS:
@@ -182,9 +234,10 @@ def main() -> int:
             f"{market}: exact={row['strict_exact_lot_count']} | primary={row['primary_strict_exact_lot_count']} | "
             f"fresh={row['fresh_current_exact_lot_count']} | hosts={row['fresh_route_host_count']} | queries={row['queries_submitted']}"
         )
-    lines.extend(["", "MATCHES"])
-    found = [item["id"] for item in score["matches"] if item["matched"]]
-    lines.append(", ".join(found) if found else "NONE")
+    lines.extend(["", "EXACT-LOT MATCHES"])
+    lines.append(", ".join(item["id"] for item in exact_score["matches"] if item["matched"]) or "NONE")
+    lines.extend(["", "ROUTE/GATEWAY MATCHES"])
+    lines.append(", ".join(item["id"] for item in route_score["matches"] if item["matched"]) or "NONE")
     lines.extend(["", "Gold anchors are scoring-only and never contribute qualification evidence."])
     summary = "\n".join(lines) + "\n"
     (OUTPUT_DIR / "route-family-exact-lot-runtime-benchmark.txt").write_text(summary, encoding="utf-8")
