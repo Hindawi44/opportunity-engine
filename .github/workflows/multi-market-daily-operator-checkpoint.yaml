@@ -2,8 +2,10 @@ name: Multi-Market Daily Operator Checkpoint
 
 on:
   schedule:
-    # Start with buffer so the daily checkpoint is normally ready before 08:00 Europe/Oslo.
-    - cron: "47 6 * * *"
+    # GitHub schedule events can be delayed or dropped. Retry hourly in a bounded
+    # Oslo-morning window; the daily guard allows only the first successful
+    # checkpoint for the local day to execute source/search work.
+    - cron: "47 0-6 * * *"
       timezone: "Europe/Oslo"
   workflow_dispatch:
     inputs:
@@ -125,10 +127,11 @@ permissions:
 
 concurrency:
   group: multi-market-daily-operator-checkpoint-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   contract-tests:
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -162,8 +165,100 @@ jobs:
           pytest tests/test_sweden_valuable_datasets_status_feed_v1.py -q
           pytest tests/test_cross_source_scent_expansion_v2.py -q
 
+  daily-schedule-guard:
+    if: ${{ github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    outputs:
+      should_run: ${{ steps.guard.outputs.should_run }}
+    steps:
+      - name: Allow only the first successful Oslo-day checkpoint
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          current_run_id = int(os.environ["CURRENT_RUN_ID"])
+          payload = json.loads(
+              subprocess.check_output(
+                  [
+                      "gh",
+                      "api",
+                      "-X",
+                      "GET",
+                      f"repos/{repo}/actions/workflows/multi-market-daily-operator-checkpoint.yaml/runs?branch=main&per_page=30",
+                  ],
+                  text=True,
+              )
+          )
+          oslo = ZoneInfo("Europe/Oslo")
+          today = datetime.now(oslo).date()
+          prior_successes = []
+          for run in payload.get("workflow_runs", []):
+              run_id = int(run.get("id") or 0)
+              if run_id == current_run_id:
+                  continue
+              if run.get("conclusion") != "success":
+                  continue
+              if run.get("event") not in {"schedule", "workflow_dispatch"}:
+                  continue
+              started = run.get("run_started_at") or run.get("created_at")
+              if not started:
+                  continue
+              started_local = datetime.fromisoformat(
+                  started.replace("Z", "+00:00")
+              ).astimezone(oslo)
+              if started_local.date() == today:
+                  prior_successes.append(
+                      {
+                          "id": run_id,
+                          "event": run.get("event"),
+                          "started_at": started,
+                      }
+                  )
+
+          should_run = not prior_successes
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"should_run={'true' if should_run else 'false'}\n")
+          print("Europe/Oslo date:", today)
+          print("prior successful checkpoint count:", len(prior_successes))
+          if prior_successes:
+              print(json.dumps(prior_successes[:3], sort_keys=True))
+          PY
+
+      - name: Cancel redundant scheduled retry cleanly
+        if: ${{ steps.guard.outputs.should_run == 'false' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "A successful checkpoint already exists for today's Europe/Oslo date. Cancelling this redundant retry."
+          gh api \
+            --method POST \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/cancel"
+          # Keep the runner alive until GitHub applies the cancellation so this
+          # guard-only retry cannot finish as SUCCESS and trigger downstream work.
+          sleep 60
+
   operator-read-only-checkpoint:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
+    needs: daily-schedule-guard
+    if: >-
+      ${{
+        always() &&
+        (
+          github.event_name == 'workflow_dispatch' ||
+          needs.daily-schedule-guard.outputs.should_run == 'true'
+        )
+      }}
     runs-on: ubuntu-latest
     timeout-minutes: 75
     env:
