@@ -2,7 +2,8 @@
 
 Scheduled production discovery remains enabled. Diagnostic/manual
 ``workflow_dispatch`` runs must not spend Brave credit unless an operator
-explicitly opts in or the run is the dedicated bounded $10 Brave test branch.
+explicitly opts in, enables the tightly bounded benchmark mode, or the run is
+the dedicated bounded $10 Brave test branch.
 
 Repository ``push`` runs are also zero-cost by default. A push may use Brave only
 when the specific job sets the explicit push override. This prevents commit or
@@ -10,7 +11,7 @@ merge-message based CI validation from silently consuming Brave credit.
 
 Auto-dispatched live-proof/checkpoint runs are intentionally zero-cost. They are
 workflow_dispatch executions too, so they remain blocked exactly like any other
-manual run.
+manual run unless the explicit benchmark contract is satisfied.
 """
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ from typing import Any, Mapping
 
 
 MANUAL_PAID_BRAVE_OVERRIDE = "OPPORTUNITY_ALLOW_PAID_BRAVE_MANUAL"
+MANUAL_PAID_BRAVE_BENCHMARK_OVERRIDE = "OPPORTUNITY_ALLOW_PAID_BRAVE_BENCHMARK"
 MANUAL_PAID_BRAVE_BLOCK_REASON = "MANUAL_WORKFLOW_PAID_BRAVE_BLOCKED"
 PUSH_PAID_BRAVE_OVERRIDE = "OPPORTUNITY_ALLOW_PAID_BRAVE_PUSH"
 PUSH_PAID_BRAVE_BLOCK_REASON = "PUSH_WORKFLOW_PAID_BRAVE_BLOCKED"
@@ -35,6 +37,15 @@ MANUAL_PAID_BRAVE_TEST_ACTOR = "hindawi44"
 MANUAL_PAID_BRAVE_TEST_BUDGET_ID = "BRAVE_MANUAL_10_USD_V1"
 MANUAL_PAID_BRAVE_TEST_MAX_REQUESTS = 2000
 MANUAL_PAID_BRAVE_OBSERVED_UNIT_COST_USD = 0.005
+
+# Search-engine maturity benchmark. This is intentionally much smaller than the
+# legacy $10 comparison budget: 60 outbound attempts at the observed unit cost
+# cap the incremental Brave spend at $0.30. It is available only for an
+# explicitly opted-in, first-attempt manual run of the production checkpoint on
+# main by the repository operator. All other manual and bot-dispatched runs stay
+# fail-closed and zero-cost.
+MANUAL_PAID_BRAVE_BENCHMARK_BUDGET_ID = "BRAVE_MANUAL_MATURITY_BENCHMARK_V1"
+MANUAL_PAID_BRAVE_BENCHMARK_MAX_REQUESTS = 60
 
 _TRUTHY = frozenset({"1", "true", "yes", "on"})
 
@@ -65,6 +76,14 @@ def _ref_name(env: Mapping[str, str]) -> str:
     return ref[len(prefix) :] if ref.startswith(prefix) else ref
 
 
+def _first_run_attempt(env: Mapping[str, str]) -> bool:
+    try:
+        attempt = int(str(env.get("GITHUB_RUN_ATTEMPT") or "1").strip())
+    except ValueError:
+        return False
+    return attempt == 1
+
+
 def _manual_bounded_test_branch_allowed(env: Mapping[str, str]) -> bool:
     """Authorize exactly one first-attempt bounded Brave comparison branch."""
     if str(env.get("GITHUB_EVENT_NAME") or "").strip().casefold() != "workflow_dispatch":
@@ -77,11 +96,24 @@ def _manual_bounded_test_branch_allowed(env: Mapping[str, str]) -> bool:
         return False
     if _ref_name(env) != MANUAL_PAID_BRAVE_TEST_BRANCH:
         return False
-    try:
-        attempt = int(str(env.get("GITHUB_RUN_ATTEMPT") or "1").strip())
-    except ValueError:
+    return _first_run_attempt(env)
+
+
+def _manual_bounded_benchmark_allowed(env: Mapping[str, str]) -> bool:
+    """Authorize one explicitly opted-in, $0.30-capped maturity benchmark."""
+    if not _truthy_env(env, MANUAL_PAID_BRAVE_BENCHMARK_OVERRIDE):
         return False
-    return attempt == 1
+    if str(env.get("GITHUB_EVENT_NAME") or "").strip().casefold() != "workflow_dispatch":
+        return False
+    if str(env.get("GITHUB_WORKFLOW") or "").strip() != AUTOMATED_CHECKPOINT_WORKFLOW:
+        return False
+    if str(env.get("GITHUB_JOB") or "").strip() != AUTOMATED_CHECKPOINT_JOB:
+        return False
+    if str(env.get("GITHUB_ACTOR") or "").strip().casefold() != MANUAL_PAID_BRAVE_TEST_ACTOR:
+        return False
+    if _ref_name(env) != "main":
+        return False
+    return _first_run_attempt(env)
 
 
 def _blocked_message(reason: str) -> str:
@@ -91,7 +123,8 @@ def _blocked_message(reason: str) -> str:
             f"{PUSH_PAID_BRAVE_OVERRIDE}=true only in an explicitly authorized paid-live job"
         )
     return (
-        f"{reason}: manual GitHub runs are zero-cost by default; set "
+        f"{reason}: manual GitHub runs are zero-cost by default; use the bounded "
+        "benchmark opt-in or set "
         f"{MANUAL_PAID_BRAVE_OVERRIDE}=true only for an intentional paid run"
     )
 
@@ -102,9 +135,10 @@ def manual_paid_brave_incremental_budget(
     """Return the fixed manual budget or fail closed before Brave transport.
 
     ``workflow_dispatch`` executions are paid only via the explicit manual
-    override or the dedicated first-attempt comparison branch. ``push`` runs are
-    blocked unless their job explicitly opts in via ``PUSH_PAID_BRAVE_OVERRIDE``.
-    Scheduled production runs are intentionally unaffected.
+    override, the $0.30 maturity benchmark opt-in, or the dedicated first-attempt
+    comparison branch. ``push`` runs are blocked unless their job explicitly
+    opts in via ``PUSH_PAID_BRAVE_OVERRIDE``. Scheduled production runs are
+    intentionally unaffected.
 
     This function is called immediately before every default Brave transport
     attempt, so an unauthorized workflow cannot bypass higher-level guards.
@@ -119,6 +153,18 @@ def manual_paid_brave_incremental_budget(
 
     if event_name != "workflow_dispatch":
         return None
+
+    if _manual_bounded_benchmark_allowed(env):
+        return {
+            "budget_id": MANUAL_PAID_BRAVE_BENCHMARK_BUDGET_ID,
+            "max_requests": MANUAL_PAID_BRAVE_BENCHMARK_MAX_REQUESTS,
+            "observed_unit_cost_usd": MANUAL_PAID_BRAVE_OBSERVED_UNIT_COST_USD,
+            "max_incremental_cost_usd": (
+                MANUAL_PAID_BRAVE_BENCHMARK_MAX_REQUESTS
+                * MANUAL_PAID_BRAVE_OBSERVED_UNIT_COST_USD
+            ),
+        }
+
     if not (_manual_override_enabled(env) or _manual_bounded_test_branch_allowed(env)):
         raise RuntimeError(_blocked_message(MANUAL_PAID_BRAVE_BLOCK_REASON))
     return {
@@ -148,6 +194,9 @@ def manual_paid_brave_block_reason(
         return None if _push_override_enabled(env) else PUSH_PAID_BRAVE_BLOCK_REASON
 
     if event_name != "workflow_dispatch":
+        return None
+
+    if _manual_bounded_benchmark_allowed(env):
         return None
 
     if _manual_override_enabled(env):
