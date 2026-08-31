@@ -1,4 +1,4 @@
-name: Germany Zero-Cost Query Replacement Gate
+name: Route-Family Benchmark V1.2 Gate
 
 on:
   push:
@@ -6,15 +6,17 @@ on:
       - brave-maturity-benchmark-v1
     paths:
       - .github/workflows/apply-route-family-regression-fix.yaml
+      - scripts/run_route_family_exact_lot_runtime_benchmark.py
 
 permissions:
   contents: read
 
 jobs:
-  de-query-replacement:
+  benchmark-v1-2:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: src:.
+      OUTPUT_DIR: artifacts/route-family-exact-lot-runtime-benchmark-v1-2
       EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
     steps:
       - name: Check out benchmark branch
@@ -28,66 +30,16 @@ jobs:
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Run Germany replacement through full adaptive runtime
-        run: |
-          python - <<'PY'
-          import importlib.util
-          import os
-          from pathlib import Path
-          from urllib.parse import unquote, urlsplit
+      - name: Compile benchmark
+        run: python -m py_compile scripts/run_route_family_exact_lot_runtime_benchmark.py
 
-          path = Path("scripts/run_exa_exact_lot_checkpoint.py")
-          spec = importlib.util.spec_from_file_location("de_replacement_runner", path)
-          runner = importlib.util.module_from_spec(spec)
-          assert spec and spec.loader
-          spec.loader.exec_module(runner)
+      - name: Run six-market benchmark V1.2
+        run: python scripts/run_route_family_exact_lot_runtime_benchmark.py
 
-          replacement = (
-              "Deutschland Lagerware Bekleidung Mindestabnahme angebotene Menge Nettopreis Stück",
-              "Deutschland Bekleidung Restposten Großhandel Sonderposten Preis Menge Stück",
-          )
-          runner.MARKET_EXACT_LOT_QUERY_PACKS["DE"] = replacement
-          result = runner.run_market(
-              market="DE",
-              exa_api_key=os.environ["EXA_API_KEY"],
-              output_dir=Path("artifacts/de-zero-cost-replacement"),
-              results_per_query=20,
-          )
-          report = result["search_run_report"]
-          candidates = result.get("all_discovered_candidates") or []
-
-          def norm(value):
-              return " ".join(unquote(str(value or "")).casefold().replace(".", " ").split())
-
-          target = "10792738"
-          target_match = None
-          hosts = set()
-          for candidate in candidates:
-              url = str(candidate.get("opportunity_identity") or "")
-              title = str(candidate.get("title") or "")
-              if url:
-                  host = (urlsplit(url).hostname or "").casefold().removeprefix("www.")
-                  if host:
-                      hosts.add(host)
-              if target in norm(f"{title} {url}"):
-                  target_match = (title, url)
-              print(f"EXACT: {title} | {url}")
-
-          print(
-              "DE_REPLACEMENT_RESULT: "
-              f"queries={report.get('queries_submitted')} "
-              f"primary_queries={report.get('primary_query_count')} "
-              f"primary_exact={report.get('primary_strict_exact_lot_count')} "
-              f"final_exact={report.get('strict_exact_lot_count')} "
-              f"fresh={report.get('final_fresh_current_strict_exact_lot_count')} "
-              f"hosts={report.get('final_fresh_current_route_host_count')} "
-              f"anchor_triggered={report.get('commercial_anchor_expansion_triggered')} "
-              f"anchor_queries={report.get('commercial_anchor_query_count')}"
-          )
-          print(f"DE_GOLD_10792738: {'MATCH' if target_match else 'MISS'}")
-          if target_match:
-              print(f"MATCH DE_RESTPOSTEN24_SWEAT_2000: {target_match[0]} | {target_match[1]}")
-          print(f"FINAL_HOSTS: {','.join(sorted(hosts))}")
-          print("Reference corrected baseline: queries=4, primary_queries=2, primary_exact=2, final_exact=2, Gold=MISS.")
-          print("Replacement keeps two primary queries and uses no site:, Brave, Gold identifier, or source domain in query text.")
-          PY
+      - name: Upload benchmark evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-family-exact-lot-runtime-benchmark-v1-2
+          path: artifacts/route-family-exact-lot-runtime-benchmark-v1-2/
+          if-no-files-found: error
+          retention-days: 14
