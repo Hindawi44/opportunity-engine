@@ -11,7 +11,7 @@ from opportunity_engine.discovery.exa_search import ExaSearchProvider
 
 
 OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "artifacts/search-maturity-blind-benchmark"))
-RESULTS_PER_QUERY = 10
+RESULTS_PER_QUERY = 20
 MAX_QUERY_COUNT = 12
 
 # The query matrix is intentionally generic and market-native. It contains no
