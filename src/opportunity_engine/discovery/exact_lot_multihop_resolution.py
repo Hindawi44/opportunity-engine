@@ -59,7 +59,7 @@ from opportunity_engine.project_domain_boundary import (
     classify_project_domain,
 )
 
-SCHEMA_VERSION = "exact-lot-multihop-resolution-1.5"
+SCHEMA_VERSION = "exact-lot-multihop-resolution-1.4"
 LAB_FAMILY = "EXACT_LOT_MULTIHOP_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_ROOT_PARENTS = 6
