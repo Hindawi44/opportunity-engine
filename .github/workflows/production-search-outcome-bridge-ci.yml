@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONPATH: src:.
+
 jobs:
   targeted-and-regression:
     runs-on: ubuntu-latest
