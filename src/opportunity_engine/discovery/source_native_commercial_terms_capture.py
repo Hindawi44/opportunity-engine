@@ -22,28 +22,29 @@ _CONDITION_PATTERNS: tuple[Pattern[str], ...] = (
 
 _SELLER_IDENTITY_PATTERNS: tuple[Pattern[str], ...] = (
     re.compile(
-        r"\b(?:säljare|saljare|seller|verkäufer|verkaufer|vendeur|venditore|"
-        r"verkoper|företag|foretag|company|bolag)\b\s*[:=\-]\s*"
+        r"\b(?:säljare|saljare|selger|seller|verkäufer|verkaufer|anbieter|vendeur|"
+        r"venditore|verkoper|företag|foretag|firma|company|bolag)\b\s*[:=\-]\s*"
         r"[^\n\r|;.!?]{2,120}",
         re.IGNORECASE,
     ),
     re.compile(
-        r"\b(?:organisationsnummer|organisationsnr|org\.?\s*nr|orgnr|company\s+number)\b"
-        r"\s*[:=\-]?\s*[A-Z0-9][A-Z0-9\- ]{4,24}",
+        r"\b(?:organisationsnummer|organisationsnr|organisasjonsnummer|org\.?\s*nr|"
+        r"orgnr|company\s+number)\b\s*[:=\-]?\s*[A-Z0-9][A-Z0-9\- ]{4,24}",
         re.IGNORECASE,
     ),
 )
 
 _FULFILMENT_PATTERNS: tuple[Pattern[str], ...] = (
     re.compile(
-        r"\b(?:frakt|leverans|shipping|delivery|versand|abholung|avhämtning|"
-        r"avhamtning|hämtning|hamtning|pickup)\b\s*[:=\-]\s*"
-        r"[^\n\r|;.!?]{1,140}",
+        r"\b(?:frakt|leverans|levering|shipping|delivery|versand|lieferung|abholung|"
+        r"avhämtning|avhamtning|hämtning|hamtning|henting|avhenting|pickup)\b"
+        r"\s*[:=\-]\s*[^\n\r|;.!?]{1,140}",
         re.IGNORECASE,
     ),
     re.compile(
         r"\b(?:endast\s+avhämtning|endast\s+avhamtning|hämtas\s+på\s+plats|"
-        r"hamtas\s+pa\s+plats|pickup\s+only|collection\s+only|shipping\s+available|"
+        r"hamtas\s+pa\s+plats|kun\s+henting|må\s+hentes|ma\s+hentes|"
+        r"pickup\s+only|collection\s+only|shipping\s+available|"
         r"frakt\s+tillkommer|leverans\s+möjlig|leverans\s+mojlig)\b"
         r"[^\n\r|;.!?]{0,100}",
         re.IGNORECASE,
