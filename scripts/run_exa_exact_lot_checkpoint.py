@@ -595,9 +595,10 @@ def run_market(
             }
         query_rows.append(row)
         for hit in hits:
-            if hit.url in seen_urls:
+            identity_key = _exact_lot_identity_key(hit.url)
+            if not identity_key or identity_key in seen_urls:
                 continue
-            seen_urls.add(hit.url)
+            seen_urls.add(identity_key)
             all_hits.append(hit)
 
     def evaluate() -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
