@@ -47,7 +47,7 @@ def test_auto_routing_does_not_expand_workflow_inventory():
         path for path in Path('.github/workflows').iterdir()
         if path.suffix in {'.yml', '.yaml'}
     ]
-    assert len(workflows) == 4
+    assert len(workflows) == 6
 
 
 def test_v2_runtime_is_local_to_main_line_and_not_checked_out_from_legacy_branch():

@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW = ROOT / ".github/workflows/tests.yml"
+WORKFLOW = ROOT / ".github/workflows/production-dispatch-after-ci.yaml"
 EXACT_LOT_QUERY_SOURCE = (
     "src/opportunity_engine/discovery/exa_exact_lot_shadow_hunt.py"
 )

@@ -2,21 +2,19 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TESTS_WORKFLOW = ROOT / ".github/workflows/tests.yml"
+DISPATCH_WORKFLOW = ROOT / ".github/workflows/production-dispatch-after-ci.yaml"
 DAILY = ROOT / ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
 WORKFLOWS = ROOT / ".github/workflows"
 
 
 def test_relevant_main_pushes_dispatch_existing_live_checkpoint() -> None:
-    text = TESTS_WORKFLOW.read_text(encoding="utf-8")
+    text = DISPATCH_WORKFLOW.read_text(encoding="utf-8")
 
-    assert "push:" in text
+    assert "workflow_run:" in text
+    assert "workflows: [Tests]" in text
     assert "branches: [main]" in text
-    assert "auto-live-checkpoint-after-main:" in text
-    assert "needs: test" in text
-    assert "github.event_name == 'push'" in text
-    assert "github.ref == 'refs/heads/main'" in text
-    assert "Detect relevant learning, memory, route or unified-search change" in text
+    assert "github.event.workflow_run.conclusion == 'success'" in text
+    assert "Detect relevant production-path change" in text
     assert "config/learning/" in text
     assert "build_domain_market_intelligence_feed" in text
     assert "run_daily_search_success_learning" in text
@@ -37,8 +35,8 @@ def test_auto_dispatch_does_not_expand_workflow_inventory() -> None:
         for path in WORKFLOWS.iterdir()
         if path.suffix in {".yml", ".yaml"}
     ]
-    assert len(live) == 4
-    assert not (WORKFLOWS / "auto-live-checkpoint-on-main.yaml").exists()
+    assert len(live) == 6
+    assert (WORKFLOWS / "production-dispatch-after-ci.yaml").exists()
 
 
 def test_target_live_checkpoint_still_supports_manual_and_daily_runs() -> None:

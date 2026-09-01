@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import atexit
 import json
+import os
 from pathlib import Path
 import sys
 from typing import Any, Mapping
@@ -27,6 +28,7 @@ FRANCE_CYCLE_FILENAME = "france-case-memory-v1.json"
 ITALY_CYCLE_FILENAME = "italy-case-memory-v1.json"
 NETHERLANDS_CYCLE_FILENAME = "netherlands-case-memory-v1.json"
 _TARGET_CLI = "build_domain_market_intelligence_feed.py"
+_EXPLICIT_DAILY_RUNTIME_ENV = "OPPORTUNITY_ENGINE_EXPLICIT_UNIFIED_DAILY_RUNTIME"
 _INSTALLED = False
 
 
@@ -149,6 +151,12 @@ def install_unified_six_market_runtime_cli_hook() -> bool:
     if _INSTALLED:
         return False
     if Path(sys.argv[0]).name != _TARGET_CLI:
+        return False
+    if str(os.environ.get(_EXPLICIT_DAILY_RUNTIME_ENV, "")).strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    }:
         return False
     atexit.register(_emit_after_daily_cli)
     _INSTALLED = True

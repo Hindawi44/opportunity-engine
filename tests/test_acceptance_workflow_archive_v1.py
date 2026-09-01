@@ -38,6 +38,8 @@ EXPECTED_LIVE = {
     "multi-market-daily-operator-checkpoint.yaml",
     "one-opportunity-commercial-analysis.yaml",
     "tests.yml",
+    "research-shadow-manual.yaml",
+    "production-dispatch-after-ci.yaml",
 }
 
 

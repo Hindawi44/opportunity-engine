@@ -29,6 +29,10 @@ The end-to-end review workflow remains:
 
 The Germany Clothing Inventory open-web pilot, the Riegermann active-auction workflow, the VENTA active-catalog watch, and the Deutsche Pfandverwertung watch remain represented. A zero-result run remains a valid, reportable outcome.
 
+Current-surface addendum (2026-09-01): `.github/workflows/research-shadow-manual.yaml`
+owns manual-only Brave research and shadow validations. `.github/workflows/production-dispatch-after-ci.yaml`
+owns the post-CI production dispatch gate. `.github/workflows/tests.yml` is now the pure full-regression CI gate.
+
 ## Complete file inventory
 
 1. `.github/workflows/daily-opportunity-pipeline.yml`

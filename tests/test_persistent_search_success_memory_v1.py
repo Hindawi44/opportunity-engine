@@ -205,7 +205,9 @@ def test_daily_checkpoint_wires_durable_search_success_learning() -> None:
 
     restore = text.index("- name: Restore previous lifecycle SQLite state")
     learning = text.index("- name: Run daily Search Success shadow learning")
-    build = text.index("- name: Build the three-market operator checkpoint")
+    build = text.index(
+        "- name: Build the legacy-compatible core and FR/IT/NL market cycles"
+    )
     append_review = text.index("- name: Append Search Success review to phone summary")
     validate = text.index("- name: Validate checkpoint safety, coverage and lifecycle integrity")
 

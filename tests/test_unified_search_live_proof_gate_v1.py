@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-WORKFLOW = Path(".github/workflows/tests.yml")
+WORKFLOW = Path(".github/workflows/production-dispatch-after-ci.yaml")
 
 
 def test_auto_dispatch_gate_covers_unified_search_runtime_changes() -> None:
@@ -20,7 +20,7 @@ def test_auto_dispatch_gate_covers_unified_search_runtime_changes() -> None:
     for path_token in required_paths:
         assert path_token in text
 
-    assert "Auto-dispatch live checkpoint after relevant main change" in text
+    assert "Production Checkpoint Dispatch After CI" in text
     assert "actions: write" in text
     assert "multi-market-daily-operator-checkpoint.yaml" in text
 

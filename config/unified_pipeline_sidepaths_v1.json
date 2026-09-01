@@ -1,6 +1,6 @@
 {
   "schema_version": "unified-pipeline-sidepaths-inventory-1.0",
-  "generated_at": "2026-08-26T06:20:00Z",
+  "generated_at": "2026-09-01T19:30:00Z",
   "governing_pipeline": {
     "contract": "UNIFIED_SIX_MARKET_PIPELINE_V1",
     "module": "src/opportunity_engine/discovery/unified_six_market_pipeline.py",
@@ -11,7 +11,9 @@
     {"path": ".github/workflows/multi-market-daily-operator-checkpoint.yaml", "role": "PRIMARY_RUNTIME", "decision": "KEEP_AS_SINGLE_GOVERNING_DAILY_PIPELINE", "feeds_stage": "DISCOVERY_TO_REPORT"},
     {"path": ".github/workflows/one-opportunity-commercial-analysis.yaml", "role": "DOWNSTREAM_ANALYSIS", "decision": "KEEP_AND_CONSUME_ONLY_UNIFIED_VERIFIED_OPPORTUNITIES", "feeds_stage": "EVIDENCE_TO_OPPORTUNITY_DECISION"},
     {"path": ".github/workflows/mind-forge-live-research-launcher.yaml", "role": "LEARNING_AND_RESEARCH", "decision": "KEEP_SEPARATE_FROM_DAILY_DECISION_AND_FEED_DISCOVERY_ONLY_THROUGH_GATES", "feeds_stage": "FEEDBACK_TO_DISCOVERY"},
-    {"path": ".github/workflows/tests.yml", "role": "CI_GUARD", "decision": "KEEP_AS_TEST_ONLY", "feeds_stage": "NONE"}
+    {"path": ".github/workflows/tests.yml", "role": "CI_GUARD", "decision": "KEEP_AS_TEST_ONLY", "feeds_stage": "NONE"},
+    {"path": ".github/workflows/research-shadow-manual.yaml", "role": "MANUAL_SHADOW_RESEARCH", "decision": "KEEP_MANUAL_ONLY_AND_SEPARATE_FROM_CI_AND_PRODUCTION", "feeds_stage": "VALIDATED_FEEDBACK_ONLY"},
+    {"path": ".github/workflows/production-dispatch-after-ci.yaml", "role": "POST_CI_PRODUCTION_GATE", "decision": "KEEP_AS_DISPATCH_ONLY_AFTER_SUCCESSFUL_CI", "feeds_stage": "DISPATCH_PRIMARY_RUNTIME"}
   ],
   "archived_workflow_inventory": [
     {"path": "docs/workflow-archive/sweden-clothing-inventory-live.yaml", "former_role": "MANUAL_DIAGNOSTIC", "decision": "ARCHIVED_REDUNDANT_ENTRY_POINT_PRODUCTION_OWNED_BY_MULTI_MARKET_CHECKPOINT"},

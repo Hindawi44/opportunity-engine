@@ -1,0 +1,48 @@
+name: Production Checkpoint Dispatch After CI
+
+on:
+  workflow_run:
+    workflows: [Tests]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out successful main revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 2
+      - name: Detect relevant production-path change
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          CURRENT="${{ github.event.workflow_run.head_sha }}"
+          CHANGED="$(git diff-tree --no-commit-id --name-only -r "$CURRENT")"
+          printf '%s\n' "$CHANGED"
+          if printf '%s\n' "$CHANGED" | grep -Eq '^(config/learning/|scripts/(build_domain_market_intelligence_feed(_core)?\.py|run_daily_search_success_learning\.py|run_auksjonen_live_clothing\.py|run_exa_exact_lot_checkpoint\.py|run_market_clothing_inventory_discovery\.py|run_unified_daily_runtime\.py|restore_previous_checkpoint_state\.py)|src/opportunity_engine/cost_guard\.py$|src/opportunity_engine/.*(learning|memory|route).*\.py$|src/opportunity_engine/discovery/(auksjonen_exact_item_verification|automatic_query_gap_miss_scout_cli_hook|checkpoint_state_restore|commercial_anchor_query_expansion|direct_exact_lot_parser_recovery_v1|domain_market_intelligence_feed|exact_lot_multihop_resolution|exa_403_extractive_evidence_shadow_v1|exa_exact_lot_shadow_hunt|exa_search|exa_shadow_page_verification|keyword_shadow_verification|market_fit_evidence_v1|provider_unique_page_verification|six_market_fabric_coverage_rotation_v1|sweden_official_clothing_liquidation_anchor|unified_daily_runtime|unified_operator_report|unified_search_runtime_cli_hook|unified_search_truth_reconciliation_cli_hook)\.py$|\.github/workflows/(multi-market-daily-operator-checkpoint\.yaml|production-dispatch-after-ci\.yaml)$)'; then
+            echo "dispatch=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dispatch=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Dispatch Multi-Market Daily Operator Checkpoint
+        if: steps.gate.outputs.dispatch == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_WORKFLOW: multi-market-daily-operator-checkpoint.yaml
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows/${TARGET_WORKFLOW}/dispatches" \
+            --data '{"ref":"main"}'

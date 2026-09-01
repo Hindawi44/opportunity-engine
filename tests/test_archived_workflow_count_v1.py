@@ -15,10 +15,10 @@ def test_archive_contains_thirty_five_retired_workflow_contracts() -> None:
     assert len(archived) == 35
 
 
-def test_live_actions_directory_contains_four_workflows() -> None:
+def test_live_actions_directory_contains_six_workflows() -> None:
     live = [
         path
         for path in WORKFLOWS.iterdir()
         if path.suffix in {".yml", ".yaml"}
     ]
-    assert len(live) == 4
+    assert len(live) == 6
