@@ -10,6 +10,10 @@ from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.discovery.source_artifact_continuity import _time
 from opportunity_engine.discovery.unified_opportunity_report import build_unified_opportunity_report
 from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY, classify_project_domain
+from opportunity_engine.search_policy_query_challenge_v1 import (
+    CHALLENGES,
+    POLICY_CHALLENGE_STAGE,
+)
 from opportunity_engine.search_experiment_execution_bridge_v1 import _market_anchored
 
 
@@ -117,6 +121,69 @@ def test_exa_exact_lot_runner_covers_all_existing_six_markets() -> None:
         assert _market_anchored(fallback, market)
         assert classify_project_domain(text=fallback) == CLOTHING_INVENTORY
         assert "site:" not in fallback.casefold()
+
+
+def test_human_approved_de_challenge_uses_one_existing_primary_slot(
+    monkeypatch, tmp_path: Path
+) -> None:
+    module = _load_script()
+    searches: list[str] = []
+
+    class FakeProvider:
+        def __init__(self, _key: str):
+            pass
+
+        def search(self, query: str, *, count: int):
+            searches.append(query)
+            return []
+
+    monkeypatch.setattr(module, "ExaSearchProvider", FakeProvider)
+    monkeypatch.setattr(
+        module,
+        "verify_provider_unique_pages",
+        lambda *_args, **_kwargs: {
+            "verified_pages": [],
+            "exact_lot_candidate_count": 0,
+        },
+    )
+    monkeypatch.setattr(
+        module,
+        "resolve_exact_lot_multihop",
+        lambda *_args, **_kwargs: {
+            "exact_lots": [],
+            "exact_lot_candidate_count": 0,
+            "gateway_page_count": 0,
+        },
+    )
+    memory = {
+        "schema_version": "unified-memory-2.0",
+        "status": "SUCCESS",
+        "project_domain_gate_enforced": True,
+        "query_memory": [],
+    }
+
+    result = module.run_market(
+        market="DE",
+        exa_api_key="test-key",
+        output_dir=tmp_path,
+        results_per_query=5,
+        search_policy_memory=memory,
+    )
+
+    assert searches == [
+        CHALLENGES["DE"]["challenger_query"],
+        module.MARKET_EXACT_LOT_QUERY_PACKS["DE"][1],
+    ]
+    assert result["search_run_report"]["primary_query_count"] == 2
+    challenge = result["search_run_report"]["search_policy_query_challenge"]
+    assert challenge["status"] == "ACTIVE"
+    assert challenge["request_slots_added"] == 0
+
+    resolution = json.loads(
+        (tmp_path / "exa-exact-lot-resolution.json").read_text(encoding="utf-8")
+    )
+    assert resolution["queries"][0]["query_stage"] == POLICY_CHALLENGE_STAGE
+    assert resolution["queries"][0]["search_policy_challenge"]["request_slots_added"] == 0
 
 
 def test_zero_yield_recall_runs_only_after_primary_strict_zero(monkeypatch, tmp_path: Path) -> None:

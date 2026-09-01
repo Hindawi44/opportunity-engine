@@ -72,6 +72,7 @@ on:
       - "scripts/run_germany_clothing_inventory_discovery_search.py"
       - "scripts/run_daily_search_success_learning.py"
       - "scripts/run_exa_exact_lot_checkpoint.py"
+      - "scripts/run_search_policy_router_review.py"
       - "scripts/restore_previous_checkpoint_state.py"
       - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
       - "src/opportunity_engine/market_intelligence.py"
@@ -88,6 +89,8 @@ on:
       - "src/opportunity_engine/discovery/cross_source_scent_expansion_v2.py"
       - "src/opportunity_engine/discovery/germany_sen_sen.py"
       - "src/opportunity_engine/logistics/official_route_freight.py"
+      - "src/opportunity_engine/search_policy_query_challenge_v1.py"
+      - "src/opportunity_engine/search_policy_router_v1.py"
       - "src/opportunity_engine/persistence/__init__.py"
       - "src/opportunity_engine/persistence/human_review.py"
       - "src/opportunity_engine/persistence/human_review_models.py"
@@ -108,6 +111,9 @@ on:
       - "tests/test_multi_market_operator_checkpoint.py"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
       - "tests/test_exa_exact_lot_checkpoint_bridge_v1.py"
+      - "tests/test_search_policy_query_challenge_v1.py"
+      - "tests/test_search_policy_router_v1.py"
+      - "tests/test_search_policy_router_review_runner_v1.py"
       - "tests/test_persistent_search_success_memory_v1.py"
       - "tests/test_useful_output_checkpoint_validator_regression.py"
       - "tests/test_germany_sen_sen_source_v1.py"
@@ -155,6 +161,9 @@ jobs:
           pytest tests/test_multi_market_operator_checkpoint.py -q
           pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
           pytest tests/test_exa_exact_lot_checkpoint_bridge_v1.py -q
+          pytest tests/test_search_policy_query_challenge_v1.py -q
+          pytest tests/test_search_policy_router_v1.py -q
+          pytest tests/test_search_policy_router_review_runner_v1.py -q
           pytest tests/test_persistent_search_success_memory_v1.py -q
           pytest tests/test_useful_output_checkpoint_validator_regression.py -q
           pytest tests/test_germany_sen_sen_source_v1.py -q
@@ -329,6 +338,7 @@ jobs:
               --market NO \
               --output-dir "$INPUT_ROOT/no-exa-exact-lot" \
               --results-per-query 5 \
+              --search-policy-memory "$INPUT_ROOT/learning/unified-memory-v2.json" \
               --persist-unified \
               --database-url "sqlite:///$INPUT_ROOT/no-exa-exact-lot/opportunity_engine.db"
 
@@ -351,6 +361,7 @@ jobs:
               --market DE \
               --output-dir "$INPUT_ROOT/de-exa-exact-lot" \
               --results-per-query 5 \
+              --search-policy-memory "$INPUT_ROOT/learning/unified-memory-v2.json" \
               --persist-unified \
               --database-url "sqlite:///$INPUT_ROOT/de-exa-exact-lot/opportunity_engine.db"
 
@@ -806,6 +817,50 @@ jobs:
               "NO", "SE", "DE", "FR", "IT", "NL"
           ]:
               raise SystemExit("Search Policy Router market coverage changed")
+          challenge_states = policy_router.get("bounded_query_challenges") or {}
+          allowed_challenge_statuses = {
+              "ACTIVE",
+              "PAUSED_ALREADY_OBSERVED_TODAY",
+              "PAUSED_MEMORY_UNAVAILABLE",
+              "COMPLETED_REVIEW_REQUIRED",
+          }
+          for market in ("DE", "NO"):
+              state = challenge_states.get(market) or {}
+              if state.get("status") not in allowed_challenge_statuses:
+                  raise SystemExit(f"{market} bounded query challenge status is invalid")
+              if state.get("max_independent_checkpoint_days") != 3:
+                  raise SystemExit(f"{market} bounded query challenge day cap changed")
+              if state.get("request_slots_added") != 0:
+                  raise SystemExit(f"{market} bounded query challenge added request slots")
+
+          input_root = Path("artifacts/multi-market-inputs")
+          for market, directory, expected_primary_slots in (
+              ("NO", "no-exa-exact-lot", 2),
+              ("DE", "de-exa-exact-lot", 2),
+          ):
+              resolution = json.loads(
+                  (input_root / directory / "exa-exact-lot-resolution.json").read_text(
+                      encoding="utf-8"
+                  )
+              )
+              state = resolution.get("search_policy_query_challenge") or {}
+              primary_rows = [
+                  row
+                  for row in resolution.get("queries") or []
+                  if row.get("query_stage") in {"PRIMARY", "POLICY_CHALLENGE"}
+              ]
+              if len(primary_rows) != expected_primary_slots:
+                  raise SystemExit(f"{market} bounded challenge changed primary slots")
+              challenge_rows = [
+                  row
+                  for row in primary_rows
+                  if row.get("query_stage") == "POLICY_CHALLENGE"
+              ]
+              expected_challenge_rows = 1 if state.get("status") == "ACTIVE" else 0
+              if len(challenge_rows) != expected_challenge_rows:
+                  raise SystemExit(f"{market} bounded challenge execution ledger is invalid")
+              if state.get("request_slots_added") != 0:
+                  raise SystemExit(f"{market} production challenge added request slots")
           if "FABRIC_PROCUREMENT" in policy_router_text:
               raise SystemExit("Fabric query leaked into clothing Search Policy Router output")
           for key in (

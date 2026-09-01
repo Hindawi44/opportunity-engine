@@ -20,6 +20,9 @@ from opportunity_engine.search_policy_router_v1 import (
     SUPPORTED_MARKETS,
     build_search_policy_router_v1,
 )
+from opportunity_engine.search_policy_query_challenge_v1 import (
+    build_market_query_plan,
+)
 from scripts.run_exa_exact_lot_checkpoint import (
     MARKET_EXACT_LOT_QUERY_PACKS,
     MARKET_ZERO_YIELD_RECALL_QUERIES,
@@ -59,8 +62,22 @@ def _write_text(path: Path, router: Mapping[str, Any]) -> None:
         f"Cost: {_display(router.get('cost'))}",
         "Production mutation: disabled",
         "",
-        "Market | Query Family | Provider/Path | Requests | Days | Fresh Candidates | Verified Candidates | Raw Exact-Lots | Unique Exact-Lots | Unique Fresh Yield/Request | Cost | Freshness | Decision | Reason",
     ]
+    challenges = router.get("bounded_query_challenges") or {}
+    if challenges:
+        lines.append("Bounded query challenges:")
+        for market in ("DE", "NO"):
+            state = challenges.get(market) or {}
+            lines.append(
+                f"- {market}: {state.get('status')} | "
+                f"days={state.get('completed_independent_checkpoint_days', 0)}/"
+                f"{state.get('max_independent_checkpoint_days', 3)} | "
+                f"request_slots_added={state.get('request_slots_added', 0)}"
+            )
+        lines.append("")
+    lines.append(
+        "Market | Query Family | Provider/Path | Requests | Days | Fresh Candidates | Verified Candidates | Raw Exact-Lots | Unique Exact-Lots | Unique Fresh Yield/Request | Cost | Freshness | Decision | Reason"
+    )
     for row in router.get("recommendations") or []:
         lines.append(
             " | ".join(
@@ -87,11 +104,33 @@ def _write_text(path: Path, router: Mapping[str, Any]) -> None:
 
 
 def write_router_review(memory: Mapping[str, Any], output_dir: Path) -> dict[str, Path]:
+    primary_queries: dict[str, tuple[str, ...]] = {}
+    review_queries: dict[str, tuple[str, ...]] = {}
+    challenge_states: dict[str, dict[str, Any]] = {}
+    for market in SUPPORTED_MARKETS:
+        query_plan, challenge_state = build_market_query_plan(
+            market=market,
+            base_queries=MARKET_EXACT_LOT_QUERY_PACKS[market],
+            memory=memory,
+        )
+        primary_queries[market] = tuple(row["query"] for row in query_plan)
+        challenge_states[market] = challenge_state
+        if challenge_state.get("status") in {
+            "PAUSED_ALREADY_OBSERVED_TODAY",
+            "COMPLETED_REVIEW_REQUIRED",
+        }:
+            review_queries[market] = (str(challenge_state["challenger_query"]),)
+
     router = build_search_policy_router_v1(
         memory,
-        primary_queries=MARKET_EXACT_LOT_QUERY_PACKS,
+        primary_queries=primary_queries,
         conditional_queries=_conditional_queries(),
+        review_queries=review_queries,
     )
+    router["bounded_query_challenges"] = {
+        market: challenge_states[market]
+        for market in ("DE", "NO")
+    }
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / JSON_FILENAME
     text_path = output_dir / TEXT_FILENAME
