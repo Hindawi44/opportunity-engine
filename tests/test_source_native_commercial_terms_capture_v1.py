@@ -27,6 +27,34 @@ def test_capture_explicit_swedish_commercial_terms_without_interpretation():
     assert captured["automatic_purchase"] is False
 
 
+def test_capture_explicit_norwegian_commercial_terms_without_interpretation():
+    captured = capture_source_native_commercial_terms(
+        """
+        Tilstand: Ny
+        Selger: Eksempel Grossist AS
+        Henting: Etter avtale
+        """
+    )
+
+    assert captured["condition_candidates"] == ["Tilstand: Ny"]
+    assert captured["seller_identity_candidates"] == ["Selger: Eksempel Grossist AS"]
+    assert captured["fulfilment_candidates"] == ["Henting: Etter avtale"]
+
+
+def test_capture_explicit_german_commercial_terms_without_interpretation():
+    captured = capture_source_native_commercial_terms(
+        """
+        Zustand: Neu
+        Verkäufer: Beispiel GmbH
+        Lieferung: Nach Vereinbarung
+        """
+    )
+
+    assert captured["condition_candidates"] == ["Zustand: Neu"]
+    assert captured["seller_identity_candidates"] == ["Verkäufer: Beispiel GmbH"]
+    assert captured["fulfilment_candidates"] == ["Lieferung: Nach Vereinbarung"]
+
+
 def test_capture_accepts_explicit_company_number_as_identity_evidence():
     captured = capture_source_native_commercial_terms(
         "Organisationsnummer: 556123-4567"
