@@ -421,6 +421,19 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
     evidence = row.get("evidence") or {}
     price_detected = evidence.get("price_evidence") is True
     quantity_detected = evidence.get("quantity_evidence") is True
+    raw_price_candidates = evidence.get("source_native_price_candidates") or []
+    raw_quantity_candidates = evidence.get("source_native_quantity_candidates") or []
+    price_candidates = (
+        [_compact(value) for value in raw_price_candidates if _compact(value)][:12]
+        if isinstance(raw_price_candidates, (list, tuple))
+        else []
+    )
+    quantity_candidates = (
+        [_compact(value) for value in raw_quantity_candidates if _compact(value)][:12]
+        if isinstance(raw_quantity_candidates, (list, tuple))
+        else []
+    )
+    value_capture_version = _compact(evidence.get("source_native_value_capture_version"))
     bounded_context = (
         "Strict Exact-Lot evidence: CLOTHING_INVENTORY subject, item-specific URL, inventory, "
         "direct sale, and source-native numeric price and quantity patterns were verified on the "
@@ -466,6 +479,9 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "identity_stable": True,
         "source_native_price_evidence_detected": price_detected,
         "source_native_quantity_evidence_detected": quantity_detected,
+        "source_native_value_capture_version": value_capture_version or None,
+        "source_native_price_candidates": price_candidates,
+        "source_native_quantity_candidates": quantity_candidates,
         "source_value_normalization_required": True,
         "verification": [
             {

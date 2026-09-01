@@ -32,6 +32,8 @@ SCHEMA_VERSION = "exa-shadow-page-verification-1.1"
 LAB_FAMILY = "EXA_SHADOW_PAGE_VERIFICATION_V1"
 SUPPORTED_MARKETS = frozenset({"NO", "SE", "DE", "FR", "IT", "NL"})
 MAX_ALLOWED_PAGE_FETCHES = 30
+SOURCE_NATIVE_VALUE_CAPTURE_VERSION = "SOURCE_NATIVE_VALUE_CAPTURE_V1"
+MAX_SOURCE_NATIVE_VALUE_CANDIDATES = 12
 
 EXACT_LOT_CANDIDATE = "EXACT_LOT_CANDIDATE"
 ACTIVE_STOCK_SIGNAL = "ACTIVE_STOCK_SIGNAL"
@@ -340,6 +342,31 @@ def _compact(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
 
 
+def _bounded_source_native_matches(
+    text: str, patterns: tuple[re.Pattern[str], ...]
+) -> list[str]:
+    """Capture bounded source-native numeric tokens without interpreting them."""
+    ordered: list[tuple[int, str]] = []
+    for pattern in patterns:
+        for match in pattern.finditer(text):
+            value = _compact(match.group(0))
+            if value:
+                ordered.append((match.start(), value))
+    ordered.sort(key=lambda item: item[0])
+
+    values: list[str] = []
+    seen: set[str] = set()
+    for _, value in ordered:
+        key = value.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        values.append(value)
+        if len(values) >= MAX_SOURCE_NATIVE_VALUE_CANDIDATES:
+            break
+    return values
+
+
 def _contains_any(text: str, markers: tuple[str, ...]) -> bool:
     return any(marker in text for marker in markers)
 
@@ -426,6 +453,13 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
         "info_or_legal_evidence": has_info_legal,
         "price_evidence": has_price,
         "quantity_evidence": has_quantity,
+        "source_native_value_capture_version": SOURCE_NATIVE_VALUE_CAPTURE_VERSION,
+        "source_native_price_candidates": _bounded_source_native_matches(
+            combined_raw, (_PRICE_RE, _SCANDINAVIAN_DASH_PRICE_RE)
+        ),
+        "source_native_quantity_candidates": _bounded_source_native_matches(
+            combined_raw, (_QUANTITY_RE, _LABELED_QUANTITY_RE)
+        ),
         "item_specific_url_evidence": item_specific_url,
         "project_domain": project_domain,
         "domain_evidence": domain_evidence,
