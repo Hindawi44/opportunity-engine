@@ -40,6 +40,8 @@ FABRIC_EXA_QUERIES = {
 FABRIC_RESULTS_PER_MARKET = 5
 RUN_MULTI_CLI = "run_multi_market_daily_operator_checkpoint.py"
 DAILY_BULLETIN_CLI = "build_domain_market_intelligence_feed.py"
+EXPLICIT_EXPANSION_ENV = "OPPORTUNITY_ENGINE_EXPLICIT_SIX_MARKET_EXPANSION"
+EXPLICIT_DAILY_RUNTIME_ENV = "OPPORTUNITY_ENGINE_EXPLICIT_UNIFIED_DAILY_RUNTIME"
 UNIFIED_PIPELINE_FILENAME = "unified-six-market-pipeline-v1.json"
 UNIFIED_PHONE_SUMMARY_FILENAME = "unified-six-market-phone-summary-v1.txt"
 FABRIC_FILENAME = "fabric-procurement-watch.json"
@@ -581,8 +583,24 @@ def install_unified_search_runtime_cli_hook() -> bool:
         return False
     target = Path(sys.argv[0]).name
     if target == RUN_MULTI_CLI:
+        # The production workflow now owns FR/IT/NL expansion as a visible step.
+        # Keep the legacy callback only for local/backwards-compatible callers.
+        # This prevents the explicit workflow step and the compatibility hook
+        # from issuing the same Exa requests twice.
+        if _compact(os.environ.get(EXPLICIT_EXPANSION_ENV)).lower() in {
+            "1",
+            "true",
+            "yes",
+        }:
+            return False
         atexit.register(_run_expansion_clothing_exa)
     elif target == DAILY_BULLETIN_CLI:
+        if _compact(os.environ.get(EXPLICIT_DAILY_RUNTIME_ENV)).lower() in {
+            "1",
+            "true",
+            "yes",
+        }:
+            return False
         # Installed after the unified river but before the older fabric hooks in
         # discovery.__init__. LIFO therefore lets the older fabric artifact land
         # first, then this callback merges Exa FR/IT/NL and rewrites the unified

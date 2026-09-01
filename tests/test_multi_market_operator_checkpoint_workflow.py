@@ -126,16 +126,36 @@ def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> 
     first_source = text.index("- name: Run Exa Exact-Lot NO checkpoint source")
     auksjonen_source = text.index("- name: Run Norway Auksjonen public clothing path")
     finn_source = text.index("- name: Read FINN saved-search alerts from Gmail")
-    build = text.index("- name: Build the three-market operator checkpoint")
+    build = text.index("- name: Build the legacy-compatible core and FR/IT/NL market cycles")
+    expansion = text.index("- name: Run visible FR/IT/NL Exa Exact-Lot expansion")
     enrich = text.index("- name: Enrich checkpoint with lifecycle state and transitions")
     reconcile = text.index("- name: Reconcile persisted human review outcomes")
 
-    assert restore < first_source < auksjonen_source < finn_source < build < enrich < reconcile
+    assert restore < first_source < auksjonen_source < finn_source < build < expansion < enrich < reconcile
     assert "previous-state-restore.json" in text
     assert "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT" in text
     assert "CURRENT_RUN_INITIALIZATION" in text
     assert "دورة الحياة:" in text
     assert "استمرارية SQLite:" in text
+
+
+def test_checkpoint_exposes_six_market_expansion_without_double_running_it() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    build_start = text.index(
+        "- name: Build the legacy-compatible core and FR/IT/NL market cycles"
+    )
+    expansion_start = text.index(
+        "- name: Run visible FR/IT/NL Exa Exact-Lot expansion"
+    )
+    enrich_start = text.index("- name: Enrich checkpoint with lifecycle state")
+    build_step = text[build_start:expansion_start]
+    expansion_step = text[expansion_start:enrich_start]
+
+    assert 'OPPORTUNITY_ENGINE_EXPLICIT_SIX_MARKET_EXPANSION: "1"' in build_step
+    assert "scripts/run_explicit_six_market_expansion.py" in expansion_step
+    assert 'set((six_market_exa.get("markets") or {})) != {"FR", "IT", "NL"}' in text
+    assert '"NO", "SE", "DE", "FR", "IT", "NL"' in text
+    assert "Six-market phone summary hides expansion markets" in text
 
 
 def test_checkpoint_persists_and_validates_auksjonen_lifecycle() -> None:

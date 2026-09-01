@@ -3,12 +3,12 @@ from pathlib import Path
 
 WORKFLOWS = Path(".github/workflows")
 CHECKPOINT = WORKFLOWS / "multi-market-daily-operator-checkpoint.yaml"
-TESTS_WORKFLOW = WORKFLOWS / "tests.yml"
+TESTS_WORKFLOW = WORKFLOWS / "research-shadow-manual.yaml"
 
 
 def test_netherlands_reuses_the_only_existing_schedule_owner() -> None:
     workflow_files = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
-    assert len(workflow_files) == 4
+    assert len(workflow_files) == 6
 
     scheduled = []
     for path in workflow_files:

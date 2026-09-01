@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW = ROOT / ".github/workflows/tests.yml"
+WORKFLOW = ROOT / ".github/workflows/research-shadow-manual.yaml"
 
 
 def test_italy_live_validation_reuses_existing_workflow() -> None:
@@ -15,10 +15,10 @@ def test_italy_live_validation_reuses_existing_workflow() -> None:
     assert "python scripts/build_italy_market_discovery.py" in text
     assert "artifacts/italy-market-discovery/italy-market-discovery.json" in text
     assert "name: italy-market-discovery-v1" in text
-    assert "github.event_name == 'push'" in text
-    assert "contains(github.event.head_commit.message, 'Italy')" in text
+    assert "workflow_dispatch:" in text
+    assert "if: ${{ inputs.italy_live_validation }}" in text
 
 
 def test_italy_live_validation_does_not_add_a_fifth_workflow() -> None:
     workflows = list((ROOT / ".github/workflows").glob("*.y*ml"))
-    assert len(workflows) == 4
+    assert len(workflows) == 6

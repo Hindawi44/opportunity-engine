@@ -597,13 +597,18 @@ jobs:
           }
           JSON
 
-      - name: Build the three-market operator checkpoint
+      - name: Build the legacy-compatible core and FR/IT/NL market cycles
+        env:
+          OPPORTUNITY_ENGINE_EXPLICIT_SIX_MARKET_EXPANSION: "1"
         run: |
           python scripts/run_multi_market_daily_operator_checkpoint.py \
             --manifest "$OUTPUT_DIR/input-manifest.json" \
             --market-matrix config/market_completion_matrix.json \
             --root . \
             --output-dir "$OUTPUT_DIR"
+
+      - name: Run visible FR/IT/NL Exa Exact-Lot expansion
+        run: python scripts/run_explicit_six_market_expansion.py
 
       - name: Enrich checkpoint with lifecycle state and transitions
         run: |
@@ -623,12 +628,20 @@ jobs:
             --root .
 
       - name: Build domain market intelligence bulletin
+        env:
+          OPPORTUNITY_ENGINE_EXPLICIT_UNIFIED_DAILY_RUNTIME: "1"
         run: |
           python scripts/build_domain_market_intelligence_feed.py \
             --checkpoint "$OUTPUT_DIR/multi-market-daily-checkpoint.json" \
             --manifest "$OUTPUT_DIR/input-manifest.json" \
             --root . \
             --output-dir "$OUTPUT_DIR"
+
+      - name: Build one explicit unified six-market runtime
+        run: |
+          python scripts/run_unified_daily_runtime.py \
+            --output-dir "$OUTPUT_DIR" \
+            --input-root "$INPUT_ROOT"
 
       - name: Append Search Success review to phone summary
         if: always()
@@ -669,6 +682,21 @@ jobs:
           )
           hunt_text = (
               root / "openai-hunt-case-enrichment.txt"
+          ).read_text(encoding="utf-8")
+          six_market_exa = json.loads(
+              (root / "unified-six-market-exa-runtime.json").read_text(encoding="utf-8")
+          )
+          six_market_pipeline = json.loads(
+              (root / "unified-six-market-pipeline-v1.json").read_text(encoding="utf-8")
+          )
+          six_market_summary = (
+              root / "unified-six-market-phone-summary-v1.txt"
+          ).read_text(encoding="utf-8")
+          operator_report = json.loads(
+              (root / "unified-operator-report-v1.json").read_text(encoding="utf-8")
+          )
+          operator_text = (
+              root / "unified-operator-report-v1.txt"
           ).read_text(encoding="utf-8")
 
           if report.get("market_coverage") != ["NO", "SE", "DE"]:
@@ -744,6 +772,22 @@ jobs:
               raise SystemExit("Domain market intelligence bulletin is incomplete")
           if intelligence.get("market_coverage") != ["NO", "SE", "DE"]:
               raise SystemExit("Domain bulletin market coverage changed")
+          if set((six_market_exa.get("markets") or {})) != {"FR", "IT", "NL"}:
+              raise SystemExit("Visible FR/IT/NL Exa expansion coverage is incomplete")
+          if six_market_pipeline.get("market_coverage") != [
+              "NO", "SE", "DE", "FR", "IT", "NL"
+          ]:
+              raise SystemExit("Authoritative six-market runtime coverage changed")
+          if "التغطية: NO | SE | DE | FR | IT | NL" not in six_market_summary:
+              raise SystemExit("Six-market phone summary hides expansion markets")
+          if operator_report.get("authority") != "UNIFIED_OPERATOR_REPORT_V1":
+              raise SystemExit("Unified operator report authority is missing")
+          if operator_report.get("market_coverage") != [
+              "NO", "SE", "DE", "FR", "IT", "NL"
+          ]:
+              raise SystemExit("Unified operator report coverage changed")
+          if operator_text.count("الإجراء البشري الوحيد:") != 1:
+              raise SystemExit("Unified operator report must expose one human action")
           for key in (
               "automatic_contact",
               "automatic_bid",

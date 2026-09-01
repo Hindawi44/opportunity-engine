@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import sys
 
 from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.discovery import unified_search_runtime_cli_hook as runtime
@@ -231,3 +232,12 @@ def test_unified_operator_artifact_contains_both_domains_without_mixing_top5(tmp
     assert "FABRIC_PROCUREMENT" in text
     for code in runtime.SIX_MARKETS:
         assert f"{code}:" in text
+def test_explicit_workflow_mode_disables_hidden_expansion_callback(monkeypatch) -> None:
+    runtime._INSTALLED = False
+    registered = []
+    monkeypatch.setattr(sys, "argv", [runtime.RUN_MULTI_CLI])
+    monkeypatch.setenv(runtime.EXPLICIT_EXPANSION_ENV, "1")
+    monkeypatch.setattr(runtime.atexit, "register", registered.append)
+
+    assert runtime.install_unified_search_runtime_cli_hook() is False
+    assert registered == []

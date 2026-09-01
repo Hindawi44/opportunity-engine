@@ -9,6 +9,7 @@ from __future__ import annotations
 import atexit
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
 import sys
 from typing import Any, Mapping
@@ -28,6 +29,7 @@ _SUMMARY_FILENAME = "unified-six-market-phone-summary-v1.txt"
 _RUNTIME_FILENAME = "unified-search-runtime-v1.json"
 _AUDIT_FILENAME = "unified-search-truth-reconciliation-v1.json"
 _INSTALLED = False
+_EXPLICIT_DAILY_RUNTIME_ENV = "OPPORTUNITY_ENGINE_EXPLICIT_UNIFIED_DAILY_RUNTIME"
 
 
 def _compact(value: object) -> str:
@@ -367,6 +369,12 @@ def install_unified_search_truth_reconciliation_cli_hook() -> bool:
     """Register before Unified Search Runtime so LIFO executes this after it."""
     global _INSTALLED
     if _INSTALLED or Path(sys.argv[0]).name != _TARGET_CLI:
+        return False
+    if str(os.environ.get(_EXPLICIT_DAILY_RUNTIME_ENV, "")).strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    }:
         return False
     atexit.register(_reconcile_after_unified_search)
     _INSTALLED = True
