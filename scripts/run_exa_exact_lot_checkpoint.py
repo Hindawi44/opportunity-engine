@@ -362,7 +362,18 @@ def _exact_lot_rows(
     verification: Mapping[str, Any], multihop: Mapping[str, Any]
 ) -> list[dict[str, Any]]:
     accepted: list[dict[str, Any]] = []
-    seen: set[str] = set()
+    accepted_by_identity: dict[str, int] = {}
+
+    def accept_preferred(row: dict[str, Any], identity_key: str) -> None:
+        existing_index = accepted_by_identity.get(identity_key)
+        if existing_index is None:
+            accepted_by_identity[identity_key] = len(accepted)
+            accepted.append(row)
+            return
+
+        existing = accepted[existing_index]
+        if _is_recovery_exact_lot(existing) and not _is_recovery_exact_lot(row):
+            accepted[existing_index] = row
 
     for raw in verification.get("verified_pages") or []:
         if not isinstance(raw, Mapping):
@@ -376,15 +387,14 @@ def _exact_lot_rows(
         row = dict(raw)
         url = _compact(row.get("final_url") or row.get("url"))
         identity_key = _exact_lot_identity_key(url)
-        if not url or identity_key in seen:
+        if not url or not identity_key:
             continue
-        seen.add(identity_key)
         row["url"] = url
         row["final_url"] = url
         row["exact_lot_origin"] = "DIRECT_SEARCH_RESULT"
         if rescued:
             row["direct_strict_evidence_rescue"] = DIRECT_STRICT_EVIDENCE_RESCUE
-        accepted.append(row)
+        accept_preferred(row, identity_key)
 
     for raw in multihop.get("exact_lots") or []:
         if not isinstance(raw, Mapping):
@@ -394,13 +404,12 @@ def _exact_lot_rows(
         row = dict(raw)
         url = _compact(row.get("final_url") or row.get("url"))
         identity_key = _exact_lot_identity_key(url)
-        if not url or identity_key in seen:
+        if not url or not identity_key:
             continue
-        seen.add(identity_key)
         row["url"] = url
         row["final_url"] = url
         row["exact_lot_origin"] = "MULTI_HOP"
-        accepted.append(row)
+        accept_preferred(row, identity_key)
 
     return accepted
 
