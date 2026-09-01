@@ -643,6 +643,12 @@ jobs:
             --output-dir "$OUTPUT_DIR" \
             --input-root "$INPUT_ROOT"
 
+      - name: Write Search Policy Router V1 review output
+        run: |
+          python scripts/run_search_policy_router_review.py \
+            --memory "$INPUT_ROOT/learning/unified-memory-v2.json" \
+            --output-dir "$OUTPUT_DIR"
+
       - name: Append Search Success review to phone summary
         if: always()
         run: |
@@ -697,6 +703,12 @@ jobs:
           )
           operator_text = (
               root / "unified-operator-report-v1.txt"
+          ).read_text(encoding="utf-8")
+          policy_router = json.loads(
+              (root / "search-policy-router-v1-review.json").read_text(encoding="utf-8")
+          )
+          policy_router_text = (
+              root / "search-policy-router-v1-review.txt"
           ).read_text(encoding="utf-8")
 
           if report.get("market_coverage") != ["NO", "SE", "DE"]:
@@ -788,6 +800,14 @@ jobs:
               raise SystemExit("Unified operator report coverage changed")
           if operator_text.count("الإجراء البشري الوحيد:") != 1:
               raise SystemExit("Unified operator report must expose one human action")
+          if policy_router.get("mode") != "REVIEW_ONLY":
+              raise SystemExit("Search Policy Router escaped review-only mode")
+          if policy_router.get("market_coverage") != [
+              "NO", "SE", "DE", "FR", "IT", "NL"
+          ]:
+              raise SystemExit("Search Policy Router market coverage changed")
+          if "FABRIC_PROCUREMENT" in policy_router_text:
+              raise SystemExit("Fabric query leaked into clothing Search Policy Router output")
           for key in (
               "automatic_contact",
               "automatic_bid",

@@ -10,6 +10,11 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Mapping, Sequence
 
+from opportunity_engine.project_domain_boundary import (
+    CLOTHING_INVENTORY,
+    classify_project_domain,
+)
+
 
 SCHEMA_VERSION = "search-policy-router-1.0"
 SUPPORTED_MARKETS = ("NO", "SE", "DE", "FR", "IT", "NL")
@@ -124,12 +129,16 @@ def build_search_policy_router_v1(
 
     recommendations: list[dict[str, Any]] = []
     excluded_provider_count = 0
+    excluded_out_of_domain_count = 0
     by_market: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in _rows(memory.get("query_memory")):
         market = _upper(row.get("market_code"))
         query = _text(row.get("query"))
         provider = _text(row.get("provider")).lower()
         if market not in SUPPORTED_MARKETS or not query:
+            continue
+        if classify_project_domain(text=query) != CLOTHING_INVENTORY:
+            excluded_out_of_domain_count += 1
             continue
         if provider != "exa":
             excluded_provider_count += 1
@@ -155,16 +164,33 @@ def build_search_policy_router_v1(
             "provider": "exa",
             "query": query,
             "runtime_role": role,
+            "query_family": (
+                next(iter(row.get("query_stage_metrics") or {}), "UNKNOWN")
+                if len(row.get("query_stage_metrics") or {}) == 1
+                else "MIXED"
+            ),
+            "path_type": "SEARCH_PROVIDER",
+            "provider_or_direct_path": "exa / EXA_EXACT_LOT_MULTIHOP",
             "decision": decision,
             "reason": reason,
             "search_request_count": requests,
             "fresh_strict_exact_lot_count": int(
                 row.get("fresh_strict_exact_lot_count") or 0
             ),
+            "fresh_candidate_count": None,
+            "verified_candidate_count": None,
+            "candidate_measurement_status": "UNKNOWN_NOT_RECORDED_IN_QUERY_MEMORY",
             "unique_fresh_strict_exact_lot_count": unique,
             "unique_fresh_yield_per_request": yield_per_request,
             "independent_checkpoint_day_count": days,
             "checkpoint_days": list(row.get("checkpoint_days") or []),
+            "freshness": (
+                max(row.get("checkpoint_days") or [])
+                if row.get("checkpoint_days")
+                else None
+            ),
+            "cost": None,
+            "cost_status": "UNKNOWN_NOT_RECORDED_IN_QUERY_MEMORY",
             "request_slots_added": 0,
             "recovery_query_credit": int(row.get("recovery_exact_lot_query_credit") or 0),
             "human_review_required": decision in {"CHALLENGE", "HOLD", "REVIEW", "UNKNOWN"},
@@ -234,6 +260,7 @@ def build_search_policy_router_v1(
         "recommendations": recommendations,
         "market_decisions": market_decisions,
         "excluded_non_exa_query_count": excluded_provider_count,
+        "excluded_out_of_domain_query_count": excluded_out_of_domain_count,
         "budget_policy": "SUBSTITUTE_WITHIN_EXISTING_REQUEST_SLOTS_ONLY",
         "request_slots_added": 0,
         "cost": None,

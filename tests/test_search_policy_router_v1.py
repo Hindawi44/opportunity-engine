@@ -153,6 +153,31 @@ def test_router_keeps_recovery_credit_zero_and_cost_unknown() -> None:
     assert router["provider_scope"] == "EXA_EXACT_LOT_ONLY"
 
 
+def test_router_excludes_out_of_domain_query_memory() -> None:
+    memory = _memory()
+    memory["query_memory"].append(
+        {
+            "market_code": "NL",
+            "provider": "exa",
+            "query": "FABRIC_PROCUREMENT Nederland stoffen groothandel leveranciers catalogus",
+            "production_search_request_count": 3,
+            "fresh_strict_exact_lot_count": 8,
+            "unique_fresh_strict_exact_lot_count": 8,
+            "independent_checkpoint_day_count": 3,
+        }
+    )
+
+    router = build_search_policy_router_v1(
+        memory, primary_queries=PRIMARY, conditional_queries=CONDITIONAL
+    )
+
+    assert router["excluded_out_of_domain_query_count"] == 1
+    assert all(
+        "FABRIC_PROCUREMENT" not in row["query"]
+        for row in router["recommendations"]
+    )
+
+
 def test_router_fails_closed_on_unsafe_or_overlapping_input() -> None:
     unsafe = _memory()
     unsafe["production_mutation"] = True
