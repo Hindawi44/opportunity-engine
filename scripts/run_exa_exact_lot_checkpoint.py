@@ -111,12 +111,13 @@ def _exact_lot_identity_key(value: object) -> str:
     return f"{scheme}://{netloc}{path}{query}"
 
 
-def _exact_lot_url_set(rows: list[Mapping[str, Any]]) -> set[str]:
-    return {
-        _compact(row.get("final_url") or row.get("url"))
-        for row in rows
-        if _compact(row.get("final_url") or row.get("url"))
-    }
+def _exact_lot_identity_set(rows: list[Mapping[str, Any]]) -> set[str]:
+    identities: set[str] = set()
+    for row in rows:
+        identity = _exact_lot_identity_key(row.get("final_url") or row.get("url"))
+        if identity:
+            identities.add(identity)
+    return identities
 
 
 def _is_recovery_exact_lot(row: Mapping[str, Any]) -> bool:
@@ -191,16 +192,19 @@ def _commercial_anchor_outcome_evidence(
     The outcome is evidence for later review-only learning. Anchor identity never
     contributes to qualification. If query provenance is missing, the new lot is
     left unattributed instead of granting credit to a brand/company by inference.
+    Cosmetic URL variants must not manufacture a false post-anchor addition.
     """
-    pre_urls = _exact_lot_url_set(pre_anchor_exact_lots)
-    final_by_url = {
-        _compact(row.get("final_url") or row.get("url")): row
-        for row in final_exact_lots
-        if _compact(row.get("final_url") or row.get("url"))
-    }
-    added_urls = set(final_by_url) - pre_urls
+    pre_identities = _exact_lot_identity_set(pre_anchor_exact_lots)
+    final_by_identity: dict[str, Mapping[str, Any]] = {}
+    for row in final_exact_lots:
+        url = _compact(row.get("final_url") or row.get("url"))
+        identity = _exact_lot_identity_key(url)
+        if identity:
+            final_by_identity[identity] = row
+
+    added_identities = set(final_by_identity) - pre_identities
     outcomes: list[dict[str, Any]] = []
-    attributed_urls: set[str] = set()
+    attributed_identities: set[str] = set()
 
     for raw_query in query_rows:
         if _compact(raw_query.get("query_stage")) != "COMMERCIAL_ANCHOR":
@@ -209,12 +213,19 @@ def _commercial_anchor_outcome_evidence(
         anchor = raw_query.get("commercial_anchor") or {}
         if not isinstance(anchor, Mapping):
             anchor = {}
-        matched_urls = sorted(
-            url
-            for url in added_urls
-            if _compact(final_by_url[url].get("query")) == query
+        matched_identities = sorted(
+            identity
+            for identity in added_identities
+            if _compact(final_by_identity[identity].get("query")) == query
         )
-        attributed_urls.update(matched_urls)
+        matched_urls = sorted(
+            _compact(
+                final_by_identity[identity].get("final_url")
+                or final_by_identity[identity].get("url")
+            )
+            for identity in matched_identities
+        )
+        attributed_identities.update(matched_identities)
         outcomes.append(
             {
                 "market_code": market,
@@ -240,7 +251,14 @@ def _commercial_anchor_outcome_evidence(
             }
         )
 
-    unattributed_urls = sorted(added_urls - attributed_urls)
+    unattributed_identities = sorted(added_identities - attributed_identities)
+    unattributed_urls = sorted(
+        _compact(
+            final_by_identity[identity].get("final_url")
+            or final_by_identity[identity].get("url")
+        )
+        for identity in unattributed_identities
+    )
     return {
         "schema_version": "commercial-anchor-outcome-evidence-1.0",
         "status": "SUCCESS" if outcomes else "VALID_ZERO",
@@ -251,13 +269,13 @@ def _commercial_anchor_outcome_evidence(
         "successful_outcome_count": sum(
             row["outcome"] == "STRICT_EXACT_LOT_SUCCESS" for row in outcomes
         ),
-        "pre_anchor_strict_exact_lot_count": len(pre_urls),
-        "post_anchor_strict_exact_lot_count": len(final_by_url),
-        "added_strict_exact_lot_count": len(added_urls),
-        "attributed_added_strict_exact_lot_count": len(attributed_urls),
-        "unattributed_added_strict_exact_lot_count": len(unattributed_urls),
+        "pre_anchor_strict_exact_lot_count": len(pre_identities),
+        "post_anchor_strict_exact_lot_count": len(final_by_identity),
+        "added_strict_exact_lot_count": len(added_identities),
+        "attributed_added_strict_exact_lot_count": len(attributed_identities),
+        "unattributed_added_strict_exact_lot_count": len(unattributed_identities),
         "unattributed_added_strict_exact_lot_urls": unattributed_urls,
-        "attribution_complete": not unattributed_urls,
+        "attribution_complete": not unattributed_identities,
         "outcomes": outcomes,
         "anchor_is_qualification_evidence": False,
         "learning_evidence_only": True,
