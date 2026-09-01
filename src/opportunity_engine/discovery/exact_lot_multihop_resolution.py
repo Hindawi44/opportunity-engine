@@ -16,6 +16,12 @@ path to adjacent stock pages. After a fair probe, a zero-yield root may be
 deferred only while another root has already produced a strict Exact-Lot and
 still has queued work. The total navigation budget, provider gates, domain gates
 and Exact-Lot gates remain unchanged.
+
+When a strict multi-hop Exact-Lot lacks both seller identity and fulfilment
+snippets, the resolver may also read at most two same-domain companion pages
+already linked from the fetched root (for example contact, terms or delivery).
+That companion lane performs no search and remains context-only: it cannot prove
+the lot, lot condition, qualification or financial-analysis readiness.
 """
 from __future__ import annotations
 
@@ -31,6 +37,11 @@ from opportunity_engine.discovery.exact_lot_child_link_resolution import (
     _compact,
     _eligible_parent,
     fetch_public_html,
+)
+from opportunity_engine.discovery.exact_lot_commercial_companion_evidence import (
+    MAX_COMPANION_PAGE_FETCHES,
+    capture_same_domain_commercial_companion_evidence,
+    extract_same_domain_commercial_companion_links,
 )
 from opportunity_engine.discovery.exa_shadow_page_verification import (
     ACTIVE_STOCK_SIGNAL,
@@ -48,7 +59,7 @@ from opportunity_engine.project_domain_boundary import (
     classify_project_domain,
 )
 
-SCHEMA_VERSION = "exact-lot-multihop-resolution-1.4"
+SCHEMA_VERSION = "exact-lot-multihop-resolution-1.5"
 LAB_FAMILY = "EXACT_LOT_MULTIHOP_RESOLUTION_V1"
 SUPPORTED_PROVIDERS = frozenset({"exa", "brave"})
 MAX_ROOT_PARENTS = 6
@@ -76,9 +87,6 @@ _PAGINATION_PATH_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Generic marketplace detail shape: a short listing-kind token, a numeric record
-# id and a meaningful slug. Domain and commercial evidence are still checked on
-# the fetched page, so this URL shape alone can never create an opportunity.
 _MARKETPLACE_ID_SLUG_RE = re.compile(
     r"(?:^|/)(?:c|listing|annonce|annuncio)-\d{2,}-[^/?#]+(?:\.html?)?(?:/|$)",
     re.IGNORECASE,
@@ -100,27 +108,16 @@ def _path(url: str) -> str:
 
 
 def _link_subject_priority(url: str) -> int:
-    """Prefer proven clothing words in a URL path, but never reject neutral links."""
     path_words = _path(url).replace("-", " ").replace("_", " ").replace("/", " ")
     return 0 if classify_project_domain(text=path_words) == CLOTHING_INVENTORY else 1
 
 
 def _commercial_url_role(url: str) -> str | None:
-    """Return one bounded navigable commercial role, never a general-web role."""
     path = _path(url).rstrip("/") or "/"
     if any(path == prefix or path.startswith(prefix + "/") for prefix in _EXCLUDED_PATH_PREFIXES):
         return None
-
-    # German clothing wholesalers may expose an aggregate hierarchy below
-    # /products/bekleidung/ while reserving singular /product/<slug> for actual
-    # item pages. Treat the hierarchy as navigation only before the generic
-    # item-specific guard can mistake a nested category for a product detail.
     if path == "/products/bekleidung" or path.startswith("/products/bekleidung/"):
         return "CATEGORY"
-
-    # Use the canonical item-specific guard for singular /product/, /lot/, etc.
-    # Also recognize a generic numeric listing-id + slug detail shape. Neither
-    # path form bypasses the downstream clothing/evidence gates.
     if _looks_item_specific_url(url) or _MARKETPLACE_ID_SLUG_RE.search(path):
         return "PRODUCT_DETAIL"
     if path.startswith("/collections/") or path.startswith("/collection/"):
@@ -137,7 +134,6 @@ def _commercial_url_role(url: str) -> str | None:
 
 
 def _pagination_continuity_distance(page_url: str, candidate_url: str) -> int | None:
-    """Return adjacent aggregate-page distance, never commercial qualification evidence."""
     if _commercial_url_role(page_url) not in _AGGREGATE_NAVIGATION_ROLES:
         return None
     if _commercial_url_role(candidate_url) not in _AGGREGATE_NAVIGATION_ROLES:
@@ -272,11 +268,6 @@ def _gateway_eligible(*, url: str, classification: str, evidence: dict[str, Any]
         return False
     if classification in {OUT_OF_DOMAIN, FETCH_FAILED}:
         return False
-
-    # Aggregate category pages are navigation evidence only. Some legitimate
-    # wholesale category pages expose stock cards with price + quantity without
-    # a page-level sale verb. That is enough to follow same-origin product links,
-    # but never enough for Exact-Lot credit, which remains strict in _strict_exact.
     navigation_commercial_evidence = bool(
         evidence.get("direct_sale_evidence") is True
         or (
@@ -304,12 +295,10 @@ def _root_subject_domain(page: dict[str, Any], url: str) -> str:
 def _aggregate_navigation_root_eligible(
     *, url: str, page: dict[str, Any], evidence: dict[str, Any]
 ) -> bool:
-    """Rescue proven aggregate clothing pages for navigation only, never credit."""
-    role = _commercial_url_role(url)
     return bool(
         page.get("fetch_ok") is True
         and page.get("classification") == ACTIVE_STOCK_SIGNAL
-        and role in {"COLLECTION", "CATEGORY", "CATALOG"}
+        and _commercial_url_role(url) in {"COLLECTION", "CATEGORY", "CATALOG"}
         and _root_subject_domain(page, url) == CLOTHING_INVENTORY
         and evidence.get("project_domain") == CLOTHING_INVENTORY
         and evidence.get("inventory_evidence") is True
@@ -378,6 +367,10 @@ def _base(
         "within_root_link_priority": "ROLE_THEN_CLOTHING_SUBJECT_V1",
         "link_priority_is_qualification_evidence": False,
         "exact_lot_acceptance_only": True,
+        "commercial_companion_evidence_enabled": True,
+        "commercial_companion_max_page_fetches_per_root": MAX_COMPANION_PAGE_FETCHES,
+        "commercial_companion_evidence_is_qualification_evidence": False,
+        "commercial_companion_search_request_count": 0,
         "max_root_parents": max_root_parents,
         "max_navigation_depth": max_navigation_depth,
         "max_links_per_page": max_links_per_page,
@@ -412,6 +405,9 @@ def _blocked(base: dict[str, Any], reason: str) -> dict[str, Any]:
         "exact_lot_yield_per_fetch": 0.0,
         "navigation_page_fetches_attempted": 0,
         "navigation_page_fetches_succeeded": 0,
+        "commercial_companion_root_count": 0,
+        "commercial_companion_page_fetches_attempted": 0,
+        "commercial_companion_page_fetches_succeeded": 0,
         "depth_budget_exhausted_count": 0,
         "page_budget_exhausted_count": 0,
     }
@@ -485,9 +481,6 @@ def resolve_exact_lot_multihop(
     page_succeeded = 0
     depth_exhausted = 0
 
-    # Phase 1: fetch every eligible root and seed one independent queue. No root
-    # is allowed to consume navigation page budget before the other roots are
-    # represented in the scheduler.
     for root in roots:
         root_url = _compact(root.get("final_url") or root.get("url"))
         root_host = _host(root_url)
@@ -523,6 +516,10 @@ def resolve_exact_lot_multihop(
             html_text=fetched_root.html,
             max_links=max_links_per_page,
         )
+        companion_links = extract_same_domain_commercial_companion_links(
+            page_url=resolved_root,
+            html_text=fetched_root.html,
+        )
         root_results.append({
             "root_url": root_url,
             "root_classification": root.get("classification"),
@@ -533,6 +530,8 @@ def resolve_exact_lot_multihop(
             "final_url": resolved_root,
             "navigation_link_count": len(first_links),
             "navigation_links": first_links,
+            "commercial_companion_link_count": len(companion_links),
+            "commercial_companion_links": companion_links,
         })
 
         queue: deque[dict[str, Any]] = deque()
@@ -557,13 +556,11 @@ def resolve_exact_lot_multihop(
                     "fetch_count": 0,
                     "exact_lot_count": 0,
                     "yield_stall_count": 0,
+                    "commercial_companion_links": companion_links,
+                    "commercial_companion_evidence": None,
                 }
             )
 
-    # Phase 2 starts root-fair. Once every zero-yield root has had a bounded fair
-    # probe, it may be deferred only if another root has already yielded a strict
-    # Exact-Lot and still has queued work. Deferred roots are restored if proven
-    # roots run out of work before the global page budget is exhausted.
     active: deque[dict[str, Any]] = deque(root_states)
     deferred_zero_yield: deque[dict[str, Any]] = deque()
     while (active or deferred_zero_yield) and page_attempted < max_navigation_page_fetches:
@@ -645,6 +642,33 @@ def resolve_exact_lot_multihop(
 
                 if _strict_exact(classification, evidence):
                     state["exact_lot_count"] += 1
+                    seller_missing = not bool(
+                        evidence.get("source_native_seller_identity_candidates") or []
+                    )
+                    fulfilment_missing = not bool(
+                        evidence.get("source_native_fulfilment_candidates") or []
+                    )
+                    if (
+                        seller_missing
+                        and fulfilment_missing
+                        and state.get("commercial_companion_links")
+                    ):
+                        if state.get("commercial_companion_evidence") is None:
+                            state["commercial_companion_evidence"] = (
+                                capture_same_domain_commercial_companion_evidence(
+                                    state["commercial_companion_links"],
+                                    root_url=state["root_url"],
+                                    aggregate_fetcher=aggregate_fetcher,
+                                )
+                            )
+                        enriched_evidence = dict(evidence)
+                        enriched_evidence["commercial_companion_verification"] = state[
+                            "commercial_companion_evidence"
+                        ]
+                        enriched_evidence[
+                            "commercial_companion_evidence_is_qualification_evidence"
+                        ] = False
+                        row["evidence"] = enriched_evidence
                     exact_lots.append({
                         **row,
                         "provider": provider,
@@ -677,12 +701,6 @@ def resolve_exact_lot_multihop(
                                 html_text=fetched_html.html,
                                 max_links=max_links_per_page,
                             )
-                            # Child links are ranked by bounded URL role and clothing
-                            # subject before DOM position. A tiny aggregate-pagination
-                            # reserve keeps catalog continuity without granting any
-                            # qualification credit. Fresh links stay ahead of older
-                            # siblings inside the same root; root-level fairness and
-                            # the unchanged global page budget still apply.
                             fresh_nodes: list[dict[str, Any]] = []
                             for link in next_links:
                                 if link in seen_navigation_urls:
@@ -718,6 +736,17 @@ def resolve_exact_lot_multihop(
     exact_lot_yield_per_fetch = (
         round(len(exact_lots) / page_attempted, 4) if page_attempted else 0.0
     )
+    companion_reports = [
+        state["commercial_companion_evidence"]
+        for state in root_states
+        if isinstance(state.get("commercial_companion_evidence"), dict)
+    ]
+    companion_fetches_attempted = sum(
+        int(report.get("page_fetches_attempted") or 0) for report in companion_reports
+    )
+    companion_fetches_succeeded = sum(
+        int(report.get("page_fetches_succeeded") or 0) for report in companion_reports
+    )
 
     return {
         **base,
@@ -731,6 +760,9 @@ def resolve_exact_lot_multihop(
         "yield_stalled_root_count": yield_stalled_root_count,
         "navigation_page_fetches_attempted": page_attempted,
         "navigation_page_fetches_succeeded": page_succeeded,
+        "commercial_companion_root_count": len(companion_reports),
+        "commercial_companion_page_fetches_attempted": companion_fetches_attempted,
+        "commercial_companion_page_fetches_succeeded": companion_fetches_succeeded,
         "depth_budget_exhausted_count": depth_exhausted,
         "page_budget_exhausted_count": page_budget_exhausted,
         "navigation_results": navigation_results,
@@ -740,6 +772,6 @@ def resolve_exact_lot_multihop(
         "exact_lot_yield_per_fetch": exact_lot_yield_per_fetch,
         "exact_lots": exact_lots,
         "interpretation_guard": (
-            "Commercial hubs, aggregate categories, pagination and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Smart link priority and proven-yield scheduling change navigation order only and are never qualification evidence. Multi-hop navigation stays same-origin, root-fair through a bounded probe and bounded by explicit URL roles, depth and the unchanged global page budget."
+            "Commercial hubs, aggregate categories, pagination and gateway pages are navigation evidence only. Exact-Lot credit is reserved for directly fetched strict clothing item/lot pages. Smart link priority and proven-yield scheduling change navigation order only and are never qualification evidence. Same-domain contact, terms or delivery companion pages are context-only and cannot prove the Exact-Lot, lot condition, qualification or financial-analysis readiness. Multi-hop navigation stays same-origin, root-fair through a bounded probe and bounded by explicit URL roles, depth and the unchanged global navigation page budget."
         ),
     }
