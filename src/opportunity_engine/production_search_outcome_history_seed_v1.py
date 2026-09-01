@@ -11,6 +11,7 @@ query credit.
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from hashlib import sha256
 import json
 from pathlib import Path
 from typing import Any, Mapping
@@ -149,7 +150,7 @@ def load_historical_query_outcome_seed(
     records = _rows(seed.get("records"))
     ids: set[str] = set()
     per_day_query_keys: set[tuple[str, str, str, str]] = set()
-    unique_urls: set[str] = set()
+    unique_identities: set[str] = set()
     requests = hits = fresh = 0
     per_run_counts: dict[str, dict[str, int]] = defaultdict(
         lambda: {"queries": 0, "hits": 0, "fresh": 0}
@@ -176,15 +177,19 @@ def load_historical_query_outcome_seed(
             raise ValueError("historical seed duplicated a query within one UTC checkpoint")
         per_day_query_keys.add(key)
 
-        urls = sorted({_text(url) for url in row.get("fresh_strict_exact_lot_urls") or [] if _text(url)})
+        identities = sorted({
+            _text(value)
+            for value in row.get("fresh_identity_hashes") or []
+            if _text(value)
+        })
         fresh_count = int(row.get("fresh_strict_exact_lot_count") or 0)
-        if fresh_count != len(urls):
-            raise ValueError("historical Fresh count does not reconcile to unique row URLs")
+        if fresh_count != len(identities):
+            raise ValueError("historical Fresh count does not reconcile to row identity hashes")
         hit_count = int(row.get("hits_received") or 0)
         requests += 1
         hits += hit_count
         fresh += fresh_count
-        unique_urls.update(urls)
+        unique_identities.update(identities)
         per_run_counts[run_id]["queries"] += 1
         per_run_counts[run_id]["hits"] += hit_count
         per_run_counts[run_id]["fresh"] += fresh_count
@@ -208,7 +213,7 @@ def load_historical_query_outcome_seed(
         raise ValueError("historical hits_received does not reconcile")
     if int(seed.get("fresh_strict_exact_lot_count") or 0) != fresh:
         raise ValueError("historical Fresh Exact-Lot count does not reconcile")
-    if int(seed.get("unique_fresh_strict_exact_lot_count") or 0) != len(unique_urls):
+    if int(seed.get("unique_fresh_strict_exact_lot_count") or 0) != len(unique_identities):
         raise ValueError("historical unique Fresh Exact-Lot count does not reconcile")
     if int(seed.get("recovery_strict_exact_lot_count") or 0) != sum(
         int(row.get("recovery_strict_exact_lot_count") or 0) for row in source_runs
@@ -244,7 +249,11 @@ def _historical_spine_record(
     run_id = _text(source_run.get("source_run_id"))
     generated_at = _text(source_run.get("generated_at"))
     sample_date = _checkpoint_day(source_run.get("sample_date") or generated_at)
-    urls = sorted({_text(url) for url in row.get("fresh_strict_exact_lot_urls") or [] if _text(url)})
+    identities = sorted({
+        _text(value)
+        for value in row.get("fresh_identity_hashes") or []
+        if _text(value)
+    })
     fresh = int(row.get("fresh_strict_exact_lot_count") or 0)
     source_path = (
         f"historical-seed/run-{run_id}/"
@@ -258,7 +267,7 @@ def _historical_spine_record(
         "source_name": f"Exa Exact-Lot {market}",
         "provider": PROVIDER,
         "query": query,
-        "url": urls[0] if urls else None,
+        "url": None,
         "result_type": "PRODUCTION_QUERY_OUTCOME_HISTORY",
         "outcome": "FRESH_SUCCESS" if fresh else "FRESH_ZERO",
         "miss_reason": None,
@@ -279,7 +288,8 @@ def _historical_spine_record(
             "search_request_count": 1,
             "hits_received": int(row.get("hits_received") or 0),
             "fresh_strict_exact_lot_count": fresh,
-            "fresh_strict_exact_lot_urls": urls,
+            "fresh_strict_exact_lot_urls": [],
+            "fresh_identity_hashes": identities,
             "recovery_exact_lot_count": 0,
             "fresh_yield_per_request": float(fresh),
             "recovery_query_credit_blocked": True,
@@ -426,11 +436,23 @@ def install_historical_query_outcome_memory_metrics() -> None:
         historical = metadata.get("historical_seed") is True
         source_run_id = _text(metadata.get("source_run_id")) if historical else ""
         day = _checkpoint_day(metadata.get("sample_date") or record.get("observed_at"))
+        identity_hashes = sorted({
+            _text(value)
+            for value in metadata.get("fresh_identity_hashes") or []
+            if _text(value)
+        })
+        if not identity_hashes:
+            identity_hashes = sorted({
+                sha256(_text(url).encode("utf-8")).hexdigest()[:20]
+                for url in metadata.get("fresh_strict_exact_lot_urls") or []
+                if _text(url)
+            })
         observation.update(
             {
                 "checkpoint_day": day or None,
                 "historical_seed": historical,
                 "source_run_id": source_run_id or run_id,
+                "fresh_identity_hashes": identity_hashes,
             }
         )
         return observation
@@ -458,12 +480,13 @@ def install_historical_query_outcome_memory_metrics() -> None:
             lambda: {
                 "days": set(),
                 "historical_observations": 0,
+                "identities": set(),
                 "stage": defaultdict(
                     lambda: {
                         "requests": 0,
                         "fresh": 0,
                         "days": set(),
-                        "urls": set(),
+                        "identities": set(),
                     }
                 ),
             }
@@ -495,11 +518,13 @@ def install_historical_query_outcome_memory_metrics() -> None:
                 stage_bucket = bucket["stage"][stage]
                 stage_bucket["requests"] += requests
                 stage_bucket["fresh"] += fresh
-                stage_bucket["urls"].update(
-                    _text(url)
-                    for url in observation.get("fresh_strict_exact_lot_urls") or []
-                    if _text(url)
-                )
+                identities = {
+                    _text(value)
+                    for value in observation.get("fresh_identity_hashes") or []
+                    if _text(value)
+                }
+                bucket["identities"].update(identities)
+                stage_bucket["identities"].update(identities)
 
         for row in output:
             key = (
@@ -511,12 +536,13 @@ def install_historical_query_outcome_memory_metrics() -> None:
             if not metric:
                 continue
             requests = int(row.get("production_search_request_count") or 0)
-            unique_count = int(row.get("fresh_exact_lot_url_count") or 0)
+            unique_count = len(metric["identities"])
             row.update(
                 {
                     "independent_checkpoint_day_count": len(metric["days"]),
                     "checkpoint_days": sorted(metric["days"]),
                     "historical_seed_observation_count": int(metric["historical_observations"]),
+                    "unique_fresh_strict_exact_lot_count": unique_count,
                     "unique_fresh_yield_per_request": (
                         unique_count / requests if requests else 0.0
                     ),
@@ -524,14 +550,14 @@ def install_historical_query_outcome_memory_metrics() -> None:
                         stage: {
                             "search_request_count": int(stage_metric["requests"]),
                             "fresh_strict_exact_lot_count": int(stage_metric["fresh"]),
-                            "unique_fresh_strict_exact_lot_count": len(stage_metric["urls"]),
+                            "unique_fresh_strict_exact_lot_count": len(stage_metric["identities"]),
                             "fresh_yield_per_request": (
                                 stage_metric["fresh"] / stage_metric["requests"]
                                 if stage_metric["requests"]
                                 else 0.0
                             ),
                             "unique_fresh_yield_per_request": (
-                                len(stage_metric["urls"]) / stage_metric["requests"]
+                                len(stage_metric["identities"]) / stage_metric["requests"]
                                 if stage_metric["requests"]
                                 else 0.0
                             ),
