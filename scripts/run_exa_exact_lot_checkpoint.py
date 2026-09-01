@@ -38,6 +38,7 @@ from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_e
 from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
 from opportunity_engine.discovery.unified_opportunity_report import write_unified_opportunity_report
 from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY, classify_project_domain
+from opportunity_engine.discovery.source_native_value_normalization import normalize_source_native_values
 from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_benchmark, _market_anchored
 
 
@@ -434,18 +435,34 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         else []
     )
     value_capture_version = _compact(evidence.get("source_native_value_capture_version"))
+    normalization = normalize_source_native_values(
+        market=market,
+        url=url,
+        price_candidates=price_candidates,
+        quantity_candidates=quantity_candidates,
+    )
+    values_normalized = normalization.get("status") == "NORMALIZED"
     bounded_context = (
         "Strict Exact-Lot evidence: CLOTHING_INVENTORY subject, item-specific URL, inventory, "
         "direct sale, and source-native numeric price and quantity patterns were verified on the "
-        "exact public page. Source values still require normalization before financial analysis."
+        "exact public page. The single unambiguous source price/quantity pair was normalized "
+        "without currency conversion, tax, customs or logistics calculation."
+        if values_normalized
+        else
+        "Strict Exact-Lot evidence: CLOTHING_INVENTORY subject, item-specific URL, inventory, "
+        "direct sale, and source-native numeric price and quantity patterns were verified on the "
+        "exact public page. Source values remain ambiguous or unsupported for normalization."
     )
     missing_information = [
-        "normalized source-native price value for financial analysis",
-        "normalized source-native quantity value for financial analysis",
         "condition",
         "seller or company identity",
         "pickup or shipping terms",
     ]
+    if not values_normalized:
+        missing_information[:0] = [
+            "normalized source-native price value for financial analysis",
+            "normalized source-native quantity value for financial analysis",
+        ]
     confirmed_information = [
         "clothing domain",
         "item-specific page",
@@ -454,6 +471,8 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "source-native numeric price evidence" if price_detected else "price evidence",
         "source-native numeric quantity evidence" if quantity_detected else "quantity evidence",
     ]
+    if values_normalized:
+        confirmed_information.append("normalized source-native price and quantity values")
     return {
         "title": title,
         "scenario": "LARGE_LOT_SALE",
@@ -482,7 +501,8 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "source_native_value_capture_version": value_capture_version or None,
         "source_native_price_candidates": price_candidates,
         "source_native_quantity_candidates": quantity_candidates,
-        "source_value_normalization_required": True,
+        "source_value_normalization_required": not values_normalized,
+        "source_value_normalization": normalization,
         "verification": [
             {
                 "url": url,
@@ -495,7 +515,8 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
                 "sale_evidence": evidence.get("direct_sale_evidence") is True,
                 "price_evidence": price_detected,
                 "quantity_evidence": quantity_detected,
-                "source_value_normalization_required": True,
+                "source_value_normalization_required": not values_normalized,
+                "source_value_normalization": normalization,
                 "verification_content_match": True,
                 "bounded_context": bounded_context,
                 "verified": True,
@@ -513,7 +534,10 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "confirmed_information": confirmed_information,
         "missing_information": missing_information,
         "next_verification_step": (
-            "Normalize the already verified source-native price and quantity values, then confirm "
+            "Confirm condition, seller identity and pickup/shipping terms before financial analysis."
+            if values_normalized
+            else
+            "Resolve source price/quantity ambiguity or unsupported formatting, then confirm "
             "condition, seller identity and pickup/shipping terms before financial analysis."
         ),
         "top5_eligible": True,
@@ -537,7 +561,7 @@ def build_checkpoint_result_from_exact_lots(
         1 for row in exact_lots if row.get("direct_strict_evidence_rescue") == DIRECT_STRICT_EVIDENCE_RESCUE
     )
     report = {
-        "schema_version": "exa-exact-lot-checkpoint-bridge-1.8",
+        "schema_version": "exa-exact-lot-checkpoint-bridge-1.9",
         "status": "SUCCESS",
         "execution_status": "PASS",
         "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -562,6 +586,11 @@ def build_checkpoint_result_from_exact_lots(
             for candidate in candidates
             if candidate.get("source_native_price_evidence_detected") is True
             and candidate.get("source_native_quantity_evidence_detected") is True
+        ),
+        "source_value_normalized_count": sum(
+            1
+            for candidate in candidates
+            if (candidate.get("source_value_normalization") or {}).get("status") == "NORMALIZED"
         ),
         "source_value_normalization_required_count": sum(
             1 for candidate in candidates if candidate.get("source_value_normalization_required") is True
