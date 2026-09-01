@@ -22,6 +22,9 @@ from opportunity_engine.discovery.keyword_shadow_verification import (
     PageFetchResult,
     fetch_public_page,
 )
+from opportunity_engine.discovery.source_native_commercial_terms_capture import (
+    capture_source_native_commercial_terms,
+)
 from opportunity_engine.project_domain_boundary import (
     CLOTHING_INVENTORY,
     OUT_OF_DOMAIN,
@@ -444,6 +447,7 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
     item_specific_url = _looks_item_specific_url(url)
     project_domain = classify_project_domain(text=combined_raw)
     domain_evidence = project_domain == CLOTHING_INVENTORY
+    commercial_terms_capture = capture_source_native_commercial_terms(combined_raw)
 
     evidence: dict[str, Any] = {
         "inventory_evidence": has_inventory,
@@ -460,6 +464,11 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
         "source_native_quantity_candidates": _bounded_source_native_matches(
             combined_raw, (_QUANTITY_RE, _LABELED_QUANTITY_RE)
         ),
+        "source_native_commercial_terms_capture_version": commercial_terms_capture["version"],
+        "source_native_condition_candidates": commercial_terms_capture["condition_candidates"],
+        "source_native_seller_identity_candidates": commercial_terms_capture["seller_identity_candidates"],
+        "source_native_fulfilment_candidates": commercial_terms_capture["fulfilment_candidates"],
+        "source_native_commercial_terms_capture_is_qualification_evidence": False,
         "item_specific_url_evidence": item_specific_url,
         "project_domain": project_domain,
         "domain_evidence": domain_evidence,
