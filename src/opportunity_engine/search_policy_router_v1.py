@@ -81,12 +81,19 @@ def _validate_memory(memory: Mapping[str, Any]) -> None:
 
 
 def _runtime_role(
-    *, market: str, query: str, primary: Mapping[str, set[str]], conditional: Mapping[str, set[str]]
+    *,
+    market: str,
+    query: str,
+    primary: Mapping[str, set[str]],
+    conditional: Mapping[str, set[str]],
+    review: Mapping[str, set[str]],
 ) -> str:
     if query in primary[market]:
         return "PRIMARY"
     if query in conditional[market]:
         return "CONDITIONAL"
+    if query in review[market]:
+        return "TRIAL_REVIEW"
     return "HISTORICAL"
 
 
@@ -104,6 +111,11 @@ def _decision(*, role: str, requests: int, unique: int, days: int) -> tuple[str,
         if unique > 0:
             return "CONDITIONAL", "Measured optional query remains eligible only behind its existing runtime trigger."
         return "REVIEW", "Conditional query has insufficient positive evidence."
+    if role == "TRIAL_REVIEW":
+        return (
+            "REVIEW",
+            "The bounded three-day query challenge is complete; a human must keep or revert it.",
+        )
     if unique > 0 and days >= MIN_CHALLENGE_DAYS:
         return "CHALLENGE", "Historical query has enough independent positive evidence for a bounded comparison."
     return "REVIEW", "Historical evidence is not mature enough for a bounded challenge."
@@ -114,11 +126,13 @@ def build_search_policy_router_v1(
     *,
     primary_queries: Mapping[str, Sequence[str]],
     conditional_queries: Mapping[str, Sequence[str]] | None = None,
+    review_queries: Mapping[str, Sequence[str]] | None = None,
 ) -> dict[str, Any]:
     """Build deterministic recommendations without changing runtime behavior."""
     _validate_memory(memory)
     primary = _query_sets(primary_queries)
     conditional = _query_sets(conditional_queries)
+    review = _query_sets(review_queries)
     overlap = {
         market: sorted(primary[market] & conditional[market])
         for market in SUPPORTED_MARKETS
@@ -126,6 +140,17 @@ def build_search_policy_router_v1(
     }
     if overlap:
         raise ValueError(f"router query cannot be both primary and conditional: {overlap}")
+    review_overlap = {
+        market: sorted(
+            (primary[market] & review[market])
+            | (conditional[market] & review[market])
+        )
+        for market in SUPPORTED_MARKETS
+        if (primary[market] & review[market])
+        or (conditional[market] & review[market])
+    }
+    if review_overlap:
+        raise ValueError(f"router review query overlaps an active role: {review_overlap}")
 
     recommendations: list[dict[str, Any]] = []
     excluded_provider_count = 0
@@ -152,6 +177,7 @@ def build_search_policy_router_v1(
             query=query,
             primary=primary,
             conditional=conditional,
+            review=review,
         )
         decision, reason = _decision(
             role=role,
@@ -202,7 +228,14 @@ def build_search_policy_router_v1(
     for market in SUPPORTED_MARKETS:
         rows = by_market.get(market, [])
         active = [row for row in rows if row["runtime_role"] == "PRIMARY"]
-        challengers = [row for row in rows if row["decision"] == "CHALLENGE"]
+        trial_reviews = [
+            row for row in rows if row["runtime_role"] == "TRIAL_REVIEW"
+        ]
+        challengers = (
+            []
+            if trial_reviews
+            else [row for row in rows if row["decision"] == "CHALLENGE"]
+        )
         weakest = min(
             active,
             key=lambda row: (
@@ -246,7 +279,12 @@ def build_search_policy_router_v1(
     recommendations.sort(
         key=lambda row: (
             row["market_code"],
-            {"PRIMARY": 0, "CONDITIONAL": 1, "HISTORICAL": 2}[row["runtime_role"]],
+            {
+                "PRIMARY": 0,
+                "CONDITIONAL": 1,
+                "TRIAL_REVIEW": 2,
+                "HISTORICAL": 3,
+            }[row["runtime_role"]],
             row["query"],
         )
     )

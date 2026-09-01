@@ -77,6 +77,25 @@ def test_exa_exact_lot_bridge_runs_for_no_se_de_before_legacy_sources() -> None:
         assert f"sqlite:///$INPUT_ROOT/{directory}/opportunity_engine.db" in text
 
 
+def test_de_no_query_challenge_reads_memory_without_adding_request_slots() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    no_start = text.index("- name: Run Exa Exact-Lot NO checkpoint source")
+    se_start = text.index("- name: Run Exa Exact-Lot SE checkpoint source")
+    de_start = text.index("- name: Run Exa Exact-Lot DE checkpoint source")
+    next_source = text.index("- name: Run Norway Auksjonen public clothing path")
+
+    no_step = text[no_start:se_start]
+    se_step = text[se_start:de_start]
+    de_step = text[de_start:next_source]
+    memory_arg = '--search-policy-memory "$INPUT_ROOT/learning/unified-memory-v2.json"'
+
+    assert memory_arg in no_step
+    assert memory_arg not in se_step
+    assert memory_arg in de_step
+    assert no_step.count("--results-per-query 5") == 1
+    assert de_step.count("--results-per-query 5") == 1
+
+
 def test_checkpoint_reads_finn_gmail_after_auksjonen() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     auksjonen = text.index("- name: Run Norway Auksjonen public clothing path")

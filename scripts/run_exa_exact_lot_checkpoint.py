@@ -40,6 +40,9 @@ from opportunity_engine.discovery.unified_opportunity_report import write_unifie
 from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY, classify_project_domain
 from opportunity_engine.discovery.source_native_value_normalization import normalize_source_native_values
 from opportunity_engine.search_experiment_execution_bridge_v1 import _custom_benchmark, _market_anchored
+from opportunity_engine.search_policy_query_challenge_v1 import (
+    build_market_query_plan,
+)
 
 
 RESULTS_PER_QUERY = 5
@@ -652,9 +655,19 @@ def _write_json(path: Path, payload: object) -> None:
 
 
 def run_market(
-    *, market: str, exa_api_key: str, output_dir: Path, results_per_query: int
+    *,
+    market: str,
+    exa_api_key: str,
+    output_dir: Path,
+    results_per_query: int,
+    search_policy_memory: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    primary_queries = MARKET_EXACT_LOT_QUERY_PACKS[market]
+    primary_query_plan, search_policy_challenge = build_market_query_plan(
+        market=market,
+        base_queries=MARKET_EXACT_LOT_QUERY_PACKS[market],
+        memory=search_policy_memory,
+    )
+    primary_queries = tuple(row["query"] for row in primary_query_plan)
     recall_queries = MARKET_ZERO_YIELD_RECALL_QUERIES.get(market, ())
     anchor_queries = build_commercial_anchor_queries(
         market=market,
@@ -673,6 +686,7 @@ def run_market(
         anchor_type: str = "",
         anchor_value: str = "",
         anchor_origin: str = "",
+        trial_id: str = "",
     ) -> None:
         if not _market_anchored(query, market):
             raise RuntimeError(f"query not market anchored: {market}: {query}")
@@ -695,6 +709,14 @@ def run_market(
                 "value": _compact(anchor_value),
                 "origin": _compact(anchor_origin),
                 "qualification_evidence": False,
+            }
+        if trial_id:
+            row["search_policy_challenge"] = {
+                "trial_id": trial_id,
+                "query_stage": stage,
+                "request_slots_added": 0,
+                "budget_change": 0,
+                "provider": "exa",
             }
         query_rows.append(row)
         for hit in hits:
@@ -725,8 +747,12 @@ def run_market(
         )
         return verification, multihop, _exact_lot_rows(verification, multihop)
 
-    for query in primary_queries:
-        collect(query, stage="PRIMARY")
+    for query_plan_row in primary_query_plan:
+        collect(
+            query_plan_row["query"],
+            stage=query_plan_row["query_stage"],
+            trial_id=query_plan_row.get("trial_id") or "",
+        )
 
     verification, multihop, exact_lots = evaluate()
     primary_snapshot = _fresh_coverage_snapshot(exact_lots)
@@ -804,6 +830,7 @@ def run_market(
     report["fresh_recall_min_current_exact_lots"] = FRESH_RECALL_MIN_CURRENT_EXACT_LOTS
     report["fresh_recall_min_current_route_hosts"] = FRESH_RECALL_MIN_CURRENT_ROUTE_HOSTS
     report["primary_query_count"] = len(primary_queries)
+    report["search_policy_query_challenge"] = search_policy_challenge
     report["primary_strict_exact_lot_count"] = primary_strict_exact_lot_count
     report["primary_fresh_current_strict_exact_lot_count"] = (
         primary_fresh_current_strict_exact_lot_count
@@ -884,6 +911,7 @@ def run_market(
             "project_domain": CLOTHING_INVENTORY,
             "provider": "exa",
             "queries": query_rows,
+            "search_policy_query_challenge": search_policy_challenge,
             "adaptive_zero_yield_recall": {
                 "available": bool(recall_queries),
                 "triggered": zero_yield_recall_triggered,
@@ -956,6 +984,14 @@ def main() -> int:
     parser.add_argument("--persist-unified", action="store_true")
     parser.add_argument("--database-url", default="")
     parser.add_argument("--alembic-config", default="alembic.ini")
+    parser.add_argument(
+        "--search-policy-memory",
+        default="",
+        help=(
+            "Optional Unified Memory V2 path used only to count the approved "
+            "three-day DE/NO query challenge."
+        ),
+    )
     args = parser.parse_args()
 
     if not 1 <= args.results_per_query <= RESULTS_PER_QUERY:
@@ -968,11 +1004,20 @@ def main() -> int:
 
     market = args.market.upper()
     output_dir = Path(args.output_dir)
+    search_policy_memory = None
+    if _compact(args.search_policy_memory):
+        memory_path = Path(args.search_policy_memory)
+        if memory_path.exists():
+            loaded_memory = json.loads(memory_path.read_text(encoding="utf-8"))
+            if not isinstance(loaded_memory, Mapping):
+                raise SystemExit("--search-policy-memory must contain a JSON object")
+            search_policy_memory = loaded_memory
     result = run_market(
         market=market,
         exa_api_key=exa_api_key,
         output_dir=output_dir,
         results_per_query=args.results_per_query,
+        search_policy_memory=search_policy_memory,
     )
     paths = write_discovery_artifacts(result, output_dir)
     unified_path = write_unified_opportunity_report(
@@ -1004,6 +1049,10 @@ def main() -> int:
     print(f"Queries: {report['queries_submitted']}")
     print(f"Hits: {report['hits_received']}")
     print(f"Strict Exact-Lots: {report['strict_exact_lot_count']}")
+    print(
+        "Search Policy challenge: "
+        f"{(report.get('search_policy_query_challenge') or {}).get('status', 'NOT_APPLICABLE')}"
+    )
     print(f"Top opportunities: {report['top5_count']}")
     for name, path in paths.items():
         print(f"{name}: {path}")

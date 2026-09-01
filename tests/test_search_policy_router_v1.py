@@ -153,6 +153,22 @@ def test_router_keeps_recovery_credit_zero_and_cost_unknown() -> None:
     assert router["provider_scope"] == "EXA_EXACT_LOT_ONLY"
 
 
+def test_completed_bounded_challenger_is_held_for_human_review() -> None:
+    challenger = "Deutschland Restposten Bekleidung Großhandel Lager"
+    router = build_search_policy_router_v1(
+        _memory(),
+        primary_queries=PRIMARY,
+        conditional_queries=CONDITIONAL,
+        review_queries={"DE": (challenger,)},
+    )
+
+    row = _recommendation(router, market="DE", query=challenger)
+    assert row["runtime_role"] == "TRIAL_REVIEW"
+    assert row["decision"] == "REVIEW"
+    assert row["human_review_required"] is True
+    assert router["market_decisions"]["DE"]["decision"] == "KEEP_OR_REVIEW"
+
+
 def test_router_excludes_out_of_domain_query_memory() -> None:
     memory = _memory()
     memory["query_memory"].append(
