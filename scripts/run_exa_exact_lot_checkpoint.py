@@ -435,6 +435,27 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         else []
     )
     value_capture_version = _compact(evidence.get("source_native_value_capture_version"))
+    commercial_terms_capture_version = _compact(
+        evidence.get("source_native_commercial_terms_capture_version")
+    )
+    raw_condition_candidates = evidence.get("source_native_condition_candidates") or []
+    raw_seller_identity_candidates = evidence.get("source_native_seller_identity_candidates") or []
+    raw_fulfilment_candidates = evidence.get("source_native_fulfilment_candidates") or []
+    condition_candidates = (
+        [_compact(value) for value in raw_condition_candidates if _compact(value)][:8]
+        if isinstance(raw_condition_candidates, (list, tuple))
+        else []
+    )
+    seller_identity_candidates = (
+        [_compact(value) for value in raw_seller_identity_candidates if _compact(value)][:8]
+        if isinstance(raw_seller_identity_candidates, (list, tuple))
+        else []
+    )
+    fulfilment_candidates = (
+        [_compact(value) for value in raw_fulfilment_candidates if _compact(value)][:8]
+        if isinstance(raw_fulfilment_candidates, (list, tuple))
+        else []
+    )
     normalization = normalize_source_native_values(
         market=market,
         url=url,
@@ -501,6 +522,11 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "source_native_value_capture_version": value_capture_version or None,
         "source_native_price_candidates": price_candidates,
         "source_native_quantity_candidates": quantity_candidates,
+        "source_native_commercial_terms_capture_version": commercial_terms_capture_version or None,
+        "source_native_condition_candidates": condition_candidates,
+        "source_native_seller_identity_candidates": seller_identity_candidates,
+        "source_native_fulfilment_candidates": fulfilment_candidates,
+        "source_native_commercial_terms_capture_is_qualification_evidence": False,
         "source_value_normalization_required": not values_normalized,
         "source_value_normalization": normalization,
         "verification": [
@@ -517,6 +543,11 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
                 "quantity_evidence": quantity_detected,
                 "source_value_normalization_required": not values_normalized,
                 "source_value_normalization": normalization,
+                "source_native_commercial_terms_capture_version": commercial_terms_capture_version or None,
+                "source_native_condition_candidates": condition_candidates,
+                "source_native_seller_identity_candidates": seller_identity_candidates,
+                "source_native_fulfilment_candidates": fulfilment_candidates,
+                "source_native_commercial_terms_capture_is_qualification_evidence": False,
                 "verification_content_match": True,
                 "bounded_context": bounded_context,
                 "verified": True,
