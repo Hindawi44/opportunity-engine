@@ -49,7 +49,7 @@ def test_value_capture_is_bounded_and_deduplicated() -> None:
     assert evidence["source_native_quantity_candidates"] == ["20 st"]
 
 
-def test_candidate_propagates_captured_values_without_enabling_financial_analysis() -> None:
+def test_candidate_normalizes_single_unambiguous_pair_without_enabling_financial_analysis() -> None:
     runner = _load_runner()
     row = {
         "url": "https://example.se/product/wholesale-clothing-lot-42",
@@ -75,5 +75,9 @@ def test_candidate_propagates_captured_values_without_enabling_financial_analysi
     assert candidate["source_native_value_capture_version"] == "SOURCE_NATIVE_VALUE_CAPTURE_V1"
     assert candidate["source_native_price_candidates"] == ["929 kr"]
     assert candidate["source_native_quantity_candidates"] == ["19 st"]
-    assert candidate["source_value_normalization_required"] is True
+    assert candidate["source_value_normalization_required"] is False
+    assert candidate["source_value_normalization"]["status"] == "NORMALIZED"
+    assert candidate["source_value_normalization"]["normalized_price"]["amount"] == 929.0
+    assert candidate["source_value_normalization"]["normalized_quantity"]["amount"] == 19
+    assert candidate["source_value_normalization"]["derived_unit_cost"]["amount_decimal"] == "48.89"
     assert candidate["analysis_eligible"] is False
