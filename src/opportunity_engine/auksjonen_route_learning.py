@@ -9,6 +9,18 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Mapping
 
+from opportunity_engine.production_search_outcome_bridge_v1 import (
+    augment_unified_learning_spine,
+    install_unified_memory_query_outcome_metrics,
+    write_production_search_outcome_bridge,
+)
+from opportunity_engine.production_search_outcome_history_seed_compact_v1 import (
+    load_compact_historical_query_outcome_seed,
+)
+from opportunity_engine.production_search_outcome_history_seed_v1 import (
+    augment_unified_learning_spine_with_history,
+    install_historical_query_outcome_memory_metrics,
+)
 from opportunity_engine.project_domain_boundary import (
     CLOTHING_INVENTORY,
     classify_project_domain,
@@ -34,6 +46,13 @@ AUKSJONEN_MARKET = "NO"
 AUKSJONEN_PARENT_DOMAIN = "auksjonen.no"
 AUKSJONEN_PATHWAY = "PUBLIC_CATEGORY_TO_EXACT_ITEM"
 AUKSJONEN_STABLE_QUERY = "Auksjonen clothing inventory category scan"
+
+# Memory V2 is imported later by the established daily CLI hook. Installing the
+# additive query-outcome metrics here patches the module globals before the same
+# checkpoint calls write_unified_memory_v2(). No search or production mutation
+# is introduced.
+install_unified_memory_query_outcome_metrics()
+install_historical_query_outcome_memory_metrics()
 
 
 def _mapping(value: object) -> Mapping[str, Any]:
@@ -160,7 +179,7 @@ def write_unified_learning_spine_with_native_routes(
     *,
     input_root: str | Path,
 ) -> dict[str, Any]:
-    """Write the normal Spine plus a same-run, review-only Auksjonen route candidate."""
+    """Write the Spine with native routes + live and historical query outcomes."""
     output = Path(output_dir)
     root = Path(input_root)
     output.mkdir(parents=True, exist_ok=True)
@@ -169,11 +188,22 @@ def write_unified_learning_spine_with_native_routes(
         _read_optional_json(root / SEARCH_SUCCESS_RELATIVE_PATH),
         _read_optional_json(root / AUKSJONEN_EXACT_ITEM_RELATIVE_PATH),
     )
+    bridge = write_production_search_outcome_bridge(
+        output,
+        input_root=root,
+    )
+    historical_seed = load_compact_historical_query_outcome_seed()
     spine = build_unified_learning_spine(
         unified_intelligence_items=_read_optional_json(output / RIVER_ITEMS_FILENAME),
         search_success_memory=search_success,
         missed_opportunity_memory=_read_optional_json(root / MISSED_OPPORTUNITIES_RELATIVE_PATH),
         daily_learning=_read_optional_json(output / DAILY_LEARNING_FILENAME),
+    )
+    spine = augment_unified_learning_spine(spine, bridge)
+    spine = augment_unified_learning_spine_with_history(
+        spine,
+        historical_seed,
+        live_bridge=bridge,
     )
     _write_json(output / OUTPUT_FILENAME, spine)
     _attach_summary(output, spine)
