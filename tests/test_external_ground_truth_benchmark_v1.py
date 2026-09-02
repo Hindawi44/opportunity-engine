@@ -1,6 +1,18 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from opportunity_engine.external_ground_truth_benchmark import evaluate_external_ground_truth
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SIX_MARKET_GAPS = (
+    ROOT
+    / "config"
+    / "learning"
+    / "external_ground_truth_benchmark_2026-09-02_six_market_search_gaps.json"
+)
 
 
 def _benchmark() -> dict:
@@ -96,3 +108,30 @@ def test_benchmark_is_read_only_and_cannot_promote_production() -> None:
     assert report["automatic_bid"] is False
     assert report["automatic_purchase"] is False
     assert report["automatic_payment"] is False
+
+
+def test_six_market_gap_fixture_keeps_four_verified_clothing_misses_fixed() -> None:
+    benchmark = json.loads(SIX_MARKET_GAPS.read_text(encoding="utf-8"))
+
+    assert [row["market_code"] for row in benchmark["opportunities"]] == [
+        "FR",
+        "NL",
+        "DE",
+        "IT",
+    ]
+    assert all(
+        row["project_domain"] == "CLOTHING_INVENTORY"
+        and row["stock_proven"] is True
+        and row["public_evidence_verified"] is True
+        and row["evidence"]["category"] == "CLOTHING_INVENTORY"
+        for row in benchmark["opportunities"]
+    )
+
+    report = evaluate_external_ground_truth(benchmark, documents={})
+
+    assert report["benchmark_count"] == 4
+    assert report["confirmed_miss_count"] == 4
+    assert report["baseline_found_count"] == 0
+    assert report["automatic_promotion"] is False
+    assert report["production_mutation"] is False
+    assert report["network_requests"] == 0
