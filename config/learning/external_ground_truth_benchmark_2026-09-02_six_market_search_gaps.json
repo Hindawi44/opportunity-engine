@@ -1,0 +1,100 @@
+{
+  "schema_version": "external-ground-truth-benchmark-1.0",
+  "captured_at": "2026-09-02T00:00:00Z",
+  "purpose": "FIXED_READ_ONLY_REGRESSION_CASES_FOR_UNIFIED_SIX_MARKET_SEARCH_GAPS",
+  "opportunities": [
+    {
+      "case_id": "ext-20260902-fr-interencheres-88566299",
+      "market_code": "FR",
+      "project_domain": "CLOTHING_INVENTORY",
+      "source_name": "Interencheres",
+      "source_url": "https://www.interencheres.com/biens-equipement/liquidation-complete-volontaire-dun-magasin-de-pret-a-porter-de-marques-diverses-en-1-lot-688145/lot-88566299.html",
+      "evidence_url": "https://www.interencheres.com/biens-equipement/liquidation-complete-volontaire-dun-magasin-de-pret-a-porter-de-marques-diverses-en-1-lot-688145/lot-88566299.html",
+      "title": "Liquidation complete de 1,120 pieces de pret-a-porter",
+      "listed_at": "2026-09-02",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "quantity_units": 1120,
+        "garment_units": 735,
+        "underwear_or_swimwear_units": 295,
+        "accessory_units": 90,
+        "stated_stock_retail_value_eur": 18704.0,
+        "sale_at": "2026-09-04T20:00:00+02:00",
+        "stock_language": "lot complet pret au chargement et conditionne sur une palette europe",
+        "category": "CLOTHING_INVENTORY"
+      }
+    },
+    {
+      "case_id": "ext-20260902-nl-marktplaats-m2436517341",
+      "market_code": "NL",
+      "project_domain": "CLOTHING_INVENTORY",
+      "source_name": "Marktplaats",
+      "source_url": "https://www.marktplaats.nl/v/kinderen-en-baby-s/kinderkleding-overige/m2436517341-1200-st-nieuwe-kinderkleding-met-kaartje-maat-50-176",
+      "evidence_url": "https://www.marktplaats.nl/v/kinderen-en-baby-s/kinderkleding-overige/m2436517341-1200-st-nieuwe-kinderkleding-met-kaartje-maat-50-176",
+      "title": "Approximately 1,200 new children's garments with tags",
+      "listed_at": "2026-08-29",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "quantity_units": 1200,
+        "lot_price_eur": 2950.0,
+        "stated_unit_price_eur": 2.45,
+        "stated_retail_value_eur": 35000.0,
+        "condition": "NEW_WITH_TAGS",
+        "pickup_location": "Dongen",
+        "category": "CLOTHING_INVENTORY"
+      }
+    },
+    {
+      "case_id": "ext-20260902-de-kleinanzeigen-salzmann-23270",
+      "market_code": "DE",
+      "project_domain": "CLOTHING_INVENTORY",
+      "source_name": "Kleinanzeigen",
+      "source_url": "https://www.kleinanzeigen.de/s-kleidung-damen/gesch%C3%A4ftsaufl%C3%B6sung-kleidung/k0c154",
+      "evidence_url": "https://www.kleinanzeigen.de/s-kleidung-damen/gesch%C3%A4ftsaufl%C3%B6sung-kleidung/k0c154",
+      "title": "Approximately 23,270 women's jackets and coats",
+      "listed_at": "2026-08-16",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "quantity_units": 23270,
+        "lot_price_eur": 115749.0,
+        "condition": "A_WARE",
+        "seller": "Salzmann Restwaren GmbH",
+        "location": "07922 Tanna",
+        "source_locator_kind": "PUBLIC_SEARCH_RESULT_PAGE",
+        "exact_listing_url_resolved": false,
+        "category": "CLOTHING_INVENTORY"
+      }
+    },
+    {
+      "case_id": "ext-20260902-it-industrialdiscount-79595",
+      "market_code": "IT",
+      "project_domain": "CLOTHING_INVENTORY",
+      "source_name": "Industrial Discount",
+      "source_url": "https://www.industrialdiscount.it/lotti/abbigliamento-e-accessori-moda-79595/",
+      "evidence_url": "https://www.industrialdiscount.it/lotti/abbigliamento-e-accessori-moda-79595/",
+      "title": "Abbigliamento e accessori moda - lot 79595",
+      "listed_at": "2026-09-02",
+      "stock_proven": true,
+      "public_evidence_verified": true,
+      "evidence": {
+        "auction_base_eur": 2173.0,
+        "minimum_offer_eur": 2173.0,
+        "buyer_premium_percent": 15,
+        "management_cost_eur": 300.0,
+        "vat_percent": 22,
+        "auction_closes_at": "2026-10-06T17:00:00+02:00",
+        "stock_language": "lotto composto da vari capi d'abbigliamento e accessori moda",
+        "category": "CLOTHING_INVENTORY"
+      }
+    }
+  ],
+  "automatic_promotion": false,
+  "production_mutation": false,
+  "automatic_contact": false,
+  "automatic_bid": false,
+  "automatic_purchase": false,
+  "automatic_payment": false
+}
