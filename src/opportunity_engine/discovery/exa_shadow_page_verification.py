@@ -25,6 +25,9 @@ from opportunity_engine.discovery.keyword_shadow_verification import (
 from opportunity_engine.discovery.source_native_commercial_terms_capture import (
     capture_source_native_commercial_terms,
 )
+from opportunity_engine.discovery.source_native_value_normalization import (
+    capture_source_native_price_basis_candidates,
+)
 from opportunity_engine.project_domain_boundary import (
     CLOTHING_INVENTORY,
     OUT_OF_DOMAIN,
@@ -460,6 +463,9 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
         "source_native_value_capture_version": SOURCE_NATIVE_VALUE_CAPTURE_VERSION,
         "source_native_price_candidates": _bounded_source_native_matches(
             combined_raw, (_PRICE_RE, _SCANDINAVIAN_DASH_PRICE_RE)
+        ),
+        "source_native_price_basis_candidates": (
+            capture_source_native_price_basis_candidates(combined_raw)
         ),
         "source_native_quantity_candidates": _bounded_source_native_matches(
             combined_raw, (_QUANTITY_RE, _LABELED_QUANTITY_RE)
