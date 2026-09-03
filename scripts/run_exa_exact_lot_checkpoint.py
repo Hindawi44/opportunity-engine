@@ -426,6 +426,7 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
     price_detected = evidence.get("price_evidence") is True
     quantity_detected = evidence.get("quantity_evidence") is True
     raw_price_candidates = evidence.get("source_native_price_candidates") or []
+    raw_price_basis_candidates = evidence.get("source_native_price_basis_candidates") or []
     raw_quantity_candidates = evidence.get("source_native_quantity_candidates") or []
     price_candidates = (
         [_compact(value) for value in raw_price_candidates if _compact(value)][:12]
@@ -435,6 +436,11 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
     quantity_candidates = (
         [_compact(value) for value in raw_quantity_candidates if _compact(value)][:12]
         if isinstance(raw_quantity_candidates, (list, tuple))
+        else []
+    )
+    price_basis_candidates = (
+        [_compact(value) for value in raw_price_basis_candidates if _compact(value)][:12]
+        if isinstance(raw_price_basis_candidates, (list, tuple))
         else []
     )
     value_capture_version = _compact(evidence.get("source_native_value_capture_version"))
@@ -464,25 +470,32 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         url=url,
         price_candidates=price_candidates,
         quantity_candidates=quantity_candidates,
+        price_basis_candidates=price_basis_candidates,
     )
     values_normalized = normalization.get("status") == "NORMALIZED"
     bounded_context = (
         "Strict Exact-Lot evidence: CLOTHING_INVENTORY subject, item-specific URL, inventory, "
         "direct sale, and source-native numeric price and quantity patterns were verified on the "
-        "exact public page. The single unambiguous source price/quantity pair was normalized "
-        "without currency conversion, tax, customs or logistics calculation."
+        "exact public page. The single unambiguous source price/quantity pair and explicit "
+        "total-or-per-item basis were normalized without currency conversion, tax, customs or "
+        "logistics calculation."
         if values_normalized
         else
         "Strict Exact-Lot evidence: CLOTHING_INVENTORY subject, item-specific URL, inventory, "
         "direct sale, and source-native numeric price and quantity patterns were verified on the "
-        "exact public page. Source values remain ambiguous or unsupported for normalization."
+        "exact public page. Source values or the total-versus-per-item price basis remain "
+        "ambiguous or unsupported for normalization."
     )
     missing_information = [
         "condition",
         "seller or company identity",
         "pickup or shipping terms",
     ]
-    if not values_normalized:
+    if normalization.get("status") == "AMBIGUOUS_PRICE_BASIS":
+        missing_information.insert(
+            0, "explicit source price basis (total lot price versus per-item price)"
+        )
+    elif not values_normalized:
         missing_information[:0] = [
             "normalized source-native price value for financial analysis",
             "normalized source-native quantity value for financial analysis",
@@ -524,6 +537,7 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "source_native_quantity_evidence_detected": quantity_detected,
         "source_native_value_capture_version": value_capture_version or None,
         "source_native_price_candidates": price_candidates,
+        "source_native_price_basis_candidates": price_basis_candidates,
         "source_native_quantity_candidates": quantity_candidates,
         "source_native_commercial_terms_capture_version": commercial_terms_capture_version or None,
         "source_native_condition_candidates": condition_candidates,
@@ -544,6 +558,7 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
                 "sale_evidence": evidence.get("direct_sale_evidence") is True,
                 "price_evidence": price_detected,
                 "quantity_evidence": quantity_detected,
+                "source_native_price_basis_candidates": price_basis_candidates,
                 "source_value_normalization_required": not values_normalized,
                 "source_value_normalization": normalization,
                 "source_native_commercial_terms_capture_version": commercial_terms_capture_version or None,

@@ -35,6 +35,7 @@ def test_candidate_propagates_raw_commercial_terms_without_claiming_readiness() 
             "quantity_evidence": True,
             "source_native_value_capture_version": "SOURCE_NATIVE_VALUE_CAPTURE_V1",
             "source_native_price_candidates": ["14 000,00 kr"],
+            "source_native_price_basis_candidates": ["Totalpris"],
             "source_native_quantity_candidates": ["Kvantitet 140"],
             "source_native_commercial_terms_capture_version": "SOURCE_NATIVE_COMMERCIAL_TERMS_CAPTURE_V1",
             "source_native_condition_candidates": ["Skick: Nytt"],

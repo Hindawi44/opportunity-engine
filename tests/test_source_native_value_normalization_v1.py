@@ -11,6 +11,7 @@ def test_grossist_single_pair_normalizes_without_financial_promotion() -> None:
         url="https://www.grossist.se/restpartier/1/20/parti/2359",
         price_candidates=["14 000,00 kr"],
         quantity_candidates=["Kvantitet 140"],
+        price_basis_candidates=["Totalpris"],
     )
 
     assert result["status"] == "NORMALIZED"
@@ -24,6 +25,11 @@ def test_grossist_single_pair_normalizes_without_financial_promotion() -> None:
     assert result["normalized_quantity"]["unit"] == "COUNT"
     assert result["derived_unit_cost"]["amount_decimal"] == "100.00"
     assert result["derived_unit_cost"]["currency"] == "SEK"
+    assert result["price_basis"] == "TOTAL"
+    assert result["price_basis_evidence"] == ["captured_context:Totalpris"]
+    assert result["derived_unit_cost"]["derivation"] == (
+        "EXPLICIT_TOTAL_PRICE_DIVIDED_BY_NORMALIZED_COUNT"
+    )
     assert result["financial_analysis_ready"] is False
     assert result["normalization_is_qualification_evidence"] is False
 
@@ -70,3 +76,54 @@ def test_explicit_eur_price_can_normalize_on_eu_market() -> None:
     assert result["normalized_price"]["amount_decimal"] == "1234.50"
     assert result["normalized_price"]["currency"] == "EUR"
     assert result["normalized_quantity"] is None
+
+
+def test_bare_price_and_quantity_fail_closed_when_price_basis_is_unknown() -> None:
+    result = normalize_source_native_values(
+        market="FR",
+        url="https://example.fr/lot/vestes",
+        price_candidates=["3,50 EUR"],
+        quantity_candidates=["750 pièces"],
+    )
+
+    assert result["status"] == "AMBIGUOUS_PRICE_BASIS"
+    assert result["price_basis"] == "UNKNOWN"
+    assert result["normalized_price"]["amount_decimal"] == "3.50"
+    assert result["normalized_quantity"]["amount"] == 750
+    assert result["derived_unit_cost"] is None
+
+
+def test_explicit_french_per_item_price_is_not_divided_by_quantity() -> None:
+    result = normalize_source_native_values(
+        market="FR",
+        url="https://example.fr/lot/vestes",
+        price_candidates=["3,50 EUR"],
+        quantity_candidates=["750 pièces"],
+        price_basis_candidates=["Prix unitaire"],
+    )
+
+    assert result["status"] == "NORMALIZED"
+    assert result["price_basis"] == "PER_ITEM"
+    assert result["price_basis_evidence"] == [
+        "captured_context:Prix unitaire"
+    ]
+    assert result["derived_unit_cost"]["amount_decimal"] == "3.50"
+    assert result["derived_unit_cost"]["derivation"] == "SOURCE_PRICE_EXPLICITLY_PER_ITEM"
+
+
+def test_italian_per_item_url_is_not_divided_by_quantity() -> None:
+    result = normalize_source_native_values(
+        market="IT",
+        url=(
+            "https://stockitaly24.com/products/17-00-al-pezzo-stock-abbigliamento-"
+            "100-pezzi"
+        ),
+        price_candidates=["17,00 EUR"],
+        quantity_candidates=["100 pezzi"],
+    )
+
+    assert result["status"] == "NORMALIZED"
+    assert result["price_basis"] == "PER_ITEM"
+    assert result["price_basis_evidence"] == ["source_url:al pezzo"]
+    assert result["derived_unit_cost"]["amount_decimal"] == "17.00"
+    assert result["derived_unit_cost"]["derivation"] == "SOURCE_PRICE_EXPLICITLY_PER_ITEM"

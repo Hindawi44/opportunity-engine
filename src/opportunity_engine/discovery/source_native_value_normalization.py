@@ -9,7 +9,7 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import re
 from typing import Any, Sequence
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 
 
 SCHEMA_VERSION = "SOURCE_NATIVE_VALUE_NORMALIZATION_V1"
@@ -50,10 +50,91 @@ _COUNT_QUANTITY_RE = re.compile(
     re.IGNORECASE,
 )
 _NUMBER_RE = re.compile(r"\d[\d\s.,]*")
+_PER_ITEM_BASIS_RE = re.compile(
+    r"(?:"
+    r"\b(?:pris|price)\s*(?:per|pr\.?)\s*(?:stk|st\.?|plagg|piece|unit)\b|"
+    r"\bprix\s+(?:unitaire|par\s+(?:pi[eè]ce|piece))\b|"
+    r"\bpar\s+(?:pi[eè]ce|piece)\b|"
+    r"\b(?:al|a|per)\s+pezzo\b|"
+    r"\b(?:prijs\s+)?per\s+stuk\b|"
+    r"\b(?:st[uü]ckpreis|pro\s+st[uü]ck)\b|"
+    r"\b(?:per\s+(?:piece|unit)|each)\b|"
+    r"/(?:pc|pcs|stk|st\.?|pi[eè]ce|piece|pezzo|stuk)\b"
+    r")",
+    re.IGNORECASE,
+)
+_TOTAL_BASIS_RE = re.compile(
+    r"\b(?:"
+    r"totalpris|pris\s+for\s+(?:partiet|lotten)|"
+    r"total\s+price|lot\s+price|"
+    r"gesamtpreis|totalpreis|"
+    r"prix\s+(?:du\s+lot|total)|"
+    r"prezzo\s+(?:totale|del\s+lotto)|"
+    r"totaalprijs|prijs\s+(?:voor|van)\s+(?:de\s+)?partij"
+    r")\b",
+    re.IGNORECASE,
+)
 
 
 def _compact(value: object) -> str:
     return " ".join(str(value or "").replace("\xa0", " ").split()).strip()
+
+
+def capture_source_native_price_basis_candidates(
+    text: str, *, limit: int = 12
+) -> list[str]:
+    """Capture explicit total/per-item labels without interpreting numeric values."""
+    ordered: list[tuple[int, str]] = []
+    for pattern in (_PER_ITEM_BASIS_RE, _TOTAL_BASIS_RE):
+        for match in pattern.finditer(text):
+            value = _compact(match.group(0))
+            if value:
+                ordered.append((match.start(), value))
+    ordered.sort(key=lambda item: item[0])
+
+    values: list[str] = []
+    seen: set[str] = set()
+    for _, value in ordered:
+        key = value.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        values.append(value)
+        if len(values) >= limit:
+            break
+    return values
+
+
+def _price_basis(
+    *, url: str, price_token: str, basis_candidates: Sequence[str]
+) -> tuple[str, list[str]]:
+    url_context = unquote(_compact(url)).replace("-", " ").replace("_", " ")
+    evidence = [_compact(value) for value in basis_candidates if _compact(value)]
+    contexts = [
+        ("source_url", url_context),
+        ("price_token", _compact(price_token)),
+        *(("captured_context", value) for value in evidence),
+    ]
+    per_item_matches = [
+        f"{source}:{match.group(0)}"
+        for source, value in contexts
+        if (match := _PER_ITEM_BASIS_RE.search(value))
+    ]
+    total_matches = [
+        f"{source}:{match.group(0)}"
+        for source, value in contexts
+        if (match := _TOTAL_BASIS_RE.search(value))
+    ]
+    basis_evidence = list(dict.fromkeys([*per_item_matches, *total_matches]))
+    per_item = bool(per_item_matches)
+    total = bool(total_matches)
+    if per_item and total:
+        return "CONFLICTING", basis_evidence
+    if per_item:
+        return "PER_ITEM", basis_evidence
+    if total:
+        return "TOTAL", basis_evidence
+    return "UNKNOWN", evidence
 
 
 def _normalize_decimal_text(raw: str) -> Decimal | None:
@@ -160,16 +241,22 @@ def normalize_source_native_values(
     url: str,
     price_candidates: Sequence[str],
     quantity_candidates: Sequence[str],
+    price_basis_candidates: Sequence[str] = (),
 ) -> dict[str, Any]:
-    """Normalize only a single unambiguous source price + count quantity pair."""
+    """Normalize only a single pair with an explicit total/per-item price basis."""
     prices = [_compact(value) for value in price_candidates if _compact(value)]
     quantities = [_compact(value) for value in quantity_candidates if _compact(value)]
+    basis_candidates = [
+        _compact(value) for value in price_basis_candidates if _compact(value)
+    ]
     base = {
         "version": SCHEMA_VERSION,
+        "price_basis_contract_version": "EXPLICIT_PRICE_BASIS_V1",
         "market_code": market,
         "source_url": _compact(url),
         "price_candidate_count": len(prices),
         "quantity_candidate_count": len(quantities),
+        "price_basis_candidate_count": len(basis_candidates),
         "currency_conversion_performed": False,
         "tax_calculation_performed": False,
         "customs_calculation_performed": False,
@@ -186,6 +273,8 @@ def normalize_source_native_values(
             "status": status,
             "normalized_price": None,
             "normalized_quantity": None,
+            "price_basis": "UNKNOWN",
+            "price_basis_evidence": basis_candidates,
             "derived_unit_cost": None,
         }
 
@@ -197,22 +286,49 @@ def normalize_source_native_values(
             "status": "UNSUPPORTED_OR_AMBIGUOUS_FORMAT",
             "normalized_price": price,
             "normalized_quantity": quantity,
+            "price_basis": "UNKNOWN",
+            "price_basis_evidence": basis_candidates,
             "derived_unit_cost": None,
         }
 
-    unit_cost = (Decimal(price["amount_decimal"]) / Decimal(quantity["amount"])).quantize(
-        Decimal("0.01"), rounding=ROUND_HALF_UP
+    price_basis, basis_evidence = _price_basis(
+        url=url,
+        price_token=prices[0],
+        basis_candidates=basis_candidates,
     )
+    if price_basis not in {"PER_ITEM", "TOTAL"}:
+        return {
+            **base,
+            "status": "AMBIGUOUS_PRICE_BASIS",
+            "normalized_price": price,
+            "normalized_quantity": quantity,
+            "price_basis": price_basis,
+            "price_basis_evidence": basis_evidence,
+            "derived_unit_cost": None,
+        }
+
+    if price_basis == "PER_ITEM":
+        unit_cost = Decimal(price["amount_decimal"]).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+        derivation = "SOURCE_PRICE_EXPLICITLY_PER_ITEM"
+    else:
+        unit_cost = (Decimal(price["amount_decimal"]) / Decimal(quantity["amount"])).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+        derivation = "EXPLICIT_TOTAL_PRICE_DIVIDED_BY_NORMALIZED_COUNT"
     return {
         **base,
         "status": "NORMALIZED",
         "normalized_price": price,
         "normalized_quantity": quantity,
+        "price_basis": price_basis,
+        "price_basis_evidence": basis_evidence,
         "derived_unit_cost": {
             "amount": float(unit_cost),
             "amount_decimal": format(unit_cost, "f"),
             "currency": price["currency"],
             "per_unit": "COUNT",
-            "derivation": "NORMALIZED_PRICE_DIVIDED_BY_NORMALIZED_COUNT",
+            "derivation": derivation,
         },
     }

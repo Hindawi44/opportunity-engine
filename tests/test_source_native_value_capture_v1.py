@@ -35,6 +35,7 @@ def test_classification_captures_bounded_source_native_price_and_quantity_tokens
     assert evidence["source_native_value_capture_version"] == "SOURCE_NATIVE_VALUE_CAPTURE_V1"
     assert evidence["source_native_price_candidates"] == ["929 kr", "1 228 kr"]
     assert evidence["source_native_quantity_candidates"] == ["19 st", "20 st"]
+    assert evidence["source_native_price_basis_candidates"] == []
 
 
 def test_value_capture_is_bounded_and_deduplicated() -> None:
@@ -66,6 +67,7 @@ def test_candidate_normalizes_single_unambiguous_pair_without_enabling_financial
             "quantity_evidence": True,
             "source_native_value_capture_version": "SOURCE_NATIVE_VALUE_CAPTURE_V1",
             "source_native_price_candidates": ["929 kr"],
+            "source_native_price_basis_candidates": ["Pris for partiet"],
             "source_native_quantity_candidates": ["19 st"],
         },
     }
@@ -74,6 +76,7 @@ def test_candidate_normalizes_single_unambiguous_pair_without_enabling_financial
 
     assert candidate["source_native_value_capture_version"] == "SOURCE_NATIVE_VALUE_CAPTURE_V1"
     assert candidate["source_native_price_candidates"] == ["929 kr"]
+    assert candidate["source_native_price_basis_candidates"] == ["Pris for partiet"]
     assert candidate["source_native_quantity_candidates"] == ["19 st"]
     assert candidate["source_value_normalization_required"] is False
     assert candidate["source_value_normalization"]["status"] == "NORMALIZED"
@@ -81,3 +84,14 @@ def test_candidate_normalizes_single_unambiguous_pair_without_enabling_financial
     assert candidate["source_value_normalization"]["normalized_quantity"]["amount"] == 19
     assert candidate["source_value_normalization"]["derived_unit_cost"]["amount_decimal"] == "48.89"
     assert candidate["analysis_eligible"] is False
+
+
+def test_classification_captures_explicit_per_item_price_basis() -> None:
+    classification, evidence = verifier._classify_page(
+        title="Lot de vêtements en vente",
+        text="Stock de 750 pièces. Prix unitaire 3,50 EUR. Lot disponible.",
+        url="https://example.fr/lot/vetements-750",
+    )
+
+    assert classification == verifier.EXACT_LOT_CANDIDATE
+    assert evidence["source_native_price_basis_candidates"] == ["Prix unitaire"]
