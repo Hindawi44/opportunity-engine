@@ -250,6 +250,52 @@ def test_checkpoint_keeps_failure_distinct_from_valid_zero(tmp_path: Path) -> No
     assert report["top5_eligible_count"] == 0
 
 
+def test_checkpoint_connects_fr_it_nl_without_promoting_unverified_rows(
+    tmp_path: Path,
+) -> None:
+    sources = [
+        _standard_source(
+            tmp_path,
+            f"{market.lower()}-exa-exact-lot",
+            market=market,
+            currency=currency,
+            candidates=[
+                {
+                    "opportunity_identity": f"https://example.test/{market.lower()}/lot",
+                    "title": f"{market} clothing lot",
+                    "listing_status": "ACTIVE",
+                    "top5_eligible": True,
+                    "analysis_eligible": False,
+                    "missing_information": ["seller identity", "shipping terms"],
+                }
+            ],
+        )
+        for market, currency in (
+            ("NO", "NOK"),
+            ("SE", "SEK"),
+            ("DE", "EUR"),
+            ("FR", "EUR"),
+            ("IT", "EUR"),
+            ("NL", "EUR"),
+        )
+    ]
+
+    report = build_multi_market_checkpoint(
+        {"sources": sources}, _matrix(), root=tmp_path
+    )
+
+    assert report["market_coverage"] == ["NO", "SE", "DE", "FR", "IT", "NL"]
+    assert [row["market_code"] for row in report["markets"]] == report["market_coverage"]
+    assert report["deduplicated_record_count"] == 6
+    assert report["top5_eligible_count"] == 6
+    assert report["analysis_eligible_count"] == 0
+    assert all(
+        row["workflow_status"] == "CANDIDATE"
+        and row["analysis_eligible"] is False
+        for row in report["deduplicated_opportunities"]
+    )
+
+
 def test_checkpoint_rejects_foreign_currency_in_nok_fields(tmp_path: Path) -> None:
     no_source = _standard_source(
         tmp_path,
