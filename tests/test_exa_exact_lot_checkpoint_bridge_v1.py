@@ -123,7 +123,7 @@ def test_exa_exact_lot_runner_covers_all_existing_six_markets() -> None:
         assert "site:" not in fallback.casefold()
 
 
-def test_human_approved_de_challenge_uses_one_existing_primary_slot(
+def test_finalized_de_challenger_uses_one_existing_primary_slot(
     monkeypatch, tmp_path: Path
 ) -> None:
     module = _load_script()
@@ -176,14 +176,15 @@ def test_human_approved_de_challenge_uses_one_existing_primary_slot(
     ]
     assert result["search_run_report"]["primary_query_count"] == 2
     challenge = result["search_run_report"]["search_policy_query_challenge"]
-    assert challenge["status"] == "ACTIVE"
+    assert challenge["status"] == "HUMAN_DECISION_APPLIED"
+    assert challenge["finalized_decision"] == "KEEP_CHALLENGER"
     assert challenge["request_slots_added"] == 0
 
     resolution = json.loads(
         (tmp_path / "exa-exact-lot-resolution.json").read_text(encoding="utf-8")
     )
-    assert resolution["queries"][0]["query_stage"] == POLICY_CHALLENGE_STAGE
-    assert resolution["queries"][0]["search_policy_challenge"]["request_slots_added"] == 0
+    assert resolution["queries"][0]["query_stage"] == "PRIMARY"
+    assert "search_policy_challenge" not in resolution["queries"][0]
 
 
 def test_zero_yield_recall_runs_only_after_primary_strict_zero(monkeypatch, tmp_path: Path) -> None:
