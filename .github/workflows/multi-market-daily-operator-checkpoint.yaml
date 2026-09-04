@@ -818,7 +818,9 @@ jobs:
           }
           if not required_intelligence_keys.issubset(intelligence):
               raise SystemExit("Domain market intelligence bulletin is incomplete")
-          if intelligence.get("market_coverage") != ["NO", "SE", "DE"]:
+          if intelligence.get("market_coverage") != [
+              "NO", "SE", "DE", "FR", "IT", "NL"
+          ]:
               raise SystemExit("Domain bulletin market coverage changed")
           if set((six_market_exa.get("markets") or {})) != {"FR", "IT", "NL"}:
               raise SystemExit("Visible FR/IT/NL Exa expansion coverage is incomplete")
