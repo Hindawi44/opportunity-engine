@@ -76,5 +76,7 @@ def test_automatic_checkpoint_uses_scoped_daily_entrypoint_and_not_full_optional
     assert '"market_code": "NO"' in text
     assert '"market_code": "SE"' in text
     assert '"market_code": "DE"' in text
-    for market in ('"market_code": "NL"', '"market_code": "PL"', '"market_code": "UK"'):
+    assert '"market_code": "NL"' in text
+    assert '"source_name": "Exa Exact-Lot NL"' in text
+    for market in ('"market_code": "PL"', '"market_code": "UK"'):
         assert market not in text
