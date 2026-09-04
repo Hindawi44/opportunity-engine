@@ -850,6 +850,7 @@ jobs:
               "PAUSED_ALREADY_OBSERVED_TODAY",
               "PAUSED_MEMORY_UNAVAILABLE",
               "COMPLETED_REVIEW_REQUIRED",
+              "HUMAN_DECISION_APPLIED",
           }
           for market in ("DE", "NO"):
               state = challenge_states.get(market) or {}

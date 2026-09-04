@@ -26,3 +26,9 @@ def test_checkpoint_validator_accepts_six_market_domain_coverage() -> None:
 
     assert '"NO", "SE", "DE", "FR", "IT", "NL"' in validation
     assert 'intelligence.get("market_coverage") != ["NO", "SE", "DE"]' not in validation
+
+
+def test_checkpoint_validator_accepts_applied_query_decisions() -> None:
+    validation = WORKFLOW.read_text(encoding="utf-8")
+
+    assert '"HUMAN_DECISION_APPLIED"' in validation
