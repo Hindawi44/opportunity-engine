@@ -856,7 +856,12 @@ jobs:
               state = challenge_states.get(market) or {}
               if state.get("status") not in allowed_challenge_statuses:
                   raise SystemExit(f"{market} bounded query challenge status is invalid")
-              if state.get("max_independent_checkpoint_days") != 3:
+              if state.get("status") == "HUMAN_DECISION_APPLIED":
+                  if state.get("remaining_independent_checkpoint_days") != 0:
+                      raise SystemExit(
+                          f"{market} finalized query challenge still has remaining days"
+                      )
+              elif state.get("max_independent_checkpoint_days") != 3:
                   raise SystemExit(f"{market} bounded query challenge day cap changed")
               if state.get("request_slots_added") != 0:
                   raise SystemExit(f"{market} bounded query challenge added request slots")
