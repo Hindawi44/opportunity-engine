@@ -21,9 +21,8 @@ def test_runtime_validator_accepts_useful_only_domain_delivery() -> None:
     assert "Domain bulletin must contain exactly one human action" not in validation
 
 
-
 def test_checkpoint_validator_accepts_six_market_domain_coverage() -> None:
     validation = WORKFLOW.read_text(encoding="utf-8")
 
-    assert \'"NO", "SE", "DE", "FR", "IT", "NL"\' in validation
-    assert \'intelligence.get("market_coverage") != ["NO", "SE", "DE"]\' not in validation
+    assert '"NO", "SE", "DE", "FR", "IT", "NL"' in validation
+    assert 'intelligence.get("market_coverage") != ["NO", "SE", "DE"]' not in validation
