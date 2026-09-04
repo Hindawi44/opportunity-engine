@@ -32,3 +32,10 @@ def test_checkpoint_validator_accepts_applied_query_decisions() -> None:
     validation = WORKFLOW.read_text(encoding="utf-8")
 
     assert '"HUMAN_DECISION_APPLIED"' in validation
+
+
+def test_checkpoint_validator_uses_finalized_challenge_remaining_days() -> None:
+    validation = WORKFLOW.read_text(encoding="utf-8")
+
+    assert 'state.get("status") == "HUMAN_DECISION_APPLIED"' in validation
+    assert 'state.get("remaining_independent_checkpoint_days") != 0' in validation
