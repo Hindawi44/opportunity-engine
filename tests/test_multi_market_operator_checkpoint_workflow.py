@@ -28,11 +28,14 @@ def test_checkpoint_workflow_is_daily_and_read_only() -> None:
     assert "run_multi_market_daily_operator_checkpoint.py" in text
 
 
-def test_checkpoint_workflow_covers_only_completed_markets() -> None:
+def test_checkpoint_workflow_connects_all_six_commercial_markets() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     assert '"market_code": "NO"' in text
     assert '"market_code": "SE"' in text
     assert '"market_code": "DE"' in text
+    assert '"market_code": "FR"' in text
+    assert '"market_code": "IT"' in text
+    assert '"market_code": "NL"' in text
     assert '"market_code": "DK"' not in text
     assert "run_auksjonen_live_clothing.py" in text
     assert "run_finn_email_intake.py" in text
@@ -125,8 +128,8 @@ def test_sweden_daily_checkpoint_runs_three_direct_source_packs_before_germany()
     assert blinto < klaravik < psauction < sen_sen < riegermann
     assert "all nine bounded source paths" in text
     assert "all ten bounded source paths" in text
-    assert "all thirteen bounded source paths" in text
-    assert '!= 13' in text
+    assert "all sixteen bounded source paths" in text
+    assert '!= 16' in text
     assert '"Klaravik" not in source_by_name' in text
     assert '"PS Auction" not in source_by_name' in text
     assert '"Sen & Sen" not in source_by_name' in text
@@ -150,7 +153,7 @@ def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> 
     enrich = text.index("- name: Enrich checkpoint with lifecycle state and transitions")
     reconcile = text.index("- name: Reconcile persisted human review outcomes")
 
-    assert restore < first_source < auksjonen_source < finn_source < build < expansion < enrich < reconcile
+    assert restore < first_source < auksjonen_source < finn_source < expansion < build < enrich < reconcile
     assert "previous-state-restore.json" in text
     assert "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT" in text
     assert "CURRENT_RUN_INITIALIZATION" in text
@@ -160,16 +163,17 @@ def test_checkpoint_restores_state_before_sources_and_enriches_after_build() -> 
 
 def test_checkpoint_exposes_six_market_expansion_without_double_running_it() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
-    build_start = text.index(
-        "- name: Build the legacy-compatible core and FR/IT/NL market cycles"
-    )
     expansion_start = text.index(
         "- name: Run visible FR/IT/NL Exa Exact-Lot expansion"
     )
+    build_start = text.index(
+        "- name: Build the legacy-compatible core and FR/IT/NL market cycles"
+    )
     enrich_start = text.index("- name: Enrich checkpoint with lifecycle state")
-    build_step = text[build_start:expansion_start]
-    expansion_step = text[expansion_start:enrich_start]
+    expansion_step = text[expansion_start:build_start]
+    build_step = text[build_start:enrich_start]
 
+    assert expansion_start < build_start < enrich_start
     assert 'OPPORTUNITY_ENGINE_EXPLICIT_SIX_MARKET_EXPANSION: "1"' in build_step
     assert "scripts/run_explicit_six_market_expansion.py" in expansion_step
     assert 'set((six_market_exa.get("markets") or {})) != {"FR", "IT", "NL"}' in text

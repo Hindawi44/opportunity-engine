@@ -1,4 +1,4 @@
-"""Read-only consolidation for Norway, Sweden, and Germany discovery artifacts.
+"""Read-only consolidation for all six clothing-market discovery artifacts.
 
 The checkpoint does not collect, contact, bid, buy, reserve, pay, convert prices,
 or alter any source runtime state. It only reconciles existing JSON artifacts into
@@ -14,7 +14,16 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
-MARKET_CURRENCIES = {"NO": "NOK", "SE": "SEK", "DE": "EUR"}
+MARKET_CURRENCIES = {
+    "NO": "NOK",
+    "SE": "SEK",
+    "DE": "EUR",
+    "FR": "EUR",
+    "IT": "EUR",
+    "NL": "EUR",
+}
+MARKET_ORDER = ("NO", "SE", "DE", "FR", "IT", "NL")
+REQUIRED_MARKETS = frozenset({"NO", "SE", "DE"})
 SUCCESS_STATES = {"PASS", "SUCCESS", "OK", "COMPLETED"}
 ENDED_STATES = {"ENDED", "CLOSED", "EXPIRED", "SOLD", "UNAVAILABLE"}
 HISTORICAL_LIFECYCLE_STATES = {
@@ -357,7 +366,7 @@ def _load_source(spec: Mapping[str, Any], root: Path) -> dict[str, Any]:
         execution_status = "VALID_ZERO_RESULT"
 
     conversion_performed = bool((report or {}).get("currency_conversion_performed"))
-    if market_code in {"SE", "DE"} and not conversion_performed:
+    if market_code != "NO" and not conversion_performed:
         for record in records:
             if record.get("price_nok") is not None or record.get("bid_price_nok") is not None:
                 raise CheckpointIntegrityError(
@@ -587,7 +596,7 @@ def build_multi_market_checkpoint(
 
     source_runs = [_load_source(spec, root_path) for spec in source_specs]
     covered_markets = {item["market_code"] for item in source_runs}
-    missing_markets = sorted(set(MARKET_CURRENCIES) - covered_markets)
+    missing_markets = sorted(REQUIRED_MARKETS - covered_markets)
     if missing_markets:
         raise CheckpointIntegrityError(
             f"Checkpoint manifest does not cover completed markets: {missing_markets}"
@@ -608,7 +617,10 @@ def build_multi_market_checkpoint(
     action = _next_action(records, source_runs)
 
     markets = []
-    for market_code in ("NO", "SE", "DE"):
+    active_market_order = tuple(
+        market_code for market_code in MARKET_ORDER if market_code in covered_markets
+    )
+    for market_code in active_market_order:
         market_sources = [
             item for item in source_runs if item["market_code"] == market_code
         ]
@@ -638,7 +650,7 @@ def build_multi_market_checkpoint(
         "generated_at": generated_at or datetime.now(timezone.utc).isoformat(),
         "domain": "CLOTHING_INVENTORY",
         "execution_mode": "MANUAL_READ_ONLY",
-        "market_coverage": ["NO", "SE", "DE"],
+        "market_coverage": list(active_market_order),
         "markets": markets,
         "source_execution_counts": dict(sorted(execution_counts.items())),
         "sources": [
@@ -691,9 +703,9 @@ def render_phone_summary(report: Mapping[str, Any]) -> str:
     status_counts = report.get("status_counts") or {}
     action = report.get("next_human_action") or {}
     lines = [
-        "ملخص الأسواق الثلاثة — مخزون الملابس",
+        "ملخص الأسواق الستة — مخزون الملابس",
         f"الوقت: {report.get('generated_at')}",
-        "التغطية: النرويج NO | السويد SE | ألمانيا DE",
+        "التغطية: النرويج NO | السويد SE | ألمانيا DE | فرنسا FR | إيطاليا IT | هولندا NL",
         (
             "المصادر: "
             f"نجاح {source_counts.get('SUCCESS', 0)} | "

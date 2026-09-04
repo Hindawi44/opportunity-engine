@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import opportunity_engine.search_policy_query_challenge_v1 as challenge_module
 from opportunity_engine.search_policy_query_challenge_v1 import (
     CHALLENGES,
     POLICY_CHALLENGE_STAGE,
@@ -73,7 +74,8 @@ def _memory(*, market: str, challenge_days: list[str]) -> dict:
     }
 
 
-def test_de_challenge_replaces_one_existing_slot_only() -> None:
+def test_de_challenge_replaces_one_existing_slot_only(monkeypatch) -> None:
+    monkeypatch.setattr(challenge_module, "FINALIZED_CHALLENGE_DECISIONS", {})
     plan, state = build_market_query_plan(
         market="DE",
         base_queries=BASE_QUERIES["DE"],
@@ -93,7 +95,8 @@ def test_de_challenge_replaces_one_existing_slot_only() -> None:
     assert state["budget_change"] == 0
 
 
-def test_no_challenge_uses_the_weak_second_slot() -> None:
+def test_no_challenge_uses_the_weak_second_slot(monkeypatch) -> None:
+    monkeypatch.setattr(challenge_module, "FINALIZED_CHALLENGE_DECISIONS", {})
     plan, state = build_market_query_plan(
         market="NO",
         base_queries=BASE_QUERIES["NO"],
@@ -109,7 +112,8 @@ def test_no_challenge_uses_the_weak_second_slot() -> None:
     assert state["status"] == "ACTIVE"
 
 
-def test_challenge_stays_active_until_three_independent_days() -> None:
+def test_challenge_stays_active_until_three_independent_days(monkeypatch) -> None:
+    monkeypatch.setattr(challenge_module, "FINALIZED_CHALLENGE_DECISIONS", {})
     plan, state = build_market_query_plan(
         market="DE",
         base_queries=BASE_QUERIES["DE"],
@@ -127,7 +131,8 @@ def test_challenge_stays_active_until_three_independent_days() -> None:
     assert state["expected_completed_days_after_successful_new_day"] == 3
 
 
-def test_challenge_does_not_repeat_on_the_same_day() -> None:
+def test_challenge_does_not_repeat_on_the_same_day(monkeypatch) -> None:
+    monkeypatch.setattr(challenge_module, "FINALIZED_CHALLENGE_DECISIONS", {})
     plan, state = build_market_query_plan(
         market="NO",
         base_queries=BASE_QUERIES["NO"],
@@ -140,7 +145,8 @@ def test_challenge_does_not_repeat_on_the_same_day() -> None:
     assert state["completed_independent_checkpoint_days"] == 1
 
 
-def test_challenge_expires_after_three_days_and_requires_human_review() -> None:
+def test_challenge_expires_after_three_days_and_requires_human_review(monkeypatch) -> None:
+    monkeypatch.setattr(challenge_module, "FINALIZED_CHALLENGE_DECISIONS", {})
     plan, state = build_market_query_plan(
         market="DE",
         base_queries=BASE_QUERIES["DE"],
@@ -159,7 +165,8 @@ def test_challenge_expires_after_three_days_and_requires_human_review() -> None:
     assert state["review_proposal"] == "KEEP_CHALLENGER_FOR_HUMAN_REVIEW"
 
 
-def test_missing_memory_pauses_instead_of_mutating_the_pack() -> None:
+def test_missing_memory_pauses_instead_of_mutating_the_pack(monkeypatch) -> None:
+    monkeypatch.setattr(challenge_module, "FINALIZED_CHALLENGE_DECISIONS", {})
     plan, state = build_market_query_plan(
         market="DE",
         base_queries=BASE_QUERIES["DE"],
@@ -184,3 +191,30 @@ def test_unselected_markets_remain_unchanged() -> None:
     assert state["status"] == "NOT_APPLICABLE"
     assert state["request_slots_added"] == 0
 
+
+def test_final_de_decision_keeps_challenger_as_primary_without_extra_cost() -> None:
+    base_queries = (CHALLENGES["DE"]["challenger_query"], BASE_QUERIES["DE"][1])
+    plan, state = build_market_query_plan(
+        market="DE", base_queries=base_queries, memory=None
+    )
+
+    assert tuple(row["query"] for row in plan) == base_queries
+    assert tuple(row["query_stage"] for row in plan) == ("PRIMARY", "PRIMARY")
+    assert state["status"] == "HUMAN_DECISION_APPLIED"
+    assert state["finalized_decision"] == "KEEP_CHALLENGER"
+    assert state["request_slots_added"] == 0
+    assert state["budget_change"] == 0
+    assert state["production_query_mutation"] is False
+
+
+def test_final_no_decision_retains_incumbent_as_primary_without_extra_cost() -> None:
+    plan, state = build_market_query_plan(
+        market="NO", base_queries=BASE_QUERIES["NO"], memory=None
+    )
+
+    assert tuple(row["query"] for row in plan) == BASE_QUERIES["NO"]
+    assert tuple(row["query_stage"] for row in plan) == ("PRIMARY", "PRIMARY")
+    assert state["status"] == "HUMAN_DECISION_APPLIED"
+    assert state["finalized_decision"] == "REVERT_INCUMBENT"
+    assert state["request_slots_added"] == 0
+    assert state["budget_change"] == 0

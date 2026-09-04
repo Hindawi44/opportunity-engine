@@ -516,6 +516,9 @@ jobs:
             --source-ref "github-actions:${{ github.run_id }}" \
             --output "$OUTPUT_DIR/human-review-outcome.json"
 
+      - name: Run visible FR/IT/NL Exa Exact-Lot expansion
+        run: python scripts/run_explicit_six_market_expansion.py
+
       - name: Write checkpoint input manifest
         run: |
           mkdir -p "$OUTPUT_DIR"
@@ -603,6 +606,24 @@ jobs:
                 "source_name": "Exa Exact-Lot DE",
                 "currency": "EUR",
                 "artifact_dir": "artifacts/multi-market-inputs/de-exa-exact-lot"
+              },
+              {
+                "market_code": "FR",
+                "source_name": "Exa Exact-Lot FR",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/fr-exa-exact-lot"
+              },
+              {
+                "market_code": "IT",
+                "source_name": "Exa Exact-Lot IT",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/it-exa-exact-lot"
+              },
+              {
+                "market_code": "NL",
+                "source_name": "Exa Exact-Lot NL",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/nl-exa-exact-lot"
               }
             ]
           }
@@ -617,9 +638,6 @@ jobs:
             --market-matrix config/market_completion_matrix.json \
             --root . \
             --output-dir "$OUTPUT_DIR"
-
-      - name: Run visible FR/IT/NL Exa Exact-Lot expansion
-        run: python scripts/run_explicit_six_market_expansion.py
 
       - name: Enrich checkpoint with lifecycle state and transitions
         run: |
@@ -722,14 +740,14 @@ jobs:
               root / "search-policy-router-v1-review.txt"
           ).read_text(encoding="utf-8")
 
-          if report.get("market_coverage") != ["NO", "SE", "DE"]:
-              raise SystemExit("The checkpoint did not cover NO, SE and DE")
+          if report.get("market_coverage") != ["NO", "SE", "DE", "FR", "IT", "NL"]:
+              raise SystemExit("The checkpoint did not cover all six markets")
           # Compatibility markers for previous source-count contracts:
           # "all six bounded source paths"
           # "all nine bounded source paths"
           # "all ten bounded source paths"
-          if len(report.get("sources") or []) != 13:
-              raise SystemExit("The checkpoint did not include all thirteen bounded source paths")
+          if len(report.get("sources") or []) != 16:
+              raise SystemExit("The checkpoint did not include all sixteen bounded source paths")
           if summary.count("الإجراء البشري الوحيد:") != 1:
               raise SystemExit("The phone report must contain exactly one human action")
           for key in (
@@ -740,7 +758,7 @@ jobs:
           ):
               if report.get(key) is not False:
                   raise SystemExit(f"Automatic action safety changed: {key}")
-          if sum((report.get("source_execution_counts") or {}).values()) != 13:
+          if sum((report.get("source_execution_counts") or {}).values()) != 16:
               raise SystemExit("Source execution statuses do not reconcile")
 
           source_by_name = {
@@ -760,7 +778,14 @@ jobs:
               raise SystemExit("PS Auction was not included in the checkpoint")
           if "Sen & Sen" not in source_by_name:
               raise SystemExit("Sen & Sen was not included in the checkpoint")
-          for exa_source in ("Exa Exact-Lot NO", "Exa Exact-Lot SE", "Exa Exact-Lot DE"):
+          for exa_source in (
+              "Exa Exact-Lot NO",
+              "Exa Exact-Lot SE",
+              "Exa Exact-Lot DE",
+              "Exa Exact-Lot FR",
+              "Exa Exact-Lot IT",
+              "Exa Exact-Lot NL",
+          ):
               if exa_source not in source_by_name:
                   raise SystemExit(f"{exa_source} was not included in the checkpoint")
 

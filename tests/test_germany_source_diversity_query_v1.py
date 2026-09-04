@@ -21,7 +21,7 @@ def _load_script():
 def test_germany_uses_two_proven_source_neutral_primary_queries() -> None:
     queries = _load_script().MARKET_EXACT_LOT_QUERY_PACKS["DE"]
     assert queries == (
-        "Deutschland Lagerware Bekleidung Mindestabnahme angebotene Menge Nettopreis Stück",
+        "Deutschland Restposten Bekleidung Großhandel Lager",
         "Deutschland Bekleidung Restposten Großhandel Sonderposten Preis Menge Stück",
     )
 
@@ -35,5 +35,5 @@ def test_germany_queries_stay_market_domain_and_source_neutral() -> None:
         assert "site:" not in query.casefold()
         assert "restposten24" not in query.casefold()
         assert "grosshandel24" not in query.casefold()
-    assert all(token in queries[0].casefold() for token in ("mindestabnahme", "menge", "nettopreis", "stück"))
+    assert all(token in queries[0].casefold() for token in ("restposten", "bekleidung", "grosshandel", "lager"))
     assert all(token in queries[1].casefold() for token in ("restposten", "grosshandel", "sonderposten", "preis", "menge"))

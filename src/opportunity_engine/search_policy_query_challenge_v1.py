@@ -34,6 +34,16 @@ CHALLENGES: dict[str, dict[str, Any]] = {
     },
 }
 
+# Human decision recorded after the bounded 2026-09-02..2026-09-04 trial.
+# Germany's challenger produced 20 unique fresh strict Exact-Lots from three
+# requests versus one for the incumbent. Norway tied the incumbent at one
+# unique result, so the incumbent remains in production.  These decisions do
+# not add request slots or change provider/budget.
+FINALIZED_CHALLENGE_DECISIONS: dict[str, str] = {
+    "DE": "KEEP_CHALLENGER",
+    "NO": "REVERT_INCUMBENT",
+}
+
 
 def _text(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
@@ -152,6 +162,47 @@ def build_market_query_plan(
             "production_mutation": False,
         }
 
+    finalized_decision = FINALIZED_CHALLENGE_DECISIONS.get(market_code)
+    if finalized_decision:
+        incumbent_query = _text(challenge["incumbent_query"])
+        challenger_query = _text(challenge["challenger_query"])
+        selected_query = (
+            challenger_query
+            if finalized_decision == "KEEP_CHALLENGER"
+            else incumbent_query
+        )
+        if queries.count(selected_query) != 1:
+            raise ValueError(
+                f"{market_code} finalized challenge query must occupy exactly one base request slot"
+            )
+        plan = tuple(
+            {"query": query, "query_stage": "PRIMARY", "trial_id": None}
+            for query in queries
+        )
+        return plan, {
+            "schema_version": SCHEMA_VERSION,
+            "trial_id": challenge["trial_id"],
+            "market_code": market_code,
+            "status": "HUMAN_DECISION_APPLIED",
+            "finalized_decision": finalized_decision,
+            "selected_query": selected_query,
+            "incumbent_query": incumbent_query,
+            "challenger_query": challenger_query,
+            "remaining_independent_checkpoint_days": 0,
+            "request_slots_before": len(queries),
+            "request_slots_after": len(plan),
+            "request_slots_added": 0,
+            "provider": "exa",
+            "budget_change": 0,
+            "automatic_expiry": True,
+            "human_review_required": False,
+            "human_approved_query_substitution": True,
+            "human_decision_applied": True,
+            "automatic_query_activation": False,
+            "production_query_mutation": False,
+            "production_mutation": False,
+        }
+
     incumbent_query = _text(challenge["incumbent_query"])
     challenger_query = _text(challenge["challenger_query"])
     if queries.count(incumbent_query) != 1:
@@ -244,4 +295,3 @@ def build_market_query_plan(
         "production_mutation": False,
     }
     return plan, state
-

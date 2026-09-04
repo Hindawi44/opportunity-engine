@@ -71,7 +71,7 @@ MARKET_EXACT_LOT_QUERY_PACKS: dict[str, tuple[str, ...]] = {
         "Sverige kläder varulager auktion parti pris antal plagg",
     ),
     "DE": (
-        "Deutschland Lagerware Bekleidung Mindestabnahme angebotene Menge Nettopreis Stück",
+        "Deutschland Restposten Bekleidung Großhandel Lager",
         "Deutschland Bekleidung Restposten Großhandel Sonderposten Preis Menge Stück",
     ),
     "FR": (MARKET_EXACT_LOT_QUERIES["FR"],),
