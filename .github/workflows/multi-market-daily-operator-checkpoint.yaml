@@ -426,7 +426,9 @@ jobs:
               --results-per-query 10 \
               --freshness pm \
               --verify-pages \
-              --verification-limit 20
+              --verification-limit 20 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/se-klaravik/opportunity_engine.db"
 
       - name: Run Sweden PS Auction bounded direct scan
         run: |
@@ -440,7 +442,9 @@ jobs:
               --results-per-query 10 \
               --freshness pm \
               --verify-pages \
-              --verification-limit 20
+              --verification-limit 20 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/se-psauction/opportunity_engine.db"
 
       - name: Run Sen & Sen bounded clothing liquidation scan
         run: |

@@ -53,6 +53,8 @@ def test_checkpoint_workflow_connects_all_six_commercial_markets() -> None:
     assert "--source sen-sen" in text
     assert '"source_name": "Sen & Sen"' in text
     assert '"artifact_dir": "artifacts/multi-market-inputs/de-sen-sen"' in text
+    for directory in ("se-klaravik", "se-psauction", "de-sen-sen"):
+        assert f'sqlite:///$INPUT_ROOT/{directory}/opportunity_engine.db' in text
     assert "run_riegermann_active_discovery.py" in text
     assert "run_venta_active_discovery.py" in text
     assert "run_dpv_active_discovery.py" in text
@@ -133,6 +135,17 @@ def test_sweden_daily_checkpoint_runs_three_direct_source_packs_before_germany()
     assert '"Klaravik" not in source_by_name' in text
     assert '"PS Auction" not in source_by_name' in text
     assert '"Sen & Sen" not in source_by_name' in text
+
+
+def test_direct_source_sqlite_databases_are_restored_across_daily_runs() -> None:
+    from opportunity_engine.discovery.checkpoint_state_restore import DATABASE_RELATIVE_PATHS
+
+    for relative_path in (
+        "se-klaravik/opportunity_engine.db",
+        "se-psauction/opportunity_engine.db",
+        "de-sen-sen/opportunity_engine.db",
+    ):
+        assert relative_path in DATABASE_RELATIVE_PATHS
 
 
 def test_checkpoint_workflow_preserves_one_human_action() -> None:
