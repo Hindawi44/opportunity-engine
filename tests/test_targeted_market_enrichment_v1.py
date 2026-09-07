@@ -92,3 +92,98 @@ def test_runner_reuses_upstream_brief_instead_of_rerunning_daily_discovery() -> 
     assert "build_domain_market_intelligence_feed" not in text
     assert '"daily_source_discovery_rerun": False' in text
     assert '"upstream_core_reused": True' in text
+
+
+def test_gate_runs_for_new_direct_opportunity_in_all_six_markets() -> None:
+    module = _load_module()
+    identity = "https://example.test/fr/new-lot"
+    checkpoint = {
+        "daily_novelty": {"novel_active_opportunity_ids": [identity]},
+        "deduplicated_opportunities": [
+            {
+                "opportunity_identity": identity,
+                "market_code": "FR",
+                "source_name": "Exact lot FR",
+                "source_url": identity,
+                "title": "New clothing lot",
+            }
+        ],
+        "sources": [],
+        "lifecycle": {"transitions": {"current_run_events": []}},
+    }
+
+    gate = module.build_targeted_enrichment_gate(_brief(with_signal=False), checkpoint)
+
+    assert gate["should_run_targeted_enrichment"] is True
+    assert gate["learning_trigger_counts"]["new_opportunities"] == 1
+    assert "FR" in gate["market_coverage"]
+
+
+def test_gate_runs_for_real_lifecycle_change_or_source_failure() -> None:
+    module = _load_module()
+    checkpoint = {
+        "daily_novelty": {"novel_active_opportunity_ids": []},
+        "deduplicated_opportunities": [],
+        "lifecycle": {
+            "transitions": {
+                "current_run_events": [
+                    {
+                        "initial_snapshot": False,
+                        "opportunity_id": "https://example.test/nl/changed",
+                        "market_code": "NL",
+                        "source_name": "Exact lot NL",
+                    }
+                ]
+            }
+        },
+        "sources": [
+            {
+                "market_code": "SE",
+                "source_name": "Example source",
+                "execution_status": "FAILURE",
+                "failure": "timeout",
+            }
+        ],
+    }
+
+    gate = module.build_targeted_enrichment_gate(_brief(with_signal=False), checkpoint)
+
+    assert gate["should_run_targeted_enrichment"] is True
+    assert gate["learning_trigger_counts"] == {
+        "new_opportunities": 0,
+        "lifecycle_changes": 1,
+        "source_failures": 1,
+    }
+
+
+def test_event_learning_brief_deduplicates_new_opportunity_transition() -> None:
+    module = _load_module()
+    identity = "https://example.test/no/new"
+    checkpoint = {
+        "daily_novelty": {"novel_active_opportunity_ids": [identity]},
+        "deduplicated_opportunities": [
+            {"opportunity_identity": identity, "market_code": "NO"}
+        ],
+        "lifecycle": {
+            "transitions": {
+                "current_run_events": [
+                    {
+                        "initial_snapshot": False,
+                        "opportunity_id": identity,
+                        "market_code": "NO",
+                    }
+                ]
+            }
+        },
+        "sources": [],
+    }
+
+    _, counts = module.prepare_event_learning_brief(
+        _brief(with_signal=False), checkpoint
+    )
+
+    assert counts == {
+        "new_opportunities": 1,
+        "lifecycle_changes": 0,
+        "source_failures": 0,
+    }
