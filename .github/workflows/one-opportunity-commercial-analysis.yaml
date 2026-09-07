@@ -145,12 +145,19 @@ jobs:
             exit 2
           fi
           echo "UPSTREAM_BRIEF=$UPSTREAM_BRIEF" >> "$GITHUB_ENV"
+          UPSTREAM_CHECKPOINT="$(find artifacts/upstream -type f -name multi-market-daily-checkpoint.json -print -quit)"
+          if [ -z "$UPSTREAM_CHECKPOINT" ]; then
+            echo "multi-market-daily-checkpoint.json not found in upstream artifact" >&2
+            exit 2
+          fi
+          echo "UPSTREAM_CHECKPOINT=$UPSTREAM_CHECKPOINT" >> "$GITHUB_ENV"
 
       - name: Run zero-cost eligibility gate
         id: gate
         run: |
           python scripts/run_targeted_market_enrichment.py \
             --brief "$UPSTREAM_BRIEF" \
+            --checkpoint "$UPSTREAM_CHECKPOINT" \
             --output-dir "$OUTPUT_DIR" \
             --gate-only
           python - <<'PY'
@@ -178,16 +185,17 @@ jobs:
           OPENAI_HUNT_TRIAGE_MODEL: gpt-5.6-luna
           OPENAI_HUNT_DEEP_MODEL: gpt-5.6-terra
           OPENAI_HUNT_MAX_SIGNALS: "10"
-          OPENAI_HUNT_MAX_DEEP_CASES: "2"
-          OPENAI_HUNT_MAX_API_REQUESTS: "3"
-          OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.16"
-          HUNT_FOLLOWUP_MAX_CASES: "2"
+          OPENAI_HUNT_MAX_DEEP_CASES: "1"
+          OPENAI_HUNT_MAX_API_REQUESTS: "2"
+          OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.08"
+          HUNT_FOLLOWUP_MAX_CASES: "1"
           HUNT_FOLLOWUP_MAX_QUERIES_PER_CASE: "3"
           HUNT_FOLLOWUP_RESULTS_PER_QUERY: "5"
-          HUNT_FOLLOWUP_MAX_REQUESTS: "6"
+          HUNT_FOLLOWUP_MAX_REQUESTS: "3"
         run: |
           python scripts/run_targeted_market_enrichment.py \
             --brief "$UPSTREAM_BRIEF" \
+            --checkpoint "$UPSTREAM_CHECKPOINT" \
             --output-dir "$OUTPUT_DIR"
 
       - name: Validate gate, safety and cost isolation
@@ -218,12 +226,12 @@ jobs:
                   raise SystemExit("Eligible enrichment is missing OPENAI_API_KEY")
               if summary.get("targeted_followup_status") == "SKIPPED_NO_BRAVE_KEY":
                   raise SystemExit("Eligible enrichment is missing BRAVE_SEARCH_API_KEY")
-              if int(summary.get("openai_api_request_count") or 0) > 3:
-                  raise SystemExit("OpenAI targeted request limit changed")
-              if float(summary.get("openai_estimated_cost_usd") or 0.0) > 0.16:
-                  raise SystemExit("OpenAI targeted cost guard changed")
-              if int(summary.get("targeted_brave_request_count") or 0) > 6:
-                  raise SystemExit("Brave targeted request limit changed")
+              if int(summary.get("openai_api_request_count") or 0) > 2:
+                raise SystemExit("OpenAI targeted request limit changed")
+              if float(summary.get("openai_estimated_cost_usd") or 0.0) > 0.08:
+                raise SystemExit("OpenAI targeted cost guard changed")
+              if int(summary.get("targeted_brave_request_count") or 0) > 3:
+                raise SystemExit("Brave targeted request limit changed")
           else:
               if gate.get("status") != "SKIPPED_NO_ELIGIBLE_HUNT_SIGNALS":
                   raise SystemExit("Zero-cost gate skip state is inconsistent")

@@ -57,6 +57,8 @@ def test_targeted_stage_reuses_upstream_artifact_and_never_rescans_markets() -> 
     assert 'gh run download "$SOURCE_RUN_ID"' in text
     assert "--name multi-market-daily-operator-checkpoint" in text
     assert "domain-market-intelligence-brief.json" in text
+    assert "multi-market-daily-checkpoint.json" in text
+    assert '--checkpoint "$UPSTREAM_CHECKPOINT"' in text
     assert "run_targeted_market_enrichment.py" in text
     targeted_start = text.index("targeted-read-only-enrichment:")
     manual_start = text.index("manual-read-only-commercial-analysis:")
@@ -74,12 +76,12 @@ def test_targeted_stage_reuses_upstream_artifact_and_never_rescans_markets() -> 
 
 def test_paid_stage_is_bounded_read_only_and_fails_closed_on_missing_keys() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
-    assert 'OPENAI_HUNT_MAX_API_REQUESTS: "3"' in text
-    assert 'OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.16"' in text
-    assert 'HUNT_FOLLOWUP_MAX_REQUESTS: "6"' in text
+    assert 'OPENAI_HUNT_MAX_API_REQUESTS: "2"' in text
+    assert 'OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.08"' in text
+    assert 'HUNT_FOLLOWUP_MAX_REQUESTS: "3"' in text
     assert 'summary.get("openai_hunt_status") == "SKIPPED_NO_API_KEY"' in text
     assert 'summary.get("targeted_followup_status") == "SKIPPED_NO_BRAVE_KEY"' in text
-    assert 'float(summary.get("openai_estimated_cost_usd") or 0.0) > 0.16' in text
+    assert 'float(summary.get("openai_estimated_cost_usd") or 0.0) > 0.08' in text
     assert "automatic_contact" in text
     assert "automatic_bid" in text
     assert "automatic_purchase" in text
@@ -94,3 +96,13 @@ def test_zero_eligibility_skips_openai_and_brave_followup_artifacts() -> None:
     assert 'steps.gate.outputs.should_run == \'true\'' in text
     assert 'openai-hunt-case-enrichment.json").exists()' in text
     assert 'hunt-case-targeted-followup.json").exists()' in text
+
+
+def test_paid_stage_persists_shadow_learning_without_automatic_activation() -> None:
+    runner = (ROOT / "scripts/run_targeted_market_enrichment.py").read_text(
+        encoding="utf-8"
+    )
+    assert 'event-search-learning-shadow.json' in runner
+    assert '"mode": "SHADOW"' in runner
+    assert '"activation_allowed": False' in runner
+    assert '"human_review_required_before_promotion": True' in runner

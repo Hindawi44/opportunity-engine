@@ -19,15 +19,18 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 SCHEMA_VERSION = "openai-hunt-case-enrichment-1.0"
 SUPPORTED_MARKETS = {"NO", "SE", "DE"}
+EVENT_LEARNING_MARKETS = {"NO", "SE", "DE", "FR", "IT", "NL"}
 ACTIVE_STATES = {"ACTIVE", "WATCH"}
 EARLY_TYPES = {
     "AUCTION_EVENT", "BUSINESS_CLOSURE", "INSOLVENCY_OR_LIQUIDATION",
     "WAREHOUSE_SURPLUS", "REPEATED_SELLER_ACTIVITY", "RELATED_INVENTORY_ACTIVITY",
+    "DIRECT_OPPORTUNITY_CHANGE", "SOURCE_FAILURE",
 }
 PRIORITY = {
     "INSOLVENCY_OR_LIQUIDATION": 60, "BUSINESS_CLOSURE": 50,
     "WAREHOUSE_SURPLUS": 45, "REPEATED_SELLER_ACTIVITY": 35,
     "RELATED_INVENTORY_ACTIVITY": 32, "AUCTION_EVENT": 25,
+    "DIRECT_OPPORTUNITY_CHANGE": 70, "SOURCE_FAILURE": 65,
 }
 PRICES = {
     "gpt-5.6-luna": (1.0, 6.0),
@@ -204,7 +207,12 @@ def select_hunt_signals(brief: Mapping[str, Any], *, max_signals: int) -> list[d
         market = _compact(signal.get("source_country")).upper()
         signal_type = _compact(signal.get("signal_type")).upper()
         state = _compact(signal.get("status")).upper()
-        if not sid or sid in seen or market not in SUPPORTED_MARKETS:
+        metadata = _mapping(signal.get("metadata"))
+        event_learning = bool(_compact(metadata.get("learning_trigger")))
+        market_allowed = market in SUPPORTED_MARKETS or (
+            event_learning and market in EVENT_LEARNING_MARKETS
+        )
+        if not sid or sid in seen or not market_allowed:
             continue
         if signal_type not in EARLY_TYPES or state not in ACTIVE_STATES:
             continue
