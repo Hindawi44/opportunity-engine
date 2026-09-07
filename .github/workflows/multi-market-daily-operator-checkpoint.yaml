@@ -80,6 +80,7 @@ on:
       - "src/opportunity_engine/discovery/domain_market_intelligence_feed.py"
       - "src/opportunity_engine/discovery/openai_hunt_case_enrichment.py"
       - "src/opportunity_engine/discovery/finn_email_intake.py"
+      - "src/opportunity_engine/discovery/gmail_opportunity_classification.py"
       - "src/opportunity_engine/discovery/human_review_checkpoint.py"
       - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
       - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
@@ -104,6 +105,7 @@ on:
       - "tests/test_domain_market_intelligence_feed_v1.py"
       - "tests/test_openai_hunt_case_enrichment_v1.py"
       - "tests/test_finn_email_intake.py"
+      - "tests/test_gmail_opportunity_classification_v1.py"
       - "tests/test_run_finn_email_intake_script.py"
       - "tests/test_cross_source_checkpoint_adapter_v1.py"
       - "tests/test_human_review_checkpoint_v1.py"
@@ -381,8 +383,8 @@ jobs:
             --output-dir "$INPUT_ROOT/no-finn-email" -- \
             python scripts/run_finn_email_intake.py \
               --gmail-api \
-              --max-messages 20 \
-              --gmail-query 'from:agent@finn.no subject:"Nye annonser:" newer_than:7d' \
+              --max-messages 50 \
+              --gmail-query 'newer_than:14d (from:agent@finn.no OR label:Opportunity-Engine)' \
               --auksjonen-report "$INPUT_ROOT/no-auksjonen/auksjonen-live-clothing-listings.json" \
               --output-dir "$INPUT_ROOT/no-finn-email"
 
