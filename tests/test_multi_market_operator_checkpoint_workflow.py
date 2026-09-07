@@ -112,8 +112,9 @@ def test_checkpoint_reads_finn_gmail_after_auksjonen() -> None:
     assert "GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}" in text
     assert "GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}" in text
     assert "--gmail-api" in text
-    assert "--max-messages 20" in text
-    assert 'from:agent@finn.no subject:"Nye annonser:" newer_than:7d' in text
+    assert "--max-messages 50" in text
+    assert "label:Opportunity-Engine" in text
+    assert 'newer_than:14d (from:agent@finn.no OR label:Opportunity-Engine)' in text
     assert "--auksjonen-report" in text
     assert '"source_name": "FINN saved-search email"' in text
     assert "all six bounded source paths" in text
