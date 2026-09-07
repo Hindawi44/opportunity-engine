@@ -21,13 +21,17 @@ from opportunity_engine.discovery.finn_email_intake import (
     run_finn_email_intake,
     write_finn_email_intake_artifacts,
 )
+from opportunity_engine.discovery.gmail_opportunity_classification import (
+    classify_gmail_messages,
+    write_gmail_classification_artifacts,
+)
 from opportunity_engine.discovery.multi_market_operator_checkpoint import (
     opportunity_identity,
 )
 
 GMAIL_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GMAIL_MESSAGES_URL = "https://gmail.googleapis.com/gmail/v1/users/me/messages"
-DEFAULT_GMAIL_QUERY = 'from:agent@finn.no subject:"Nye annonser:" newer_than:7d'
+DEFAULT_GMAIL_QUERY = 'newer_than:14d (from:agent@finn.no OR label:Opportunity-Engine)'
 DEFAULT_MAX_MESSAGES = 20
 MAX_GMAIL_MESSAGES = 50
 DEFAULT_TIMEOUT_SECONDS = 20.0
@@ -326,6 +330,7 @@ def main() -> int:
         ))
 
     collection = collect_finn_saved_search_messages(messages)
+    classification = classify_gmail_messages(messages)
     result = run_finn_email_intake(collection)
     link_auksjonen_channels(result, messages, args.auksjonen_report)
     paths = write_finn_email_intake_artifacts(
@@ -333,10 +338,12 @@ def main() -> int:
         collection,
         Path(args.output_dir),
     )
+    paths.update(write_gmail_classification_artifacts(classification, args.output_dir))
 
     report = result["search_run_report"]
     print(f"Execution status: {report['execution_status']}")
     print(f"Accepted FINN messages: {report['email_messages_accepted']}")
+    print(f"Classified project messages: {classification['message_count']}")
     print(f"Extracted FINN leads: {report['email_leads_extracted']}")
     print(f"Auksjonen cross-channel links: {report.get('auksjonen_cross_channel_links', 0)}")
     print(f"Analysis-eligible opportunities: {report['analysis_eligible_count']}")
