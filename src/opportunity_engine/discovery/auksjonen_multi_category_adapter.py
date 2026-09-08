@@ -1,8 +1,9 @@
 """Bounded multi-category Auksjonen clothing inventory collection.
 
-The category identifiers are limited to public clothing categories observed on
-ny.auksjonen.no. Each category is scanned page by page, results are de-duplicated
-by objectId, and only explicit inventory-lot signals can reach opportunity output.
+The category identifiers are limited to public categories observed on
+ny.auksjonen.no that contain clothing or clothing-inventory lots. Each category
+is scanned page by page, results are de-duplicated by objectId, and only explicit
+clothing/accessory plus inventory-lot signals can reach opportunity output.
 """
 from __future__ import annotations
 
@@ -18,6 +19,7 @@ from opportunity_engine.discovery.auksjonen_public_api_adapter import (
     AuksjonenLiveClothingCollection,
     AuksjonenLiveClothingListing,
     DEFAULT_PAGE_SIZE,
+    INVENTORY_LOT_CATEGORY_ID,
     MAX_LISTINGS,
     MAX_PAGES,
     MAX_PAGE_SIZE,
@@ -49,6 +51,7 @@ class AuksjonenCategorySpec:
 APPROVED_CLOTHING_CATEGORIES = (
     AuksjonenCategorySpec("10110508", "Klær, kosmetikk og accessoirer"),
     AuksjonenCategorySpec("90010", "Klær/Arbeidsklær"),
+    AuksjonenCategorySpec(INVENTORY_LOT_CATEGORY_ID, "Vareparti og konkursbo"),
 )
 APPROVED_CATEGORY_IDS = frozenset(
     category.category_id for category in APPROVED_CLOTHING_CATEGORIES

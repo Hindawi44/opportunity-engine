@@ -373,6 +373,7 @@ jobs:
             --output-dir "$INPUT_ROOT/no-auksjonen" -- \
             python scripts/run_auksjonen_live_clothing.py \
               --max-listings 30 \
+              --item-verification-limit 10 \
               --output-dir "$INPUT_ROOT/no-auksjonen" \
               --persist-unified \
               --database-url "sqlite:///$INPUT_ROOT/no-auksjonen/opportunity_engine.db"
