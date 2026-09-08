@@ -12,16 +12,22 @@ from opportunity_engine.discovery.auksjonen_multi_category_adapter import (
 FAR_FUTURE_MS = 4102444800000
 
 
-def raw_item(object_id: int, title: str) -> dict[str, object]:
+def raw_item(
+    object_id: int,
+    title: str,
+    *,
+    category2: int = 10110508,
+    buy_now_price: float | None = None,
+) -> dict[str, object]:
     return {
         "address": "Testveien 1",
         "auctionId": 900000 + object_id,
         "bidCount": 0,
         "bidExpired": False,
         "bidderCount": 0,
-        "buyNowPrice": None,
+        "buyNowPrice": buy_now_price,
         "category1": 1011,
-        "category2": 10110508,
+        "category2": category2,
         "city": "Oslo",
         "currency": "NOK",
         "currentBidAmount": 0.0,
@@ -35,10 +41,11 @@ def raw_item(object_id: int, title: str) -> dict[str, object]:
     }
 
 
-def test_only_observed_clothing_categories_are_approved():
+def test_only_observed_target_categories_are_approved():
     assert [category.category_id for category in APPROVED_CLOTHING_CATEGORIES] == [
         "10110508",
         "90010",
+        "11004",
     ]
     for category in APPROVED_CLOTHING_CATEGORIES:
         assert is_approved_category_endpoint(category.endpoint)
@@ -75,11 +82,11 @@ def test_collector_combines_categories_and_promotes_lot(monkeypatch):
     result = collector.collect()
     combined = result.combined
 
-    assert len(result.scans) == 2
+    assert len(result.scans) == 3
     assert result.scan_complete is True
-    assert combined.reported_size == 2
-    assert combined.items_received == 2
-    assert combined.pages_fetched == 2
+    assert combined.reported_size == 3
+    assert combined.items_received == 3
+    assert combined.pages_fetched == 3
     assert [item.title for item in combined.inventory_opportunities] == [
         "Restlager med 120 stk arbeidsjakker"
     ]
@@ -102,6 +109,61 @@ def test_duplicate_object_is_kept_once_across_categories(monkeypatch):
     assert len(result.combined.inventory_opportunities) == 1
 
 
+def test_inventory_category_paginates_and_captures_rosenvinge_lot(monkeypatch):
+    collector = AuksjonenMultiCategoryCollector()
+    requested_windows: list[tuple[str, str, str]] = []
+
+    def fake_fetch(url: str):
+        query = parse_qs(urlparse(url).query)
+        category_id = query["category2"][0]
+        start = query["from"][0]
+        end = query["to"][0]
+        requested_windows.append((category_id, start, end))
+
+        if category_id != "11004":
+            return {"size": 0, "items": []}
+        if start == "1":
+            return {
+                "size": 31,
+                "items": [
+                    raw_item(
+                        object_id,
+                        f"Verktøyparti {object_id}",
+                        category2=11004,
+                    )
+                    for object_id in range(1, 31)
+                ],
+            }
+        return {
+            "size": 31,
+            "items": [
+                raw_item(
+                    623189,
+                    "VAREPARTI Rosenvinge Smykker, skjerf, luer, belter",
+                    category2=11004,
+                    buy_now_price=40000.0,
+                )
+            ],
+        }
+
+    monkeypatch.setattr(collector, "_fetch", fake_fetch)
+    result = collector.collect()
+
+    assert ("11004", "1", "30") in requested_windows
+    assert ("11004", "31", "60") in requested_windows
+    inventory_scan = next(
+        scan for scan in result.scans if scan.category.category_id == "11004"
+    )
+    assert inventory_scan.reported_size == 31
+    assert inventory_scan.items_received == 31
+    assert inventory_scan.pages_fetched == 2
+    assert inventory_scan.scan_complete is True
+
+    opportunities = result.combined.inventory_opportunities
+    assert [item.object_id for item in opportunities] == [623189]
+    assert opportunities[0].buy_now_price_nok == 40000.0
+
+
 def test_category_diagnostics_are_written(tmp_path, monkeypatch):
     collector = AuksjonenMultiCategoryCollector()
 
@@ -113,7 +175,7 @@ def test_category_diagnostics_are_written(tmp_path, monkeypatch):
     path = write_multi_category_artifact(result, tmp_path)
     payload = json.loads(path.read_text(encoding="utf-8"))
 
-    assert payload["category_count"] == 2
+    assert payload["category_count"] == 3
     assert payload["scan_complete"] is True
     assert payload["combined"]["valid_inventory_opportunity_count"] == 0
     assert payload["paid_search_used"] is False

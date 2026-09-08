@@ -201,6 +201,8 @@ def test_checkpoint_persists_and_validates_auksjonen_lifecycle() -> None:
     end = text.index("Read FINN saved-search alerts from Gmail", start)
     norway_step = text[start:end]
 
+    assert "--max-listings 30" in norway_step
+    assert "--item-verification-limit 10" in norway_step
     assert "--persist-unified" in norway_step
     assert (
         'sqlite:///$INPUT_ROOT/no-auksjonen/opportunity_engine.db' in norway_step

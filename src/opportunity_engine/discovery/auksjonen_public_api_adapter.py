@@ -20,6 +20,7 @@ from urllib.request import Request, urlopen
 
 DEFAULT_CATEGORY_ID = "10110508"
 WORKWEAR_CATEGORY_ID = "90010"
+INVENTORY_LOT_CATEGORY_ID = "11004"
 DEFAULT_PAGE_SIZE = 30
 MAX_PAGE_SIZE = 30
 MAX_PAGES = 10
@@ -33,7 +34,8 @@ _CLOTHING_PATTERN = re.compile(
     r"\b(klær|jakke|jakker|bukse|bukser|sko|kjole|kjoler|skjorte|skjorter|"
     r"genser|gensere|frakk|frakker|dress|dresser|vest|vester|tøy|arbeidsklær|"
     r"arbeidstøy|arbeidsjakke|arbeidsjakker|mc-klær|mote|tekstil|veske|vesker|"
-    r"overall|kjeledress|uniform)\b",
+    r"smykke|smykker|skjerf|lue|luer|belte|belter|hanske|hansker|vott|votter|"
+    r"accessoirer|tilbehør|overall|kjeledress|uniform)\b",
     re.I,
 )
 _LOT_PATTERN = re.compile(

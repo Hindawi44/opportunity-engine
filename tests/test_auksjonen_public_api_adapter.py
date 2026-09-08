@@ -147,6 +147,33 @@ def test_workwear_category_is_page_native_clothing_evidence_for_brand_only_lot()
     assert normalized.inventory_lot_signal is True
 
 
+def test_clothing_accessory_lot_in_general_inventory_category_is_accepted():
+    normalized = normalize_public_api_item(
+        live_item(
+            objectId=623189,
+            title="VAREPARTI Rosenvinge Smykker, skjerf, luer, belter",
+            category2=11004,
+            buyNowPrice=40000.0,
+        ),
+        now=NOW,
+    )
+
+    assert normalized is not None
+    assert normalized.object_id == 623189
+    assert normalized.buy_now_price_nok == 40000.0
+    assert normalized.inventory_lot_signal is True
+
+
+def test_unrelated_lot_in_general_inventory_category_is_rejected():
+    assert normalize_public_api_item(
+        live_item(
+            title="LAGERTØMMING – STORT PARTI JERNVARE – 1987 Pakker",
+            category2=11004,
+        ),
+        now=NOW,
+    ) is None
+
+
 def test_inventory_lot_signal_is_preserved_without_inventing_quantity():
     normalized = normalize_public_api_item(
         live_item(title="Vareparti med arbeidsklær samlet"),
