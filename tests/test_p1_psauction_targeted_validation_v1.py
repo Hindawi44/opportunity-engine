@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     ACTIVE,
+    CATEGORY_INDEX,
     ENDED,
     ITEM_LISTING,
     UNKNOWN,
@@ -22,6 +23,10 @@ from opportunity_engine.discovery.sweden_psauction_playwright import (
 NOW = datetime(2026, 8, 16, 19, 43, tzinfo=timezone.utc)
 ENDED_ITEM_URL = "https://psauction.se/item/view/826330/didrikssons-barnklader"
 ACTIVE_FIXTURE_URL = "https://psauction.se/item/view/999999/arbetsklader-parti"
+VAXJO_AUCTION_URL = (
+    "https://psauction.se/auction/68986/"
+    "vaxjo-inunder-ab-i-konkurs"
+)
 
 
 class _FixtureSearchProvider:
@@ -111,6 +116,75 @@ def test_active_fixture_resolves_active_only_from_future_exact_deadline() -> Non
     diagnostics = verifier.diagnostics()
     assert diagnostics["indexed_resolved_active"] == 1
     assert diagnostics["indexed_resolved_ended"] == 0
+
+
+def test_current_vaxjo_auction_route_resolves_active_from_exact_deadline() -> None:
+    """Regression: current parent-auction route 68986 must reach verification."""
+    verifier = _verifier(
+        SearchHit(
+            title="Växjö Inunder AB i konkurs",
+            url=VAXJO_AUCTION_URL,
+            description=(
+                "Auktionen innehåller butiksinredning, möbler och kläder såsom "
+                "underkläder och badkläder. 35 objekt. "
+                "Auktionen slutar 2026-09-10 18:00."
+            ),
+            provider="fixture",
+        )
+    )
+
+    result = verifier(VAXJO_AUCTION_URL)
+
+    assert result.verified is True
+    assert result.listing_status == ACTIVE
+    assert result.page_role == ITEM_LISTING
+    assert result.opportunity_identity == "url-id:68986"
+    assert result.clothing_inventory_evidence is True
+    assert result.event_scenario == "COMPANY_BANKRUPTCY"
+
+
+def test_rendered_parent_auction_index_requires_exact_status_corroboration(
+    monkeypatch,
+) -> None:
+    """A multi-object auction page must not pass as a verified exact lot."""
+    indexed = _FixtureSearchProvider(
+        [
+            SearchHit(
+                title="Växjö Inunder AB i konkurs",
+                url=VAXJO_AUCTION_URL,
+                description=(
+                    "Kläder och butiksinredning. 35 objekt. "
+                    "Auktionen slutar 2026-09-10 18:00."
+                ),
+                provider="fixture",
+            )
+        ]
+    )
+    category_result = PageVerification(
+        url=VAXJO_AUCTION_URL,
+        title="Växjö Inunder AB i konkurs",
+        page_role=CATEGORY_INDEX,
+        verified=True,
+    )
+    monkeypatch.setattr(
+        "opportunity_engine.discovery.sweden_psauction_playwright.verify_public_html",
+        lambda _url, _html: category_result,
+    )
+    verifier = PSAuctionPlaywrightFallbackVerifier(
+        lambda _url: category_result,
+        config=PSAuctionPlaywrightConfig(max_pages=1, delay_seconds=2.0),
+        rendered_page_loader=lambda url: (url, "<html>rendered auction</html>"),
+        indexed_search_provider=indexed,
+        clock=lambda: NOW,
+    )
+
+    result = verifier(VAXJO_AUCTION_URL)
+
+    assert result.verified is True
+    assert result.page_role == ITEM_LISTING
+    assert result.listing_status == ACTIVE
+    assert indexed.queries == ['site:psauction.se/auction "68986"']
+    assert verifier.diagnostics()["failed"] == 1
 
 
 def test_rendered_swedish_status_markers_match_indexed_status_contract() -> None:

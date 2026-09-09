@@ -2,6 +2,8 @@ import pytest
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     ACTIVE,
+    CATEGORY_INDEX,
+    ENDED,
     ITEM_LISTING,
     UNRESOLVED_SOURCE,
     PageVerification,
@@ -208,3 +210,32 @@ def test_browser_error_preserves_primary_failure():
     assert diagnostics["attempted"] == 1
     assert diagnostics["failed"] == 1
     assert diagnostics["errors"][0]["error"] == "chromium navigation failed"
+
+
+def test_redirect_to_exact_ended_auction_route_resolves_ended(monkeypatch):
+    active_url = "https://psauction.se/auction/68906/arbetsklader"
+    ended_url = (
+        "https://psauction.se/auction/ended/68906/"
+        "avyttring-av-arbets-och-skyddsklader-3"
+    )
+    monkeypatch.setattr(
+        "opportunity_engine.discovery.sweden_psauction_playwright.verify_public_html",
+        lambda url, _html: PageVerification(
+            url=url,
+            title="Avyttring av arbets- och skyddskläder",
+            page_role=CATEGORY_INDEX,
+            verified=True,
+        ),
+    )
+    verifier = PSAuctionPlaywrightFallbackVerifier(
+        lambda url: _blocked(url),
+        rendered_page_loader=lambda _url: (ended_url, "<html>ended auction</html>"),
+    )
+
+    result = verifier(active_url)
+
+    assert result.verified is True
+    assert result.listing_status == ENDED
+    assert result.page_role == ITEM_LISTING
+    assert result.opportunity_identity == "url-id:68906"
+    assert result.url == ended_url

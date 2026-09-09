@@ -35,7 +35,13 @@ from opportunity_engine.discovery.sweden_current_first import (
 )
 from opportunity_engine.discovery.sweden_klaravik import verify_klaravik_public_page
 from opportunity_engine.discovery.sweden_psauction import (
+    PSAUCTION_CURRENT_QUERY_IDS,
     build_psauction_clothing_queries,
+)
+from opportunity_engine.discovery.sweden_psauction_bankruptcy_index import (
+    PSAuctionBankruptcyIndexAugmentedProvider,
+    PSAuctionBankruptcyIndexCollection,
+    PSAuctionBankruptcyIndexCollector,
 )
 from opportunity_engine.discovery.sweden_psauction_playwright import (
     PSAuctionPlaywrightConfig,
@@ -61,7 +67,7 @@ def _effective_brave_freshness(source: str, requested: str) -> str:
     """Use exact-page status, not search-index age, for direct auction sources.
 
     Targeted Swedish source packs already restrict results to one source and then
-    verify exact public item pages as ACTIVE/ENDED. Search-engine page age is not
+    verify exact public listing pages as ACTIVE/ENDED. Search-engine page age is not
     an authoritative auction-state signal and can suppress still-relevant indexed
     inventory pages before the source verifier gets a chance to inspect them.
     The broad open-web mode keeps the caller's freshness filter unchanged.
@@ -174,7 +180,7 @@ def main() -> int:
         "--psauction-browser-pages",
         type=int,
         default=6,
-        help="Maximum rendered PS Auction item pages (1-6)",
+        help="Maximum rendered PS Auction listing pages (1-6)",
     )
     parser.add_argument(
         "--psauction-browser-delay-seconds",
@@ -226,17 +232,28 @@ def main() -> int:
         query_budget = 16 if args.source == "open-web" else 8
 
     psauction_provider: PSAuctionPrefetchedSearchProvider | None = None
+    psauction_index_collection: PSAuctionBankruptcyIndexCollection | None = None
     klaravik_provider: KlaravikPrefetchedSearchProvider | None = None
     blinto_provider: BlintoPrefetchedSearchProvider | None = None
     if args.source == "psauction":
         queries = build_psauction_clothing_queries(query_budget)
-        psauction_provider = PSAuctionPrefetchedSearchProvider(
+        psauction_index_collection = PSAuctionBankruptcyIndexCollector().collect()
+        psauction_search = PSAuctionBankruptcyIndexAugmentedProvider(
             brave,
+            target_queries=tuple(
+                query.query
+                for query in queries
+                if query.query_id in PSAUCTION_CURRENT_QUERY_IDS
+            ),
+            current_hits=psauction_index_collection.hits,
+        )
+        psauction_provider = PSAuctionPrefetchedSearchProvider(
+            psauction_search,
             queries=queries,
             request_budget=len(queries),
         )
         provider = SwedenLocalizedSearchProvider(psauction_provider)
-        query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V1"
+        query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V2"
     elif args.source == "klaravik":
         queries = build_klaravik_clothing_queries(query_budget)
         klaravik_provider = KlaravikPrefetchedSearchProvider(
@@ -306,6 +323,10 @@ def main() -> int:
     result = apply_post_verification_top5_hard_gate(result)
     targeted_provider = psauction_provider or klaravik_provider or blinto_provider
     source_diagnostics = targeted_provider.diagnostics() if targeted_provider else None
+    if source_diagnostics is not None and psauction_index_collection is not None:
+        source_diagnostics["bankruptcy_index"] = (
+            psauction_index_collection.diagnostics()
+        )
     if psauction_provider is not None and source_diagnostics is not None:
         result = enrich_psauction_discovery_result(
             result,

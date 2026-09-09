@@ -1,8 +1,9 @@
 """Bounded PS Auction source targeting for Swedish Clothing Inventory discovery.
 
-The adapter uses only public Brave-indexed pages and accepts one exact PS Auction
-item URL shape. It does not log in, bid, purchase, infer hidden inventory, or
-assume an auction is active before the public page verifier confirms it.
+The adapter accepts PS Auction's current public ``/auction/<id>/<slug>`` route
+and the legacy ``/item/view/<id>/<slug>`` route. It does not log in, bid,
+purchase, infer hidden inventory, or assume an auction is active before the
+public page verifier confirms it.
 """
 from __future__ import annotations
 
@@ -22,6 +23,14 @@ from opportunity_engine.discovery.search_provider import SearchHit, SearchProvid
 
 PSAUCTION_HOST = "psauction.se"
 PSAUCTION_ITEM_PATH = re.compile(r"^/item/view/(?P<item_id>\d+)/[^/?#]+/?$", re.I)
+PSAUCTION_AUCTION_PATH = re.compile(
+    r"^/auction/(?P<item_id>\d+)/[^/?#]+/?$",
+    re.I,
+)
+PSAUCTION_ENDED_AUCTION_PATH = re.compile(
+    r"^/auction/ended/(?P<item_id>\d+)/[^/?#]+/?$",
+    re.I,
+)
 _STOCKHOLM_TZ = ZoneInfo("Europe/Stockholm")
 PSAUCTION_CURRENT_QUERY_IDS = frozenset({
     "se-ps-current-01",
@@ -188,7 +197,7 @@ _BULK_TERMS = (
 )
 _BULK_QUANTITY_PATTERN = re.compile(
     r"\b(?:ca\s*)?(\d{2,7})(?:\+)?\s*"
-    r"(?:st|par|plagg|artiklar|pall|kartonger?|krt)\b",
+    r"(?:st|par|plagg|artiklar|objekt|pall|kartonger?|krt)\b",
     re.I,
 )
 _ENDED_OR_SOLD_TERMS = (
@@ -230,14 +239,20 @@ def build_psauction_current_window_queries(
             "AUCTION",
             "SALE_INTENT",
             "CLOTHING_INVENTORY",
-            f'site:psauction.se/item/view kläder parti "Auktionen avslutas" {month}',
+            (
+                "site:psauction.se/auction (konkurs OR konkursbo) kläder "
+                f'"Auktionen slutar" {month}'
+            ),
         ),
         DiscoveryQuery(
             "se-ps-current-02",
             "AUCTION",
             "SALE_INTENT",
             "CLOTHING_INVENTORY",
-            f'site:psauction.se/item/view arbetskläder lager "Auktionen avslutas" {month}',
+            (
+                "site:psauction.se/auction (konkurs OR konkursbo) arbetskläder "
+                f'"Auktionen slutar" {month}'
+            ),
         ),
     )
 
@@ -272,18 +287,68 @@ def _normalized_host(host: str | None) -> str:
     return value[4:] if value.startswith("www.") else value
 
 
-def canonicalize_psauction_item_url(url: str) -> tuple[str, str] | None:
-    """Return canonical URL and item ID only for one specific PS Auction item."""
+def _listing_path_match(path: str) -> tuple[str, re.Match[str]] | None:
+    for route, pattern in (
+        ("ended_auction", PSAUCTION_ENDED_AUCTION_PATH),
+        ("auction", PSAUCTION_AUCTION_PATH),
+        ("item", PSAUCTION_ITEM_PATH),
+    ):
+        match = pattern.fullmatch(path or "/")
+        if match is not None:
+            return route, match
+    return None
+
+
+def canonicalize_psauction_listing_url(url: str) -> tuple[str, str] | None:
+    """Return canonical URL and ID for one exact PS Auction listing route."""
     canonical = normalize_public_url(url)
     if not canonical:
         return None
     parsed = urlparse(canonical)
     if _normalized_host(parsed.hostname) != PSAUCTION_HOST:
         return None
-    match = PSAUCTION_ITEM_PATH.fullmatch(parsed.path or "/")
-    if match is None:
+    matched = _listing_path_match(parsed.path)
+    if matched is None:
         return None
+    _, match = matched
     return canonical, match.group("item_id")
+
+
+def canonicalize_psauction_item_url(url: str) -> tuple[str, str] | None:
+    """Backward-compatible alias for exact PS Auction listing routes."""
+    return canonicalize_psauction_listing_url(url)
+
+
+def psauction_listing_route(url: str) -> str | None:
+    """Return the exact approved route kind without inferring listing status."""
+    canonical = normalize_public_url(url)
+    if not canonical:
+        return None
+    parsed = urlparse(canonical)
+    if _normalized_host(parsed.hostname) != PSAUCTION_HOST:
+        return None
+    matched = _listing_path_match(parsed.path)
+    return matched[0] if matched is not None else None
+
+
+def build_psauction_exact_status_query(url: str) -> str | None:
+    """Build a route-scoped exact-ID status query for one approved listing."""
+    canonical = normalize_public_url(url)
+    if not canonical:
+        return None
+    parsed = urlparse(canonical)
+    if _normalized_host(parsed.hostname) != PSAUCTION_HOST:
+        return None
+    matched = _listing_path_match(parsed.path)
+    if matched is None:
+        return None
+    route, match = matched
+    path_prefix = {
+        "auction": "/auction",
+        "ended_auction": "/auction/ended",
+        "item": "/item/view",
+    }[route]
+    return f'site:{PSAUCTION_HOST}{path_prefix} "{match.group("item_id")}"'
 
 
 def _compact(value: str) -> str:
@@ -307,23 +372,33 @@ def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
     if _normalized_host(parsed.hostname) != PSAUCTION_HOST:
         return PSAuctionGateDecision(False, canonical, None, "not a PS Auction host")
 
-    path_match = PSAUCTION_ITEM_PATH.fullmatch(parsed.path or "/")
-    if not path_match:
+    matched = _listing_path_match(parsed.path)
+    if matched is None:
         return PSAuctionGateDecision(
             False,
             canonical,
             None,
-            "PS Auction URL is not one specific item page",
+            "PS Auction URL is not one specific listing page",
         )
+    route, path_match = matched
 
-    title = _compact(hit.title)
-    combined = _compact(f"{hit.title} {hit.description}")
-    if not any(term in title for term in _CLOTHING_TITLE_TERMS):
+    if route == "ended_auction":
         return PSAuctionGateDecision(
             False,
             canonical,
             path_match.group("item_id"),
-            "specific PS Auction title lacks clothing evidence",
+            _ENDED_REASON,
+        )
+
+    title = _compact(hit.title)
+    combined = _compact(f"{hit.title} {hit.description}")
+    clothing_scope = combined if route == "auction" else title
+    if not any(term in clothing_scope for term in _CLOTHING_TITLE_TERMS):
+        return PSAuctionGateDecision(
+            False,
+            canonical,
+            path_match.group("item_id"),
+            "specific PS Auction listing lacks clothing evidence",
         )
     if not _has_bulk_scope(combined):
         return PSAuctionGateDecision(
@@ -344,7 +419,7 @@ def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
         True,
         canonical,
         path_match.group("item_id"),
-        "specific PS Auction bulk clothing-inventory item page",
+        "specific PS Auction bulk clothing-inventory listing page",
     )
 
 

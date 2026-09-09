@@ -1,13 +1,13 @@
-"""Bounded browser and indexed-search verification for public PS Auction item pages.
+"""Bounded browser and indexed-search verification for PS Auction listing pages.
 
 The lightweight verifier remains primary. A rendered browser is used only when
-one exact PS Auction item page returns HTTP 403 or insufficient public content.
-If the rendered page still cannot prove the listing state, a bounded exact-item
+one exact PS Auction listing page returns HTTP 403 or insufficient public content.
+If the rendered page still cannot prove the listing state, a bounded exact-ID
 public search corroboration is attempted using the configured Brave API key.
 
 Indexed corroboration is deliberately conservative: it can confirm ENDED from
 explicit ended/sold evidence or an auction end timestamp already in the past,
-and it can confirm ACTIVE only when the exact item has clothing/bulk evidence
+and it can confirm ACTIVE only when the exact listing has clothing/bulk evidence
 and an explicit auction end timestamp in the future. Search-index absence or
 ambiguous snippets remain unresolved.
 
@@ -40,7 +40,9 @@ from opportunity_engine.discovery.sweden_clothing_inventory import (
     enrich_sweden_page_verification,
 )
 from opportunity_engine.discovery.sweden_psauction import (
-    canonicalize_psauction_item_url,
+    build_psauction_exact_status_query,
+    canonicalize_psauction_listing_url,
+    psauction_listing_route,
     psauction_gate_decision,
 )
 
@@ -187,7 +189,7 @@ def _indexed_status(text: str, now: datetime) -> tuple[str, str | None]:
 
 
 class PSAuctionPlaywrightFallbackVerifier:
-    """Render one exact PS Auction item, then corroborate by exact indexed search."""
+    """Render one exact PS Auction listing, then corroborate its exact ID."""
 
     def __init__(
         self,
@@ -226,10 +228,16 @@ class PSAuctionPlaywrightFallbackVerifier:
 
     def _should_fallback(self, url: str, result: PageVerification) -> bool:
         error = str(result.error or "").strip().casefold()
-        return (
-            canonicalize_psauction_item_url(url) is not None
-            and result.verified is not True
+        unresolved_access = (
+            result.verified is not True
             and any(part in error for part in _FALLBACK_ERROR_PARTS)
+        )
+        exact_route_misclassified = (
+            result.verified is True and result.page_role != ITEM_LISTING
+        )
+        return (
+            canonicalize_psauction_listing_url(url) is not None
+            and (unresolved_access or exact_route_misclassified)
         )
 
     def _ensure_browser(self) -> None:
@@ -366,7 +374,7 @@ class PSAuctionPlaywrightFallbackVerifier:
     def _same_item_hits(item_id: str, hits: list[SearchHit]) -> list[SearchHit]:
         exact: list[SearchHit] = []
         for hit in hits:
-            pair = canonicalize_psauction_item_url(hit.url)
+            pair = canonicalize_psauction_listing_url(hit.url)
             if pair is not None and pair[1] == item_id:
                 exact.append(hit)
         return exact
@@ -396,7 +404,7 @@ class PSAuctionPlaywrightFallbackVerifier:
         url: str,
         unresolved: PageVerification,
     ) -> PageVerification:
-        pair = canonicalize_psauction_item_url(url)
+        pair = canonicalize_psauction_listing_url(url)
         if pair is None:
             return unresolved
         canonical, item_id = pair
@@ -412,7 +420,9 @@ class PSAuctionPlaywrightFallbackVerifier:
             return unresolved
 
         self._indexed_attempted_urls.append(canonical)
-        query = f'site:psauction.se/item/view "{item_id}"'
+        query = build_psauction_exact_status_query(canonical)
+        if query is None:
+            return unresolved
         try:
             raw_hits = list(provider.search(query, count=_INDEXED_RESULTS_PER_QUERY))
         except Exception as exc:
@@ -503,22 +513,59 @@ class PSAuctionPlaywrightFallbackVerifier:
             self._budget_exhausted += 1
             return self._corroborate_with_indexed_search(url, primary_result)
 
-        canonical_pair = canonicalize_psauction_item_url(url)
+        canonical_pair = canonicalize_psauction_listing_url(url)
         canonical = canonical_pair[0] if canonical_pair else url
         self._attempted_urls.append(canonical)
         try:
             final_url, rendered_html = self._load_rendered_page(canonical)
-            final_pair = canonicalize_psauction_item_url(final_url)
+            final_pair = canonicalize_psauction_listing_url(final_url)
             if final_pair is None:
                 raise RuntimeError(
-                    "rendered page redirected outside one specific PS Auction item"
+                    "rendered page redirected outside one specific PS Auction listing"
+                )
+            if canonical_pair is not None and final_pair[1] != canonical_pair[1]:
+                raise RuntimeError(
+                    "rendered page redirected to a different PS Auction listing"
                 )
             rendered_result = enrich_sweden_page_verification(
                 verify_public_html(final_pair[0], rendered_html)
             )
-            if rendered_result.verified is True:
+            if psauction_listing_route(final_pair[0]) == "ended_auction":
+                ended_result = PageVerification(
+                    url=final_pair[0],
+                    title=rendered_result.title,
+                    text=rendered_result.text,
+                    listing_status=ENDED,
+                    page_role=ITEM_LISTING,
+                    opportunity_identity=f"url-id:{final_pair[1]}",
+                    identity_stable=True,
+                    clothing_inventory_evidence=(
+                        rendered_result.clothing_inventory_evidence
+                    ),
+                    sale_evidence=False,
+                    event_scenario=rendered_result.event_scenario,
+                    bounded_context=rendered_result.bounded_context,
+                    verified=True,
+                    error="PS Auction redirected to its ended-auction route",
+                )
+                self._successful_urls.append(canonical)
+                return ended_result
+            if (
+                rendered_result.verified is True
+                and rendered_result.page_role == ITEM_LISTING
+            ):
                 self._successful_urls.append(canonical)
                 return rendered_result
+
+            if rendered_result.verified is True:
+                rendered_result = replace(
+                    rendered_result,
+                    verified=False,
+                    error=(
+                        "rendered exact PS Auction route resolved as "
+                        f"{rendered_result.page_role}; exact status corroboration required"
+                    ),
+                )
 
             self._failed_urls.append(canonical)
             self._errors.append(
@@ -552,7 +599,8 @@ class PSAuctionPlaywrightFallbackVerifier:
         )
         return {
             "enabled": True,
-            "scope": "specific_psauction_item_pages_only",
+            "scope": "specific_psauction_listing_pages_only",
+            "accepted_routes": ["/auction/<id>/<slug>", "/item/view/<id>/<slug>"],
             "max_pages": self.config.max_pages,
             "delay_seconds": self.config.delay_seconds,
             "navigation_timeout_seconds": self.config.navigation_timeout_seconds,

@@ -11,8 +11,11 @@ from opportunity_engine.discovery.sweden_clothing_inventory import (
 from opportunity_engine.discovery.sweden_psauction import (
     PSAUCTION_CLOTHING_QUERY_MATRIX,
     PSAuctionTargetedSearchProvider,
+    build_psauction_exact_status_query,
     build_psauction_clothing_queries,
     canonicalize_psauction_item_url,
+    canonicalize_psauction_listing_url,
+    psauction_listing_route,
     psauction_gate_decision,
 )
 
@@ -44,7 +47,8 @@ def test_query_pack_is_bounded_and_site_restricted():
     queries = build_psauction_clothing_queries(8)
 
     assert len(queries) == 8
-    assert all("site:psauction.se/item/view" in query.query for query in queries)
+    assert all("site:psauction.se/auction" in query.query for query in queries[:2])
+    assert all("site:psauction.se/item/view" in query.query for query in queries[2:])
     assert all(query.asset_scope == "CLOTHING_INVENTORY" for query in queries)
     assert len({query.query for query in PSAUCTION_CLOTHING_QUERY_MATRIX}) == len(
         PSAUCTION_CLOTHING_QUERY_MATRIX
@@ -63,8 +67,29 @@ def test_query_budget_fails_closed_outside_pack_bounds():
 
 def test_exact_item_url_canonicalization_is_bounded():
     canonical = canonicalize_psauction_item_url(_hit().url)
+    current = (
+        "https://psauction.se/auction/68986/"
+        "vaxjo-inunder-ab-i-konkurs"
+    )
+    ended = (
+        "https://psauction.se/auction/ended/68906/"
+        "avyttring-av-arbets-och-skyddsklader-3"
+    )
 
     assert canonical == (_hit().url, "1319712")
+    assert canonicalize_psauction_listing_url(current) == (current, "68986")
+    assert canonicalize_psauction_listing_url(ended) == (ended, "68906")
+    assert psauction_listing_route(current) == "auction"
+    assert psauction_listing_route(ended) == "ended_auction"
+    assert build_psauction_exact_status_query(current) == (
+        'site:psauction.se/auction "68986"'
+    )
+    assert build_psauction_exact_status_query(ended) == (
+        'site:psauction.se/auction/ended "68906"'
+    )
+    assert build_psauction_exact_status_query(_hit().url) == (
+        'site:psauction.se/item/view "1319712"'
+    )
     assert canonicalize_psauction_item_url("https://psauction.se/auctions") is None
     assert canonicalize_psauction_item_url(
         "https://example.com/item/view/1319712/test"
@@ -92,6 +117,63 @@ def test_gate_accepts_bulk_accessories_with_explicit_quantity():
 
     assert decision.accepted is True
     assert decision.item_id == "1560018"
+
+
+def test_gate_accepts_current_vaxjo_bankruptcy_auction_route():
+    decision = psauction_gate_decision(
+        SearchHit(
+            title="Växjö Inunder AB i konkurs",
+            url=(
+                "https://psauction.se/auction/68986/"
+                "vaxjo-inunder-ab-i-konkurs"
+            ),
+            description=(
+                "Auktionen innehåller butiksinredning, möbler och kläder såsom "
+                "underkläder och badkläder. 35 objekt. Auktionen slutar "
+                "2026-09-10."
+            ),
+            provider="PS Auction bankruptcy index",
+        )
+    )
+
+    assert decision.accepted is True
+    assert decision.item_id == "68986"
+
+
+def test_gate_rejects_ended_current_auction_route():
+    decision = psauction_gate_decision(
+        SearchHit(
+            title="Avslutad modebutik AB i konkurs",
+            url="https://psauction.se/auction/68000/avslutad-modebutik",
+            description=(
+                "Auktionen innehåller kläder och butiksinredning. 24 objekt. "
+                "Auktionen är avslutad."
+            ),
+            provider="PS Auction bankruptcy index",
+        )
+    )
+
+    assert decision.accepted is False
+    assert decision.item_id == "68000"
+    assert decision.reason == "specific PS Auction item is ended or sold"
+
+
+def test_gate_rejects_explicit_ended_auction_route_without_snippet_status():
+    decision = psauction_gate_decision(
+        SearchHit(
+            title="Avyttring av arbets- och skyddskläder",
+            url=(
+                "https://psauction.se/auction/ended/68906/"
+                "avyttring-av-arbets-och-skyddsklader-3"
+            ),
+            description="79 objekt i Helsingborg.",
+            provider="PS Auction ended index",
+        )
+    )
+
+    assert decision.accepted is False
+    assert decision.item_id == "68906"
+    assert decision.reason == "specific PS Auction item is ended or sold"
 
 
 def test_gate_rejects_single_clothing_item_without_bulk_evidence():
@@ -129,7 +211,7 @@ def test_gate_rejects_auction_index_and_wrong_host():
     )
 
     assert index.accepted is False
-    assert "specific item page" in index.reason
+    assert "specific listing page" in index.reason
     assert other_host.accepted is False
     assert other_host.reason == "not a PS Auction host"
 
@@ -179,7 +261,7 @@ def test_targeted_provider_filters_hits_and_reports_diagnostics():
     assert diagnostics["rejected_samples"][0]["query_id"] == query.query_id
     assert diagnostics["rejected_samples"][0]["url"] == "https://psauction.se/auctions"
     assert diagnostics["rejected_samples"][0]["reason"] == (
-        "PS Auction URL is not one specific item page"
+        "PS Auction URL is not one specific listing page"
     )
     assert diagnostics["rejected_samples"][1]["item_id"] == "999999"
     assert "lacks clothing evidence" in diagnostics["rejected_samples"][1]["reason"]

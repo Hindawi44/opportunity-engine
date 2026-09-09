@@ -25,7 +25,9 @@ def test_default_psauction_budget_prioritizes_current_window_then_inventory() ->
     assert len(queries) == 8
     assert {query.query_id for query in queries[:2]} == PSAUCTION_CURRENT_QUERY_IDS
     assert all("2026-08" in query.query for query in queries[:2])
-    assert all("Auktionen avslutas" in query.query for query in queries[:2])
+    assert all("Auktionen slutar" in query.query for query in queries[:2])
+    assert all("site:psauction.se/auction" in query.query for query in queries[:2])
+    assert all("site:psauction.se/item/view" in query.query for query in queries[2:])
     assert any("konkursbo" in query.query for query in queries)
     assert any("restlager" in query.query for query in queries)
 
