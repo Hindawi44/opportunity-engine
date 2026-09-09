@@ -441,14 +441,14 @@ def test_precheckpoint_request_displaces_one_no_radar_request(tmp_path: Path) ->
         results_per_query=10,
     )
 
-    assert len(calls) == 5
-    assert sum(1 for market, _ in calls if market == "NO") == 1
+    assert len(calls) == 7
+    assert sum(1 for market, _ in calls if market == "NO") == 3
     learned = report["learned_query_overlay"]
     assert learned["precheckpoint_learned_request_count"] == 1
     assert learned["radar_requests_displaced"] == 1
-    assert learned["radar_request_count_after_displacement"] == 5
-    assert learned["combined_learned_plus_radar_request_count"] == 6
-    assert learned["baseline_radar_request_budget"] == 6
+    assert learned["radar_request_count_after_displacement"] == 7
+    assert learned["combined_learned_plus_radar_request_count"] == 8
+    assert learned["baseline_radar_request_budget"] == 8
     assert learned["combined_request_budget_unchanged"] is True
     assert learned["extra_search_requests"] == 0
 

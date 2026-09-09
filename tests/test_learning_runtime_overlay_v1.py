@@ -157,8 +157,8 @@ def test_runtime_overlay_adds_zero_search_requests(tmp_path: Path) -> None:
         results_per_query=10,
     )
 
-    assert report["requests_made"] == 6
-    assert len(calls) == 6
+    assert report["requests_made"] == 8
+    assert len(calls) == 8
     assert report["learned_query_overlay"]["extra_search_requests"] == 0
     assert report["learned_query_overlay"]["query_budget_unchanged"] is True
     assert report["learned_query_overlay"]["active_terms_by_market"] == {
