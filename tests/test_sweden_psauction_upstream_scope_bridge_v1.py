@@ -124,5 +124,7 @@ def test_daily_runner_uses_scope_bridge_only_on_psauction_fallback_path():
 
     assert "class _PSAuctionUpstreamScopeVerifier" in text
     assert "PSAUCTION_PREFETCH_STRICT_GATE" in text
+    assert "PSAuctionBankruptcyIndexCollector().collect()" in text
+    assert "PSAuctionBankruptcyIndexAugmentedProvider(" in text
     assert "browser_verifier = _PSAuctionUpstreamScopeVerifier(" in text
     assert 'args.source == "psauction" and args.verify_pages' in text
