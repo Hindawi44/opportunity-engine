@@ -143,6 +143,36 @@ def test_current_vaxjo_auction_route_resolves_active_from_exact_deadline() -> No
     assert result.event_scenario == "COMPANY_BANKRUPTCY"
 
 
+def test_native_only_verification_never_constructs_indexed_brave_fallback(
+    monkeypatch,
+) -> None:
+    def _forbidden_brave(*_args, **_kwargs):
+        raise AssertionError("indexed Brave fallback must remain disabled")
+
+    monkeypatch.setenv("BRAVE_SEARCH_API_KEY", "would-be-paid-key")
+    monkeypatch.setattr(
+        "opportunity_engine.discovery.sweden_psauction_playwright.BraveSearchProvider",
+        _forbidden_brave,
+    )
+    verifier = PSAuctionPlaywrightFallbackVerifier(
+        _blocked_primary,
+        config=PSAuctionPlaywrightConfig(
+            max_pages=1,
+            delay_seconds=2.0,
+            navigation_timeout_seconds=1.0,
+        ),
+        rendered_page_loader=_disabled_renderer,
+        allow_indexed_search=False,
+    )
+
+    result = verifier(VAXJO_AUCTION_URL)
+
+    assert result.verified is False
+    diagnostics = verifier.diagnostics()
+    assert diagnostics["indexed_corroboration_enabled"] is False
+    assert diagnostics["indexed_attempted"] == 0
+
+
 def test_rendered_parent_auction_index_requires_exact_status_corroboration(
     monkeypatch,
 ) -> None:

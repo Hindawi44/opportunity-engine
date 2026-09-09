@@ -66,6 +66,11 @@ def _paid_brave_scope_args(argv: Sequence[str]) -> argparse.Namespace:
     return parsed
 
 
+def _supports_native_discovery_without_brave(*, market: str, source: str) -> bool:
+    """Return whether a source has a complete zero-cost native first pass."""
+    return market.strip().upper() == "SE" and source.strip().casefold() == "psauction"
+
+
 def _write_zero_cost_blocked_discovery(
     *,
     market: str,
@@ -169,21 +174,35 @@ def main() -> int:
     except RuntimeError as exc:
         if MANUAL_PAID_BRAVE_BLOCK_REASON not in str(exc):
             raise
-        paths = _write_zero_cost_blocked_discovery(
+        if _supports_native_discovery_without_brave(
             market=selected.market,
             source=paid_scope.source,
-            query_budget=paid_scope.query_budget,
-            output_dir=persistence.output_dir,
-        )
-        print("Status: VALID_ZERO_COST_GUARD")
-        print(f"Market: {selected.market}")
-        print(f"Source: {paid_scope.source or 'open-web'}")
-        print("Queries: 0")
-        print("Top opportunities: 0")
-        print("Paid Brave requests: 0")
-        for name, path in paths.items():
-            print(f"{name}: {path}")
-        return 0
+        ):
+            # PS Auction owns a bounded public bankruptcy-index collector. Run
+            # that source-native path even when the optional paid Brave fallback
+            # is blocked; the selected runner also disables indexed Brave status
+            # corroboration so this execution cannot spend search credit.
+            remaining = [
+                *remaining,
+                "--paid-brave-disabled-reason",
+                MANUAL_PAID_BRAVE_BLOCK_REASON,
+            ]
+        else:
+            paths = _write_zero_cost_blocked_discovery(
+                market=selected.market,
+                source=paid_scope.source,
+                query_budget=paid_scope.query_budget,
+                output_dir=persistence.output_dir,
+            )
+            print("Status: VALID_ZERO_COST_GUARD")
+            print(f"Market: {selected.market}")
+            print(f"Source: {paid_scope.source or 'open-web'}")
+            print("Queries: 0")
+            print("Top opportunities: 0")
+            print("Paid Brave requests: 0")
+            for name, path in paths.items():
+                print(f"{name}: {path}")
+            return 0
 
     runner = select_market_runner(selected.market)
     sys.argv = [sys.argv[0], *remaining]
