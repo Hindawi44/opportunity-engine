@@ -15,8 +15,9 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+import re
 from typing import Any, Callable, Mapping, Sequence
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from urllib.parse import parse_qs, parse_qsl, urlencode, urlsplit, urlunsplit
 
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
@@ -41,6 +42,7 @@ MAX_RESULTS_PER_QUERY = 10
 class MarketRadarQuery:
     query_id: str
     query: str
+    source_scope: str | None = None
 
 
 MARKET_QUERIES: dict[str, tuple[MarketRadarQuery, ...]] = {
@@ -83,6 +85,36 @@ MARKET_QUERIES: dict[str, tuple[MarketRadarQuery, ...]] = {
     ),
 }
 
+_NO_KONKSALG_SCOPE = "NO_KONKSALG_PUBLIC_POST"
+_NO_CLEARANCE_MARKETPLACE_SCOPE = "NO_CLEARANCE_MARKETPLACE_PUBLIC_SALE"
+
+# Two Norway-only source-focus requests supplement the six generic radar
+# requests.  They remain signal-only and are intentionally separate so that
+# Facebook indexing cannot crowd out FINN or Norsk Avvikling results.
+SOURCE_FOCUS_QUERIES: dict[str, tuple[MarketRadarQuery, ...]] = {
+    "NO": (
+        MarketRadarQuery(
+            "no-konksalg-public-clearance",
+            'site:facebook.com/konksalg/posts '
+            '("konkurssalg" OR "alt må bort" OR "alle varer" OR "få dager igjen") '
+            '(arbeidsklær OR arbeidstøy OR klær OR tekstil OR vernesko OR bekledning)',
+            source_scope=_NO_KONKSALG_SCOPE,
+        ),
+        MarketRadarQuery(
+            "no-finn-norskavvikling-public-clearance",
+            '(site:finn.no/recommerce/forsale/item OR '
+            'site:resalg.com/listing OR '
+            'site:norskavvikling.no/aktive-salg OR '
+            'site:norskavvikling.no/produkt) '
+            '("konkurssalg" OR "alt må bort" OR restlager OR varelager OR vareparti) '
+            '(arbeidsklær OR arbeidstøy OR klær OR tekstil OR vernesko OR bekledning)',
+            source_scope=_NO_CLEARANCE_MARKETPLACE_SCOPE,
+        ),
+    ),
+    "SE": (),
+    "DE": (),
+}
+
 _CLOTHING_TERMS: dict[str, tuple[str, ...]] = {
     "NO": (
         "klær",
@@ -91,6 +123,8 @@ _CLOTHING_TERMS: dict[str, tuple[str, ...]] = {
         "tekstil",
         "arbeidsklær",
         "arbeidsklaer",
+        "arbeidstøy",
+        "arbeidstoy",
         "vernesko",
         "sikkerhetssko",
         "bekledning",
@@ -165,6 +199,7 @@ _SURPLUS_TERMS: dict[str, tuple[str, ...]] = {
         "varelager",
         "lagerbeholdning",
         "parti klær",
+        "vareparti",
         "lageroverskudd",
         "lagersalg",
     ),
@@ -191,6 +226,27 @@ _TRACKING_QUERY_KEYS = {
     "source",
 }
 
+_NO_SOURCE_FOCUS_CLEARANCE_TERMS = (
+    "alt må bort",
+    "alle varer",
+)
+_FACEBOOK_KONKSALG_POST_PATH = re.compile(
+    r"^/konksalg/posts/(?:[^/]+/)?(?:\d+|pfbid[a-z0-9_-]+)$",
+    re.I,
+)
+_FINN_ITEM_PATH = re.compile(r"^/recommerce/forsale/item/\d+$", re.I)
+_FINN_SHORT_ITEM_PATH = re.compile(r"^/\d+$")
+_FINN_LEGACY_ITEM_PATH = re.compile(r"^/bap/forsale/ad\.html$", re.I)
+_RESALG_LISTING_PATH = re.compile(r"^/listing/[^/]+$", re.I)
+_NORSK_AVVIKLING_PRODUCT_PATH = re.compile(r"^/produkt/[^/]+$", re.I)
+
+_SOURCE_SCOPE_CHANNELS = {
+    _NO_KONKSALG_SCOPE: frozenset({"KONKSALG_FACEBOOK"}),
+    _NO_CLEARANCE_MARKETPLACE_SCOPE: frozenset(
+        {"FINN_PUBLIC_ITEM", "RESALG_PUBLIC_LISTING", "NORSK_AVVIKLING_PUBLIC_SALE"}
+    ),
+}
+
 ProviderFactory = Callable[[str, str, str | None], SearchProvider]
 
 
@@ -200,6 +256,7 @@ def _compact(value: object) -> str:
 
 def _fold(value: object) -> str:
     return _compact(value).casefold()
+
 
 def _iso_utc(value: datetime) -> str:
     normalized = value
@@ -238,6 +295,65 @@ def _canonical_url(raw_url: str) -> str:
             urlencode(filtered_query, doseq=True),
             "",
         )
+    )
+
+
+def _normalized_host(raw_host: str | None) -> str:
+    host = (raw_host or "").casefold()
+    for prefix in ("www.", "m."):
+        if host.startswith(prefix):
+            return host[len(prefix) :]
+    return host
+
+
+def _public_clearance_source_channel(canonical_url: str) -> str | None:
+    """Identify only bounded public pages from the Norway source-focus lane."""
+    parsed = urlsplit(canonical_url)
+    host = _normalized_host(parsed.hostname)
+    path = parsed.path or "/"
+
+    if host == "facebook.com" and _FACEBOOK_KONKSALG_POST_PATH.fullmatch(path):
+        return "KONKSALG_FACEBOOK"
+
+    if host == "finn.no":
+        if _FINN_ITEM_PATH.fullmatch(path) or _FINN_SHORT_ITEM_PATH.fullmatch(path):
+            return "FINN_PUBLIC_ITEM"
+        if _FINN_LEGACY_ITEM_PATH.fullmatch(path):
+            finnkode = parse_qs(parsed.query).get("finnkode", ())
+            if finnkode and finnkode[0].isdigit():
+                return "FINN_PUBLIC_ITEM"
+        return None
+
+    if host == "resalg.com" and _RESALG_LISTING_PATH.fullmatch(path):
+        return "RESALG_PUBLIC_LISTING"
+
+    if host == "norskavvikling.no":
+        folded_path = path.casefold()
+        if (
+            folded_path in {"/aktive-salg", "/butikk"}
+            or folded_path.startswith("/aktive-salg/")
+            or _NORSK_AVVIKLING_PRODUCT_PATH.fullmatch(path)
+        ):
+            return "NORSK_AVVIKLING_PUBLIC_SALE"
+    return None
+
+
+def _selected_market_queries(
+    market_code: str,
+    queries_per_market: int,
+) -> tuple[MarketRadarQuery, ...]:
+    market = market_code.upper()
+    return (
+        *MARKET_QUERIES[market][:queries_per_market],
+        *SOURCE_FOCUS_QUERIES.get(market, ()),
+    )
+
+
+def radar_query_budget_total(queries_per_market: int) -> int:
+    """Return the exact generic plus source-focus request ceiling."""
+    return sum(
+        len(_selected_market_queries(market, queries_per_market))
+        for market in SUPPORTED_MARKETS
     )
 
 
@@ -305,10 +421,24 @@ def market_signal_from_brave_hit(
         return None
     combined = f"{title} {description}".strip()
     signal_type, clothing_terms, event_terms = _classify_signal(market, combined)
+    if signal_type is None and query.source_scope in _SOURCE_SCOPE_CHANNELS:
+        # Source-focused public clearance pages may use the terse wording seen
+        # in the Nærbø miss ("ALT MÅ BORT / ALLE VARER") without spelling out
+        # insolvency in the indexed snippet. Clothing evidence is still
+        # mandatory, so ordinary cross-category promotions remain rejected.
+        clothing_terms = _matched_terms(combined, _CLOTHING_TERMS[market])
+        event_terms = _matched_terms(combined, _NO_SOURCE_FOCUS_CLEARANCE_TERMS)
+        if clothing_terms and event_terms:
+            signal_type = MarketSignalType.WAREHOUSE_SURPLUS
     if signal_type is None:
         return None
 
     canonical_url = _canonical_url(_compact(hit.url))
+    source_channel = _public_clearance_source_channel(canonical_url)
+    if query.source_scope:
+        allowed_channels = _SOURCE_SCOPE_CHANNELS.get(query.source_scope, frozenset())
+        if source_channel not in allowed_channels:
+            return None
     signal_id = (
         f"brave-radar:{market.casefold()}:"
         f"{sha256(canonical_url.encode('utf-8')).hexdigest()[:24]}"
@@ -316,18 +446,21 @@ def market_signal_from_brave_hit(
     value = description or title
     value = value[:500]
     evidence_value = combined[:4000]
+    evidence_metadata: dict[str, Any] = {
+        "query_id": query.query_id,
+        "source_rank": rank,
+        "provider": _compact(hit.provider) or "Brave Search",
+        "verification_status": "UNVERIFIED_PUBLIC_WEB",
+    }
+    if source_channel:
+        evidence_metadata["source_channel"] = source_channel
     evidence = Evidence(
         evidence_type="BRAVE_SEARCH_RESULT",
         value=evidence_value,
         source_url=canonical_url,
         captured_at=observed_at,
         verified=False,
-        metadata={
-            "query_id": query.query_id,
-            "source_rank": rank,
-            "provider": _compact(hit.provider) or "Brave Search",
-            "verification_status": "UNVERIFIED_PUBLIC_WEB",
-        },
+        metadata=evidence_metadata,
     )
     return MarketSignalRecord(
         signal_id=signal_id,
@@ -364,6 +497,8 @@ def market_signal_from_brave_hit(
             "clothing_terms": sorted(set(clothing_terms)),
             "event_terms": sorted(set(event_terms)),
             "canonical_url": canonical_url,
+            **({"source_scope": query.source_scope} if query.source_scope else {}),
+            **({"source_channel": source_channel} if source_channel else {}),
         },
     )
 
@@ -459,7 +594,7 @@ def collect_manifest_brave_market_signals(
     results_per_query: int = DEFAULT_RESULTS_PER_QUERY,
     freshness: str | None = DEFAULT_FRESHNESS,
 ) -> dict[str, Any]:
-    """Search six bounded market queries and merge accepted standalone signals."""
+    """Search bounded generic and source-focus queries and merge signals."""
     if not 1 <= queries_per_market <= MAX_QUERIES_PER_MARKET:
         raise ValueError(
             f"queries_per_market must be between 1 and {MAX_QUERIES_PER_MARKET}"
@@ -483,12 +618,20 @@ def collect_manifest_brave_market_signals(
 
     for market_code in SUPPORTED_MARKETS:
         target = _target_spec(manifest, market_code)
+        selected_queries = _selected_market_queries(
+            market_code,
+            queries_per_market,
+        )
+        generic_query_budget = len(MARKET_QUERIES[market_code][:queries_per_market])
+        source_focus_query_budget = len(SOURCE_FOCUS_QUERIES.get(market_code, ()))
         common: dict[str, Any] = {
             "schema_version": SCHEMA_VERSION,
             "source": "Brave Search market signal radar",
             "source_country": market_code,
             "freshness": freshness,
-            "query_budget": queries_per_market,
+            "query_budget": len(selected_queries),
+            "generic_query_budget": generic_query_budget,
+            "source_focus_query_budget": source_focus_query_budget,
             "results_per_query": results_per_query,
             "queries_attempted": 0,
             "queries_succeeded": 0,
@@ -525,7 +668,6 @@ def collect_manifest_brave_market_signals(
         rejected = 0
         duplicates = 0
         succeeded = 0
-        selected_queries = MARKET_QUERIES[market_code][:queries_per_market]
         for query in selected_queries:
             common["queries_attempted"] = int(common["queries_attempted"]) + 1
             request_count += 1
@@ -549,7 +691,6 @@ def collect_manifest_brave_market_signals(
                 if canonical_url in seen_urls:
                     duplicates += 1
                     continue
-                seen_urls.add(canonical_url)
                 signal = market_signal_from_brave_hit(
                     hit,
                     market_code=market_code,
@@ -560,6 +701,7 @@ def collect_manifest_brave_market_signals(
                 if signal is None:
                     rejected += 1
                     continue
+                seen_urls.add(canonical_url)
                 accepted[signal.signal_id] = signal.model_dump(mode="json")
 
         common["queries_succeeded"] = succeeded
@@ -598,7 +740,11 @@ def collect_manifest_brave_market_signals(
         "retrieval_transport": "BRAVE_SEARCH",
         "market_coverage": list(SUPPORTED_MARKETS),
         "market_count": len(market_reports),
-        "query_budget_total": len(SUPPORTED_MARKETS) * queries_per_market,
+        "query_budget_total": radar_query_budget_total(queries_per_market),
+        "source_focus_query_budget_total": sum(
+            len(SOURCE_FOCUS_QUERIES.get(market, ()))
+            for market in SUPPORTED_MARKETS
+        ),
         "requests_made": request_count,
         "results_per_query": results_per_query,
         "freshness": freshness,
