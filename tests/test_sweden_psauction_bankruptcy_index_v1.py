@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+import sys
+
+import pytest
+
 from opportunity_engine.discovery.clothing_inventory_search import (
     ACTIVE,
     ITEM_LISTING,
@@ -25,11 +31,16 @@ from opportunity_engine.discovery.sweden_psauction_bankruptcy_index import (
 from opportunity_engine.discovery.sweden_psauction_prefetch import (
     PSAuctionPrefetchedSearchProvider,
 )
+from scripts import run_sweden_clothing_inventory_discovery_search as sweden_runner
 
 
 VAXJO_URL = (
     "https://psauction.se/auction/68986/"
     "vaxjo-inunder-ab-i-konkurs"
+)
+CAROLINE_URL = (
+    "https://psauction.se/auction/68961/"
+    "by-caroline-s-fashion-ab-i-konkurs"
 )
 INDEX_HTML = """
 <html><body>
@@ -40,6 +51,14 @@ INDEX_HTML = """
       <p>Auktionen innehåller butiksinredning, möbler och kläder såsom
       skyltdockor, klädställningar, underkläder och badkläder.</p>
       <span>35 objekt</span><span>35246 Växjö</span><span>1D 15H 15M</span>
+    </article>
+  </a>
+  <a href="/auction/68961/by-caroline-s-fashion-ab-i-konkurs">
+    <article>
+      <h3>by Caroline S Fashion AB i konkurs</h3>
+      <p>Auktionen innehåller varulager med cirka 170 st damkläder,
+      klänningar, blusar och accessoarer.</p>
+      <span>12 objekt</span><span>3D 4H</span>
     </article>
   </a>
   <a href="/auction/68000/avslutad-modebutik">
@@ -117,9 +136,9 @@ def test_bankruptcy_index_keeps_vaxjo_and_rejects_ended_and_nonclothing() -> Non
         fetch_index=_fetch_index
     ).collect()
 
-    assert [hit.url for hit in collection.hits] == [VAXJO_URL]
+    assert [hit.url for hit in collection.hits] == [VAXJO_URL, CAROLINE_URL]
     assert collection.hits[0].title == "Växjö Inunder AB i konkurs"
-    assert collection.rows_seen == 4
+    assert collection.rows_seen == 5
     assert collection.rejected_hits == 3
     assert collection.rejection_reasons == {
         "specific clothing item lacks bulk inventory evidence": 1,
@@ -161,7 +180,7 @@ def test_waf_challenge_uses_one_bounded_rendered_index_fallback() -> None:
         render_index=render_index,
     ).collect()
 
-    assert [hit.url for hit in collection.hits] == [VAXJO_URL]
+    assert [hit.url for hit in collection.hits] == [VAXJO_URL, CAROLINE_URL]
     assert render_calls == [(PSAUCTION_BANKRUPTCY_INDEX_URL, 8.0, 45.0)]
     diagnostics = collection.diagnostics()
     assert diagnostics["http_status"] == 202
@@ -283,3 +302,55 @@ def test_vaxjo_native_hit_reaches_discovery_as_a_traceable_strong_lead() -> None
     )
     assert vaxjo["opportunity_state"] == STRONG_LEAD_REQUIRES_VERIFICATION
     assert vaxjo["source_urls"] == [VAXJO_URL]
+
+
+def test_native_only_runner_recovers_both_reference_auctions_without_brave(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    collection = PSAuctionBankruptcyIndexCollector(fetch_index=_fetch_index).collect()
+
+    class _FixtureCollector:
+        def collect(self):
+            return collection
+
+    def _forbidden_brave(*_args, **_kwargs):
+        raise AssertionError("Brave must not be constructed in native-only mode")
+
+    output_dir = tmp_path / "se-psauction"
+    monkeypatch.delenv("BRAVE_SEARCH_API_KEY", raising=False)
+    monkeypatch.setattr(
+        sweden_runner,
+        "PSAuctionBankruptcyIndexCollector",
+        _FixtureCollector,
+    )
+    monkeypatch.setattr(sweden_runner, "BraveSearchProvider", _forbidden_brave)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_sweden_clothing_inventory_discovery_search.py",
+            "--source",
+            "psauction",
+            "--query-budget",
+            "2",
+            "--output-dir",
+            str(output_dir),
+            "--paid-brave-disabled-reason",
+            "MANUAL_WORKFLOW_PAID_BRAVE_BLOCKED",
+        ],
+    )
+
+    assert sweden_runner.main() == 0
+    report = json.loads((output_dir / "search-run-report.json").read_text())
+    candidates = json.loads(
+        (output_dir / "all-discovered-candidates.json").read_text()
+    )
+    identities = {candidate["opportunity_identity"] for candidate in candidates}
+
+    assert {"url-id:68986", "url-id:68961"} <= identities
+    assert report["status"] == "PASS"
+    assert report["native_discovery_status"] == "SUCCESS"
+    assert report["cost_guard_status"] == "PAID_BRAVE_FALLBACK_SKIPPED"
+    assert report["paid_search_used"] is False
+    assert report["paid_brave_requests"] == 0

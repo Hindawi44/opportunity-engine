@@ -18,6 +18,7 @@ from opportunity_engine.discovery.clothing_inventory_search import (
     write_discovery_artifacts,
 )
 from opportunity_engine.discovery.early_opportunity_gate import apply_early_opportunity_gate
+from opportunity_engine.discovery.search_provider import SearchHit
 from opportunity_engine.discovery.sweden_blinto import (
     enrich_blinto_discovery_result,
     verify_blinto_public_page,
@@ -61,6 +62,16 @@ from opportunity_engine.markets.sweden import load_sweden_market_profile
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGETED_SOURCES = frozenset({"psauction", "klaravik", "blinto"})
+
+
+class _NativeOnlySearchProvider:
+    """Zero-network fallback used after the paid Brave guard has fired."""
+
+    name = "PS Auction native bankruptcy index only"
+
+    def search(self, query: str, *, count: int = 10) -> tuple[SearchHit, ...]:
+        del query, count
+        return ()
 
 
 def _effective_brave_freshness(source: str, requested: str) -> str:
@@ -200,6 +211,11 @@ def main() -> int:
         ),
     )
     parser.add_argument("--alembic-config", default="alembic.ini")
+    parser.add_argument(
+        "--paid-brave-disabled-reason",
+        default=None,
+        help=argparse.SUPPRESS,
+    )
     args = parser.parse_args()
 
     if not 1 <= args.results_per_query <= 20:
@@ -212,20 +228,14 @@ def main() -> int:
         raise SystemExit("--psauction-browser-fallback requires --verify-pages")
     if args.persist_unified and not str(args.database_url).strip():
         raise SystemExit("--database-url must not be empty with --persist-unified")
-
-    api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
-    if not api_key:
-        raise SystemExit("BRAVE_SEARCH_API_KEY is required")
+    if args.paid_brave_disabled_reason and args.source != "psauction":
+        raise SystemExit(
+            "--paid-brave-disabled-reason is supported only with --source psauction"
+        )
 
     profile = load_sweden_market_profile(ROOT)
     effective_freshness = _effective_brave_freshness(args.source, args.freshness)
-    brave = BraveSearchProvider(
-        api_key,
-        country=profile.market_code,
-        freshness=None if effective_freshness == "none" else effective_freshness,
-        extra_snippets=True,
-        operators=True,
-    )
+    paid_brave_disabled = bool(args.paid_brave_disabled_reason)
 
     query_budget = args.query_budget
     if query_budget is None:
@@ -237,9 +247,24 @@ def main() -> int:
     blinto_provider: BlintoPrefetchedSearchProvider | None = None
     if args.source == "psauction":
         queries = build_psauction_clothing_queries(query_budget)
+        # This public source-owned index is always collected before constructing
+        # or calling the optional paid search fallback.
         psauction_index_collection = PSAuctionBankruptcyIndexCollector().collect()
+        if paid_brave_disabled:
+            base_search = _NativeOnlySearchProvider()
+        else:
+            api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
+            if not api_key:
+                raise SystemExit("BRAVE_SEARCH_API_KEY is required")
+            base_search = BraveSearchProvider(
+                api_key,
+                country=profile.market_code,
+                freshness=None,
+                extra_snippets=True,
+                operators=True,
+            )
         psauction_search = PSAuctionBankruptcyIndexAugmentedProvider(
-            brave,
+            base_search,
             target_queries=tuple(
                 query.query
                 for query in queries
@@ -254,28 +279,39 @@ def main() -> int:
         )
         provider = SwedenLocalizedSearchProvider(psauction_provider)
         query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V2"
-    elif args.source == "klaravik":
-        queries = build_klaravik_clothing_queries(query_budget)
-        klaravik_provider = KlaravikPrefetchedSearchProvider(
-            brave,
-            queries=queries,
-            request_budget=len(queries),
-        )
-        provider = SwedenLocalizedSearchProvider(klaravik_provider)
-        query_pack = "SWEDEN_KLARAVIK_CLOTHING_INVENTORY_V1"
-    elif args.source == "blinto":
-        queries = build_blinto_clothing_queries(query_budget)
-        blinto_provider = BlintoPrefetchedSearchProvider(
-            brave,
-            queries=queries,
-            request_budget=len(queries),
-        )
-        provider = SwedenLocalizedSearchProvider(blinto_provider)
-        query_pack = "SWEDEN_BLINTO_CLOTHING_INVENTORY_V1"
     else:
-        queries = build_sweden_clothing_inventory_queries(query_budget)
-        provider = SwedenLocalizedSearchProvider(brave)
-        query_pack = "SWEDEN_CLOTHING_INVENTORY_V1"
+        api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
+        if not api_key:
+            raise SystemExit("BRAVE_SEARCH_API_KEY is required")
+        brave = BraveSearchProvider(
+            api_key,
+            country=profile.market_code,
+            freshness=None if effective_freshness == "none" else effective_freshness,
+            extra_snippets=True,
+            operators=True,
+        )
+        if args.source == "klaravik":
+            queries = build_klaravik_clothing_queries(query_budget)
+            klaravik_provider = KlaravikPrefetchedSearchProvider(
+                brave,
+                queries=queries,
+                request_budget=len(queries),
+            )
+            provider = SwedenLocalizedSearchProvider(klaravik_provider)
+            query_pack = "SWEDEN_KLARAVIK_CLOTHING_INVENTORY_V1"
+        elif args.source == "blinto":
+            queries = build_blinto_clothing_queries(query_budget)
+            blinto_provider = BlintoPrefetchedSearchProvider(
+                brave,
+                queries=queries,
+                request_budget=len(queries),
+            )
+            provider = SwedenLocalizedSearchProvider(blinto_provider)
+            query_pack = "SWEDEN_BLINTO_CLOTHING_INVENTORY_V1"
+        else:
+            queries = build_sweden_clothing_inventory_queries(query_budget)
+            provider = SwedenLocalizedSearchProvider(brave)
+            query_pack = "SWEDEN_CLOTHING_INVENTORY_V1"
 
     verifier = None
     if args.verify_pages:
@@ -304,6 +340,7 @@ def main() -> int:
                 max_pages=args.psauction_browser_pages,
                 delay_seconds=args.psauction_browser_delay_seconds,
             ),
+            allow_indexed_search=not paid_brave_disabled,
         )
         verifier = browser_verifier
 
@@ -358,8 +395,22 @@ def main() -> int:
     report["brave_freshness_requested"] = args.freshness
     report["brave_freshness"] = effective_freshness
     report["source_status_verification_authoritative"] = args.source in TARGETED_SOURCES
-    report["brave_extra_snippets"] = True
-    report["brave_operators"] = True
+    report["brave_extra_snippets"] = not paid_brave_disabled
+    report["brave_operators"] = not paid_brave_disabled
+    report["brave_fallback_enabled"] = not paid_brave_disabled
+    if paid_brave_disabled:
+        native_failed = bool(
+            psauction_index_collection is None
+            or psauction_index_collection.errors
+        )
+        report["paid_search_used"] = False
+        report["paid_brave_requests"] = 0
+        report["cost_guard_status"] = "PAID_BRAVE_FALLBACK_SKIPPED"
+        report["cost_guard_reason"] = args.paid_brave_disabled_reason
+        report["native_discovery_status"] = "FAILURE" if native_failed else "SUCCESS"
+        if native_failed:
+            report["status"] = "FAIL"
+            report["execution_status"] = "FAIL"
     report["source_diagnostics"] = source_diagnostics
     report["source_page_verifier_diagnostics"] = (
         browser_verifier.diagnostics() if browser_verifier else None

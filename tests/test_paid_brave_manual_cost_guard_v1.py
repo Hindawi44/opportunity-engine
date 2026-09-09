@@ -232,6 +232,51 @@ def test_auto_checkpoint_market_runner_emits_zero_cost_valid_zero(
     assert json.loads((output_dir / "discovery-top5.json").read_text()) == []
 
 
+def test_auto_checkpoint_psauction_runs_native_path_while_brave_is_blocked(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    output_dir = tmp_path / "se-psauction"
+    runner_calls: list[list[str]] = []
+
+    def native_runner() -> int:
+        runner_calls.append(list(sys.argv))
+        return 0
+
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "workflow_dispatch")
+    monkeypatch.setenv("GITHUB_WORKFLOW", "Multi-Market Daily Operator Checkpoint")
+    monkeypatch.setenv("GITHUB_JOB", "operator-read-only-checkpoint")
+    monkeypatch.setenv("GITHUB_ACTOR", "github-actions[bot]")
+    monkeypatch.setenv("BRAVE_SEARCH_API_KEY", "would-be-paid-key")
+    monkeypatch.setattr(
+        market_runner,
+        "select_market_runner",
+        lambda _market: native_runner,
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_market_clothing_inventory_discovery.py",
+            "--market",
+            "SE",
+            "--source",
+            "psauction",
+            "--query-budget",
+            "8",
+            "--output-dir",
+            str(output_dir),
+        ],
+    )
+
+    assert market_runner.main() == 0
+    assert len(runner_calls) == 1
+    assert "--paid-brave-disabled-reason" in runner_calls[0]
+    reason_index = runner_calls[0].index("--paid-brave-disabled-reason") + 1
+    assert runner_calls[0][reason_index] == MANUAL_PAID_BRAVE_BLOCK_REASON
+    assert not (output_dir / "search-run-report.json").exists()
+
+
 def test_market_runner_passes_bounded_scope_before_paid_source_selection() -> None:
     script = (ROOT / "scripts/run_market_clothing_inventory_discovery.py").read_text(
         encoding="utf-8"

@@ -198,12 +198,14 @@ class PSAuctionPlaywrightFallbackVerifier:
         config: PSAuctionPlaywrightConfig | None = None,
         rendered_page_loader: RenderedPageLoader | None = None,
         indexed_search_provider: SearchProvider | None = None,
+        allow_indexed_search: bool = True,
         clock: Clock | None = None,
     ) -> None:
         self.primary_verifier = primary_verifier
         self.config = config or PSAuctionPlaywrightConfig()
         self._injected_loader = rendered_page_loader
         self._injected_indexed_search_provider = indexed_search_provider
+        self._allow_indexed_search = bool(allow_indexed_search)
         self._indexed_search_provider: SearchProvider | None = None
         self._clock = clock or (lambda: datetime.now(timezone.utc))
         self._playwright = None
@@ -353,6 +355,8 @@ class PSAuctionPlaywrightFallbackVerifier:
             ) from chromium_exc
 
     def _get_indexed_search_provider(self) -> SearchProvider | None:
+        if not self._allow_indexed_search:
+            return None
         if self._injected_indexed_search_provider is not None:
             return self._injected_indexed_search_provider
         if self._indexed_search_provider is not None:
@@ -593,7 +597,7 @@ class PSAuctionPlaywrightFallbackVerifier:
             )
 
     def diagnostics(self) -> dict[str, object]:
-        indexed_enabled = bool(
+        indexed_enabled = self._allow_indexed_search and bool(
             self._injected_indexed_search_provider is not None
             or os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
         )
