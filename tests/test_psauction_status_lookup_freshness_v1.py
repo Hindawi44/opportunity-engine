@@ -32,6 +32,28 @@ def test_exact_psauction_status_lookup_ignores_configured_freshness():
     assert "freshness" not in params
 
 
+def test_exact_current_auction_status_lookup_also_ignores_freshness():
+    seen_urls: list[str] = []
+
+    def transport(request, timeout):
+        seen_urls.append(request.full_url)
+        return _payload()
+
+    provider = BraveSearchProvider(
+        "test-key",
+        transport=transport,
+        freshness="pm",
+        country="SE",
+        operators=True,
+    )
+
+    provider.search('site:psauction.se/auction "68986"', count=5)
+
+    params = parse_qs(urlparse(seen_urls[0]).query)
+    assert params["q"] == ['site:psauction.se/auction "68986"']
+    assert "freshness" not in params
+
+
 def test_normal_discovery_query_keeps_configured_freshness():
     seen_urls: list[str] = []
 
