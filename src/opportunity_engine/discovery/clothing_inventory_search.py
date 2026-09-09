@@ -63,6 +63,7 @@ _CLOTHING_TERMS = (
     "klær", "klesbutikk", "kleslager", "sko", "arbeidstøy", "sportsklær",
     "tekstil", "mote", "bekledning", "klesparti", "klesmerke", "plagg",
     "arbeidsjakke", "strømpebukse", "skjorte", "hettegenser", "genser", "joggebukse",
+    "jeans", "denim", "bukser", "olabukse", "olabukser",
 )
 _INVENTORY_TERMS = (
     "varelager", "hele lageret", "hele varelageret", "komplett lager", "restlager",
