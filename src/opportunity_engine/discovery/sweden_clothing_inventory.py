@@ -7,6 +7,7 @@ mixing market-specific vocabulary into its core rules.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import replace
 from typing import Sequence
 
@@ -95,9 +96,11 @@ _SWEDISH_INVENTORY_TERMS = (
     "parti med kläder", "parti kläder", "alla kläder", "samtliga kläder",
     "sortiment med arbetskläder", "pall", "kartong", "kartonger",
 )
+_SWEDISH_AUCTION_OBJECT_COUNT = re.compile(r"\b(\d{1,7})\s*objekt\b", re.I)
 _SWEDISH_SALE_TERMS = (
     "säljes", "till salu", "auktion", "nätauktion", "budgivning",
     "utförsäljning", "samlad försäljning", "auktionen avslutas",
+    "auktionen slutar",
     "nuvarande bud", "lägg ett bud", "serviceavgift",
 )
 _SWEDISH_ENDED_TERMS = (
@@ -105,7 +108,7 @@ _SWEDISH_ENDED_TERMS = (
     "såld", "avbruten",
 )
 _SWEDISH_ACTIVE_TERMS = (
-    "auktionen avslutas", "nuvarande bud", "lägg ett bud", "budgivning",
+    "auktionen avslutas", "auktionen slutar", "nuvarande bud", "lägg ett bud", "budgivning",
     "aktiv", "pågående", "till salu", "säljes",
 )
 _SWEDISH_SCENARIOS: tuple[tuple[str, tuple[str, ...]], ...] = (
@@ -177,6 +180,15 @@ def _swedish_scenario(text: str) -> str | None:
     return None
 
 
+def _has_swedish_inventory_scope(text: str) -> bool:
+    if any(term in text for term in _SWEDISH_INVENTORY_TERMS):
+        return True
+    return any(
+        int(match.group(1)) >= 10
+        for match in _SWEDISH_AUCTION_OBJECT_COUNT.finditer(text)
+    )
+
+
 def enrich_sweden_page_verification(
     verification: PageVerification,
 ) -> PageVerification:
@@ -201,7 +213,7 @@ def enrich_sweden_page_verification(
         return verification
 
     clothing = any(term in text for term in _SWEDISH_CLOTHING_TERMS)
-    inventory = any(term in text for term in _SWEDISH_INVENTORY_TERMS)
+    inventory = _has_swedish_inventory_scope(text)
     sale = any(term in text for term in _SWEDISH_SALE_TERMS)
     scenario = _swedish_scenario(text)
     listing_status = verification.listing_status

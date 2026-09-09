@@ -39,11 +39,11 @@ _USAGE_LIMIT_CIRCUIT_MESSAGE = (
     "Brave Search usage limit circuit open after HTTP 402; "
     "subsequent requests skipped for this process"
 )
-# Exact PS Auction item-ID lookups are verification/status queries, not fresh
+# Exact PS Auction listing-ID lookups are verification/status queries, not fresh
 # discovery. Applying a page-age filter can hide the historical item page that
 # proves an already-discovered candidate is ENDED, leaving stale lots unresolved.
 _PSAUCTION_EXACT_ITEM_STATUS_LOOKUP = re.compile(
-    r'^site:psauction\.se/item/view\s+"\d+"$',
+    r'^site:psauction\.se/(?:auction|item/view)\s+"\d+"$',
     re.I,
 )
 

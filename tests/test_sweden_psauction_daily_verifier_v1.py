@@ -20,9 +20,10 @@ def test_psauction_rendering_is_bounded_and_fail_closed() -> None:
     text = VERIFIER.read_text(encoding="utf-8")
 
     assert "MAX_RENDERED_PAGES = 6" in text
-    assert '"specific_psauction_item_pages_only"' in text
+    assert '"specific_psauction_listing_pages_only"' in text
+    assert '"/auction/<id>/<slug>"' in text
     assert '"insufficient public listing content"' in text
-    assert "canonicalize_psauction_item_url" in text
+    assert "canonicalize_psauction_listing_url" in text
     assert "system Chromium renderer failed" in text
     assert '"automatic_contact": False' in text
     assert '"automatic_bid": False' in text

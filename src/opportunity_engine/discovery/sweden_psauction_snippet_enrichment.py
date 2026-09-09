@@ -51,6 +51,7 @@ _GENERIC_SEGMENT_TERMS = (
     "klimatavtrycket för ett motsvarande nyproducerat objekt",
 )
 _BANKRUPTCY_PHRASES = (
+    "i konkurs",
     "tillhör ett konkursbo",
     "objektet tillhör ett konkursbo",
     "tvångsförsäljning då objektet tillhör ett konkursbo",
