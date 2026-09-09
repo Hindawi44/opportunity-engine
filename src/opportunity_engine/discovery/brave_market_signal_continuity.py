@@ -237,13 +237,23 @@ def _manual_cost_guard_report(
 
     sources = []
     for market_code in SUPPORTED_MARKETS:
+        selected_queries = _radar._selected_market_queries(
+            market_code,
+            queries_per_market,
+        )
         sources.append(
             {
                 "schema_version": "brave-market-signal-radar-1.0",
                 "source": "Brave Search market signal radar",
                 "source_country": market_code,
                 "freshness": freshness,
-                "query_budget": queries_per_market,
+                "query_budget": len(selected_queries),
+                "generic_query_budget": len(
+                    _radar.MARKET_QUERIES[market_code][:queries_per_market]
+                ),
+                "source_focus_query_budget": len(
+                    _radar.SOURCE_FOCUS_QUERIES.get(market_code, ())
+                ),
                 "results_per_query": results_per_query,
                 "queries_attempted": 0,
                 "queries_succeeded": 0,
@@ -267,7 +277,11 @@ def _manual_cost_guard_report(
         "retrieval_transport": "BRAVE_SEARCH",
         "market_coverage": list(SUPPORTED_MARKETS),
         "market_count": len(sources),
-        "query_budget_total": len(SUPPORTED_MARKETS) * queries_per_market,
+        "query_budget_total": _radar.radar_query_budget_total(queries_per_market),
+        "source_focus_query_budget_total": sum(
+            len(_radar.SOURCE_FOCUS_QUERIES.get(market, ()))
+            for market in SUPPORTED_MARKETS
+        ),
         "requests_made": 0,
         "results_per_query": results_per_query,
         "freshness": freshness,
@@ -313,7 +327,7 @@ def collect_manifest_brave_market_signals(
     prelearned_requests, prelearned_path, prelearned_error = (
         _precheckpoint_learned_request_count(root)
     )
-    baseline_radar_budget = len(SUPPORTED_MARKETS) * queries_per_market
+    baseline_radar_budget = _radar.radar_query_budget_total(queries_per_market)
     no_displacement_requested = min(max(0, prelearned_requests), queries_per_market)
 
     kwargs: dict[str, Any] = {

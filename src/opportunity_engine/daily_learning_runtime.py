@@ -12,7 +12,10 @@ from opportunity_engine.daily_learning_operator import (
     DailyLearningPolicy,
     run_daily_learning_cycle,
 )
-from opportunity_engine.discovery.brave_market_signal_radar import MARKET_QUERIES
+from opportunity_engine.discovery.brave_market_signal_radar import (
+    MARKET_QUERIES,
+    SOURCE_FOCUS_QUERIES,
+)
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.learning_promotion_gate import load_query_promotion_decisions
 from opportunity_engine.learned_query_overlay import (
@@ -100,7 +103,7 @@ def load_core_opportunity_queries(path: str | Path) -> list[str]:
 
 def load_active_learning_queries(path: str | Path) -> list[str]:
     queries: list[str] = list(load_core_opportunity_queries(path))
-    for market_rows in MARKET_QUERIES.values():
+    for market_rows in (*MARKET_QUERIES.values(), *SOURCE_FOCUS_QUERIES.values()):
         queries.extend(_SignalOnlyQuery(item.query) for item in market_rows)
     return queries
 
