@@ -399,16 +399,20 @@ def test_brave_radar_is_bounded_deduplicated_and_merges_market_reports(
     )
 
     assert report["market_coverage"] == ["NO", "SE", "DE"]
-    assert report["query_budget_total"] == 6
-    assert report["requests_made"] == 6
-    assert len(calls) == 6
+    assert report["query_budget_total"] == 8
+    assert report["source_focus_query_budget_total"] == 2
+    assert report["requests_made"] == 8
+    assert len(calls) == 8
     assert all(count == 10 for _, _, count in calls)
     assert report["signal_count"] == 2
     assert report["status_counts"] == {"SUCCESS": 2, "VALID_ZERO": 1}
 
     by_market = {item["source_country"]: item for item in report["sources"]}
     assert by_market["NO"]["accepted_signal_count"] == 1
-    assert by_market["NO"]["duplicate_result_count"] == 1
+    assert by_market["NO"]["query_budget"] == 4
+    assert by_market["NO"]["generic_query_budget"] == 2
+    assert by_market["NO"]["source_focus_query_budget"] == 2
+    assert by_market["NO"]["duplicate_result_count"] == 3
     assert by_market["SE"]["status"] == "VALID_ZERO"
     assert by_market["DE"]["accepted_signal_count"] == 1
 
