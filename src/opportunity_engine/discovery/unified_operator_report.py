@@ -219,6 +219,18 @@ def build_unified_operator_report(output_dir: str | Path) -> dict[str, Any]:
     disconnected = [
         row for row in search_truth if row["requires_commercial_checkpoint_connection"]
     ]
+    lifecycle = _mapping(checkpoint.get("lifecycle"))
+    stage_counts = _mapping(lifecycle.get("stage_counts"))
+    ranking_eligible_count = _int(
+        checkpoint.get("ranking_eligible_count")
+        if checkpoint.get("ranking_eligible_count") is not None
+        else checkpoint.get("top5_eligible_count")
+    )
+    commercially_qualified_count = _int(
+        checkpoint.get("commercially_qualified_count")
+        if checkpoint.get("commercially_qualified_count") is not None
+        else stage_counts.get("QUALIFIED_OPPORTUNITY")
+    )
     return {
         "schema_version": "unified-operator-report-1.1",
         "generated_at": pipeline.get("generated_at") or checkpoint.get("generated_at"),
@@ -237,7 +249,12 @@ def build_unified_operator_report(output_dir: str | Path) -> dict[str, Any]:
         ),
         "source_execution_counts": source_counts,
         "opportunity_status_counts": status_counts,
-        "top5_eligible_count": int(checkpoint.get("top5_eligible_count") or 0),
+        # Compatibility field; this is ranking-pool eligibility, not a final
+        # commercial qualification or purchase recommendation.
+        "top5_eligible_count": ranking_eligible_count,
+        "ranking_eligible_count": ranking_eligible_count,
+        "analysis_eligible_count": _int(checkpoint.get("analysis_eligible_count")),
+        "commercially_qualified_count": commercially_qualified_count,
         "top5_opportunities": top5,
         "top5_market_coverage": list(
             dict.fromkeys(
@@ -249,6 +266,7 @@ def build_unified_operator_report(output_dir: str | Path) -> dict[str, Any]:
         "top5_market_diversity_enforced": True,
         "top5_scope": "COMMERCIAL_CHECKPOINT_ELIGIBLE_ONLY",
         "search_truth_is_not_commercial_qualification": True,
+        "ranking_pool_is_not_commercial_qualification": True,
         "primary_human_action": action,
         "single_human_action_enforced": True,
         "compatibility_inputs": [
@@ -312,8 +330,14 @@ def render_unified_operator_report(report: Mapping[str, Any]) -> str:
             "الفرص: "
             f"نشطة {statuses.get('ACTIVE', 0)} | "
             f"تاريخية {statuses.get('HISTORICAL', 0)} | "
-            f"غير محسومة {statuses.get('UNRESOLVED', 0)} | "
-            f"Top 5 مؤهل {report.get('top5_eligible_count', 0)}"
+            f"غير محسومة {statuses.get('UNRESOLVED', 0)}"
+        ),
+        (
+            "الأهلية: قابل للدخول في ترتيب Top 5 "
+            f"{report.get('ranking_eligible_count', report.get('top5_eligible_count', 0))} | "
+            f"مؤهل للتحليل {report.get('analysis_eligible_count', 0)} | "
+            "مؤهل لقرار تجاري نهائي "
+            f"{report.get('commercially_qualified_count', 0)}"
         ),
         f"Exact-Lot موثّق حسب السوق: {search_counts or 'لا يوجد'}",
         f"توزيع Top 5: {top5_markets or 'لا يوجد مؤهل'}",

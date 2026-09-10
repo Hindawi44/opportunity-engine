@@ -204,10 +204,15 @@ def test_enrichment_adds_stage_counts_and_initial_events(tmp_path: Path) -> None
     assert transitions["initial_snapshots_created_this_run"] == 1
     assert transitions["transitions_created_this_run"] == 0
     assert enriched["lifecycle"]["persistence"]["cross_run_continuity"] is False
+    assert enriched["ranking_eligible_count"] == 1
+    assert enriched["commercially_qualified_count"] == 0
     assert enriched["next_human_action"]["workflow_status"] == "REQUIRES_VERIFICATION"
     assert "requires human verification" in enriched["next_human_action"]["reason"]
     summary = render_lifecycle_phone_summary(enriched)
     assert "دورة الحياة:" in summary
+    assert "قابل للدخول في ترتيب Top 5: 1" in summary
+    assert "مؤهل لقرار تجاري نهائي: 0" in summary
+    assert "Top 5 مؤهل" not in summary
     assert summary.count("الإجراء البشري الوحيد:") == 1
 
 

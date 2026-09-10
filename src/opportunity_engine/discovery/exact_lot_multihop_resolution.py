@@ -623,6 +623,7 @@ def resolve_exact_lot_multihop(
                     title=fetched.title,
                     text=fetched.text,
                     url=final_url,
+                    raw_html=fetched.raw_html,
                 )
                 row = {
                     **node,

@@ -301,7 +301,13 @@ def _has_explicit_purchase_control(text: str) -> bool:
     return any(marker in normalized for marker in _EXPLICIT_PURCHASE_MARKERS)
 
 
-def _classify_child_page(*, title: str, text: str, url: str) -> tuple[str, dict[str, Any]]:
+def _classify_child_page(
+    *,
+    title: str,
+    text: str,
+    url: str,
+    raw_html: str = "",
+) -> tuple[str, dict[str, Any]]:
     """Classify one item-specific child with local-subject domain evidence.
 
     The existing classifier supplies the base commercial evidence. This layer
@@ -315,6 +321,7 @@ def _classify_child_page(*, title: str, text: str, url: str) -> tuple[str, dict[
         title=title,
         text=normalized_text,
         url=url,
+        raw_html=raw_html,
     )
     evidence = dict(evidence)
     full_page_domain = evidence.get("project_domain")
@@ -575,6 +582,7 @@ def resolve_exact_lot_child_links(
             title=fetched.title,
             text=fetched.text,
             url=final_url,
+            raw_html=fetched.raw_html,
         )
         accepted = bool(
             classification == EXACT_LOT_CANDIDATE

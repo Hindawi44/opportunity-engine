@@ -260,7 +260,10 @@ def _apply_reused_market_fit_to_exact_lot_result(
     candidates = corrected.get("all_discovered_candidates")
     if not isinstance(report, dict) or not isinstance(candidates, list):
         return corrected
-    if _compact(report.get("source_mode")) != "EXA_EXACT_LOT_MULTIHOP":
+    if _compact(report.get("source_mode")) not in {
+        "EXA_EXACT_LOT_MULTIHOP",
+        "EXA_PRIMARY_BRAVE_FALLBACK_MULTIHOP",
+    }:
         return corrected
 
     fallback_market = _compact(report.get("market_code")).upper()

@@ -385,6 +385,12 @@ def enrich_checkpoint_with_lifecycle(
     cross_run_continuity = bool(restored_successful)
 
     enriched["schema_version"] = "multi-market-operator-checkpoint-1.1"
+    enriched["ranking_eligible_count"] = int(
+        enriched.get("top5_eligible_count") or 0
+    )
+    enriched["commercially_qualified_count"] = int(
+        stage_counter.get("QUALIFIED_OPPORTUNITY", 0)
+    )
     enriched["lifecycle"] = {
         "stage_counts": {
             status: int(stage_counter.get(status, 0)) for status in WORKFLOW_STATUSES
@@ -468,8 +474,11 @@ def render_lifecycle_phone_summary(report: Mapping[str, Any]) -> str:
         ),
         f"استمرارية SQLite: {continuity}",
         (
-            f"Top 5 مؤهل: {report.get('top5_eligible_count', 0)} | "
-            f"مؤهل للتحليل: {report.get('analysis_eligible_count', 0)}"
+            "قابل للدخول في ترتيب Top 5: "
+            f"{report.get('ranking_eligible_count', report.get('top5_eligible_count', 0))} | "
+            f"مؤهل للتحليل: {report.get('analysis_eligible_count', 0)} | "
+            "مؤهل لقرار تجاري نهائي: "
+            f"{report.get('commercially_qualified_count', stages.get('QUALIFIED_OPPORTUNITY', 0))}"
         ),
         f"الإجراء البشري الوحيد: {action.get('action', 'NO_IMMEDIATE_ACTION')}",
         f"السبب: {action.get('reason', '')}",

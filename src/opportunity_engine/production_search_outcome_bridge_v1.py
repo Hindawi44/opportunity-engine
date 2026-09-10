@@ -1,4 +1,4 @@
-"""Bridge live Exa Exact-Lot query outcomes into review-only learning evidence.
+"""Bridge live verified web-search query outcomes into review-only learning evidence.
 
 The bridge consumes artifacts already emitted by the six-market production
 Exact-Lot runtime. It performs no network search and does not re-run the Exact-Lot
@@ -25,6 +25,7 @@ OUTPUT_FILENAME = "production-search-outcome-bridge-v1.json"
 EVIDENCE_KIND = "PRODUCTION_SEARCH_QUERY_OUTCOME"
 MARKETS = ("NO", "SE", "DE", "FR", "IT", "NL")
 PROVIDER = "exa"
+HYBRID_PROVIDER = "exa-primary-brave-fallback"
 
 _SAFETY_FALSE_FIELDS = (
     "automatic_query_activation",
@@ -107,9 +108,9 @@ def _found_queries(candidate: Mapping[str, Any]) -> list[str]:
     return [_text(value) for value in values if _text(value)]
 
 
-def _record_id(*, market: str, query: str, stage: str) -> str:
+def _record_id(*, market: str, provider: str, query: str, stage: str) -> str:
     digest = sha256(
-        f"{market}|{PROVIDER}|{stage}|{query}".encode("utf-8")
+        f"{market}|{provider}|{stage}|{query}".encode("utf-8")
     ).hexdigest()[:24]
     return f"production-search-outcome:{digest}"
 
@@ -122,8 +123,8 @@ def _validate_resolution(resolution: Mapping[str, Any], *, market: str) -> None:
         raise ValueError(f"{market} resolution market identity mismatch")
     if _upper(resolution.get("project_domain")) != CLOTHING_INVENTORY:
         raise ValueError(f"{market} resolution escaped CLOTHING_INVENTORY")
-    if _text(resolution.get("provider")).lower() != PROVIDER:
-        raise ValueError(f"{market} resolution provider is not Exa")
+    if _text(resolution.get("provider")).lower() not in {PROVIDER, HYBRID_PROVIDER}:
+        raise ValueError(f"{market} resolution provider is not a supported unified route")
     if resolution.get("production_mutation") not in {None, False}:
         raise ValueError(f"{market} resolution changed production_mutation safety")
 
@@ -147,9 +148,10 @@ def _validate_report(
         report.get("strict_exact_lot_count") or 0
     ) != candidate_count:
         raise ValueError(f"{market} strict Exact-Lot candidates do not reconcile with report")
-    if report.get("current_exa_discovery_strict_exact_lot_count") is not None and int(
-        report.get("current_exa_discovery_strict_exact_lot_count") or 0
-    ) != fresh_count:
+    reported_fresh = report.get("current_web_discovery_strict_exact_lot_count")
+    if reported_fresh is None:
+        reported_fresh = report.get("current_exa_discovery_strict_exact_lot_count")
+    if reported_fresh is not None and int(reported_fresh or 0) != fresh_count:
         raise ValueError(f"{market} fresh Exact-Lot provenance does not reconcile with report")
     if report.get("freshly_reverified_recovery_exact_lot_count") is not None and int(
         report.get("freshly_reverified_recovery_exact_lot_count") or 0
@@ -180,6 +182,8 @@ def _market_outcomes(
             {
                 "query": query,
                 "query_stage": stage,
+                "provider": _text(raw.get("provider")).casefold() or PROVIDER,
+                "execution_status": _upper(raw.get("status")) or "SUCCESS",
                 "hits_received": len(_rows(raw.get("hits"))),
                 "fresh_urls": [],
             }
@@ -225,25 +229,34 @@ def _market_outcomes(
     for row in executed:
         urls = sorted(set(row.pop("fresh_urls")))
         fresh_count = len(urls)
+        execution_status = row["execution_status"]
+        skipped = execution_status.startswith("SKIPPED_")
+        failed = execution_status == "FAILURE"
+        if skipped or failed:
+            outcome = execution_status
+        else:
+            outcome = "FRESH_SUCCESS" if fresh_count else "FRESH_ZERO"
         records.append(
             {
                 "outcome_id": _record_id(
                     market=market,
+                    provider=row["provider"],
                     query=row["query"],
                     stage=row["query_stage"],
                 ),
                 "market_code": market,
                 "project_domain": CLOTHING_INVENTORY,
-                "provider": PROVIDER,
+                "provider": row["provider"],
                 "query": row["query"],
                 "query_stage": row["query_stage"],
-                "search_request_count": 1,
+                "execution_status": execution_status,
+                "search_request_count": 0 if skipped else 1,
                 "hits_received": row["hits_received"],
                 "fresh_strict_exact_lot_count": fresh_count,
                 "fresh_strict_exact_lot_urls": urls,
                 "recovery_exact_lot_count": 0,
                 "fresh_yield_per_request": float(fresh_count),
-                "outcome": "FRESH_SUCCESS" if fresh_count else "FRESH_ZERO",
+                "outcome": outcome,
                 "generated_at": generated_at,
                 "source_path": source_path,
                 "recovery_query_credit_blocked": True,
@@ -316,7 +329,11 @@ def build_production_search_outcome_bridge(*, input_root: str | Path) -> dict[st
         "schema_version": SCHEMA_VERSION,
         "status": "SUCCESS" if records else "VALID_ZERO",
         "project_domain": CLOTHING_INVENTORY,
-        "provider": PROVIDER,
+        "provider": (
+            HYBRID_PROVIDER
+            if any(_text(row.get("provider")).casefold() == "brave" for row in records)
+            else PROVIDER
+        ),
         "market_coverage": list(MARKETS),
         "query_outcome_count": len(records),
         "search_request_count": sum(int(row["search_request_count"]) for row in records),
@@ -359,8 +376,11 @@ def _spine_record(row: Mapping[str, Any]) -> dict[str, Any]:
         "evidence_kind": EVIDENCE_KIND,
         "market_code": _upper(row.get("market_code")),
         "project_domain": CLOTHING_INVENTORY,
-        "source_name": f"Exa Exact-Lot {_upper(row.get('market_code'))}",
-        "provider": PROVIDER,
+        "source_name": (
+            f"{_text(row.get('provider')).title()} Exact-Lot "
+            f"{_upper(row.get('market_code'))}"
+        ),
+        "provider": _text(row.get("provider")).casefold() or PROVIDER,
         "query": _text(row.get("query")) or None,
         "url": urls[0] if urls else None,
         "result_type": "PRODUCTION_QUERY_OUTCOME",

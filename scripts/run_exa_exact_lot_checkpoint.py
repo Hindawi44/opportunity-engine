@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Run the unified Exa Exact-Lot + Multi-Hop route as a checkpoint source.
+"""Run the unified verified Exact-Lot + Multi-Hop route as a checkpoint source.
 
 All six clothing markets stay on the same Search -> Verification -> Multi-Hop ->
 Exact-Lot path. Generic recall and bounded commercial-anchor expansion remain
-query stages inside the same runtime. Recovery memory may assist navigation, but
-it must never make weak fresh search coverage look sufficient. Commercial anchors
-are discovery hints only; they are never qualification evidence.
+query stages inside the same runtime. Exa is primary; one source-neutral Brave
+query is available only when final fresh verified coverage remains weak. Recovery
+memory may assist navigation, but it must never make weak fresh search coverage
+look sufficient. Commercial anchors are discovery hints only; they are never
+qualification evidence.
 """
 from __future__ import annotations
 
@@ -28,6 +30,7 @@ from opportunity_engine.discovery.commercial_anchor_query_expansion import (
     MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
     build_commercial_anchor_queries,
 )
+from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.exa_exact_lot_shadow_hunt import MARKET_EXACT_LOT_QUERIES
 from opportunity_engine.discovery.exa_search import ExaSearchProvider
 from opportunity_engine.discovery.exa_shadow_page_verification import (
@@ -36,6 +39,11 @@ from opportunity_engine.discovery.exa_shadow_page_verification import (
 )
 from opportunity_engine.discovery.exact_lot_multihop_resolution import resolve_exact_lot_multihop
 from opportunity_engine.discovery.provider_unique_page_verification import verify_provider_unique_pages
+from opportunity_engine.discovery.search_provider_role_policy import (
+    BRAVE,
+    VERIFIED_EXACT_LOT_FALLBACK,
+    require_provider_for_intent,
+)
 from opportunity_engine.discovery.unified_opportunity_report import write_unified_opportunity_report
 from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY, classify_project_domain
 from opportunity_engine.discovery.source_native_value_normalization import normalize_source_native_values
@@ -51,6 +59,16 @@ COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS = 8
 COMMERCIAL_ANCHOR_MIN_UNIQUE_DISCOVERY_HITS_BY_MARKET = {"DE": 6}
 FRESH_RECALL_MIN_CURRENT_EXACT_LOTS = 3
 FRESH_RECALL_MIN_CURRENT_ROUTE_HOSTS = 2
+BRAVE_FALLBACK_MAX_QUERIES_PER_MARKET = 1
+BRAVE_FALLBACK_MAX_OUTBOUND_ATTEMPTS_PER_MARKET = 1
+BRAVE_FALLBACK_RESULTS_PER_QUERY = 5
+BRAVE_FALLBACK_MAX_PAGE_FETCHES = 5
+BRAVE_FALLBACK_MAX_ROOT_PARENTS = 2
+BRAVE_FALLBACK_MAX_NAVIGATION_FETCHES = 12
+EXA_SOURCE_MODE = "EXA_EXACT_LOT_MULTIHOP"
+HYBRID_SOURCE_MODE = "EXA_PRIMARY_BRAVE_FALLBACK_MULTIHOP"
+EXA_ENGINE_VERSION = "UNIFIED_EXA_EXACT_LOT_MULTIHOP_V1"
+HYBRID_ENGINE_VERSION = "UNIFIED_EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK_V1"
 DIRECT_STRICT_EVIDENCE_RESCUE = "QUALIFIED_B2B_STRICT_EVIDENCE_V1"
 MARKET_CURRENCIES = {
     "NO": "NOK",
@@ -86,6 +104,19 @@ MARKET_ZERO_YIELD_RECALL_QUERIES: dict[str, tuple[str, ...]] = {
     "FR": ("France déstockage vêtements grossiste stock lot",),
     "IT": ("Italia liquidazione stock abbigliamento ingrosso",),
     "NL": ("Nederland kledingvoorraad restpartij groothandel",),
+}
+
+# A single source-neutral, local-language fallback query is available in every
+# market. It is spent only after the complete Exa route (primary, eligible
+# recall and bounded commercial-anchor expansion) still has weak *fresh*
+# verified Exact-Lot coverage. One Brave request per weak market is a hard cap.
+MARKET_BRAVE_FALLBACK_QUERIES: dict[str, str] = {
+    "NO": "Norge klær vareparti konkursbo restlager selges samlet pris stk",
+    "SE": "Sverige kläder restparti konkurslager säljes auktion pris antal",
+    "DE": "Deutschland Bekleidung Restposten Insolvenz Lagerverkauf Preis Menge Stück",
+    "FR": "France vêtements lot stock liquidation à vendre prix quantité pièces",
+    "IT": "Italia abbigliamento lotto stock liquidazione in vendita prezzo quantità pezzi",
+    "NL": "Nederland kleding restpartij voorraad liquidatie te koop prijs aantal stuks",
 }
 
 
@@ -167,6 +198,196 @@ def _fresh_coverage_snapshot(rows: list[Mapping[str, Any]]) -> dict[str, Any]:
         "reverified_recovery_strict_exact_lot_count": recovery_count,
         "fresh_current_route_host_count": len(route_hosts),
         "fresh_current_route_hosts": sorted(route_hosts),
+    }
+
+
+def _brave_fallback_reasons(
+    snapshot: Mapping[str, Any], *, exa_search_error_count: int = 0
+) -> list[str]:
+    """Explain the bounded fallback using verified fresh coverage, never raw hits."""
+    reasons: list[str] = []
+    if int(snapshot.get("fresh_current_strict_exact_lot_count") or 0) < (
+        FRESH_RECALL_MIN_CURRENT_EXACT_LOTS
+    ):
+        reasons.append("FRESH_EXACT_LOT_COUNT_BELOW_THRESHOLD")
+    if int(snapshot.get("fresh_current_route_host_count") or 0) < (
+        FRESH_RECALL_MIN_CURRENT_ROUTE_HOSTS
+    ):
+        reasons.append("FRESH_ROUTE_HOST_COUNT_BELOW_THRESHOLD")
+    if reasons and exa_search_error_count > 0:
+        reasons.append("EXA_SEARCH_ERROR")
+    return reasons
+
+
+def _hit_benchmark_row(hit: object) -> dict[str, Any]:
+    url = _compact(getattr(hit, "url", ""))
+    try:
+        domain = (urlsplit(url).hostname or "").casefold().removeprefix("www.")
+    except ValueError:
+        domain = ""
+    return {
+        "title": _compact(getattr(hit, "title", ""))[:1000],
+        "url": url,
+        "domain": domain,
+        "description": _compact(getattr(hit, "description", ""))[:1000],
+        "provider": _compact(getattr(hit, "provider", "")),
+    }
+
+
+def _hybrid_provider_benchmark(
+    *,
+    market: str,
+    query: str,
+    exa_hits: list[object],
+    brave_hits: list[object],
+) -> dict[str, Any]:
+    """Build the verifier's symmetric input without mixing provider provenance."""
+    exa_rows = [_hit_benchmark_row(hit) for hit in exa_hits]
+    brave_rows = [_hit_benchmark_row(hit) for hit in brave_hits]
+    exa_urls = {row["url"] for row in exa_rows if row["url"]}
+    brave_urls = {row["url"] for row in brave_rows if row["url"]}
+    exa_domains = {row["domain"] for row in exa_rows if row["domain"]}
+    brave_domains = {row["domain"] for row in brave_rows if row["domain"]}
+    return {
+        "schema_version": "search-experiment-benchmark-1.0",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "status": "SUCCESS",
+        "shadow_only": True,
+        "provider_mode": "exa-primary-brave-fallback",
+        "query_mode": "exact_lot",
+        "query_set": {market: query},
+        "project_domain": CLOTHING_INVENTORY,
+        "project_domain_gate_enforced": True,
+        "markets": [market],
+        "results_per_query": BRAVE_FALLBACK_RESULTS_PER_QUERY,
+        "exa_request_count": 0,
+        "brave_request_count": 1,
+        "market_results": [
+            {
+                "market_code": market,
+                "query": query,
+                "exa": {
+                    "result_count": len(exa_rows),
+                    "unique_domain_count": len(exa_domains),
+                    "results": exa_rows,
+                },
+                "brave": {
+                    "result_count": len(brave_rows),
+                    "unique_domain_count": len(brave_domains),
+                    "results": brave_rows,
+                },
+                "comparison": {
+                    "shared_url_count": len(exa_urls & brave_urls),
+                    "exa_unique_url_count": len(exa_urls - brave_urls),
+                    "brave_unique_url_count": len(brave_urls - exa_urls),
+                    "shared_domain_count": len(exa_domains & brave_domains),
+                    "exa_unique_domain_count": len(exa_domains - brave_domains),
+                    "brave_unique_domain_count": len(brave_domains - exa_domains),
+                },
+            }
+        ],
+        "automatic_query_activation": False,
+        "automatic_provider_activation": False,
+        "automatic_source_promotion": False,
+        "automatic_code_change": False,
+        "production_query_mutation": False,
+        "production_mutation": False,
+        "automatic_contact": False,
+        "automatic_bid": False,
+        "automatic_reservation": False,
+        "automatic_purchase": False,
+        "automatic_payment": False,
+    }
+
+
+def _merge_exact_lots(
+    primary: list[Mapping[str, Any]], fallback: list[Mapping[str, Any]]
+) -> list[dict[str, Any]]:
+    """Merge only already-verified rows; Exa/current rows win identity ties."""
+    merged: list[dict[str, Any]] = []
+    indexes: dict[str, int] = {}
+    for raw in [*primary, *fallback]:
+        row = dict(raw)
+        identity = _exact_lot_identity_key(row.get("final_url") or row.get("url"))
+        if not identity:
+            continue
+        existing_index = indexes.get(identity)
+        if existing_index is None:
+            indexes[identity] = len(merged)
+            merged.append(row)
+            continue
+        existing = merged[existing_index]
+        if _is_recovery_exact_lot(existing) and not _is_recovery_exact_lot(row):
+            merged[existing_index] = row
+    return merged
+
+
+def _fallback_failure_status(error: object) -> str:
+    folded = _compact(error).upper()
+    if any(
+        marker in folded
+        for marker in (
+            "PAID_BRAVE_BLOCKED",
+            "BRAVE_MANUAL_INCREMENTAL_BUDGET",
+            "COST_GUARD",
+        )
+    ):
+        return "SKIPPED_COST_GUARD"
+    if "HTTP 402" in folded or "USAGE LIMIT" in folded:
+        return "SKIPPED_PROVIDER_LIMIT"
+    return "FAILURE"
+
+
+def _live_page_validation_summary(
+    verification: Mapping[str, Any],
+    multihop: Mapping[str, Any],
+    *,
+    fallback_verification: Mapping[str, Any] | None = None,
+    fallback_multihop: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    verification_rows = [verification]
+    multihop_rows = [multihop]
+    if fallback_verification:
+        verification_rows.append(fallback_verification)
+    if fallback_multihop:
+        multihop_rows.append(fallback_multihop)
+    direct_attempted = sum(
+        int(
+            row.get("total_page_fetches_attempted")
+            or row.get("page_fetches_attempted")
+            or 0
+        )
+        for row in verification_rows
+    )
+    direct_succeeded = sum(
+        int(
+            row.get("total_page_fetches_succeeded")
+            or row.get("page_fetches_succeeded")
+            or 0
+        )
+        for row in verification_rows
+    )
+    navigation_attempted = sum(
+        int(row.get("navigation_page_fetches_attempted") or 0)
+        for row in multihop_rows
+    )
+    navigation_succeeded = sum(
+        int(row.get("navigation_page_fetches_succeeded") or 0)
+        for row in multihop_rows
+    )
+    return {
+        "required_before_exact_lot_counting": True,
+        "search_snippets_are_qualification_evidence": False,
+        "direct_page_fetches_attempted": direct_attempted,
+        "direct_page_fetches_succeeded": direct_succeeded,
+        "navigation_page_fetches_attempted": navigation_attempted,
+        "navigation_page_fetches_succeeded": navigation_succeeded,
+        "fetch_failed_page_count": sum(
+            int(row.get("fetch_failed_count") or 0) for row in verification_rows
+        ),
+        "unproven_page_count": sum(
+            int(row.get("unproven_page_count") or 0) for row in verification_rows
+        ),
     }
 
 
@@ -422,7 +643,19 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
     url = _compact(row.get("final_url") or row.get("url"))
     title = _compact(row.get("title")) or _title_from_url(url)
     origin = _compact(row.get("exact_lot_origin")) or "STRICT_EXACT_LOT"
+    row_provider = _compact(row.get("provider")).casefold()
+    search_provider = "BRAVE" if "brave" in row_provider else "EXA"
+    provider_label = "Brave" if search_provider == "BRAVE" else "Exa"
     evidence = row.get("evidence") or {}
+    resalg_listing = evidence.get("resalg_listing") or {}
+    if not isinstance(resalg_listing, Mapping):
+        resalg_listing = {}
+    resalg_current_bid = resalg_listing.get("current_bid") or {}
+    if not isinstance(resalg_current_bid, Mapping):
+        resalg_current_bid = {}
+    resalg_lot_container = resalg_listing.get("lot_container_quantity") or {}
+    if not isinstance(resalg_lot_container, Mapping):
+        resalg_lot_container = {}
     price_detected = evidence.get("price_evidence") is True
     quantity_detected = evidence.get("quantity_evidence") is True
     raw_price_candidates = evidence.get("source_native_price_candidates") or []
@@ -510,16 +743,21 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
     ]
     if values_normalized:
         confirmed_information.append("normalized source-native price and quantity values")
+    if resalg_current_bid:
+        confirmed_information.append("ReSalg current bid bound to listing Produkt-ID")
+    if resalg_listing.get("ends_at"):
+        confirmed_information.append("ReSalg auction deadline bound to listing Produkt-ID")
     return {
         "title": title,
         "scenario": "LARGE_LOT_SALE",
         "opportunity_state": CONFIRMED_SALE,
-        "reason": f"Exa {origin} passed the strict clothing Exact-Lot gate.",
+        "reason": f"{provider_label} {origin} passed the strict clothing Exact-Lot gate.",
         "page_role": ITEM_LISTING,
         "source_urls": [url],
         "canonical_urls": [url],
         "found_by_queries": [_compact(row.get("query"))] if _compact(row.get("query")) else [],
-        "source_providers": ["EXA"],
+        "source_providers": [search_provider],
+        "search_provider": search_provider,
         "evidence_signals": [
             "CLOTHING_INVENTORY",
             "ITEM_SPECIFIC_URL",
@@ -530,7 +768,7 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         ],
         "descriptions": [],
         "inventory_type": "BULK_CLOTHING_LOT",
-        "listing_status": ACTIVE,
+        "listing_status": resalg_listing.get("listing_status") or ACTIVE,
         "opportunity_identity": url,
         "identity_stable": True,
         "source_native_price_evidence_detected": price_detected,
@@ -544,6 +782,14 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
         "source_native_seller_identity_candidates": seller_identity_candidates,
         "source_native_fulfilment_candidates": fulfilment_candidates,
         "source_native_commercial_terms_capture_is_qualification_evidence": False,
+        "source_specific_enrichment": dict(resalg_listing) if resalg_listing else None,
+        "sale_mode": "AUCTION" if resalg_listing else None,
+        "current_bid": resalg_current_bid.get("amount"),
+        "currency": resalg_current_bid.get("currency"),
+        "auction_end_text": resalg_listing.get("ends_at"),
+        "lot_units": resalg_lot_container.get("amount"),
+        "lot_unit_type": resalg_lot_container.get("unit"),
+        "stock_location": resalg_listing.get("pickup_location"),
         "source_value_normalization_required": not values_normalized,
         "source_value_normalization": normalization,
         "verification": [
@@ -566,6 +812,15 @@ def _candidate_from_exact_lot(row: Mapping[str, Any], *, market: str) -> dict[st
                 "source_native_seller_identity_candidates": seller_identity_candidates,
                 "source_native_fulfilment_candidates": fulfilment_candidates,
                 "source_native_commercial_terms_capture_is_qualification_evidence": False,
+                "source_specific_enrichment": (
+                    dict(resalg_listing) if resalg_listing else None
+                ),
+                "current_bid": resalg_current_bid.get("amount"),
+                "currency": resalg_current_bid.get("currency"),
+                "auction_end_text": resalg_listing.get("ends_at"),
+                "lot_units": resalg_lot_container.get("amount"),
+                "lot_unit_type": resalg_lot_container.get("unit"),
+                "stock_location": resalg_listing.get("pickup_location"),
                 "verification_content_match": True,
                 "bounded_context": bounded_context,
                 "verified": True,
@@ -604,6 +859,8 @@ def build_checkpoint_result_from_exact_lots(
     hit_count: int,
     verification: Mapping[str, Any],
     multihop: Mapping[str, Any],
+    source_mode: str = EXA_SOURCE_MODE,
+    engine_version: str = EXA_ENGINE_VERSION,
 ) -> dict[str, Any]:
     candidates = [_candidate_from_exact_lot(row, market=market) for row in exact_lots]
     direct_rescue_count = sum(
@@ -617,7 +874,9 @@ def build_checkpoint_result_from_exact_lots(
         "domain": CLOTHING_INVENTORY,
         "market_code": market,
         "currency": MARKET_CURRENCIES[market],
-        "source_mode": "EXA_EXACT_LOT_MULTIHOP",
+        "source_mode": source_mode,
+        "engine_version": engine_version,
+        "provider_strategy": "EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK",
         "query_pack": "SIX_MARKET_EXACT_LOT_CONTROLLED_COMMERCIAL_ANCHORS_V1",
         "queries_submitted": query_count,
         "hits_received": hit_count,
@@ -676,6 +935,7 @@ def run_market(
     output_dir: Path,
     results_per_query: int,
     search_policy_memory: Mapping[str, Any] | None = None,
+    brave_api_key: str = "",
 ) -> dict[str, Any]:
     primary_query_plan, search_policy_challenge = build_market_query_plan(
         market=market,
@@ -689,10 +949,11 @@ def run_market(
         project_domain=CLOTHING_INVENTORY,
         max_queries=MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
     )
-    provider = ExaSearchProvider(exa_api_key)
+    exa_provider = ExaSearchProvider(exa_api_key)
     all_hits = []
     seen_urls: set[str] = set()
     query_rows: list[dict[str, Any]] = []
+    exa_search_errors: list[dict[str, str]] = []
 
     def collect(
         query: str,
@@ -709,15 +970,32 @@ def run_market(
             raise RuntimeError(f"query escaped clothing domain: {market}: {query}")
         if "site:" in query.casefold():
             raise RuntimeError(f"source-specific query is forbidden: {market}: {query}")
-        hits = list(provider.search(query, count=results_per_query))[:results_per_query]
+        search_error = ""
+        try:
+            hits = list(exa_provider.search(query, count=results_per_query))[:results_per_query]
+        except RuntimeError as exc:
+            hits = []
+            search_error = _compact(exc)[:500]
+            exa_search_errors.append(
+                {
+                    "query": query,
+                    "query_stage": stage,
+                    "error_type": type(exc).__name__,
+                    "error": search_error,
+                }
+            )
         row = {
             "query": query,
             "query_stage": stage,
+            "provider": "exa",
+            "status": "FAILURE" if search_error else "SUCCESS",
             "hits": [
                 {"title": hit.title, "url": hit.url, "description": hit.description}
                 for hit in hits
             ],
         }
+        if search_error:
+            row["error"] = search_error
         if stage == "COMMERCIAL_ANCHOR":
             row["commercial_anchor"] = {
                 "type": _compact(anchor_type),
@@ -824,28 +1102,204 @@ def run_market(
             )
         verification, multihop, exact_lots = evaluate()
 
-    final_snapshot = _fresh_coverage_snapshot(exact_lots)
+    exa_final_exact_lots = [dict(row) for row in exact_lots]
+    exa_final_snapshot = _fresh_coverage_snapshot(exa_final_exact_lots)
     anchor_outcome_evidence = _commercial_anchor_outcome_evidence(
         market=market,
         query_rows=query_rows,
         pre_anchor_exact_lots=pre_anchor_exact_lots,
-        final_exact_lots=exact_lots,
+        final_exact_lots=exa_final_exact_lots,
     )
+
+    fallback_reasons = _brave_fallback_reasons(
+        exa_final_snapshot,
+        exa_search_error_count=len(exa_search_errors),
+    )
+    fallback_required = bool(fallback_reasons)
+    fallback_triggered = False
+    fallback_status = "NOT_REQUIRED"
+    fallback_error = ""
+    fallback_query = MARKET_BRAVE_FALLBACK_QUERIES[market]
+    brave_hits: list[Any] = []
+    brave_raw_hit_count = 0
+    brave_verification: dict[str, Any] = {}
+    brave_multihop: dict[str, Any] = {}
+    brave_exact_lots: list[dict[str, Any]] = []
+    brave_logical_query_count = 0
+
+    if fallback_required and not _compact(brave_api_key):
+        fallback_status = "SKIPPED_NO_API_KEY"
+    elif fallback_required:
+        if not _market_anchored(fallback_query, market):
+            raise RuntimeError(f"fallback query not market anchored: {market}: {fallback_query}")
+        if classify_project_domain(text=fallback_query) != CLOTHING_INVENTORY:
+            raise RuntimeError(f"fallback query escaped clothing domain: {market}: {fallback_query}")
+        if "site:" in fallback_query.casefold():
+            raise RuntimeError(f"source-specific fallback query is forbidden: {market}: {fallback_query}")
+
+        fallback_triggered = True
+        brave_logical_query_count = 1
+        try:
+            require_provider_for_intent(BRAVE, VERIFIED_EXACT_LOT_FALLBACK)
+            brave_provider = BraveSearchProvider(
+                brave_api_key,
+                country=market,
+                extra_snippets=True,
+                max_retries=0,
+            )
+            raw_brave_hits = list(
+                brave_provider.search(
+                    fallback_query,
+                    count=min(results_per_query, BRAVE_FALLBACK_RESULTS_PER_QUERY),
+                )
+            )[:BRAVE_FALLBACK_RESULTS_PER_QUERY]
+            brave_raw_hit_count = len(raw_brave_hits)
+            for hit in raw_brave_hits:
+                identity = _exact_lot_identity_key(getattr(hit, "url", ""))
+                if not identity or identity in seen_urls:
+                    continue
+                seen_urls.add(identity)
+                brave_hits.append(hit)
+            fallback_status = "SUCCESS" if brave_hits else "VALID_ZERO_RESULT"
+        except RuntimeError as exc:
+            fallback_error = _compact(exc)[:500]
+            fallback_status = _fallback_failure_status(exc)
+
+        brave_query_row: dict[str, Any] = {
+            "query": fallback_query,
+            "query_stage": "BRAVE_VERIFIED_FALLBACK",
+            "provider": "brave",
+            "status": fallback_status,
+            "hits": [
+                {"title": hit.title, "url": hit.url, "description": hit.description}
+                for hit in brave_hits
+            ],
+        }
+        if fallback_error:
+            brave_query_row["error"] = fallback_error
+        query_rows.append(brave_query_row)
+
+        if fallback_status in {"SUCCESS", "VALID_ZERO_RESULT"}:
+            brave_benchmark = _hybrid_provider_benchmark(
+                market=market,
+                query=fallback_query,
+                exa_hits=list(all_hits),
+                brave_hits=brave_hits,
+            )
+            brave_verification = verify_provider_unique_pages(
+                brave_benchmark,
+                provider="brave",
+                max_page_fetches=min(
+                    BRAVE_FALLBACK_MAX_PAGE_FETCHES,
+                    max(1, len(brave_hits)),
+                ),
+            )
+            brave_multihop = resolve_exact_lot_multihop(
+                brave_verification,
+                max_root_parents=BRAVE_FALLBACK_MAX_ROOT_PARENTS,
+                max_navigation_depth=3,
+                max_links_per_page=12,
+                max_navigation_page_fetches=BRAVE_FALLBACK_MAX_NAVIGATION_FETCHES,
+            )
+            brave_exact_lots = _exact_lot_rows(brave_verification, brave_multihop)
+            for row in brave_exact_lots:
+                row["provider"] = "brave"
+                row.setdefault("retrieval_provenance", "DIRECT_SEARCH_RESULT")
+
+    exact_lots = _merge_exact_lots(exa_final_exact_lots, brave_exact_lots)
+    final_snapshot = _fresh_coverage_snapshot(exact_lots)
+    hybrid_used = fallback_status in {"SUCCESS", "VALID_ZERO_RESULT"}
+    source_mode = HYBRID_SOURCE_MODE if hybrid_used else EXA_SOURCE_MODE
+    engine_version = HYBRID_ENGINE_VERSION if hybrid_used else EXA_ENGINE_VERSION
+    combined_verification = dict(verification)
+    combined_verification["exact_lot_candidate_count"] = int(
+        verification.get("exact_lot_candidate_count") or 0
+    ) + int(brave_verification.get("exact_lot_candidate_count") or 0)
+    combined_multihop = dict(multihop)
+    combined_multihop["exact_lot_candidate_count"] = int(
+        multihop.get("exact_lot_candidate_count") or 0
+    ) + int(brave_multihop.get("exact_lot_candidate_count") or 0)
+    combined_multihop["gateway_page_count"] = int(
+        multihop.get("gateway_page_count") or 0
+    ) + int(brave_multihop.get("gateway_page_count") or 0)
 
     result = build_checkpoint_result_from_exact_lots(
         exact_lots,
         market=market,
         query_count=len(query_rows),
         hit_count=sum(len(row["hits"]) for row in query_rows),
-        verification=verification,
-        multihop=multihop,
+        verification=combined_verification,
+        multihop=combined_multihop,
+        source_mode=source_mode,
+        engine_version=engine_version,
     )
     report = result["search_run_report"]
+    successful_query_statuses = {"SUCCESS", "VALID_ZERO_RESULT"}
+    successful_query_count = sum(
+        _compact(row.get("status")).upper() in successful_query_statuses
+        for row in query_rows
+    )
+    failed_or_skipped_query_count = len(query_rows) - successful_query_count
+    if successful_query_count == 0:
+        report["status"] = "FAILURE"
+        report["execution_status"] = "FAIL"
+        retrieval_status = "FAILURE"
+    elif failed_or_skipped_query_count:
+        retrieval_status = "PARTIAL_SUCCESS"
+    else:
+        retrieval_status = "SUCCESS"
+    report["retrieval_status"] = retrieval_status
+    report["successful_query_count"] = successful_query_count
+    report["failed_or_skipped_query_count"] = failed_or_skipped_query_count
     report["fresh_recall_trigger_version"] = "FRESH_RECALL_TRIGGER_V1"
     report["fresh_recall_min_current_exact_lots"] = FRESH_RECALL_MIN_CURRENT_EXACT_LOTS
     report["fresh_recall_min_current_route_hosts"] = FRESH_RECALL_MIN_CURRENT_ROUTE_HOSTS
     report["primary_query_count"] = len(primary_queries)
     report["search_policy_query_challenge"] = search_policy_challenge
+    report["provider_strategy"] = "EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK"
+    report["primary_search_provider"] = "EXA"
+    report["providers_supported"] = ["EXA", "BRAVE"]
+    report["providers_available"] = ["EXA"] + (
+        ["BRAVE"] if _compact(brave_api_key) else []
+    )
+    report["providers_used"] = ["EXA"] + (["BRAVE"] if hybrid_used else [])
+    report["exa_query_count"] = sum(
+        row.get("provider") == "exa" for row in query_rows
+    )
+    report["exa_search_error_count"] = len(exa_search_errors)
+    report["exa_search_errors"] = exa_search_errors
+    report["brave_fallback_required"] = fallback_required
+    report["brave_fallback_available"] = bool(_compact(brave_api_key))
+    report["brave_fallback_triggered"] = fallback_triggered
+    report["brave_fallback_status"] = fallback_status
+    report["brave_fallback_trigger_reasons"] = fallback_reasons
+    report["brave_fallback_max_queries_per_market"] = (
+        BRAVE_FALLBACK_MAX_QUERIES_PER_MARKET
+    )
+    report["brave_fallback_max_outbound_attempts_per_market"] = (
+        BRAVE_FALLBACK_MAX_OUTBOUND_ATTEMPTS_PER_MARKET
+    )
+    report["brave_fallback_query_count"] = brave_logical_query_count
+    report["brave_fallback_raw_hits_received"] = brave_raw_hit_count
+    report["brave_fallback_hits_received"] = len(brave_hits)
+    report["brave_fallback_duplicate_hits_excluded"] = max(
+        0, brave_raw_hit_count - len(brave_hits)
+    )
+    report["exa_strict_exact_lot_count"] = len(exa_final_exact_lots)
+    report["brave_fallback_verified_exact_lot_count"] = len(brave_exact_lots)
+    report["brave_fallback_added_strict_exact_lot_count"] = max(
+        0, len(exact_lots) - len(exa_final_exact_lots)
+    )
+    report["brave_fallback_error"] = fallback_error or None
+    report["exact_lots_counted_only_after_live_page_verification"] = True
+    report["live_page_validation"] = _live_page_validation_summary(
+        verification,
+        multihop,
+        fallback_verification=brave_verification,
+        fallback_multihop=brave_multihop,
+    )
+    report["direct_source_adapters_remain_checkpoint_inputs"] = True
+    report["country_specific_search_bypass_created"] = False
     report["primary_strict_exact_lot_count"] = primary_strict_exact_lot_count
     report["primary_fresh_current_strict_exact_lot_count"] = (
         primary_fresh_current_strict_exact_lot_count
@@ -892,7 +1346,9 @@ def run_market(
     report["commercial_anchor_pre_fresh_current_route_host_count"] = int(
         post_recall_snapshot["fresh_current_route_host_count"]
     )
-    report["commercial_anchor_added_exact_lot_count"] = max(0, len(exact_lots) - anchor_pre_count)
+    report["commercial_anchor_added_exact_lot_count"] = max(
+        0, len(exa_final_exact_lots) - anchor_pre_count
+    )
     report["commercial_anchor_outcome_count"] = anchor_outcome_evidence["outcome_count"]
     report["commercial_anchor_successful_outcome_count"] = anchor_outcome_evidence[
         "successful_outcome_count"
@@ -902,6 +1358,12 @@ def run_market(
     ]
     report["commercial_anchor_is_qualification_evidence"] = False
     report["commercial_anchor_max_queries_per_market"] = MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET
+    report["exa_final_fresh_current_strict_exact_lot_count"] = int(
+        exa_final_snapshot["fresh_current_strict_exact_lot_count"]
+    )
+    report["exa_final_fresh_current_route_host_count"] = int(
+        exa_final_snapshot["fresh_current_route_host_count"]
+    )
     report["final_fresh_current_strict_exact_lot_count"] = int(
         final_snapshot["fresh_current_strict_exact_lot_count"]
     )
@@ -920,11 +1382,15 @@ def run_market(
     _write_json(
         output_dir / "exa-exact-lot-resolution.json",
         {
-            "schema_version": "exa-exact-lot-checkpoint-resolution-1.8",
+            "schema_version": "exa-exact-lot-checkpoint-resolution-1.9",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "market": market,
             "project_domain": CLOTHING_INVENTORY,
-            "provider": "exa",
+            "provider": "exa-primary-brave-fallback" if hybrid_used else "exa",
+            "provider_strategy": "EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK",
+            "providers_used": report["providers_used"],
+            "source_mode": source_mode,
+            "engine_version": engine_version,
             "queries": query_rows,
             "search_policy_query_challenge": search_policy_challenge,
             "adaptive_zero_yield_recall": {
@@ -959,17 +1425,45 @@ def run_market(
                 "max_queries_per_market": MAX_COMMERCIAL_ANCHOR_QUERIES_PER_MARKET,
                 "query_count": len(anchor_queries) if anchor_expansion_triggered else 0,
                 "pre_anchor_strict_exact_lot_count": anchor_pre_count,
-                "added_exact_lot_count": max(0, len(exact_lots) - anchor_pre_count),
-                "final_strict_exact_lot_count": len(exact_lots),
+                "added_exact_lot_count": max(
+                    0, len(exa_final_exact_lots) - anchor_pre_count
+                ),
+                "final_strict_exact_lot_count": len(exa_final_exact_lots),
                 "final_fresh_current_exact_lot_count": int(
-                    final_snapshot["fresh_current_strict_exact_lot_count"]
+                    exa_final_snapshot["fresh_current_strict_exact_lot_count"]
                 ),
                 "final_fresh_current_route_host_count": int(
-                    final_snapshot["fresh_current_route_host_count"]
+                    exa_final_snapshot["fresh_current_route_host_count"]
                 ),
                 "anchor_is_qualification_evidence": False,
             },
             "commercial_anchor_outcome_evidence": anchor_outcome_evidence,
+            "brave_verified_fallback": {
+                "required": fallback_required,
+                "available": bool(_compact(brave_api_key)),
+                "triggered": fallback_triggered,
+                "status": fallback_status,
+                "trigger_reasons": fallback_reasons,
+                "query": fallback_query if fallback_required else None,
+                "max_queries_per_market": BRAVE_FALLBACK_MAX_QUERIES_PER_MARKET,
+                "max_outbound_attempts_per_market": (
+                    BRAVE_FALLBACK_MAX_OUTBOUND_ATTEMPTS_PER_MARKET
+                ),
+                "query_count": brave_logical_query_count,
+                "raw_hits_received": brave_raw_hit_count,
+                "hits_received": len(brave_hits),
+                "duplicate_hits_excluded": max(
+                    0, brave_raw_hit_count - len(brave_hits)
+                ),
+                "verified_exact_lot_count": len(brave_exact_lots),
+                "added_strict_exact_lot_count": report[
+                    "brave_fallback_added_strict_exact_lot_count"
+                ],
+                "error": fallback_error or None,
+                "verification": brave_verification,
+                "multihop": brave_multihop,
+            },
+            "live_page_validation": report["live_page_validation"],
             "direct_strict_evidence_rescue": {
                 "rule": DIRECT_STRICT_EVIDENCE_RESCUE,
                 "count": len(direct_rescue_urls),
@@ -986,6 +1480,7 @@ def run_market(
             ],
             "production_mutation": False,
             "automatic_provider_activation": False,
+            "country_specific_search_bypass_created": False,
         },
     )
     return result
@@ -1014,6 +1509,7 @@ def main() -> int:
     if args.persist_unified and not _compact(args.database_url):
         raise SystemExit("--database-url is required with --persist-unified")
     exa_api_key = _compact(os.environ.get("EXA_API_KEY"))
+    brave_api_key = _compact(os.environ.get("BRAVE_SEARCH_API_KEY"))
     if not exa_api_key:
         raise SystemExit("EXA_API_KEY is required")
 
@@ -1033,6 +1529,7 @@ def main() -> int:
         output_dir=output_dir,
         results_per_query=args.results_per_query,
         search_policy_memory=search_policy_memory,
+        brave_api_key=brave_api_key,
     )
     paths = write_discovery_artifacts(result, output_dir)
     unified_path = write_unified_opportunity_report(

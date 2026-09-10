@@ -144,7 +144,13 @@ def reconcile_unified_search_truth(
             continue
 
         hits = _int(search.get("hits_received"))
-        exa_exact = _int(search.get("strict_exact_lot_count"))
+        unified_exact = _int(search.get("strict_exact_lot_count"))
+        exa_exact = _int(
+            search.get("exa_strict_exact_lot_count")
+            if search.get("exa_strict_exact_lot_count") is not None
+            else unified_exact
+        )
+        brave_exact = _int(search.get("brave_fallback_verified_exact_lot_count"))
         stages = _stage_index(market)
         discovery = stages.get("DISCOVERY")
         exact_stage = stages.get("EXACT_LOT_VERIFICATION")
@@ -155,7 +161,7 @@ def reconcile_unified_search_truth(
             continue
 
         existing_exact = _int(exact_stage.get("verified_active_exact_lot_count"))
-        effective_exact = max(existing_exact, exa_exact)
+        effective_exact = max(existing_exact, unified_exact)
         source_failures = _source_failure_count(discovery)
         qualification_count = _int(qualification.get("qualification_count"))
         financial_ready = _int(qualification.get("financial_decision_ready_count"))
@@ -165,6 +171,8 @@ def reconcile_unified_search_truth(
             "search_status": search_status,
             "hits_received": hits,
             "exa_exact_lot_count": exa_exact,
+            "brave_fallback_exact_lot_count": brave_exact,
+            "unified_exact_lot_count": unified_exact,
             "effective_exact_lot_count": effective_exact,
             "source_failure_count_preserved": source_failures,
             "stage_changes": [],
@@ -192,8 +200,17 @@ def reconcile_unified_search_truth(
         )
         exact_stage["verified_active_exact_lot_count"] = effective_exact
         exact_stage["exa_verified_exact_lot_count"] = exa_exact
+        exact_stage["brave_fallback_verified_exact_lot_count"] = brave_exact
+        exact_stage["unified_verified_exact_lot_count"] = unified_exact
         exact_stage["capability_implemented"] = True
-        exact_stage["engine_version"] = "UNIFIED_EXA_EXACT_LOT_MULTIHOP_V1"
+        exact_stage["engine_version"] = search.get("engine_version") or (
+            "UNIFIED_EXA_EXACT_LOT_MULTIHOP_V1"
+        )
+        exact_stage["provider_strategy"] = search.get("provider_strategy") or (
+            "EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK"
+        )
+        exact_stage["brave_fallback_status"] = search.get("brave_fallback_status")
+        exact_stage["live_page_validation"] = search.get("live_page_validation") or {}
 
         old_qualification = _compact(qualification.get("status")).upper() or "UNKNOWN"
         if effective_exact > 0 and not financial_ready and not qualification_count:
@@ -261,7 +278,11 @@ def reconcile_unified_search_truth(
         decision["unified_search_hits"] = hits
 
         market["search_truth_reconciled"] = True
-        market["unified_search_provider"] = "exa"
+        market["unified_search_provider"] = search.get("provider") or "exa"
+        market["primary_search_provider"] = "exa"
+        market["unified_search_provider_strategy"] = search.get(
+            "provider_strategy"
+        ) or "EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK"
         market["country_specific_search_path"] = False
         changes.append(market_changes)
 

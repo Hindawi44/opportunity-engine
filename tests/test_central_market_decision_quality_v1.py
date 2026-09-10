@@ -29,6 +29,23 @@ def _card(case_id: str, title: str, case_type: str = "DIRECT_OPPORTUNITY") -> di
     }
 
 
+def _canonical_card(
+    case_id: str,
+    title: str,
+    identity: str,
+    case_type: str = "DIRECT_OPPORTUNITY",
+) -> dict:
+    card = _card(case_id, title, case_type)
+    card.update(
+        {
+            "opportunity_identity": identity,
+            "workflow_status": "ACTIONABLE",
+            "canonical_opportunity_identities": [identity],
+        }
+    )
+    return card
+
+
 def _brief(top: dict) -> dict:
     return {
         "status": "SUCCESS",
@@ -99,6 +116,53 @@ def test_below_market_candidate_outranks_first_above_market_candidate() -> None:
     assert action["action_type"] == "VERIFY_LANDED_COST_FOR_BELOW_MARKET_OPPORTUNITY"
     assert action["target_id"] == "case:second"
     assert result["today_snapshot"]["market_decision_quality"] == "BENCHMARK_APPLIED"
+
+
+def test_checkpoint_choice_is_enriched_but_never_replaced_by_market_reranking() -> None:
+    chosen = _canonical_card(
+        "case:wigstad",
+        "Wigstad 50 fleece garments",
+        "no:auction:wigstad-50",
+        "AUCTION_INVENTORY",
+    )
+    rival = _canonical_card(
+        "case:boots",
+        "10 pairs of boots",
+        "no:listing:boots-10",
+        "B2B_INVENTORY",
+    )
+    brief = _brief(chosen)
+    brief["checkpoint_preferred_opportunity_identity"] = "no:auction:wigstad-50"
+    brief["top_actionable_opportunity"].update(
+        {
+            "opportunity_identity": "no:auction:wigstad-50",
+            "workflow_status": "ACTIONABLE",
+            "canonical_opportunity_identities": ["no:auction:wigstad-50"],
+        }
+    )
+    comparables = {
+        "status": "SUCCESS",
+        "target_benchmarks": [
+            _benchmark("case:wigstad", "ABOVE_MARKET"),
+            _benchmark("case:boots", "CLEARLY_BELOW_MARKET"),
+        ],
+    }
+
+    result = apply_market_benchmark_to_brief(
+        brief,
+        {"actionable_now": [chosen, rival]},
+        comparables,
+    )
+
+    selected = result["top_actionable_opportunity"]
+    action = result["primary_human_action"]
+    assert selected["case_id"] == "case:wigstad"
+    assert selected["opportunity_identity"] == "no:auction:wigstad-50"
+    assert selected["market_benchmark"]["benchmark_classification"] == "ABOVE_MARKET"
+    assert selected["selection_basis"] == "CHECKPOINT_CANONICAL_SELECTION_WITH_MARKET_COMPARABLES"
+    assert action["target_id"] == "case:wigstad"
+    assert action["opportunity_identity"] == "no:auction:wigstad-50"
+    assert result["decision_quality_policy"] == "CHECKPOINT_CANONICAL_SELECTION_THEN_MARKET_ENRICHMENT"
 
 
 def test_existing_actionability_order_is_preserved_without_benchmark_evidence() -> None:

@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 from collections import Counter
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Mapping
 from urllib.parse import urlsplit
 
 from opportunity_engine.discovery.keyword_shadow_verification import (
@@ -27,6 +27,9 @@ from opportunity_engine.discovery.source_native_commercial_terms_capture import 
 )
 from opportunity_engine.discovery.source_native_value_normalization import (
     capture_source_native_price_basis_candidates,
+)
+from opportunity_engine.discovery.resalg_listing_enrichment import (
+    parse_resalg_listing,
 )
 from opportunity_engine.project_domain_boundary import (
     CLOTHING_INVENTORY,
@@ -437,7 +440,13 @@ def _looks_item_specific_url(url: str) -> bool:
     return bool(_ITEM_PATH_RE.search(path))
 
 
-def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[str, Any]]:
+def _classify_page(
+    *,
+    title: str,
+    text: str,
+    url: str = "",
+    raw_html: str = "",
+) -> tuple[str, dict[str, Any]]:
     combined_raw = f"{_compact(title)} {_compact(text)}"
     combined = combined_raw.casefold()
     has_inventory = _contains_any(combined, _INVENTORY_MARKERS)
@@ -451,6 +460,19 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
     project_domain = classify_project_domain(text=combined_raw)
     domain_evidence = project_domain == CLOTHING_INVENTORY
     commercial_terms_capture = capture_source_native_commercial_terms(combined_raw)
+    resalg_listing = parse_resalg_listing(url=url, html=raw_html)
+    if resalg_listing:
+        current_bid = resalg_listing.get("current_bid")
+        lot_container = resalg_listing.get("lot_container_quantity")
+        source_auction = bool(
+            resalg_listing.get("listing_id")
+            and isinstance(current_bid, Mapping)
+        )
+        has_inventory = bool(has_inventory or isinstance(lot_container, Mapping))
+        has_direct_sale = bool(has_direct_sale or source_auction)
+        has_price = bool(has_price or isinstance(current_bid, Mapping))
+        has_quantity = bool(has_quantity or isinstance(lot_container, Mapping))
+        item_specific_url = bool(item_specific_url or resalg_listing.get("listing_id"))
 
     evidence: dict[str, Any] = {
         "inventory_evidence": has_inventory,
@@ -479,7 +501,27 @@ def _classify_page(*, title: str, text: str, url: str = "") -> tuple[str, dict[s
         "project_domain": project_domain,
         "domain_evidence": domain_evidence,
         "required_project_domain": CLOTHING_INVENTORY,
+        "resalg_listing": resalg_listing,
     }
+    if resalg_listing:
+        current_bid = resalg_listing.get("current_bid")
+        lot_container = resalg_listing.get("lot_container_quantity")
+        if isinstance(current_bid, Mapping):
+            amount = _compact(current_bid.get("amount_decimal"))
+            evidence["source_native_price_candidates"] = [f"{amount} NOK"]
+        if isinstance(lot_container, Mapping):
+            evidence["source_native_quantity_candidates"] = [
+                f"{lot_container.get('amount')} Palle konteiner"
+            ]
+        evidence["source_listing_status"] = resalg_listing.get("listing_status")
+        evidence["auction_end_at"] = resalg_listing.get("ends_at")
+        evidence["source_current_bid"] = current_bid
+        evidence["source_bid_count"] = resalg_listing.get("bid_count")
+
+        # A page can remain publicly readable after its own auction deadline.
+        # Keep it as evidence, but never route it into the active Exact-Lot lane.
+        if resalg_listing.get("listing_status") == "ENDED":
+            return UNPROVEN_PAGE, evidence
 
     exact_shape = (
         has_inventory
@@ -633,6 +675,7 @@ def verify_exa_unique_pages(
             title=fetched.title or candidate["title"],
             text=fetched.text,
             url=fetched.final_url or candidate["url"],
+            raw_html=fetched.raw_html,
         )
         verified_pages.append(
             {

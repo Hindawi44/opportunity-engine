@@ -64,16 +64,25 @@ def _safety_ok(payload: Mapping[str, Any]) -> bool:
 
 def _clothing_provenance_assessment(report: Mapping[str, Any]) -> dict[str, Any]:
     total = int(report.get("strict_exact_lot_count") or 0)
+    current_field = (
+        "current_web_discovery_strict_exact_lot_count"
+        if "current_web_discovery_strict_exact_lot_count" in report
+        else "current_exa_discovery_strict_exact_lot_count"
+    )
     separated = (
-        "current_exa_discovery_strict_exact_lot_count" in report
+        current_field in report
         and "freshly_reverified_recovery_exact_lot_count" in report
     )
-    current = int(report.get("current_exa_discovery_strict_exact_lot_count") or 0)
+    current = int(report.get(current_field) or 0)
+    current_exa = int(
+        report.get("current_exa_discovery_strict_exact_lot_count") or 0
+    )
     recovery = int(report.get("freshly_reverified_recovery_exact_lot_count") or 0)
     consistent = separated and current >= 0 and recovery >= 0 and current + recovery == total
     return {
         "strict_exact_lot_count": total,
-        "current_exa_discovery_strict_exact_lot_count": current,
+        "current_exa_discovery_strict_exact_lot_count": current_exa,
+        "current_web_discovery_strict_exact_lot_count": current,
         "freshly_reverified_recovery_exact_lot_count": recovery,
         "provenance_separated": separated,
         "provenance_counts_consistent": consistent,
@@ -263,7 +272,11 @@ def evaluate_search_maturity(
             report.get("status") == "SUCCESS"
             and report.get("execution_status") == "PASS"
             and report.get("domain") == "CLOTHING_INVENTORY"
-            and report.get("source_mode") == "EXA_EXACT_LOT_MULTIHOP"
+            and report.get("source_mode")
+            in {
+                "EXA_EXACT_LOT_MULTIHOP",
+                "EXA_PRIMARY_BRAVE_FALLBACK_MULTIHOP",
+            }
             and strict_count > 0
             and provenance["provenance_separated"] is True
             and provenance["provenance_counts_consistent"] is True
@@ -300,7 +313,11 @@ def evaluate_search_maturity(
             row.get("status") == "SUCCESS"
             and report.get("status") == "SUCCESS"
             and report.get("domain") == "CLOTHING_INVENTORY"
-            and report.get("source_mode") == "EXA_EXACT_LOT_MULTIHOP"
+            and report.get("source_mode")
+            in {
+                "EXA_EXACT_LOT_MULTIHOP",
+                "EXA_PRIMARY_BRAVE_FALLBACK_MULTIHOP",
+            }
             and strict_count > 0
             and provenance["provenance_separated"] is True
             and provenance["provenance_counts_consistent"] is True

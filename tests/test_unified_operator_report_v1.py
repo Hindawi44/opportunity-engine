@@ -46,6 +46,8 @@ def _inputs(root: Path) -> None:
             "source_execution_counts": {"SUCCESS": 4, "VALID_ZERO_RESULT": 2},
             "status_counts": {"ACTIVE": 1, "HISTORICAL": 3, "UNRESOLVED": 0},
             "top5_eligible_count": 1,
+            "analysis_eligible_count": 0,
+            "lifecycle": {"stage_counts": {"QUALIFIED_OPPORTUNITY": 0}},
             "deduplicated_opportunities": [
                 {"opportunity_id": "one", "market_code": "NO", "top5_eligible": True},
                 {"opportunity_id": "two", "market_code": "NO", "top5_eligible": False},
@@ -99,6 +101,9 @@ def test_report_uses_one_central_action_and_six_market_truth(tmp_path: Path) -> 
     assert report["commercial_checkpoint_gap_markets"] == ["SE", "DE", "FR", "IT", "NL"]
     assert report["unconnected_verified_exact_lot_count"] == 25
     assert report["legacy_reports_are_not_operator_authority"] is True
+    assert report["ranking_eligible_count"] == 1
+    assert report["analysis_eligible_count"] == 0
+    assert report["commercially_qualified_count"] == 0
 
     text = render_unified_operator_report(report)
     assert text.count("الإجراء البشري الوحيد:") == 1
@@ -108,6 +113,9 @@ def test_report_uses_one_central_action_and_six_market_truth(tmp_path: Path) -> 
     assert "مرشح البحث FR: https://example.test/fr/leader" in text
     assert "LEGACY_ACTION" not in text
     assert "DOMAIN_ACTION" not in text
+    assert "قابل للدخول في ترتيب Top 5 1" in text
+    assert "مؤهل لقرار تجاري نهائي 0" in text
+    assert "Top 5 مؤهل" not in text
 
 
 def test_top5_gives_each_eligible_market_a_slot_before_duplicates(tmp_path: Path) -> None:

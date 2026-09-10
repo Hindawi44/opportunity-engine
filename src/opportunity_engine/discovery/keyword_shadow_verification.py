@@ -60,6 +60,10 @@ class PageFetchResult:
     text: str
     error: str | None = None
     truncated: bool = False
+    # Bounded source HTML is retained in memory for source-specific parsers that
+    # need structured attributes or script values absent from visible text. It
+    # is never copied wholesale into operator artifacts.
+    raw_html: str = ""
 
 
 class _VisibleTextParser(HTMLParser):
@@ -119,10 +123,10 @@ def _public_https_url(raw_url: str) -> bool:
     )
 
 
-def _parse_html(body: bytes, encoding: str | None) -> tuple[str, str]:
+def _decode_html(body: bytes, encoding: str | None) -> str:
     requested_encoding = str(encoding or "utf-8").strip() or "utf-8"
     try:
-        text = body.decode(requested_encoding, errors="replace")
+        return body.decode(requested_encoding, errors="replace")
     except LookupError:
         # Some legacy sites incorrectly expose a database collation such as
         # `latin1_general_ci` as the HTTP/HTML charset. Treat a latin1-prefixed
@@ -132,7 +136,11 @@ def _parse_html(body: bytes, encoding: str | None) -> tuple[str, str]:
             if requested_encoding.casefold().startswith(("latin1", "latin-1"))
             else "utf-8"
         )
-        text = body.decode(fallback_encoding, errors="replace")
+        return body.decode(fallback_encoding, errors="replace")
+
+
+def _parse_html(body: bytes, encoding: str | None) -> tuple[str, str]:
+    text = _decode_html(body, encoding)
     parser = _VisibleTextParser()
     parser.feed(text)
     title = " ".join(parser.title_parts).strip()
@@ -217,6 +225,7 @@ def fetch_public_page(url: str) -> PageFetchResult:
                 total += len(chunk)
             body = b"".join(chunks)
             title, text = _parse_html(body, response.encoding)
+            raw_html = _decode_html(body, response.encoding)
             if not text:
                 return PageFetchResult(
                     requested_url=requested,
@@ -237,6 +246,7 @@ def fetch_public_page(url: str) -> PageFetchResult:
                 text=text,
                 error=None,
                 truncated=truncated,
+                raw_html=raw_html,
             )
     except requests.RequestException as exc:
         return PageFetchResult(

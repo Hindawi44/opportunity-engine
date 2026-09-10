@@ -1,8 +1,9 @@
-"""Unify live Exa search truth across all six markets and both project domains.
+"""Unify live search truth across all six markets and both project domains.
 
 This migration hook removes the operational gap between the legacy NO/SE/DE
-checkpoint and the FR/IT/NL expansion cycles. It also adds a generic Exa fabric
-procurement search for FR/IT/NL without adding hard-coded supplier domains.
+checkpoint and the FR/IT/NL expansion cycles. Clothing uses Exa first with one
+bounded, verified Brave fallback when fresh coverage is weak. Fabric procurement
+continues to use generic Exa search without hard-coded supplier domains.
 
 Safety remains read-only: no query/source promotion, contact, bid, reservation,
 purchase, or payment is enabled.
@@ -141,12 +142,18 @@ def _merge_cycle_exact_truth(
     if _compact(report.get("status")).upper() != "SUCCESS":
         return
 
-    exa_count = int(report.get("strict_exact_lot_count") or 0)
+    unified_count = int(report.get("strict_exact_lot_count") or 0)
+    exa_count = int(
+        report.get("exa_strict_exact_lot_count")
+        if report.get("exa_strict_exact_lot_count") is not None
+        else unified_count
+    )
+    brave_count = int(report.get("brave_fallback_verified_exact_lot_count") or 0)
     existing = cycle.get("exact_lot_verification") or {}
     if not isinstance(existing, Mapping):
         existing = {}
     existing_count = int(existing.get("verified_active_exact_lot_lead_count") or 0)
-    combined_count = max(existing_count, exa_count)
+    combined_count = max(existing_count, unified_count)
     existing_urls = {
         _compact(url)
         for url in existing.get("verified_exact_lot_urls") or []
@@ -160,21 +167,28 @@ def _merge_cycle_exact_truth(
 
     cycle["discovery_status"] = "SUCCESS"
     cycle["discovery_accepted_signal_count"] = max(
-        int(cycle.get("discovery_accepted_signal_count") or 0), exa_count
+        int(cycle.get("discovery_accepted_signal_count") or 0), unified_count
     )
     cycle["exact_lot_verification"] = {
         **dict(existing),
-        "engine_version": "UNIFIED_EXA_EXACT_LOT_MULTIHOP_V1",
+        "engine_version": report.get("engine_version")
+        or "UNIFIED_EXA_EXACT_LOT_MULTIHOP_V1",
         "status": "SUCCESS" if combined_count else "VALID_ZERO",
         "candidate_lead_count": max(
-            int(existing.get("candidate_lead_count") or 0), exa_count
+            int(existing.get("candidate_lead_count") or 0), unified_count
         ),
         "source_page_verified_count": max(existing_verified_pages, exa_verified_pages),
         "verified_active_exact_lot_lead_count": combined_count,
         "verified_exact_lot_urls": combined_urls,
         "exa_verified_active_exact_lot_count": exa_count,
+        "brave_fallback_verified_active_exact_lot_count": brave_count,
+        "unified_verified_active_exact_lot_count": unified_count,
         "exa_source_mode": report.get("source_mode"),
         "exa_query_pack": report.get("query_pack"),
+        "provider_strategy": report.get("provider_strategy"),
+        "providers_used": report.get("providers_used") or ["EXA"],
+        "brave_fallback_status": report.get("brave_fallback_status"),
+        "live_page_validation": report.get("live_page_validation"),
     }
     cycle["exact_lot_verification_status"] = cycle["exact_lot_verification"]["status"]
     cycle["primary_search_provider"] = "exa"
@@ -186,12 +200,16 @@ def _merge_cycle_exact_truth(
 
 def _run_expansion_clothing_exa() -> None:
     api_key = _compact(os.environ.get("EXA_API_KEY"))
+    brave_api_key = _compact(os.environ.get("BRAVE_SEARCH_API_KEY"))
     output_dir = _output_dir()
     input_root = _input_root()
     status: dict[str, Any] = {
-        "schema_version": "unified-six-market-exa-runtime-1.0",
+        "schema_version": "unified-six-market-search-runtime-1.1",
         "generated_at": _now(),
         "project_domain": CLOTHING_INVENTORY,
+        "provider_strategy": "EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK",
+        "primary_provider": "exa",
+        "brave_fallback_available": bool(brave_api_key),
         "markets": {},
         **_safety(),
     }
@@ -214,6 +232,7 @@ def _run_expansion_clothing_exa() -> None:
                 exa_api_key=api_key,
                 output_dir=source_dir,
                 results_per_query=FABRIC_RESULTS_PER_MARKET,
+                brave_api_key=brave_api_key,
             )
             paths = runner.write_discovery_artifacts(result, source_dir)
             unified_path = runner.write_unified_opportunity_report(
@@ -237,6 +256,9 @@ def _run_expansion_clothing_exa() -> None:
                 "hits_received": report.get("hits_received", 0),
                 "strict_exact_lot_count": report.get("strict_exact_lot_count", 0),
                 "exact_lot_urls": urls,
+                "provider_strategy": report.get("provider_strategy"),
+                "providers_used": report.get("providers_used") or ["EXA"],
+                "brave_fallback_status": report.get("brave_fallback_status"),
             }
         except Exception as exc:  # keep legacy market cycle available on retrieval errors
             status["markets"][market] = {
@@ -443,17 +465,37 @@ def _clothing_runtime(input_root: Path) -> dict[str, Any]:
         source_dir = input_root / f"{market.casefold()}-exa-exact-lot"
         report = _load_json(source_dir / "search-run-report.json")
         resolution = _load_json(source_dir / "exa-exact-lot-resolution.json")
+        providers_used = report.get("providers_used") or ["EXA"]
         markets[market] = {
             "status": report.get("status") or "NOT_RUN",
-            "provider": "exa",
+            "provider": "exa+brave" if "BRAVE" in providers_used else "exa",
+            "primary_provider": "exa",
+            "provider_strategy": report.get("provider_strategy")
+            or "EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK",
+            "providers_used": providers_used,
             "hits_received": int(report.get("hits_received") or 0),
             "strict_exact_lot_count": int(report.get("strict_exact_lot_count") or 0),
+            "exa_strict_exact_lot_count": int(
+                report.get("exa_strict_exact_lot_count")
+                if report.get("exa_strict_exact_lot_count") is not None
+                else report.get("strict_exact_lot_count") or 0
+            ),
+            "brave_fallback_verified_exact_lot_count": int(
+                report.get("brave_fallback_verified_exact_lot_count") or 0
+            ),
+            "brave_fallback_status": report.get("brave_fallback_status")
+            or "NOT_REPORTED",
+            "live_page_validation": report.get("live_page_validation") or {},
             "exact_lot_urls": resolution.get("strict_exact_lot_urls") or [],
             "source_mode": report.get("source_mode"),
+            "engine_version": report.get("engine_version")
+            or "UNIFIED_EXA_EXACT_LOT_MULTIHOP_V1",
         }
     return {
         "project_domain": CLOTHING_INVENTORY,
-        "provider": "exa",
+        "provider": "exa-primary-brave-fallback",
+        "primary_provider": "exa",
+        "provider_strategy": "EXA_PRIMARY_BRAVE_VERIFIED_FALLBACK",
         "market_coverage": list(SIX_MARKETS),
         "markets": markets,
         **_safety(),
@@ -516,13 +558,19 @@ def _append_unified_runtime(
 
     summary_path = output_dir / UNIFIED_PHONE_SUMMARY_FILENAME
     base = summary_path.read_text(encoding="utf-8").rstrip() if summary_path.exists() else ""
-    lines = [base, "", "بحث Exa الموحد — CLOTHING_INVENTORY"]
+    lines = [
+        base,
+        "",
+        "بحث الويب الموحد — CLOTHING_INVENTORY (Exa أولًا + Brave fallback عند الضعف)",
+    ]
     clothing_markets = clothing.get("markets") or {}
     for market in SIX_MARKETS:
         row = clothing_markets.get(market) or {}
         lines.append(
             f"{market}: {row.get('status')} | hits={row.get('hits_received', 0)} | "
-            f"Exact-Lots={row.get('strict_exact_lot_count', 0)}"
+            f"Exact-Lots={row.get('strict_exact_lot_count', 0)} | "
+            f"providers={','.join(row.get('providers_used') or ['EXA'])} | "
+            f"fallback={row.get('brave_fallback_status', 'NOT_REPORTED')}"
         )
     lines.extend(["", "بحث Exa الموحد — FABRIC_PROCUREMENT"])
     fabric_markets = fabric.get("markets") or {}
