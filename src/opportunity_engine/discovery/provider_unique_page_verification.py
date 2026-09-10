@@ -263,6 +263,7 @@ def _verify_fetched_candidate(
         title=page_title,
         text=fetched.text,
         url=fetched.final_url or candidate["url"],
+        raw_html=fetched.raw_html,
     )
     classification, evidence = _qualified_b2b_active_stock(
         classification=classification,

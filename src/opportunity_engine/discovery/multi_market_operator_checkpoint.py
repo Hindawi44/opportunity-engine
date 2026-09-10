@@ -642,8 +642,19 @@ def build_multi_market_checkpoint(
                 "top5_eligible_count": sum(
                     item["top5_eligible"] is True for item in market_records
                 ),
+                "ranking_eligible_count": sum(
+                    item["top5_eligible"] is True for item in market_records
+                ),
             }
         )
+
+    ranking_eligible_count = sum(
+        item["top5_eligible"] is True for item in records
+    )
+    commercially_qualified_count = sum(
+        _compact(item.get("workflow_status")).upper() == "QUALIFIED_OPPORTUNITY"
+        for item in records
+    )
 
     return {
         "schema_version": "multi-market-operator-checkpoint-1.0",
@@ -682,10 +693,14 @@ def build_multi_market_checkpoint(
             key: int(status_counts.get(key, 0))
             for key in ("ACTIVE", "UPCOMING", "HISTORICAL", "ENDED", "UNRESOLVED")
         },
-        "top5_eligible_count": sum(item["top5_eligible"] is True for item in records),
+        # Compatibility field retained for existing consumers. It means that a
+        # record may enter the ranking pool, not that it is commercially ready.
+        "top5_eligible_count": ranking_eligible_count,
+        "ranking_eligible_count": ranking_eligible_count,
         "analysis_eligible_count": sum(
             item["analysis_eligible"] is True for item in records
         ),
+        "commercially_qualified_count": commercially_qualified_count,
         "deduplicated_opportunities": records,
         "missing_evidence": missing_evidence,
         "activation_blockers": blockers,
@@ -723,8 +738,11 @@ def render_phone_summary(report: Mapping[str, Any]) -> str:
             f"غير محسوم {status_counts.get('UNRESOLVED', 0)}"
         ),
         (
-            f"Top 5 مؤهل: {report.get('top5_eligible_count', 0)} | "
-            f"مؤهل للتحليل: {report.get('analysis_eligible_count', 0)}"
+            "قابل للدخول في ترتيب Top 5: "
+            f"{report.get('ranking_eligible_count', report.get('top5_eligible_count', 0))} | "
+            f"مؤهل للتحليل: {report.get('analysis_eligible_count', 0)} | "
+            "مؤهل لقرار تجاري نهائي: "
+            f"{report.get('commercially_qualified_count', 0)}"
         ),
         f"الإجراء البشري الوحيد: {action.get('action', 'NO_IMMEDIATE_ACTION')}",
         f"السبب: {action.get('reason', '')}",

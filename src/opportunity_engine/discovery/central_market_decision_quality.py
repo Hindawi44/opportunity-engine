@@ -70,7 +70,10 @@ def _benchmark_by_case(report: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
 
 
 def _card_projection(
-    card: Mapping[str, Any], benchmark: Mapping[str, Any] | None
+    card: Mapping[str, Any],
+    benchmark: Mapping[str, Any] | None,
+    *,
+    checkpoint_selected: bool = False,
 ) -> dict[str, Any]:
     projected = {
         "case_id": card.get("case_id"),
@@ -85,9 +88,18 @@ def _card_projection(
         "missing_information": list(card.get("missing_information") or []),
         "risk_flags": list(card.get("risk_flags") or []),
         "source_urls": list(card.get("source_urls") or [])[:5],
+        "opportunity_identity": card.get("opportunity_identity"),
+        "workflow_status": card.get("workflow_status"),
+        "canonical_opportunity_identities": list(
+            card.get("canonical_opportunity_identities") or []
+        ),
         "market_benchmark": _benchmark_summary(benchmark),
         "selection_basis": (
-            "MARKET_COMPARABLES_THEN_EXISTING_ACTIONABILITY_ORDER"
+            "CHECKPOINT_CANONICAL_SELECTION_WITH_MARKET_COMPARABLES"
+            if checkpoint_selected and benchmark
+            else "CHECKPOINT_CANONICAL_SELECTION"
+            if checkpoint_selected
+            else "MARKET_COMPARABLES_THEN_EXISTING_ACTIONABILITY_ORDER"
             if benchmark
             else "EXISTING_ACTIONABILITY_ORDER"
         ),
@@ -127,6 +139,59 @@ def select_market_aware_opportunity(
     return _card_projection(selected, benchmark)
 
 
+def _checkpoint_selected_opportunity(
+    brief: Mapping[str, Any],
+    unified: Mapping[str, Any],
+    comparables: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Enrich the checkpoint-owned choice without replacing its identity."""
+    preferred_identity = _compact(
+        brief.get("checkpoint_preferred_opportunity_identity")
+    )
+    if not preferred_identity:
+        return None
+
+    cards = [
+        card
+        for card in _rows(unified.get("actionable_now"))
+        if _compact(card.get("case_type")).upper() in _COMMERCIAL_CASE_TYPES
+    ]
+    selected = next(
+        (
+            card
+            for card in cards
+            if _compact(card.get("opportunity_identity")) == preferred_identity
+            or preferred_identity
+            in {
+                _compact(identity)
+                for identity in card.get("canonical_opportunity_identities") or []
+            }
+        ),
+        None,
+    )
+
+    # The consistency layer already projected the checkpoint choice into the
+    # central brief. Preserve that choice even if the river projection is
+    # unexpectedly incomplete instead of silently selecting another deal.
+    if selected is None:
+        current = brief.get("top_actionable_opportunity")
+        if isinstance(current, Mapping) and _compact(
+            current.get("opportunity_identity")
+        ) == preferred_identity:
+            selected = dict(current)
+    if selected is None:
+        return None
+
+    benchmark = _benchmark_by_case(comparables).get(
+        _compact(selected.get("case_id"))
+    )
+    return _card_projection(
+        selected,
+        benchmark,
+        checkpoint_selected=True,
+    )
+
+
 def _market_action(opportunity: Mapping[str, Any]) -> dict[str, Any]:
     benchmark = opportunity.get("market_benchmark")
     benchmark = benchmark if isinstance(benchmark, Mapping) else {}
@@ -135,6 +200,8 @@ def _market_action(opportunity: Mapping[str, Any]) -> dict[str, Any]:
         "target_type": opportunity.get("case_type"),
         "target_id": opportunity.get("case_id"),
         "target": opportunity.get("headline"),
+        "opportunity_identity": opportunity.get("opportunity_identity"),
+        "workflow_status": opportunity.get("workflow_status"),
         "market_benchmark_classification": classification or None,
         "decision_basis": (
             "MARKET_COMPARABLES_PLUS_EXISTING_ACTIONABILITY"
@@ -202,7 +269,12 @@ def apply_market_benchmark_to_brief(
 ) -> dict[str, Any]:
     """Return a central brief whose commercial choice uses existing benchmark evidence."""
     result = deepcopy(dict(brief))
-    selected = select_market_aware_opportunity(unified, comparables)
+    checkpoint_preferred = bool(
+        _compact(brief.get("checkpoint_preferred_opportunity_identity"))
+    )
+    selected = _checkpoint_selected_opportunity(brief, unified, comparables)
+    if selected is None and not checkpoint_preferred:
+        selected = select_market_aware_opportunity(unified, comparables)
     snapshot = result.get("today_snapshot")
     if not isinstance(snapshot, dict):
         snapshot = {}
@@ -225,7 +297,11 @@ def apply_market_benchmark_to_brief(
         "BENCHMARK_APPLIED" if classification else "UNIFIED_PRIORITY_ONLY"
     )
     snapshot["top_market_benchmark_classification"] = classification or None
-    result["decision_quality_policy"] = "MARKET_COMPARABLES_THEN_EXISTING_ACTIONABILITY_ORDER"
+    result["decision_quality_policy"] = (
+        "CHECKPOINT_CANONICAL_SELECTION_THEN_MARKET_ENRICHMENT"
+        if checkpoint_preferred
+        else "MARKET_COMPARABLES_THEN_EXISTING_ACTIONABILITY_ORDER"
+    )
     result["market_comparables_are_asking_prices_not_completed_sales"] = True
     result["shipping_still_requires_verification"] = True
     return result

@@ -3,9 +3,10 @@
 This compatibility layer is read-only with respect to discovery policy. It adds
 no searches, page fetches, providers, sources, markets, runtimes, agents, or
 qualification evidence. It only preserves evidence already available while the
-existing unified Exa runtime executes:
+existing unified verified-search runtime executes:
 
 * remembers the original Exa query that first discovered each search-result URL;
+* preserves Brave attribution when the bounded verified fallback contributes a lot;
 * restores that query onto verified pages before Multi-Hop inherits it;
 * marks freshly reverified route-memory pages as PROVEN_ROUTE_RECOVERY instead
   of allowing downstream reports to imply a direct current Exa discovery;
@@ -125,10 +126,17 @@ def _verify_with_query_and_recovery_provenance(*args, **kwargs):  # type: ignore
             raw["fresh_page_verification_required"] = True
             continue
 
-        original_query = _QUERY_BY_MARKET_URL.get((market, source_url)) if market else None
+        original_query = (
+            _QUERY_BY_MARKET_URL.get((market, source_url))
+            if market and provider == "exa"
+            else None
+        )
         if original_query:
             raw["query"] = original_query
             raw["query_provenance_source"] = "ORIGINAL_EXA_RESULT_QUERY"
+            raw["query_provenance_preserved"] = True
+        elif provider == "brave" and _compact(raw.get("query")):
+            raw["query_provenance_source"] = "ORIGINAL_BRAVE_RESULT_QUERY"
             raw["query_provenance_preserved"] = True
         raw["retrieval_provenance"] = "DIRECT_SEARCH_RESULT"
     report["query_provenance_preserved"] = True
@@ -151,8 +159,24 @@ def _provenance_from_candidate(candidate: Mapping[str, Any], *, market: str) -> 
     return "STRICT_EXACT_LOT"
 
 
+def _candidate_search_provider(candidate: Mapping[str, Any]) -> str:
+    explicit = _compact(candidate.get("search_provider")).upper()
+    if explicit in {"EXA", "BRAVE"}:
+        return explicit
+    providers = candidate.get("source_providers") or []
+    if isinstance(providers, list):
+        for value in providers:
+            provider = _compact(value).upper()
+            if "BRAVE" in provider:
+                return "BRAVE"
+            if provider == "EXA":
+                return "EXA"
+    return "BRAVE" if "BRAVE" in _compact(candidate.get("reason")).upper() else "EXA"
+
+
 def _annotate_candidate(candidate: dict[str, Any], provenance: str) -> None:
-    candidate["search_provider"] = "EXA"
+    search_provider = _candidate_search_provider(candidate)
+    candidate["search_provider"] = search_provider
     candidate["retrieval_provenance"] = provenance
     candidate["exact_lot_origin"] = provenance
     candidate["route_memory_reverified"] = provenance == "PROVEN_ROUTE_RECOVERY"
@@ -160,7 +184,7 @@ def _annotate_candidate(candidate: dict[str, Any], provenance: str) -> None:
     candidate["provenance_scope"] = "MARKET_PLUS_URL"
     for verification in candidate.get("verification") or []:
         if isinstance(verification, dict):
-            verification["search_provider"] = "EXA"
+            verification["search_provider"] = search_provider
             verification["retrieval_provenance"] = provenance
             verification["route_memory_reverified"] = provenance == "PROVEN_ROUTE_RECOVERY"
             verification["provenance_scope"] = "MARKET_PLUS_URL"
@@ -172,12 +196,15 @@ def _top5_with_truthful_provenance(result: Mapping[str, Any]) -> dict[str, Any]:
     market = _market(report.get("market_code")) if isinstance(report, Mapping) else ""
     candidates = gated.get("all_discovered_candidates") or []
     provenance_counts: dict[str, int] = {}
+    provider_counts: dict[str, int] = {}
     by_url: dict[str, str] = {}
     for candidate in candidates:
         if not isinstance(candidate, dict):
             continue
         provenance = _provenance_from_candidate(candidate, market=market)
         provenance_counts[provenance] = provenance_counts.get(provenance, 0) + 1
+        provider = _candidate_search_provider(candidate)
+        provider_counts[provider] = provider_counts.get(provider, 0) + 1
         url = _candidate_url(candidate)
         if url:
             by_url[url] = provenance
@@ -200,11 +227,16 @@ def _top5_with_truthful_provenance(result: Mapping[str, Any]) -> dict[str, Any]:
             for key, count in provenance_counts.items()
             if key != "PROVEN_ROUTE_RECOVERY"
         )
-        report["current_exa_discovery_strict_exact_lot_count"] = current
+        brave_current = int(provider_counts.get("BRAVE", 0))
+        exa_current = max(0, current - brave_current)
+        report["current_exa_discovery_strict_exact_lot_count"] = exa_current
+        report["current_brave_fallback_strict_exact_lot_count"] = brave_current
+        report["current_web_discovery_strict_exact_lot_count"] = current
         report["freshly_reverified_recovery_exact_lot_count"] = recovery
         report["strict_exact_lot_count_includes_reverified_recovery"] = recovery > 0
         report["exact_lot_provenance_counts"] = dict(sorted(provenance_counts.items()))
-        report["search_provider"] = "EXA"
+        report["search_provider"] = "EXA+BRAVE" if brave_current else "EXA"
+        report["search_provider_counts"] = dict(sorted(provider_counts.items()))
         report["query_provenance_preserved"] = True
         report["provenance_scope"] = "MARKET_PLUS_URL"
         report["recovery_query_credit_blocked"] = True
@@ -274,13 +306,23 @@ def _clothing_runtime_with_provenance(input_root):  # type: ignore[no-untyped-de
         report = search_runtime._load_json(source_dir / "search-run-report.json")
         total = int(report.get("strict_exact_lot_count") or row.get("strict_exact_lot_count") or 0)
         recovery = int(report.get("freshly_reverified_recovery_exact_lot_count") or 0)
-        current = int(
+        exa_current = int(
             report.get("current_exa_discovery_strict_exact_lot_count")
             if report.get("current_exa_discovery_strict_exact_lot_count") is not None
             else max(0, total - recovery)
         )
+        brave_current = int(
+            report.get("current_brave_fallback_strict_exact_lot_count") or 0
+        )
+        current = int(
+            report.get("current_web_discovery_strict_exact_lot_count")
+            if report.get("current_web_discovery_strict_exact_lot_count") is not None
+            else max(0, total - recovery)
+        )
         row["strict_exact_lot_count"] = total
-        row["current_exa_discovery_strict_exact_lot_count"] = current
+        row["current_exa_discovery_strict_exact_lot_count"] = exa_current
+        row["current_brave_fallback_strict_exact_lot_count"] = brave_current
+        row["current_web_discovery_strict_exact_lot_count"] = current
         row["freshly_reverified_recovery_exact_lot_count"] = recovery
         row["strict_exact_lot_count_includes_reverified_recovery"] = recovery > 0
         row["provenance_scope"] = "MARKET_PLUS_URL"
@@ -292,8 +334,15 @@ def _clothing_runtime_with_provenance(input_root):  # type: ignore[no-untyped-de
 
 def _route_index_with_recovery_truth(resolution: Mapping[str, Any]) -> dict[str, str]:
     routes: dict[str, str] = {}
-    verification = resolution.get("verification") or {}
-    if isinstance(verification, Mapping):
+    fallback = resolution.get("brave_verified_fallback") or {}
+    fallback = fallback if isinstance(fallback, Mapping) else {}
+    verifications = [
+        resolution.get("verification") or {},
+        fallback.get("verification") or {},
+    ]
+    for verification in verifications:
+        if not isinstance(verification, Mapping):
+            continue
         for row in verification.get("verified_pages") or []:
             if not isinstance(row, Mapping):
                 continue
@@ -308,8 +357,10 @@ def _route_index_with_recovery_truth(resolution: Mapping[str, Any]) -> dict[str,
                 or provider == verifier.PROVEN_ROUTE_RECOVERY_PROVIDER
                 else "DIRECT_SEARCH_RESULT"
             )
-    multihop = resolution.get("multihop") or {}
-    if isinstance(multihop, Mapping):
+    multihops = [resolution.get("multihop") or {}, fallback.get("multihop") or {}]
+    for multihop in multihops:
+        if not isinstance(multihop, Mapping):
+            continue
         for row in multihop.get("exact_lots") or []:
             if not isinstance(row, Mapping):
                 continue
@@ -331,7 +382,9 @@ def _render_search_runtime_with_provenance(ledger: Mapping[str, Any]) -> str:
             f"{code} ملابس: {row.get('status', 'NOT_RUN')} | "
             f"hits={row.get('hits_received', 0)} | "
             f"Exact-Lots={row.get('strict_exact_lot_count', 0)} | "
-            f"current={row.get('current_exa_discovery_strict_exact_lot_count', 0)} | "
+            f"current-web={row.get('current_web_discovery_strict_exact_lot_count', 0)} | "
+            f"exa={row.get('current_exa_discovery_strict_exact_lot_count', 0)} | "
+            f"brave={row.get('current_brave_fallback_strict_exact_lot_count', 0)} | "
             f"reverified-recovery={row.get('freshly_reverified_recovery_exact_lot_count', 0)}"
         )
     fabric_markets = fabric.get("markets") or {} if isinstance(fabric, Mapping) else {}
