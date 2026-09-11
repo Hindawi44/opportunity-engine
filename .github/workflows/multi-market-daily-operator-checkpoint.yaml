@@ -663,6 +663,13 @@ jobs:
             --manifest "$OUTPUT_DIR/input-manifest.json" \
             --root .
 
+      - name: Investigate bounded pending opportunities
+        run: |
+          python scripts/run_pending_opportunity_investigation.py \
+            --report "$OUTPUT_DIR/multi-market-daily-checkpoint.json" \
+            --output "$OUTPUT_DIR/pending-opportunity-investigation.json" \
+            --limit 10
+
       - name: Build domain market intelligence bulletin
         env:
           OPPORTUNITY_ENGINE_EXPLICIT_UNIFIED_DAILY_RUNTIME: "1"

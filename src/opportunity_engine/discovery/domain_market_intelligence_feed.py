@@ -316,9 +316,22 @@ def _first_source_name(item: Mapping[str, Any]) -> str | None:
 
 
 def _direct_opportunities(checkpoint: Mapping[str, Any]) -> list[dict[str, Any]]:
+    # The lifecycle reconciliation layer marks unchanged active records as
+    # carry-over.  They remain available in the checkpoint for monitoring, but
+    # must not be promoted into today's operator-facing opportunity list.
+    novelty = checkpoint.get("daily_novelty")
+    novel_ids: set[str] | None = None
+    if isinstance(novelty, Mapping) and novelty.get("gate_applied") is True:
+        novel_ids = {
+            _compact(value)
+            for value in novelty.get("novel_active_opportunity_ids") or []
+            if _compact(value)
+        }
     result: list[dict[str, Any]] = []
     for item in checkpoint.get("deduplicated_opportunities") or []:
         if not isinstance(item, Mapping):
+            continue
+        if novel_ids is not None and _compact(item.get("opportunity_identity")) not in novel_ids:
             continue
         workflow = _compact(item.get("workflow_status")).upper()
         if workflow not in DIRECT_WORKFLOWS:
