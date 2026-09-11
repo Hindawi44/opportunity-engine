@@ -13,10 +13,30 @@ from opportunity_engine.discovery.brave_market_signal_radar import (
     market_signal_from_brave_hit,
 )
 from opportunity_engine.discovery.domain_market_intelligence_feed import (
+    _direct_opportunities,
     build_domain_market_intelligence_brief,
     market_signal_from_opportunity_record,
     persist_manifest_market_signals,
 )
+
+
+def test_daily_novelty_gate_hides_unchanged_carryover_from_operator_feed() -> None:
+    record = _opportunity_record()
+    record.update(
+        {
+            "opportunity_identity": "auction:lot:1",
+            "workflow_status": "ACTIVE_OPPORTUNITY",
+            "analysis_eligible": True,
+        }
+    )
+    checkpoint = {
+        "daily_novelty": {
+            "gate_applied": True,
+            "novel_active_opportunity_ids": [],
+        },
+        "deduplicated_opportunities": [record],
+    }
+    assert _direct_opportunities(checkpoint) == []
 from opportunity_engine.discovery.phone_readable_market_bulletin import (
     enrich_phone_readable_market_bulletin,
     render_phone_readable_market_bulletin,
