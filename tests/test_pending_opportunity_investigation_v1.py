@@ -44,6 +44,35 @@ def test_selects_public_url_from_opportunity_identity_when_source_url_missing() 
     assert [row["opportunity_identity"] for row in selected] == [identity_url]
 
 
+def test_rotation_prefers_unseen_then_oldest_attempted_records() -> None:
+    report = {
+        "deduplicated_opportunities": [
+            _record("seen-newer", 100),
+            _record("unseen-low", 10),
+            _record("seen-older", 90),
+            _record("unseen-high", 80),
+        ]
+    }
+    state = {
+        "records": {
+            "seen-newer": {
+                "attempt_count": 1,
+                "last_investigated_at": "2026-09-12T10:00:00+00:00",
+            },
+            "seen-older": {
+                "attempt_count": 2,
+                "last_investigated_at": "2026-09-10T10:00:00+00:00",
+            },
+        }
+    }
+    selected = select_pending_opportunities(report, limit=3, investigation_state=state)
+    assert [row["opportunity_identity"] for row in selected] == [
+        "unseen-high",
+        "unseen-low",
+        "seen-older",
+    ]
+
+
 def test_investigation_uses_identity_url_and_exposes_backlog_counts() -> None:
     identity_url = "https://market.example/item/123"
     report = {
@@ -74,6 +103,9 @@ def test_investigation_uses_identity_url_and_exposes_backlog_counts() -> None:
     assert result["unselectable_pending_count"] == 1
     assert result["selected_count"] == 1
     assert result["investigated_count"] == 1
+    assert result["newly_investigated_count"] == 1
+    assert result["unseen_pending_after_selection"] == 0
+    assert result["investigation_state"]["records"][identity_url]["attempt_count"] == 1
 
 
 def test_investigation_records_verified_and_failed_without_promoting() -> None:
