@@ -44,6 +44,7 @@ LEARNING_STATE_FILENAMES = (
     "keyword-learning-history.json",
     "parser-rescue-overlay.json",
     "search-success-memory.json",
+    "pending-investigation-state.json",
 )
 
 
