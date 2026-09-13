@@ -23,6 +23,7 @@ from opportunity_engine.discovery.search_provider import SearchHit, SearchProvid
 from opportunity_engine.discovery.sweden_psauction import (
     PSAUCTION_CURRENT_QUERY_IDS,
     PSAUCTION_HOST,
+    PSAUCTION_NATIVE_ACTIVE_INDEX_PROVIDER,
     PSAuctionGateDecision,
     psauction_gate_decision,
 )
@@ -118,7 +119,7 @@ class PSAuctionPrefetchedSearchProvider:
             raw_by_query[query.query] = raw_hits
             pairs = tuple((hit, psauction_gate_decision(hit)) for hit in raw_hits)
             decisions_by_query[query.query] = pairs
-            for _, decision in pairs:
+            for hit, decision in pairs:
                 if (
                     decision.reason == _ENDED_REASON
                     and decision.item_id
@@ -126,7 +127,10 @@ class PSAuctionPrefetchedSearchProvider:
                 ):
                     historical_ids.append(decision.item_id)
                 if (
-                    query.query_id in PSAUCTION_CURRENT_QUERY_IDS
+                    (
+                        query.query_id in PSAUCTION_CURRENT_QUERY_IDS
+                        or hit.provider == PSAUCTION_NATIVE_ACTIVE_INDEX_PROVIDER
+                    )
                     and decision.accepted
                     and decision.item_id
                     and decision.item_id not in current_window_ids

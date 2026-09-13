@@ -22,11 +22,12 @@ from opportunity_engine.discovery.sweden_psauction import (
     build_psauction_clothing_queries,
 )
 from opportunity_engine.discovery.sweden_psauction_bankruptcy_index import (
-    PSAUCTION_BANKRUPTCY_INDEX_URL,
+    PSAUCTION_ACTIVE_INDEX_POLICY,
+    PSAUCTION_ACTIVE_INDEX_URL,
     BankruptcyIndexFetch,
     PSAuctionBankruptcyIndexAugmentedProvider,
     PSAuctionBankruptcyIndexCollector,
-    is_approved_psauction_bankruptcy_index_url,
+    is_approved_psauction_active_index_url,
 )
 from opportunity_engine.discovery.sweden_psauction_prefetch import (
     PSAuctionPrefetchedSearchProvider,
@@ -41,6 +42,21 @@ VAXJO_URL = (
 CAROLINE_URL = (
     "https://psauction.se/auction/68961/"
     "by-caroline-s-fashion-ab-i-konkurs"
+)
+PINKOHOLIC_URL = (
+    "https://psauction.se/auction/69086/"
+    "butikslager-med-shakers-klader-hygienprodukter-och-tillbehor-1"
+)
+CHILDRENS_DRESSES_URL = (
+    "https://psauction.se/auction/68929/"
+    "avyttring-parti-med-exklusiva-barnklanningar-1"
+)
+DESIGN_FURNITURE_URL = (
+    "https://psauction.se/auction/69010/designmobler-fran-konkursbo"
+)
+PAINT_AND_LEISURE_STORE_URL = (
+    "https://psauction.se/auction/69073/"
+    "avyttring-fran-maleri-och-fritidsbutik"
 )
 INDEX_HTML = """
 <html><body>
@@ -59,6 +75,35 @@ INDEX_HTML = """
       <p>Auktionen innehåller varulager med cirka 170 st damkläder,
       klänningar, blusar och accessoarer.</p>
       <span>12 objekt</span><span>3D 4H</span>
+    </article>
+  </a>
+  <a href="/auction/69086/butikslager-med-shakers-klader-hygienprodukter-och-tillbehor-1">
+    <article>
+      <h3>Butikslager med shakers, kläder, hygienprodukter och tillbehör</h3>
+      <p>Auktionen innehåller cirka 4 000 st kläder och 700 accessoarer
+      från ett butikslager.</p>
+      <span>5 objekt</span><span>43430 Kungsbacka</span><span>10D 4H</span>
+    </article>
+  </a>
+  <a href="/auction/68929/avyttring-parti-med-exklusiva-barnklanningar-1">
+    <article>
+      <h3>Avyttring parti med exklusiva barnklänningar</h3>
+      <p>Parti med cirka 118 st nya barnklänningar för vidareförsäljning.</p>
+      <span>1 objekt</span><span>70341 Örebro</span><span>1D 4H</span>
+    </article>
+  </a>
+  <a href="/auction/69010/designmobler-fran-konkursbo">
+    <article>
+      <h3>Designmöbler från konkursbo</h3>
+      <p>Auktionen innehåller bord, stolar och soffor.</p>
+      <span>6 objekt</span><span>2D 4H</span>
+    </article>
+  </a>
+  <a href="/auction/69073/avyttring-fran-maleri-och-fritidsbutik">
+    <article>
+      <h3>Avyttring från måleri- och fritidsbutik</h3>
+      <p>Färg, penslar och fritidsprodukter från butik.</p>
+      <span>90 objekt</span><span>2D 4H</span>
     </article>
   </a>
   <a href="/auction/68000/avslutad-modebutik">
@@ -82,14 +127,14 @@ INDEX_HTML = """
       <span>1 objekt</span><span>2D 4H</span>
     </article>
   </a>
-  <a href="/auctions?bankruptcy=1">Alla konkursauktioner</a>
+  <a href="/auctions">Alla auktioner</a>
 </body></html>
 """
 
 
 def _fetch_index(_url: str, _timeout: float) -> BankruptcyIndexFetch:
     return BankruptcyIndexFetch(
-        final_url=PSAUCTION_BANKRUPTCY_INDEX_URL,
+        final_url=PSAUCTION_ACTIVE_INDEX_URL,
         html=INDEX_HTML,
     )
 
@@ -119,31 +164,37 @@ class _EmptyProvider:
         return ()
 
 
-def test_index_scope_is_exact_and_rejects_nearby_routes() -> None:
-    assert is_approved_psauction_bankruptcy_index_url(
-        PSAUCTION_BANKRUPTCY_INDEX_URL
+def test_active_index_scope_is_exact_and_rejects_filtered_or_foreign_routes() -> None:
+    assert is_approved_psauction_active_index_url(
+        PSAUCTION_ACTIVE_INDEX_URL
     )
-    assert not is_approved_psauction_bankruptcy_index_url(
-        "https://psauction.se/auctions"
+    assert not is_approved_psauction_active_index_url(
+        "https://psauction.se/auctions?bankruptcy=1"
     )
-    assert not is_approved_psauction_bankruptcy_index_url(
-        "https://example.com/auctions?bankruptcy=1"
+    assert not is_approved_psauction_active_index_url(
+        "https://example.com/auctions"
     )
 
 
-def test_bankruptcy_index_keeps_vaxjo_and_rejects_ended_and_nonclothing() -> None:
+def test_active_index_recovers_in_scope_sales_and_rejects_out_of_scope_assets() -> None:
     collection = PSAuctionBankruptcyIndexCollector(
         fetch_index=_fetch_index
     ).collect()
 
-    assert [hit.url for hit in collection.hits] == [VAXJO_URL, CAROLINE_URL]
+    assert [hit.url for hit in collection.hits] == [
+        VAXJO_URL,
+        CAROLINE_URL,
+        PINKOHOLIC_URL,
+        CHILDRENS_DRESSES_URL,
+    ]
     assert collection.hits[0].title == "Växjö Inunder AB i konkurs"
-    assert collection.rows_seen == 5
-    assert collection.rejected_hits == 3
+    assert collection.rows_seen == 9
+    assert collection.rejected_hits == 5
     assert collection.rejection_reasons == {
         "specific clothing item lacks bulk inventory evidence": 1,
         "specific PS Auction item is ended or sold": 1,
-        "specific PS Auction listing lacks clothing evidence": 1,
+        "specific PS Auction listing lacks clothing evidence": 2,
+        "vehicle or heavy machinery scope excluded": 1,
     }
     diagnostics = collection.diagnostics()
     assert diagnostics["index_requests"] == 1
@@ -157,7 +208,7 @@ def test_waf_challenge_uses_one_bounded_rendered_index_fallback() -> None:
 
     def challenge_fetch(_url: str, _timeout: float) -> BankruptcyIndexFetch:
         return BankruptcyIndexFetch(
-            final_url=PSAUCTION_BANKRUPTCY_INDEX_URL,
+            final_url=PSAUCTION_ACTIVE_INDEX_URL,
             html="",
             status_code=202,
             waf_action="challenge",
@@ -180,8 +231,13 @@ def test_waf_challenge_uses_one_bounded_rendered_index_fallback() -> None:
         render_index=render_index,
     ).collect()
 
-    assert [hit.url for hit in collection.hits] == [VAXJO_URL, CAROLINE_URL]
-    assert render_calls == [(PSAUCTION_BANKRUPTCY_INDEX_URL, 8.0, 45.0)]
+    assert [hit.url for hit in collection.hits] == [
+        VAXJO_URL,
+        CAROLINE_URL,
+        PINKOHOLIC_URL,
+        CHILDRENS_DRESSES_URL,
+    ]
+    assert render_calls == [(PSAUCTION_ACTIVE_INDEX_URL, 8.0, 45.0)]
     diagnostics = collection.diagnostics()
     assert diagnostics["http_status"] == 202
     assert diagnostics["waf_action"] == "challenge"
@@ -194,7 +250,7 @@ def test_waf_challenge_uses_one_bounded_rendered_index_fallback() -> None:
 def test_waf_challenge_fails_closed_when_rendering_is_unavailable() -> None:
     def challenge_fetch(_url: str, _timeout: float) -> BankruptcyIndexFetch:
         return BankruptcyIndexFetch(
-            final_url=PSAUCTION_BANKRUPTCY_INDEX_URL,
+            final_url=PSAUCTION_ACTIVE_INDEX_URL,
             html="",
             status_code=202,
             waf_action="challenge",
@@ -245,6 +301,40 @@ def test_native_index_hits_are_prioritized_without_removing_brave_fallback() -> 
     assert first[-1].provider == "Brave"
     assert second[-1].provider == "Brave"
     assert base.calls == [(queries[0].query, 3), (queries[1].query, 3)]
+
+
+def test_full_query_pack_preserves_more_than_twenty_native_active_auctions() -> None:
+    queries = build_psauction_clothing_queries(8)
+    native_hits = tuple(
+        SearchHit(
+            title=f"Klädlager {index} i konkurs",
+            url=f"https://psauction.se/auction/{70000 + index}/kladlager-{index}",
+            description="Auktionen innehåller kläder och skor. 20 objekt.",
+            provider=PSAUCTION_ACTIVE_INDEX_POLICY,
+        )
+        for index in range(25)
+    )
+    augmented = PSAuctionBankruptcyIndexAugmentedProvider(
+        _EmptyProvider(),
+        target_queries=tuple(query.query for query in queries),
+        current_hits=native_hits,
+    )
+    prefetched = PSAuctionPrefetchedSearchProvider(
+        augmented,
+        queries=queries,
+        request_budget=len(queries),
+    )
+
+    returned = tuple(
+        hit
+        for query in queries
+        for hit in prefetched.search(query.query, count=10)
+    )
+
+    assert {hit.url for hit in returned} == {hit.url for hit in native_hits}
+    diagnostics = prefetched.diagnostics()
+    assert len(diagnostics["current_window_item_ids"]) == 25
+    assert diagnostics["current_window_priority_applied"] is True
 
 
 def test_vaxjo_current_auction_page_is_verified_as_active_inventory() -> None:
@@ -304,7 +394,7 @@ def test_vaxjo_native_hit_reaches_discovery_as_a_traceable_strong_lead() -> None
     assert vaxjo["source_urls"] == [VAXJO_URL]
 
 
-def test_native_only_runner_recovers_both_reference_auctions_without_brave(
+def test_native_only_runner_recovers_all_in_scope_reference_auctions_without_brave(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -348,9 +438,20 @@ def test_native_only_runner_recovers_both_reference_auctions_without_brave(
     )
     identities = {candidate["opportunity_identity"] for candidate in candidates}
 
-    assert {"url-id:68986", "url-id:68961"} <= identities
+    assert {
+        "url-id:68986",
+        "url-id:68961",
+        "url-id:69086",
+        "url-id:68929",
+    } <= identities
+    assert "url-id:69010" not in identities
+    assert "url-id:69073" not in identities
     assert report["status"] == "PASS"
     assert report["native_discovery_status"] == "SUCCESS"
     assert report["cost_guard_status"] == "PAID_BRAVE_FALLBACK_SKIPPED"
     assert report["paid_search_used"] is False
     assert report["paid_brave_requests"] == 0
+    assert report["source_diagnostics"]["active_index"]["source_mode"] == (
+        "NATIVE_ACTIVE_INDEX"
+    )
+    assert "bankruptcy_index" not in report["source_diagnostics"]

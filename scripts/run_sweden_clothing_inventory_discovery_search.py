@@ -36,7 +36,6 @@ from opportunity_engine.discovery.sweden_current_first import (
 )
 from opportunity_engine.discovery.sweden_klaravik import verify_klaravik_public_page
 from opportunity_engine.discovery.sweden_psauction import (
-    PSAUCTION_CURRENT_QUERY_IDS,
     build_psauction_clothing_queries,
 )
 from opportunity_engine.discovery.sweden_psauction_bankruptcy_index import (
@@ -67,7 +66,7 @@ TARGETED_SOURCES = frozenset({"psauction", "klaravik", "blinto"})
 class _NativeOnlySearchProvider:
     """Zero-network fallback used after the paid Brave guard has fired."""
 
-    name = "PS Auction native bankruptcy index only"
+    name = "PS Auction native active index only"
 
     def search(self, query: str, *, count: int = 10) -> tuple[SearchHit, ...]:
         del query, count
@@ -265,11 +264,11 @@ def main() -> int:
             )
         psauction_search = PSAuctionBankruptcyIndexAugmentedProvider(
             base_search,
-            target_queries=tuple(
-                query.query
-                for query in queries
-                if query.query_id in PSAUCTION_CURRENT_QUERY_IDS
-            ),
+            # Spread the bounded native result set across the full query pack.
+            # With ten results per lane this preserves up to the collector's
+            # 50-auction cap instead of silently truncating the active index to
+            # the first twenty cards.
+            target_queries=tuple(query.query for query in queries),
             current_hits=psauction_index_collection.hits,
         )
         psauction_provider = PSAuctionPrefetchedSearchProvider(
@@ -361,7 +360,7 @@ def main() -> int:
     targeted_provider = psauction_provider or klaravik_provider or blinto_provider
     source_diagnostics = targeted_provider.diagnostics() if targeted_provider else None
     if source_diagnostics is not None and psauction_index_collection is not None:
-        source_diagnostics["bankruptcy_index"] = (
+        source_diagnostics["active_index"] = (
             psauction_index_collection.diagnostics()
         )
     if psauction_provider is not None and source_diagnostics is not None:

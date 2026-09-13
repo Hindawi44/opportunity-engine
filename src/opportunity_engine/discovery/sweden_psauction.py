@@ -36,6 +36,7 @@ PSAUCTION_CURRENT_QUERY_IDS = frozenset({
     "se-ps-current-01",
     "se-ps-current-02",
 })
+PSAUCTION_NATIVE_ACTIVE_INDEX_PROVIDER = "PSAUCTION_ACTIVE_INDEX_V1"
 
 # The legacy matrix remains inventory-first and is retained as bounded fallback
 # coverage. The normal daily builder prepends two current-month status-intent
@@ -209,6 +210,33 @@ _ENDED_OR_SOLD_TERMS = (
     "avbruten",
 )
 _ENDED_REASON = "specific PS Auction item is ended or sold"
+_EXCLUDED_ASSET_TERMS = (
+    "fordon",
+    "personbil",
+    "personbilar",
+    "lastbil",
+    "lastbilar",
+    "motorcykel",
+    "motorcyklar",
+    "moped",
+    "släpvagn",
+    "släpvagnar",
+    "minigrävare",
+    "grävmaskin",
+    "grävmaskiner",
+    "hjullastare",
+    "entreprenadmaskin",
+    "entreprenadmaskiner",
+    "industrimaskin",
+    "industrimaskiner",
+    "verkstadsmaskin",
+    "verkstadsmaskiner",
+    "svarv",
+    "svarvar",
+    "traktor",
+    "traktorer",
+)
+_EXCLUDED_ASSET_REASON = "vehicle or heavy machinery scope excluded"
 
 
 @dataclass(frozen=True, slots=True)
@@ -392,6 +420,13 @@ def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
 
     title = _compact(hit.title)
     combined = _compact(f"{hit.title} {hit.description}")
+    if any(term in combined for term in _EXCLUDED_ASSET_TERMS):
+        return PSAuctionGateDecision(
+            False,
+            canonical,
+            path_match.group("item_id"),
+            _EXCLUDED_ASSET_REASON,
+        )
     clothing_scope = combined if route == "auction" else title
     if not any(term in clothing_scope for term in _CLOTHING_TITLE_TERMS):
         return PSAuctionGateDecision(
