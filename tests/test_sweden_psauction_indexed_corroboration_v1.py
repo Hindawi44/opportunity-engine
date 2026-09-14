@@ -158,7 +158,7 @@ def test_wrong_item_search_result_cannot_corroborate_candidate():
     result = verifier(ITEM)
 
     assert result.verified is False
-    assert "lacked exact clothing/bulk evidence" in str(result.error)
+    assert "lacked exact resale-inventory evidence" in str(result.error)
 
 
 def test_generic_binding_bid_text_without_deadline_does_not_confirm_active():

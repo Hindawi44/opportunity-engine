@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from opportunity_engine.discovery.clothing_inventory_search import (
+    RESELLABLE_INVENTORY,
     STRONG_LEAD_REQUIRES_VERIFICATION,
     classify_search_hit,
 )
@@ -49,7 +50,7 @@ def test_query_pack_is_bounded_and_site_restricted():
     assert len(queries) == 8
     assert all("site:psauction.se/auction" in query.query for query in queries[:2])
     assert all("site:psauction.se/item/view" in query.query for query in queries[2:])
-    assert all(query.asset_scope == "CLOTHING_INVENTORY" for query in queries)
+    assert all(query.asset_scope == RESELLABLE_INVENTORY for query in queries)
     assert len({query.query for query in PSAUCTION_CLOTHING_QUERY_MATRIX}) == len(
         PSAUCTION_CLOTHING_QUERY_MATRIX
     )
@@ -101,6 +102,7 @@ def test_gate_accepts_one_specific_psauction_clothing_lot():
 
     assert decision.accepted is True
     assert decision.item_id == "1319712"
+    assert decision.asset_scope == "CLOTHING_INVENTORY"
     assert decision.canonical_url.endswith(
         "/item/view/1319712/parti-med-klader-och-accessoarer-ca-600-artiklar"
     )
@@ -138,6 +140,43 @@ def test_gate_accepts_current_vaxjo_bankruptcy_auction_route():
 
     assert decision.accepted is True
     assert decision.item_id == "68986"
+    assert decision.asset_scope == "CLOTHING_INVENTORY"
+
+
+def test_gate_accepts_stores_for_you_store_inventory_regression():
+    decision = psauction_gate_decision(
+        SearchHit(
+            title="Stores For You AB i konkurs",
+            url=(
+                "https://psauction.se/auction/69208/"
+                "stores-for-you-ab-i-konkurs"
+            ),
+            description=(
+                "Varulager från tre webbshoppar och e-handelsbutiker. "
+                "162 objekt. Inköpsvärdet uppgår till 4 600 000 SEK."
+            ),
+            provider="PS Auction active index",
+        )
+    )
+
+    assert decision.accepted is True
+    assert decision.item_id == "69208"
+    assert decision.asset_scope == "STORE_INVENTORY"
+
+
+def test_gate_accepts_design_furniture_regression():
+    decision = psauction_gate_decision(
+        SearchHit(
+            title="Designmöbler från konkursbo",
+            url="https://psauction.se/auction/69010/designmobler-fran-konkursbo",
+            description="Auktionen innehåller bord, stolar och soffor. 6 objekt.",
+            provider="PS Auction active index",
+        )
+    )
+
+    assert decision.accepted is True
+    assert decision.item_id == "69010"
+    assert decision.asset_scope == "FURNITURE"
 
 
 def test_gate_rejects_ended_current_auction_route():
@@ -186,10 +225,10 @@ def test_gate_rejects_single_clothing_item_without_bulk_evidence():
     )
 
     assert decision.accepted is False
-    assert decision.reason == "specific clothing item lacks bulk inventory evidence"
+    assert decision.reason == "specific target item lacks bulk inventory evidence"
 
 
-def test_gate_rejects_shop_fittings_without_clothing_inventory():
+def test_gate_accepts_shop_fittings_as_implicit_multi_asset_lot():
     decision = psauction_gate_decision(
         _hit(
             title="Butiksinredning – Hyllor, bord, speglar och klädställ",
@@ -198,8 +237,8 @@ def test_gate_rejects_shop_fittings_without_clothing_inventory():
         )
     )
 
-    assert decision.accepted is False
-    assert "lacks clothing evidence" in decision.reason
+    assert decision.accepted is True
+    assert decision.asset_scope == "STORE_FIXTURES"
 
 
 def test_gate_rejects_auction_index_and_wrong_host():
@@ -216,7 +255,7 @@ def test_gate_rejects_auction_index_and_wrong_host():
     assert other_host.reason == "not a PS Auction host"
 
 
-def test_gate_rejects_non_clothing_psauction_item():
+def test_gate_rejects_unsupported_psauction_item():
     decision = psauction_gate_decision(
         _hit(
             title="Cirkelsåg med tillbehör",
@@ -225,7 +264,20 @@ def test_gate_rejects_non_clothing_psauction_item():
     )
 
     assert decision.accepted is False
-    assert "lacks clothing evidence" in decision.reason
+    assert "lacks supported resale-inventory evidence" in decision.reason
+
+
+def test_gate_rejects_heavy_machinery_even_when_mixed_with_store_inventory():
+    decision = psauction_gate_decision(
+        _hit(
+            title="Butikslager och verkstadsmaskiner från konkursbo",
+            url="https://psauction.se/auction/69999/blandat-konkursbo",
+            description="20 objekt: kläder, svarv och industrimaskiner.",
+        )
+    )
+
+    assert decision.accepted is False
+    assert decision.reason == "vehicle or heavy machinery scope excluded"
 
 
 def test_targeted_provider_filters_hits_and_reports_diagnostics():
@@ -264,7 +316,9 @@ def test_targeted_provider_filters_hits_and_reports_diagnostics():
         "PS Auction URL is not one specific listing page"
     )
     assert diagnostics["rejected_samples"][1]["item_id"] == "999999"
-    assert "lacks clothing evidence" in diagnostics["rejected_samples"][1]["reason"]
+    assert "lacks supported resale-inventory evidence" in (
+        diagnostics["rejected_samples"][1]["reason"]
+    )
 
 
 def test_psauction_hit_remains_unverified_until_public_page_check():

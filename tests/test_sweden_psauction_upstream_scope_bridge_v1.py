@@ -19,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 RUNNER = ROOT / "scripts" / "run_sweden_clothing_inventory_discovery_search.py"
 ITEM = "https://psauction.se/item/view/1560018/parti-med-klader"
 OTHER_ITEM = "https://psauction.se/item/view/1560019/annat-parti"
+STORE_INVENTORY = (
+    "https://psauction.se/auction/69208/stores-for-you-ab-i-konkurs"
+)
 NOW = datetime(2026, 8, 16, 12, 0, tzinfo=timezone.utc)
 
 
@@ -76,6 +79,7 @@ def test_upstream_scope_bridge_uses_exact_index_hit_for_status_only():
         rendered_page_loader=_shell,
         indexed_search_provider=search,
         clock=lambda: NOW,
+        upstream_asset_scope=lambda _url: "CLOTHING_INVENTORY",
     )
 
     result = verifier(ITEM)
@@ -86,10 +90,41 @@ def test_upstream_scope_bridge_uses_exact_index_hit_for_status_only():
     assert result.identity_stable is True
     assert result.opportunity_identity == "url-id:1560018"
     assert result.clothing_inventory_evidence is True
+    assert result.resale_inventory_evidence is True
     assert result.sale_evidence is True
     assert search.queries == [('site:psauction.se/item/view "1560018"', 5)]
     assert diagnostics["indexed_resolved_active"] == 1
     assert diagnostics["upstream_scope_bridge"] == "PSAUCTION_PREFETCH_STRICT_GATE"
+
+
+def test_upstream_scope_bridge_preserves_non_clothing_scope_from_prefetch():
+    module = _load_runner_module()
+    search = FakeIndexedSearch(
+        [
+            SearchHit(
+                title="PS Auction objekt 69208",
+                url=STORE_INVENTORY,
+                description="Auktionen slutar 2026-09-18 18:00.",
+                provider="Brave Search",
+            )
+        ]
+    )
+    verifier = module._PSAuctionUpstreamScopeVerifier(
+        lambda url: _unresolved(url),
+        rendered_page_loader=_shell,
+        indexed_search_provider=search,
+        clock=lambda: NOW,
+        upstream_asset_scope=lambda _url: "STORE_INVENTORY",
+    )
+
+    result = verifier(STORE_INVENTORY)
+
+    assert result.verified is True
+    assert result.listing_status == ACTIVE
+    assert result.opportunity_identity == "url-id:69208"
+    assert result.clothing_inventory_evidence is False
+    assert result.resale_inventory_evidence is True
+    assert result.sale_evidence is True
 
 
 def test_upstream_scope_bridge_still_rejects_wrong_item_id():

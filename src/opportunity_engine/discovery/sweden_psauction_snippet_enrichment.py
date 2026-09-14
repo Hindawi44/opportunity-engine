@@ -186,6 +186,28 @@ def _inventory_type(text: str) -> str | None:
         return "mixed_clothing_inventory"
     if "skor" in text:
         return "footwear_inventory"
+    if any(
+        term in text
+        for term in (
+            "butikslager",
+            "webblager",
+            "webbshop",
+            "webbshoppar",
+            "e-handelsbutik",
+            "e-handelsbutiker",
+        )
+    ):
+        return "store_inventory"
+    if any(
+        term in text
+        for term in ("butiksinredning", "hyllor", "klädställningar", "kassadisk")
+    ):
+        return "store_fixtures"
+    if any(
+        term in text
+        for term in ("designmöbler", "kontorsmöbler", "möbler", "möbelhus")
+    ):
+        return "furniture"
     return None
 
 

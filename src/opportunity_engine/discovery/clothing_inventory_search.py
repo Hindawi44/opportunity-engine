@@ -34,6 +34,7 @@ ORDINARY_STORE = "ORDINARY_STORE"
 ARTICLE_OR_INFO = "ARTICLE_OR_INFO"
 UNRESOLVED_SOURCE = "UNRESOLVED_SOURCE"
 UNVERIFIED_EVENT = "UNVERIFIED_EVENT"
+RESELLABLE_INVENTORY = "RESELLABLE_INVENTORY"
 
 _TRACKING_PARAMETERS = {
     "fbclid", "gclid", "mc_cid", "mc_eid", "ref", "referrer", "source",
@@ -64,6 +65,22 @@ _CLOTHING_TERMS = (
     "tekstil", "mote", "bekledning", "klesparti", "klesmerke", "plagg",
     "arbeidsjakke", "strømpebukse", "skjorte", "hettegenser", "genser", "joggebukse",
     "jeans", "denim", "bukser", "olabukse", "olabukser",
+)
+_RESELLABLE_ASSET_TERMS = (
+    # Store inventory / mixed retail stock.
+    "butikslager", "webblager", "varulager", "webbshop", "webbshoppar",
+    "e-handelsbutik", "e-handelsbutiker", "butikkvarelager", "butikk lager",
+    "store inventory", "retail inventory", "shop inventory",
+    # Furniture that can be handled as ordinary resale stock.
+    "möbler", "designmöbler", "kontorsmöbler", "möbelhus",
+    "møbler", "designmøbler", "kontormøbler", "møbelhus",
+    "furniture", "office furniture", "bord", "stolar", "stoler",
+    "soffor", "sofaer", "skrivbord", "skrivebord",
+    # Store fixtures and fittings.
+    "butiksinredning", "butikkinnredning", "store fixtures",
+    "shop fittings", "hyllor", "hyller", "hyllsystem", "reoler",
+    "klädställningar", "klesstativer", "kassadisk", "skyltdockor",
+    "utstillingsdukker", "displayställ", "displaystativer",
 )
 _INVENTORY_TERMS = (
     "varelager", "hele lageret", "hele varelageret", "komplett lager", "restlager",
@@ -189,6 +206,7 @@ class PageVerification:
     opportunity_identity: str | None = None
     identity_stable: bool = False
     clothing_inventory_evidence: bool = False
+    resale_inventory_evidence: bool = False
     sale_evidence: bool = False
     event_scenario: str = UNVERIFIED_EVENT
     bounded_context: str | None = None
@@ -228,6 +246,7 @@ class MergedCandidate:
     scenario: str
     state: str
     reason: str
+    asset_scope: str = "CLOTHING_INVENTORY"
     source_urls: list[str] = field(default_factory=list)
     canonical_urls: list[str] = field(default_factory=list)
     found_by_queries: list[str] = field(default_factory=list)
@@ -278,6 +297,7 @@ class MergedCandidate:
             "scenario": self.scenario,
             "opportunity_state": self.state,
             "reason": self.reason,
+            "asset_scope": self.asset_scope,
             "page_role": self.page_role,
             "opportunity_identity": self.opportunity_identity,
             "identity_stable": self.identity_stable,
@@ -401,11 +421,16 @@ def classify_search_hit(hit: SearchHit, query: DiscoveryQuery) -> CandidateObser
     text = _normalized_text(hit.title, hit.description)
     scenario, event_hits = _scenario_from_text(text)
     clothing_hits = _term_hits(text, _CLOTHING_TERMS)
+    resale_asset_hits = _term_hits(text, _RESELLABLE_ASSET_TERMS)
     inventory_hits = _term_hits(text, _INVENTORY_TERMS)
     sale_hits = _term_hits(text, (*_STRONG_SALE_TERMS, *_AUCTION_TERMS))
     business_hits = _term_hits(text, _BUSINESS_TERMS)
     has_event = bool(event_hits)
     has_clothing_scope = bool(clothing_hits)
+    has_resale_scope = bool(resale_asset_hits) and (
+        query.asset_scope == RESELLABLE_INVENTORY
+    )
+    has_target_scope = has_clothing_scope or has_resale_scope
     has_inventory_scope = bool(inventory_hits)
     has_business = bool(business_hits)
     identity_stable, opportunity_identity = _stable_identity(canonical_url, hit.title, hit.description)
@@ -417,7 +442,9 @@ def classify_search_hit(hit: SearchHit, query: DiscoveryQuery) -> CandidateObser
 
     if any(term in text for term in _JOB_TERMS):
         state, reason = REJECTED_NOISE, "job advertisement"
-    elif any(term in text for term in _GENERIC_INFO_TERMS) and not (has_event and has_clothing_scope):
+    elif any(term in text for term in _GENERIC_INFO_TERMS) and not (
+        has_event and has_target_scope
+    ):
         state, reason = REJECTED_NOISE, "informational page without a traceable commercial event"
     elif any(term in text for term in _ORDINARY_SHOP_TERMS) and not has_event and not has_inventory_scope:
         state, reason = REJECTED_NOISE, "ordinary online store"
@@ -425,13 +452,25 @@ def classify_search_hit(hit: SearchHit, query: DiscoveryQuery) -> CandidateObser
         single_item = any(re.search(rf"\b{re.escape(term)}\b", text) for term in _SINGLE_ITEM_TERMS)
         if single_item and not has_inventory_scope and not has_event and not has_business:
             state, reason = REJECTED_NOISE, "ordinary single-item listing"
-        elif has_clothing_scope and (has_inventory_scope or has_business or has_event) and (sale_hits or has_event):
+        elif has_target_scope and (
+            has_inventory_scope or has_business or has_event
+        ) and (sale_hits or has_event):
             state = STRONG_LEAD_REQUIRES_VERIFICATION
-            reason = "specific commercial signal retained pending bounded public-page verification"
+            reason = (
+                "specific target-inventory commercial signal retained pending "
+                "bounded public-page verification"
+            )
         else:
-            state, reason = REJECTED_NOISE, "insufficient clothing-inventory commercial evidence"
+            state, reason = (
+                REJECTED_NOISE,
+                "insufficient target-inventory commercial evidence",
+            )
 
-    signals = tuple(dict.fromkeys((*event_hits, *clothing_hits, *inventory_hits, *sale_hits)))
+    signals = tuple(
+        dict.fromkeys(
+            (*event_hits, *clothing_hits, *resale_asset_hits, *inventory_hits, *sale_hits)
+        )
+    )
     listing_status = ENDED if any(term in text for term in _ENDED_TERMS) else UNKNOWN
     return CandidateObservation(
         title=hit.title.strip(),
@@ -504,6 +543,7 @@ def _merge_observations(observations: Sequence[CandidateObservation]) -> list[Me
             scenario=best.scenario,
             state=best.state,
             reason=best.reason,
+            asset_scope=best.query.asset_scope,
             page_role=best.page_role_hint,
             opportunity_identity=best.opportunity_identity,
             identity_stable=best.identity_stable,
@@ -885,7 +925,13 @@ def _complete_verification_defaults(result: PageVerification) -> PageVerificatio
     scenario, _ = _scenario_from_text(normalized)
     role = ITEM_LISTING if stable else UNRESOLVED_SOURCE
     clothing = bool(_term_hits(normalized, _CLOTHING_TERMS)) and bool(_term_hits(normalized, _INVENTORY_TERMS))
-    sale = bool(_term_hits(normalized, (*_STRONG_SALE_TERMS, *_AUCTION_TERMS))) and clothing
+    resale = bool(_term_hits(normalized, (*_CLOTHING_TERMS, *_RESELLABLE_ASSET_TERMS)))
+    resale_inventory = resale and bool(
+        _term_hits(normalized, _INVENTORY_TERMS) or scenario != UNVERIFIED_EVENT
+    )
+    sale = bool(
+        _term_hits(normalized, (*_STRONG_SALE_TERMS, *_AUCTION_TERMS))
+    ) and (clothing or resale_inventory)
     return PageVerification(
         url=result.url,
         title=result.title,
@@ -902,6 +948,9 @@ def _complete_verification_defaults(result: PageVerification) -> PageVerificatio
         opportunity_identity=result.opportunity_identity or identity,
         identity_stable=result.identity_stable or stable,
         clothing_inventory_evidence=result.clothing_inventory_evidence or clothing,
+        resale_inventory_evidence=(
+            result.resale_inventory_evidence or resale_inventory
+        ),
         sale_evidence=result.sale_evidence or sale,
         event_scenario=result.event_scenario if result.event_scenario != UNVERIFIED_EVENT else scenario,
         bounded_context=result.bounded_context or result.text,
@@ -954,29 +1003,43 @@ def _apply_verification(candidate: MergedCandidate, raw_result: PageVerification
     candidate.published_at = result.published_at
     candidate.listing_status = result.listing_status
     candidate.scenario = result.event_scenario if result.event_scenario != UNVERIFIED_EVENT else UNVERIFIED_EVENT
+    target_inventory_evidence = (
+        result.resale_inventory_evidence
+        if candidate.asset_scope == RESELLABLE_INVENTORY
+        else result.clothing_inventory_evidence
+    )
 
     if result.listing_status == ENDED:
         candidate.state = STRONG_LEAD_REQUIRES_VERIFICATION
         candidate.reason = "specific listing is ended and retained as historical evidence only"
     elif (
         result.identity_stable
-        and result.clothing_inventory_evidence
+        and target_inventory_evidence
         and result.sale_evidence
         and result.listing_status == ACTIVE
     ):
         candidate.state = CONFIRMED_SALE
         candidate.reason = "specific active sale confirmed by bounded public-page evidence"
-    elif result.identity_stable and result.clothing_inventory_evidence:
+    elif result.identity_stable and target_inventory_evidence:
         candidate.state = STRONG_LEAD_REQUIRES_VERIFICATION
-        candidate.reason = "specific clothing-inventory listing retained; sale or active status requires verification"
+        candidate.reason = (
+            "specific target-inventory listing retained; sale or active status "
+            "requires verification"
+        )
     else:
         candidate.state = REJECTED_NOISE
-        candidate.reason = "item page lacks bounded clothing-inventory evidence"
+        candidate.reason = "item page lacks bounded target-inventory evidence"
         candidate.false_positive_guard_triggered = True
 
     for signal in _term_hits(
         _normalized_text(result.title, result.bounded_context),
-        (*_CLOTHING_TERMS, *_INVENTORY_TERMS, *_STRONG_SALE_TERMS, *_AUCTION_TERMS),
+        (
+            *_CLOTHING_TERMS,
+            *_RESELLABLE_ASSET_TERMS,
+            *_INVENTORY_TERMS,
+            *_STRONG_SALE_TERMS,
+            *_AUCTION_TERMS,
+        ),
     ):
         _append_unique(candidate.evidence_signals, signal)
 
@@ -999,9 +1062,14 @@ def score_discovery_candidate(candidate: MergedCandidate, *, observed_at: dateti
     observed = observed_at or datetime.now(timezone.utc)
     event_strength = _EVENT_PRIORITY.get(candidate.scenario, 0)
     text = _normalized_text(candidate.title, *candidate.descriptions, " ".join(candidate.evidence_signals))
+    target_terms = (
+        (*_CLOTHING_TERMS, *_RESELLABLE_ASSET_TERMS)
+        if candidate.asset_scope == RESELLABLE_INVENTORY
+        else _CLOTHING_TERMS
+    )
     inventory_clarity = (
         20 if candidate.page_role == ITEM_LISTING and candidate.inventory_type
-        else 12 if candidate.identity_stable and any(term in text for term in _CLOTHING_TERMS)
+        else 12 if candidate.identity_stable and any(term in text for term in target_terms)
         else 0
     )
     sale_signal = 20 if candidate.state == CONFIRMED_SALE else 8 if candidate.state == STRONG_LEAD_REQUIRES_VERIFICATION else 0
@@ -1025,7 +1093,7 @@ def score_discovery_candidate(candidate: MergedCandidate, *, observed_at: dateti
     if event_strength:
         candidate.why_opportunity.append(f"commercial event detected: {candidate.scenario}")
     if inventory_clarity:
-        candidate.why_opportunity.append("specific clothing-inventory evidence detected")
+        candidate.why_opportunity.append("specific target-inventory evidence detected")
     if sale_signal == 20:
         candidate.why_opportunity.append("specific active sale confirmed")
     elif sale_signal:
@@ -1189,6 +1257,11 @@ def run_clothing_inventory_discovery(
 def _decisive_active_item_verification(candidate: Mapping[str, Any]) -> bool:
     """Require bounded public evidence for the final Top 5 boundary."""
     candidate_identity = candidate.get("opportunity_identity")
+    evidence_field = (
+        "resale_inventory_evidence"
+        if candidate.get("asset_scope") == RESELLABLE_INVENTORY
+        else "clothing_inventory_evidence"
+    )
     for verification in candidate.get("verification") or []:
         if not isinstance(verification, Mapping):
             continue
@@ -1203,7 +1276,7 @@ def _decisive_active_item_verification(candidate: Mapping[str, Any]) -> bool:
             and verification.get("page_role") == ITEM_LISTING
             and verification.get("identity_stable") is True
             and verification.get("listing_status") == ACTIVE
-            and verification.get("clothing_inventory_evidence") is True
+            and verification.get(evidence_field) is True
             and verification.get("sale_evidence") is True
             and identity_matches
         ):

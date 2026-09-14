@@ -49,6 +49,16 @@ _SWEDISH_TO_NORWEGIAN_ALIASES: tuple[tuple[str, str], ...] = (
     ("sportkläder", "sportsklær"),
     ("beklädnad", "bekledning"),
     ("skor", "sko"),
+    ("butikslager", "butikkvarelager"),
+    ("webblager", "butikkvarelager"),
+    ("butiksinredning", "butikkinnredning"),
+    ("designmöbler", "designmøbler"),
+    ("kontorsmöbler", "kontormøbler"),
+    ("möbler", "møbler"),
+    ("hyllor", "hyller"),
+    ("stolar", "stoler"),
+    ("klädställningar", "klesstativer"),
+    ("skyltdockor", "utstillingsdukker"),
     ("varulager", "varelager"),
     ("varulagret", "varelager"),
     ("hela lagret", "hele lageret"),
@@ -92,9 +102,23 @@ _SWEDISH_CLOTHING_TERMS = (
 )
 _SWEDISH_INVENTORY_TERMS = (
     "varulager", "varulagret", "hela lagret", "hela varulagret", "lagerparti",
+    "butikslager", "webblager", "webbshoppar", "e-handelsbutiker",
     "restlager", "restparti", "överskottslager", "partiförsäljning",
     "parti med kläder", "parti kläder", "alla kläder", "samtliga kläder",
     "sortiment med arbetskläder", "pall", "kartong", "kartonger",
+)
+_SWEDISH_STORE_INVENTORY_TERMS = (
+    "butikslager", "webblager", "webbshop", "webbshoppar",
+    "e-handelsbutik", "e-handelsbutiker",
+    "butiksvaror", "butikssortiment",
+)
+_SWEDISH_FURNITURE_TERMS = (
+    "möbler", "designmöbler", "kontorsmöbler", "möbelhus", "bord",
+    "stolar", "soffor", "skrivbord",
+)
+_SWEDISH_STORE_FIXTURE_TERMS = (
+    "butiksinredning", "hyllor", "hyllsystem", "klädställningar",
+    "kassadisk", "skyltdockor", "displayställ",
 )
 _SWEDISH_AUCTION_OBJECT_COUNT = re.compile(r"\b(\d{1,7})\s*objekt\b", re.I)
 _SWEDISH_SALE_TERMS = (
@@ -189,6 +213,32 @@ def _has_swedish_inventory_scope(text: str) -> bool:
     )
 
 
+def _swedish_resale_inventory_type(text: str) -> str | None:
+    if any(term in text for term in _SWEDISH_CLOTHING_TERMS):
+        return next(term for term in _SWEDISH_CLOTHING_TERMS if term in text)
+    if any(term in text for term in _SWEDISH_STORE_INVENTORY_TERMS):
+        return "store_inventory"
+    if any(term in text for term in _SWEDISH_STORE_FIXTURE_TERMS):
+        return "store_fixtures"
+    if any(term in text for term in _SWEDISH_FURNITURE_TERMS):
+        return "furniture"
+    return None
+
+
+def _has_swedish_resale_inventory_scope(text: str) -> bool:
+    inventory_type = _swedish_resale_inventory_type(text)
+    if inventory_type is None:
+        return False
+    if inventory_type in _SWEDISH_CLOTHING_TERMS:
+        return _has_swedish_inventory_scope(text)
+    if inventory_type == "store_inventory":
+        return True
+    return any(
+        int(match.group(1)) >= 2
+        for match in _SWEDISH_AUCTION_OBJECT_COUNT.finditer(text)
+    )
+
+
 def enrich_sweden_page_verification(
     verification: PageVerification,
 ) -> PageVerification:
@@ -214,6 +264,7 @@ def enrich_sweden_page_verification(
 
     clothing = any(term in text for term in _SWEDISH_CLOTHING_TERMS)
     inventory = _has_swedish_inventory_scope(text)
+    resale_inventory = _has_swedish_resale_inventory_scope(text)
     sale = any(term in text for term in _SWEDISH_SALE_TERMS)
     scenario = _swedish_scenario(text)
     listing_status = verification.listing_status
@@ -226,14 +277,18 @@ def enrich_sweden_page_verification(
         verification,
         inventory_type=(
             verification.inventory_type
-            or next((term for term in _SWEDISH_CLOTHING_TERMS if term in text), None)
+            or _swedish_resale_inventory_type(text)
         ),
         listing_status=listing_status,
         clothing_inventory_evidence=(
             verification.clothing_inventory_evidence or (clothing and inventory)
         ),
+        resale_inventory_evidence=(
+            verification.resale_inventory_evidence or resale_inventory
+        ),
         sale_evidence=(
-            verification.sale_evidence or (sale and (clothing or inventory))
+            verification.sale_evidence
+            or (sale and ((clothing and inventory) or resale_inventory))
         ),
         event_scenario=scenario or verification.event_scenario,
     )

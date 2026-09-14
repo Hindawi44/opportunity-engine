@@ -8,8 +8,12 @@ import pytest
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     ACTIVE,
+    CONFIRMED_SALE,
     ITEM_LISTING,
+    RESELLABLE_INVENTORY,
     STRONG_LEAD_REQUIRES_VERIFICATION,
+    PageVerification,
+    apply_post_verification_top5_hard_gate,
     run_clothing_inventory_discovery,
     verify_public_html,
 )
@@ -58,6 +62,9 @@ PAINT_AND_LEISURE_STORE_URL = (
     "https://psauction.se/auction/69073/"
     "avyttring-fran-maleri-och-fritidsbutik"
 )
+STORES_FOR_YOU_URL = (
+    "https://psauction.se/auction/69208/stores-for-you-ab-i-konkurs"
+)
 INDEX_HTML = """
 <html><body>
   <a href="/auction/68986/vaxjo-inunder-ab-i-konkurs">
@@ -104,6 +111,14 @@ INDEX_HTML = """
       <h3>Avyttring från måleri- och fritidsbutik</h3>
       <p>Färg, penslar och fritidsprodukter från butik.</p>
       <span>90 objekt</span><span>2D 4H</span>
+    </article>
+  </a>
+  <a href="/auction/69208/stores-for-you-ab-i-konkurs">
+    <article>
+      <h3>Stores For You AB i konkurs</h3>
+      <p>Varulager från tre webbshoppar och e-handelsbutiker.
+      Inköpsvärdet uppgår till 4 600 000 SEK.</p>
+      <span>162 objekt</span><span>Auktionen slutar 2026-09-18</span>
     </article>
   </a>
   <a href="/auction/68000/avslutad-modebutik">
@@ -176,7 +191,7 @@ def test_active_index_scope_is_exact_and_rejects_filtered_or_foreign_routes() ->
     )
 
 
-def test_active_index_recovers_in_scope_sales_and_rejects_out_of_scope_assets() -> None:
+def test_active_index_recovers_full_resale_scope_and_rejects_excluded_assets() -> None:
     collection = PSAuctionBankruptcyIndexCollector(
         fetch_index=_fetch_index
     ).collect()
@@ -186,14 +201,16 @@ def test_active_index_recovers_in_scope_sales_and_rejects_out_of_scope_assets() 
         CAROLINE_URL,
         PINKOHOLIC_URL,
         CHILDRENS_DRESSES_URL,
+        DESIGN_FURNITURE_URL,
+        PAINT_AND_LEISURE_STORE_URL,
+        STORES_FOR_YOU_URL,
     ]
     assert collection.hits[0].title == "Växjö Inunder AB i konkurs"
-    assert collection.rows_seen == 9
-    assert collection.rejected_hits == 5
+    assert collection.rows_seen == 10
+    assert collection.rejected_hits == 3
     assert collection.rejection_reasons == {
-        "specific clothing item lacks bulk inventory evidence": 1,
+        "specific target item lacks bulk inventory evidence": 1,
         "specific PS Auction item is ended or sold": 1,
-        "specific PS Auction listing lacks clothing evidence": 2,
         "vehicle or heavy machinery scope excluded": 1,
     }
     diagnostics = collection.diagnostics()
@@ -236,6 +253,9 @@ def test_waf_challenge_uses_one_bounded_rendered_index_fallback() -> None:
         CAROLINE_URL,
         PINKOHOLIC_URL,
         CHILDRENS_DRESSES_URL,
+        DESIGN_FURNITURE_URL,
+        PAINT_AND_LEISURE_STORE_URL,
+        STORES_FOR_YOU_URL,
     ]
     assert render_calls == [(PSAUCTION_ACTIVE_INDEX_URL, 8.0, 45.0)]
     diagnostics = collection.diagnostics()
@@ -394,7 +414,7 @@ def test_vaxjo_native_hit_reaches_discovery_as_a_traceable_strong_lead() -> None
     assert vaxjo["source_urls"] == [VAXJO_URL]
 
 
-def test_native_only_runner_recovers_all_in_scope_reference_auctions_without_brave(
+def test_native_only_runner_recovers_full_resale_scope_without_brave(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -443,10 +463,17 @@ def test_native_only_runner_recovers_all_in_scope_reference_auctions_without_bra
         "url-id:68961",
         "url-id:69086",
         "url-id:68929",
+        "url-id:69010",
+        "url-id:69073",
+        "url-id:69208",
     } <= identities
-    assert "url-id:69010" not in identities
-    assert "url-id:69073" not in identities
+    assert {
+        candidate["asset_scope"]
+        for candidate in candidates
+        if candidate["opportunity_identity"] in identities
+    } == {RESELLABLE_INVENTORY}
     assert report["status"] == "PASS"
+    assert report["domain"] == RESELLABLE_INVENTORY
     assert report["native_discovery_status"] == "SUCCESS"
     assert report["cost_guard_status"] == "PAID_BRAVE_FALLBACK_SKIPPED"
     assert report["paid_search_used"] is False
@@ -455,3 +482,76 @@ def test_native_only_runner_recovers_all_in_scope_reference_auctions_without_bra
         "NATIVE_ACTIVE_INDEX"
     )
     assert "bankruptcy_index" not in report["source_diagnostics"]
+
+
+@pytest.mark.parametrize(
+    ("url", "title", "text", "inventory_type"),
+    (
+        (
+            STORES_FOR_YOU_URL,
+            "Stores For You AB i konkurs",
+            (
+                "Auktionen slutar 2026-09-18. Varulager från tre webbshoppar "
+                "och e-handelsbutiker. 162 objekt."
+            ),
+            "store_inventory",
+        ),
+        (
+            DESIGN_FURNITURE_URL,
+            "Designmöbler från konkursbo",
+            "Auktionen slutar 2026-09-18. Bord, stolar och soffor. 6 objekt.",
+            "furniture",
+        ),
+    ),
+)
+def test_non_clothing_reference_auction_survives_final_verification_gate(
+    url: str,
+    title: str,
+    text: str,
+    inventory_type: str,
+) -> None:
+    query = build_psauction_clothing_queries(1)[0]
+
+    class _OneHitProvider:
+        name = "PS Auction regression fixture"
+
+        def search(self, _query: str, *, count: int = 10):
+            return (
+                SearchHit(
+                    title=title,
+                    url=url,
+                    description=text,
+                    provider=self.name,
+                ),
+            )
+
+    verification = enrich_sweden_page_verification(
+        PageVerification(
+            url=url,
+            title=title,
+            text=text,
+            listing_status=ACTIVE,
+            page_role=ITEM_LISTING,
+            opportunity_identity=f"url-id:{url.split('/')[4]}",
+            identity_stable=True,
+            verified=True,
+        )
+    )
+    assert verification.clothing_inventory_evidence is False
+    assert verification.resale_inventory_evidence is True
+    assert verification.inventory_type == inventory_type
+
+    result = run_clothing_inventory_discovery(
+        SwedenLocalizedSearchProvider(_OneHitProvider()),
+        queries=(query,),
+        verifier=lambda _url: verification,
+    )
+    hardened = apply_post_verification_top5_hard_gate(result)
+    candidate = hardened["all_discovered_candidates"][0]
+
+    assert candidate["asset_scope"] == RESELLABLE_INVENTORY
+    assert candidate["opportunity_state"] == CONFIRMED_SALE
+    assert candidate["top5_eligible"] is True
+    assert hardened["discovery_top5"][0]["opportunity_identity"] == (
+        f"url-id:{url.split('/')[4]}"
+    )

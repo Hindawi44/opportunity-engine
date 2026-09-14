@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
 import os
 from pathlib import Path
 import sys
+from typing import Callable
 
 from opportunity_engine.discovery.blinto_historical_price_trust import (
     apply_blinto_historical_price_trust_gate,
 )
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.clothing_inventory_search import (
+    RESELLABLE_INVENTORY,
     apply_post_verification_top5_hard_gate,
     run_clothing_inventory_discovery,
     write_discovery_artifacts,
@@ -92,10 +95,20 @@ class _PSAuctionUpstreamScopeVerifier(PSAuctionPlaywrightFallbackVerifier):
 
     This bridge is used only by the PS Auction source path below. Candidates on
     that path have already passed PSAuctionPrefetchedSearchProvider's exact-item,
-    clothing-title and bulk-inventory gates across the complete bounded prefetch.
+    approved resale-asset and bulk-inventory gates across the complete bounded
+    prefetch.
     The parent verifier still filters indexed search results to the same item ID;
     therefore the second search only needs to corroborate ACTIVE/ENDED state.
     """
+
+    def __init__(
+        self,
+        *args,
+        upstream_asset_scope: Callable[[str], str | None] | None = None,
+        **kwargs,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self._upstream_asset_scope = upstream_asset_scope
 
     @staticmethod
     def _scope_is_proven(hits) -> bool:
@@ -103,6 +116,24 @@ class _PSAuctionUpstreamScopeVerifier(PSAuctionPlaywrightFallbackVerifier):
         # requested item ID. Upstream scope was already proved by the strict
         # PS Auction prefetch gate, so one exact indexed hit is sufficient here.
         return bool(hits)
+
+    def _corroborate_with_indexed_search(self, url, unresolved):
+        result = super()._corroborate_with_indexed_search(url, unresolved)
+        asset_scope = (
+            self._upstream_asset_scope(url)
+            if self._upstream_asset_scope is not None
+            else None
+        )
+        if not result.verified or asset_scope is None:
+            return result
+        return replace(
+            result,
+            clothing_inventory_evidence=(
+                result.clothing_inventory_evidence
+                or asset_scope == "CLOTHING_INVENTORY"
+            ),
+            resale_inventory_evidence=True,
+        )
 
     def diagnostics(self) -> dict[str, object]:
         diagnostics = super().diagnostics()
@@ -277,7 +308,7 @@ def main() -> int:
             request_budget=len(queries),
         )
         provider = SwedenLocalizedSearchProvider(psauction_provider)
-        query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V2"
+        query_pack = "SWEDEN_PSAUCTION_RESELLABLE_INVENTORY_V3"
     else:
         api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
         if not api_key:
@@ -330,7 +361,7 @@ def main() -> int:
 
     browser_verifier: PSAuctionPlaywrightFallbackVerifier | None = None
     if use_psauction_browser_fallback:
-        # The strict prefetch provider has already proved clothing/bulk scope
+        # The strict prefetch provider has already proved resale/bulk scope
         # before verification begins. The bridge prevents the exact status
         # search from needlessly proving that same scope a second time.
         browser_verifier = _PSAuctionUpstreamScopeVerifier(
@@ -340,6 +371,11 @@ def main() -> int:
                 delay_seconds=args.psauction_browser_delay_seconds,
             ),
             allow_indexed_search=not paid_brave_disabled,
+            upstream_asset_scope=(
+                psauction_provider.asset_scope_for_url
+                if psauction_provider is not None
+                else None
+            ),
         )
         verifier = browser_verifier
 
@@ -379,7 +415,12 @@ def main() -> int:
     }.get(args.source)
 
     report = result["search_run_report"]
-    report["domain"] = "CLOTHING_INVENTORY"
+    result_domain = (
+        RESELLABLE_INVENTORY
+        if args.source == "psauction"
+        else "CLOTHING_INVENTORY"
+    )
+    report["domain"] = result_domain
     report["market_code"] = profile.market_code
     report["market_name"] = profile.market_name
     report["currency"] = profile.currency_code
@@ -426,7 +467,7 @@ def main() -> int:
         output_dir,
         market_code=profile.market_code,
         currency=profile.currency_code,
-        domain="CLOTHING_INVENTORY",
+        domain=result_domain,
     )
     paths["unified_opportunity_report"] = unified_report_path
 

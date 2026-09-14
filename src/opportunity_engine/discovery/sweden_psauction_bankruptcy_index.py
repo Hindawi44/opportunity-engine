@@ -4,7 +4,7 @@ The current PS Auction site exposes auction groups at
 ``/auction/<id>/<slug>`` from its public ``/auctions`` page. This adapter reads
 that approved index, renders the same page once when AWS WAF
 returns its empty JavaScript challenge response, keeps only exact
-clothing-inventory auction pages, and injects them ahead of the existing
+practical resale-inventory auction pages, and injects them ahead of the existing
 bounded Brave fallback. It never logs in, contacts a seller, bids, or performs
 a purchase action.
 """

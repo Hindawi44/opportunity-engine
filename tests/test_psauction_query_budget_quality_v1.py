@@ -6,6 +6,9 @@ from opportunity_engine.discovery.sweden_psauction import (
     PSAUCTION_CURRENT_QUERY_IDS,
     build_psauction_clothing_queries,
 )
+from opportunity_engine.discovery.clothing_inventory_search import (
+    RESELLABLE_INVENTORY,
+)
 
 
 def test_default_psauction_budget_prioritizes_current_window_then_inventory() -> None:
@@ -53,4 +56,4 @@ def test_current_window_query_is_priority_hint_not_active_claim() -> None:
 
     assert all(query.scenario == "AUCTION" for query in current)
     assert all(query.intent == "SALE_INTENT" for query in current)
-    assert all(query.asset_scope == "CLOTHING_INVENTORY" for query in current)
+    assert all(query.asset_scope == RESELLABLE_INVENTORY for query in current)
