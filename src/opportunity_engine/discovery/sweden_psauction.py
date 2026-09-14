@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo
 
 from opportunity_engine.discovery.clothing_inventory_search import (
     DiscoveryQuery,
+    RESELLABLE_INVENTORY,
     normalize_public_url,
 )
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
@@ -36,6 +37,7 @@ PSAUCTION_CURRENT_QUERY_IDS = frozenset({
     "se-ps-current-01",
     "se-ps-current-02",
 })
+PSAUCTION_NATIVE_ACTIVE_INDEX_PROVIDER = "PSAUCTION_ACTIVE_INDEX_V1"
 
 # The legacy matrix remains inventory-first and is retained as bounded fallback
 # coverage. The normal daily builder prepends two current-month status-intent
@@ -47,21 +49,21 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "se-ps-05",
         "COMPANY_BANKRUPTCY",
         "SALE_INTENT",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view konkursbo kläder parti -fordon -maskin',
     ),
     DiscoveryQuery(
         "se-ps-08",
         "WAREHOUSE_SURPLUS",
         "SALE_INTENT",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view restlager kläder',
     ),
     DiscoveryQuery(
         "se-ps-09",
         "LARGE_LOT_SALE",
         "SPECIALIZED",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view lagerparti kläder accessoarer',
         "SECONDARY",
     ),
@@ -69,7 +71,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "se-ps-14",
         "INVENTORY_LIQUIDATION",
         "SPECIALIZED",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view butikslager kläder accessoarer',
         "SECONDARY",
     ),
@@ -77,7 +79,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "se-ps-11",
         "WAREHOUSE_SURPLUS",
         "SPECIALIZED",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view arbetskläder arbetsskor parti',
         "SECONDARY",
     ),
@@ -85,7 +87,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "se-ps-12",
         "LARGE_LOT_SALE",
         "SPECIALIZED",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view skor lager parti konkurs',
         "SECONDARY",
     ),
@@ -93,7 +95,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "se-ps-15",
         "LARGE_LOT_SALE",
         "SPECIALIZED",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view textil kläder parti',
         "SECONDARY",
     ),
@@ -101,21 +103,21 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "se-ps-06",
         "LARGE_LOT_SALE",
         "SALE_INTENT",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view "parti med kläder" -fordon',
     ),
     DiscoveryQuery(
         "se-ps-07",
         "INVENTORY_LIQUIDATION",
         "SALE_INTENT",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view "samtliga kläder" butik',
     ),
     DiscoveryQuery(
         "se-ps-10",
         "COMPANY_BANKRUPTCY",
         "SPECIALIZED",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view jeans kläder konkursbo',
         "SECONDARY",
     ),
@@ -123,7 +125,7 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "se-ps-13",
         "LARGE_LOT_SALE",
         "SPECIALIZED",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view modekläder varulager',
         "SECONDARY",
     ),
@@ -131,28 +133,28 @@ PSAUCTION_CLOTHING_QUERY_MATRIX: tuple[DiscoveryQuery, ...] = (
         "se-ps-01",
         "AUCTION",
         "SALE_INTENT",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view "Auktionen avslutas" kläder parti',
     ),
     DiscoveryQuery(
         "se-ps-02",
         "AUCTION",
         "SALE_INTENT",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view "Auktionen avslutas" arbetskläder sortiment',
     ),
     DiscoveryQuery(
         "se-ps-03",
         "AUCTION",
         "SALE_INTENT",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view "Auktionen avslutas" skor parti',
     ),
     DiscoveryQuery(
         "se-ps-04",
         "AUCTION",
         "SALE_INTENT",
-        "CLOTHING_INVENTORY",
+        RESELLABLE_INVENTORY,
         'site:psauction.se/item/view "Auktionen avslutas" bälten',
     ),
 )
@@ -178,6 +180,58 @@ _CLOTHING_TITLE_TERMS = (
     "textil",
     "plagg",
 )
+_STORE_INVENTORY_TERMS = (
+    "butikslager",
+    "webblager",
+    "varulager",
+    "butiksvaror",
+    "butikssortiment",
+    "webbshop",
+    "webbshoppar",
+    "e-handelsbutik",
+    "e-handelsbutiker",
+    "fritidsbutik",
+    "butik",
+)
+_FURNITURE_TERMS = (
+    "möbler",
+    "designmöbler",
+    "kontorsmöbler",
+    "möbelhus",
+    "bord",
+    "stolar",
+    "soffor",
+    "skrivbord",
+)
+_STORE_FIXTURE_TERMS = (
+    "butiksinredning",
+    "hyllor",
+    "hyllsystem",
+    "klädställ",
+    "klädställningar",
+    "kassadisk",
+    "skyltdockor",
+    "displayställ",
+)
+_IMPLICIT_MULTI_ASSET_TERMS = (
+    # These words describe stock, a collection, or plural resale assets by
+    # themselves. They may therefore pass the lot gate on an exact item route
+    # even when the snippet omits a numeric quantity.
+    "butikslager",
+    "webblager",
+    "varulager",
+    "butiksvaror",
+    "butikssortiment",
+    "butiksinredning",
+    "hyllsystem",
+    "klädställningar",
+    "displayställ",
+    "designmöbler",
+    "kontorsmöbler",
+    "möbler",
+    "stolar",
+    "soffor",
+)
 _BULK_TERMS = (
     "parti",
     "lager",
@@ -200,6 +254,7 @@ _BULK_QUANTITY_PATTERN = re.compile(
     r"(?:st|par|plagg|artiklar|objekt|pall|kartonger?|krt)\b",
     re.I,
 )
+_AUCTION_OBJECT_COUNT_PATTERN = re.compile(r"\b(\d{1,7})\s*objekt\b", re.I)
 _ENDED_OR_SOLD_TERMS = (
     "auktionen är avslutad",
     "auktionen avslutad",
@@ -209,6 +264,33 @@ _ENDED_OR_SOLD_TERMS = (
     "avbruten",
 )
 _ENDED_REASON = "specific PS Auction item is ended or sold"
+_EXCLUDED_ASSET_TERMS = (
+    "fordon",
+    "personbil",
+    "personbilar",
+    "lastbil",
+    "lastbilar",
+    "motorcykel",
+    "motorcyklar",
+    "moped",
+    "släpvagn",
+    "släpvagnar",
+    "minigrävare",
+    "grävmaskin",
+    "grävmaskiner",
+    "hjullastare",
+    "entreprenadmaskin",
+    "entreprenadmaskiner",
+    "industrimaskin",
+    "industrimaskiner",
+    "verkstadsmaskin",
+    "verkstadsmaskiner",
+    "svarv",
+    "svarvar",
+    "traktor",
+    "traktorer",
+)
+_EXCLUDED_ASSET_REASON = "vehicle or heavy machinery scope excluded"
 
 
 @dataclass(frozen=True, slots=True)
@@ -217,6 +299,7 @@ class PSAuctionGateDecision:
     canonical_url: str
     item_id: str | None
     reason: str
+    asset_scope: str | None = None
 
 
 def build_psauction_current_window_queries(
@@ -238,20 +321,22 @@ def build_psauction_current_window_queries(
             "se-ps-current-01",
             "AUCTION",
             "SALE_INTENT",
-            "CLOTHING_INVENTORY",
+            RESELLABLE_INVENTORY,
             (
-                "site:psauction.se/auction (konkurs OR konkursbo) kläder "
-                f'"Auktionen slutar" {month}'
+                "site:psauction.se/auction (konkurs OR avyttring OR avveckling) "
+                "(butikslager OR varulager OR webbshop OR kläder OR skor) "
+                f'"Auktionen slutar" {month} -fordon -maskiner'
             ),
         ),
         DiscoveryQuery(
             "se-ps-current-02",
             "AUCTION",
             "SALE_INTENT",
-            "CLOTHING_INVENTORY",
+            RESELLABLE_INVENTORY,
             (
-                "site:psauction.se/auction (konkurs OR konkursbo) arbetskläder "
-                f'"Auktionen slutar" {month}'
+                "site:psauction.se/auction (möbler OR butiksinredning OR "
+                "hyllor OR klädställningar) "
+                f'"Auktionen slutar" {month} -fordon -maskiner'
             ),
         ),
     )
@@ -362,8 +447,22 @@ def _has_bulk_scope(text: str) -> bool:
     return any(int(match.group(1)) >= 10 for match in _BULK_QUANTITY_PATTERN.finditer(text))
 
 
+def classify_psauction_resale_asset_scope(text: str) -> str | None:
+    """Classify only the resale asset families approved for the PS source lane."""
+    normalized = _compact(text)
+    if any(term in normalized for term in _CLOTHING_TITLE_TERMS):
+        return "CLOTHING_INVENTORY"
+    if any(term in normalized for term in _STORE_FIXTURE_TERMS):
+        return "STORE_FIXTURES"
+    if any(term in normalized for term in _FURNITURE_TERMS):
+        return "FURNITURE"
+    if any(term in normalized for term in _STORE_INVENTORY_TERMS):
+        return "STORE_INVENTORY"
+    return None
+
+
 def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
-    """Accept only a specific, not-known-ended PS Auction bulk clothing page."""
+    """Accept one current PS listing in the approved practical resale scope."""
     canonical = normalize_public_url(hit.url)
     if not canonical:
         return PSAuctionGateDecision(False, "", None, "invalid public HTTPS URL")
@@ -392,34 +491,56 @@ def psauction_gate_decision(hit: SearchHit) -> PSAuctionGateDecision:
 
     title = _compact(hit.title)
     combined = _compact(f"{hit.title} {hit.description}")
-    clothing_scope = combined if route == "auction" else title
-    if not any(term in clothing_scope for term in _CLOTHING_TITLE_TERMS):
-        return PSAuctionGateDecision(
-            False,
-            canonical,
-            path_match.group("item_id"),
-            "specific PS Auction listing lacks clothing evidence",
-        )
-    if not _has_bulk_scope(combined):
-        return PSAuctionGateDecision(
-            False,
-            canonical,
-            path_match.group("item_id"),
-            "specific clothing item lacks bulk inventory evidence",
-        )
     if any(term in combined for term in _ENDED_OR_SOLD_TERMS):
         return PSAuctionGateDecision(
             False,
             canonical,
             path_match.group("item_id"),
             _ENDED_REASON,
+            classify_psauction_resale_asset_scope(combined),
+        )
+    if any(term in combined for term in _EXCLUDED_ASSET_TERMS):
+        return PSAuctionGateDecision(
+            False,
+            canonical,
+            path_match.group("item_id"),
+            _EXCLUDED_ASSET_REASON,
+        )
+    target_scope = combined if route == "auction" else title
+    asset_scope = classify_psauction_resale_asset_scope(target_scope)
+    if asset_scope is None:
+        return PSAuctionGateDecision(
+            False,
+            canonical,
+            path_match.group("item_id"),
+            "specific PS Auction listing lacks supported resale-inventory evidence",
+        )
+    has_parent_auction_scope = route == "auction" and (
+        _AUCTION_OBJECT_COUNT_PATTERN.search(combined) is not None
+        or any(term in combined for term in ("konkurs", "avyttring", "avveckling"))
+    )
+    has_implicit_multi_asset_scope = (
+        asset_scope != "CLOTHING_INVENTORY"
+        and any(term in target_scope for term in _IMPLICIT_MULTI_ASSET_TERMS)
+    )
+    if not _has_bulk_scope(combined) and not (
+        (asset_scope != "CLOTHING_INVENTORY" and has_parent_auction_scope)
+        or has_implicit_multi_asset_scope
+    ):
+        return PSAuctionGateDecision(
+            False,
+            canonical,
+            path_match.group("item_id"),
+            "specific target item lacks bulk inventory evidence",
+            asset_scope,
         )
 
     return PSAuctionGateDecision(
         True,
         canonical,
         path_match.group("item_id"),
-        "specific PS Auction bulk clothing-inventory listing page",
+        "specific PS Auction practical resale-inventory listing page",
+        asset_scope,
     )
 
 
@@ -479,6 +600,7 @@ class PSAuctionTargetedSearchProvider:
                 "url": hit.url,
                 "canonical_url": decision.canonical_url,
                 "item_id": decision.item_id,
+                "asset_scope": decision.asset_scope,
                 "reason": decision.reason,
                 "description": hit.description[:500],
             }

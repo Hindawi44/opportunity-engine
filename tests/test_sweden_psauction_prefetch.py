@@ -71,6 +71,10 @@ def test_prefetch_removes_item_globally_when_any_query_marks_it_ended():
     assert diagnostics["historical_item_ids"] == ["580782"]
     assert diagnostics["accepted_item_ids"] == ["670524"]
     assert diagnostics["requests_made"] == 2
+    assert provider.asset_scope_for_url(_unresolved_hit().url) == (
+        "CLOTHING_INVENTORY"
+    )
+    assert provider.asset_scope_for_url("https://psauction.se/auctions") is None
 
 
 def test_prefetch_reuses_cached_queries_without_extra_provider_calls():

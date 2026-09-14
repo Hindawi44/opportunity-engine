@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
 import os
 from pathlib import Path
 import sys
+from typing import Callable
 
 from opportunity_engine.discovery.blinto_historical_price_trust import (
     apply_blinto_historical_price_trust_gate,
 )
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.clothing_inventory_search import (
+    RESELLABLE_INVENTORY,
     apply_post_verification_top5_hard_gate,
     run_clothing_inventory_discovery,
     write_discovery_artifacts,
@@ -36,7 +39,6 @@ from opportunity_engine.discovery.sweden_current_first import (
 )
 from opportunity_engine.discovery.sweden_klaravik import verify_klaravik_public_page
 from opportunity_engine.discovery.sweden_psauction import (
-    PSAUCTION_CURRENT_QUERY_IDS,
     build_psauction_clothing_queries,
 )
 from opportunity_engine.discovery.sweden_psauction_bankruptcy_index import (
@@ -67,7 +69,7 @@ TARGETED_SOURCES = frozenset({"psauction", "klaravik", "blinto"})
 class _NativeOnlySearchProvider:
     """Zero-network fallback used after the paid Brave guard has fired."""
 
-    name = "PS Auction native bankruptcy index only"
+    name = "PS Auction native active index only"
 
     def search(self, query: str, *, count: int = 10) -> tuple[SearchHit, ...]:
         del query, count
@@ -93,10 +95,20 @@ class _PSAuctionUpstreamScopeVerifier(PSAuctionPlaywrightFallbackVerifier):
 
     This bridge is used only by the PS Auction source path below. Candidates on
     that path have already passed PSAuctionPrefetchedSearchProvider's exact-item,
-    clothing-title and bulk-inventory gates across the complete bounded prefetch.
+    approved resale-asset and bulk-inventory gates across the complete bounded
+    prefetch.
     The parent verifier still filters indexed search results to the same item ID;
     therefore the second search only needs to corroborate ACTIVE/ENDED state.
     """
+
+    def __init__(
+        self,
+        *args,
+        upstream_asset_scope: Callable[[str], str | None] | None = None,
+        **kwargs,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self._upstream_asset_scope = upstream_asset_scope
 
     @staticmethod
     def _scope_is_proven(hits) -> bool:
@@ -104,6 +116,24 @@ class _PSAuctionUpstreamScopeVerifier(PSAuctionPlaywrightFallbackVerifier):
         # requested item ID. Upstream scope was already proved by the strict
         # PS Auction prefetch gate, so one exact indexed hit is sufficient here.
         return bool(hits)
+
+    def _corroborate_with_indexed_search(self, url, unresolved):
+        result = super()._corroborate_with_indexed_search(url, unresolved)
+        asset_scope = (
+            self._upstream_asset_scope(url)
+            if self._upstream_asset_scope is not None
+            else None
+        )
+        if not result.verified or asset_scope is None:
+            return result
+        return replace(
+            result,
+            clothing_inventory_evidence=(
+                result.clothing_inventory_evidence
+                or asset_scope == "CLOTHING_INVENTORY"
+            ),
+            resale_inventory_evidence=True,
+        )
 
     def diagnostics(self) -> dict[str, object]:
         diagnostics = super().diagnostics()
@@ -265,11 +295,11 @@ def main() -> int:
             )
         psauction_search = PSAuctionBankruptcyIndexAugmentedProvider(
             base_search,
-            target_queries=tuple(
-                query.query
-                for query in queries
-                if query.query_id in PSAUCTION_CURRENT_QUERY_IDS
-            ),
+            # Spread the bounded native result set across the full query pack.
+            # With ten results per lane this preserves up to the collector's
+            # 50-auction cap instead of silently truncating the active index to
+            # the first twenty cards.
+            target_queries=tuple(query.query for query in queries),
             current_hits=psauction_index_collection.hits,
         )
         psauction_provider = PSAuctionPrefetchedSearchProvider(
@@ -278,7 +308,7 @@ def main() -> int:
             request_budget=len(queries),
         )
         provider = SwedenLocalizedSearchProvider(psauction_provider)
-        query_pack = "SWEDEN_PSAUCTION_CLOTHING_INVENTORY_V2"
+        query_pack = "SWEDEN_PSAUCTION_RESELLABLE_INVENTORY_V3"
     else:
         api_key = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
         if not api_key:
@@ -331,7 +361,7 @@ def main() -> int:
 
     browser_verifier: PSAuctionPlaywrightFallbackVerifier | None = None
     if use_psauction_browser_fallback:
-        # The strict prefetch provider has already proved clothing/bulk scope
+        # The strict prefetch provider has already proved resale/bulk scope
         # before verification begins. The bridge prevents the exact status
         # search from needlessly proving that same scope a second time.
         browser_verifier = _PSAuctionUpstreamScopeVerifier(
@@ -341,6 +371,11 @@ def main() -> int:
                 delay_seconds=args.psauction_browser_delay_seconds,
             ),
             allow_indexed_search=not paid_brave_disabled,
+            upstream_asset_scope=(
+                psauction_provider.asset_scope_for_url
+                if psauction_provider is not None
+                else None
+            ),
         )
         verifier = browser_verifier
 
@@ -361,7 +396,7 @@ def main() -> int:
     targeted_provider = psauction_provider or klaravik_provider or blinto_provider
     source_diagnostics = targeted_provider.diagnostics() if targeted_provider else None
     if source_diagnostics is not None and psauction_index_collection is not None:
-        source_diagnostics["bankruptcy_index"] = (
+        source_diagnostics["active_index"] = (
             psauction_index_collection.diagnostics()
         )
     if psauction_provider is not None and source_diagnostics is not None:
@@ -380,7 +415,12 @@ def main() -> int:
     }.get(args.source)
 
     report = result["search_run_report"]
-    report["domain"] = "CLOTHING_INVENTORY"
+    result_domain = (
+        RESELLABLE_INVENTORY
+        if args.source == "psauction"
+        else "CLOTHING_INVENTORY"
+    )
+    report["domain"] = result_domain
     report["market_code"] = profile.market_code
     report["market_name"] = profile.market_name
     report["currency"] = profile.currency_code
@@ -427,7 +467,7 @@ def main() -> int:
         output_dir,
         market_code=profile.market_code,
         currency=profile.currency_code,
-        domain="CLOTHING_INVENTORY",
+        domain=result_domain,
     )
     paths["unified_opportunity_report"] = unified_report_path
 

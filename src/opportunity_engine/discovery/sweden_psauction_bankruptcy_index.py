@@ -1,10 +1,10 @@
-"""Bounded native discovery from PS Auction's public bankruptcy index.
+"""Bounded native discovery from PS Auction's public active-auction index.
 
 The current PS Auction site exposes auction groups at
-``/auction/<id>/<slug>`` from one public ``/auctions?bankruptcy=1`` page. This
-adapter reads that approved index, renders the same page once when AWS WAF
+``/auction/<id>/<slug>`` from its public ``/auctions`` page. This adapter reads
+that approved index, renders the same page once when AWS WAF
 returns its empty JavaScript challenge response, keeps only exact
-clothing-inventory auction pages, and injects them ahead of the existing
+practical resale-inventory auction pages, and injects them ahead of the existing
 bounded Brave fallback. It never logs in, contacts a seller, bids, or performs
 a purchase action.
 """
@@ -18,7 +18,7 @@ from html.parser import HTMLParser
 import shutil
 import subprocess
 from typing import Any
-from urllib.parse import parse_qs, urljoin, urlparse
+from urllib.parse import urljoin, urlparse
 
 import requests
 
@@ -28,12 +28,17 @@ from opportunity_engine.discovery.clothing_inventory_search import (
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
 from opportunity_engine.discovery.sweden_psauction import (
     PSAUCTION_AUCTION_PATH,
+    PSAUCTION_NATIVE_ACTIVE_INDEX_PROVIDER,
     canonicalize_psauction_listing_url,
     psauction_gate_decision,
 )
 
-PSAUCTION_BANKRUPTCY_INDEX_POLICY = "PSAUCTION_BANKRUPTCY_INDEX_V1"
-PSAUCTION_BANKRUPTCY_INDEX_URL = "https://psauction.se/auctions?bankruptcy=1"
+PSAUCTION_ACTIVE_INDEX_POLICY = PSAUCTION_NATIVE_ACTIVE_INDEX_PROVIDER
+PSAUCTION_ACTIVE_INDEX_URL = "https://psauction.se/auctions"
+# Backward-compatible imports for callers deployed with the bankruptcy-only
+# adapter name. Both aliases now point to the active-auction source contract.
+PSAUCTION_BANKRUPTCY_INDEX_POLICY = PSAUCTION_ACTIVE_INDEX_POLICY
+PSAUCTION_BANKRUPTCY_INDEX_URL = PSAUCTION_ACTIVE_INDEX_URL
 MAX_INDEX_AUCTIONS = 50
 MIN_RENDER_DELAY_SECONDS = 4.0
 MAX_RENDER_DELAY_SECONDS = 15.0
@@ -51,18 +56,22 @@ def _normalized_host(value: str | None) -> str:
     return host[4:] if host.startswith("www.") else host
 
 
-def is_approved_psauction_bankruptcy_index_url(url: str) -> bool:
-    """Allow only the single public bankruptcy-auction index route."""
+def is_approved_psauction_active_index_url(url: str) -> bool:
+    """Allow only the single public all-active-auctions index route."""
     canonical = normalize_public_url(url)
     if not canonical:
         return False
     parsed = urlparse(canonical)
-    query = parse_qs(parsed.query, keep_blank_values=True)
     return (
         _normalized_host(parsed.hostname) == "psauction.se"
         and parsed.path.rstrip("/").casefold() == "/auctions"
-        and query == {"bankruptcy": ["1"]}
+        and not parsed.query
     )
+
+
+def is_approved_psauction_bankruptcy_index_url(url: str) -> bool:
+    """Backward-compatible alias for the active-auction index URL guard."""
+    return is_approved_psauction_active_index_url(url)
 
 
 def _compact(value: str) -> str:
@@ -156,8 +165,8 @@ class PSAuctionBankruptcyIndexConfig:
     render_timeout_seconds: float = 45.0
 
     def __post_init__(self) -> None:
-        if not is_approved_psauction_bankruptcy_index_url(self.index_url):
-            raise ValueError("index_url must be the approved PS Auction bankruptcy index")
+        if not is_approved_psauction_active_index_url(self.index_url):
+            raise ValueError("index_url must be the approved PS Auction active index")
         if not 1 <= self.max_auctions <= MAX_INDEX_AUCTIONS:
             raise ValueError(
                 f"max_auctions must be between 1 and {MAX_INDEX_AUCTIONS}"
@@ -195,9 +204,9 @@ class PSAuctionBankruptcyIndexCollection:
 
     def diagnostics(self) -> dict[str, object]:
         return {
-            "policy": PSAUCTION_BANKRUPTCY_INDEX_POLICY,
+            "policy": PSAUCTION_ACTIVE_INDEX_POLICY,
             "source": "PS_AUCTION",
-            "source_mode": "NATIVE_BANKRUPTCY_INDEX",
+            "source_mode": "NATIVE_ACTIVE_INDEX",
             "index_url": self.index_url,
             "final_url": self.final_url,
             "captured_at": self.captured_at,
@@ -248,8 +257,8 @@ def _render_index(
     timeout_seconds: float,
 ) -> BankruptcyIndexFetch:
     """Render only the approved public index with a bounded system browser."""
-    if not is_approved_psauction_bankruptcy_index_url(url):
-        raise ValueError("render URL must be the approved PS Auction bankruptcy index")
+    if not is_approved_psauction_active_index_url(url):
+        raise ValueError("render URL must be the approved PS Auction active index")
     executable = next(
         (
             path
@@ -296,7 +305,7 @@ def _render_index(
     )
 
 
-def parse_psauction_bankruptcy_index(
+def parse_psauction_active_index(
     html_text: str,
     *,
     base_url: str,
@@ -322,7 +331,7 @@ def parse_psauction_bankruptcy_index(
             title=title,
             url=canonical,
             description=description,
-            provider=PSAUCTION_BANKRUPTCY_INDEX_POLICY,
+            provider=PSAUCTION_ACTIVE_INDEX_POLICY,
         )
         previous = best_by_url.get(canonical)
         if previous is None or len(hit.description) > len(previous.description):
@@ -330,8 +339,17 @@ def parse_psauction_bankruptcy_index(
     return tuple(best_by_url.values())
 
 
+def parse_psauction_bankruptcy_index(
+    html_text: str,
+    *,
+    base_url: str,
+) -> tuple[SearchHit, ...]:
+    """Backward-compatible alias for :func:`parse_psauction_active_index`."""
+    return parse_psauction_active_index(html_text, base_url=base_url)
+
+
 class PSAuctionBankruptcyIndexCollector:
-    """Read and locally filter one approved PS Auction bankruptcy index page."""
+    """Read and locally filter the approved PS Auction active index page."""
 
     def __init__(
         self,
@@ -372,16 +390,16 @@ class PSAuctionBankruptcyIndexCollector:
                 waf_action = fetched.waf_action
                 final_url = fetched.final_url
                 if str(fetched.waf_action or "").casefold() == "challenge":
-                    fallback_reason = "HTTP bankruptcy index returned an AWS WAF challenge"
+                    fallback_reason = "HTTP active index returned an AWS WAF challenge"
                 elif fetched.status_code != 200:
                     fallback_reason = (
-                        "HTTP bankruptcy index returned "
+                        "HTTP active index returned "
                         f"status {fetched.status_code}"
                     )
                 elif len(fetched.html.strip()) < 80:
-                    fallback_reason = "HTTP bankruptcy index returned insufficient content"
+                    fallback_reason = "HTTP active index returned insufficient content"
             except Exception as exc:
-                fallback_reason = f"HTTP bankruptcy index fetch failed: {exc}"
+                fallback_reason = f"HTTP active index fetch failed: {exc}"
                 fetched = BankruptcyIndexFetch(
                     final_url=self.config.index_url,
                     html="",
@@ -409,11 +427,11 @@ class PSAuctionBankruptcyIndexCollector:
 
             final_url = fetched.final_url
             selected_transport = fetched.transport
-            if not is_approved_psauction_bankruptcy_index_url(final_url):
+            if not is_approved_psauction_active_index_url(final_url):
                 raise RuntimeError(
-                    "bankruptcy index redirected outside the approved PS Auction route"
+                    "active index redirected outside the approved PS Auction route"
                 )
-            raw_hits = parse_psauction_bankruptcy_index(
+            raw_hits = parse_psauction_active_index(
                 fetched.html,
                 base_url=final_url,
             )
@@ -490,7 +508,7 @@ class PSAuctionBankruptcyIndexAugmentedProvider:
         self._current_hits = tuple(current_hits)
         self.name = (
             f"{getattr(provider, 'name', provider.__class__.__name__)} + "
-            "PS Auction Bankruptcy Index"
+            "PS Auction Active Index"
         )
 
     def search(self, query: str, *, count: int = 10) -> Sequence[SearchHit]:

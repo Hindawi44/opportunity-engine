@@ -23,7 +23,9 @@ from opportunity_engine.discovery.search_provider import SearchHit, SearchProvid
 from opportunity_engine.discovery.sweden_psauction import (
     PSAUCTION_CURRENT_QUERY_IDS,
     PSAUCTION_HOST,
+    PSAUCTION_NATIVE_ACTIVE_INDEX_PROVIDER,
     PSAuctionGateDecision,
+    canonicalize_psauction_listing_url,
     psauction_gate_decision,
 )
 
@@ -67,6 +69,7 @@ class PSAuctionPrefetchedSearchProvider:
         self._historical_item_ids: list[str] = []
         self._accepted_item_ids: list[str] = []
         self._accepted_urls: list[str] = []
+        self._asset_scope_by_url: dict[str, str] = {}
         self._accepted_samples: list[dict[str, Any]] = []
         self._rejected_samples: list[dict[str, Any]] = []
         self._rejection_reasons: Counter[str] = Counter()
@@ -88,6 +91,7 @@ class PSAuctionPrefetchedSearchProvider:
             "url": hit.url,
             "canonical_url": decision.canonical_url,
             "item_id": decision.item_id,
+            "asset_scope": decision.asset_scope,
             "reason": reason,
             "description": hit.description[:500],
         }
@@ -118,7 +122,7 @@ class PSAuctionPrefetchedSearchProvider:
             raw_by_query[query.query] = raw_hits
             pairs = tuple((hit, psauction_gate_decision(hit)) for hit in raw_hits)
             decisions_by_query[query.query] = pairs
-            for _, decision in pairs:
+            for hit, decision in pairs:
                 if (
                     decision.reason == _ENDED_REASON
                     and decision.item_id
@@ -126,7 +130,10 @@ class PSAuctionPrefetchedSearchProvider:
                 ):
                     historical_ids.append(decision.item_id)
                 if (
-                    query.query_id in PSAUCTION_CURRENT_QUERY_IDS
+                    (
+                        query.query_id in PSAUCTION_CURRENT_QUERY_IDS
+                        or hit.provider == PSAUCTION_NATIVE_ACTIVE_INDEX_PROVIDER
+                    )
                     and decision.accepted
                     and decision.item_id
                     and decision.item_id not in current_window_ids
@@ -200,6 +207,10 @@ class PSAuctionPrefetchedSearchProvider:
                 )
                 accepted.append(accepted_hit)
                 globally_accepted_urls.add(decision.canonical_url)
+                if decision.asset_scope:
+                    self._asset_scope_by_url[decision.canonical_url] = (
+                        decision.asset_scope
+                    )
                 self._accepted_hits += 1
                 if len(self._accepted_samples) < 20:
                     self._accepted_samples.append(sample)
@@ -229,6 +240,13 @@ class PSAuctionPrefetchedSearchProvider:
             raise ValueError("query is not registered in the PS Auction source policy")
         self._prefetch(count)
         return self._hits_by_query[query]
+
+    def asset_scope_for_url(self, url: str) -> str | None:
+        """Return scope already proven by this run's strict source gate."""
+        pair = canonicalize_psauction_listing_url(url)
+        if pair is None:
+            return None
+        return self._asset_scope_by_url.get(pair[0])
 
     def diagnostics(self) -> dict[str, Any]:
         return {

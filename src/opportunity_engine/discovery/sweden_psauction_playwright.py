@@ -7,7 +7,7 @@ public search corroboration is attempted using the configured Brave API key.
 
 Indexed corroboration is deliberately conservative: it can confirm ENDED from
 explicit ended/sold evidence or an auction end timestamp already in the past,
-and it can confirm ACTIVE only when the exact listing has clothing/bulk evidence
+and it can confirm ACTIVE only when the exact listing has approved resale/bulk evidence
 and an explicit auction end timestamp in the future. Search-index absence or
 ambiguous snippets remain unresolved.
 
@@ -42,6 +42,7 @@ from opportunity_engine.discovery.sweden_clothing_inventory import (
 from opportunity_engine.discovery.sweden_psauction import (
     build_psauction_exact_status_query,
     canonicalize_psauction_listing_url,
+    classify_psauction_resale_asset_scope,
     psauction_listing_route,
     psauction_gate_decision,
 )
@@ -91,6 +92,13 @@ _INVENTORY_TYPE_TERMS = (
     "textil",
     "bälten",
     "accessoarer",
+    "butikslager",
+    "webblager",
+    "butiksinredning",
+    "designmöbler",
+    "kontorsmöbler",
+    "möbler",
+    "möbelhus",
 )
 
 PrimaryVerifier = Callable[[str], PageVerification]
@@ -448,7 +456,7 @@ class PSAuctionPlaywrightFallbackVerifier:
                 unresolved,
                 error=(
                     f"{unresolved.error or 'source-page verification unresolved'}; "
-                    "indexed corroboration lacked exact clothing/bulk evidence"
+                    "indexed corroboration lacked exact resale-inventory evidence"
                 ),
             )
             self._indexed_cache[canonical] = result
@@ -459,6 +467,11 @@ class PSAuctionPlaywrightFallbackVerifier:
             _clean_indexed_text(f"{hit.title} | {hit.description}")
             for hit in exact_hits
         )[:6000]
+        asset_scope = classify_psauction_resale_asset_scope(
+            f"{canonical} | {evidence}"
+        )
+        clothing_evidence = asset_scope == "CLOTHING_INVENTORY"
+        resale_evidence = asset_scope is not None
         status, status_detail = _indexed_status(evidence, self._clock())
         if status == UNKNOWN:
             self._indexed_unresolved_urls.append(canonical)
@@ -470,7 +483,8 @@ class PSAuctionPlaywrightFallbackVerifier:
                 page_role=ITEM_LISTING,
                 opportunity_identity=f"url-id:{item_id}",
                 identity_stable=True,
-                clothing_inventory_evidence=True,
+                clothing_inventory_evidence=clothing_evidence,
+                resale_inventory_evidence=resale_evidence,
                 error=(
                     f"{unresolved.error or 'source-page verification unresolved'}; "
                     "indexed corroboration did not prove a current or ended auction state"
@@ -488,7 +502,8 @@ class PSAuctionPlaywrightFallbackVerifier:
             page_role=ITEM_LISTING,
             opportunity_identity=f"url-id:{item_id}",
             identity_stable=True,
-            clothing_inventory_evidence=True,
+            clothing_inventory_evidence=clothing_evidence,
+            resale_inventory_evidence=resale_evidence,
             sale_evidence=status == ACTIVE,
             event_scenario=self._scenario_from_index_text(evidence),
             bounded_context=evidence[:4000] or None,
