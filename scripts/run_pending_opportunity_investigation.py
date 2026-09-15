@@ -28,13 +28,20 @@ from opportunity_engine.discovery.lifecycle_checkpoint_integration import (
     write_lifecycle_checkpoint_artifacts,
 )
 
-SCHEMA_VERSION = "pending-opportunity-investigation-1.3"
-STATE_SCHEMA_VERSION = "pending-opportunity-investigation-state-1.0"
+SCHEMA_VERSION = "pending-opportunity-investigation-1.4"
+STATE_SCHEMA_VERSION = "pending-opportunity-investigation-state-1.1"
 STATE_FILENAME = "pending-investigation-state.json"
 MAX_LIMIT = 20
 PENDING_WORKFLOW_STATUSES = {"REQUIRES_VERIFICATION", "ACTIVE_OPPORTUNITY"}
 VERIFIED_EXACT_LOT_STATUS = "VERIFIED_EXACT_LOT_CANDIDATE"
 EXACT_ITEM_PAGE_BLOCKER = "verified exact item-page evidence"
+EXACT_ITEM_PAGE_BLOCKERS = frozenset(
+    {
+        "verified exact item-page evidence",
+        "verified exact item page evidence",
+        "verified exact item pages for promoted bulk lots",
+    }
+)
 
 
 def _text(value: object) -> str:
@@ -68,9 +75,17 @@ def _is_public_http_url(value: object) -> bool:
 
 
 def _investigation_url(item: Mapping[str, Any]) -> str:
-    """Return the best live-page URL available on a checkpoint record."""
+    """Return the best live-page URL available on a checkpoint record.
+
+    Canonical checkpoint records may expose a scalar URL or only the merged
+    ``source_urls`` list. Treat both forms as first-class investigation input so
+    deduplication cannot make an otherwise verifiable record invisible.
+    """
     for key in ("source_url", "canonical_url", "url", "opportunity_identity"):
         value = item.get(key)
+        if _is_public_http_url(value):
+            return _text(value)
+    for value in item.get("source_urls") or []:
         if _is_public_http_url(value):
             return _text(value)
     return ""
@@ -105,6 +120,14 @@ def _attempt_count(state_records: Mapping[str, Mapping[str, Any]], item: Mapping
         return 0
 
 
+def _exact_item_page_blockers(item: Mapping[str, Any]) -> list[str]:
+    return [
+        value
+        for value in _text_list(item.get("missing_evidence"))
+        if value.casefold() in EXACT_ITEM_PAGE_BLOCKERS
+    ]
+
+
 def select_pending_opportunities(
     report: Mapping[str, Any],
     limit: int = 10,
@@ -125,6 +148,7 @@ def select_pending_opportunities(
             score = 0.0
         history = state_records.get(_state_key(item)) or {}
         attempts = _attempt_count(state_records, item)
+        item["_resolution_priority"] = 0 if _exact_item_page_blockers(item) else 1
         item["_rank_score"] = score
         item["_attempt_count"] = attempts
         item["_last_investigated_at"] = _text(history.get("last_investigated_at"))
@@ -132,6 +156,7 @@ def select_pending_opportunities(
 
     rows.sort(
         key=lambda item: (
+            int(item.get("_resolution_priority") or 0),
             0 if int(item.get("_attempt_count") or 0) == 0 else 1,
             _text(item.get("_last_investigated_at")),
             -float(item.get("_rank_score") or 0),
@@ -139,6 +164,7 @@ def select_pending_opportunities(
         )
     )
     for item in rows:
+        item.pop("_resolution_priority", None)
         item.pop("_rank_score", None)
         item.pop("_attempt_count", None)
         item.pop("_last_investigated_at", None)
@@ -155,6 +181,9 @@ def investigate_pending_opportunities(
     all_rows = _rows(report.get("deduplicated_opportunities"))
     pending_rows = [item for item in all_rows if _is_pending(item)]
     selectable_rows = [item for item in pending_rows if _investigation_url(item)]
+    resolution_targetable_rows = [
+        item for item in selectable_rows if _exact_item_page_blockers(item)
+    ]
     previous_state_records = _state_records(investigation_state)
     previously_attempted_pending = sum(
         _attempt_count(previous_state_records, item) > 0 for item in selectable_rows
@@ -169,6 +198,9 @@ def investigate_pending_opportunities(
     )
     selected_unseen_count = sum(
         _attempt_count(previous_state_records, item) == 0 for item in selected
+    )
+    selected_resolution_targetable_count = sum(
+        bool(_exact_item_page_blockers(item)) for item in selected
     )
 
     results: list[dict[str, Any]] = []
@@ -185,6 +217,7 @@ def investigate_pending_opportunities(
             "market_code": item.get("market_code"),
             "source_url": url,
             "discovery_score": item.get("discovery_score"),
+            "targeted_missing_evidence": _exact_item_page_blockers(item),
         }
         if not getattr(fetched, "ok", False):
             result_row = {
@@ -234,6 +267,10 @@ def investigate_pending_opportunities(
                 "attempt_count": previous_attempts + 1,
                 "last_investigated_at": generated_at,
                 "last_status": result_row["investigation_status"],
+                "last_classification": result_row.get("classification"),
+                "last_status_code": result_row.get("status_code"),
+                "last_final_url": result_row.get("final_url") or url,
+                "last_evidence": deepcopy(result_row.get("evidence") or {}),
                 "source_url": url,
                 "market_code": item.get("market_code"),
             }
@@ -264,6 +301,8 @@ def investigate_pending_opportunities(
         "pending_candidate_count": len(pending_rows),
         "selectable_pending_count": len(selectable_rows),
         "unselectable_pending_count": len(pending_rows) - len(selectable_rows),
+        "resolution_targetable_pending_count": len(resolution_targetable_rows),
+        "selected_resolution_targetable_count": selected_resolution_targetable_count,
         "previously_investigated_pending_count": previously_attempted_pending,
         "unseen_pending_before_selection": unseen_before,
         "newly_investigated_count": selected_unseen_count,
@@ -299,16 +338,17 @@ def reconcile_investigation_lifecycle(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Apply only evidence that a durable exact-lot investigation actually proved.
 
-    Exact-lot verification clears the exact-item-page blocker and nothing else.
-    A record advances to ACTIVE_OPPORTUNITY only when that was its final blocker.
-    Prior durable state is reapplied on later daily runs so canonical source
-    regeneration cannot silently forget investigation evidence.
+    Exact-lot verification clears recognized exact-item-page blockers and nothing
+    else. A record advances to ACTIVE_OPPORTUNITY only when that was its final
+    blocker. Prior durable state is reapplied on later daily runs so canonical
+    source regeneration cannot silently forget investigation evidence.
     """
     reconciled = deepcopy(dict(report))
     state_records = _state_records(investigation_state)
     newly_verified = {_text(item) for item in newly_verified_ids or [] if _text(item)}
     applied_ids: list[str] = []
     blocker_cleared_ids: list[str] = []
+    already_satisfied_ids: list[str] = []
     still_pending_ids: list[str] = []
     promoted_ids: list[str] = []
 
@@ -326,19 +366,29 @@ def reconcile_investigation_lifecycle(
         if workflow not in PENDING_WORKFLOW_STATUSES:
             continue
 
+        missing = _text_list(item.get("missing_evidence"))
+        matched_blockers = [
+            value for value in missing if value.casefold() in EXACT_ITEM_PAGE_BLOCKERS
+        ]
         item["pending_investigation"] = {
             "status": VERIFIED_EXACT_LOT_STATUS,
             "last_investigated_at": history.get("last_investigated_at"),
             "source_url": history.get("source_url"),
-            "evidence_effect": "EXACT_ITEM_PAGE_BLOCKER_ONLY",
+            "final_url": history.get("last_final_url"),
+            "evidence": deepcopy(history.get("last_evidence") or {}),
+            "evidence_effect": "RECOGNIZED_EXACT_ITEM_PAGE_BLOCKERS_ONLY",
+            "matched_blockers": matched_blockers,
         }
         applied_ids.append(identity)
 
-        missing = _text_list(item.get("missing_evidence"))
-        if EXACT_ITEM_PAGE_BLOCKER not in missing:
+        if not matched_blockers:
+            already_satisfied_ids.append(identity)
+            if workflow == "REQUIRES_VERIFICATION":
+                still_pending_ids.append(identity)
             continue
 
-        remaining = [value for value in missing if value != EXACT_ITEM_PAGE_BLOCKER]
+        matched_keys = {value.casefold() for value in matched_blockers}
+        remaining = [value for value in missing if value.casefold() not in matched_keys]
         item["missing_evidence"] = remaining
         item["verified"] = True
         blocker_cleared_ids.append(identity)
@@ -387,6 +437,16 @@ def reconcile_investigation_lifecycle(
     for item in valid_records:
         all_missing.update(_text_list(item.get("missing_evidence")))
     reconciled["missing_evidence"] = sorted(all_missing)
+
+    applied_set = set(applied_ids)
+    unresolved_evidence_counts: Counter[str] = Counter()
+    for item in valid_records:
+        identity = _state_key(item)
+        if identity not in applied_set:
+            continue
+        if _text(item.get("workflow_status")).upper() != "REQUIRES_VERIFICATION":
+            continue
+        unresolved_evidence_counts.update(_text_list(item.get("missing_evidence")))
 
     current_run_promoted = [identity for identity in promoted_ids if identity in newly_verified]
     if current_run_promoted:
@@ -437,17 +497,27 @@ def reconcile_investigation_lifecycle(
             )
 
     reconciliation = {
-        "schema_version": "pending-investigation-lifecycle-reconciliation-1.0",
+        "schema_version": "pending-investigation-lifecycle-reconciliation-1.1",
         "durable_exact_lot_state_count": sum(
             _text(value.get("last_status")).upper() == VERIFIED_EXACT_LOT_STATUS
             for value in state_records.values()
         ),
+        "durable_evidence_record_count": sum(
+            isinstance(value.get("last_evidence"), Mapping)
+            and bool(value.get("last_evidence"))
+            for value in state_records.values()
+        ),
         "applied_record_count": len(applied_ids),
         "exact_item_page_blocker_cleared_count": len(blocker_cleared_ids),
-        "still_requires_verification_count": len(still_pending_ids),
+        "exact_item_page_already_satisfied_count": len(already_satisfied_ids),
+        "still_requires_verification_count": len(set(still_pending_ids)),
+        "unresolved_evidence_counts": dict(
+            sorted((key, int(value)) for key, value in unresolved_evidence_counts.items())
+        ),
         "promoted_to_active_count": len(promoted_ids),
         "current_run_promoted_to_active_count": len(current_run_promoted),
         "applied_opportunity_ids": sorted(set(applied_ids)),
+        "blocker_cleared_opportunity_ids": sorted(set(blocker_cleared_ids)),
         "promoted_opportunity_ids": sorted(set(promoted_ids)),
         "current_run_promoted_opportunity_ids": sorted(set(current_run_promoted)),
         "commercial_decision_created": False,
@@ -530,6 +600,9 @@ def main() -> int:
         "status": result["status"],
         "selection_status": result["selection_status"],
         "pending_candidate_count": result["pending_candidate_count"],
+        "selectable_pending_count": result["selectable_pending_count"],
+        "resolution_targetable_pending_count": result["resolution_targetable_pending_count"],
+        "selected_resolution_targetable_count": result["selected_resolution_targetable_count"],
         "selected_count": result["selected_count"],
         "investigated_count": result["investigated_count"],
         "newly_investigated_count": result["newly_investigated_count"],
