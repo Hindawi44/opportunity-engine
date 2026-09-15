@@ -2,9 +2,9 @@
 """Investigate a bounded set of pending opportunities using their live pages.
 
 This is an evidence step, not a purchase or commercial-decision step. It records
-what the public page proves, rotates across the pending backlog, and reconciles
-that durable investigation evidence back into the checkpoint lifecycle without
-claiming more than the page actually proved.
+what the public page proves, rotates across the pending backlog, enriches already
+verified Exact-Lot records with deterministic field evidence, and reconciles that
+durable evidence back into the checkpoint lifecycle without over-claiming.
 """
 from __future__ import annotations
 
@@ -27,9 +27,14 @@ from opportunity_engine.discovery.lifecycle_checkpoint_integration import (
     WORKFLOW_STATUSES,
     write_lifecycle_checkpoint_artifacts,
 )
+from opportunity_engine.discovery.pending_evidence_enrichment import (
+    ENRICHABLE_BLOCKERS,
+    build_pending_evidence_enrichment,
+    enrichment_target_blockers,
+)
 
-SCHEMA_VERSION = "pending-opportunity-investigation-1.4"
-STATE_SCHEMA_VERSION = "pending-opportunity-investigation-state-1.1"
+SCHEMA_VERSION = "pending-opportunity-investigation-1.5"
+STATE_SCHEMA_VERSION = "pending-opportunity-investigation-state-1.2"
 STATE_FILENAME = "pending-investigation-state.json"
 MAX_LIMIT = 20
 PENDING_WORKFLOW_STATUSES = {"REQUIRES_VERIFICATION", "ACTIVE_OPPORTUNITY"}
@@ -75,12 +80,7 @@ def _is_public_http_url(value: object) -> bool:
 
 
 def _investigation_url(item: Mapping[str, Any]) -> str:
-    """Return the best live-page URL available on a checkpoint record.
-
-    Canonical checkpoint records may expose a scalar URL or only the merged
-    ``source_urls`` list. Treat both forms as first-class investigation input so
-    deduplication cannot make an otherwise verifiable record invisible.
-    """
+    """Return the best live-page URL available on a checkpoint record."""
     for key in ("source_url", "canonical_url", "url", "opportunity_identity"):
         value = item.get(key)
         if _is_public_http_url(value):
@@ -128,6 +128,21 @@ def _exact_item_page_blockers(item: Mapping[str, Any]) -> list[str]:
     ]
 
 
+def _enrichment_blockers(item: Mapping[str, Any]) -> list[str]:
+    return enrichment_target_blockers(item.get("missing_evidence"))
+
+
+def _durable_exact_lot(history: Mapping[str, Any]) -> bool:
+    return _text(history.get("last_status")).upper() == VERIFIED_EXACT_LOT_STATUS
+
+
+def _enrichment_targetable(
+    item: Mapping[str, Any], state_records: Mapping[str, Mapping[str, Any]]
+) -> bool:
+    history = state_records.get(_state_key(item)) or {}
+    return bool(_durable_exact_lot(history) and _enrichment_blockers(item))
+
+
 def select_pending_opportunities(
     report: Mapping[str, Any],
     limit: int = 10,
@@ -148,7 +163,13 @@ def select_pending_opportunities(
             score = 0.0
         history = state_records.get(_state_key(item)) or {}
         attempts = _attempt_count(state_records, item)
-        item["_resolution_priority"] = 0 if _exact_item_page_blockers(item) else 1
+        if _exact_item_page_blockers(item):
+            resolution_priority = 0
+        elif _durable_exact_lot(history) and _enrichment_blockers(item):
+            resolution_priority = 1
+        else:
+            resolution_priority = 2
+        item["_resolution_priority"] = resolution_priority
         item["_rank_score"] = score
         item["_attempt_count"] = attempts
         item["_last_investigated_at"] = _text(history.get("last_investigated_at"))
@@ -181,10 +202,15 @@ def investigate_pending_opportunities(
     all_rows = _rows(report.get("deduplicated_opportunities"))
     pending_rows = [item for item in all_rows if _is_pending(item)]
     selectable_rows = [item for item in pending_rows if _investigation_url(item)]
+    previous_state_records = _state_records(investigation_state)
     resolution_targetable_rows = [
         item for item in selectable_rows if _exact_item_page_blockers(item)
     ]
-    previous_state_records = _state_records(investigation_state)
+    enrichment_targetable_rows = [
+        item
+        for item in selectable_rows
+        if _enrichment_targetable(item, previous_state_records)
+    ]
     previously_attempted_pending = sum(
         _attempt_count(previous_state_records, item) > 0 for item in selectable_rows
     )
@@ -202,23 +228,29 @@ def investigate_pending_opportunities(
     selected_resolution_targetable_count = sum(
         bool(_exact_item_page_blockers(item)) for item in selected
     )
+    selected_enrichment_targetable_count = sum(
+        _enrichment_targetable(item, previous_state_records) for item in selected
+    )
 
     results: list[dict[str, Any]] = []
     newly_verified_exact_lot_ids: list[str] = []
+    current_run_enrichment_resolved_ids: list[str] = []
     generated_at = datetime.now(timezone.utc).isoformat()
     updated_state_records = {key: dict(value) for key, value in previous_state_records.items()}
 
     for item in selected:
         url = _investigation_url(item)
         fetched = page_fetcher(url)
+        targeted_missing = [*_exact_item_page_blockers(item), *_enrichment_blockers(item)]
         base = {
             "opportunity_identity": item.get("opportunity_identity"),
             "title": item.get("title"),
             "market_code": item.get("market_code"),
             "source_url": url,
             "discovery_score": item.get("discovery_score"),
-            "targeted_missing_evidence": _exact_item_page_blockers(item),
+            "targeted_missing_evidence": list(dict.fromkeys(targeted_missing)),
         }
+        enrichment: dict[str, Any] = {}
         if not getattr(fetched, "ok", False):
             result_row = {
                 **base,
@@ -226,16 +258,23 @@ def investigate_pending_opportunities(
                 "classification": FETCH_FAILED,
                 "fetch_error": getattr(fetched, "error", None),
                 "evidence": {},
+                "evidence_enrichment": {},
             }
         else:
+            final_url = _text(getattr(fetched, "final_url", "") or url)
             classification, evidence = _classify_page(
                 title=_text(getattr(fetched, "title", "") or item.get("title")),
                 text=_text(getattr(fetched, "text", "")),
-                url=_text(getattr(fetched, "final_url", "") or url),
+                url=final_url,
                 raw_html=_text(getattr(fetched, "raw_html", "")),
             )
             if classification == EXACT_LOT_CANDIDATE:
                 status = VERIFIED_EXACT_LOT_STATUS
+                enrichment = build_pending_evidence_enrichment(
+                    market=_text(item.get("market_code")).upper(),
+                    url=final_url,
+                    evidence=evidence,
+                )
             elif classification == ACTIVE_STOCK_SIGNAL:
                 status = "VERIFIED_ACTIVE_STOCK"
             else:
@@ -247,6 +286,7 @@ def investigate_pending_opportunities(
                 "status_code": getattr(fetched, "status_code", None),
                 "final_url": getattr(fetched, "final_url", url),
                 "evidence": evidence,
+                "evidence_enrichment": enrichment,
             }
         results.append(result_row)
 
@@ -259,6 +299,8 @@ def investigate_pending_opportunities(
                 and previous_status != VERIFIED_EXACT_LOT_STATUS
             ):
                 newly_verified_exact_lot_ids.append(state_key)
+            if _text_list(enrichment.get("resolved_blockers")):
+                current_run_enrichment_resolved_ids.append(state_key)
             try:
                 previous_attempts = max(0, int(previous.get("attempt_count") or 0))
             except (TypeError, ValueError):
@@ -271,14 +313,27 @@ def investigate_pending_opportunities(
                 "last_status_code": result_row.get("status_code"),
                 "last_final_url": result_row.get("final_url") or url,
                 "last_evidence": deepcopy(result_row.get("evidence") or {}),
+                "last_enrichment": deepcopy(enrichment),
                 "source_url": url,
                 "market_code": item.get("market_code"),
             }
 
     counts: dict[str, int] = {}
+    enrichment_status_counts: dict[str, int] = {}
+    current_run_resolved_blockers: Counter[str] = Counter()
     for result in results:
         key = _text(result.get("investigation_status"))
         counts[key] = counts.get(key, 0) + 1
+        enrichment = result.get("evidence_enrichment") or {}
+        if isinstance(enrichment, Mapping) and enrichment:
+            enrichment_status = _text(enrichment.get("status"))
+            if enrichment_status:
+                enrichment_status_counts[enrichment_status] = (
+                    enrichment_status_counts.get(enrichment_status, 0) + 1
+                )
+            current_run_resolved_blockers.update(
+                _text_list(enrichment.get("resolved_blockers"))
+            )
 
     if selected:
         selection_status = "SELECTED_FOR_INVESTIGATION"
@@ -303,6 +358,8 @@ def investigate_pending_opportunities(
         "unselectable_pending_count": len(pending_rows) - len(selectable_rows),
         "resolution_targetable_pending_count": len(resolution_targetable_rows),
         "selected_resolution_targetable_count": selected_resolution_targetable_count,
+        "evidence_enrichment_targetable_pending_count": len(enrichment_targetable_rows),
+        "selected_evidence_enrichment_targetable_count": selected_enrichment_targetable_count,
         "previously_investigated_pending_count": previously_attempted_pending,
         "unseen_pending_before_selection": unseen_before,
         "newly_investigated_count": selected_unseen_count,
@@ -311,7 +368,14 @@ def investigate_pending_opportunities(
         "remaining_selectable_after_selection": max(0, len(selectable_rows) - len(selected)),
         "investigated_count": len(results),
         "status_counts": counts,
+        "enrichment_status_counts": enrichment_status_counts,
+        "current_run_enrichment_resolved_counts": dict(
+            sorted((key, int(value)) for key, value in current_run_resolved_blockers.items())
+        ),
         "newly_verified_exact_lot_ids": sorted(set(newly_verified_exact_lot_ids)),
+        "current_run_enrichment_resolved_ids": sorted(
+            set(current_run_enrichment_resolved_ids)
+        ),
         "results": results,
         "investigation_state": updated_state,
         "promotion_to_opportunity_allowed": False,
@@ -335,22 +399,23 @@ def reconcile_investigation_lifecycle(
     investigation_state: Mapping[str, Any],
     *,
     newly_verified_ids: Sequence[str] | None = None,
+    current_run_enriched_ids: Sequence[str] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Apply only evidence that a durable exact-lot investigation actually proved.
-
-    Exact-lot verification clears recognized exact-item-page blockers and nothing
-    else. A record advances to ACTIVE_OPPORTUNITY only when that was its final
-    blocker. Prior durable state is reapplied on later daily runs so canonical
-    source regeneration cannot silently forget investigation evidence.
-    """
+    """Apply only field-specific evidence that durable investigation proved."""
     reconciled = deepcopy(dict(report))
     state_records = _state_records(investigation_state)
     newly_verified = {_text(item) for item in newly_verified_ids or [] if _text(item)}
+    current_run_enriched = {
+        _text(item) for item in current_run_enriched_ids or [] if _text(item)
+    }
     applied_ids: list[str] = []
     blocker_cleared_ids: list[str] = []
+    exact_blocker_cleared_ids: list[str] = []
+    enrichment_applied_ids: list[str] = []
     already_satisfied_ids: list[str] = []
     still_pending_ids: list[str] = []
     promoted_ids: list[str] = []
+    enrichment_resolved_counts: Counter[str] = Counter()
 
     records = reconciled.get("deduplicated_opportunities") or []
     for item in records:
@@ -358,7 +423,7 @@ def reconcile_investigation_lifecycle(
             continue
         identity = _state_key(item)
         history = state_records.get(identity) or {}
-        if _text(history.get("last_status")).upper() != VERIFIED_EXACT_LOT_STATUS:
+        if not _durable_exact_lot(history):
             continue
         if _text(item.get("listing_status")).upper() != "ACTIVE":
             continue
@@ -367,8 +432,23 @@ def reconcile_investigation_lifecycle(
             continue
 
         missing = _text_list(item.get("missing_evidence"))
-        matched_blockers = [
+        matched_exact_blockers = [
             value for value in missing if value.casefold() in EXACT_ITEM_PAGE_BLOCKERS
+        ]
+        enrichment = history.get("last_enrichment") or {}
+        if not isinstance(enrichment, Mapping):
+            enrichment = {}
+        resolved_enrichment_keys = {
+            value.casefold()
+            for value in _text_list(enrichment.get("resolved_blockers"))
+            if value.casefold() in ENRICHABLE_BLOCKERS
+        }
+        matched_enrichment_blockers = [
+            value for value in missing if value.casefold() in resolved_enrichment_keys
+        ]
+        matched_blockers = [
+            *matched_exact_blockers,
+            *matched_enrichment_blockers,
         ]
         item["pending_investigation"] = {
             "status": VERIFIED_EXACT_LOT_STATUS,
@@ -376,13 +456,23 @@ def reconcile_investigation_lifecycle(
             "source_url": history.get("source_url"),
             "final_url": history.get("last_final_url"),
             "evidence": deepcopy(history.get("last_evidence") or {}),
-            "evidence_effect": "RECOGNIZED_EXACT_ITEM_PAGE_BLOCKERS_ONLY",
+            "evidence_enrichment": deepcopy(enrichment),
+            "evidence_effect": "VALIDATED_FIELD_SPECIFIC_EVIDENCE_ONLY",
+            "matched_exact_item_page_blockers": matched_exact_blockers,
+            "matched_enrichment_blockers": matched_enrichment_blockers,
             "matched_blockers": matched_blockers,
         }
         applied_ids.append(identity)
 
-        if not matched_blockers:
+        if not matched_exact_blockers:
             already_satisfied_ids.append(identity)
+        if matched_exact_blockers:
+            exact_blocker_cleared_ids.append(identity)
+        if matched_enrichment_blockers:
+            enrichment_applied_ids.append(identity)
+            enrichment_resolved_counts.update(matched_enrichment_blockers)
+
+        if not matched_blockers:
             if workflow == "REQUIRES_VERIFICATION":
                 still_pending_ids.append(identity)
             continue
@@ -403,7 +493,7 @@ def reconcile_investigation_lifecycle(
             item["workflow_status"] = "ACTIVE_OPPORTUNITY"
             item["evaluation_status"] = "NOT_EVALUATED"
             item["analysis_eligible"] = True
-            item["lifecycle_reason_code"] = "PENDING_INVESTIGATION_EXACT_LOT_VERIFIED"
+            item["lifecycle_reason_code"] = "PENDING_INVESTIGATION_EVIDENCE_COMPLETE"
             promoted_ids.append(identity)
 
     valid_records = [item for item in records if isinstance(item, Mapping)]
@@ -448,7 +538,10 @@ def reconcile_investigation_lifecycle(
             continue
         unresolved_evidence_counts.update(_text_list(item.get("missing_evidence")))
 
-    current_run_promoted = [identity for identity in promoted_ids if identity in newly_verified]
+    current_run_proof_ids = newly_verified | current_run_enriched
+    current_run_promoted = [
+        identity for identity in promoted_ids if identity in current_run_proof_ids
+    ]
     if current_run_promoted:
         promoted_set = set(current_run_promoted)
         candidates = [
@@ -463,8 +556,8 @@ def reconcile_investigation_lifecycle(
                 "action": "REVIEW_ONE_OPPORTUNITY",
                 "opportunity_identity": _text(target.get("opportunity_identity")),
                 "reason": (
-                    "Current-run page investigation cleared the final exact-item "
-                    "verification blocker; the opportunity is ready for human analysis review."
+                    "Current-run deterministic page investigation/enrichment cleared "
+                    "the final verification blocker; human analysis review is now allowed."
                 ),
                 "workflow_status": "ACTIVE_OPPORTUNITY",
                 "missing_evidence": list(target.get("missing_evidence") or []),
@@ -497,19 +590,30 @@ def reconcile_investigation_lifecycle(
             )
 
     reconciliation = {
-        "schema_version": "pending-investigation-lifecycle-reconciliation-1.1",
+        "schema_version": "pending-investigation-lifecycle-reconciliation-1.2",
         "durable_exact_lot_state_count": sum(
-            _text(value.get("last_status")).upper() == VERIFIED_EXACT_LOT_STATUS
-            for value in state_records.values()
+            _durable_exact_lot(value) for value in state_records.values()
         ),
         "durable_evidence_record_count": sum(
             isinstance(value.get("last_evidence"), Mapping)
             and bool(value.get("last_evidence"))
             for value in state_records.values()
         ),
+        "durable_enrichment_record_count": sum(
+            isinstance(value.get("last_enrichment"), Mapping)
+            and bool(value.get("last_enrichment"))
+            for value in state_records.values()
+        ),
         "applied_record_count": len(applied_ids),
-        "exact_item_page_blocker_cleared_count": len(blocker_cleared_ids),
-        "exact_item_page_already_satisfied_count": len(already_satisfied_ids),
+        "exact_item_page_blocker_cleared_count": len(set(exact_blocker_cleared_ids)),
+        "exact_item_page_already_satisfied_count": len(set(already_satisfied_ids)),
+        "evidence_enrichment_applied_record_count": len(set(enrichment_applied_ids)),
+        "evidence_enrichment_blocker_cleared_count": int(
+            sum(enrichment_resolved_counts.values())
+        ),
+        "evidence_enrichment_resolved_counts": dict(
+            sorted((key, int(value)) for key, value in enrichment_resolved_counts.items())
+        ),
         "still_requires_verification_count": len(set(still_pending_ids)),
         "unresolved_evidence_counts": dict(
             sorted((key, int(value)) for key, value in unresolved_evidence_counts.items())
@@ -518,6 +622,9 @@ def reconcile_investigation_lifecycle(
         "current_run_promoted_to_active_count": len(current_run_promoted),
         "applied_opportunity_ids": sorted(set(applied_ids)),
         "blocker_cleared_opportunity_ids": sorted(set(blocker_cleared_ids)),
+        "evidence_enrichment_applied_opportunity_ids": sorted(
+            set(enrichment_applied_ids)
+        ),
         "promoted_opportunity_ids": sorted(set(promoted_ids)),
         "current_run_promoted_opportunity_ids": sorted(set(current_run_promoted)),
         "commercial_decision_created": False,
@@ -568,6 +675,7 @@ def main() -> int:
         report,
         result["investigation_state"],
         newly_verified_ids=result.get("newly_verified_exact_lot_ids") or [],
+        current_run_enriched_ids=result.get("current_run_enrichment_resolved_ids") or [],
     )
     result["lifecycle_reconciliation"] = lifecycle_reconciliation
 
@@ -603,11 +711,15 @@ def main() -> int:
         "selectable_pending_count": result["selectable_pending_count"],
         "resolution_targetable_pending_count": result["resolution_targetable_pending_count"],
         "selected_resolution_targetable_count": result["selected_resolution_targetable_count"],
+        "evidence_enrichment_targetable_pending_count": result["evidence_enrichment_targetable_pending_count"],
+        "selected_evidence_enrichment_targetable_count": result["selected_evidence_enrichment_targetable_count"],
         "selected_count": result["selected_count"],
         "investigated_count": result["investigated_count"],
         "newly_investigated_count": result["newly_investigated_count"],
         "unseen_pending_after_selection": result["unseen_pending_after_selection"],
         "status_counts": result["status_counts"],
+        "enrichment_status_counts": result["enrichment_status_counts"],
+        "current_run_enrichment_resolved_counts": result["current_run_enrichment_resolved_counts"],
         "lifecycle_reconciliation": lifecycle_reconciliation,
         "state_path": state_path.as_posix(),
     }, ensure_ascii=False, sort_keys=True))
