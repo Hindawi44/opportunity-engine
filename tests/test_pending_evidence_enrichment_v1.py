@@ -34,7 +34,7 @@ def _exact_stockitaly_page(url: str):
     return SimpleNamespace(
         ok=True,
         title="HUF stock abbigliamento uomo 80 pezzi",
-        text="Stock abbigliamento in vendita. 80 pezzi. EUR 10.50 per pezzo.",
+        text="Stock abbigliamento in vendita. 80 pezzi. 10.50 EUR per pezzo.",
         raw_html="",
         final_url=url,
         status_code=200,
