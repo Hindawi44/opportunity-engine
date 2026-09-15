@@ -1,0 +1,215 @@
+name: MIND FORGE Generalization Main CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  OPENAI_AGENTS_DISABLE_TRACING: "1"
+  OPENAI_AGENTS_DONT_LOG_MODEL_DATA: "1"
+  OPENAI_AGENTS_DONT_LOG_TOOL_DATA: "1"
+
+jobs:
+  mind-forge-generalization:
+    name: MIND FORGE zero-cost generalization contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out MIND FORGE target ref
+        uses: actions/checkout@v4
+        with:
+          ref: agent/mind-forge-generalization-tests
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run zero-cost generalization contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python mind-forge-live/phase1/generalization_contract_v1.py | tee mind-forge-generalization-contract.json
+      - name: Validate generalization contract result
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("mind-forge-generalization-contract.json").read_text(encoding="utf-8"))
+          if data.get("status") != "MIND_FORGE_GENERALIZATION_CONTRACT_PASS": raise SystemExit("generalization contract did not pass")
+          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0: raise SystemExit("generalization contract must remain fully offline")
+          if data.get("case_count") != 8: raise SystemExit("expected eight generalization cases")
+          print("MIND FORGE generalization contract: PASS")
+          PY
+      - name: Run zero-cost NORWAY_COMMERCE contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python mind-forge-live/phase1/norway_commerce_contract_v1.py | tee mind-forge-norway-commerce-contract.json
+      - name: Validate NORWAY_COMMERCE contract result
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("mind-forge-norway-commerce-contract.json").read_text(encoding="utf-8"))
+          if data.get("status") != "NORWAY_COMMERCE_CONTRACT_PASS": raise SystemExit("NORWAY_COMMERCE contract did not pass")
+          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0: raise SystemExit("NORWAY_COMMERCE contract must remain fully offline")
+          if data.get("commerce_case_count") != 8: raise SystemExit("expected eight Norway commerce cases")
+          if data.get("idea_box_count") != 20 or data.get("discovery_candidate_count") != 20: raise SystemExit("expected twenty Norway commerce candidates")
+          if data.get("lens_count") != 6: raise SystemExit("expected six NORWAY_COMMERCE research lenses")
+          print("NORWAY_COMMERCE contract: PASS")
+          PY
+      - name: Dry-run real Norway commerce discovery seed
+        shell: bash
+        run: |
+          python - <<'PY'
+          import importlib.util, json
+          from pathlib import Path
+          seed = "ابحث عن تجارة مربحة في النرويج"
+          path = Path("mind-forge-live/phase1/norway_commerce_v1.py")
+          spec = importlib.util.spec_from_file_location("norway_commerce_v1", path)
+          module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+          profile = "NORWAY_COMMERCE" if module.is_norway_commerce_seed(seed) else "OTHER"
+          candidates = module.candidate_seeds_for_seed(seed, limit=20)
+          if profile != "NORWAY_COMMERCE" or len(candidates) != 20: raise SystemExit("Norway commerce dry run did not expand correctly")
+          payload = {"status":"NORWAY_COMMERCE_DRY_RUN_PASS","seed":seed,"profile":profile,"candidate_count":len(candidates),"network_calls":0,"paid_api_calls":0,"candidates":candidates}
+          Path("mind-forge-norway-commerce-dry-run.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(json.dumps(payload, ensure_ascii=False, indent=2))
+          PY
+      - name: Run zero-cost Creative Engine V2 open contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python mind-forge-live/phase1/creative_v2_open_contract.py | tee mind-forge-creative-v2-open-contract.json
+      - name: Validate Creative Engine V2 open contract
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("mind-forge-creative-v2-open-contract.json").read_text(encoding="utf-8"))
+          if data.get("status") != "CREATIVE_V2_OPEN_CONTRACT_PASS": raise SystemExit("Creative Engine V2 open contract did not pass")
+          if data.get("network_calls") != 0 or data.get("paid_api_calls") != 0: raise SystemExit("Creative Engine V2 contract must remain fully offline")
+          if data.get("v1_preserved") is not True: raise SystemExit("V1 must remain preserved as fallback/benchmark")
+          if data.get("v2_uses_predefined_pattern_frames") is not False: raise SystemExit("V2 must not use predefined V1 pattern frames")
+          if data.get("v2_min_required_family_diversity") != 8: raise SystemExit("V2 must require at least eight discovered families")
+          print("Creative Engine V2 open contract: PASS")
+          PY
+      - name: Upload generalization reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-generalization-contracts
+          path: |
+            mind-forge-generalization-contract.json
+            mind-forge-norway-commerce-contract.json
+            mind-forge-norway-commerce-dry-run.json
+            mind-forge-creative-v2-open-contract.json
+          if-no-files-found: error
+          retention-days: 30
+
+  creative-v2-open-live-once:
+    name: Creative V2 Open one paid trial
+    needs: mind-forge-generalization
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MIND_FORGE_LIVE_ENABLED: "1"
+    steps:
+      - name: Check out V2 test branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/mind-forge-generalization-tests
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install live dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "openai-agents>=0.14.0" "pydantic>=2.11.0,<3.0"
+      - name: Build isolated V2 runtime
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/mind-forge-v2"
+          mkdir -p "$APP/mind_forge" artifacts/mind-forge-creative-v2-open-live
+          touch "$APP/mind_forge/__init__.py"
+          for file in contracts_v1.py question_generator_v1.py creative_engine_v1.py creative_engine_v2_open.py expert_minds_v1.py live_model_adapter_v1.py live_creative_v2_open.py
+          do
+            cp "mind-forge-live/phase1/$file" "$APP/mind_forge/$file"
+          done
+          python -m compileall -q "$APP/mind_forge"
+          echo "APP=$APP" >> "$GITHUB_ENV"
+      - name: Run one bounded paid Creative V2 generation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PYTHONPATH: ${{ env.APP }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' | tee artifacts/mind-forge-creative-v2-open-live/stdout.json
+          import json, os
+          from pathlib import Path
+          from mind_forge.contracts_v1 import TopicInput
+          from mind_forge.question_generator_v1 import generate_questions
+          from mind_forge.live_model_adapter_v1 import LiveBudgetGate, LiveModelPolicy
+          from mind_forge.live_creative_v2_open import generate_live_open_ideas
+
+          if not os.environ.get("OPENAI_API_KEY"):
+              raise SystemExit("OPENAI_API_KEY is unavailable")
+          seed = "التجارة في النرويج"
+          topic = TopicInput(topic=seed)
+          questions = generate_questions(topic)
+          policy = LiveModelPolicy(
+              enabled=True,
+              creative_model="gpt-5.6-luna",
+              expert_model="gpt-5.6-luna",
+              max_requests=1,
+              max_input_tokens=20_000,
+              max_output_tokens=12_500,
+              max_estimated_cost_usd=0.02,
+              creative_max_output_tokens=3_500,
+              expert_max_output_tokens=900,
+              creative_reasoning_effort="medium",
+              expert_reasoning_effort="low",
+          )
+          gate = LiveBudgetGate(policy)
+          creative = generate_live_open_ideas(topic, questions, policy, gate)
+          payload = {
+              "status": "CREATIVE_V2_OPEN_LIVE_COMPLETE",
+              "seed": seed,
+              "idea_count": len(creative.ideas),
+              "mechanism_diversity_ratio": creative.mechanism_diversity_ratio,
+              "mechanism_families": creative.mechanism_family_by_idea_id,
+              "usage": gate.usage.model_dump(),
+              "ideas": [idea.model_dump(mode="json") for idea in creative.ideas],
+          }
+          path = Path("artifacts/mind-forge-creative-v2-open-live/result.json")
+          path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(json.dumps(payload, ensure_ascii=False, indent=2))
+          PY
+      - name: Validate paid V2 result and budget
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("artifacts/mind-forge-creative-v2-open-live/result.json").read_text(encoding="utf-8"))
+          if data.get("status") != "CREATIVE_V2_OPEN_LIVE_COMPLETE": raise SystemExit("V2 live creative did not complete")
+          if data.get("idea_count") != 14: raise SystemExit(f"expected 14 ideas, got {data.get('idea_count')}")
+          if data.get("mechanism_diversity_ratio", 0) < (8/14): raise SystemExit("V2 mechanism diversity fell below 8/14")
+          if int(data["usage"]["requests"]) > 1: raise SystemExit("more than one model request was used")
+          if float(data["usage"]["estimated_cost_usd"]) > 0.02: raise SystemExit("V2 paid budget exceeded")
+          print("CREATIVE V2 OPEN LIVE: PASS")
+          PY
+      - name: Upload paid V2 result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mind-forge-creative-v2-open-live
+          path: artifacts/mind-forge-creative-v2-open-live/
+          if-no-files-found: warn
+          retention-days: 30
