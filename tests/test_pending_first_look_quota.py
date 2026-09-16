@@ -5,6 +5,7 @@ from scripts.run_pending_opportunity_investigation import (
     investigate_pending_opportunities,
     select_pending_opportunities,
 )
+from opportunity_engine.discovery.pending_evidence_enrichment import QUANTITY_BLOCKER
 
 
 def _row(index: int, *, exact: bool = False, urgent: bool = False) -> dict:
@@ -17,8 +18,7 @@ def _row(index: int, *, exact: bool = False, urgent: bool = False) -> dict:
         "workflow_status": "REQUIRES_VERIFICATION",
         "missing_evidence": (
             ["verified exact item-page evidence"] if urgent else
-            ["documented source-native quantity for the exact lot"] if exact else
-            ["seller identity"]
+            [QUANTITY_BLOCKER] if exact else ["seller identity"]
         ),
         "discovery_score": 100 - index / 1000,
     }
