@@ -42,6 +42,18 @@ _STOCKITALY_QUANTITY_RE = re.compile(
     re.IGNORECASE,
 )
 
+# The Salzmann product widget exposes one labelled availability value and repeats
+# the same count with its native unit. The site's recommendation cards expose
+# other numbers below the main widget: never normalize those page-wide tokens.
+_SALZMANN_AVAILABILITY_RE = re.compile(
+    r"^Verf(?:ü|u)gbare\s+Menge\s+(?P<count>[1-9]\d{0,8})$",
+    re.IGNORECASE,
+)
+_SALZMANN_UNIT_RE = re.compile(
+    r"^(?P<count>[1-9]\d{0,8})\s*(?P<unit>Stk\.?|Kg)$",
+    re.IGNORECASE,
+)
+
 
 def _text(value: object) -> str:
     return " ".join(str(value or "").split()).strip()
@@ -115,6 +127,47 @@ def _stockitaly_url_values(url: str) -> dict[str, Any] | None:
     }
 
 
+def _salzmann_primary_availability(
+    *, url: str, evidence: Mapping[str, Any], quantity_candidates: list[str]
+) -> dict[str, Any] | None:
+    """Prove only a main-product *available stock count*, never a lot/order size.
+
+    Two consecutive tokens must be the widget's labelled availability and its
+    identical `Stk` count. This structural anchor prevents recommendation-card
+    counts from being mistaken for the current product. Kg/pallet quantities and
+    malformed or mismatched pairs remain unresolved for the count blocker.
+    """
+    try:
+        parsed = urlsplit(_text(url))
+    except ValueError:
+        return None
+    host = (parsed.hostname or "").casefold().rstrip(".")
+    if parsed.scheme.lower() != "https" or host not in {
+        "salzmann-restwaren.de", "www.salzmann-restwaren.de"
+    }:
+        return None
+    if not re.fullmatch(r"/product/[^/]+/?", unquote(parsed.path or ""), re.I):
+        return None
+    if evidence.get("item_specific_url_evidence") is not True or evidence.get("domain_evidence") is not True:
+        return None
+    if len(quantity_candidates) < 2:
+        return None
+    label = _SALZMANN_AVAILABILITY_RE.fullmatch(quantity_candidates[0])
+    unit = _SALZMANN_UNIT_RE.fullmatch(quantity_candidates[1])
+    if not label or not unit or label.group("count") != unit.group("count"):
+        return None
+    if unit.group("unit").casefold().rstrip(".") != "stk":
+        return None
+    return {
+        "amount": int(label.group("count")),
+        "unit": "COUNT",
+        "quantity_basis": "AVAILABLE_STOCK_NOT_COMMITTED_LOT_SIZE",
+        "lot_size_proven": False,
+        "source_tokens": quantity_candidates[:2],
+        "financial_analysis_values_only": True,
+    }
+
+
 def build_pending_evidence_enrichment(
     *,
     market: str,
@@ -138,6 +191,13 @@ def build_pending_evidence_enrichment(
         price_basis_candidates=basis_candidates,
     )
     source_url_values = _stockitaly_url_values(url)
+    salzmann_availability = (
+        _salzmann_primary_availability(
+            url=url, evidence=source_evidence, quantity_candidates=quantity_candidates
+        )
+        if _text(market).upper() == "DE"
+        else None
+    )
 
     validated_price = None
     validated_quantity = None
@@ -157,6 +217,13 @@ def build_pending_evidence_enrichment(
         validation_source = "SOURCE_NATIVE_VALUE_NORMALIZATION_V1"
         price_basis = normalization.get("price_basis")
         price_basis_evidence = list(normalization.get("price_basis_evidence") or [])
+    elif salzmann_availability:
+        # Product availability is sourced independently of related-product cards.
+        # "ab" prices are starting prices without a proven lot/per-item basis:
+        # retain price, minimum order, and commercial blockers as unresolved.
+        validated_quantity = salzmann_availability
+        validation_source = "SALZMANN_PRIMARY_AVAILABILITY_ANCHOR_V1"
+        price_basis = "UNKNOWN_STARTING_FROM_PRICE"
 
     resolved_blockers: list[str] = []
     if isinstance(validated_price, Mapping):
@@ -191,6 +258,11 @@ def build_pending_evidence_enrichment(
         "price_basis_evidence": price_basis_evidence,
         "normalization": normalization,
         "field_statuses": field_statuses,
+        "source_specific_primary_availability": salzmann_availability,
+        "source_specific_price_guard": (
+            "STARTING_FROM_PRICE_AND_RELATED_PRODUCT_PRICES_UNVALIDATED"
+            if salzmann_availability else None
+        ),
         "captured_unvalidated": {
             "condition_candidates": condition_candidates,
             "fulfilment_candidates": fulfilment_candidates,
