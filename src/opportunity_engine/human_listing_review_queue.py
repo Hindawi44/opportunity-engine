@@ -121,9 +121,14 @@ def _page_proof(row: dict, url: str) -> bool:
     """Use existing dated source investigation, not inferred page legitimacy."""
     pending = row.get("pending_investigation") or {}
     evidence = pending.get("evidence") or {}
+    # The generic classifier also reads navigation/category text. A page is
+    # confirmed only when the source parser supplies its own listing identity;
+    # boolean keyword matches alone are not item-specific proof.
+    native_listing = evidence.get("resalg_listing") or {}
     return bool(
         pending.get("status") == "VERIFIED_EXACT_LOT_CANDIDATE"
         and pending.get("last_investigated_at")
+        and isinstance(native_listing, dict) and native_listing.get("listing_id")
         and classify_url(pending.get("final_url") or pending.get("source_url") or "") == "DIRECT"
         and _url_key(pending.get("final_url") or pending.get("source_url")) == _url_key(url)
         and all(evidence.get(field) is True for field in (
@@ -189,7 +194,7 @@ def build_queue(report: dict, memory: dict | None = None, batch_size: int = 10) 
             "photos": [], "commercially_qualified": False,
             "source_detail_status": "EXACT_ITEM_VERIFIED" if page_proven else "POSSIBLE_DIRECT_LISTING_UNVERIFIED",
             "missing_evidence": row.get("missing_evidence") or [],
-            "why_selected": ("Dated source page supplied item-specific evidence; live stock and site identity unverified"
+            "why_selected": ("Dated source-native listing identity and item evidence; stock and site identity unverified"
                              if page_proven else "Direct-looking URL only; page, site identity and stock unverified"),
         })
     buckets = {m: [x for x in review if x["market"] == m] for m in MARKETS}
