@@ -12,6 +12,7 @@ from opportunity_engine.discovery.unified_daily_runtime import (
 )
 from opportunity_engine.human_listing_review_queue import build_queue, readable_text
 from opportunity_engine.operator_study_memory import export_memory
+from opportunity_engine.source_status_reconciliation import reconcile_auksjonen_snapshot
 
 
 def main() -> int:
@@ -32,10 +33,29 @@ def main() -> int:
         report = json.loads(report_path.read_text(encoding="utf-8"))
         memory = export_memory(Path(args.input_root))
         queue = build_queue(report, memory)
+        source_snapshot = Path(args.input_root) / "no-auksjonen" / "auksjonen-live-clothing-listings.json"
+        if source_snapshot.is_file():
+            try:
+                evidence = json.loads(source_snapshot.read_text(encoding="utf-8"))
+                queue = reconcile_auksjonen_snapshot(queue, evidence)
+            except (OSError, ValueError, TypeError, AttributeError) as exc:
+                queue["counts"]["auksjonen_snapshot_status"] = "UNREADABLE_SOURCE_SNAPSHOT"
+                queue["counts"]["auksjonen_snapshot_error_type"] = type(exc).__name__
+        else:
+            queue["counts"]["auksjonen_snapshot_status"] = "MISSING_NO_ENDING_INFERRED"
         (output_dir / "human-listing-review-queue-v1.json").write_text(
             json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         text = readable_text(queue)
+        text += "\nتدقيق حالة مزادات Auksjonen (دليل مصدر مؤرخ، وليس تأكيد مخزون):\n"
+        text += "حالة ملف المصدر: " + queue["counts"]["auksjonen_snapshot_status"] + "\n"
+        for row in queue["daily_batch"]:
+            proof = row.get("source_status_evidence")
+            if proof:
+                text += (f"- {row['title']}: {proof['status']} عند {proof['captured_at']}؛ "
+                         f"نهاية معلنة {proof['ends_at']}؛ المخزون غير مؤكد.\n")
+            elif row.get("source_status_note"):
+                text += f"- {row['title']}: {row['source_status_note']}\n"
         (output_dir / "human-listing-review-queue-v1.txt").write_text(text, encoding="utf-8")
         phone_summary = output_dir / "multi-market-phone-summary.txt"
         if phone_summary.is_file():
