@@ -12,6 +12,7 @@ from opportunity_engine.discovery.unified_daily_runtime import (
 )
 from opportunity_engine.human_listing_review_queue import build_queue, readable_text
 from opportunity_engine.balanced_link_review import build_balanced_review, readable_balanced_review
+from opportunity_engine.psauction_child_links import extract_parent_children, readable_child_links
 from opportunity_engine.operator_study_memory import export_memory
 from opportunity_engine.source_status_reconciliation import reconcile_auksjonen_snapshot
 from opportunity_engine.source_page_audit import audit_review_batch
@@ -45,8 +46,8 @@ def main() -> int:
                 queue["counts"]["auksjonen_snapshot_error_type"] = type(exc).__name__
         else:
             queue["counts"]["auksjonen_snapshot_status"] = "MISSING_NO_ENDING_INFERRED"
-        # This is strictly source-page read-only; it performs no paid search or
-        # commercial action. Avoid external network calls in pytest regression.
+        # Read-only public pages, no paid search or commercial actions.
+        # No network calls during ordinary pytest fixture runs.
         production_run = os.environ.get("GITHUB_ACTIONS") == "true" and "PYTEST_CURRENT_TEST" not in os.environ
         if production_run or os.environ.get("OPPORTUNITY_ENGINE_SOURCE_PAGE_AUDIT") == "1":
             queue = audit_review_batch(queue)
@@ -55,10 +56,20 @@ def main() -> int:
                             "batch": queue["daily_batch"], "held": queue["held_separately"]},
                            ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
             )
-        # The discovery inbox does not relax evidence gates in the strict queue.
-        # It restores suppressed source-specific leads and preserves campaign
-        # parents as navigation tasks, never as verified individual lots.
+        # This supplementary inbox restores useful but unverified item leads;
+        # it does not relax the strict source verification or human decision gates.
         balanced = build_balanced_review(report, queue, memory)
+        child_report = None
+        if production_run or os.environ.get("OPPORTUNITY_ENGINE_PSAUCTION_CHILD_EXTRACTION") == "1":
+            child_report = extract_parent_children(balanced)
+            # Preserve the same dated extraction result in the navigation lane.
+            balanced["campaign_parents_for_child_extraction"] = child_report["parents"]
+            balanced["counts"]["source_linked_child_item_urls_unverified"] = (
+                child_report["counts"]["child_links_extracted_unverified"]
+            )
+            (output_dir / "psauction-child-links-v1.json").write_text(
+                json.dumps(child_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
         (output_dir / "human-balanced-link-review-v1.json").write_text(
             json.dumps(balanced, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
@@ -85,9 +96,9 @@ def main() -> int:
                 text += (f"- {row['title']}: "
                          f"{row.get('source_page_check_status', 'NOT_CHECKED')}; "
                          "الشركة والمخزون غير مؤكدين.\n")
-        # Display actionable search leads to the human without inventing trade
-        # qualifications or disguising a parent page as a direct item listing.
         text += "\n" + readable_balanced_review(balanced)
+        if child_report is not None:
+            text += "\n" + readable_child_links(child_report)
         (output_dir / "human-listing-review-queue-v1.txt").write_text(text, encoding="utf-8")
         phone_summary = output_dir / "multi-market-phone-summary.txt"
         if phone_summary.is_file():
@@ -95,6 +106,8 @@ def main() -> int:
                 handle.write("\n" + text)
         print("human_listing_review_queue:", queue["counts"])
         print("balanced_link_review:", balanced["counts"])
+        if child_report is not None:
+            print("psauction_child_link_extraction:", child_report["counts"])
     elif os.environ.get("GITHUB_ACTIONS") == "true":
         raise FileNotFoundError(f"Daily review source checkpoint is missing: {report_path}")
     print(f"unified_daily_pipeline: {paths['pipeline']}")
