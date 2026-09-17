@@ -79,7 +79,7 @@ def test_redirect_to_landing_page_blocks_original_direct_url():
     assert queue["held_separately"][0]["reason"] == "REDIRECT_TO_CAMPAIGN"
 
 
-def test_dated_source_item_evidence_does_not_verify_site_or_stock():
+def test_generic_keyword_signals_alone_never_verify_exact_item():
     listing = row("https://stockitaly24.com/products/lot-100")
     listing["pending_investigation"] = {
         "source_url": listing["source_urls"][0],
@@ -92,12 +92,15 @@ def test_dated_source_item_evidence_does_not_verify_site_or_stock():
             "price_evidence": True, "quantity_evidence": True,
         },
     }
-    queue = build_queue({"deduplicated_opportunities": [listing]})
-    item = queue["review_queue"][0]
-    assert item["page_type"] == "SOURCE_ITEM_PAGE_EVIDENCE"
-    assert item["source_detail_status"] == "EXACT_ITEM_VERIFIED"
-    assert item["site_identity_status"] == "UNVERIFIED"
-    assert item["stock_confidence"] == "UNVERIFIED"
+    result = build_queue({"deduplicated_opportunities": [listing]})["review_queue"][0]
+    assert result["source_detail_status"] == "POSSIBLE_DIRECT_LISTING_UNVERIFIED"
+    assert result["site_identity_status"] == "UNVERIFIED"
+    assert result["stock_confidence"] == "UNVERIFIED"
+    listing["pending_investigation"]["evidence"]["resalg_listing"] = {"listing_id": "native-100"}
+    result = build_queue({"deduplicated_opportunities": [listing]})["review_queue"][0]
+    assert result["page_type"] == "SOURCE_ITEM_PAGE_EVIDENCE"
+    assert result["source_detail_status"] == "EXACT_ITEM_VERIFIED"
+    assert result["site_identity_status"] == "UNVERIFIED"
     listing["pending_investigation"]["evidence"]["price_evidence"] = False
     assert build_queue({"deduplicated_opportunities": [listing]})["review_queue"][0]["source_detail_status"] == "POSSIBLE_DIRECT_LISTING_UNVERIFIED"
 
