@@ -40,11 +40,15 @@ def test_literal_source_anchors_only_with_native_id_and_source_title():
     assert result[1]["title_from_parent_anchor"] == "2 st arbetsbyxor"
 
 
-def test_no_fabricated_links_from_numbers_or_generic_anchor_text():
+def test_no_fabricated_links_from_numbers_but_generic_source_item_href_is_kept():
     html = '''36 objekt <span>1567233 Jacka Cutter &amp; Buck</span>
     <a href="/item/view/1567233/jacka-cutter-buck-xs">Mer info</a>
     <a href="/item/view/123"></a>'''
-    assert extract_child_anchors(html, PARENT) == []
+    result = extract_child_anchors(html, PARENT)
+    assert len(result) == 1 and result[0]["source_url"] == ITEM
+    assert result[0]["title_from_parent_anchor"] is None
+    assert result[0]["title_evidence"] == "NOT_EXTRACTED"
+    assert extract_child_anchors("36 objekt 1567233", PARENT) == []
     assert extract_child_anchors(html, "https://psauction.se/auctions") == []
 
 
@@ -60,6 +64,7 @@ def test_bounded_parent_extraction_preserves_provenance_and_unverified_flags():
     assert result["counts"]["parents_attempted"] == 1
     assert result["counts"]["child_links_extracted_unverified"] == 1
     assert result["counts"]["parents_with_child_links"] == 1
+    assert result["parents"][0]["child_listings_extracted"] is True
     child = result["child_item_url_leads"][0]
     assert child["source_url"] == ITEM and child["parent_url"] == PARENT
     assert child["identity"] == "psauction-item:1567233"
@@ -104,3 +109,4 @@ def test_invalid_parent_cannot_trigger_fetch_and_duplicates_across_parents_suppr
         f'<a href="{ITEM}">12 jackor</a>', final=url))
     assert result["counts"]["parents_attempted"] == 2
     assert result["counts"]["child_links_extracted_unverified"] == 1
+    assert result["parents"][1]["child_listings_extracted"] is False
