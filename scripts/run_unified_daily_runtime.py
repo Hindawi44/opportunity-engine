@@ -45,9 +45,9 @@ def main() -> int:
         else:
             queue["counts"]["auksjonen_snapshot_status"] = "MISSING_NO_ENDING_INFERRED"
         # This is strictly source-page read-only; it performs no paid search or
-        # commercial action. Run only on the production checkpoint (or when
-        # explicitly opted in), never during plain CLI unit tests.
-        if os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("OPPORTUNITY_ENGINE_SOURCE_PAGE_AUDIT") == "1":
+        # commercial action. Avoid external network calls in pytest regression.
+        production_run = os.environ.get("GITHUB_ACTIONS") == "true" and "PYTEST_CURRENT_TEST" not in os.environ
+        if production_run or os.environ.get("OPPORTUNITY_ENGINE_SOURCE_PAGE_AUDIT") == "1":
             queue = audit_review_batch(queue)
             (output_dir / "human-listing-page-audit-v1.json").write_text(
                 json.dumps({"counts": queue["counts"], "audit": queue["source_page_audit"],
