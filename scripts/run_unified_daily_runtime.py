@@ -11,6 +11,7 @@ from opportunity_engine.discovery.unified_daily_runtime import (
     build_unified_daily_runtime,
 )
 from opportunity_engine.human_listing_review_queue import build_queue, readable_text
+from opportunity_engine.balanced_link_review import build_balanced_review, readable_balanced_review
 from opportunity_engine.operator_study_memory import export_memory
 from opportunity_engine.source_status_reconciliation import reconcile_auksjonen_snapshot
 from opportunity_engine.source_page_audit import audit_review_batch
@@ -54,6 +55,13 @@ def main() -> int:
                             "batch": queue["daily_batch"], "held": queue["held_separately"]},
                            ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
             )
+        # The discovery inbox does not relax evidence gates in the strict queue.
+        # It restores suppressed source-specific leads and preserves campaign
+        # parents as navigation tasks, never as verified individual lots.
+        balanced = build_balanced_review(report, queue, memory)
+        (output_dir / "human-balanced-link-review-v1.json").write_text(
+            json.dumps(balanced, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
         (output_dir / "human-listing-review-queue-v1.json").write_text(
             json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
@@ -77,12 +85,16 @@ def main() -> int:
                 text += (f"- {row['title']}: "
                          f"{row.get('source_page_check_status', 'NOT_CHECKED')}; "
                          "الشركة والمخزون غير مؤكدين.\n")
+        # Display actionable search leads to the human without inventing trade
+        # qualifications or disguising a parent page as a direct item listing.
+        text += "\n" + readable_balanced_review(balanced)
         (output_dir / "human-listing-review-queue-v1.txt").write_text(text, encoding="utf-8")
         phone_summary = output_dir / "multi-market-phone-summary.txt"
         if phone_summary.is_file():
             with phone_summary.open("a", encoding="utf-8") as handle:
                 handle.write("\n" + text)
         print("human_listing_review_queue:", queue["counts"])
+        print("balanced_link_review:", balanced["counts"])
     elif os.environ.get("GITHUB_ACTIONS") == "true":
         raise FileNotFoundError(f"Daily review source checkpoint is missing: {report_path}")
     print(f"unified_daily_pipeline: {paths['pipeline']}")
