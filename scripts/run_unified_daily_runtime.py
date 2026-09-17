@@ -13,6 +13,7 @@ from opportunity_engine.discovery.unified_daily_runtime import (
 from opportunity_engine.human_listing_review_queue import build_queue, readable_text
 from opportunity_engine.operator_study_memory import export_memory
 from opportunity_engine.source_status_reconciliation import reconcile_auksjonen_snapshot
+from opportunity_engine.source_page_audit import audit_review_batch
 
 
 def main() -> int:
@@ -43,6 +44,16 @@ def main() -> int:
                 queue["counts"]["auksjonen_snapshot_error_type"] = type(exc).__name__
         else:
             queue["counts"]["auksjonen_snapshot_status"] = "MISSING_NO_ENDING_INFERRED"
+        # This is strictly source-page read-only; it performs no paid search or
+        # commercial action. Run only on the production checkpoint (or when
+        # explicitly opted in), never during plain CLI unit tests.
+        if os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("OPPORTUNITY_ENGINE_SOURCE_PAGE_AUDIT") == "1":
+            queue = audit_review_batch(queue)
+            (output_dir / "human-listing-page-audit-v1.json").write_text(
+                json.dumps({"counts": queue["counts"], "audit": queue["source_page_audit"],
+                            "batch": queue["daily_batch"], "held": queue["held_separately"]},
+                           ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
         (output_dir / "human-listing-review-queue-v1.json").write_text(
             json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
@@ -56,6 +67,16 @@ def main() -> int:
                          f"نهاية معلنة {proof['ends_at']}؛ المخزون غير مؤكد.\n")
             elif row.get("source_status_note"):
                 text += f"- {row['title']}: {row['source_status_note']}\n"
+        if "source_page_audit" in queue:
+            text += "\nتدقيق صفحات المصدر المحدود (لا يثبت هوية الشركة أو المخزون):\n"
+            text += (f"فُحصت {queue['counts']['page_audit_attempted']} صفحات؛ "
+                     f"هوية منتج من المصدر {queue['counts']['page_audit_product_id_evidence']}؛ "
+                     f"تحويلات محتجزة {queue['counts']['page_audit_redirect_held']}؛ "
+                     f"نفاد معلن {queue['counts']['page_audit_sold_out_held']}.\n")
+            for row in queue["daily_batch"]:
+                text += (f"- {row['title']}: "
+                         f"{row.get('source_page_check_status', 'NOT_CHECKED')}; "
+                         "الشركة والمخزون غير مؤكدين.\n")
         (output_dir / "human-listing-review-queue-v1.txt").write_text(text, encoding="utf-8")
         phone_summary = output_dir / "multi-market-phone-summary.txt"
         if phone_summary.is_file():
