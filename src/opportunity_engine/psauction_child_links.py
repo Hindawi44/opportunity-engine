@@ -1,10 +1,8 @@
-"""Read-only PS Auction parent -> child URL evidence for the human discovery inbox.
+"""Read-only PS Auction parent-to-child discovery from literal source HTML anchors.
 
-An auction group is not an item. Only a literal source HTML anchor with an
-approved /item/view/<number>/<slug> route establishes a child *URL lead*.
-Neither the link, the parent status nor HTTP 200 establishes stock, seller,
-item-page identity or commercial qualification. A blocked/JS-only parent is
-UNRESOLVED, not zero inventory. No login, bidding, contact or paid search.
+A source-linked item URL is a review lead, not evidence of live inventory,
+seller identity or commercial suitability. A blocked/JS-only parent is unknown,
+not an empty auction. No login, bids, purchases, contact or paid search.
 """
 from __future__ import annotations
 
@@ -50,10 +48,10 @@ def _child_url(href: str, parent_url: str) -> tuple[str, str] | None:
     parts = urlsplit(absolute)
     if parts.query or parts.fragment:
         return None
-    matched = PSAUCTION_ITEM_PATH.fullmatch(parts.path)
-    if not matched:
+    match = PSAUCTION_ITEM_PATH.fullmatch(parts.path)
+    if match is None:
         return None
-    return "https://psauction.se" + parts.path.rstrip("/"), matched.group("item_id")
+    return "https://psauction.se" + parts.path.rstrip("/"), match.group("item_id")
 
 
 class _ItemAnchors(HTMLParser):
@@ -62,7 +60,7 @@ class _ItemAnchors(HTMLParser):
         self.parent_url = parent_url
         self.active: tuple[str, str] | None = None
         self.words: list[str] = []
-        self.found: list[tuple[str, str, str]] = []
+        self.found: list[tuple[str, str, str | None]] = []
         self.skip = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
@@ -91,21 +89,27 @@ class _ItemAnchors(HTMLParser):
             return
         if tag == "a" and self.active is not None:
             title = " ".join(" ".join(self.words).split())[:240]
-            if title and title.casefold() not in _UNHELPFUL:
-                self.found.append((*self.active, title))
+            # "Mer info" is still a real item hyperlink. Keep its URL and
+            # native ID without fabricating a descriptive item title.
+            title = title if title and title.casefold() not in _UNHELPFUL else None
+            self.found.append((*self.active, title))
             self.active = None
             self.words = []
 
 
-def extract_child_anchors(html: str, parent_url: str) -> list[dict[str, str]]:
-    """Parse only literal PS Auction item anchors; never fabricate URLs from IDs."""
+def extract_child_anchors(html: str, parent_url: str) -> list[dict[str, Any]]:
+    """Only literal source item hrefs: never construct URLs from object counts or IDs."""
     if not _parent_ok(parent_url) or not isinstance(html, str):
         return []
     parser = _ItemAnchors(parent_url)
     parser.feed(html[:MAX_HTML_CHARS])
-    unique: dict[str, dict[str, str]] = {}
+    unique: dict[str, dict[str, Any]] = {}
     for url, native_id, title in parser.found:
-        unique.setdefault(url, {"source_url": url, "native_item_id": native_id, "title_from_parent_anchor": title})
+        previous = unique.get(url)
+        if previous is None or (title and not previous["title_from_parent_anchor"]):
+            unique[url] = {"source_url": url, "native_item_id": native_id,
+                           "title_from_parent_anchor": title,
+                           "title_evidence": "PARENT_ANCHOR_TEXT" if title else "NOT_EXTRACTED"}
     return list(unique.values())
 
 
@@ -113,7 +117,7 @@ def extract_parent_children(balanced: Mapping[str, Any], *,
                             fetcher: Callable[[str], Any] = fetch_public_page,
                             limit: int = MAX_PARENT_READS,
                             checked_at: str | None = None) -> dict[str, Any]:
-    """Inspect up to eleven already-discovered parents; keep evidence and unknowns distinct."""
+    """Inspect at most eleven known parent URLs, preserving failure and provenance."""
     if not 0 <= limit <= MAX_PARENT_READS:
         raise ValueError("parent read limit must be 0..11")
     timestamp = checked_at or datetime.now(timezone.utc).isoformat()
@@ -138,22 +142,21 @@ def extract_parent_children(balanced: Mapping[str, Any], *,
             attempted += 1
             parent["source_last_checked_at"] = timestamp
             try:
-                response = fetcher(url)
+                page = fetcher(url)
             except Exception as exc:
                 parent["child_extraction_status"] = "FETCH_FAILED_UNVERIFIED"
                 parent["fetch_error_type"] = type(exc).__name__
             else:
-                final = str(getattr(response, "final_url", "") or "")
-                parent["http_status"] = getattr(response, "status_code", None)
+                final = str(getattr(page, "final_url", "") or "")
+                parent["http_status"] = getattr(page, "status_code", None)
                 parent["source_final_url"] = final
-                if not getattr(response, "ok", False):
+                if not getattr(page, "ok", False):
                     parent["child_extraction_status"] = "FETCH_FAILED_UNVERIFIED"
-                    parent["fetch_error_type"] = str(getattr(response, "error", "") or "HTTP_NOT_READABLE")[:100]
+                    parent["fetch_error_type"] = str(getattr(page, "error", "") or "HTTP_NOT_READABLE")[:100]
                 elif final.rstrip("/") != url.rstrip("/"):
                     parent["child_extraction_status"] = "REDIRECTED_PARENT_NOT_MINED"
                 else:
-                    html = str(getattr(response, "raw_html", "") or "")
-                    found = extract_child_anchors(html, url)
+                    found = extract_child_anchors(str(getattr(page, "raw_html", "") or ""), url)
                     parent["children_found_in_fetched_html"] = len(found)
                     parent["child_extraction_status"] = (
                         "SOURCE_CHILD_ANCHORS_EXTRACTED_URLS_UNVERIFIED" if found
@@ -163,6 +166,7 @@ def extract_parent_children(balanced: Mapping[str, Any], *,
                         if len(children) >= MAX_TOTAL_CHILDREN or child["source_url"] in seen:
                             continue
                         seen.add(child["source_url"])
+                        parent["child_listings_extracted"] = True
                         children.append({
                             **child, "identity": "psauction-item:" + child["native_item_id"],
                             "parent_url": url, "market": "SE", "discovered_from_parent_at": timestamp,
@@ -197,7 +201,7 @@ def readable_child_links(result: Mapping[str, Any]) -> str:
              f"فشل فتح: {counts['parent_fetch_failed']}؛ بلا روابط ظاهرة: {counts['parent_no_anchors_unverified']}.",
              "روابط العناصر أدناه مأخوذة من روابط الصفحة الأصلية؛ هوية الإعلان والمخزون والبائع لم تُتحقق بعد."]
     for item in result["child_item_url_leads"][:15]:
-        lines += [f"- {item['title_from_parent_anchor']}: {item['source_url']}"]
+        lines.append(f"- {item['title_from_parent_anchor'] or 'عنوان غير مستخرج'}: {item['source_url']}")
     if len(result["child_item_url_leads"]) > 15:
         lines.append("روابط إضافية موجودة في ملف JSON؛ لم تُحذف من التقرير.")
     return "\n".join(lines) + "\n"
