@@ -48,7 +48,7 @@ def _source_item_pattern(url: str) -> bool:
         return len(parts) == 2 and parts[-1].isdigit()
     if host == "cdon.se":
         return len(parts) == 2 and parts[0] == "produkt" and bool(
-            re.search(r"-[a-f0-9]{20,}$", parts[-1], flags=re.IGNORECASE)
+            re.search(r"-[a-f0-9]{16,64}$", parts[-1], flags=re.IGNORECASE)
         )
     return False
 
