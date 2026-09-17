@@ -11,11 +11,12 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 MARKETS = ("NO", "SE", "DE", "FR", "IT", "NL")
 _EXCLUDED_DOMAINS = frozenset({"vinqa-grossiste.com"})
+_AMBIGUOUS_PRODUCT_SLUGS = frozenset({"box", "boxes", "mystery-box"})
 _GENERIC_SLUGS = frozenset({
     "all", "index", "search", "category", "categories", "collection",
     "collections", "catalog", "catalogue", "products", "product", "stock",
-    "boxes", "box", "mystery-box", "restpartier", "clothing", "clothes",
-    "fashion", "shoes", "footwear", "new", "sale", "wholesale",
+    "restpartier", "clothing", "clothes", "fashion", "shoes", "footwear",
+    "new", "sale", "wholesale",
 })
 _GENERIC_PATH_SEGMENTS = frozenset({
     "search", "category", "categories", "collection", "collections",
@@ -47,12 +48,14 @@ def classify_url(url: str) -> str:
             return "CAMPAIGN"  # Parent auction is not its individual objects.
         if _host(host, "riegermann.de") and "/objekte/au-" in path:
             return "CAMPAIGN"
+        if _host(host, "auksjonen.no") and path.startswith("/auksjon/auktion/"):
+            return "CAMPAIGN"
         if any(part in _GENERIC_PATH_SEGMENTS for part in parts):
             return "CAMPAIGN"
         if parts[-1] in _GENERIC_SLUGS:
             return "CAMPAIGN"
-        if len(parts) >= 2 and parts[-2] in {"products", "product", "stock", "p"} and parts[-1] in _GENERIC_SLUGS:
-            return "CAMPAIGN"
+        if parts[-1] in _AMBIGUOUS_PRODUCT_SLUGS:
+            return "UNKNOWN"  # Could be a real boxed item or configurable landing page.
         direct = (
             _host(host, "auksjonen.no") and parts[0] == "auksjon" and len(parts) >= 2,
             _host(host, "finn.no") and (
