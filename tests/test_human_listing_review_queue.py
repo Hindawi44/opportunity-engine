@@ -57,14 +57,14 @@ def test_host_spoofing_and_variant_query_not_deduped():
 
 def test_generic_routes_and_configurable_boxes_are_not_specific_offers():
     assert classify_url("https://stockitaly24.com/collections/shoes") == "CAMPAIGN"
-    assert classify_url("https://stockitaly24.com/products/box") == "CAMPAIGN"
+    assert classify_url("https://stockitaly24.com/products/box") == "UNKNOWN"
     assert classify_url("https://www.finn.no/450273961") == "DIRECT"
     assert classify_url("https://www.finn.no/recommerce/forsale/item/123") == "DIRECT"
     rows = [row("https://stockitaly24.com/products/box", "generic"),
             row("https://www.finn.no/450273961", "legacy")]
     queue = build_queue({"deduplicated_opportunities": rows})
     assert [r["identity"] for r in queue["review_queue"]] == ["legacy"]
-    assert queue["held_separately"][0]["reason"] == "CAMPAIGN"
+    assert queue["held_separately"][0]["reason"] == "UNKNOWN"
 
 
 def test_redirect_to_landing_page_blocks_original_direct_url():
