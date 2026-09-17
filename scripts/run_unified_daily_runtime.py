@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
 
 from opportunity_engine.discovery.unified_daily_runtime import (
     build_unified_daily_runtime,
 )
+from opportunity_engine.human_listing_review_queue import build_queue, readable_text
+from opportunity_engine.operator_study_memory import export_memory
+from opportunity_engine.source_status_reconciliation import reconcile_auksjonen_snapshot
 
 
 def main() -> int:
@@ -22,7 +26,44 @@ def main() -> int:
 
     os.environ["OUTPUT_DIR"] = args.output_dir
     os.environ["INPUT_ROOT"] = args.input_root
-    paths = build_unified_daily_runtime(Path(args.output_dir))
+    output_dir = Path(args.output_dir)
+    paths = build_unified_daily_runtime(output_dir)
+    report_path = output_dir / "multi-market-daily-checkpoint.json"
+    if report_path.is_file():
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        memory = export_memory(Path(args.input_root))
+        queue = build_queue(report, memory)
+        source_snapshot = Path(args.input_root) / "no-auksjonen" / "auksjonen-live-clothing-listings.json"
+        if source_snapshot.is_file():
+            try:
+                evidence = json.loads(source_snapshot.read_text(encoding="utf-8"))
+                queue = reconcile_auksjonen_snapshot(queue, evidence)
+            except (OSError, ValueError, TypeError, AttributeError) as exc:
+                queue["counts"]["auksjonen_snapshot_status"] = "UNREADABLE_SOURCE_SNAPSHOT"
+                queue["counts"]["auksjonen_snapshot_error_type"] = type(exc).__name__
+        else:
+            queue["counts"]["auksjonen_snapshot_status"] = "MISSING_NO_ENDING_INFERRED"
+        (output_dir / "human-listing-review-queue-v1.json").write_text(
+            json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        text = readable_text(queue)
+        text += "\nتدقيق حالة مزادات Auksjonen (دليل مصدر مؤرخ، وليس تأكيد مخزون):\n"
+        text += "حالة ملف المصدر: " + queue["counts"]["auksjonen_snapshot_status"] + "\n"
+        for row in queue["daily_batch"]:
+            proof = row.get("source_status_evidence")
+            if proof:
+                text += (f"- {row['title']}: {proof['status']} عند {proof['captured_at']}؛ "
+                         f"نهاية معلنة {proof['ends_at']}؛ المخزون غير مؤكد.\n")
+            elif row.get("source_status_note"):
+                text += f"- {row['title']}: {row['source_status_note']}\n"
+        (output_dir / "human-listing-review-queue-v1.txt").write_text(text, encoding="utf-8")
+        phone_summary = output_dir / "multi-market-phone-summary.txt"
+        if phone_summary.is_file():
+            with phone_summary.open("a", encoding="utf-8") as handle:
+                handle.write("\n" + text)
+        print("human_listing_review_queue:", queue["counts"])
+    elif os.environ.get("GITHUB_ACTIONS") == "true":
+        raise FileNotFoundError(f"Daily review source checkpoint is missing: {report_path}")
     print(f"unified_daily_pipeline: {paths['pipeline']}")
     print(f"unified_daily_runtime: {paths['runtime']}")
     print(f"unified_daily_summary: {paths['summary']}")
