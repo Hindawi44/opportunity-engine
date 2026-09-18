@@ -25,6 +25,7 @@ def test_daily_runtime_exports_source_direct_links_and_study_memory(monkeypatch,
     (output / "multi-market-phone-summary.txt").write_text("الإجراء البشري الوحيد: انتظر\n")
     needed = ("pipeline", "runtime", "summary", "reconciliation", "operator_report_json", "operator_report_text")
     monkeypatch.setattr(cli, "build_unified_daily_runtime", lambda directory: {name: directory / name for name in needed})
+    monkeypatch.setattr(cli, "ingest_explicit_events", lambda directory: {"status": "NO_EVENTS", "events_seen": 0})
     monkeypatch.setattr(cli, "export_memory", lambda directory: {"deleted_ids": [], "study": [], "later": []})
     monkeypatch.setattr(sys, "argv", ["run_unified_daily_runtime.py", "--output-dir", str(output), "--input-root", str(input_root)])
     assert cli.main() == 0

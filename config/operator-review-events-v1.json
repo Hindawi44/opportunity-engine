@@ -1,0 +1,19 @@
+{
+  "schema_version": "operator-review-events-v1",
+  "events": [
+    {
+      "request_id": "explicit-chat-2026-09-18-bijuymoda-3445-delete",
+      "authority": "EXPLICIT_USER",
+      "review_run": 503,
+      "review_position": 1,
+      "database_relative_path": "it-exa-exact-lot/opportunity_engine.db",
+      "opportunity_id": "https://bijuymoda.com/it/lotti-in-offerta-all-ingrosso/3445-stock-all-ingrosso-di-abbigliamento-e-scarpe-ampia-varieta-di-marche-e-modelli.html",
+      "source_url": "https://bijuymoda.com/it/lotti-in-offerta-all-ingrosso/3445-stock-all-ingrosso-di-abbigliamento-e-scarpe-ampia-varieta-di-marche-e-modelli.html",
+      "action": "DELETE",
+      "reason": "",
+      "decided_at": "2026-09-18T10:21:00+02:00",
+      "scope": "REVIEW_INBOX_ONLY_NOT_A_STOCK_OR_SELLER_CLAIM",
+      "preserve_historical_discovery": true
+    }
+  ]
+}

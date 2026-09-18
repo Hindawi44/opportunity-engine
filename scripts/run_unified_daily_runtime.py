@@ -14,6 +14,7 @@ from opportunity_engine.human_listing_review_queue import build_queue, readable_
 from opportunity_engine.balanced_link_review import build_balanced_review, readable_balanced_review
 from opportunity_engine.psauction_child_links import extract_parent_children, readable_child_links
 from opportunity_engine.operator_study_memory import export_memory
+from opportunity_engine.operator_decision_ingest import ingest_explicit_events
 from opportunity_engine.source_status_reconciliation import reconcile_auksjonen_snapshot
 from opportunity_engine.source_page_audit import audit_review_batch
 
@@ -34,8 +35,16 @@ def main() -> int:
     report_path = output_dir / "multi-market-daily-checkpoint.json"
     if report_path.is_file():
         report = json.loads(report_path.read_text(encoding="utf-8"))
+        # A Git-tracked, explicit human event is an ingestion input only. SQLite
+        # remains the sole decision-memory authority; validate exact source
+        # identity and confirm a committed row before showing it as persisted.
+        ingestion = ingest_explicit_events(Path(args.input_root))
+        (output_dir / "operator-review-event-ingest-v1.json").write_text(
+            json.dumps(ingestion, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
         memory = export_memory(Path(args.input_root))
         queue = build_queue(report, memory)
+        queue["operator_review_ingest"] = ingestion
         source_snapshot = Path(args.input_root) / "no-auksjonen" / "auksjonen-live-clothing-listings.json"
         if source_snapshot.is_file():
             try:
