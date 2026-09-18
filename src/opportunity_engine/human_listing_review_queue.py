@@ -9,8 +9,9 @@ from __future__ import annotations
 from collections import Counter
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+from opportunity_engine.operator_source_exclusion import is_operator_excluded_url
+
 MARKETS = ("NO", "SE", "DE", "FR", "IT", "NL")
-_EXCLUDED_DOMAINS = frozenset({"vinqa-grossiste.com"})
 _AMBIGUOUS_PRODUCT_SLUGS = frozenset({"box", "boxes", "mystery-box"})
 _GENERIC_SLUGS = frozenset({
     "all", "index", "search", "category", "categories", "collection",
@@ -38,12 +39,12 @@ def classify_url(url: str) -> str:
         parsed = urlsplit(url)
         host, path = (parsed.hostname or "").lower(), parsed.path.lower()
         parts = [part for part in path.strip("/").split("/") if part]
-        if parsed.scheme not in {"http", "https"} or not host or not parts:
+        if parsed.scheme not in {"http", "https"} or not host:
             return "UNKNOWN"
-        if parsed.username or parsed.password:
-            return "UNKNOWN"
-        if any(_host(host, domain) for domain in _EXCLUDED_DOMAINS):
+        if is_operator_excluded_url(url):
             return "EXCLUDED"
+        if not parts or parsed.username or parsed.password:
+            return "UNKNOWN"
         if _host(host, "psauction.se") and path.startswith("/auction/"):
             return "CAMPAIGN"  # Parent auction is not its individual objects.
         if _host(host, "riegermann.de") and "/objekte/au-" in path:
@@ -96,7 +97,7 @@ def _direct_url(row: dict) -> tuple[str | None, str]:
     if isinstance(final, str) and final.strip():
         final_role = classify_url(final)
         if final_role != "DIRECT":
-            return None, "REDIRECT_TO_" + final_role
+            return None, "EXCLUDED_SOURCE" if final_role == "EXCLUDED" else "REDIRECT_TO_" + final_role
         original = pending.get("source_url") or row.get("canonical_url")
         if isinstance(original, str) and original.strip():
             old_host = urlsplit(original).hostname or ""
@@ -108,12 +109,14 @@ def _direct_url(row: dict) -> tuple[str | None, str]:
         return final, "DIRECT"
     urls = [row.get("canonical_url"), pending.get("source_url"), *(row.get("source_urls") or [])]
     valid = [u for u in urls if isinstance(u, str) and u.strip()]
+    # Exclusion is authoritative for the source record; do not revive a different
+    # alias URL from the same rejected source or convert rejection to ENDED.
+    if any(classify_url(url) == "EXCLUDED" for url in valid):
+        return None, "EXCLUDED_SOURCE"
     for url in valid:
         if classify_url(url) == "DIRECT":
             return url, "DIRECT"
     roles = {classify_url(url) for url in valid}
-    if "EXCLUDED" in roles:
-        return None, "EXCLUDED_SOURCE"
     return None, "CAMPAIGN" if "CAMPAIGN" in roles else "UNKNOWN"
 
 
@@ -121,9 +124,6 @@ def _page_proof(row: dict, url: str) -> bool:
     """Use existing dated source investigation, not inferred page legitimacy."""
     pending = row.get("pending_investigation") or {}
     evidence = pending.get("evidence") or {}
-    # The generic classifier also reads navigation/category text. A page is
-    # confirmed only when the source parser supplies its own listing identity;
-    # boolean keyword matches alone are not item-specific proof.
     native_listing = evidence.get("resalg_listing") or {}
     return bool(
         pending.get("status") == "VERIFIED_EXACT_LOT_CANDIDATE"
@@ -186,7 +186,7 @@ def build_queue(report: dict, memory: dict | None = None, batch_size: int = 10) 
             "market": row.get("market_code"), "sources": row.get("source_names") or [],
             "record_status": status, "stock_confidence": "UNVERIFIED",
             "page_type": "SOURCE_ITEM_PAGE_EVIDENCE" if page_proven else "DIRECT_URL_SHAPE_ONLY_UNVERIFIED",
-            "site_identity_status": "UNVERIFIED",  # Neither HTTP 200 nor a product URL validates a business.
+            "site_identity_status": "UNVERIFIED",
             "capture_timestamp": report.get("generated_at"),
             "source_last_investigated_at": pending.get("last_investigated_at"),
             "lot_quantity": lot_quantity, "price": None, "price_basis": None,
