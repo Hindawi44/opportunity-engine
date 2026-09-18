@@ -15,6 +15,7 @@ from urllib.request import Request, urlopen
 
 from opportunity_engine.cost_guard import manual_paid_brave_incremental_budget
 from opportunity_engine.discovery.search_provider import SearchHit
+from opportunity_engine.operator_source_exclusion import is_operator_excluded_url
 
 try:  # GitHub Actions runners are Linux; fail closed if locking is unavailable.
     import fcntl
@@ -367,7 +368,8 @@ def _parse_hits(payload: Any) -> list[SearchHit]:
         title = str(item.get("title") or "").strip()
         url = str(item.get("url") or "").strip()
         description = _combined_description(item)
-        if not title or not url.startswith("https://") or url in seen_urls:
+        # Respect explicit domain exclusions before verification or navigation.
+        if not title or not url.startswith("https://") or url in seen_urls or is_operator_excluded_url(url):
             continue
         seen_urls.add(url)
         hits.append(
