@@ -9,6 +9,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from opportunity_engine.discovery.search_provider import SearchHit
+from opportunity_engine.operator_source_exclusion import is_operator_excluded_url
 
 EXA_SEARCH_ENDPOINT = "https://api.exa.ai/search"
 EXA_HIGHLIGHT_DESCRIPTION_PREFIX = "EXA_SEARCH_HIGHLIGHTS_V1::"
@@ -177,7 +178,9 @@ def _parse_hits(payload: Any) -> list[SearchHit]:
             continue
         title = str(item.get("title") or "").strip()
         url = str(item.get("url") or "").strip()
-        if not title or not url.startswith("https://") or url in seen_urls:
+        # Operator preference is applied before discovery verification and
+        # page fetching; historical source records remain in old artifacts.
+        if not title or not url.startswith("https://") or url in seen_urls or is_operator_excluded_url(url):
             continue
         seen_urls.add(url)
         hits.append(
