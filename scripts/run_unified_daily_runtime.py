@@ -110,7 +110,7 @@ def main() -> int:
             for row in queue["daily_batch"]:
                 text += (f"- {row['title']}: "
                          f"{row.get('source_page_check_status', 'NOT_CHECKED')}; "
-                         "الشركة والمخزون غير مؤكدين.\n")
+                         "الشركة والمخزون غير مؤكدان.\n")
         text += "\n" + readable_balanced_review(balanced)
         if child_report is not None:
             # Native PS item anchors are exploration data, NOT confirmed lots.
@@ -121,13 +121,24 @@ def main() -> int:
         (output_dir / "human-listing-review-queue-v1.txt").write_text(text, encoding="utf-8")
         phone_summary = output_dir / "multi-market-phone-summary.txt"
         if phone_summary.is_file():
-            # The legacy cross-market summary can include non-auction Top-5
-            # counts. Keep it for provenance, but NEVER send those figures as
-            # an auction-only operator summary or resurrect old advert URLs.
+            # Legacy cross-market lifecycle and search-success metrics remain
+            # technical evidence, not an auction-only report or opportunity.
             (output_dir / "multi-market-phone-summary-technical-legacy.txt").write_text(
                 phone_summary.read_text(encoding="utf-8"), encoding="utf-8"
             )
+            # These three operational disclosures keep the existing workflow's
+            # safety/lifecycle contract without re-importing ad-derived counts.
+            text += ("\nدورة الحياة: إحصاءات البحث المختلط في الملف التقني؛ ليست مزادات مؤهلة.\n"
+                     "استمرارية SQLite: تفاصيل الحالة في ملف الإنتاج التقني؛ لا تثبت توافر أي مزاد.\n"
+                     "الإجراء البشري الوحيد: مراجعة مزادات موثقة الحالة يدويًا، بلا شراء أو اتصال آلي.\n")
             phone_summary.write_text(text, encoding="utf-8")
+        # A later workflow step used to append this wholesale-provider learning
+        # report verbatim to the human phone summary. Archive the identical bytes
+        # under a technical filename so that old search advertisements cannot
+        # re-enter the auction-only summary. Keep the JSON audit report intact.
+        search_review = output_dir / "search-success-review.txt"
+        if search_review.is_file():
+            search_review.replace(output_dir / "search-success-review-technical-legacy.txt")
         print("auction_only_human_review_queue:", queue["counts"])
         print("auction_navigation_review:", balanced["counts"])
         if child_report is not None:
