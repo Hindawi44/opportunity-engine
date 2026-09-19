@@ -1,6 +1,10 @@
-name: Event-first hunter pilot (manual, no paid APIs)
+name: Event-first hunter pilot (one initial run, then manual)
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/event-first-hunter-pilot.yaml"
   workflow_dispatch:
 
 permissions:
