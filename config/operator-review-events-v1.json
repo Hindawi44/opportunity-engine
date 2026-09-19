@@ -31,6 +31,22 @@
       "stock_confirmed": false,
       "purchase_approved": false,
       "preserve_historical_discovery": true
+    },
+    {
+      "request_id": "explicit-chat-2026-09-19-salzmann-gh_sal32205-1-delete",
+      "authority": "EXPLICIT_USER",
+      "review_run": 503,
+      "review_position": 5,
+      "database_relative_path": "de-exa-exact-lot/opportunity_engine.db",
+      "opportunity_id": "https://salzmann-restwaren.de/product/bekleidung-versch-marken-groessen-blazer-t-shirts-longsleeves-oberteile-mix/",
+      "source_url": "https://salzmann-restwaren.de/product/bekleidung-versch-marken-groessen-blazer-t-shirts-longsleeves-oberteile-mix/",
+      "action": "DELETE",
+      "reason": "EXPLICIT_OPERATOR_REVIEW_DELETE_ONLY: Exclude only review listing #5, seller SKU GH_SAL32205-1, from future human-review inbox. Retain original discovery row and immutable decision history. Do not block salzmann-restwaren.de as a domain or suppress other listings, do not infer sold-out, closure, stock status, fraud, or seller disqualification. No seller contact, purchase, sale, bid, reservation, or payment.",
+      "decided_at": "2026-09-19T09:07:54+02:00",
+      "scope": "EXACT_LISTING_REVIEW_INBOX_ONLY_NOT_DOMAIN_EXCLUSION_OR_STOCK_CLAIM",
+      "stock_confirmed": false,
+      "purchase_approved": false,
+      "preserve_historical_discovery": true
     }
   ]
 }
