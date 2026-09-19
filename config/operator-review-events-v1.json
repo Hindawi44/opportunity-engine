@@ -63,6 +63,22 @@
       "stock_confirmed": false,
       "purchase_approved": false,
       "preserve_historical_discovery": true
+    },
+    {
+      "request_id": "explicit-chat-2026-09-19-nipa-stock-lot120-delete",
+      "authority": "EXPLICIT_USER",
+      "review_run": 503,
+      "review_position": 7,
+      "database_relative_path": "it-exa-exact-lot/opportunity_engine.db",
+      "opportunity_id": "https://nipa-stock.com/it/product/assortiment-brendovoj-stokovoj-odezhdy-iz-germanii-kategoriya-avs",
+      "source_url": "https://nipa-stock.com/it/product/assortiment-brendovoj-stokovoj-odezhdy-iz-germanii-kategoriya-avs",
+      "action": "DELETE",
+      "reason": "EXPLICIT_OPERATOR_REVIEW_DELETE_ONLY: Exclude only review listing #7, Nipa Stock lot 120, at this exact source URL from future review and held-link presentation. Keep the original Italian-market discovery record and prior review decisions. Do not exclude nipa-stock.com, affect any other seller listings, or infer sold-out, stock status, verified sale, fraud, or seller disqualification. No contact, purchase, sale, bid, reservation, or payment.",
+      "decided_at": "2026-09-19T09:32:11+02:00",
+      "scope": "EXACT_LISTING_REVIEW_INBOX_ONLY_NOT_DOMAIN_EXCLUSION_OR_STOCK_CLAIM",
+      "stock_confirmed": false,
+      "purchase_approved": false,
+      "preserve_historical_discovery": true
     }
   ]
 }
