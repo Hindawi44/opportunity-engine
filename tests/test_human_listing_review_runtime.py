@@ -9,6 +9,7 @@ from scripts import run_unified_daily_runtime as cli
 
 AUK = "https://www.auksjonen.no/auksjon/overskuddsvarer/arbeidsklaer-parti/574797"
 FINN = "https://www.finn.no/recommerce/forsale/item/471259920"
+SEARCH_AD = "www.destockplus.com"
 
 
 def test_daily_runtime_exports_only_auction_lots_and_preserves_review_memory(monkeypatch, tmp_path):
@@ -30,7 +31,14 @@ def test_daily_runtime_exports_only_auction_lots_and_preserves_review_memory(mon
         ],
     }
     (output / "multi-market-daily-checkpoint.json").write_text(json.dumps(checkpoint))
-    (output / "multi-market-phone-summary.txt").write_text("الإجراء البشري الوحيد: انتظر\n")
+    (output / "multi-market-phone-summary.txt").write_text(
+        "الإجراء البشري الوحيد: انتظر\nإعلانات قديمة: " + FINN + "\n")
+    # The production workflow appends this file AFTER the auction CLI. Keep its
+    # contents as audit evidence, but prevent the subsequent append by archiving
+    # the text under a technical filename and retaining its JSON separately.
+    search_review = "Search Success Learning:\n- REVIEW: exa FR " + SEARCH_AD + "\n"
+    (output / "search-success-review.txt").write_text(search_review)
+    (output / "search-success-review.json").write_text(json.dumps({"review_status": "CANDIDATE"}))
     snapshot = input_root / "no-auksjonen" / "auksjonen-live-clothing-listings.json"
     snapshot.parent.mkdir()
     snapshot.write_text(json.dumps({
@@ -59,7 +67,13 @@ def test_daily_runtime_exports_only_auction_lots_and_preserves_review_memory(mon
     archived = (output / "multi-market-phone-summary-technical-legacy.txt").read_text()
     assert "مزادات فقط" in text and AUK in text and FINN not in text
     assert "مزادات فقط" in summary and AUK in summary and FINN not in summary
+    assert SEARCH_AD not in summary
+    assert summary.count("الإجراء البشري الوحيد:") == 1
+    assert "دورة الحياة:" in summary and "استمرارية SQLite:" in summary
     assert "الإجراء البشري الوحيد: انتظر" not in summary
-    assert archived == "الإجراء البشري الوحيد: انتظر\n"
+    assert archived == "الإجراء البشري الوحيد: انتظر\nإعلانات قديمة: " + FINN + "\n"
+    assert (output / "search-success-review-technical-legacy.txt").read_text() == search_review
+    assert not (output / "search-success-review.txt").exists()
+    assert json.loads((output / "search-success-review.json").read_text())["review_status"] == "CANDIDATE"
     assert result["automatic_contact"] is False
     assert result["automatic_purchase"] is False
