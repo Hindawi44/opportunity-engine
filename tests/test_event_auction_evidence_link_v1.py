@@ -6,12 +6,26 @@ import pytest
 from scripts.link_event_hunter_auction_evidence import (
     link_existing_auctions, render_linked_arabic,
 )
-from tests.test_event_first_hunter_pilot import source_report
 from scripts.run_event_first_hunter_pilot import build_event_report
 
 
 def event_report():
-    return build_event_report(source_report())
+    return build_event_report({
+        "source_key": "BRREG_ENHETSREGISTERET_API",
+        "source_country": "NO",
+        "status": "SUCCESS",
+        "generated_at": "2026-09-19T08:00:00Z",
+        "retrieved_record_count": 12,
+        "candidate_entity_count": 1,
+        "signals": [{
+            "signal_id": "official-notice:no:brreg:123456789:konkurs",
+            "metadata": {"organisation_number": "123456789", "event_kind": "KONKURS"},
+            "company_name": "Eksempel Tekstil AS",
+            "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/123456789",
+            "event_date": "2026-09-18T00:00:00Z",
+            "observed_at": "2026-09-19T08:00:00Z",
+        }],
+    })
 
 
 def brief(*rows):
