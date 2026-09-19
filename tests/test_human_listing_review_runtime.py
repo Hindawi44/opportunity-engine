@@ -56,8 +56,10 @@ def test_daily_runtime_exports_only_auction_lots_and_preserves_review_memory(mon
     assert result["daily_batch"][0]["opportunity_confirmed"] is False
     text = (output / "human-listing-review-queue-v1.txt").read_text()
     summary = (output / "multi-market-phone-summary.txt").read_text()
+    archived = (output / "multi-market-phone-summary-technical-legacy.txt").read_text()
     assert "مزادات فقط" in text and AUK in text and FINN not in text
-    assert AUK in summary and FINN not in summary
-    assert summary.count("الإجراء البشري الوحيد:") == 1
+    assert "مزادات فقط" in summary and AUK in summary and FINN not in summary
+    assert "الإجراء البشري الوحيد: انتظر" not in summary
+    assert archived == "الإجراء البشري الوحيد: انتظر\n"
     assert result["automatic_contact"] is False
     assert result["automatic_purchase"] is False
