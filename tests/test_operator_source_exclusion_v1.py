@@ -59,3 +59,35 @@ def test_rejected_source_cannot_reenter_via_alias_or_historical_final_url():
     queue = build_queue(report)
     assert not queue["review_queue"]
     assert queue["counts"]["excluded_source"] == 2
+
+
+def test_lux_operator_exclusion_covers_whole_host_and_subdomains_not_lookalikes():
+    item = "https://luxvintagewholesale.com/it/products/mix-abbigliamento-50-60-70"
+    assert excluded_domain(item) == "luxvintagewholesale.com"
+    assert excluded_domain("https://WWW.LUXVINTAGEWHOLESALE.COM/products/test") == "luxvintagewholesale.com"
+    assert is_operator_excluded_url("https://shop.luxvintagewholesale.com/collections/vintage")
+    assert classify_url(item) == "EXCLUDED"
+    assert classify_url("https://sub.luxvintagewholesale.com/products/lot") == "EXCLUDED"
+    assert not is_operator_excluded_url("https://notluxvintagewholesale.com/products/lot")
+    assert not is_operator_excluded_url("https://luxvintagewholesale.com.example.org/products/lot")
+    assert not is_operator_excluded_url("https://cubecompany.nl/product/lot")
+
+
+def test_lux_excluded_from_both_provider_discovery_and_review_while_history_remains():
+    excluded = "https://luxvintagewholesale.com/it/products/mix-abbigliamento-50-60-70"
+    allowed = "https://salzmann-restwaren.de/product/other"
+    raw_hits = [{"title": "Past Lux lot", "url": excluded}, {"title": "Allowed lot", "url": allowed}]
+    assert [hit.url for hit in exa_hits({"results": raw_hits})] == [allowed]
+    assert [hit.url for hit in brave_hits({"web": {"results": raw_hits}})] == [allowed]
+    historical_report = {"generated_at": "2026-09-19T06:00:00Z", "deduplicated_opportunities": [
+        {"opportunity_identity": excluded, "canonical_url": excluded, "source_urls": [excluded],
+         "title": "historical Lux listing", "market_code": "IT", "listing_status": "ACTIVE"},
+        {"opportunity_identity": allowed, "canonical_url": allowed, "source_urls": [allowed],
+         "title": "independent", "market_code": "DE", "listing_status": "ACTIVE"},
+    ]}
+    queue = build_queue(historical_report)
+    assert len(historical_report["deduplicated_opportunities"]) == 2
+    assert [row["source_url"] for row in queue["review_queue"]] == [allowed]
+    assert queue["counts"]["excluded_source"] == 1
+    assert queue["held_separately"][0]["reason"] == "EXCLUDED_SOURCE"
+    assert queue["automatic_purchase"] is False
