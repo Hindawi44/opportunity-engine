@@ -1,7 +1,7 @@
-"""Bounded Norway-only, multi-site bankruptcy sale-link investigations.
+"""Bounded Norwegian multi-site insolvency sale leads, review-only.
 
-An exact listing with bankruptcy wording is a LEAD, not seller/stock/availability
-proof. No paid APIs, unapproved FINN scraping, database writes or commerce.
+An official event is not a sale. A marketplace description is not independent
+seller or live-status proof. No foreign jobs, paid API, SQLite writes or commerce.
 """
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ SOURCES = {
     "Auksjonen": "https://www.auksjonen.no/auksjoner/torget/vareparti-og-konkursbo",
 }
 INSOLVENCY = re.compile(r"konkurs(?:bo(?:et|ets)?|salg|rammet)?|avvikling|opphørssalg|tømmesalg", re.I)
+ITEM_ESTATE = re.compile(r"selges\s+av\s*:\s*konkursbo|fra\s+(?:et\s+)?konkursbo|konkursboet\s+etter|konkurssalg\s+p[åa]g[åa]r", re.I)
 ENDED = re.compile(r"denne auksjonen er nå ferdig|auksjon(?:en)? er avsluttet|auksjon avsluttet|\bsolgt\b|\bavsluttet\b", re.I)
 MAX_BYTES = 1_500_000
 
@@ -93,7 +94,7 @@ def exact_item(source: str, raw: str, index: str) -> str | None:
 
 
 def fetch_html(url: str) -> str:
-    """Only exact allowlisted public HTTPS pages; bounded decompressed HTML."""
+    """Only exact allowlisted public HTTPS; bounded decompressed HTML."""
     if not any(url == index or exact_item(name, url, index) == url for name, index in SOURCES.items()):
         raise ValueError("Unapproved Norwegian public source URL")
     response = requests.get(url, timeout=12, allow_redirects=False,
@@ -103,7 +104,6 @@ def fetch_html(url: str) -> str:
         response.raise_for_status()
         if response.is_redirect or "html" not in response.headers.get("content-type", "").lower():
             raise RuntimeError("Redirect or non-HTML response")
-        # requests.iter_content transparently decompresses gzip/br; raw.read did not.
         chunks: list[bytes] = []
         size = 0
         for chunk in response.iter_content(chunk_size=65536):
@@ -138,6 +138,7 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
     errors: list[dict[str, str]] = []
     sources: list[dict[str, Any]] = []
     urls: dict[str, tuple[str, str]] = {}
+    auksjonen_fallback: dict[str, tuple[str, str]] = {}
     for name, index in SOURCES.items():
         try:
             page = Page()
@@ -151,9 +152,18 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
                     if INSOLVENCY.search(label + " " + urlsplit(direct).path):
                         urls.setdefault(direct, (name, label))
                         found += 1
-            status = "READ_BOUNDED" if page.anchors else "NO_ANCHORS_UNVERIFIED_NOT_ZERO"
+                    elif name == "Auksjonen" and len(auksjonen_fallback) < 8:
+                        # Category title is NOT proof. Read a few individual
+                        # item descriptions before discarding real estate sales.
+                        auksjonen_fallback.setdefault(direct, (name, label))
             if not page.anchors:
-                errors.append({"source": name, "stage": "index", "reason": "No HTML anchors extracted; page is not proof of zero listings"})
+                status = "NO_ANCHORS_UNVERIFIED_NOT_ZERO"
+                errors.append({"source": name, "stage": "index", "reason": "No HTML anchors extracted; not evidence of zero listings"})
+            elif not exact:
+                status = "NO_SUPPORTED_INDIVIDUAL_ROUTES_UNVERIFIED"
+                errors.append({"source": name, "stage": "index", "reason": "Site links do not match supported exact-item routes; coverage incomplete"})
+            else:
+                status = "READ_BOUNDED"
             sources.append({"source": name, "index_url": index, "status": status,
                             "html_anchor_count": len(page.anchors), "individual_listing_links": exact,
                             "bankruptcy_labeled_exact_links": found})
@@ -162,6 +172,8 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
             sources.append({"source": name, "index_url": index, "status": "FAILED_NOT_ZERO",
                             "html_anchor_count": None, "individual_listing_links": None,
                             "bankruptcy_labeled_exact_links": None})
+    for url, row in auksjonen_fallback.items():
+        urls.setdefault(url, row)
     leads: list[dict[str, Any]] = []
     closed = 0
     checked = 0
@@ -171,11 +183,16 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
             page = Page()
             page.feed(loader(url))
             heading = page.headings[0] if page.headings else ""
-            if not heading or not INSOLVENCY.search(heading):
-                continue  # No item-specific bankruptcy evidence.
+            if not heading:
+                continue
             text = " ".join(" ".join(page.parts).split())
             start = text.find(heading)
             item_text = text[max(0, start):max(0, start) + 3500]
+            # A normal title may hide an explicit "Selges av: Konkursbo" in
+            # its own description; site-wide category/footer language alone
+            # must not qualify.
+            if not (INSOLVENCY.search(heading) or ITEM_ESTATE.search(item_text[:1800])):
+                continue
             if ENDED.search(item_text):
                 closed += 1
                 continue
