@@ -13,7 +13,7 @@ def test_only_official_insolvency_first_pilot_runs():
     assert "norway-insolvency-source-evidence" in text
     assert "run_norway_direct_sales.py --" not in text
     assert "norway-direct-sale-pilot:" not in text
-    assert "norway-events:\n    # Preserve prior event source and historical code; do not execute its clothing-filtered collector.\n    if: ${{ false }}" in text
+    assert "norway-events:\n    # Keep the audited source code and historical artifacts; do not execute events.\n    if: ${{ false }}" in text
     assert "OPENAI_API_KEY:" not in text
     assert "BRAVE_SEARCH_API_KEY:" not in text
     assert "EXA_API_KEY:" not in text
