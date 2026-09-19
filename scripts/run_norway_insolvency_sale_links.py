@@ -1,9 +1,7 @@
-"""Norwegian insolvency sale leads from several public sites; read-only, PR pilot.
+"""Bounded Norway-only, multi-site bankruptcy sale-link investigations.
 
-Only individual pages with item-specific bankruptcy language are investigated.
-A marketplace claim or a name/organisation-number match is NOT independent
-proof of the estate seller, currently available assets, or a purchase decision.
-Never scrape FINN or private/authorized feeds without a supported access route.
+An exact listing with bankruptcy wording is a LEAD, not seller/stock/availability
+proof. No paid APIs, unapproved FINN scraping, database writes or commerce.
 """
 from __future__ import annotations
 
@@ -47,6 +45,8 @@ class Page(HTMLParser):
         if tag == "a" and values.get("href") and self.href is None:
             self.href = str(values["href"])
             self.anchor_parts = [str(values.get("title") or values.get("aria-label") or "")]
+        if tag == "img" and self.href is not None:
+            self.anchor_parts.append(str(values.get("alt") or ""))
         if tag == "h1":
             self.heading = True
             self.heading_parts = []
@@ -72,38 +72,46 @@ class Page(HTMLParser):
 
 
 def exact_item(source: str, raw: str, index: str) -> str | None:
-    """Allow only individual, public, Norwegian-platform item routes, not homepages."""
-    url = urljoin(index, raw)
-    parsed = urlsplit(url)
-    if parsed.scheme != "https" or parsed.query or parsed.fragment or parsed.username or parsed.password or parsed.port not in (None, 443):
+    try:
+        url = urljoin(index, raw)
+        parsed = urlsplit(url)
+        if (parsed.scheme != "https" or parsed.query or parsed.fragment or
+                parsed.username or parsed.password or parsed.port not in (None, 443)):
+            return None
+        host, path = (parsed.hostname or "").lower(), parsed.path
+        if source == "Norsk Avvikling":
+            valid = host in {"norskavvikling.no", "www.norskavvikling.no"} and bool(re.fullmatch(r"/produkt/[a-z0-9-]+/?", path, re.I))
+        elif source == "Vareauksjonen":
+            valid = host in {"vareauksjonen.no", "www.vareauksjonen.no"} and bool(re.fullmatch(r"/Event/Details/\d+/[^?#]+/C\d+(?:/[^?#]+)?/?", path, re.I))
+        elif source == "Auksjonen":
+            valid = host in {"auksjonen.no", "www.auksjonen.no"} and bool(re.fullmatch(r"/auksjon/(torget|overskuddsvarer)/[^/]+/\d{4,}/?", path, re.I))
+        else:
+            valid = False
+        return url if valid else None
+    except ValueError:
         return None
-    host, path = (parsed.hostname or "").lower(), parsed.path
-    allowed = False
-    if source == "Norsk Avvikling":
-        allowed = host in {"norskavvikling.no", "www.norskavvikling.no"} and bool(re.fullmatch(r"/produkt/[a-z0-9-]+/?", path, re.I))
-    elif source == "Vareauksjonen":
-        allowed = host in {"vareauksjonen.no", "www.vareauksjonen.no"} and bool(re.fullmatch(r"/Event/Details/\d+/[^?#]+/C\d+(?:/[^?#]+)?/?", path, re.I))
-    elif source == "Auksjonen":
-        allowed = host in {"auksjonen.no", "www.auksjonen.no"} and bool(re.fullmatch(r"/auksjon/(torget|overskuddsvarer)/[^/]+/\d{4,}/?", path, re.I))
-    return url if allowed else None
 
 
 def fetch_html(url: str) -> str:
-    """No credentials, redirects, foreign hosts, oversized pages, or paid APIs."""
-    source = next((name for name, index in SOURCES.items() if url == index or exact_item(name, url, index) == url), None)
-    if source is None:
+    """Only exact allowlisted public HTTPS pages; bounded decompressed HTML."""
+    if not any(url == index or exact_item(name, url, index) == url for name, index in SOURCES.items()):
         raise ValueError("Unapproved Norwegian public source URL")
     response = requests.get(url, timeout=12, allow_redirects=False,
-                            headers={"User-Agent": "OpportunityEngine-NO-insolvency/1.0", "Accept": "text/html"},
+                            headers={"User-Agent": "OpportunityEngine-NO-insolvency/1.1", "Accept": "text/html"},
                             stream=True)
     try:
         response.raise_for_status()
         if response.is_redirect or "html" not in response.headers.get("content-type", "").lower():
             raise RuntimeError("Redirect or non-HTML response")
-        raw = response.raw.read(MAX_BYTES + 1)
-        if len(raw) > MAX_BYTES:
-            raise RuntimeError("Public page exceeds bounded size")
-        return raw.decode(response.encoding or "utf-8", errors="replace")
+        # requests.iter_content transparently decompresses gzip/br; raw.read did not.
+        chunks: list[bytes] = []
+        size = 0
+        for chunk in response.iter_content(chunk_size=65536):
+            size += len(chunk)
+            if size > MAX_BYTES:
+                raise RuntimeError("Public page exceeds bounded decompressed size")
+            chunks.append(chunk)
+        return b"".join(chunks).decode(response.encoding or "utf-8", errors="replace")
     finally:
         response.close()
 
@@ -117,7 +125,7 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
     stamp = (now or datetime.now(timezone.utc)).isoformat()
     events = events_report.get("events")
     if not isinstance(events, list):
-        raise ValueError("Official report must include its actual sampled event records")
+        raise ValueError("Official report must include actual sampled events")
     companies = {}
     for event in events:
         if not isinstance(event, dict) or event.get("source_country") != "NO":
@@ -134,16 +142,26 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
         try:
             page = Page()
             page.feed(loader(index))
+            exact = 0
             found = 0
             for href, label in page.anchors:
                 direct = exact_item(name, href, index)
-                if direct and INSOLVENCY.search(label + " " + urlsplit(direct).path):
-                    urls.setdefault(direct, (name, label))
-                    found += 1
-            sources.append({"source": name, "index_url": index, "status": "READ_BOUNDED", "bankruptcy_labeled_exact_links": found})
+                if direct:
+                    exact += 1
+                    if INSOLVENCY.search(label + " " + urlsplit(direct).path):
+                        urls.setdefault(direct, (name, label))
+                        found += 1
+            status = "READ_BOUNDED" if page.anchors else "NO_ANCHORS_UNVERIFIED_NOT_ZERO"
+            if not page.anchors:
+                errors.append({"source": name, "stage": "index", "reason": "No HTML anchors extracted; page is not proof of zero listings"})
+            sources.append({"source": name, "index_url": index, "status": status,
+                            "html_anchor_count": len(page.anchors), "individual_listing_links": exact,
+                            "bankruptcy_labeled_exact_links": found})
         except Exception as exc:
             errors.append({"source": name, "stage": "index", "reason": f"{type(exc).__name__}: {exc}"})
-            sources.append({"source": name, "index_url": index, "status": "FAILED_NOT_ZERO", "bankruptcy_labeled_exact_links": None})
+            sources.append({"source": name, "index_url": index, "status": "FAILED_NOT_ZERO",
+                            "html_anchor_count": None, "individual_listing_links": None,
+                            "bankruptcy_labeled_exact_links": None})
     leads: list[dict[str, Any]] = []
     closed = 0
     checked = 0
@@ -153,24 +171,26 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
             page = Page()
             page.feed(loader(url))
             heading = page.headings[0] if page.headings else ""
-            text = " ".join(" ".join(page.parts).split())[:50000]
             if not heading or not INSOLVENCY.search(heading):
-                continue  # Category/footer boilerplate does not prove item-specific bankruptcy.
-            if ENDED.search(text):
+                continue  # No item-specific bankruptcy evidence.
+            text = " ".join(" ".join(page.parts).split())
+            start = text.find(heading)
+            item_text = text[max(0, start):max(0, start) + 3500]
+            if ENDED.search(item_text):
                 closed += 1
-                continue  # Native closure marker overrides index labels such as "open".
+                continue
             relation = "NO_OFFICIAL_COMPANY_MATCH_SOURCE_CLAIM_ONLY"
             org = None
             for number, event in companies.items():
                 company = str(event["company_name"]).strip()
-                if re.search(rf"(?<!\d){re.escape(number)}(?!\d)", text[:6000]):
+                if re.search(rf"(?<!\d){re.escape(number)}(?!\d)", item_text):
                     org, relation = number, "ORGANISATION_NUMBER_ON_PAGE_NOT_SELLER_VERIFIED"
                     break
-                if len(company) >= 8 and company.casefold() in text[:6000].casefold():
+                if len(company) >= 8 and company.casefold() in item_text.casefold():
                     org, relation = number, "COMPANY_NAME_ON_PAGE_NOT_SELLER_VERIFIED"
                     break
-            leads.append({"source": name, "url": url, "title": heading,
-                          "index_label": label, "organisation_number": org,
+            leads.append({"source": name, "url": url, "title": heading, "index_label": label,
+                          "organisation_number": org,
                           "official_event_url": companies[org]["official_url"] if org else None,
                           "relation_evidence": relation,
                           "sale_status": "UNVERIFIED_NO_SOURCE_NATIVE_OPEN_PROOF",
