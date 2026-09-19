@@ -34,8 +34,8 @@ def events():
 
 def test_cube_event_has_exact_review_scope_and_preserves_prior_human_actions():
     recorded = events()
-    assert len(recorded) == 4
-    assert {event["request_id"] for event in recorded} == OLDER_REQUESTS | {REQUEST}
+    assert len(recorded) >= 4
+    assert {event["request_id"] for event in recorded} >= OLDER_REQUESTS | {REQUEST}
     cube, = [event for event in recorded if event["request_id"] == REQUEST]
     assert (cube["authority"], cube["review_run"], cube["review_position"]) == (
         "EXPLICIT_USER", 503, 6,
@@ -51,7 +51,12 @@ def test_cube_event_has_exact_review_scope_and_preserves_prior_human_actions():
 
 
 def test_cube_sqlite_replay_preserves_historical_sources_and_older_decisions(tmp_path):
-    recorded = events()
+    # Replay only the four decisions this regression was designed to test;
+    # subsequent independent review actions have their own acceptance tests.
+    recorded = [event for event in events() if event["request_id"] in OLDER_REQUESTS | {REQUEST}]
+    assert len(recorded) == 4
+    event_file = tmp_path / "cube-events.json"
+    event_file.write_text(json.dumps({"schema_version": "operator-review-events-v1", "events": recorded}), encoding="utf-8")
     root = tmp_path / "multi-market-inputs"
     for event in recorded:
         db = root / event["database_relative_path"]
@@ -73,8 +78,8 @@ def test_cube_sqlite_replay_preserves_historical_sources_and_older_decisions(tmp
             OTHER_CUBE, OTHER_CUBE, "Another Cube product", "NL", "EXA",
             "CLOTHING_INVENTORY", json.dumps({"metadata": {"page_role": "ITEM_LISTING"}}),
         ))
-    first = ingest_explicit_events(root, events_path=EVENTS)
-    second = ingest_explicit_events(root, events_path=EVENTS)
+    first = ingest_explicit_events(root, events_path=event_file)
+    second = ingest_explicit_events(root, events_path=event_file)
     assert first["status"] == second["status"] == "VERIFIED_SQLITE_COMMITTED"
     assert first["events_committed_or_replayed"] == second["events_committed_or_replayed"] == 4
     assert first["automatic_purchase"] is False and first["automatic_contact"] is False
