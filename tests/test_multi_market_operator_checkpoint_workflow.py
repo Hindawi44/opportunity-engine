@@ -22,7 +22,7 @@ def test_old_clothing_only_event_runner_is_paused_without_deleting_source():
     assert "  schedule:" not in text
     assert "  workflow_dispatch:" not in text
     assert "  pull_request:" in text
-    assert "norway-events:\n    # Preserve prior event source and historical code; do not execute its clothing-filtered collector.\n    if: ${{ false }}" in text
+    assert "norway-events:\n    # Keep the audited source code and historical artifacts; do not execute events.\n    if: ${{ false }}" in text
     assert "run_event_first_hunter_pilot.py" in text
     assert "norway-hunter-evidence" in text
     assert "if: always()" in text
