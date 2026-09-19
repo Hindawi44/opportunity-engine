@@ -1,54 +1,37 @@
 from pathlib import Path
 
-
 WORKFLOWS = Path(".github/workflows")
-CHECKPOINT = WORKFLOWS / "multi-market-daily-operator-checkpoint.yaml"
+ACTIVE = WORKFLOWS / "multi-market-daily-operator-checkpoint.yaml"
+ARCHIVED = Path("docs/archive/legacy-six-market-checkpoint-20260919.yaml.txt")
 TESTS_WORKFLOW = WORKFLOWS / "research-shadow-manual.yaml"
 
 
-def test_france_reuses_existing_schedule_and_does_not_add_scheduler() -> None:
-    workflow_files = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
-    assert len(workflow_files) == 6
+def test_france_does_not_add_a_new_automatic_schedule() -> None:
+    workflows = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
+    assert len(workflows) == 6
     scheduled = []
-    for path in workflow_files:
-        live_lines = [
-            line for line in path.read_text(encoding="utf-8").splitlines()
-            if not line.lstrip().startswith("#")
-        ]
-        if any(line.strip() == "schedule:" for line in live_lines):
+    for path in workflows:
+        lines = [line for line in path.read_text(encoding="utf-8").splitlines()
+                 if not line.lstrip().startswith("#")]
+        if any(line.strip() == "schedule:" for line in lines):
             scheduled.append(path.name)
     assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
+    assert ACTIVE.read_text(encoding="utf-8").startswith("name: Norway Opportunity Hunter\n")
 
 
-def test_daily_runner_and_restore_include_france_sidecar() -> None:
-    runner = Path("scripts/run_multi_market_daily_operator_checkpoint.py").read_text(
-        encoding="utf-8"
-    )
-    restore = Path("scripts/restore_previous_checkpoint_state.py").read_text(
-        encoding="utf-8"
-    )
-    tests_workflow = TESTS_WORKFLOW.read_text(encoding="utf-8")
-    checkpoint = CHECKPOINT.read_text(encoding="utf-8")
-
-    assert "collect_france_market_signals" in runner
-    assert "run_france_case_memory_cycle" in runner
-    assert "_run_france_memory_sidecar" in runner
-    assert 'input_root / "fr-market"' in runner
-    assert 'output_dir / "france-market-discovery-v1.json"' in runner
-    assert 'output_dir / "france-case-memory-v1.json"' in runner
-    assert 'output_dir / "france-signal-follow-up-v1.json"' in runner
-    assert '"market_role": "OFFICIAL_EXPANSION_MARKET"' in runner
-    assert '"canonical_market_coverage_unchanged": ["NO", "SE", "DE"]' in runner
-
+def test_france_state_and_execution_contract_are_historical_only() -> None:
+    runner = Path("scripts/run_multi_market_daily_operator_checkpoint.py").read_text(encoding="utf-8")
+    restore = Path("scripts/restore_previous_checkpoint_state.py").read_text(encoding="utf-8")
+    manual = TESTS_WORKFLOW.read_text(encoding="utf-8")
+    old = ARCHIVED.read_text(encoding="utf-8")
+    active = ACTIVE.read_text(encoding="utf-8")
+    for marker in ("collect_france_market_signals", "run_france_case_memory_cycle", "_run_france_memory_sidecar",
+                   'input_root / "fr-market"', 'output_dir / "france-market-discovery-v1.json"',
+                   'output_dir / "france-case-memory-v1.json"', 'output_dir / "france-signal-follow-up-v1.json"'):
+        assert marker in runner
     assert 'FRANCE_MEMORY_RELATIVE_PATH = "fr-market/opportunity_engine.db"' in restore
-    assert "FRANCE_MEMORY_RELATIVE_PATH" in restore
-
-    assert "france-market-discovery-live:" in tests_workflow
-    assert "France market discovery live validation" in tests_workflow
-    assert "test_france_market_discovery_v1.py" in tests_workflow
-    assert "test_france_case_memory_adapter_v1.py" in tests_workflow
-
-    assert "python scripts/restore_previous_checkpoint_state.py" in checkpoint
-    assert "python scripts/run_multi_market_daily_operator_checkpoint.py" in checkpoint
-    assert "artifacts/multi-market-daily-operator-checkpoint/" in checkpoint
-    assert "artifacts/multi-market-inputs/" in checkpoint
+    assert "france-market-discovery-live:" in manual
+    assert "python scripts/restore_previous_checkpoint_state.py" in old
+    assert "python scripts/run_multi_market_daily_operator_checkpoint.py" in old
+    assert "run_multi_market_daily_operator_checkpoint.py" not in active
+    assert "france-market-discovery" not in active
