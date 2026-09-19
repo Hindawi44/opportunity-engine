@@ -35,11 +35,12 @@ def test_manual_workflow_is_norway_only_and_no_paid_or_foreign_search() -> None:
     assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in ARCHIVED.read_text(encoding="utf-8")
 
 
-def test_production_dispatch_waits_for_successful_ci() -> None:
+def test_legacy_post_ci_dispatch_is_disabled() -> None:
     text = (WORKFLOWS / "production-dispatch-after-ci.yaml").read_text(encoding="utf-8")
-    assert "workflow_run:" in text
-    assert "workflows: [Tests]" in text
-    assert "github.event.workflow_run.conclusion == 'success'" in text
+    trigger = text.split("on:", 1)[1].split("permissions:", 1)[0]
+    assert "workflow_run:" not in trigger
+    assert "workflow_dispatch:" in trigger
+    assert "dispatch:\n    if: ${{ false }}" in text
     assert "TARGET_WORKFLOW: multi-market-daily-operator-checkpoint.yaml" in text
     assert "BRAVE_SEARCH_API_KEY" not in text
     assert "EXA_API_KEY" not in text
