@@ -10,12 +10,13 @@ from urllib.parse import urlsplit
 # Explicit human decisions. Keep historic records and explanations outside this filter.
 OPERATOR_EXCLUDED_DOMAINS = frozenset({
     "friptadium.com",  # 2026-09-18: user explicitly excluded the whole site.
+    "luxvintagewholesale.com",  # 2026-09-19: user explicitly excluded the whole site.
     "vinqa-grossiste.com",  # 2026-09-17: user explicitly excluded the whole site.
 })
 
 
 def excluded_domain(url: object) -> str | None:
-    """Return excluded registrable source hostname, matching subdomains only."""
+    """Return excluded source hostname, matching exact hosts or their subdomains."""
     if not isinstance(url, str):
         return None
     try:
