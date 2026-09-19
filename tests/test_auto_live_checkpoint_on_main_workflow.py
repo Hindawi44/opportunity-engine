@@ -6,36 +6,35 @@ DAILY = ROOT / ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
 WORKFLOWS = ROOT / ".github/workflows"
 
 
-def test_relevant_main_pushes_dispatch_existing_live_checkpoint() -> None:
+def test_old_post_ci_dispatch_is_not_automatically_triggered() -> None:
     text = DISPATCH_WORKFLOW.read_text(encoding="utf-8")
-    assert "workflow_run:" in text
-    assert "workflows: [Tests]" in text
-    assert "branches: [main]" in text
-    assert "github.event.workflow_run.conclusion == 'success'" in text
+    trigger = text.split("on:", 1)[1].split("permissions:", 1)[0]
+    assert "workflow_run:" not in trigger
+    assert "schedule:" not in trigger
+    assert "workflow_dispatch:" in trigger
+    assert "dispatch:\n    if: ${{ false }}" in text
     assert "Detect relevant production-path change" in text
     assert "actions: write" in text
     assert "contents: read" in text
     assert "multi-market-daily-operator-checkpoint.yaml" in text
     assert "/actions/workflows/${TARGET_WORKFLOW}/dispatches" in text
-    assert "--data '{\"ref\":\"main\"}'" in text
     assert "git push" not in text
 
 
-def test_auto_dispatch_does_not_expand_workflow_inventory() -> None:
+def test_pause_does_not_expand_workflow_inventory() -> None:
     live = [path for path in WORKFLOWS.iterdir() if path.suffix in {".yml", ".yaml"}]
     assert len(live) == 6
     assert (WORKFLOWS / "production-dispatch-after-ci.yaml").exists()
 
 
-def test_target_live_checkpoint_supports_only_norwegian_manual_and_daily_runs() -> None:
+def test_event_only_checkpoint_is_preserved_but_not_scheduled() -> None:
     text = DAILY.read_text(encoding="utf-8")
+    trigger = text.split("on:", 1)[1].split("permissions:", 1)[0]
     assert text.startswith("name: Norway Opportunity Hunter\n")
-    assert "workflow_dispatch:" in text
-    assert "schedule:" in text
-    assert 'cron: "47 5 * * *"' in text
-    assert 'timezone: "Europe/Oslo"' in text
+    assert "workflow_dispatch:" not in trigger
+    assert "schedule:" not in trigger
     assert "cancel-in-progress: false" in text
-    assert "norway-events:" in text
+    assert "norway-events:\n    # Keep the audited source code and historical artifacts; do not execute events.\n    if: ${{ false }}" in text
     assert "run_event_first_hunter_pilot.py" in text
     assert "operator-read-only-checkpoint:" not in text
     assert "run_explicit_six_market_expansion.py" not in text

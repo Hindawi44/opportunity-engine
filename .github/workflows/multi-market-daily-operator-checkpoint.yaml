@@ -1,12 +1,9 @@
 name: Norway Opportunity Hunter
 
-# The former six-market pipeline is archived under docs/archive/ and MUST NOT run.
-# No SE, DE, FR, IT or NL discovery is invoked by this workflow.
+# Historical event-hunter implementation is retained but deliberately disabled.
+# The old event feed does not verify assets currently offered for sale.
+# Do not reactivate scheduling before a tested direct-listing replacement exists.
 on:
-  schedule:
-    - cron: "47 5 * * *"
-      timezone: "Europe/Oslo"
-  workflow_dispatch:
   pull_request:
     paths:
       - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
@@ -38,7 +35,8 @@ jobs:
           pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py
 
   norway-events:
-    if: ${{ github.event_name != 'pull_request' }}
+    # Keep the audited source code and historical artifacts; do not execute events.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:

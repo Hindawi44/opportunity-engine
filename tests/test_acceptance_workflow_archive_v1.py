@@ -58,14 +58,13 @@ def test_actions_surface_matches_current_workflows() -> None:
     assert current == EXPECTED_LIVE
 
 
-def test_only_multi_market_checkpoint_owns_an_automatic_schedule() -> None:
+def test_no_unverified_company_event_hunter_runs_on_schedule() -> None:
     scheduled = []
     for path in WORKFLOWS.iterdir():
         if path.suffix not in {".yml", ".yaml"}:
             continue
         text = path.read_text(encoding="utf-8")
-        # Ignore comments containing historical schedule examples.
         live_lines = [line for line in text.splitlines() if not line.lstrip().startswith("#")]
         if any(line.strip() == "schedule:" for line in live_lines):
             scheduled.append(path.name)
-    assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
+    assert scheduled == []

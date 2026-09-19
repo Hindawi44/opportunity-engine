@@ -1,4 +1,4 @@
-"""Contract for the active Norway-only hunt; historical multi-market spec is archived."""
+"""Contract for the paused event-only runner and preserved six-market history."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,28 +13,23 @@ def test_old_six_country_workflow_archived_not_executable():
     assert '"market_code": "FR"' in old
     assert '"market_code": "NL"' in old
     assert "Run visible FR/IT/NL Exa Exact-Lot expansion" in old
-    # The original stays available only as historical documentation, not as
-    # another GitHub Actions workflow or an active source.
     assert ARCHIVE.parent != WORKFLOW.parent
 
 
-def test_active_workflow_is_scheduled_norway_only():
+def test_event_only_workflow_is_paused_without_deleting_source():
     text = WORKFLOW.read_text(encoding="utf-8")
     assert text.startswith("name: Norway Opportunity Hunter\n")
-    assert 'cron: "47 5 * * *"' in text
-    assert 'timezone: "Europe/Oslo"' in text
-    assert "workflow_dispatch:" in text
-    assert "norway-events:" in text
+    assert "  schedule:" not in text
+    assert "  workflow_dispatch:" not in text
+    assert "  pull_request:" in text
+    assert "norway-events:\n    # Keep the audited source code and historical artifacts; do not execute events.\n    if: ${{ false }}" in text
     assert "run_event_first_hunter_pilot.py" in text
-    assert "--live --lookback-days 1 --update-limit 500 --entity-limit 20" in text
-    assert "--max-cards 5" in text
     assert "norway-hunter-evidence" in text
     assert "if: always()" in text
 
 
 def test_active_workflow_does_not_execute_non_norwegian_sources_or_paid_services():
     text = WORKFLOW.read_text(encoding="utf-8")
-    # Ignore the explanatory comment but reject active invocations and scope.
     code = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
     for token in (
         "--market SE", "--market DE", "--market FR", "--market IT", "--market NL",
@@ -54,7 +49,7 @@ def test_active_workflow_does_not_execute_non_norwegian_sources_or_paid_services
     assert "automatic_purchase" not in code
 
 
-def test_active_workflow_does_not_claim_full_market_coverage_or_inventory():
+def test_paused_workflow_never_claims_inventory_from_company_events():
     text = WORKFLOW.read_text(encoding="utf-8")
     assert "Read Norwegian official company events only" in text
     assert "--update-limit 500" in text

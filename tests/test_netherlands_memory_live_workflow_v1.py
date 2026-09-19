@@ -7,13 +7,13 @@ OLD_MANUAL = Path("docs/archive/foreign-manual-research-20260919.yaml.txt")
 MANUAL = WORKFLOWS / "research-shadow-manual.yaml"
 
 
-def test_netherlands_is_not_in_the_only_automatic_runtime() -> None:
+def test_netherlands_is_not_in_an_automatic_runtime() -> None:
     workflows = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
     assert len(workflows) == 6
     scheduled = [path.name for path in workflows if any(
         line.strip() == "schedule:" for line in path.read_text(encoding="utf-8").splitlines()
         if not line.lstrip().startswith("#"))]
-    assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
+    assert scheduled == []
     active = ACTIVE.read_text(encoding="utf-8")
     assert active.startswith("name: Norway Opportunity Hunter\n")
     assert "run_explicit_six_market_expansion.py" not in active
