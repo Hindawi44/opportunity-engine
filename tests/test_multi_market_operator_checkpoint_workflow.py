@@ -1,4 +1,4 @@
-"""Contract for the paused event-only runner and preserved six-market history."""
+"""Contract for Norway-only event-first runner and preserved six-market history."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +16,7 @@ def test_old_six_country_workflow_archived_not_executable():
     assert ARCHIVE.parent != WORKFLOW.parent
 
 
-def test_event_only_workflow_is_paused_without_deleting_source():
+def test_old_clothing_only_event_runner_is_paused_without_deleting_source():
     text = WORKFLOW.read_text(encoding="utf-8")
     assert text.startswith("name: Norway Opportunity Hunter\n")
     assert "  schedule:" not in text
@@ -49,10 +49,12 @@ def test_active_workflow_does_not_execute_non_norwegian_sources_or_paid_services
     assert "automatic_purchase" not in code
 
 
-def test_paused_workflow_never_claims_inventory_from_company_events():
+def test_paused_legacy_runner_and_new_official_source_keep_inventory_separate():
     text = WORKFLOW.read_text(encoding="utf-8")
     assert "Read Norwegian official company events only" in text
     assert "--update-limit 500" in text
     assert "--entity-limit 20" in text
     assert "--output-dir artifacts/norway-hunter" in text
+    assert "run_norway_insolvency_sample.py --page-size 25 --max-cards 10" in text
+    assert "norway-insolvency-source-evidence" in text
     assert "verified_inventory_links: 1" not in text

@@ -1,15 +1,16 @@
 name: Norway Opportunity Hunter
 
-# Historical company-event implementation remains disabled; no scheduled runs.
-# The direct item pilot runs only on PR, never automatically on main.
+# Bankruptcy/liquidation FIRST, all sectors. No general auctions in the opportunity feed.
+# No schedule or paid providers; PR-only bounded source verification.
+# Historical company-event implementation below remains retained and disabled.
 on:
   pull_request:
     paths:
       - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
-      - "scripts/run_event_first_hunter_pilot.py"
-      - "scripts/run_norway_direct_sales.py"
-      - "tests/test_norway_direct_sales.py"
+      - "scripts/run_norway_insolvency_sample.py"
+      - "tests/test_norway_insolvency_sample.py"
+      - "tests/test_norway_insolvency_workflow.py"
 
 permissions:
   contents: read
@@ -29,17 +30,17 @@ jobs:
           python-version: "3.11"
       - name: Install existing dependencies
         run: python -m pip install -r requirements.txt
-      - name: Verify Norway-only and direct-sale contracts
+      - name: Verify insolvency-first and historical safety contracts
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_direct_sales.py
+          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py
 
-  norway-direct-sale-pilot:
+  norway-insolvency-source-pilot:
     needs: norway-contract
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 8
     permissions:
       contents: read
     env:
@@ -51,15 +52,15 @@ jobs:
           python-version: "3.11"
       - name: Install existing project dependencies
         run: python -m pip install -r requirements.txt
-      - name: Read public Norway exact sales only; maximum two free pages and ten cards
+      - name: Sample three official Norway insolvency statuses, all sectors
         run: |
-          python scripts/run_norway_direct_sales.py --max-pages 2 --max-cards 10 --output-dir artifacts/norway-direct-sales
-      - name: Preserve real count, direct links, and any source failures
+          python scripts/run_norway_insolvency_sample.py --page-size 25 --max-cards 10 --output-dir artifacts/norway-insolvency
+      - name: Preserve official event evidence and failures, NOT general auction cards
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: norway-direct-sales-evidence
-          path: artifacts/norway-direct-sales/
+          name: norway-insolvency-source-evidence
+          path: artifacts/norway-insolvency/
           if-no-files-found: warn
           retention-days: 30
 
