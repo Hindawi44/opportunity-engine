@@ -1,7 +1,7 @@
-"""Bounded Norwegian multi-site insolvency sale leads, review-only.
+"""Bounded Norway-only cross-site insolvency-sale leads, review-only.
 
-An official event is not a sale. A marketplace description is not independent
-seller or live-status proof. No foreign jobs, paid API, SQLite writes or commerce.
+An official company event and a listing claim do not prove identity, stock,
+availability or permission to buy. No paid APIs, foreign searches or DB writes.
 """
 from __future__ import annotations
 
@@ -22,7 +22,11 @@ SOURCES = {
     "Auksjonen": "https://www.auksjonen.no/auksjoner/torget/vareparti-og-konkursbo",
 }
 INSOLVENCY = re.compile(r"konkurs(?:bo(?:et|ets)?|salg|rammet)?|avvikling|opphørssalg|tømmesalg", re.I)
-ITEM_ESTATE = re.compile(r"selges\s+av\s*:\s*konkursbo|fra\s+(?:et\s+)?konkursbo|konkursboet\s+etter|konkurssalg\s+p[åa]g[åa]r", re.I)
+# Do not match "alle produkter kan være fra konkursbo" in generic page boilerplate.
+ITEM_ESTATE = re.compile(
+    r"selges\s+av\s*:\s*konkursbo|selges\s+fra\s+(?:ett?\s+)?konkursbo"
+    r"|konkursboet\s+etter|konkurssalg\s+p[åa]g[åa]r", re.I,
+)
 ENDED = re.compile(r"denne auksjonen er nå ferdig|auksjon(?:en)? er avsluttet|auksjon avsluttet|\bsolgt\b|\bavsluttet\b", re.I)
 MAX_BYTES = 1_500_000
 
@@ -94,7 +98,7 @@ def exact_item(source: str, raw: str, index: str) -> str | None:
 
 
 def fetch_html(url: str) -> str:
-    """Only exact allowlisted public HTTPS; bounded decompressed HTML."""
+    """Only allowlisted public HTTPS pages, no redirects; cap decoded HTML."""
     if not any(url == index or exact_item(name, url, index) == url for name, index in SOURCES.items()):
         raise ValueError("Unapproved Norwegian public source URL")
     response = requests.get(url, timeout=12, allow_redirects=False,
@@ -153,8 +157,8 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
                         urls.setdefault(direct, (name, label))
                         found += 1
                     elif name == "Auksjonen" and len(auksjonen_fallback) < 8:
-                        # Category title is NOT proof. Read a few individual
-                        # item descriptions before discarding real estate sales.
+                        # A category is not estate proof. Check a few exact item
+                        # descriptions for explicit estate-sale wording.
                         auksjonen_fallback.setdefault(direct, (name, label))
             if not page.anchors:
                 status = "NO_ANCHORS_UNVERIFIED_NOT_ZERO"
@@ -188,9 +192,6 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
             text = " ".join(" ".join(page.parts).split())
             start = text.find(heading)
             item_text = text[max(0, start):max(0, start) + 3500]
-            # A normal title may hide an explicit "Selges av: Konkursbo" in
-            # its own description; site-wide category/footer language alone
-            # must not qualify.
             if not (INSOLVENCY.search(heading) or ITEM_ESTATE.search(item_text[:1800])):
                 continue
             if ENDED.search(item_text):
