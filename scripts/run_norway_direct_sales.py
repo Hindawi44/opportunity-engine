@@ -32,8 +32,11 @@ def fetch_page(url: str) -> Mapping[str, Any]:
         raise ValueError("Only the public Norwegian Auksjonen category search is allowed")
     req = Request(url, headers={"Accept": "application/json", "User-Agent": "OpportunityEngine/NO-Direct-Sales-1.0"})
     with urlopen(req, timeout=15) as response:  # noqa: S310 - exact allowlisted HTTPS API
-        if urlparse(response.geturl()).netloc != "ny.auksjonen.no":
-            raise RuntimeError("API redirected to another host")
+        final = urlparse(response.geturl())
+        if (final.scheme != "https" or final.netloc not in
+                {"ny.auksjonen.no", "www.auksjonen.no", "auksjonen.no"}
+                or final.path != "/api/category-search/search"):
+            raise RuntimeError(f"API redirected outside exact search: {final.netloc}{final.path}")
         if response.status != 200:
             raise RuntimeError(f"API HTTP {response.status}")
         raw = response.read(MAX_PAGE_BYTES + 1)
