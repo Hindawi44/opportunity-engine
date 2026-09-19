@@ -65,7 +65,7 @@ jobs:
           retention-days: 30
 
   norway-events:
-    # Preserve prior event source and historical code; do not execute its clothing-filtered collector.
+    # Keep the audited source code and historical artifacts; do not execute events.
     if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
