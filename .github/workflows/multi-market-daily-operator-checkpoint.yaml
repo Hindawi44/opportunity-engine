@@ -49,6 +49,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install existing project dependencies
+        run: python -m pip install -r requirements.txt
       - name: Read public Norway exact sales only; maximum two free pages and ten cards
         run: |
           python scripts/run_norway_direct_sales.py --max-pages 2 --max-cards 10 --output-dir artifacts/norway-direct-sales
