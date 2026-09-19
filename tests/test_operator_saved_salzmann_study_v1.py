@@ -1,4 +1,4 @@
-"""The operator's listing-4 study must persist without claiming inventory or a purchase."""
+"""Listing-4 study is durable and cannot imply inventory or purchase approval."""
 from __future__ import annotations
 
 import json
@@ -14,12 +14,22 @@ SALZMANN_URL = (
     "https://salzmann-restwaren.de/product/"
     "bekleidung-fuer-herren-pullover-cardigans-blusen-shirts-jacken-strickwaren/"
 )
+STUDY_REQUEST = "explicit-chat-2026-09-19-salzmann-gh_han03112-20-study"
+DELETE_REQUEST = "explicit-chat-2026-09-18-bijuymoda-3445-delete"
+
+
+def historical_pair():
+    payload = json.loads(EVENTS.read_text(encoding="utf-8"))
+    selected = [event for event in payload["events"]
+                if event["request_id"] in {STUDY_REQUEST, DELETE_REQUEST}]
+    assert len(selected) == 2
+    assert {e["request_id"] for e in selected} == {STUDY_REQUEST, DELETE_REQUEST}
+    return selected
 
 
 def test_study_evidence_source_attribution_and_review_only_authority():
     study = json.loads(STUDY.read_text(encoding="utf-8"))
-    payload = json.loads(EVENTS.read_text(encoding="utf-8"))
-    matching = [event for event in payload["events"] if event["source_url"] == SALZMANN_URL]
+    matching = [event for event in historical_pair() if event["source_url"] == SALZMANN_URL]
     assert len(matching) == 1
     event = matching[0]
     assert event["authority"] == "EXPLICIT_USER"
@@ -40,11 +50,13 @@ def test_study_evidence_source_attribution_and_review_only_authority():
     assert study["automatic_purchase"] is False
     assert study["automatic_contact"] is False
     assert study["historical_source_record_preserved"] is True
-    assert len(payload["events"]) == 2  # Existing Bijuymoda exclusion is preserved.
 
 
 def test_study_ingests_idempotently_into_existing_sqlite_memory(tmp_path):
-    events = json.loads(EVENTS.read_text(encoding="utf-8"))["events"]
+    events = historical_pair()  # Isolate this fixed historical pair from later user events.
+    replay_input = tmp_path / "events.json"
+    replay_input.write_text(json.dumps({"schema_version": "operator-review-events-v1",
+                                        "events": events}), encoding="utf-8")
     root = tmp_path / "multi-market-inputs"
     for event in events:
         db = root / event["database_relative_path"]
@@ -60,10 +72,10 @@ def test_study_ingests_idempotently_into_existing_sqlite_memory(tmp_path):
                 "EXA", "CLOTHING_INVENTORY",
                 json.dumps({"metadata": {"page_role": "ITEM_LISTING"}}),
             ))
-    first = ingest_explicit_events(root, events_path=EVENTS)
-    replay = ingest_explicit_events(root, events_path=EVENTS)
+    first = ingest_explicit_events(root, events_path=replay_input)
+    replay = ingest_explicit_events(root, events_path=replay_input)
     assert first["status"] == replay["status"] == "VERIFIED_SQLITE_COMMITTED"
-    assert first["events_committed_or_replayed"] == 2
+    assert first["events_committed_or_replayed"] == len(events)
     assert first["automatic_purchase"] is False
     assert first["automatic_contact"] is False
 
@@ -76,7 +88,7 @@ def test_study_ingests_idempotently_into_existing_sqlite_memory(tmp_path):
         assert connection.execute("SELECT COUNT(*) FROM operator_listing_decisions").fetchone()[0] == 1
         assert connection.execute("SELECT COUNT(*) FROM unified_opportunities").fetchone()[0] == 1
     memory = export_memory(root)
-    assert memory["audit_event_count"] == 2
+    assert memory["audit_event_count"] == len(events)
     assert len(memory["study"]) == 1
     assert memory["study"][0]["source_url"] == SALZMANN_URL
     assert len(memory["deleted_ids"]) == 1
