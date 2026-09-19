@@ -1,0 +1,374 @@
+name: Manual Search Research and Shadow Labs
+
+on:
+  workflow_dispatch:
+    inputs:
+      italy_live_validation:
+        description: Run bounded Italy live validation
+        required: false
+        default: false
+        type: boolean
+      france_live_validation:
+        description: Run bounded France live validation
+        required: false
+        default: false
+        type: boolean
+      netherlands_live_validation:
+        description: Run bounded Netherlands live validation
+        required: false
+        default: false
+        type: boolean
+      keyword_lab:
+        description: Run KEYWORD_DISCOVERY_LAB_V1 after tests pass
+        required: false
+        default: false
+        type: boolean
+      keyword_shadow_verify:
+        description: Run frozen KEYWORD_SHADOW_VERIFICATION_V1 after tests pass
+        required: false
+        default: false
+        type: boolean
+      keyword_limit:
+        description: Number of Italian keyword candidates to test
+        required: false
+        default: "10"
+      results_per_keyword:
+        description: Brave results per keyword (bounded to 10)
+        required: false
+        default: "5"
+      freshness:
+        description: Search freshness window
+        required: false
+        default: none
+        type: choice
+        options:
+          - none
+          - pm
+          - py
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: تنزيل ملفات المشروع
+        uses: actions/checkout@v4
+
+      - name: إعداد Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: تثبيت المكتبات
+        run: pip install -r requirements.txt
+
+      - name: تشغيل الاختبارات
+        id: pytest
+        shell: bash
+        run: |
+          set +e
+          pytest -q > pytest-output.log 2>&1
+          status=$?
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: رفع تقرير الاختبارات
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-output
+          path: pytest-output.log
+
+      - name: إنهاء بالفشل عند فشل الاختبارات
+        if: steps.pytest.outputs.exit_code != '0'
+        run: exit 1
+
+  keyword-discovery-lab-v1:
+    name: Italy keyword quality shadow lab
+    needs: contract-tests
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.keyword_lab }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/keyword-discovery-lab-v1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify lab unit contracts
+        run: pytest tests/test_keyword_discovery_lab.py -q
+
+      - name: Confirm bounded search configuration
+        shell: bash
+        run: |
+          if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
+            echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
+            exit 1
+          fi
+          KEYWORD_LIMIT="${{ inputs.keyword_limit }}"
+          RESULTS_PER_KEYWORD="${{ inputs.results_per_keyword }}"
+          if [ "$KEYWORD_LIMIT" -lt 1 ] || [ "$KEYWORD_LIMIT" -gt 10 ]; then
+            echo "V1 workflow allows 1..10 keywords only" >&2
+            exit 1
+          fi
+          if [ "$RESULTS_PER_KEYWORD" -lt 1 ] || [ "$RESULTS_PER_KEYWORD" -gt 10 ]; then
+            echo "results_per_keyword must be 1..10" >&2
+            exit 1
+          fi
+
+      - name: Run bounded shadow keyword lab
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_keyword_discovery_lab.py \
+            --output "$OUTPUT_DIR/keyword-lab-report.json" \
+            --keyword-limit "${{ inputs.keyword_limit }}" \
+            --results-per-keyword "${{ inputs.results_per_keyword }}" \
+            --freshness "${{ inputs.freshness }}"
+
+      - name: Print ranked keyword summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("artifacts/keyword-discovery-lab-v1/keyword-lab-report.json").read_text())
+          print("status:", report.get("status"))
+          print("queries:", report.get("queries_succeeded"), "/", report.get("queries_attempted"))
+          print("PROMOTE:", report.get("promote_count", 0))
+          print("SHADOW:", report.get("shadow_count", 0))
+          print("REJECT:", report.get("reject_count", 0))
+          print("\nRANKING")
+          for item in report.get("ranking", []):
+              print(
+                  f"#{item['rank']:02d} {item['score']:6.2f} {item['decision']:7s} "
+                  f"yield={item['actionable_yield']:.2f} fp={item['false_positive_ratio']:.2f} "
+                  f"{item['query']}"
+              )
+          PY
+
+      - name: Upload keyword lab artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyword-discovery-lab-v1
+          path: artifacts/keyword-discovery-lab-v1/keyword-lab-report.json
+          if-no-files-found: error
+          retention-days: 30
+
+  keyword-shadow-verification-v1:
+    name: Italy keyword SHADOW page verification
+    needs: contract-tests
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.keyword_shadow_verify }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OUTPUT_DIR: artifacts/keyword-shadow-verification-v1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify frozen stage-2 contracts
+        run: pytest tests/test_keyword_shadow_verification.py -q
+
+      - name: Confirm frozen verification budget
+        shell: bash
+        run: |
+          if [ -z "$BRAVE_SEARCH_API_KEY" ]; then
+            echo "BRAVE_SEARCH_API_KEY repository secret is required" >&2
+            exit 1
+          fi
+          echo "Frozen budget: 3 Brave queries x 5 results; max 15 direct page fetches"
+
+      - name: Run bounded stage-2 verification
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          python scripts/run_keyword_shadow_verification.py \
+            --output "$OUTPUT_DIR/keyword-shadow-verification-report.json" \
+            --freshness "${{ inputs.freshness }}"
+
+      - name: Print verified ranking
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("artifacts/keyword-shadow-verification-v1/keyword-shadow-verification-report.json").read_text())
+          print("status:", report.get("status"))
+          print("Brave queries:", report.get("stage1_query_count"))
+          print("pages:", report.get("page_fetches_succeeded"), "/", report.get("page_fetches_attempted"))
+          print("PROMOTE:", report.get("promote_count", 0))
+          print("SHADOW:", report.get("shadow_count", 0))
+          print("REJECT:", report.get("reject_count", 0))
+          print("\nVERIFIED RANKING")
+          for item in report.get("ranking", []):
+              metrics = item.get("metrics", {})
+              print(
+                  f"#{item['rank']:02d} {item['score']:6.2f} {item['decision']:7s} "
+                  f"coverage={item['verified_page_coverage']:.2f} "
+                  f"seller={metrics.get('seller_identity_ratio', 0):.2f} "
+                  f"commercial={metrics.get('quantity_or_price_ratio', 0):.2f} "
+                  f"{item['query']}"
+              )
+          PY
+
+      - name: Upload verified keyword artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyword-shadow-verification-v1
+          path: artifacts/keyword-shadow-verification-v1/keyword-shadow-verification-report.json
+          if-no-files-found: error
+          retention-days: 30
+
+  italy-market-discovery-live:
+    name: Italy market discovery live validation
+    needs: contract-tests
+    if: ${{ inputs.italy_live_validation }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate Italy discovery and memory contracts
+        run: |
+          pytest tests/test_italy_market_discovery_v1.py -q
+          pytest tests/test_italy_case_memory_adapter_v1.py -q
+
+      - name: Run bounded live Italy discovery
+        run: |
+          python scripts/build_italy_market_discovery.py \
+            --output artifacts/italy-market-discovery/italy-market-discovery.json
+
+      - name: Upload live Italy discovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: italy-market-discovery-v1
+          path: artifacts/italy-market-discovery/italy-market-discovery.json
+          if-no-files-found: error
+          retention-days: 30
+
+  netherlands-market-discovery-live:
+    name: Netherlands market discovery live validation
+    needs: contract-tests
+    if: ${{ inputs.netherlands_live_validation }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate Netherlands discovery, identity and memory contracts
+        run: |
+          pytest tests/test_netherlands_market_discovery_v1.py -q
+          pytest tests/test_netherlands_entity_identity_resolution_v1.py -q
+          pytest tests/test_netherlands_case_memory_adapter_v1.py -q
+
+      - name: Run bounded live Netherlands discovery and identity resolution
+        run: |
+          python scripts/build_netherlands_market_discovery.py \
+            --output artifacts/netherlands-market-discovery/netherlands-market-discovery.json \
+            --identity-output artifacts/netherlands-market-discovery/netherlands-entity-identity-resolution.json
+
+      - name: Upload live Netherlands discovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: netherlands-market-discovery-v1
+          path: |
+            artifacts/netherlands-market-discovery/netherlands-market-discovery.json
+            artifacts/netherlands-market-discovery/netherlands-entity-identity-resolution.json
+          if-no-files-found: error
+          retention-days: 30
+
+  france-market-discovery-live:
+    name: France market discovery live validation
+    needs: contract-tests
+    if: ${{ inputs.france_live_validation }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate France discovery and memory contracts
+        run: |
+          pytest tests/test_france_market_discovery_v1.py -q
+          pytest tests/test_france_case_memory_adapter_v1.py -q
+
+      - name: Run bounded live France discovery
+        run: |
+          python scripts/build_france_market_discovery.py \
+            --output artifacts/france-market-discovery/france-market-discovery.json
+
+      - name: Upload live France discovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: france-market-discovery-v1
+          path: artifacts/france-market-discovery/france-market-discovery.json
+          if-no-files-found: error
+          retention-days: 30
