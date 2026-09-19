@@ -121,8 +121,13 @@ def main() -> int:
         (output_dir / "human-listing-review-queue-v1.txt").write_text(text, encoding="utf-8")
         phone_summary = output_dir / "multi-market-phone-summary.txt"
         if phone_summary.is_file():
-            with phone_summary.open("a", encoding="utf-8") as handle:
-                handle.write("\n" + text)
+            # The legacy cross-market summary can include non-auction Top-5
+            # counts. Keep it for provenance, but NEVER send those figures as
+            # an auction-only operator summary or resurrect old advert URLs.
+            (output_dir / "multi-market-phone-summary-technical-legacy.txt").write_text(
+                phone_summary.read_text(encoding="utf-8"), encoding="utf-8"
+            )
+            phone_summary.write_text(text, encoding="utf-8")
         print("auction_only_human_review_queue:", queue["counts"])
         print("auction_navigation_review:", balanced["counts"])
         if child_report is not None:
