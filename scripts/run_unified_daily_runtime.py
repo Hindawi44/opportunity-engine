@@ -10,9 +10,12 @@ from pathlib import Path
 from opportunity_engine.discovery.unified_daily_runtime import (
     build_unified_daily_runtime,
 )
-from opportunity_engine.human_listing_review_queue import build_queue, readable_text
+from opportunity_engine.human_listing_review_queue import build_queue
+from opportunity_engine.auction_only_review_policy import (
+    restrict_to_auction_sources, require_dated_open_auction, readable_auction_review,
+)
 from opportunity_engine.balanced_link_review import build_balanced_review, readable_balanced_review
-from opportunity_engine.psauction_child_links import extract_parent_children, readable_child_links
+from opportunity_engine.psauction_child_links import extract_parent_children
 from opportunity_engine.operator_study_memory import export_memory
 from opportunity_engine.operator_decision_ingest import ingest_explicit_events
 from opportunity_engine.source_status_reconciliation import reconcile_auksjonen_snapshot
@@ -35,15 +38,17 @@ def main() -> int:
     report_path = output_dir / "multi-market-daily-checkpoint.json"
     if report_path.is_file():
         report = json.loads(report_path.read_text(encoding="utf-8"))
-        # A Git-tracked, explicit human event is an ingestion input only. SQLite
-        # remains the sole decision-memory authority; validate exact source
-        # identity and confirm a committed row before showing it as persisted.
+        # Keep Git-tracked human events as ingestion INPUT only. SQLite remains
+        # the decision-memory authority, including prior non-auction studies.
         ingestion = ingest_explicit_events(Path(args.input_root))
         (output_dir / "operator-review-event-ingest-v1.json").write_text(
             json.dumps(ingestion, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         memory = export_memory(Path(args.input_root))
-        queue = build_queue(report, memory)
+        # An advert is not a real opportunity: keep all source records in the
+        # historical checkpoint/SQLite but remove non-auction pages before any
+        # live status check, human display, page audit or link-recovery pass.
+        queue = restrict_to_auction_sources(build_queue(report, memory))
         queue["operator_review_ingest"] = ingestion
         source_snapshot = Path(args.input_root) / "no-auksjonen" / "auksjonen-live-clothing-listings.json"
         if source_snapshot.is_file():
@@ -55,8 +60,10 @@ def main() -> int:
                 queue["counts"]["auksjonen_snapshot_error_type"] = type(exc).__name__
         else:
             queue["counts"]["auksjonen_snapshot_status"] = "MISSING_NO_ENDING_INFERRED"
-        # Read-only public pages, no paid search or commercial actions.
-        # No network calls during ordinary pytest fixture runs.
+        # Fail closed: auction-shaped URLs without recent source-native OPEN
+        # evidence are technical holds, never opportunities or operator DELETE.
+        queue = require_dated_open_auction(queue)
+        # Read-only public auction pages only, no paid search/commercial action.
         production_run = os.environ.get("GITHUB_ACTIONS") == "true" and "PYTEST_CURRENT_TEST" not in os.environ
         if production_run or os.environ.get("OPPORTUNITY_ENGINE_SOURCE_PAGE_AUDIT") == "1":
             queue = audit_review_batch(queue)
@@ -65,13 +72,12 @@ def main() -> int:
                             "batch": queue["daily_batch"], "held": queue["held_separately"]},
                            ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
             )
-        # This supplementary inbox restores useful but unverified item leads;
-        # it does not relax the strict source verification or human decision gates.
+        # Balanced navigation sees only auction parents/holds; it cannot
+        # resurrect classified advertisements or supplier product pages.
         balanced = build_balanced_review(report, queue, memory)
         child_report = None
         if production_run or os.environ.get("OPPORTUNITY_ENGINE_PSAUCTION_CHILD_EXTRACTION") == "1":
             child_report = extract_parent_children(balanced)
-            # Preserve the same dated extraction result in the navigation lane.
             balanced["campaign_parents_for_child_extraction"] = child_report["parents"]
             balanced["counts"]["source_linked_child_item_urls_unverified"] = (
                 child_report["counts"]["child_links_extracted_unverified"]
@@ -85,7 +91,7 @@ def main() -> int:
         (output_dir / "human-listing-review-queue-v1.json").write_text(
             json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
-        text = readable_text(queue)
+        text = readable_auction_review(queue)
         text += "\nتدقيق حالة مزادات Auksjonen (دليل مصدر مؤرخ، وليس تأكيد مخزون):\n"
         text += "حالة ملف المصدر: " + queue["counts"]["auksjonen_snapshot_status"] + "\n"
         for row in queue["daily_batch"]:
@@ -96,7 +102,7 @@ def main() -> int:
             elif row.get("source_status_note"):
                 text += f"- {row['title']}: {row['source_status_note']}\n"
         if "source_page_audit" in queue:
-            text += "\nتدقيق صفحات المصدر المحدود (لا يثبت هوية الشركة أو المخزون):\n"
+            text += "\nتدقيق صفحات المزاد المحدود (لا يثبت هوية الشركة أو المخزون):\n"
             text += (f"فُحصت {queue['counts']['page_audit_attempted']} صفحات؛ "
                      f"هوية منتج من المصدر {queue['counts']['page_audit_product_id_evidence']}؛ "
                      f"تحويلات محتجزة {queue['counts']['page_audit_redirect_held']}؛ "
@@ -107,16 +113,25 @@ def main() -> int:
                          "الشركة والمخزون غير مؤكدين.\n")
         text += "\n" + readable_balanced_review(balanced)
         if child_report is not None:
-            text += "\n" + readable_child_links(child_report)
+            # Native PS item anchors are exploration data, NOT confirmed lots.
+            # Keep them in technical JSON, never advertise unverified child
+            # item URLs as fresh human opportunities in the phone summary.
+            text += ("\nروابط عناصر مزاد PS Auction المستخرجة (تقنية فقط، لا تعرض كفرص): "
+                     + str(child_report["counts"]["child_links_extracted_unverified"]) + "\n")
         (output_dir / "human-listing-review-queue-v1.txt").write_text(text, encoding="utf-8")
         phone_summary = output_dir / "multi-market-phone-summary.txt"
         if phone_summary.is_file():
-            with phone_summary.open("a", encoding="utf-8") as handle:
-                handle.write("\n" + text)
-        print("human_listing_review_queue:", queue["counts"])
-        print("balanced_link_review:", balanced["counts"])
+            # The legacy cross-market summary can include non-auction Top-5
+            # counts. Keep it for provenance, but NEVER send those figures as
+            # an auction-only operator summary or resurrect old advert URLs.
+            (output_dir / "multi-market-phone-summary-technical-legacy.txt").write_text(
+                phone_summary.read_text(encoding="utf-8"), encoding="utf-8"
+            )
+            phone_summary.write_text(text, encoding="utf-8")
+        print("auction_only_human_review_queue:", queue["counts"])
+        print("auction_navigation_review:", balanced["counts"])
         if child_report is not None:
-            print("psauction_child_link_extraction:", child_report["counts"])
+            print("psauction_technical_child_extraction:", child_report["counts"])
     elif os.environ.get("GITHUB_ACTIONS") == "true":
         raise FileNotFoundError(f"Daily review source checkpoint is missing: {report_path}")
     print(f"unified_daily_pipeline: {paths['pipeline']}")
