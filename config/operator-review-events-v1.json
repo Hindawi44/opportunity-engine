@@ -14,6 +14,23 @@
       "decided_at": "2026-09-18T10:21:00+02:00",
       "scope": "REVIEW_INBOX_ONLY_NOT_A_STOCK_OR_SELLER_CLAIM",
       "preserve_historical_discovery": true
+    },
+    {
+      "request_id": "explicit-chat-2026-09-19-salzmann-gh_han03112-20-study",
+      "authority": "EXPLICIT_USER",
+      "review_run": 503,
+      "review_position": 4,
+      "database_relative_path": "de-exa-exact-lot/opportunity_engine.db",
+      "opportunity_id": "https://salzmann-restwaren.de/product/bekleidung-fuer-herren-pullover-cardigans-blusen-shirts-jacken-strickwaren/",
+      "source_url": "https://salzmann-restwaren.de/product/bekleidung-fuer-herren-pullover-cardigans-blusen-shirts-jacken-strickwaren/",
+      "action": "STUDY",
+      "reason": "STUDY_ONLY_NOT_PURCHASE: Seller page identifies SKU GH_HAN03112-20; advertises from EUR 2.88 net, 44 pieces, mixed A/B/C, B2B only. These are page claims, not independently confirmed stock. Unknown: physical stock, brand/size/grade manifest, final quote, provenance, current official register proof, shipping/import/VAT to Norway. Detailed source-attributed evidence: config/operator-studies-v1/de-salzmann-gh_han03112-20.json. No purchase approval or seller contact.",
+      "decided_at": "2026-09-19T08:54:06+02:00",
+      "scope": "SAVE_STUDY_ONLY_NO_PURCHASE_APPROVAL_NO_STOCK_CONFIRMATION",
+      "study_evidence_path": "config/operator-studies-v1/de-salzmann-gh_han03112-20.json",
+      "stock_confirmed": false,
+      "purchase_approved": false,
+      "preserve_historical_discovery": true
     }
   ]
 }
