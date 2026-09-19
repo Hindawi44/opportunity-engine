@@ -47,6 +47,22 @@
       "stock_confirmed": false,
       "purchase_approved": false,
       "preserve_historical_discovery": true
+    },
+    {
+      "request_id": "explicit-chat-2026-09-19-cube-company-listing6-delete",
+      "authority": "EXPLICIT_USER",
+      "review_run": 503,
+      "review_position": 6,
+      "database_relative_path": "nl-exa-exact-lot/opportunity_engine.db",
+      "opportunity_id": "https://cubecompany.nl/product/partij-herenkleding-jack-jones-only-sons-petrol-industries-1050-stuks/",
+      "source_url": "https://cubecompany.nl/product/partij-herenkleding-jack-jones-only-sons-petrol-industries-1050-stuks/",
+      "action": "DELETE",
+      "reason": "EXPLICIT_OPERATOR_REVIEW_DELETE_ONLY: Exclude only Cube Company listing #6, Jack & Jones / Only & Sons / Petrol Industries 1050-stuks URL, from future review and held-link presentation. Retain its original discovery row and all previous review events. Do not exclude cubecompany.nl or other listings, do not assert independently confirmed stock, a completed sale, fraud, or seller disqualification. No contact, bids, purchasing, selling, reservations, or payment.",
+      "decided_at": "2026-09-19T09:23:22+02:00",
+      "scope": "EXACT_LISTING_REVIEW_INBOX_ONLY_NOT_DOMAIN_EXCLUSION_OR_STOCK_CLAIM",
+      "stock_confirmed": false,
+      "purchase_approved": false,
+      "preserve_historical_discovery": true
     }
   ]
 }

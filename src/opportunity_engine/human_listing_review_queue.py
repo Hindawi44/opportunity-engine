@@ -150,6 +150,12 @@ def build_queue(report: dict, memory: dict | None = None, batch_size: int = 10) 
     stats = Counter()
     for row in rows:
         identity = row.get("opportunity_identity") or ""
+        # An explicit operator DELETE applies to the exact record BEFORE URL
+        # classification: otherwise UNKNOWN/redirected items leak into held links.
+        # This does not delete the source row or exclude a supplier domain.
+        if identity in deleted:
+            stats["operator_deleted"] += 1
+            continue
         url, role = _direct_url(row)
         status = row.get("listing_status") or "UNRESOLVED"
         if not url:
@@ -166,9 +172,6 @@ def build_queue(report: dict, memory: dict | None = None, batch_size: int = 10) 
             stats["duplicate_urls"] += 1
             continue
         seen.add(key)
-        if identity in deleted:
-            stats["operator_deleted"] += 1
-            continue
         if identity in studying:
             stats["in_study_memory"] += 1
             continue
