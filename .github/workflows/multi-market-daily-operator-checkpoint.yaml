@@ -1,8 +1,8 @@
 name: Norway Opportunity Hunter
 
-# Bankruptcy/liquidation FIRST, all sectors. No general auctions in the opportunity feed.
-# No schedule or paid providers; PR-only bounded source verification.
-# Historical company-event implementation below remains retained and disabled.
+# Bankruptcy/liquidation FIRST, all sectors. Only insolvency-labeled exact pages
+# enter research; unrelated auction listings never become insolvency opportunities.
+# No schedule, no paid providers, no foreign searches and no database mutation.
 on:
   pull_request:
     paths:
@@ -11,6 +11,8 @@ on:
       - "scripts/run_norway_insolvency_sample.py"
       - "tests/test_norway_insolvency_sample.py"
       - "tests/test_norway_insolvency_workflow.py"
+      - "scripts/run_norway_insolvency_sale_links.py"
+      - "tests/test_norway_insolvency_sale_links.py"
 
 permissions:
   contents: read
@@ -30,17 +32,17 @@ jobs:
           python-version: "3.11"
       - name: Install existing dependencies
         run: python -m pip install -r requirements.txt
-      - name: Verify insolvency-first and historical safety contracts
+      - name: Verify insolvency-first, multi-source, and historical safety contracts
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py
+          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py
 
   norway-insolvency-source-pilot:
     needs: norway-contract
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 9
     permissions:
       contents: read
     env:
@@ -55,7 +57,10 @@ jobs:
       - name: Sample three official Norway insolvency statuses, all sectors
         run: |
           python scripts/run_norway_insolvency_sample.py --page-size 25 --max-cards 10 --output-dir artifacts/norway-insolvency
-      - name: Preserve official event evidence and failures, NOT general auction cards
+      - name: Investigate bounded exact insolvency-sale links from three public Norway websites
+        run: |
+          python scripts/run_norway_insolvency_sale_links.py --events artifacts/norway-insolvency/insolvency-events.json --max-details 9 --output-dir artifacts/norway-insolvency
+      - name: Preserve official events, source errors and unverified sale-link evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
