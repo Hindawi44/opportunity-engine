@@ -7,7 +7,7 @@ OLD_MANUAL = Path("docs/archive/foreign-manual-research-20260919.yaml.txt")
 TESTS_WORKFLOW = WORKFLOWS / "research-shadow-manual.yaml"
 
 
-def test_france_does_not_add_a_new_automatic_schedule() -> None:
+def test_france_does_not_add_an_automatic_schedule() -> None:
     workflows = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
     assert len(workflows) == 6
     scheduled = []
@@ -16,7 +16,7 @@ def test_france_does_not_add_a_new_automatic_schedule() -> None:
                  if not line.lstrip().startswith("#")]
         if any(line.strip() == "schedule:" for line in lines):
             scheduled.append(path.name)
-    assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
+    assert scheduled == []
     assert ACTIVE.read_text(encoding="utf-8").startswith("name: Norway Opportunity Hunter\n")
 
 
