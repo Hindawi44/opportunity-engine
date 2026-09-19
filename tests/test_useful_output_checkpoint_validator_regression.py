@@ -1,41 +1,43 @@
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW = ROOT / ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+ACTIVE = ROOT / ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+ARCHIVED = ROOT / "docs/archive/legacy-six-market-checkpoint-20260919.yaml.txt"
 
 
-def test_runtime_validator_accepts_useful_only_domain_delivery() -> None:
-    """The cleaned domain delivery no longer carries the legacy human-action block."""
-    text = WORKFLOW.read_text(encoding="utf-8")
+def _legacy_validation() -> str:
+    text = ARCHIVED.read_text(encoding="utf-8")
     start = text.index("- name: Validate checkpoint safety, coverage and lifecycle integrity")
     end = text.index("- name: Upload checkpoint and source evidence", start)
-    validation = text[start:end]
+    return text[start:end]
 
-    # The operator phone summary still owns the single bounded human action.
+
+def test_legacy_runtime_validator_preserved_for_historical_artifacts() -> None:
+    validation = _legacy_validation()
     assert 'summary.count("الإجراء البشري الوحيد:") != 1' in validation
-
-    # The useful-only domain delivery intentionally contains opportunity rows only.
-    # Runtime validation must not reject it for omitting the legacy action block.
     assert 'intelligence_text.count("الإجراء البشري الوحيد:") != 1' not in validation
     assert "Domain bulletin must contain exactly one human action" not in validation
 
 
-def test_checkpoint_validator_accepts_six_market_domain_coverage() -> None:
-    validation = WORKFLOW.read_text(encoding="utf-8")
-
+def test_six_market_validation_is_archived_and_absent_from_active_workflow() -> None:
+    validation = _legacy_validation()
+    active = ACTIVE.read_text(encoding="utf-8")
     assert '"NO", "SE", "DE", "FR", "IT", "NL"' in validation
     assert 'intelligence.get("market_coverage") != ["NO", "SE", "DE"]' not in validation
+    assert '"NO", "SE", "DE", "FR", "IT", "NL"' not in active
+    assert active.startswith("name: Norway Opportunity Hunter\n")
 
 
-def test_checkpoint_validator_accepts_applied_query_decisions() -> None:
-    validation = WORKFLOW.read_text(encoding="utf-8")
-
+def test_historical_query_decision_validator_is_not_reused_as_new_proof() -> None:
+    validation = _legacy_validation()
+    active = ACTIVE.read_text(encoding="utf-8")
     assert '"HUMAN_DECISION_APPLIED"' in validation
+    assert '"HUMAN_DECISION_APPLIED"' not in active
 
 
-def test_checkpoint_validator_uses_finalized_challenge_remaining_days() -> None:
-    validation = WORKFLOW.read_text(encoding="utf-8")
-
+def test_historical_challenge_state_validator_is_preserved_but_not_scheduled() -> None:
+    validation = _legacy_validation()
+    active = ACTIVE.read_text(encoding="utf-8")
     assert 'state.get("status") == "HUMAN_DECISION_APPLIED"' in validation
     assert 'state.get("remaining_independent_checkpoint_days") != 0' in validation
+    assert "remaining_independent_checkpoint_days" not in active

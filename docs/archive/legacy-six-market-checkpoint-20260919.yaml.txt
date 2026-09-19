@@ -1,0 +1,996 @@
+name: Multi-Market Daily Operator Checkpoint
+
+on:
+  schedule:
+    # GitHub schedule events can be delayed or dropped. Retry hourly in a bounded
+    # Oslo-morning window; the daily guard allows only the first successful
+    # checkpoint for the local day to execute source/search work.
+    - cron: "47 0-6 * * *"
+      timezone: "Europe/Oslo"
+  workflow_dispatch:
+    inputs:
+      sweden_query_budget:
+        description: Bounded queries per Swedish direct source
+        required: false
+        default: "8"
+      germany_sen_sen_query_budget:
+        description: Bounded Sen & Sen direct-source queries
+        required: false
+        default: "6"
+      riegermann_auction_limit:
+        description: Maximum active Riegermann clothing auctions
+        required: false
+        default: "5"
+      germany_catalog_limit:
+        description: Maximum active catalogs for each German watch
+        required: false
+        default: "5"
+      run_cross_source_scent_v2:
+        description: Run experimental cross-source scent expansion V2
+        required: false
+        type: boolean
+        default: false
+      cross_source_scent_v2_max_requests:
+        description: Maximum Brave requests for the optional V2 trial
+        required: false
+        default: "12"
+      human_review_opportunity_id:
+        description: Exact opportunity identity to review; leave empty when outcome is NONE
+        required: false
+        default: ""
+      human_review_outcome:
+        description: Optional explicit lifecycle review outcome
+        required: false
+        type: choice
+        default: NONE
+        options:
+          - NONE
+          - VERIFIED
+          - NEEDS_MORE_INFORMATION
+          - REJECTED
+          - CLOSED
+      human_review_note:
+        description: Optional reviewer note
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+      - "alembic/versions/0004_human_review_outcome_v1.py"
+      - "alembic/versions/0005_domain_market_signal_v1.py"
+      - "scripts/apply_human_review_outcome.py"
+      - "scripts/build_domain_market_intelligence_feed.py"
+      - "scripts/reconcile_checkpoint_human_reviews.py"
+      - "scripts/run_multi_market_daily_operator_checkpoint.py"
+      - "scripts/run_checkpoint_source_command.py"
+      - "scripts/run_auksjonen_live_clothing.py"
+      - "scripts/run_finn_email_intake.py"
+      - "scripts/run_cross_source_checkpoint_adapter.py"
+      - "scripts/run_cross_source_clothing_verification.py"
+      - "scripts/run_cross_source_scent_expansion_v2.py"
+      - "scripts/run_market_clothing_inventory_discovery.py"
+      - "scripts/run_germany_clothing_inventory_discovery_search.py"
+      - "scripts/run_daily_search_success_learning.py"
+      - "scripts/run_exa_exact_lot_checkpoint.py"
+      - "scripts/run_search_policy_router_review.py"
+      - "scripts/restore_previous_checkpoint_state.py"
+      - "scripts/enrich_multi_market_checkpoint_lifecycle.py"
+      - "src/opportunity_engine/market_intelligence.py"
+      - "src/opportunity_engine/discovery/auksjonen_unified_lifecycle.py"
+      - "src/opportunity_engine/discovery/domain_market_intelligence_feed.py"
+      - "src/opportunity_engine/discovery/openai_hunt_case_enrichment.py"
+      - "src/opportunity_engine/discovery/finn_email_intake.py"
+      - "src/opportunity_engine/discovery/gmail_opportunity_classification.py"
+      - "src/opportunity_engine/discovery/human_review_checkpoint.py"
+      - "src/opportunity_engine/discovery/multi_market_operator_checkpoint.py"
+      - "src/opportunity_engine/discovery/checkpoint_state_restore.py"
+      - "src/opportunity_engine/discovery/lifecycle_checkpoint_integration.py"
+      - "src/opportunity_engine/discovery/sweden_valuable_datasets_status_feed.py"
+      - "src/opportunity_engine/discovery/central_intelligence_orchestrator_cli_hook.py"
+      - "src/opportunity_engine/discovery/cross_source_scent_expansion_v2.py"
+      - "src/opportunity_engine/discovery/germany_sen_sen.py"
+      - "src/opportunity_engine/logistics/official_route_freight.py"
+      - "src/opportunity_engine/search_policy_query_challenge_v1.py"
+      - "src/opportunity_engine/search_policy_router_v1.py"
+      - "src/opportunity_engine/persistence/__init__.py"
+      - "src/opportunity_engine/persistence/human_review.py"
+      - "src/opportunity_engine/persistence/human_review_models.py"
+      - "src/opportunity_engine/persistence/market_signal_models.py"
+      - "src/opportunity_engine/persistence/market_signal_repository.py"
+      - "src/opportunity_engine/persistence/unified_report_adapter.py"
+      - "config/buyers/mahmoud_namsos_v1.json"
+      - "config/market_completion_matrix.json"
+      - "config/learning/search-success-bootstrap-v1.json"
+      - "tests/test_auksjonen_unified_lifecycle_persistence_v1.py"
+      - "tests/test_domain_market_intelligence_feed_v1.py"
+      - "tests/test_openai_hunt_case_enrichment_v1.py"
+      - "tests/test_finn_email_intake.py"
+      - "tests/test_gmail_opportunity_classification_v1.py"
+      - "tests/test_run_finn_email_intake_script.py"
+      - "tests/test_cross_source_checkpoint_adapter_v1.py"
+      - "tests/test_human_review_checkpoint_v1.py"
+      - "tests/test_human_review_outcome_v1.py"
+      - "tests/test_multi_market_operator_checkpoint.py"
+      - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "tests/test_exa_exact_lot_checkpoint_bridge_v1.py"
+      - "tests/test_search_policy_query_challenge_v1.py"
+      - "tests/test_search_policy_router_v1.py"
+      - "tests/test_search_policy_router_review_runner_v1.py"
+      - "tests/test_persistent_search_success_memory_v1.py"
+      - "tests/test_useful_output_checkpoint_validator_regression.py"
+      - "tests/test_germany_sen_sen_source_v1.py"
+      - "tests/test_germany_targeted_source_runner_v1.py"
+      - "tests/test_official_route_freight_v1.py"
+      - "tests/test_official_route_freight_workflow_wiring_v1.py"
+      - "tests/test_lifecycle_checkpoint_integration_v1.py"
+      - "tests/test_sweden_valuable_datasets_status_feed_v1.py"
+      - "tests/test_cross_source_scent_expansion_v2.py"
+      - "docs/FINN_GMAIL_INTAKE_BRIDGE_V1.md"
+      - "docs/MULTI_MARKET_DAILY_OPERATOR_CHECKPOINT_TASK_v1.0.md"
+      - "docs/OPENAI_HUNT_CASE_ENRICHMENT_V1.md"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: multi-market-daily-operator-checkpoint-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract-tests:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install focused test dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Test the multi-market checkpoint contract
+        env:
+          PYTHONPATH: src:.
+        run: |
+          pytest tests/test_auksjonen_unified_lifecycle_persistence_v1.py -q
+          pytest tests/test_domain_market_intelligence_feed_v1.py -q
+          pytest tests/test_openai_hunt_case_enrichment_v1.py -q
+          pytest tests/test_finn_email_intake.py -q
+          pytest tests/test_run_finn_email_intake_script.py -q
+          pytest tests/test_cross_source_checkpoint_adapter_v1.py -q
+          pytest tests/test_human_review_outcome_v1.py -q
+          pytest tests/test_human_review_checkpoint_v1.py -q
+          pytest tests/test_multi_market_operator_checkpoint.py -q
+          pytest tests/test_multi_market_operator_checkpoint_workflow.py -q
+          pytest tests/test_exa_exact_lot_checkpoint_bridge_v1.py -q
+          pytest tests/test_search_policy_query_challenge_v1.py -q
+          pytest tests/test_search_policy_router_v1.py -q
+          pytest tests/test_search_policy_router_review_runner_v1.py -q
+          pytest tests/test_persistent_search_success_memory_v1.py -q
+          pytest tests/test_useful_output_checkpoint_validator_regression.py -q
+          pytest tests/test_germany_sen_sen_source_v1.py -q
+          pytest tests/test_germany_targeted_source_runner_v1.py -q
+          pytest tests/test_official_route_freight_v1.py -q
+          pytest tests/test_official_route_freight_workflow_wiring_v1.py -q
+          pytest tests/test_lifecycle_checkpoint_integration_v1.py -q
+          pytest tests/test_sweden_valuable_datasets_status_feed_v1.py -q
+          pytest tests/test_cross_source_scent_expansion_v2.py -q
+
+  daily-schedule-guard:
+    if: ${{ github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    outputs:
+      should_run: ${{ steps.guard.outputs.should_run }}
+    steps:
+      - name: Allow only the first successful Oslo-day checkpoint
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          current_run_id = int(os.environ["CURRENT_RUN_ID"])
+          payload = json.loads(
+              subprocess.check_output(
+                  [
+                      "gh",
+                      "api",
+                      "-X",
+                      "GET",
+                      f"repos/{repo}/actions/workflows/multi-market-daily-operator-checkpoint.yaml/runs?branch=main&per_page=30",
+                  ],
+                  text=True,
+              )
+          )
+          oslo = ZoneInfo("Europe/Oslo")
+          today = datetime.now(oslo).date()
+          prior_successes = []
+          for run in payload.get("workflow_runs", []):
+              run_id = int(run.get("id") or 0)
+              if run_id == current_run_id:
+                  continue
+              if run.get("conclusion") != "success":
+                  continue
+              if run.get("event") not in {"schedule", "workflow_dispatch"}:
+                  continue
+              started = run.get("run_started_at") or run.get("created_at")
+              if not started:
+                  continue
+              started_local = datetime.fromisoformat(
+                  started.replace("Z", "+00:00")
+              ).astimezone(oslo)
+              if started_local.date() == today:
+                  prior_successes.append(
+                      {
+                          "id": run_id,
+                          "event": run.get("event"),
+                          "started_at": started,
+                      }
+                  )
+
+          should_run = not prior_successes
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"should_run={'true' if should_run else 'false'}\n")
+          print("Europe/Oslo date:", today)
+          print("prior successful checkpoint count:", len(prior_successes))
+          if prior_successes:
+              print(json.dumps(prior_successes[:3], sort_keys=True))
+          PY
+
+      - name: Cancel redundant scheduled retry cleanly
+        if: ${{ steps.guard.outputs.should_run == 'false' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "A successful checkpoint already exists for today's Europe/Oslo date. Cancelling this redundant retry."
+          gh api \
+            --method POST \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/cancel"
+          # Keep the runner alive until GitHub applies the cancellation so this
+          # guard-only retry cannot finish as SUCCESS and trigger downstream work.
+          sleep 60
+
+  operator-read-only-checkpoint:
+    needs: daily-schedule-guard
+    if: >-
+      ${{
+        always() &&
+        (
+          github.event_name == 'workflow_dispatch' ||
+          needs.daily-schedule-guard.outputs.should_run == 'true'
+        )
+      }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      PYTHONPATH: src:.
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      BOLAGSVERKET_CLIENT_ID: ${{ secrets.BOLAGSVERKET_CLIENT_ID }}
+      BOLAGSVERKET_CLIENT_SECRET: ${{ secrets.BOLAGSVERKET_CLIENT_SECRET }}
+      BOLAGSVERKET_SE_ORGANISATION_NUMBERS: ${{ secrets.BOLAGSVERKET_SE_ORGANISATION_NUMBERS }}
+      GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+      GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+      GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      MYBRING_API_UID: ${{ secrets.MYBRING_API_UID }}
+      MYBRING_API_KEY: ${{ secrets.MYBRING_API_KEY }}
+      MYBRING_CLIENT_URL: ${{ secrets.MYBRING_CLIENT_URL }}
+      MYBRING_CUSTOMER_NUMBER: ${{ secrets.MYBRING_CUSTOMER_NUMBER }}
+      OPENAI_HUNT_TRIAGE_MODEL: gpt-5.6-luna
+      OPENAI_HUNT_DEEP_MODEL: gpt-5.6-terra
+      OPENAI_HUNT_MAX_SIGNALS: "10"
+      OPENAI_HUNT_MAX_DEEP_CASES: "2"
+      OPENAI_HUNT_MAX_API_REQUESTS: "3"
+      OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.16"
+      INPUT_ROOT: artifacts/multi-market-inputs
+      OUTPUT_DIR: artifacts/multi-market-daily-operator-checkpoint
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install existing project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Restore previous lifecycle SQLite state
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          python scripts/restore_previous_checkpoint_state.py \
+            --input-root "$INPUT_ROOT" \
+            --status-path "$OUTPUT_DIR/previous-state-restore.json"
+
+      - name: Run daily Search Success shadow learning
+        continue-on-error: true
+        run: |
+          python scripts/run_daily_search_success_learning.py \
+            --input-root "$INPUT_ROOT" \
+            --output-dir "$OUTPUT_DIR" \
+            --run-id "${{ github.run_id }}" \
+            --bootstrap-memory config/learning/search-success-bootstrap-v1.json \
+            --results-per-query 5
+          test -f "$INPUT_ROOT/learning/search-success-memory.json"
+          test -f "$OUTPUT_DIR/search-success-review.json"
+          test -f "$OUTPUT_DIR/search-success-review.txt"
+
+      - name: Run Exa Exact-Lot NO checkpoint source
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/no-exa-exact-lot" -- \
+            python scripts/run_exa_exact_lot_checkpoint.py \
+              --market NO \
+              --output-dir "$INPUT_ROOT/no-exa-exact-lot" \
+              --results-per-query 5 \
+              --search-policy-memory "$INPUT_ROOT/learning/unified-memory-v2.json" \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/no-exa-exact-lot/opportunity_engine.db"
+
+      - name: Run Exa Exact-Lot SE checkpoint source
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/se-exa-exact-lot" -- \
+            python scripts/run_exa_exact_lot_checkpoint.py \
+              --market SE \
+              --output-dir "$INPUT_ROOT/se-exa-exact-lot" \
+              --results-per-query 5 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/se-exa-exact-lot/opportunity_engine.db"
+
+      - name: Run Exa Exact-Lot DE checkpoint source
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-exa-exact-lot" -- \
+            python scripts/run_exa_exact_lot_checkpoint.py \
+              --market DE \
+              --output-dir "$INPUT_ROOT/de-exa-exact-lot" \
+              --results-per-query 5 \
+              --search-policy-memory "$INPUT_ROOT/learning/unified-memory-v2.json" \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-exa-exact-lot/opportunity_engine.db"
+
+      - name: Run Norway Auksjonen public clothing path
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/no-auksjonen" -- \
+            python scripts/run_auksjonen_live_clothing.py \
+              --max-listings 30 \
+              --item-verification-limit 10 \
+              --output-dir "$INPUT_ROOT/no-auksjonen" \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/no-auksjonen/opportunity_engine.db"
+
+      - name: Read FINN saved-search alerts from Gmail
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/no-finn-email" -- \
+            python scripts/run_finn_email_intake.py \
+              --gmail-api \
+              --max-messages 50 \
+              --gmail-query 'newer_than:14d (from:agent@finn.no OR label:Opportunity-Engine)' \
+              --auksjonen-report "$INPUT_ROOT/no-auksjonen/auksjonen-live-clothing-listings.json" \
+              --output-dir "$INPUT_ROOT/no-finn-email"
+
+      - name: Run Norway bounded cross-source verification
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/no-cross-source" -- \
+            python scripts/run_cross_source_checkpoint_adapter.py \
+              --output-dir "$INPUT_ROOT/no-cross-source" \
+              --lookback-days 365 \
+              --max-bankruptcy-leads 40 \
+              --max-detail-pages 5 \
+              --max-vareauksjonen-details 5 \
+              --max-auksjoner-no-auctions 25
+
+      - name: Run Sweden Blinto bounded pilot
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/se-blinto" -- \
+            python scripts/run_market_clothing_inventory_discovery.py \
+              --market SE \
+              --source blinto \
+              --output-dir "$INPUT_ROOT/se-blinto" \
+              --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
+              --results-per-query 10 \
+              --freshness pm \
+              --verify-pages \
+              --verification-limit 20 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/se-blinto/opportunity_engine.db"
+
+      - name: Run Sweden Klaravik bounded direct scan
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/se-klaravik" -- \
+            python scripts/run_market_clothing_inventory_discovery.py \
+              --market SE \
+              --source klaravik \
+              --output-dir "$INPUT_ROOT/se-klaravik" \
+              --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
+              --results-per-query 10 \
+              --freshness pm \
+              --verify-pages \
+              --verification-limit 20 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/se-klaravik/opportunity_engine.db"
+
+      - name: Run Sweden PS Auction bounded direct scan
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/se-psauction" -- \
+            python scripts/run_market_clothing_inventory_discovery.py \
+              --market SE \
+              --source psauction \
+              --output-dir "$INPUT_ROOT/se-psauction" \
+              --query-budget "${{ github.event.inputs.sweden_query_budget || '8' }}" \
+              --results-per-query 10 \
+              --freshness pm \
+              --verify-pages \
+              --verification-limit 20 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/se-psauction/opportunity_engine.db"
+
+      - name: Run Sen & Sen bounded clothing liquidation scan
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-sen-sen" -- \
+            python scripts/run_market_clothing_inventory_discovery.py \
+              --market DE \
+              --source sen-sen \
+              --output-dir "$INPUT_ROOT/de-sen-sen" \
+              --query-budget "${{ github.event.inputs.germany_sen_sen_query_budget || '6' }}" \
+              --results-per-query 10 \
+              --freshness pm \
+              --verify-pages \
+              --verification-limit 20 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-sen-sen/opportunity_engine.db"
+
+      - name: Run active Riegermann discovery
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-riegermann" -- \
+            python scripts/run_riegermann_active_discovery.py \
+              --output-dir "$INPUT_ROOT/de-riegermann" \
+              --auction-limit "${{ github.event.inputs.riegermann_auction_limit || '5' }}" \
+              --catalog-page-limit 100 \
+              --item-verification-limit 10 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-riegermann/opportunity_engine.db"
+
+      - name: Run VENTA active clothing watch
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-venta" -- \
+            python scripts/run_venta_active_discovery.py \
+              --output-dir "$INPUT_ROOT/de-venta" \
+              --catalog-limit "${{ github.event.inputs.germany_catalog_limit || '5' }}" \
+              --catalog-page-limit 100 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-venta/opportunity_engine.db"
+
+      - name: Run Deutsche Pfandverwertung active clothing watch
+        run: |
+          python scripts/run_checkpoint_source_command.py \
+            --output-dir "$INPUT_ROOT/de-dpv" -- \
+            python scripts/run_dpv_active_discovery.py \
+              --output-dir "$INPUT_ROOT/de-dpv" \
+              --catalog-limit "${{ github.event.inputs.germany_catalog_limit || '5' }}" \
+              --catalog-page-limit 100 \
+              --item-verification-limit 10 \
+              --persist-unified \
+              --database-url "sqlite:///$INPUT_ROOT/de-dpv/opportunity_engine.db"
+
+      - name: Apply optional human review outcome
+        if: ${{ github.event.inputs.human_review_outcome != '' && github.event.inputs.human_review_outcome != 'NONE' }}
+        env:
+          REVIEW_OPPORTUNITY_ID: ${{ github.event.inputs.human_review_opportunity_id }}
+          REVIEW_OUTCOME: ${{ github.event.inputs.human_review_outcome }}
+          REVIEW_NOTE: ${{ github.event.inputs.human_review_note }}
+          REVIEWER: ${{ github.actor }}
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          if [ -z "$REVIEW_OPPORTUNITY_ID" ]; then
+            echo "human_review_opportunity_id is required when an outcome is selected" >&2
+            exit 2
+          fi
+          python scripts/apply_human_review_outcome.py \
+            --input-root "$INPUT_ROOT" \
+            --opportunity-id "$REVIEW_OPPORTUNITY_ID" \
+            --outcome "$REVIEW_OUTCOME" \
+            --reviewer "$REVIEWER" \
+            --note "$REVIEW_NOTE" \
+            --request-id "github-run:${{ github.run_id }}" \
+            --source-ref "github-actions:${{ github.run_id }}" \
+            --output "$OUTPUT_DIR/human-review-outcome.json"
+
+      - name: Run visible FR/IT/NL Exa Exact-Lot expansion
+        run: python scripts/run_explicit_six_market_expansion.py
+
+      - name: Write checkpoint input manifest
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          cat > "$OUTPUT_DIR/input-manifest.json" <<'JSON'
+          {
+            "schema_version": 1,
+            "sources": [
+              {
+                "market_code": "NO",
+                "source_name": "Auksjonen.no",
+                "currency": "NOK",
+                "artifact_dir": "artifacts/multi-market-inputs/no-auksjonen",
+                "report_kind": "AUKSJONEN_LIVE",
+                "report_file": "auksjonen-live-clothing-listings.json",
+                "top5_file": "live-clothing-top5.json"
+              },
+              {
+                "market_code": "NO",
+                "source_name": "FINN saved-search email",
+                "currency": "NOK",
+                "artifact_dir": "artifacts/multi-market-inputs/no-finn-email"
+              },
+              {
+                "market_code": "NO",
+                "source_name": "Norway cross-source verification",
+                "currency": "NOK",
+                "artifact_dir": "artifacts/multi-market-inputs/no-cross-source"
+              },
+              {
+                "market_code": "NO",
+                "source_name": "Exa Exact-Lot NO",
+                "currency": "NOK",
+                "artifact_dir": "artifacts/multi-market-inputs/no-exa-exact-lot"
+              },
+              {
+                "market_code": "SE",
+                "source_name": "Blinto",
+                "currency": "SEK",
+                "artifact_dir": "artifacts/multi-market-inputs/se-blinto"
+              },
+              {
+                "market_code": "SE",
+                "source_name": "Klaravik",
+                "currency": "SEK",
+                "artifact_dir": "artifacts/multi-market-inputs/se-klaravik"
+              },
+              {
+                "market_code": "SE",
+                "source_name": "PS Auction",
+                "currency": "SEK",
+                "artifact_dir": "artifacts/multi-market-inputs/se-psauction"
+              },
+              {
+                "market_code": "SE",
+                "source_name": "Exa Exact-Lot SE",
+                "currency": "SEK",
+                "artifact_dir": "artifacts/multi-market-inputs/se-exa-exact-lot"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "Sen & Sen",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-sen-sen"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "Riegermann",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-riegermann"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "VENTA Industrieversteigerungen",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-venta"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "Deutsche Pfandverwertung",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-dpv"
+              },
+              {
+                "market_code": "DE",
+                "source_name": "Exa Exact-Lot DE",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/de-exa-exact-lot"
+              },
+              {
+                "market_code": "FR",
+                "source_name": "Exa Exact-Lot FR",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/fr-exa-exact-lot"
+              },
+              {
+                "market_code": "IT",
+                "source_name": "Exa Exact-Lot IT",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/it-exa-exact-lot"
+              },
+              {
+                "market_code": "NL",
+                "source_name": "Exa Exact-Lot NL",
+                "currency": "EUR",
+                "artifact_dir": "artifacts/multi-market-inputs/nl-exa-exact-lot"
+              }
+            ]
+          }
+          JSON
+
+      - name: Build the legacy-compatible core and FR/IT/NL market cycles
+        env:
+          OPPORTUNITY_ENGINE_EXPLICIT_SIX_MARKET_EXPANSION: "1"
+        run: |
+          python scripts/run_multi_market_daily_operator_checkpoint.py \
+            --manifest "$OUTPUT_DIR/input-manifest.json" \
+            --market-matrix config/market_completion_matrix.json \
+            --root . \
+            --output-dir "$OUTPUT_DIR"
+
+      - name: Enrich checkpoint with lifecycle state and transitions
+        run: |
+          python scripts/enrich_multi_market_checkpoint_lifecycle.py \
+            --report "$OUTPUT_DIR/multi-market-daily-checkpoint.json" \
+            --summary "$OUTPUT_DIR/multi-market-phone-summary.txt" \
+            --manifest "$OUTPUT_DIR/input-manifest.json" \
+            --restore-status "$OUTPUT_DIR/previous-state-restore.json" \
+            --root .
+
+      - name: Reconcile persisted human review outcomes
+        run: |
+          python scripts/reconcile_checkpoint_human_reviews.py \
+            --report "$OUTPUT_DIR/multi-market-daily-checkpoint.json" \
+            --summary "$OUTPUT_DIR/multi-market-phone-summary.txt" \
+            --manifest "$OUTPUT_DIR/input-manifest.json" \
+            --root .
+
+      - name: Investigate bounded pending opportunities
+        run: |
+          python scripts/run_pending_opportunity_investigation.py \
+            --report "$OUTPUT_DIR/multi-market-daily-checkpoint.json" \
+            --output "$OUTPUT_DIR/pending-opportunity-investigation.json" \
+            --limit 10
+
+      - name: Build domain market intelligence bulletin
+        env:
+          OPPORTUNITY_ENGINE_EXPLICIT_UNIFIED_DAILY_RUNTIME: "1"
+        run: |
+          python scripts/build_domain_market_intelligence_feed.py \
+            --checkpoint "$OUTPUT_DIR/multi-market-daily-checkpoint.json" \
+            --manifest "$OUTPUT_DIR/input-manifest.json" \
+            --root . \
+            --output-dir "$OUTPUT_DIR"
+
+      - name: Build one explicit unified six-market runtime
+        run: |
+          python scripts/run_unified_daily_runtime.py \
+            --output-dir "$OUTPUT_DIR" \
+            --input-root "$INPUT_ROOT"
+
+      - name: Write Search Policy Router V1 review output
+        run: |
+          python scripts/run_search_policy_router_review.py \
+            --memory "$INPUT_ROOT/learning/unified-memory-v2.json" \
+            --output-dir "$OUTPUT_DIR"
+
+      - name: Append Search Success review to phone summary
+        if: always()
+        run: |
+          if [ -f "$OUTPUT_DIR/search-success-review.txt" ] && [ -f "$OUTPUT_DIR/multi-market-phone-summary.txt" ]; then
+            printf '\n' >> "$OUTPUT_DIR/multi-market-phone-summary.txt"
+            cat "$OUTPUT_DIR/search-success-review.txt" >> "$OUTPUT_DIR/multi-market-phone-summary.txt"
+          fi
+
+      - name: Run optional cross-source scent expansion V2 trial
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_cross_source_scent_v2 }}
+        continue-on-error: true
+        run: |
+          python scripts/run_cross_source_scent_expansion_v2.py \
+            --output-dir "$OUTPUT_DIR/cross-source-scent-v2" \
+            --max-requests "${{ inputs.cross_source_scent_v2_max_requests || '12' }}" \
+            --results-per-query 8
+
+      - name: Validate checkpoint safety, coverage and lifecycle integrity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/multi-market-daily-operator-checkpoint")
+          report = json.loads(
+              (root / "multi-market-daily-checkpoint.json").read_text(encoding="utf-8")
+          )
+          summary = (root / "multi-market-phone-summary.txt").read_text(encoding="utf-8")
+          intelligence = json.loads(
+              (root / "domain-market-intelligence-brief.json").read_text(encoding="utf-8")
+          )
+          intelligence_text = (
+              root / "domain-market-intelligence-brief.txt"
+          ).read_text(encoding="utf-8")
+          hunt = json.loads(
+              (root / "openai-hunt-case-enrichment.json").read_text(encoding="utf-8")
+          )
+          hunt_text = (
+              root / "openai-hunt-case-enrichment.txt"
+          ).read_text(encoding="utf-8")
+          six_market_exa = json.loads(
+              (root / "unified-six-market-exa-runtime.json").read_text(encoding="utf-8")
+          )
+          six_market_pipeline = json.loads(
+              (root / "unified-six-market-pipeline-v1.json").read_text(encoding="utf-8")
+          )
+          six_market_summary = (
+              root / "unified-six-market-phone-summary-v1.txt"
+          ).read_text(encoding="utf-8")
+          operator_report = json.loads(
+              (root / "unified-operator-report-v1.json").read_text(encoding="utf-8")
+          )
+          operator_text = (
+              root / "unified-operator-report-v1.txt"
+          ).read_text(encoding="utf-8")
+          policy_router = json.loads(
+              (root / "search-policy-router-v1-review.json").read_text(encoding="utf-8")
+          )
+          policy_router_text = (
+              root / "search-policy-router-v1-review.txt"
+          ).read_text(encoding="utf-8")
+
+          if report.get("market_coverage") != ["NO", "SE", "DE", "FR", "IT", "NL"]:
+              raise SystemExit("The checkpoint did not cover all six markets")
+          # Compatibility markers for previous source-count contracts:
+          # "all six bounded source paths"
+          # "all nine bounded source paths"
+          # "all ten bounded source paths"
+          if len(report.get("sources") or []) != 16:
+              raise SystemExit("The checkpoint did not include all sixteen bounded source paths")
+          if summary.count("الإجراء البشري الوحيد:") != 1:
+              raise SystemExit("The phone report must contain exactly one human action")
+          for key in (
+              "automatic_contact",
+              "automatic_bid",
+              "automatic_purchase",
+              "automatic_payment",
+          ):
+              if report.get(key) is not False:
+                  raise SystemExit(f"Automatic action safety changed: {key}")
+          if sum((report.get("source_execution_counts") or {}).values()) != 16:
+              raise SystemExit("Source execution statuses do not reconcile")
+
+          source_by_name = {
+              item.get("source_name"): item for item in report.get("sources") or []
+          }
+          if (source_by_name.get("Auksjonen.no") or {}).get("persistence_status") != "SUCCESS":
+              raise SystemExit("Auksjonen unified SQLite persistence did not succeed")
+          if "FINN saved-search email" not in source_by_name:
+              raise SystemExit("FINN saved-search email was not included in the checkpoint")
+          if "Norway cross-source verification" not in source_by_name:
+              raise SystemExit("Norway cross-source verification was not included in the checkpoint")
+          if "Blinto" not in source_by_name:
+              raise SystemExit("Blinto was not included in the checkpoint")
+          if "Klaravik" not in source_by_name:
+              raise SystemExit("Klaravik was not included in the checkpoint")
+          if "PS Auction" not in source_by_name:
+              raise SystemExit("PS Auction was not included in the checkpoint")
+          if "Sen & Sen" not in source_by_name:
+              raise SystemExit("Sen & Sen was not included in the checkpoint")
+          for exa_source in (
+              "Exa Exact-Lot NO",
+              "Exa Exact-Lot SE",
+              "Exa Exact-Lot DE",
+              "Exa Exact-Lot FR",
+              "Exa Exact-Lot IT",
+              "Exa Exact-Lot NL",
+          ):
+              if exa_source not in source_by_name:
+                  raise SystemExit(f"{exa_source} was not included in the checkpoint")
+
+          lifecycle = report.get("lifecycle") or {}
+          stage_counts = lifecycle.get("stage_counts") or {}
+          if sum(stage_counts.values()) != report.get("deduplicated_record_count"):
+              raise SystemExit("Lifecycle stage counts do not reconcile")
+          persistence = lifecycle.get("persistence") or {}
+          if persistence.get("comparison_scope") not in {
+              "CURRENT_RUN_INITIALIZATION",
+              "SINCE_PREVIOUS_SUCCESSFUL_CHECKPOINT",
+          }:
+              raise SystemExit("Lifecycle comparison scope is missing")
+          lifecycle_sources = {
+              item.get("source_name"): item for item in persistence.get("sources") or []
+          }
+          if (lifecycle_sources.get("Auksjonen.no") or {}).get("status") != "SUCCESS":
+              raise SystemExit("Auksjonen lifecycle event storage is not enabled")
+          if "دورة الحياة:" not in summary or "استمرارية SQLite:" not in summary:
+              raise SystemExit("Phone summary does not expose lifecycle status")
+
+          required_intelligence_keys = {
+              "new_signals_today",
+              "changed_signals_since_previous_checkpoint",
+              "early_signals_to_watch",
+              "current_direct_opportunities",
+              "selected_human_action",
+              "source_coverage",
+              "unavailable_or_failed_sources",
+          }
+          if not required_intelligence_keys.issubset(intelligence):
+              raise SystemExit("Domain market intelligence bulletin is incomplete")
+          if intelligence.get("market_coverage") != [
+              "NO", "SE", "DE", "FR", "IT", "NL"
+          ]:
+              raise SystemExit("Domain bulletin market coverage changed")
+          if set((six_market_exa.get("markets") or {})) != {"FR", "IT", "NL"}:
+              raise SystemExit("Visible FR/IT/NL Exa expansion coverage is incomplete")
+          if six_market_pipeline.get("market_coverage") != [
+              "NO", "SE", "DE", "FR", "IT", "NL"
+          ]:
+              raise SystemExit("Authoritative six-market runtime coverage changed")
+          if "التغطية: NO | SE | DE | FR | IT | NL" not in six_market_summary:
+              raise SystemExit("Six-market phone summary hides expansion markets")
+          if operator_report.get("authority") != "UNIFIED_OPERATOR_REPORT_V1":
+              raise SystemExit("Unified operator report authority is missing")
+          if operator_report.get("market_coverage") != [
+              "NO", "SE", "DE", "FR", "IT", "NL"
+          ]:
+              raise SystemExit("Unified operator report coverage changed")
+          if operator_text.count("الإجراء البشري الوحيد:") != 1:
+              raise SystemExit("Unified operator report must expose one human action")
+          if policy_router.get("mode") != "REVIEW_ONLY":
+              raise SystemExit("Search Policy Router escaped review-only mode")
+          if policy_router.get("market_coverage") != [
+              "NO", "SE", "DE", "FR", "IT", "NL"
+          ]:
+              raise SystemExit("Search Policy Router market coverage changed")
+          challenge_states = policy_router.get("bounded_query_challenges") or {}
+          allowed_challenge_statuses = {
+              "ACTIVE",
+              "PAUSED_ALREADY_OBSERVED_TODAY",
+              "PAUSED_MEMORY_UNAVAILABLE",
+              "COMPLETED_REVIEW_REQUIRED",
+              "HUMAN_DECISION_APPLIED",
+          }
+          for market in ("DE", "NO"):
+              state = challenge_states.get(market) or {}
+              if state.get("status") not in allowed_challenge_statuses:
+                  raise SystemExit(f"{market} bounded query challenge status is invalid")
+              if state.get("status") == "HUMAN_DECISION_APPLIED":
+                  if state.get("remaining_independent_checkpoint_days") != 0:
+                      raise SystemExit(
+                          f"{market} finalized query challenge still has remaining days"
+                      )
+              elif state.get("max_independent_checkpoint_days") != 3:
+                  raise SystemExit(f"{market} bounded query challenge day cap changed")
+              if state.get("request_slots_added") != 0:
+                  raise SystemExit(f"{market} bounded query challenge added request slots")
+
+          input_root = Path("artifacts/multi-market-inputs")
+          for market, directory, expected_primary_slots in (
+              ("NO", "no-exa-exact-lot", 2),
+              ("DE", "de-exa-exact-lot", 2),
+          ):
+              resolution = json.loads(
+                  (input_root / directory / "exa-exact-lot-resolution.json").read_text(
+                      encoding="utf-8"
+                  )
+              )
+              state = resolution.get("search_policy_query_challenge") or {}
+              primary_rows = [
+                  row
+                  for row in resolution.get("queries") or []
+                  if row.get("query_stage") in {"PRIMARY", "POLICY_CHALLENGE"}
+              ]
+              if len(primary_rows) != expected_primary_slots:
+                  raise SystemExit(f"{market} bounded challenge changed primary slots")
+              challenge_rows = [
+                  row
+                  for row in primary_rows
+                  if row.get("query_stage") == "POLICY_CHALLENGE"
+              ]
+              expected_challenge_rows = 1 if state.get("status") == "ACTIVE" else 0
+              if len(challenge_rows) != expected_challenge_rows:
+                  raise SystemExit(f"{market} bounded challenge execution ledger is invalid")
+              if state.get("request_slots_added") != 0:
+                  raise SystemExit(f"{market} production challenge added request slots")
+          if "FABRIC_PROCUREMENT" in policy_router_text:
+              raise SystemExit("Fabric query leaked into clothing Search Policy Router output")
+          for key in (
+              "automatic_contact",
+              "automatic_bid",
+              "automatic_purchase",
+              "automatic_payment",
+          ):
+              if intelligence.get(key) is not False:
+                  raise SystemExit(f"Domain bulletin changed automatic safety: {key}")
+
+          if hunt.get("status") not in {
+              "SUCCESS",
+              "SKIPPED_NO_API_KEY",
+              "NO_ELIGIBLE_SIGNALS",
+              "SKIPPED_BUDGET_GUARD",
+              "FAILED",
+          }:
+              raise SystemExit("OpenAI hunt-case status is invalid")
+          if int(hunt.get("selected_signal_count") or 0) > 10:
+              raise SystemExit("OpenAI hunt-case signal limit changed")
+          if int(hunt.get("deep_case_count") or 0) > 2:
+              raise SystemExit("OpenAI hunt-case deep-analysis limit changed")
+          if int(hunt.get("api_request_count") or 0) > 3:
+              raise SystemExit("OpenAI hunt-case request limit changed")
+          if hunt.get("promotion_to_opportunity_allowed") is not False:
+              raise SystemExit("OpenAI output may not promote opportunities")
+          for key in (
+              "automatic_contact",
+              "automatic_bid",
+              "automatic_purchase",
+              "automatic_payment",
+          ):
+              if hunt.get(key) is not False:
+                  raise SystemExit(f"OpenAI hunt case changed automatic safety: {key}")
+          if "ليست إثباتًا لوجود بيع أو مخزون" not in hunt_text:
+              raise SystemExit("OpenAI hunt-case advisory warning is missing")
+
+          search_success_review = root / "search-success-review.json"
+          if search_success_review.exists():
+              payload = json.loads(search_success_review.read_text(encoding="utf-8"))
+              if payload.get("review_status") not in {
+                  "NO_VERIFIED_ROUTE",
+                  "CANDIDATE",
+                  "REPLICATED_FOR_REVIEW",
+              }:
+                  raise SystemExit("Search Success review status is invalid")
+              for key in (
+                  "automatic_provider_activation",
+                  "automatic_source_promotion",
+                  "production_query_mutation",
+                  "production_mutation",
+                  "automatic_contact",
+                  "automatic_bid",
+                  "automatic_reservation",
+                  "automatic_purchase",
+                  "automatic_payment",
+              ):
+                  if payload.get(key) is not False:
+                      raise SystemExit(f"Search Success review changed safety: {key}")
+
+          review = root / "human-review-outcome.json"
+          if review.exists():
+              payload = json.loads(review.read_text(encoding="utf-8"))
+              for key in (
+                  "automatic_contact",
+                  "automatic_bid",
+                  "automatic_purchase",
+                  "automatic_payment",
+              ):
+                  if payload.get(key) is not False:
+                      raise SystemExit(f"Human review changed automatic safety: {key}")
+          print(summary)
+          print(intelligence_text)
+          print(hunt_text)
+          PY
+
+      - name: Upload checkpoint and source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multi-market-daily-operator-checkpoint
+          path: |
+            artifacts/multi-market-daily-operator-checkpoint/
+            artifacts/multi-market-inputs/
+          if-no-files-found: error
