@@ -1,7 +1,7 @@
 """Bounded Norway-only cross-site insolvency-sale leads, review-only.
 
-An official company event and a listing claim do not prove identity, stock,
-availability or permission to buy. No paid APIs, foreign searches or DB writes.
+Official company events and seller claims do not prove stock or availability.
+No paid APIs, foreign searches, DB writes, contact, bids or purchases.
 """
 from __future__ import annotations
 
@@ -22,13 +22,17 @@ SOURCES = {
     "Auksjonen": "https://www.auksjonen.no/auksjoner/torget/vareparti-og-konkursbo",
 }
 INSOLVENCY = re.compile(r"konkurs(?:bo(?:et|ets)?|salg|rammet)?|avvikling|opphørssalg|tømmesalg", re.I)
-# Do not match "alle produkter kan være fra konkursbo" in generic page boilerplate.
 ITEM_ESTATE = re.compile(
     r"selges\s+av\s*:\s*konkursbo|selges\s+fra\s+(?:ett?\s+)?konkursbo"
     r"|konkursboet\s+etter|konkurssalg\s+p[åa]g[åa]r", re.I,
 )
-ENDED = re.compile(r"denne auksjonen er nå ferdig|auksjon(?:en)? er avsluttet|auksjon avsluttet|\bsolgt\b|\bavsluttet\b", re.I)
+ENDED = re.compile(
+    r"denne auksjonen er nå ferdig|auksjon(?:en)? er avsluttet|auksjon avsluttet"
+    r"|budrunden er avsluttet|\bsolgt\b|\bavsluttet\b|\blukket\b", re.I,
+)
+CATALOG_ENDED = re.compile(r"\blukket\b|denne auksjonen er nå ferdig|auksjonen er avsluttet", re.I)
 MAX_BYTES = 1_500_000
+MAX_CATALOGS = 2
 
 
 class Page(HTMLParser):
@@ -76,33 +80,53 @@ class Page(HTMLParser):
             self.heading = False
 
 
-def exact_item(source: str, raw: str, index: str) -> str | None:
+def _safe_url(raw: str, index: str) -> tuple[str, str, str] | None:
     try:
         url = urljoin(index, raw)
         parsed = urlsplit(url)
         if (parsed.scheme != "https" or parsed.query or parsed.fragment or
                 parsed.username or parsed.password or parsed.port not in (None, 443)):
             return None
-        host, path = (parsed.hostname or "").lower(), parsed.path
-        if source == "Norsk Avvikling":
-            valid = host in {"norskavvikling.no", "www.norskavvikling.no"} and bool(re.fullmatch(r"/produkt/[a-z0-9-]+/?", path, re.I))
-        elif source == "Vareauksjonen":
-            valid = host in {"vareauksjonen.no", "www.vareauksjonen.no"} and bool(re.fullmatch(r"/Event/Details/\d+/[^?#]+/C\d+(?:/[^?#]+)?/?", path, re.I))
-        elif source == "Auksjonen":
-            valid = host in {"auksjonen.no", "www.auksjonen.no"} and bool(re.fullmatch(r"/auksjon/(torget|overskuddsvarer)/[^/]+/\d{4,}/?", path, re.I))
-        else:
-            valid = False
-        return url if valid else None
-    except ValueError:
+        return url, (parsed.hostname or "").lower(), parsed.path
+    except (ValueError, TypeError):
         return None
 
 
+def exact_item(source: str, raw: str, index: str) -> str | None:
+    """Individual item ONLY. Vare /Event/Details is a catalog, not a lot."""
+    parsed = _safe_url(raw, index)
+    if parsed is None:
+        return None
+    url, host, path = parsed
+    if source == "Norsk Avvikling":
+        valid = host in {"norskavvikling.no", "www.norskavvikling.no"} and bool(re.fullmatch(r"/produkt/[a-z0-9-]+/?", path, re.I))
+    elif source == "Vareauksjonen":
+        valid = host in {"vareauksjonen.no", "www.vareauksjonen.no"} and bool(re.fullmatch(r"/Event/LotDetails/\d{4,}/[a-z0-9_%.-]+/?", path, re.I))
+    elif source == "Auksjonen":
+        valid = host in {"auksjonen.no", "www.auksjonen.no"} and bool(re.fullmatch(r"/auksjon/(torget|overskuddsvarer)/[^/]+/\d{4,}/?", path, re.I))
+    else:
+        valid = False
+    return url if valid else None
+
+
+def vare_catalog(raw: str, index: str = SOURCES["Vareauksjonen"]) -> str | None:
+    """Allowlisted catalog navigation. Never count a catalog as an item."""
+    parsed = _safe_url(raw, index)
+    if parsed is None:
+        return None
+    url, host, path = parsed
+    if (host in {"vareauksjonen.no", "www.vareauksjonen.no"} and
+            re.fullmatch(r"/Event/Details/\d{4,}(?:/[a-z0-9_%.-]+){0,3}/?", path, re.I)):
+        return url
+    return None
+
+
 def fetch_html(url: str) -> str:
-    """Only allowlisted public HTTPS pages, no redirects; cap decoded HTML."""
-    if not any(url == index or exact_item(name, url, index) == url for name, index in SOURCES.items()):
+    """Only allowlisted HTTPS index, Vare catalogs and items; cap decoded HTML."""
+    if not any(url == index or exact_item(name, url, index) == url for name, index in SOURCES.items()) and vare_catalog(url) != url:
         raise ValueError("Unapproved Norwegian public source URL")
     response = requests.get(url, timeout=12, allow_redirects=False,
-                            headers={"User-Agent": "OpportunityEngine-NO-insolvency/1.1", "Accept": "text/html"},
+                            headers={"User-Agent": "OpportunityEngine-NO-insolvency/1.2", "Accept": "text/html"},
                             stream=True)
     try:
         response.raise_for_status()
@@ -143,12 +167,14 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
     sources: list[dict[str, Any]] = []
     urls: dict[str, tuple[str, str]] = {}
     auksjonen_fallback: dict[str, tuple[str, str]] = {}
+    catalogs: dict[str, str] = {}
     for name, index in SOURCES.items():
         try:
             page = Page()
             page.feed(loader(index))
             exact = 0
             found = 0
+            catalog_count = 0
             for href, label in page.anchors:
                 direct = exact_item(name, href, index)
                 if direct:
@@ -157,32 +183,68 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
                         urls.setdefault(direct, (name, label))
                         found += 1
                     elif name == "Auksjonen" and len(auksjonen_fallback) < 8:
-                        # A category is not estate proof. Check a few exact item
-                        # descriptions for explicit estate-sale wording.
                         auksjonen_fallback.setdefault(direct, (name, label))
+                elif name == "Vareauksjonen":
+                    catalog = vare_catalog(href, index)
+                    if catalog:
+                        catalog_count += 1
+                        if INSOLVENCY.search(label):
+                            catalogs.setdefault(catalog, label)
             if not page.anchors:
                 status = "NO_ANCHORS_UNVERIFIED_NOT_ZERO"
                 errors.append({"source": name, "stage": "index", "reason": "No HTML anchors extracted; not evidence of zero listings"})
-            elif not exact:
-                status = "NO_SUPPORTED_INDIVIDUAL_ROUTES_UNVERIFIED"
-                errors.append({"source": name, "stage": "index", "reason": "Site links do not match supported exact-item routes; coverage incomplete"})
+            elif not exact and not catalog_count:
+                status = "NO_SUPPORTED_ROUTES_UNVERIFIED"
+                errors.append({"source": name, "stage": "index", "reason": "Index has no supported individual or catalog URLs; coverage incomplete"})
+            elif name == "Vareauksjonen" and not exact:
+                status = "CATALOG_LINKS_ONLY_INDIVIDUAL_SCAN_REQUIRED"
             else:
                 status = "READ_BOUNDED"
             sources.append({"source": name, "index_url": index, "status": status,
                             "html_anchor_count": len(page.anchors), "individual_listing_links": exact,
-                            "bankruptcy_labeled_exact_links": found})
+                            "bankruptcy_labeled_exact_links": found, "catalog_navigation_links": catalog_count})
         except Exception as exc:
             errors.append({"source": name, "stage": "index", "reason": f"{type(exc).__name__}: {exc}"})
             sources.append({"source": name, "index_url": index, "status": "FAILED_NOT_ZERO",
                             "html_anchor_count": None, "individual_listing_links": None,
-                            "bankruptcy_labeled_exact_links": None})
+                            "bankruptcy_labeled_exact_links": None, "catalog_navigation_links": None})
+
+    catalogs_checked = 0
+    catalogs_closed = 0
+    for catalog_url, label in list(catalogs.items())[:MAX_CATALOGS]:
+        catalogs_checked += 1
+        try:
+            page = Page()
+            page.feed(loader(catalog_url))
+            heading = page.headings[0] if page.headings else ""
+            opening = " ".join(" ".join(page.parts).split())[:1000]
+            if not INSOLVENCY.search(heading):
+                errors.append({"source": "Vareauksjonen", "stage": "catalog", "url": catalog_url,
+                               "reason": "Index estate label not supported by auction-specific heading"})
+                continue
+            if CATALOG_ENDED.search(opening):
+                catalogs_closed += 1
+                continue
+            for href, item_label in page.anchors:
+                lot_url = exact_item("Vareauksjonen", href, catalog_url)
+                if lot_url:
+                    urls.setdefault(lot_url, ("Vareauksjonen", item_label or label))
+        except Exception as exc:
+            errors.append({"source": "Vareauksjonen", "stage": "catalog", "url": catalog_url,
+                           "reason": f"{type(exc).__name__}: {exc}"})
     for url, row in auksjonen_fallback.items():
         urls.setdefault(url, row)
+
+    # Round robin keeps a single busy source from exhausting the nine detail reads.
+    per_source = {source: [(u, data) for u, data in urls.items() if data[0] == source] for source in SOURCES}
+    selected: list[tuple[str, tuple[str, str]]] = []
+    while len(selected) < max_details and any(per_source.values()):
+        for source in SOURCES:
+            if per_source[source] and len(selected) < max_details:
+                selected.append(per_source[source].pop(0))
     leads: list[dict[str, Any]] = []
     closed = 0
-    checked = 0
-    for url, (name, label) in list(urls.items())[:max_details]:
-        checked += 1
+    for url, (name, label) in selected:
         try:
             page = Page()
             page.feed(loader(url))
@@ -197,8 +259,12 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
             if ENDED.search(item_text):
                 closed += 1
                 continue
-            relation = "NO_OFFICIAL_COMPANY_MATCH_SOURCE_CLAIM_ONLY"
+            # Vare lot pages have TWO h1s: parent auction/estate and individual
+            # lot. Use the individual lot as card title, but preserve parent
+            # separately as source-provided association evidence only.
+            lot_title = page.headings[-1] if name == "Vareauksjonen" and len(page.headings) > 1 else heading
             org = None
+            relation = "NO_OFFICIAL_COMPANY_MATCH_SOURCE_CLAIM_ONLY"
             for number, event in companies.items():
                 company = str(event["company_name"]).strip()
                 if re.search(rf"(?<!\d){re.escape(number)}(?!\d)", item_text):
@@ -207,8 +273,9 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
                 if len(company) >= 8 and company.casefold() in item_text.casefold():
                     org, relation = number, "COMPANY_NAME_ON_PAGE_NOT_SELLER_VERIFIED"
                     break
-            leads.append({"source": name, "url": url, "title": heading, "index_label": label,
-                          "organisation_number": org,
+            leads.append({"source": name, "url": url, "title": lot_title,
+                          "auction_title": heading if name == "Vareauksjonen" and lot_title != heading else None,
+                          "index_label": label, "organisation_number": org,
                           "official_event_url": companies[org]["official_url"] if org else None,
                           "relation_evidence": relation,
                           "sale_status": "UNVERIFIED_NO_SOURCE_NATIVE_OPEN_PROOF",
@@ -217,11 +284,17 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
         except Exception as exc:
             errors.append({"source": name, "stage": "item", "url": url,
                            "reason": f"{type(exc).__name__}: {exc}"})
+    for source in sources:
+        if source["source"] == "Vareauksjonen" and source["status"] == "CATALOG_LINKS_ONLY_INDIVIDUAL_SCAN_REQUIRED":
+            source["status"] = "CATALOG_SCAN_BOUNDED_INCOMPLETE" if catalogs_checked else "CATALOGS_UNOPENED_INCOMPLETE"
+            source["catalogs_checked"] = catalogs_checked
+            source["catalogs_closed"] = catalogs_closed
     return {"schema_version": "no-insolvency-multisource-evidence-1", "captured_at": stamp,
             "scope": "NO_ONLY_BANKRUPTCY_LIQUIDATION_ALL_SECTORS",
             "event_sample_count": len(companies), "marketplace_sources": sources,
-            "candidate_exact_urls_from_indices": len(urls), "detail_pages_checked": checked,
-            "detail_budget": max_details, "closed_pages_excluded": closed,
+            "candidate_exact_urls_from_indices": len(urls), "detail_pages_checked": len(selected),
+            "detail_budget": max_details, "vare_catalogs_checked": catalogs_checked,
+            "vare_catalogs_closed": catalogs_closed, "closed_pages_excluded": closed,
             "review_only_unverified_direct_leads": leads, "unverified_lead_count": len(leads),
             "verified_insolvency_sale_count": 0, "verified_insolvency_sale_links": [],
             "source_errors": errors, "source_coverage_complete": False,
@@ -247,7 +320,10 @@ def main() -> None:
     for failure in result["source_errors"]:
         lines.append(f"تعذر التحقق من {failure['source']}: {failure['reason']}")
     (args.output_dir / "insolvency-sale-link-investigations-ar.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(json.dumps({key: result[key] for key in ("event_sample_count", "candidate_exact_urls_from_indices", "detail_pages_checked", "unverified_lead_count", "closed_pages_excluded", "verified_insolvency_sale_count", "source_errors")}, ensure_ascii=False))
+    print(json.dumps({key: result[key] for key in (
+        "event_sample_count", "candidate_exact_urls_from_indices", "detail_pages_checked",
+        "vare_catalogs_checked", "vare_catalogs_closed", "unverified_lead_count",
+        "closed_pages_excluded", "verified_insolvency_sale_count", "source_errors")}, ensure_ascii=False))
 
 
 if __name__ == "__main__":

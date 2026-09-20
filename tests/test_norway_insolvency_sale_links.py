@@ -3,11 +3,12 @@ from datetime import datetime, timezone
 
 import pytest
 
-from scripts.run_norway_insolvency_sale_links import SOURCES, discover, exact_item
+from scripts.run_norway_insolvency_sale_links import SOURCES, discover, exact_item, vare_catalog
 
-NOW = datetime(2026, 9, 19, 18, tzinfo=timezone.utc)
+NOW = datetime(2026, 9, 20, 8, tzinfo=timezone.utc)
 NORSK_LOT = "https://norskavvikling.no/produkt/parti-fra-konkursbo/"
-VARE_LOT = "https://www.vareauksjonen.no/Event/Details/199258/Varer-fra-konkursbo/C161445"
+VARE_LOT = "https://www.vareauksjonen.no/Event/LotDetails/209267/Bilder-og-bord"
+VARE_CATALOG = "https://www.vareauksjonen.no/Event/Details/199258/Konkursbo-etter-Naromsorg"
 AUCTION_LOT = "https://www.auksjonen.no/auksjon/torget/Parti_fra_konkursbo/627689"
 
 
@@ -27,15 +28,10 @@ def mock_pages():
             '<a href="/produkt/regular/">Vanlig restlager</a>'
             '<a href="https://evil.example/produkt/parti-fra-konkursbo/">konkursbo</a>'
         ),
-        SOURCES["Vareauksjonen"]: (
-            '<a href="/Event/Details/199258/Varer-fra-konkursbo/C161445">'
-            'Varer fra konkursbo</a>'
-        ),
-        SOURCES["Auksjonen"]: (
-            '<a href="/auksjon/torget/Parti_fra_konkursbo/627689">Parti fra konkursbo</a>'
-        ),
+        SOURCES["Vareauksjonen"]: '<a href="/Event/LotDetails/209267/Bilder-og-bord">Bilder fra konkursbo</a>',
+        SOURCES["Auksjonen"]: '<a href="/auksjon/torget/Parti_fra_konkursbo/627689">Parti fra konkursbo</a>',
         NORSK_LOT: '<html><h1>Parti fra konkursbo</h1><p>Nord Industri AS 123456789. Til salgs</p><p>Legg til i handlekurv</p></html>',
-        VARE_LOT: '<html><h1>Varer fra konkursbo</h1><p>Den store auksjonen er avsluttet. Solgt</p></html>',
+        VARE_LOT: '<html><h1>Konkursbo etter Nord Industri AS</h1><h1>Bilder og bord</h1><p>Avsluttet. Solgt</p></html>',
         AUCTION_LOT: '<html><h1>Parti fra konkursbo</h1><p>Fra et ukjent konkursbo. Gi bud</p></html>',
     }
 
@@ -57,8 +53,7 @@ def test_collects_three_distinct_norwegian_sites_and_never_calls_generic_sale_op
 
 
 def test_exact_identity_is_investigation_not_verified_sale_or_seller():
-    pages = mock_pages()
-    report = discover(events(), loader=lambda url: pages[url], now=NOW)
+    report = discover(events(), loader=lambda url: mock_pages()[url], now=NOW)
     linked = next(lead for lead in report["review_only_unverified_direct_leads"] if lead["source"] == "Norsk Avvikling")
     assert linked["organisation_number"] == "123456789"
     assert linked["official_event_url"].endswith("/123456789")
@@ -74,6 +69,63 @@ def test_false_index_claim_cannot_bypass_specific_item_heading():
     pages[NORSK_LOT] = '<h1>Vanlig bil</h1><p>Alle produkter kan være fra konkursbo i våre generelle vilkår.</p>'
     report = discover(events(), loader=lambda url: pages[url], now=NOW)
     assert all(lead["url"] != NORSK_LOT for lead in report["review_only_unverified_direct_leads"])
+
+
+def test_real_vare_lot_route_is_item_but_event_details_are_navigation_only():
+    index = SOURCES["Vareauksjonen"]
+    assert exact_item("Vareauksjonen", VARE_LOT, index) == VARE_LOT
+    assert exact_item("Vareauksjonen", VARE_CATALOG, index) is None
+    assert vare_catalog(VARE_CATALOG) == VARE_CATALOG
+    assert vare_catalog("https://www.vareauksjonen.no/Event/Details/199258/") is not None
+    assert vare_catalog(VARE_LOT) is None
+    assert exact_item("Vareauksjonen", VARE_LOT + "?item=1", index) is None
+    assert exact_item("Vareauksjonen", "https://evil.example/Event/LotDetails/209267/Bilder-og-bord", index) is None
+    assert vare_catalog("https://evil.example/Event/Details/199258") is None
+
+
+def test_bounded_vare_catalog_expands_real_lot_without_promoting_to_sale():
+    pages = mock_pages()
+    pages[SOURCES["Vareauksjonen"]] = (
+        f'<a href="{VARE_CATALOG}">Konkursbo etter Nord Industri AS</a>'
+        '<a href="/Event/Details/200000/Vanlig-auksjon">Vanlig auksjon</a>'
+    )
+    pages[VARE_CATALOG] = (
+        '<h1>Konkursbo etter Nord Industri AS</h1><p>Aktiv. Første objekt stenges senere</p>'
+        f'<a href="{VARE_LOT}">Bilder og bord</a>'
+        '<a href="https://evil.example/Event/LotDetails/987654/Foreign">foreign</a>'
+    )
+    pages[VARE_LOT] = (
+        '<h1>Konkursbo etter Nord Industri AS</h1><h1>Bilder og bord</h1>'
+        '<p>Objektnr. 122 Aktiv. Beskrivelse: 1 bord</p>'
+    )
+    report = discover(events(), loader=lambda url: pages[url], now=NOW)
+    assert report["vare_catalogs_checked"] == 1
+    assert report["vare_catalogs_closed"] == 0
+    assert report["candidate_exact_urls_from_indices"] == 3
+    assert report["detail_pages_checked"] == 3
+    assert report["marketplace_sources"][1]["catalog_navigation_links"] == 2
+    assert report["marketplace_sources"][1]["status"] == "CATALOG_SCAN_BOUNDED_INCOMPLETE"
+    vare = next(lead for lead in report["review_only_unverified_direct_leads"] if lead["source"] == "Vareauksjonen")
+    assert vare["url"] == VARE_LOT
+    assert vare["organisation_number"] == "123456789"
+    assert vare["relation_evidence"] == "COMPANY_NAME_ON_PAGE_NOT_SELLER_VERIFIED"
+    assert not vare["seller_identity_verified"] and not vare["availability_verified"]
+    assert report["verified_insolvency_sale_count"] == 0
+
+
+def test_closed_vare_catalog_blocks_all_its_lots():
+    pages = mock_pages()
+    pages[SOURCES["Vareauksjonen"]] = f'<a href="{VARE_CATALOG}">Konkursbo etter Nord Industri AS</a>'
+    pages[VARE_CATALOG] = (
+        '<h1>Konkursbo etter Nord Industri AS</h1><p>Lukket (#199258)</p>'
+        f'<a href="{VARE_LOT}">Bilder og bord</a>'
+    )
+    report = discover(events(), loader=lambda url: pages[url], now=NOW)
+    assert report["vare_catalogs_checked"] == 1
+    assert report["vare_catalogs_closed"] == 1
+    assert report["candidate_exact_urls_from_indices"] == 2
+    assert report["verified_insolvency_sale_count"] == 0
+    assert all(lead["source"] != "Vareauksjonen" for lead in report["review_only_unverified_direct_leads"])
 
 
 def test_url_allowlist_rejects_foreign_hosts_parent_queries_and_unsafe_ports():
