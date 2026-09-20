@@ -3,9 +3,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from scripts.run_norway_insolvency_sale_links import (
-    SOURCES, discover, exact_item, vare_catalog,
-)
+from scripts.run_norway_insolvency_sale_links import SOURCES, discover, exact_item, vare_catalog
 
 NOW = datetime(2026, 9, 20, 8, tzinfo=timezone.utc)
 NORSK_LOT = "https://norskavvikling.no/produkt/parti-fra-konkursbo/"
@@ -30,12 +28,8 @@ def mock_pages():
             '<a href="/produkt/regular/">Vanlig restlager</a>'
             '<a href="https://evil.example/produkt/parti-fra-konkursbo/">konkursbo</a>'
         ),
-        SOURCES["Vareauksjonen"]: (
-            '<a href="/Event/LotDetails/209267/Bilder-og-bord">Bilder fra konkursbo</a>'
-        ),
-        SOURCES["Auksjonen"]: (
-            '<a href="/auksjon/torget/Parti_fra_konkursbo/627689">Parti fra konkursbo</a>'
-        ),
+        SOURCES["Vareauksjonen"]: '<a href="/Event/LotDetails/209267/Bilder-og-bord">Bilder fra konkursbo</a>',
+        SOURCES["Auksjonen"]: '<a href="/auksjon/torget/Parti_fra_konkursbo/627689">Parti fra konkursbo</a>',
         NORSK_LOT: '<html><h1>Parti fra konkursbo</h1><p>Nord Industri AS 123456789. Til salgs</p><p>Legg til i handlekurv</p></html>',
         VARE_LOT: '<html><h1>Konkursbo etter Nord Industri AS</h1><h1>Bilder og bord</h1><p>Avsluttet. Solgt</p></html>',
         AUCTION_LOT: '<html><h1>Parti fra konkursbo</h1><p>Fra et ukjent konkursbo. Gi bud</p></html>',
@@ -113,7 +107,8 @@ def test_bounded_vare_catalog_expands_real_lot_without_promoting_to_sale():
     assert report["marketplace_sources"][1]["status"] == "CATALOG_SCAN_BOUNDED_INCOMPLETE"
     vare = next(lead for lead in report["review_only_unverified_direct_leads"] if lead["source"] == "Vareauksjonen")
     assert vare["url"] == VARE_LOT
-    assert vare["organisation_number"] is None  # parent heading name is not org-number proof
+    assert vare["organisation_number"] == "123456789"
+    assert vare["relation_evidence"] == "COMPANY_NAME_ON_PAGE_NOT_SELLER_VERIFIED"
     assert not vare["seller_identity_verified"] and not vare["availability_verified"]
     assert report["verified_insolvency_sale_count"] == 0
 
