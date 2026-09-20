@@ -259,6 +259,10 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
             if ENDED.search(item_text):
                 closed += 1
                 continue
+            # Vare lot pages have TWO h1s: parent auction/estate and individual
+            # lot. Use the individual lot as card title, but preserve parent
+            # separately as source-provided association evidence only.
+            lot_title = page.headings[-1] if name == "Vareauksjonen" and len(page.headings) > 1 else heading
             org = None
             relation = "NO_OFFICIAL_COMPANY_MATCH_SOURCE_CLAIM_ONLY"
             for number, event in companies.items():
@@ -269,8 +273,9 @@ def discover(events_report: Mapping[str, Any], *, loader: Callable[[str], str] =
                 if len(company) >= 8 and company.casefold() in item_text.casefold():
                     org, relation = number, "COMPANY_NAME_ON_PAGE_NOT_SELLER_VERIFIED"
                     break
-            leads.append({"source": name, "url": url, "title": heading, "index_label": label,
-                          "organisation_number": org,
+            leads.append({"source": name, "url": url, "title": lot_title,
+                          "auction_title": heading if name == "Vareauksjonen" and lot_title != heading else None,
+                          "index_label": label, "organisation_number": org,
                           "official_event_url": companies[org]["official_url"] if org else None,
                           "relation_evidence": relation,
                           "sale_status": "UNVERIFIED_NO_SOURCE_NATIVE_OPEN_PROOF",
