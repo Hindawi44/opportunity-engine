@@ -1,13 +1,15 @@
 name: Norway Opportunity Hunter
 
-# Bankruptcy/liquidation FIRST, all sectors. Only exact item pages with
-# page-level estate evidence enter review; generic category alone is insufficient.
-# No schedule, paid providers, foreign searches or database mutation.
+# Recover the existing Norwegian search/verifier first. Its cross-source
+# pipeline is clothing-focused; the insolvency-first experiment is supplementary.
+# PR only: no schedule, paid providers, foreign searches or database mutation.
 on:
   pull_request:
     paths:
       - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
+      - "scripts/run_cross_source_clothing_verification.py"
+      - "tests/test_existing_norway_engine_workflow.py"
       - "scripts/run_norway_insolvency_sample.py"
       - "tests/test_norway_insolvency_sample.py"
       - "tests/test_norway_insolvency_workflow.py"
@@ -36,11 +38,45 @@ jobs:
           python-version: "3.11"
       - name: Install existing dependencies
         run: python -m pip install -r requirements.txt
-      - name: Verify insolvency-first, multi-source, and historical safety contracts
+      - name: Verify original Norway-source and history contracts, then experimental source checks
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+
+  norway-existing-engine:
+    needs: norway-contract
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PYTHONPATH: src:.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing project dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run original Norway cross-source verifier with bounded public reads and no SQLite writes
+        run: |
+          python scripts/run_cross_source_clothing_verification.py \
+            --lookback-days 60 \
+            --max-bankruptcy-leads 12 \
+            --max-detail-pages 3 \
+            --max-vareauksjonen-details 3 \
+            --max-auksjoner-no-auctions 8 \
+            --output-dir artifacts/norway-existing-engine
+      - name: Preserve original Norway-source evidence even when a source fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: norway-original-cross-source-evidence
+          path: artifacts/norway-existing-engine/
+          if-no-files-found: warn
+          retention-days: 30
 
   norway-insolvency-source-pilot:
     needs: norway-contract
