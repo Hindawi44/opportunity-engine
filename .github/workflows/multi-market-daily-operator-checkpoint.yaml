@@ -1,8 +1,8 @@
 name: Norway Opportunity Hunter
 
-# Bankruptcy/liquidation FIRST, all sectors. Only insolvency-labeled exact pages
-# enter research; unrelated auction listings never become insolvency opportunities.
-# No schedule, no paid providers, no foreign searches and no database mutation.
+# Bankruptcy/liquidation FIRST, all sectors. Only exact item pages with
+# page-level estate evidence enter review; generic category alone is insufficient.
+# No schedule, paid providers, foreign searches or database mutation.
 on:
   pull_request:
     paths:
@@ -15,6 +15,8 @@ on:
       - "tests/test_norway_insolvency_sale_links.py"
       - "scripts/audit_norway_insolvency_sale_links.py"
       - "tests/test_norway_insolvency_sale_status_audit.py"
+      - "scripts/probe_norway_unlabeled_vare_lots.py"
+      - "tests/test_norway_unlabeled_vare_probe.py"
 
 permissions:
   contents: read
@@ -38,7 +40,7 @@ jobs:
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py
+          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
 
   norway-insolvency-source-pilot:
     needs: norway-contract
@@ -59,9 +61,12 @@ jobs:
       - name: Sample three official Norway insolvency statuses, all sectors
         run: |
           python scripts/run_norway_insolvency_sample.py --page-size 25 --max-cards 10 --output-dir artifacts/norway-insolvency
-      - name: Investigate bounded exact insolvency-sale links from three public Norway websites
+      - name: Discover exact insolvency-sale links from three Norwegian sources with six detail reads
         run: |
-          python scripts/run_norway_insolvency_sale_links.py --events artifacts/norway-insolvency/insolvency-events.json --max-details 9 --output-dir artifacts/norway-insolvency
+          python scripts/run_norway_insolvency_sale_links.py --events artifacts/norway-insolvency/insolvency-events.json --max-details 6 --output-dir artifacts/norway-insolvency
+      - name: Probe three unlabeled Vare individual lot headings within total nine-detail budget
+        run: |
+          python scripts/probe_norway_unlabeled_vare_lots.py --max-probe 3 --output-dir artifacts/norway-insolvency
       - name: Exclude sold or ended lots and validate explicitly named estate companies against official register
         run: |
           python scripts/audit_norway_insolvency_sale_links.py --events artifacts/norway-insolvency/insolvency-events.json --output-dir artifacts/norway-insolvency
