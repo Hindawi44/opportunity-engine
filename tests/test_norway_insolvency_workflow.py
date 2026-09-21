@@ -1,4 +1,4 @@
-"""The operator-visible Norway workflow cannot emit arbitrary auction cards."""
+"""The operator-visible Norway workflow cannot emit arbitrary or sold auction cards."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,3 +17,13 @@ def test_only_official_insolvency_first_pilot_runs():
     assert "OPENAI_API_KEY:" not in text
     assert "BRAVE_SEARCH_API_KEY:" not in text
     assert "EXA_API_KEY:" not in text
+
+
+def test_source_scan_must_finish_and_be_audited_before_arabic_cards_are_uploaded():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    source = text.index("python scripts/run_norway_insolvency_sale_links.py")
+    audit = text.index("python scripts/audit_norway_insolvency_sale_links.py")
+    upload = text.index("name: norway-insolvency-source-evidence")
+    assert source < audit < upload
+    assert "tests/test_norway_insolvency_sale_status_audit.py" in text
+    assert "scripts/audit_norway_insolvency_sale_links.py" in text
