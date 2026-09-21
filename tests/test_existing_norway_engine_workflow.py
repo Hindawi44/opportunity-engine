@@ -1,0 +1,44 @@
+"""Regression guard: restore the original Norway sources, not a replacement engine."""
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+WORKFLOW = ROOT / ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+ARCHIVE = ROOT / "docs/archive/legacy-six-market-checkpoint-20260919.yaml.txt"
+ORIGINAL = ROOT / "scripts/run_cross_source_clothing_verification.py"
+
+
+def test_original_norway_sources_reconnected_without_replacing_code():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert ORIGINAL.is_file()
+    original = ORIGINAL.read_text(encoding="utf-8")
+    for source in ("CrossSourceClothingSaleVerifier", "VareauksjonenPublicCollector", "AuksjonerNoPublicCollector"):
+        assert source in original
+    assert "norway-existing-engine:" in text
+    job = text.split("  norway-existing-engine:\n", 1)[1].split("  norway-insolvency-source-pilot:\n", 1)[0]
+    assert "python scripts/run_cross_source_clothing_verification.py" in job
+    for option in ("--lookback-days 60", "--max-bankruptcy-leads 12", "--max-detail-pages 3", "--max-vareauksjonen-details 3", "--max-auksjoner-no-auctions 8"):
+        assert option in job
+    assert "norway-original-cross-source-evidence" in job
+    assert "if: always()" in job
+    assert "--persist-unified" not in job
+    assert "--database-url" not in job
+    assert "BRAVE_SEARCH_API_KEY" not in job
+    assert "EXA_API_KEY" not in job
+    assert "OPENAI_API_KEY" not in job
+    assert "scripts/run_norway_insolvency_sale_links.py" not in job
+
+
+def test_no_foreign_execution_cost_or_history_deletion():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert ARCHIVE.is_file()
+    old = ARCHIVE.read_text(encoding="utf-8")
+    for original_stage in ("Run Exa Exact-Lot NO checkpoint source", "Run Norway Auksjonen public clothing path", "Read FINN saved-search alerts from Gmail", "Run Norway bounded cross-source verification", "Restore previous lifecycle SQLite state"):
+        assert original_stage in old
+    assert "  schedule:" not in text
+    assert "  workflow_dispatch:" not in text
+    assert "run_exa_exact_lot_checkpoint.py" not in text
+    assert "run_finn_email_intake.py" not in text
+    assert "restore_previous_checkpoint_state.py" not in text
+    assert "delete" not in text.lower()
+    assert "  pull_request:" in text
+    assert "norway-insolvency-source-pilot:" in text
