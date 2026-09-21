@@ -13,6 +13,8 @@ on:
       - "tests/test_norway_insolvency_workflow.py"
       - "scripts/run_norway_insolvency_sale_links.py"
       - "tests/test_norway_insolvency_sale_links.py"
+      - "scripts/audit_norway_insolvency_sale_links.py"
+      - "tests/test_norway_insolvency_sale_status_audit.py"
 
 permissions:
   contents: read
@@ -36,7 +38,7 @@ jobs:
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py
+          pytest -q tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py
 
   norway-insolvency-source-pilot:
     needs: norway-contract
@@ -60,7 +62,10 @@ jobs:
       - name: Investigate bounded exact insolvency-sale links from three public Norway websites
         run: |
           python scripts/run_norway_insolvency_sale_links.py --events artifacts/norway-insolvency/insolvency-events.json --max-details 9 --output-dir artifacts/norway-insolvency
-      - name: Preserve official events, source errors and unverified sale-link evidence
+      - name: Exclude sold or ended lots and validate explicitly named estate companies against official register
+        run: |
+          python scripts/audit_norway_insolvency_sale_links.py --events artifacts/norway-insolvency/insolvency-events.json --output-dir artifacts/norway-insolvency
+      - name: Preserve official events, original raw report, status exclusions and audited Arabic review
         if: always()
         uses: actions/upload-artifact@v4
         with:
