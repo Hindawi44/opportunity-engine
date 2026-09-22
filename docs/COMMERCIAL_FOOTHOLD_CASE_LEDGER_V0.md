@@ -12,45 +12,89 @@ Each case exists to improve commercial understanding and test whether a repeatab
 
 ### Status
 
-`CONTINUE`
+`NEED_EVIDENCE`
 
 ### Why it attracted attention
 
 - approximately 3,600 pairs;
-- seller price: 150,000 NOK before VAT;
+- fixed seller price: 150,000 NOK before VAT;
 - entry basis: approximately 41.7 NOK per pair before buyer fees, transport and other friction;
-- visual evidence suggested a mixed fashion / generic footwear inventory.
+- the live listing states 10–12 footwear models for women, men and children;
+- stated size span is EU 29–46;
+- the listing describes the stock as a new lot of leisure / casual footwear.
 
-### Known facts
+### Verified live listing facts — 2026-08-28
 
 ```text
-category: FOOTWEAR
+listing_channel: Auksjonen.no
+listing_id: 572303
+mirror_channel: Mascus
+mascus_id: 798F63C6
+seller: FAMILY MARKET AS
+seller_org_no: 821703972
+seller_company_status: ACTIVE
+seller_registered_for_vat: YES
+seller_business_address: Ringvålvegen 4, 7080 Heimdal, Norway
+stock_location: Heimdal, Norway
+listing_type: FIXED_PRICE
+listing_price_ex_vat_nok: 150000
 quantity_pairs: ~3600
-seller_price_ex_vat_nok: 150000
-entry_price_per_pair_ex_vat_nok: ~41.7
-location: NORWAY
-condition: appears new / requires verification
+stated_model_count: 10-12
+customer_segments: WOMEN + MEN + CHILDREN
+stated_size_range_eu: 29-46
+condition_claim: NEW LOT
+product_description: leisure / casual footwear
+public_listing_photos: 13
+visual_styles_observed: sneakers + high-top/casual boots + mixed casual footwear
 brand_mix: UNKNOWN
-model_mix: mixed / exact distribution UNKNOWN
-size_curve: UNKNOWN
+exact_models: UNKNOWN
+quantity_per_model: UNKNOWN
+size_distribution_inside_29_46: UNKNOWN
 packing_list: UNKNOWN
+box / packaging condition: UNKNOWN
+grade_A_B_returns: UNKNOWN
 buyer_fees: UNKNOWN
 transport_cost: UNKNOWN
 reason_for_sale: UNKNOWN
+bankruptcy_or_closure_evidence: NONE FOUND
 ```
+
+### Evidence correction from seller verification
+
+The seller is currently an active Norwegian company and is registered for VAT.
+
+No current evidence was found that this stock is being sold because of bankruptcy or business closure.
+
+Therefore:
+
+```text
+reason_for_sale: UNKNOWN
+liquidation_assumption: NOT ALLOWED
+```
+
+A large lot alone is not evidence of insolvency or closure.
+
+### Image evidence boundary
+
+The public listing images confirm a mixed set of casual footwear styles and visible product packaging / boxes in some photos.
+
+The public thumbnails do **not** provide reliable enough evidence to identify the full brand mix, exact model names, exact size distribution, or quantities per model.
+
+Those fields remain `UNKNOWN` until a seller inventory list, packing list, EAN/SKU list, or higher-quality product documentation is obtained.
 
 ### Missing facts that can materially change the case
 
 - brands and authenticity evidence;
-- exact models;
-- size distribution;
+- exact model / SKU / EAN list;
 - quantity per model;
-- new / returns / B-grade status;
-- packaging condition;
+- exact size distribution within the stated 29–46 range;
+- women / men / children quantity split;
+- confirmation whether all stock is first-quality new A-stock, or whether any B-grade / returns are included;
+- original-box percentage and packaging condition;
+- packing list / pallet count;
 - buyer fees;
-- transport;
-- reason for sale;
-- exact inventory list.
+- transport / loading details;
+- reason for sale.
 
 ### Exit routes currently evidenced
 
@@ -128,8 +172,10 @@ VAT cash requirement: YES / exact treatment to verify for transaction path
 buyer premium: UNKNOWN
 transport: UNKNOWN
 sorting: likely
-size-curve risk: HIGH until inventory list is known
-model concentration risk: UNKNOWN
+size-range existence: VERIFIED (29-46)
+size-distribution quality: UNKNOWN
+model_count: VERIFIED (10-12)
+model concentration risk: UNKNOWN until quantity/model is known
 authenticity risk: UNKNOWN
 storage: likely
 capital lock: potentially material
@@ -150,40 +196,57 @@ The downstream buyer layer exists in the market, but we do not yet have our own 
 
 ### What changed our view
 
-Originally the case could have been interpreted mainly as a low-entry-price opportunity.
-
-Market study changed the question to:
+The first live-facts pass materially improved the stock definition:
 
 ```text
-Who can absorb the stock?
-At what quantity?
-At what evidenced price?
-How quickly?
-With what friction?
+BEFORE:
+~3600 mixed shoes / composition largely unknown
+
+NOW VERIFIED:
+~3600 pairs
+10-12 models
+women + men + children
+EU sizes 29-46
+new leisure/casual footwear claim
+Heimdal, Norway
+seller = active Family Market AS
 ```
 
-The case is therefore useful even before a purchase decision because it tests the shape of the downstream market.
+It also removed an unsafe assumption:
+
+```text
+large stock != bankruptcy / closure
+```
+
+However, a wide size range does not prove a commercially healthy size curve, and 10–12 models does not reveal concentration per model.
 
 ### Current decision
 
-`CONTINUE`
+`NEED_EVIDENCE`
 
-Not because 41.7 NOK/pair is automatically cheap, but because the case can still produce high-value commercial evidence.
+Reason:
+
+The case has enough evidence to remain commercially interesting, but the missing brand / SKU / per-model quantity / exact size-curve data can materially change both exit-market fit and realistic exit price.
 
 ### Next unresolved commercial question
 
-Obtain the inventory composition first:
+Obtain the seller's exact inventory composition before moving to buyer matching.
+
+Minimum requested dataset:
 
 ```text
-brands
-models
-size distribution
-quantity per model
-condition / grade
-packing list
+brand
+model / SKU / EAN
+women / men / children
+size
+quantity by size
+quantity by model
+new A-stock / B-grade / return status
+original box yes/no
+pallet / carton count
 ```
 
-Only after those facts are known can the exit routes be matched to realistic buyer segments and price evidence.
+Until that dataset is available, downstream buyer matching remains preliminary rather than deal-specific.
 
 ---
 
