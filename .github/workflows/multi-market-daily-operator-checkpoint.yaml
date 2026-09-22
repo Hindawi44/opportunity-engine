@@ -1,8 +1,7 @@
 name: Norway Opportunity Hunter
 
-# Recover the existing Norwegian search/verifier first. Its cross-source
-# pipeline is clothing-focused; the insolvency-first experiment is supplementary.
-# PR only: no schedule, paid providers, foreign searches or database mutation.
+# Restore EXISTING Norway tools rather than replacing them. PR-only evidence;
+# no daily schedule, paid providers, foreign market, Gmail or database mutation.
 on:
   pull_request:
     paths:
@@ -10,6 +9,9 @@ on:
       - "tests/test_multi_market_operator_checkpoint_workflow.py"
       - "scripts/run_cross_source_clothing_verification.py"
       - "tests/test_existing_norway_engine_workflow.py"
+      - "scripts/run_norway_direct_sales.py"
+      - "tests/test_norway_direct_sales.py"
+      - "tests/test_norway_all_assets_workflow.py"
       - "scripts/run_norway_insolvency_sample.py"
       - "tests/test_norway_insolvency_sample.py"
       - "tests/test_norway_insolvency_workflow.py"
@@ -19,6 +21,7 @@ on:
       - "tests/test_norway_insolvency_sale_status_audit.py"
       - "scripts/probe_norway_unlabeled_vare_lots.py"
       - "tests/test_norway_unlabeled_vare_probe.py"
+      - "docs/NORWAY_RECOVERY_SCOPE_20260922.md"
 
 permissions:
   contents: read
@@ -38,11 +41,42 @@ jobs:
           python-version: "3.11"
       - name: Install existing dependencies
         run: python -m pip install -r requirements.txt
-      - name: Verify original Norway-source and history contracts, then experimental source checks
+      - name: Verify existing Norway tools, all-asset direct links and historical safety
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+
+  norway-all-assets:
+    needs: norway-contract
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    permissions:
+      contents: read
+    env:
+      PYTHONPATH: src:.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run pre-existing Norwegian all-asset individual-sale collector, not an insolvency registry
+        run: |
+          python scripts/run_norway_direct_sales.py \
+            --max-pages 2 \
+            --max-cards 10 \
+            --output-dir artifacts/norway-all-assets
+      - name: Preserve exact direct item links, source errors and zero-result evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: norway-existing-all-assets-evidence
+          path: artifacts/norway-all-assets/
+          if-no-files-found: warn
+          retention-days: 30
 
   norway-existing-engine:
     needs: norway-contract
@@ -79,8 +113,9 @@ jobs:
           retention-days: 30
 
   norway-insolvency-source-pilot:
-    needs: norway-contract
-    if: ${{ github.event_name == 'pull_request' }}
+    # The experimental replacement yielded no qualified links in bounded live
+    # samples. Preserve its code/history, but stop duplicate network work.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 9
     permissions:
