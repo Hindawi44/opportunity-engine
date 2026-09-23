@@ -1,7 +1,8 @@
 name: Norway Opportunity Hunter
 
-# Restore EXISTING Norway tools rather than replacing them. PR-only evidence;
-# no daily schedule, paid providers, foreign market, Gmail or database mutation.
+# Restore EXISTING Norway tools rather than replacing them. PR checks plus a
+# main-push continuity snapshot; no daily schedule, paid providers, foreign
+# execution, Gmail or commercial actions. SQLite writes are Norway-only review state.
 on:
   pull_request:
     paths:
