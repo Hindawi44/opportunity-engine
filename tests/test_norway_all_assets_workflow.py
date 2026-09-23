@@ -13,10 +13,13 @@ def test_original_all_asset_runner_reconnected_and_bounded():
     assert DIRECT.is_file() and CROSS.is_file() and ARCHIVE.is_file()
     job = text.split("  norway-all-assets:\n", 1)[1].split("  norway-existing-engine:\n", 1)[0]
     assert "needs: norway-contract" in job
-    assert "if: ${{ github.event_name == 'pull_request' }}" in job
+    assert "if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}" in job
     assert "python scripts/run_norway_direct_sales.py" in job
     assert "--max-pages 2" in job and "--max-cards 10" in job
+    assert "python scripts/restore_norway_review_state.py" in job
+    assert "python scripts/run_norway_review_cycle.py" in job
     assert "norway-existing-all-assets-evidence" in job
+    assert "name: multi-market-daily-operator-checkpoint" in job
     assert "if: always()" in job
     assert "--persist-unified" not in job and "--database-url" not in job
     assert "run_norway_insolvency_sale_links.py" not in job
@@ -27,6 +30,7 @@ def test_no_duplicate_insolvency_run_or_paid_foreign_cron():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert "  schedule:" not in workflow
     assert "  workflow_dispatch:" not in workflow
+    assert "  push:" in workflow and "- main" in workflow
     assert "  norway-insolvency-source-pilot:\n    # The experimental replacement yielded no qualified links in bounded live\n    # samples. Preserve its code/history, but stop duplicate network work.\n    if: ${{ false }}" in workflow
     for token in (
         "BRAVE_SEARCH_API_KEY:", "EXA_API_KEY:", "OPENAI_API_KEY:",

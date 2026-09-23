@@ -1,7 +1,8 @@
 name: Norway Opportunity Hunter
 
-# Restore EXISTING Norway tools rather than replacing them. PR-only evidence;
-# no daily schedule, paid providers, foreign market, Gmail or database mutation.
+# Restore EXISTING Norway tools rather than replacing them. PR checks plus a
+# main-push continuity snapshot; no daily schedule, paid providers, foreign
+# execution, Gmail or commercial actions. SQLite writes are Norway-only review state.
 on:
   pull_request:
     paths:
@@ -12,6 +13,10 @@ on:
       - "scripts/run_norway_direct_sales.py"
       - "tests/test_norway_direct_sales.py"
       - "tests/test_norway_all_assets_workflow.py"
+      - "scripts/restore_norway_review_state.py"
+      - "scripts/run_norway_review_cycle.py"
+      - "tests/test_norway_review_cycle.py"
+      - "config/operator-review-events-v1.json"
       - "scripts/run_norway_insolvency_sample.py"
       - "tests/test_norway_insolvency_sample.py"
       - "tests/test_norway_insolvency_workflow.py"
@@ -23,8 +28,23 @@ on:
       - "tests/test_norway_unlabeled_vare_probe.py"
       - "docs/NORWAY_RECOVERY_SCOPE_20260922.md"
 
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/multi-market-daily-operator-checkpoint.yaml"
+      - "scripts/run_norway_direct_sales.py"
+      - "scripts/restore_norway_review_state.py"
+      - "scripts/run_norway_review_cycle.py"
+      - "src/opportunity_engine/operator_decision_ingest.py"
+      - "src/opportunity_engine/operator_study_memory.py"
+      - "config/operator-review-events-v1.json"
+      - "tests/test_norway_review_cycle.py"
+      - "tests/test_norway_all_assets_workflow.py"
+
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: norway-opportunity-hunter-${{ github.ref }}
@@ -32,7 +52,7 @@ concurrency:
 
 jobs:
   norway-contract:
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,17 +65,20 @@ jobs:
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_review_cycle.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
 
   norway-all-assets:
     needs: norway-contract
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 15
     permissions:
       contents: read
+      actions: read
     env:
       PYTHONPATH: src:.
+      INPUT_ROOT: artifacts/multi-market-inputs
+      REVIEW_OUTPUT: artifacts/norway-review-cycle
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -63,20 +86,43 @@ jobs:
           python-version: "3.11"
       - name: Install existing dependencies
         run: python -m pip install -r requirements.txt
+      - name: Restore previous Norwegian SQLite review state only
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/restore_norway_review_state.py \
+            --input-root "$INPUT_ROOT" \
+            --status-path "$REVIEW_OUTPUT/previous-state-restore.json"
       - name: Run pre-existing Norwegian all-asset individual-sale collector, not an insolvency registry
         run: |
           python scripts/run_norway_direct_sales.py \
             --max-pages 2 \
             --max-cards 10 \
-            --output-dir artifacts/norway-all-assets
-      - name: Preserve exact direct item links, source errors and zero-result evidence
+            --output-dir "$INPUT_ROOT/no-auksjonen"
+      - name: Persist current Norwegian links and rebuild explicit review memory
+        run: |
+          python scripts/run_norway_review_cycle.py \
+            --direct-sales "$INPUT_ROOT/no-auksjonen/direct-sales.json" \
+            --input-root "$INPUT_ROOT" \
+            --output-dir "$REVIEW_OUTPUT"
+      - name: Preserve exact direct item links and SQLite evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: norway-existing-all-assets-evidence
-          path: artifacts/norway-all-assets/
+          path: artifacts/multi-market-inputs/no-auksjonen/
           if-no-files-found: warn
           retention-days: 30
+      - name: Preserve durable Norway review state for the next main run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multi-market-daily-operator-checkpoint
+          path: |
+            artifacts/multi-market-inputs/
+            artifacts/norway-review-cycle/
+          if-no-files-found: warn
+          retention-days: 90
 
   norway-existing-engine:
     needs: norway-contract
