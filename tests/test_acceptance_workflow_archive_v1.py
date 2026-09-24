@@ -58,7 +58,7 @@ def test_actions_surface_matches_current_workflows() -> None:
     assert current == EXPECTED_LIVE
 
 
-def test_no_unverified_company_event_hunter_runs_on_schedule() -> None:
+def test_only_norway_checkpoint_runs_on_schedule_and_event_prototype_stays_disabled() -> None:
     scheduled = []
     for path in WORKFLOWS.iterdir():
         if path.suffix not in {".yml", ".yaml"}:
@@ -67,4 +67,9 @@ def test_no_unverified_company_event_hunter_runs_on_schedule() -> None:
         live_lines = [line for line in text.splitlines() if not line.lstrip().startswith("#")]
         if any(line.strip() == "schedule:" for line in live_lines):
             scheduled.append(path.name)
-    assert scheduled == []
+    assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
+    active = (WORKFLOWS / scheduled[0]).read_text(encoding="utf-8")
+    assert "name: Norway Opportunity Hunter" in active
+    assert "norway-events:\n    # Keep the audited source code and historical artifacts; do not execute events.\n    if: ${{ false }}" in active
+    for foreign in ("--market SE", "--market DE", "--market FR", "--market IT", "--market NL"):
+        assert foreign not in active
