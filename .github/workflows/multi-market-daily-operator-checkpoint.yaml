@@ -173,6 +173,31 @@ jobs:
           python scripts/run_norway_openai_search_intelligence.py \
             --input-root "$INPUT_ROOT" \
             --output-dir "$OPENAI_OUTPUT"
+      - name: Fail closed if a Norway source command failed
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          failures = []
+          for relative in (
+              "no-auksjonen/execution-status.json",
+              "no-exa-exact-lot/execution-status.json",
+              "no-finn-email/execution-status.json",
+          ):
+              path = Path("artifacts/multi-market-inputs") / relative
+              if not path.is_file():
+                  failures.append(f"{relative}:MISSING_STATUS")
+                  continue
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              code = payload.get("source_command_exit_code")
+              if code not in (0, None):
+                  failures.append(f"{relative}:EXIT_{code}")
+          if failures:
+              raise SystemExit("Norway source command failure: " + ", ".join(failures))
+          print("norway_source_command_gate: PASS")
+          PY
       - name: Preserve exact direct item links and SQLite evidence
         if: always()
         uses: actions/upload-artifact@v4
