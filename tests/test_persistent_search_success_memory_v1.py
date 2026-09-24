@@ -18,11 +18,16 @@ for name, test in vars(legacy).items():
         globals()[name] = test
 
 
-def test_search_success_learning_is_archived_not_cross_country_scheduled() -> None:
+def test_cross_country_search_learning_stays_archived_while_exa_returns_to_norway() -> None:
     old = ARCHIVED_WORKFLOW.read_text(encoding="utf-8")
     active = ACTIVE.read_text(encoding="utf-8")
     assert "scripts/run_daily_search_success_learning.py" in old
     assert 'EXA_API_KEY: ${{ secrets.EXA_API_KEY }}' in old
     assert "scripts/run_daily_search_success_learning.py" not in active
-    assert 'EXA_API_KEY: ${{ secrets.EXA_API_KEY }}' not in active
+    norway = active.split("  norway-all-assets:\n", 1)[1].split("  norway-existing-engine:\n", 1)[0]
+    assert 'EXA_API_KEY: ${{ secrets.EXA_API_KEY }}' in norway
+    assert "run_exa_exact_lot_checkpoint.py" in norway
+    assert "--market NO" in norway
+    for foreign in ("--market SE", "--market DE", "--market FR", "--market IT", "--market NL"):
+        assert foreign not in active
     assert "run_event_first_hunter_pilot.py" in active
