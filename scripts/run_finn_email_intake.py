@@ -295,6 +295,14 @@ def _gmail_credentials() -> tuple[str, str, str]:
     )
 
 
+def _parse_ingested_at(value: str) -> datetime:
+    """Convert the intake ISO timestamp to the timezone-aware canonical type."""
+    parsed = datetime.fromisoformat(str(value).strip().replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("FINN intake ingested_at must be timezone-aware")
+    return parsed
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -354,7 +362,7 @@ def main() -> int:
     unified_path = write_unified_opportunity_report(
         result,
         Path(args.output_dir),
-        generated_at=collection.ingested_at,
+        generated_at=_parse_ingested_at(collection.ingested_at),
         market_code="NO",
         currency="NOK",
         domain=CLOTHING_INVENTORY,
