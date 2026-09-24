@@ -113,3 +113,20 @@ def test_finn_gmail_runner_can_persist_to_existing_norway_sqlite() -> None:
     assert 'market_code="NO"' in text
     assert 'currency="NOK"' in text
     assert "persist_unified_report_with_artifacts" in text
+    assert "_parse_ingested_at(collection.ingested_at)" in text
+
+
+def test_finn_ingested_timestamp_is_converted_to_timezone_aware_datetime() -> None:
+    parsed = _parse_ingested_at("2026-09-24T06:59:31.004223+00:00")
+    assert parsed.tzinfo is not None
+    assert parsed.utcoffset() is not None
+
+
+def test_workflow_surfaces_wrapped_source_failures_after_all_tools_run() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    job = text.split("  norway-all-assets:\n", 1)[1].split("  norway-existing-engine:\n", 1)[0]
+    assert "Fail closed if a Norway source command failed" in job
+    assert "no-auksjonen/execution-status.json" in job
+    assert "no-exa-exact-lot/execution-status.json" in job
+    assert "no-finn-email/execution-status.json" in job
+    assert "Norway source command failure:" in job
