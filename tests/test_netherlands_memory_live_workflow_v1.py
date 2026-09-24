@@ -13,8 +13,9 @@ def test_netherlands_is_not_in_an_automatic_runtime() -> None:
     scheduled = [path.name for path in workflows if any(
         line.strip() == "schedule:" for line in path.read_text(encoding="utf-8").splitlines()
         if not line.lstrip().startswith("#"))]
-    assert scheduled == []
+    assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
     active = ACTIVE.read_text(encoding="utf-8")
+    assert "--market NL" not in active
     assert active.startswith("name: Norway Opportunity Hunter\n")
     assert "run_explicit_six_market_expansion.py" not in active
     assert "netherlands" not in active.casefold()
