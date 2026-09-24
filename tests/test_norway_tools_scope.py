@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from scripts.run_norway_openai_search_intelligence import build_norway_search_brief
+from scripts.run_finn_email_intake import _parse_ingested_at
 
 
 ROOT = Path(__file__).resolve().parents[1]
