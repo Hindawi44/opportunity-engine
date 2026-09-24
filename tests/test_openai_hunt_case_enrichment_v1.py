@@ -22,11 +22,17 @@ for name, test in vars(legacy).items():
         globals()[name] = test
 
 
-def test_model_credentials_remain_only_in_archived_workflow_not_norway_pilot() -> None:
+def test_model_credentials_are_restored_only_for_bounded_norway_hunt() -> None:
     old = ARCHIVED_WORKFLOW.read_text(encoding="utf-8")
     active = ACTIVE.read_text(encoding="utf-8")
     assert "OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}" in old
     assert 'OPENAI_HUNT_MAX_API_REQUESTS: "3"' in old
-    assert "OPENAI_API_KEY:" not in active
+    norway = active.split("  norway-all-assets:\n", 1)[1].split("  norway-existing-engine:\n", 1)[0]
+    assert "OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}" in norway
+    assert 'OPENAI_HUNT_MAX_API_REQUESTS: "2"' in norway
+    assert 'OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.08"' in norway
+    assert "run_norway_openai_search_intelligence.py" in norway
+    for foreign in ("--market SE", "--market DE", "--market FR", "--market IT", "--market NL"):
+        assert foreign not in active
     assert "run_event_first_hunter_pilot.py" in active
     assert "automatic_purchase: true" not in active

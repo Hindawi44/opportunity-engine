@@ -15,8 +15,10 @@ def test_italy_is_not_an_automatic_market_anymore() -> None:
                  if not line.lstrip().startswith("#")]
         if any(line.strip() == "schedule:" for line in lines):
             scheduled.append(path.name)
-    assert scheduled == []
-    assert "italy" not in ACTIVE.read_text(encoding="utf-8").casefold()
+    assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
+    active = ACTIVE.read_text(encoding="utf-8")
+    assert "italy" not in active.casefold()
+    assert "--market IT" not in active
     assert "\n  schedule:" not in TESTS_WORKFLOW.read_text(encoding="utf-8")
 
 

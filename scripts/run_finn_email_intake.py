@@ -28,6 +28,13 @@ from opportunity_engine.discovery.gmail_opportunity_classification import (
 from opportunity_engine.discovery.multi_market_operator_checkpoint import (
     opportunity_identity,
 )
+from opportunity_engine.discovery.unified_opportunity_report import (
+    write_unified_opportunity_report,
+)
+from opportunity_engine.persistence.live_unified_persistence import (
+    persist_unified_report_with_artifacts,
+)
+from opportunity_engine.project_domain_boundary import CLOTHING_INVENTORY
 
 GMAIL_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GMAIL_MESSAGES_URL = "https://gmail.googleapis.com/gmail/v1/users/me/messages"
@@ -311,10 +318,15 @@ def main() -> int:
         "--output-dir",
         default="artifacts/finn-email-intake",
     )
+    parser.add_argument("--persist-unified", action="store_true")
+    parser.add_argument("--database-url", default="")
+    parser.add_argument("--alembic-config", default="alembic.ini")
     args = parser.parse_args()
 
     if not args.message_files and not args.gmail_api:
         parser.error("supply message files or use --gmail-api")
+    if args.persist_unified and not str(args.database_url or "").strip():
+        parser.error("--database-url is required with --persist-unified")
 
     messages = [
         message
@@ -339,6 +351,23 @@ def main() -> int:
         Path(args.output_dir),
     )
     paths.update(write_gmail_classification_artifacts(classification, args.output_dir))
+    unified_path = write_unified_opportunity_report(
+        result,
+        Path(args.output_dir),
+        generated_at=collection.ingested_at,
+        market_code="NO",
+        currency="NOK",
+        domain=CLOTHING_INVENTORY,
+    )
+    paths["unified_opportunity_report"] = unified_path
+    if args.persist_unified:
+        _, persistence_path = persist_unified_report_with_artifacts(
+            unified_path,
+            Path(args.output_dir),
+            database_url=args.database_url,
+            config_path=args.alembic_config,
+        )
+        paths["unified_persistence_summary"] = persistence_path
 
     report = result["search_run_report"]
     print(f"Execution status: {report['execution_status']}")

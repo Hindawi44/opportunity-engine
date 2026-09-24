@@ -16,8 +16,11 @@ def test_france_does_not_add_an_automatic_schedule() -> None:
                  if not line.lstrip().startswith("#")]
         if any(line.strip() == "schedule:" for line in lines):
             scheduled.append(path.name)
-    assert scheduled == []
-    assert ACTIVE.read_text(encoding="utf-8").startswith("name: Norway Opportunity Hunter\n")
+    assert scheduled == ["multi-market-daily-operator-checkpoint.yaml"]
+    active = ACTIVE.read_text(encoding="utf-8")
+    assert active.startswith("name: Norway Opportunity Hunter\n")
+    assert "--market FR" not in active
+    assert "france-market-discovery" not in active
 
 
 def test_france_state_and_execution_contract_are_historical_only() -> None:

@@ -28,17 +28,33 @@ def test_original_norway_sources_reconnected_without_replacing_code():
     assert "scripts/run_norway_insolvency_sale_links.py" not in job
 
 
-def test_no_foreign_execution_cost_or_history_deletion():
+def test_original_norway_paid_and_gmail_paths_are_restored_without_foreign_execution():
     text = WORKFLOW.read_text(encoding="utf-8")
     assert ARCHIVE.is_file()
     old = ARCHIVE.read_text(encoding="utf-8")
-    for original_stage in ("Run Exa Exact-Lot NO checkpoint source", "Run Norway Auksjonen public clothing path", "Read FINN saved-search alerts from Gmail", "Run Norway bounded cross-source verification", "Restore previous lifecycle SQLite state"):
+    for original_stage in (
+        "Run Exa Exact-Lot NO checkpoint source",
+        "Run Norway Auksjonen public clothing path",
+        "Read FINN saved-search alerts from Gmail",
+        "Run Norway bounded cross-source verification",
+        "Restore previous lifecycle SQLite state",
+    ):
         assert original_stage in old
-    assert "  schedule:" not in text
-    assert "  workflow_dispatch:" not in text
-    assert "run_exa_exact_lot_checkpoint.py" not in text
-    assert "run_finn_email_intake.py" not in text
+
+    active = text.split("  norway-all-assets:\n", 1)[1].split("  norway-existing-engine:\n", 1)[0]
+    assert "run_exa_exact_lot_checkpoint.py" in active
+    assert "--market NO" in active
+    assert "run_finn_email_intake.py" in active
+    assert "--gmail-api" in active
+    assert "run_norway_openai_search_intelligence.py" in active
+    assert "restore_norway_review_state.py" in active
     assert "restore_previous_checkpoint_state.py" not in text
-    assert "delete" not in text.lower()
+
+    for foreign in ("--market SE", "--market DE", "--market FR", "--market IT", "--market NL"):
+        assert foreign not in text
+    for destructive in ("git clean", "rm -rf artifacts/multi-market-inputs", "DROP TABLE"):
+        assert destructive not in text
+    assert "  schedule:" in text
+    assert "  workflow_dispatch:" in text
     assert "  pull_request:" in text
     assert "norway-insolvency-source-pilot:" in text

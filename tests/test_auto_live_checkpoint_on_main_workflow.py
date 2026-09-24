@@ -27,14 +27,17 @@ def test_pause_does_not_expand_workflow_inventory() -> None:
     assert (WORKFLOWS / "production-dispatch-after-ci.yaml").exists()
 
 
-def test_event_only_checkpoint_is_preserved_but_not_scheduled() -> None:
+def test_norway_checkpoint_is_daily_and_manual_while_event_prototype_stays_disabled() -> None:
     text = DAILY.read_text(encoding="utf-8")
     trigger = text.split("on:", 1)[1].split("permissions:", 1)[0]
     assert text.startswith("name: Norway Opportunity Hunter\n")
-    assert "workflow_dispatch:" not in trigger
-    assert "schedule:" not in trigger
+    assert "workflow_dispatch:" in trigger
+    assert "schedule:" in trigger
+    assert 'timezone: "Europe/Oslo"' in trigger
     assert "cancel-in-progress: false" in text
     assert "norway-events:\n    # Keep the audited source code and historical artifacts; do not execute events.\n    if: ${{ false }}" in text
     assert "run_event_first_hunter_pilot.py" in text
     assert "operator-read-only-checkpoint:" not in text
     assert "run_explicit_six_market_expansion.py" not in text
+    for foreign in ("--market SE", "--market DE", "--market FR", "--market IT", "--market NL"):
+        assert foreign not in text
