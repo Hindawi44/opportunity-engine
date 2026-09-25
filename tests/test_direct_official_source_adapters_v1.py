@@ -154,6 +154,79 @@ def test_brreg_direct_api_rejects_non_clothing_entity() -> None:
     assert report["signals"] == []
 
 
+def test_brreg_bankruptcy_only_mode_accepts_all_sectors_and_skips_liquidation_updates() -> None:
+    bankruptcy_org = "888777666"
+    liquidation_org = "777666555"
+    construction_bankruptcy = {
+        "organisasjonsnummer": bankruptcy_org,
+        "navn": "Bygg og Betong AS",
+        "konkurs": True,
+        "konkursdato": "2026-08-03",
+        "naeringskode1": {
+            "kode": "41.200",
+            "beskrivelse": "Oppføring av bygninger",
+        },
+    }
+    liquidation_update = {
+        "oppdateringsid": 2,
+        "organisasjonsnummer": liquidation_org,
+        "endringstype": "Endring",
+        "endringer": [
+            {"op": "add", "path": "/underAvvikling", "value": True},
+        ],
+    }
+    transport = FakeBrregJson(
+        {
+            bankruptcy_org: construction_bankruptcy,
+            liquidation_org: {
+                "organisasjonsnummer": liquidation_org,
+                "navn": "Frivillig Avvikling AS",
+                "underAvvikling": True,
+            },
+        },
+        updates=[_status_update(bankruptcy_org), liquidation_update],
+    )
+
+    report = collect_brreg_direct_signals(
+        observed_at=NOW,
+        json_get=transport,
+        require_clothing=False,
+        bankruptcy_only=True,
+    )
+
+    assert report["status"] == "SUCCESS"
+    assert report["bankruptcy_only"] is True
+    assert report["all_sectors"] is True
+    assert report["candidate_entity_count"] == 1
+    assert report["entity_fetch_count"] == 1
+    assert report["accepted_signal_count"] == 1
+    assert report["signals"][0]["metadata"]["event_kind"] == "KONKURS"
+    assert report["signals"][0]["company_name"] == "Bygg og Betong AS"
+    assert all(liquidation_org not in url for url in transport.calls)
+
+
+def test_brreg_bankruptcy_only_mode_requires_current_bankruptcy_flag() -> None:
+    orgnr = "888777666"
+    historical = {
+        "organisasjonsnummer": orgnr,
+        "navn": "Tidligere Konkurs AS",
+        "konkurs": False,
+        "konkursdato": "2024-01-02",
+        "naeringskode1": {"kode": "41.200", "beskrivelse": "Bygg"},
+    }
+    report = collect_brreg_direct_signals(
+        observed_at=NOW,
+        json_get=FakeBrregJson(
+            {orgnr: historical},
+            updates=[_status_update(orgnr)],
+        ),
+        require_clothing=False,
+        bankruptcy_only=True,
+    )
+    assert report["status"] == "VALID_ZERO"
+    assert report["accepted_signal_count"] == 0
+
+
 def test_brreg_successful_zero_is_not_retrieval_zero() -> None:
     report = collect_brreg_direct_signals(
         observed_at=NOW,

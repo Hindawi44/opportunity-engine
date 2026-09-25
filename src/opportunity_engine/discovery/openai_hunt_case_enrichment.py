@@ -22,12 +22,13 @@ SUPPORTED_MARKETS = {"NO", "SE", "DE"}
 EVENT_LEARNING_MARKETS = {"NO", "SE", "DE", "FR", "IT", "NL"}
 ACTIVE_STATES = {"ACTIVE", "WATCH"}
 EARLY_TYPES = {
+    "BANKRUPTCY",
     "AUCTION_EVENT", "BUSINESS_CLOSURE", "INSOLVENCY_OR_LIQUIDATION",
     "WAREHOUSE_SURPLUS", "REPEATED_SELLER_ACTIVITY", "RELATED_INVENTORY_ACTIVITY",
     "DIRECT_OPPORTUNITY_CHANGE", "SOURCE_FAILURE",
 }
 PRIORITY = {
-    "INSOLVENCY_OR_LIQUIDATION": 60, "BUSINESS_CLOSURE": 50,
+    "BANKRUPTCY": 65, "INSOLVENCY_OR_LIQUIDATION": 60, "BUSINESS_CLOSURE": 50,
     "WAREHOUSE_SURPLUS": 45, "REPEATED_SELLER_ACTIVITY": 35,
     "RELATED_INVENTORY_ACTIVITY": 32, "AUCTION_EVENT": 25,
     "DIRECT_OPPORTUNITY_CHANGE": 70, "SOURCE_FAILURE": 65,
@@ -440,7 +441,7 @@ def attach_hunt_case_intelligence(brief: Mapping[str, Any], report: Mapping[str,
 def render_openai_hunt_case_enrichment(report: Mapping[str, Any]) -> str:
     cases = _rows(report.get("cases"))
     lines = [
-        "تحليل OpenAI لقضايا مطاردة مخزون الملابس",
+        "تحليل OpenAI لقضايا مطاردة الأصول",
         f"الوقت: {report.get('generated_at')}", f"الحالة: {report.get('status')}",
         f"الإشارات المفحوصة: {report.get('selected_signal_count', 0)}",
         f"قضايا المطاردة: {len(cases)}", f"قضايا محللة بعمق: {report.get('deep_case_count', 0)}",

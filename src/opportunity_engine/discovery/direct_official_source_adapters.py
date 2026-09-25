@@ -59,6 +59,11 @@ _BRREG_STATUS_PATH_MARKERS = (
     "/tvangsavviklet",
     "/tvangsopplost",
 )
+_BRREG_BANKRUPTCY_PATH_MARKERS = (
+    "/konkurs",
+    "/konkursdato",
+    "/underkonkursbehandling",
+)
 _BRREG_CLOTHING_NACE_PREFIXES = ("14", "46.42", "47.71")
 _BRREG_CLOTHING_TERMS = (
     "klær",
@@ -225,15 +230,22 @@ def _truthy_change_value(value: object) -> bool:
     return text not in {"", "false", "0", "null", "none"}
 
 
-def _update_has_relevant_status_change(update: Mapping[str, Any]) -> bool:
+def _update_has_relevant_status_change(
+    update: Mapping[str, Any], *, bankruptcy_only: bool = False
+) -> bool:
     changes = update.get("endringer")
     if not isinstance(changes, Sequence) or isinstance(changes, (str, bytes)):
         return False
+    markers = (
+        _BRREG_BANKRUPTCY_PATH_MARKERS
+        if bankruptcy_only
+        else _BRREG_STATUS_PATH_MARKERS
+    )
     for change in changes:
         if not isinstance(change, Mapping):
             continue
         path = _fold(change.get("path"))
-        if not any(marker in path for marker in _BRREG_STATUS_PATH_MARKERS):
+        if not any(marker in path for marker in markers):
             continue
         operation = _fold(change.get("op"))
         if operation == "remove":
@@ -340,11 +352,23 @@ def _brreg_signal(
     *,
     observed_at: datetime,
     update: Mapping[str, Any],
+    require_clothing: bool = True,
+    bankruptcy_only: bool = False,
 ) -> MarketSignalRecord | None:
     event_kind = _brreg_event_kind(entity)
     orgnr = _compact(entity.get("organisasjonsnummer"))
     name = _compact(entity.get("navn"))
-    if not event_kind or not orgnr or not name or not _brreg_entity_is_clothing(entity):
+    current_bankruptcy = (
+        entity.get("konkurs") is True
+        or entity.get("underKonkursbehandling") is True
+    )
+    if (
+        not event_kind
+        or not orgnr
+        or not name
+        or (require_clothing and not _brreg_entity_is_clothing(entity))
+        or (bankruptcy_only and (event_kind != "KONKURS" or not current_bankruptcy))
+    ):
         return None
 
     labels = {
@@ -416,6 +440,8 @@ def collect_brreg_direct_signals(
     entity_fetch_limit: int = DEFAULT_ENTITY_FETCH_LIMIT,
     timeout: float = DEFAULT_TIMEOUT_SECONDS,
     json_get: JsonGetter = _default_json_get,
+    require_clothing: bool = True,
+    bankruptcy_only: bool = False,
 ) -> dict[str, Any]:
     if lookback_days < 1:
         raise ValueError("lookback_days must be at least 1")
@@ -458,6 +484,11 @@ def collect_brreg_direct_signals(
             "generated_at": _iso_utc(observed_at),
             "status": "BLOCKED_DIRECT_ACCESS",
             "access_mode": "DIRECT_OFFICIAL_REST_API",
+            "bankruptcy_only": bankruptcy_only,
+            "all_sectors": not require_clothing,
+            "lookback_days": lookback_days,
+            "update_limit": update_limit,
+            "entity_limit": entity_fetch_limit,
             "errors": [f"{type(exc).__name__}: {exc}"],
             "signals": [],
             "retrieved_record_count": 0,
@@ -471,7 +502,9 @@ def collect_brreg_direct_signals(
     candidates: dict[str, dict[str, Any]] = {}
     for update in updates:
         orgnr = _compact(update.get("organisasjonsnummer"))
-        if orgnr and _update_has_relevant_status_change(update):
+        if orgnr and _update_has_relevant_status_change(
+            update, bankruptcy_only=bankruptcy_only
+        ):
             candidates.setdefault(orgnr, update)
 
     signals: dict[str, dict[str, Any]] = {}
@@ -495,7 +528,13 @@ def collect_brreg_direct_signals(
         except Exception as exc:
             entity_errors.append(f"{orgnr}: {type(exc).__name__}: {exc}")
             continue
-        signal = _brreg_signal(entity, observed_at=observed_at, update=update)
+        signal = _brreg_signal(
+            entity,
+            observed_at=observed_at,
+            update=update,
+            require_clothing=require_clothing,
+            bankruptcy_only=bankruptcy_only,
+        )
         if signal is None:
             rejected += 1
             continue
@@ -514,6 +553,10 @@ def collect_brreg_direct_signals(
         "access_mode": "DIRECT_OFFICIAL_REST_API",
         "updates_url": updates_url,
         "lookback_days": lookback_days,
+        "update_limit": update_limit,
+        "entity_limit": entity_fetch_limit,
+        "bankruptcy_only": bankruptcy_only,
+        "all_sectors": not require_clothing,
         "retrieved_record_count": len(updates),
         "candidate_entity_count": len(candidates),
         "entity_fetch_count": entity_fetch_count,
