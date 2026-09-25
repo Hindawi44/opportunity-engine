@@ -1,9 +1,14 @@
-"""Contract: official insolvency event != assets for sale; no sector gate."""
+"""Contract: official bankruptcy event != assets for sale; no sector gate."""
 from datetime import datetime, timezone
 
 import pytest
 
-from scripts.run_norway_insolvency_sample import FILTERS, render_arabic, sample
+from scripts.run_norway_insolvency_sample import (
+    FILTERS,
+    build_recent_sample,
+    render_arabic,
+    sample,
+)
 
 NOW = datetime(2026, 9, 19, 12, tzinfo=timezone.utc)
 
@@ -21,6 +26,36 @@ def registry(rows):
     return {"_embedded": {"enheter": rows}, "page": {"totalElements": len(rows)}}
 
 
+def recent_source(*, status="SUCCESS", signals=None, errors=None):
+    return {
+        "source_key": "BRREG_ENHETSREGISTERET_API",
+        "source_country": "NO",
+        "status": status,
+        "bankruptcy_only": True,
+        "all_sectors": True,
+        "lookback_days": 7,
+        "retrieved_record_count": 12,
+        "candidate_entity_count": 1,
+        "entity_fetch_count": 1,
+        "errors": errors or [],
+        "signals": signals or [],
+    }
+
+
+def recent_signal():
+    return {
+        "signal_id": "official-notice:no:brreg:123456789:konkurs",
+        "company_name": "Nord Industri AS",
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/123456789",
+        "event_date": "2026-09-23T00:00:00Z",
+        "location": "Namsos",
+        "metadata": {
+            "organisation_number": "123456789",
+            "event_kind": "KONKURS",
+        },
+    }
+
+
 def test_all_sectors_company_is_discovered_from_official_status_not_clothing():
     calls = []
     def fetcher(status, size):
@@ -28,7 +63,8 @@ def test_all_sectors_company_is_discovered_from_official_status_not_clothing():
         return registry([entity()] if status == "konkurs" else [])
     report = sample(fetcher=fetcher, now=NOW)
     assert calls == [(status, 25) for status in FILTERS]
-    assert report["scope"] == "NO_ONLY_INSOLVENCY_LIQUIDATION_ALL_SECTORS"
+    assert FILTERS == ("konkurs",)
+    assert report["scope"] == "NO_ONLY_OFFICIAL_BANKRUPTCY_ALL_SECTORS"
     assert report["unique_sampled_companies"] == 1
     assert report["events"][0]["company_name"] == "Nord Industri AS"
     assert report["events"][0]["event_kinds"] == ["konkurs"]
@@ -37,16 +73,66 @@ def test_all_sectors_company_is_discovered_from_official_status_not_clothing():
     assert report["verified_insolvency_sale_count"] == 0
     assert report["verified_insolvency_sale_links"] == []
     assert report["ordinary_auction_listings_excluded"] is True
+    assert report["liquidation_events_excluded"] is True
+    assert report["forced_dissolution_events_excluded"] is True
+    assert report["surplus_only_links_excluded"] is True
+    assert report["dealer_links_excluded"] is True
+    assert "avvikling" not in report["events"][0]["followup_search"].casefold()
     assert "لا يُعامل أي إعلان مزاد عام" in render_arabic(report)
 
 
-def test_bankruptcy_liquidation_and_forced_liquidation_dedupe_same_company():
+def test_recent_official_updates_become_bankruptcy_only_events():
+    report = build_recent_sample(
+        recent_source(signals=[recent_signal()]),
+        max_cards=5,
+        update_limit=500,
+        entity_limit=20,
+        now=NOW,
+    )
+    assert report["source_mode"] == "RECENT_OFFICIAL_UPDATES"
+    assert report["coverage"] == "BOUNDED_RECENT_UPDATES_NOT_FULL_NORWAY"
+    assert report["events"][0]["event_kinds"] == ["konkurs"]
+    assert report["events"][0]["event_date"] == "2026-09-23"
+    assert "avvikling" not in report["events"][0]["followup_search"].casefold()
+    assert "تحديثات رسمية حديثة" in render_arabic(report)
+
+
+def test_recent_converter_rejects_any_non_bankruptcy_signal():
+    signal = recent_signal()
+    signal["metadata"]["event_kind"] = "AVVIKLING"
+    report = build_recent_sample(recent_source(signals=[signal]), now=NOW)
+    assert report["events"] == []
+    assert report["invalid_official_signal_count"] == 1
+    assert report["coverage"] == "PARTIAL_SOURCE_FAILURE"
+
+
+def test_recent_official_source_failure_is_not_reported_as_zero_events():
+    report = build_recent_sample(
+        recent_source(
+            status="BLOCKED_DIRECT_ACCESS",
+            errors=["official API unavailable"],
+        ),
+        now=NOW,
+    )
+    assert report["coverage"] == "SOURCE_UNAVAILABLE"
+    assert report["filter_queries_successful"] == 0
+    assert report["source_errors"]
+
+
+def test_liquidation_flags_cannot_enter_bankruptcy_only_sample():
     def fetcher(status, size):
-        return registry([entity(**{status: True})])
+        assert status == "konkurs"
+        return registry([
+            entity(konkurs=False, underAvvikling=True),
+            entity(
+                "222222222",
+                konkurs=False,
+                underTvangsavviklingEllerTvangsopplosning=True,
+            ),
+        ])
     report = sample(fetcher=fetcher, now=NOW)
-    assert report["unique_sampled_companies"] == 1
-    assert report["events"][0]["event_kinds"] == list(FILTERS)
-    assert report["displayed_event_count"] == 1
+    assert report["unique_sampled_companies"] == 0
+    assert report["events"] == []
 
 
 def test_unrelated_ordinary_listing_or_false_registry_flags_do_not_qualify():
@@ -63,12 +149,10 @@ def test_unrelated_ordinary_listing_or_false_registry_flags_do_not_qualify():
 
 def test_one_failed_status_is_not_converted_to_zero_coverage():
     def fetcher(status, size):
-        if status == "konkurs":
-            raise RuntimeError("HTTP 503")
-        return registry([])
+        raise RuntimeError("HTTP 503")
     report = sample(fetcher=fetcher, now=NOW)
-    assert report["coverage"] == "PARTIAL_SOURCE_FAILURE"
-    assert report["filter_queries_successful"] == 2
+    assert report["coverage"] == "SOURCE_UNAVAILABLE"
+    assert report["filter_queries_successful"] == 0
     assert len(report["source_errors"]) == 1
 
 
@@ -78,7 +162,7 @@ def test_total_failure_is_explicit_not_zero_opportunities():
     report = sample(fetcher=broken, now=NOW)
     assert report["coverage"] == "SOURCE_UNAVAILABLE"
     assert report["filter_queries_successful"] == 0
-    assert len(report["source_errors"]) == 3
+    assert len(report["source_errors"]) == 1
 
 
 def test_invalid_payload_and_bounded_budget_fail_closed():

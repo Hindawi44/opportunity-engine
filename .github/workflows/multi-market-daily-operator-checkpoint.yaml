@@ -1,8 +1,8 @@
 name: Norway Opportunity Hunter
 
-# Restore EXISTING Norway tools rather than replacing them. Search, Gmail and
-# paid/model helpers are allowed only inside the Norway route. No foreign-market
-# execution and no automatic contact, bid, purchase or payment.
+# Official Norwegian bankruptcy event first. Paid search may then chase that
+# exact company's sale link. Generic auctions, dealers, surplus, liquidation,
+# foreign execution and automatic contact/bid/purchase/payment stay excluded.
 on:
   schedule:
     - cron: "47 6 * * *"
@@ -27,7 +27,11 @@ on:
       - "tests/test_norway_tools_scope.py"
       - "config/operator-review-events-v1.json"
       - "scripts/run_norway_insolvency_sample.py"
+      - "src/opportunity_engine/discovery/direct_official_source_adapters.py"
+      - "scripts/run_norway_bankruptcy_link_hunt.py"
       - "tests/test_norway_insolvency_sample.py"
+      - "tests/test_direct_official_source_adapters_v1.py"
+      - "tests/test_norway_bankruptcy_link_hunt.py"
       - "tests/test_norway_insolvency_workflow.py"
       - "scripts/run_norway_insolvency_sale_links.py"
       - "tests/test_norway_insolvency_sale_links.py"
@@ -46,6 +50,9 @@ on:
       - "scripts/restore_norway_review_state.py"
       - "scripts/run_norway_review_cycle.py"
       - "scripts/run_norway_openai_search_intelligence.py"
+      - "scripts/run_norway_insolvency_sample.py"
+      - "src/opportunity_engine/discovery/direct_official_source_adapters.py"
+      - "scripts/run_norway_bankruptcy_link_hunt.py"
       - "scripts/run_finn_email_intake.py"
       - "scripts/run_exa_exact_lot_checkpoint.py"
       - "scripts/run_auksjonen_live_clothing.py"
@@ -74,14 +81,75 @@ jobs:
           python-version: "3.11"
       - name: Install existing dependencies
         run: python -m pip install -r requirements.txt
-      - name: Verify existing Norway tools, all-asset direct links and historical safety
+      - name: Verify bankruptcy-only link chase and historical safety
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_review_cycle.py tests/test_norway_tools_scope.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_review_cycle.py tests/test_norway_tools_scope.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_direct_official_source_adapters_v1.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_bankruptcy_link_hunt.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+
+  norway-bankruptcy-hunter:
+    needs: norway-contract
+    if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && needs.norway-contract.result == 'success')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PYTHONPATH: src:.
+      BANKRUPTCY_OUTPUT: artifacts/norway-bankruptcy
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPPORTUNITY_ALLOW_PAID_BRAVE_PUSH: "true"
+      OPPORTUNITY_ALLOW_PAID_BRAVE_MANUAL: "true"
+      OPENAI_HUNT_TRIAGE_MODEL: gpt-5.6-luna
+      OPENAI_HUNT_DEEP_MODEL: gpt-5.6-terra
+      OPENAI_HUNT_MAX_SIGNALS: "10"
+      OPENAI_HUNT_MAX_DEEP_CASES: "1"
+      OPENAI_HUNT_MAX_API_REQUESTS: "2"
+      OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.08"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Read official Norwegian bankruptcy events only
+        run: |
+          python scripts/run_norway_insolvency_sample.py \
+            --recent-updates \
+            --lookback-days 7 \
+            --update-limit 500 \
+            --entity-limit 20 \
+            --max-cards 5 \
+            --output-dir "$BANKRUPTCY_OUTPUT"
+      - name: Chase exact bankruptcy sale links with Exa and bounded Brave fallback
+        run: |
+          python scripts/run_norway_bankruptcy_link_hunt.py \
+            --events "$BANKRUPTCY_OUTPUT/insolvency-events.json" \
+            --max-events 5 \
+            --results-per-query 5 \
+            --max-page-reads 15 \
+            --output-dir "$BANKRUPTCY_OUTPUT"
+      - name: Analyze only proven bankruptcy-linked pages with bounded OpenAI
+        run: |
+          python scripts/run_norway_openai_search_intelligence.py \
+            --bankruptcy-report "$BANKRUPTCY_OUTPUT/bankruptcy-link-hunt.json" \
+            --output-dir "$BANKRUPTCY_OUTPUT/openai"
+      - name: Preserve official events, link decisions and bounded AI analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: norway-bankruptcy-link-evidence
+          path: artifacts/norway-bankruptcy/
+          if-no-files-found: warn
+          retention-days: 30
 
   norway-all-assets:
-    if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    # Preserved for history only. The operator rejected generic auction,
+    # surplus/dealer and Gmail-listing intake for the active route.
+    if: ${{ false && (github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -219,7 +287,8 @@ jobs:
           retention-days: 90
 
   norway-existing-engine:
-    if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    # Preserved for history only; it is not an event-first bankruptcy route.
+    if: ${{ false && (github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
