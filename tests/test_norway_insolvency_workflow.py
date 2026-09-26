@@ -10,18 +10,28 @@ def test_live_route_is_official_bankruptcy_then_paid_link_chase_then_openai():
     live = text.split("  norway-bankruptcy-hunter:\n", 1)[1].split(
         "  norway-all-assets:\n", 1
     )[0]
+    restore = live.index("python scripts/restore_norway_bankruptcy_watchlist.py")
     official = live.index("python scripts/run_norway_insolvency_sample.py")
+    prepare = live.index("python scripts/run_norway_bankruptcy_watchlist.py prepare")
     chase = live.index("python scripts/run_norway_bankruptcy_link_hunt.py")
+    finalize = live.index("python scripts/run_norway_bankruptcy_watchlist.py finalize")
     openai = live.index("python scripts/run_norway_openai_search_intelligence.py")
-    assert official < chase < openai
+    assert restore < official < prepare < chase < finalize < openai
+    assert "actions: read" in live
     assert "--recent-updates" in live
     assert "--lookback-days 7" in live
     assert "--update-limit 500" in live
     assert "--entity-limit 20" in live
-    assert "--max-cards 5" in live
+    assert "--max-cards 20" in live
     assert "--max-events 5" in live
     assert "--results-per-query 5" in live
     assert "--max-page-reads 15" in live
+    assert "--retention-days 60" in live
+    assert "--recheck-days 3" in live
+    assert "--max-due-cases 5" in live
+    assert "bankruptcy-watchlist-due-events.json" in live
+    assert "bankruptcy-new-link-report.json" in live
+    assert "retention-days: 90" in live
     assert "--bankruptcy-report" in live
     assert "EXA_API_KEY: ${{ secrets.EXA_API_KEY }}" in live
     assert "BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}" in live

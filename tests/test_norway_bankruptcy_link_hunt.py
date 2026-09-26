@@ -85,6 +85,8 @@ def test_exa_link_is_kept_only_after_page_proves_bankruptcy_identity_and_sale():
     assert len(exa.calls) == 1
     assert brave.calls == []
     assert "avvikling" not in exa.calls[0][0].casefold()
+    assert ORG in exa.calls[0][0]
+    assert "bostyrer" in exa.calls[0][0].casefold()
     assert report["verified_bankruptcy_sale_link_count"] == 1
     link = report["verified_bankruptcy_sale_links"][0]
     assert link["classification"] == "OFFICIAL_BANKRUPTCY_LINKED_ASSET_SALE"
@@ -98,6 +100,53 @@ def test_exa_link_is_kept_only_after_page_proves_bankruptcy_identity_and_sale():
     assert link["human_review_required"] is True
     assert report["policy"]["search_snippet_never_sufficient"] is True
     assert "إفلاس مثبت الربط" in render_arabic(report)
+
+
+def test_known_watchlist_sale_url_is_rechecked_without_paid_search():
+    persisted = event_report()
+    persisted["events"][0]["known_sale_urls"] = [SALE_URL]
+    exa = FakeProvider("Exa", [hit()])
+    brave = FakeProvider("Brave Search", [hit(provider="Brave Search")])
+
+    report = hunt_bankruptcy_links(
+        persisted,
+        exa=exa,
+        brave=brave,
+        loader=lambda url: active_bankruptcy_html(),
+        now=NOW,
+    )
+
+    assert exa.calls == []
+    assert brave.calls == []
+    assert report["known_link_rechecks"] == 1
+    assert report["coverage"] == "DIRECT_WATCHLIST_RECHECK_ONLY"
+    assert report["paid_provider_requests"] == 0
+    assert report["events_searched"] == 1
+    assert report["verified_bankruptcy_sale_link_count"] == 1
+    assert (
+        report["verified_bankruptcy_sale_links"][0]["search_provider"]
+        == "Watchlist direct recheck"
+    )
+
+
+def test_failed_direct_watchlist_read_is_not_reported_as_a_clean_zero():
+    persisted = event_report()
+    persisted["events"][0]["known_sale_urls"] = [SALE_URL]
+
+    def unavailable(url: str) -> str:
+        raise RuntimeError("temporary page outage")
+
+    report = hunt_bankruptcy_links(
+        persisted,
+        exa=None,
+        brave=None,
+        loader=unavailable,
+        now=NOW,
+    )
+
+    assert report["coverage"] == "DIRECT_WATCHLIST_RECHECK_FAILED"
+    assert report["paid_provider_requests"] == 0
+    assert report["rejected_hits"][0]["reason"] == "PAGE_READ_FAILED:RuntimeError"
 
 
 def test_surplus_dealer_exa_result_is_rejected_then_brave_fallback_runs():
