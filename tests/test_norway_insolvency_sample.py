@@ -173,7 +173,7 @@ def test_invalid_payload_and_bounded_budget_fail_closed():
         with pytest.raises(ValueError):
             sample(size=invalid)
     with pytest.raises(ValueError):
-        sample(max_cards=11)
+        sample(max_cards=21)
     report = sample(fetcher=lambda status, size: registry([]), now=NOW)
     assert report["paid_provider_requests"] == 0
     assert all(report[k] is False for k in ("automatic_contact", "automatic_bid", "automatic_purchase", "automatic_payment"))

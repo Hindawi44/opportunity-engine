@@ -29,9 +29,13 @@ on:
       - "scripts/run_norway_insolvency_sample.py"
       - "src/opportunity_engine/discovery/direct_official_source_adapters.py"
       - "scripts/run_norway_bankruptcy_link_hunt.py"
+      - "scripts/run_norway_bankruptcy_watchlist.py"
+      - "scripts/restore_norway_bankruptcy_watchlist.py"
       - "tests/test_norway_insolvency_sample.py"
       - "tests/test_direct_official_source_adapters_v1.py"
       - "tests/test_norway_bankruptcy_link_hunt.py"
+      - "tests/test_norway_bankruptcy_watchlist.py"
+      - "tests/test_restore_norway_bankruptcy_watchlist.py"
       - "tests/test_norway_insolvency_workflow.py"
       - "scripts/run_norway_insolvency_sale_links.py"
       - "tests/test_norway_insolvency_sale_links.py"
@@ -53,6 +57,12 @@ on:
       - "scripts/run_norway_insolvency_sample.py"
       - "src/opportunity_engine/discovery/direct_official_source_adapters.py"
       - "scripts/run_norway_bankruptcy_link_hunt.py"
+      - "scripts/run_norway_bankruptcy_watchlist.py"
+      - "scripts/restore_norway_bankruptcy_watchlist.py"
+      - "tests/test_norway_bankruptcy_link_hunt.py"
+      - "tests/test_norway_bankruptcy_watchlist.py"
+      - "tests/test_restore_norway_bankruptcy_watchlist.py"
+      - "tests/test_norway_insolvency_workflow.py"
       - "scripts/run_finn_email_intake.py"
       - "scripts/run_exa_exact_lot_checkpoint.py"
       - "scripts/run_auksjonen_live_clothing.py"
@@ -85,7 +95,7 @@ jobs:
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_review_cycle.py tests/test_norway_tools_scope.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_direct_official_source_adapters_v1.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_bankruptcy_link_hunt.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_review_cycle.py tests/test_norway_tools_scope.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_direct_official_source_adapters_v1.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_bankruptcy_link_hunt.py tests/test_norway_bankruptcy_watchlist.py tests/test_restore_norway_bankruptcy_watchlist.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
 
   norway-bankruptcy-hunter:
     needs: norway-contract
@@ -94,6 +104,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
+      actions: read
     env:
       PYTHONPATH: src:.
       BANKRUPTCY_OUTPUT: artifacts/norway-bankruptcy
@@ -115,6 +126,13 @@ jobs:
           python-version: "3.11"
       - name: Install project dependencies
         run: python -m pip install -r requirements.txt
+      - name: Restore the previous 60-day bankruptcy watchlist
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/restore_norway_bankruptcy_watchlist.py \
+            --target "$BANKRUPTCY_OUTPUT/bankruptcy-watchlist.json" \
+            --status-path "$BANKRUPTCY_OUTPUT/bankruptcy-watchlist-restore.json"
       - name: Read official Norwegian bankruptcy events only
         run: |
           python scripts/run_norway_insolvency_sample.py \
@@ -122,29 +140,47 @@ jobs:
             --lookback-days 7 \
             --update-limit 500 \
             --entity-limit 20 \
-            --max-cards 5 \
+            --max-cards 20 \
+            --output-dir "$BANKRUPTCY_OUTPUT"
+      - name: Retain official bankruptcies for 60 days and select due follow-ups
+        run: |
+          python scripts/run_norway_bankruptcy_watchlist.py prepare \
+            --events "$BANKRUPTCY_OUTPUT/insolvency-events.json" \
+            --watchlist "$BANKRUPTCY_OUTPUT/bankruptcy-watchlist.json" \
+            --retention-days 60 \
+            --recheck-days 3 \
+            --max-due-cases 5 \
             --output-dir "$BANKRUPTCY_OUTPUT"
       - name: Chase exact bankruptcy sale links with Exa and bounded Brave fallback
         run: |
           python scripts/run_norway_bankruptcy_link_hunt.py \
-            --events "$BANKRUPTCY_OUTPUT/insolvency-events.json" \
+            --events "$BANKRUPTCY_OUTPUT/bankruptcy-watchlist-due-events.json" \
             --max-events 5 \
             --results-per-query 5 \
             --max-page-reads 15 \
             --output-dir "$BANKRUPTCY_OUTPUT"
-      - name: Analyze only proven bankruptcy-linked pages with bounded OpenAI
+      - name: Update durable case state and expose only newly proven sale links
+        run: |
+          python scripts/run_norway_bankruptcy_watchlist.py finalize \
+            --watchlist "$BANKRUPTCY_OUTPUT/bankruptcy-watchlist.json" \
+            --due-events "$BANKRUPTCY_OUTPUT/bankruptcy-watchlist-due-events.json" \
+            --link-report "$BANKRUPTCY_OUTPUT/bankruptcy-link-hunt.json" \
+            --delta "$BANKRUPTCY_OUTPUT/bankruptcy-watchlist-delta.json" \
+            --recheck-days 3 \
+            --output-dir "$BANKRUPTCY_OUTPUT"
+      - name: Analyze only newly proven bankruptcy-linked pages with bounded OpenAI
         run: |
           python scripts/run_norway_openai_search_intelligence.py \
-            --bankruptcy-report "$BANKRUPTCY_OUTPUT/bankruptcy-link-hunt.json" \
+            --bankruptcy-report "$BANKRUPTCY_OUTPUT/bankruptcy-new-link-report.json" \
             --output-dir "$BANKRUPTCY_OUTPUT/openai"
-      - name: Preserve official events, link decisions and bounded AI analysis
+      - name: Preserve the watchlist, official evidence and bounded AI analysis
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: norway-bankruptcy-link-evidence
           path: artifacts/norway-bankruptcy/
           if-no-files-found: warn
-          retention-days: 30
+          retention-days: 90
 
   norway-all-assets:
     # Preserved for history only. The operator rejected generic auction,

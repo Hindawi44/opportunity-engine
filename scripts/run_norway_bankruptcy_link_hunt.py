@@ -345,10 +345,10 @@ def _page_rejection(
     return None, identity_method
 
 
-def _search_query(company_name: str) -> str:
+def _search_query(company_name: str, organisation_number: str) -> str:
     return (
-        f'"{company_name}" konkursbo '
-        "(auksjon OR selges OR varelager OR driftsmidler OR inventar)"
+        f'"{company_name}" "{organisation_number}" konkursbo '
+        "(bostyrer OR auksjon OR selges OR varelager OR driftsmidler OR inventar)"
     )
 
 
@@ -393,9 +393,11 @@ def hunt_bankruptcy_links(
     rejected: list[dict[str, Any]] = []
     provider_errors: list[dict[str, str]] = []
     request_counts: dict[str, int] = {"Exa": 0, "Brave Search": 0}
+    request_counts_by_org: dict[str, dict[str, int]] = {}
     seen_event_urls: set[tuple[str, str]] = set()
     page_reads = 0
     searched_events = 0
+    known_link_rechecks = 0
 
     def reject(*, event: Mapping[str, Any], hit: SearchHit, reason: str) -> None:
         if len(rejected) >= MAX_REJECTED_HITS:
@@ -492,13 +494,36 @@ def hunt_bankruptcy_links(
 
     for event in events:
         organisation_number, company_name = _event_identity(event)
-        del organisation_number
-        query = _search_query(company_name)
+        query = _search_query(company_name, organisation_number)
         accepted_for_event = 0
-        if exa is not None:
+        event_checked = False
+        known_urls = event.get("known_sale_urls") or []
+        if not isinstance(known_urls, list) or len(known_urls) > 2:
+            raise ValueError("known_sale_urls must be a bounded list")
+        if known_urls:
+            event_checked = True
+            known_link_rechecks += len(known_urls)
+            accepted_for_event += inspect_hits(
+                event,
+                [
+                    SearchHit(
+                        title=f"{company_name} konkursbo - tidligere verifisert salg",
+                        url=str(url),
+                        description=(
+                            "Direkte kontroll av tidligere verifisert side der "
+                            "konkursboets eiendeler selges"
+                        ),
+                        provider="Watchlist direct recheck",
+                    )
+                    for url in known_urls
+                ],
+            )
+        if accepted_for_event == 0 and exa is not None:
             provider = _provider_name(exa)
             request_counts[provider] = request_counts.get(provider, 0) + 1
-            searched_events += 1
+            per_org = request_counts_by_org.setdefault(organisation_number, {})
+            per_org[provider] = per_org.get(provider, 0) + 1
+            event_checked = True
             try:
                 accepted_for_event += inspect_hits(
                     event,
@@ -515,8 +540,9 @@ def hunt_bankruptcy_links(
         if accepted_for_event == 0 and brave is not None and page_reads < max_page_reads:
             provider = _provider_name(brave)
             request_counts[provider] = request_counts.get(provider, 0) + 1
-            if exa is None:
-                searched_events += 1
+            per_org = request_counts_by_org.setdefault(organisation_number, {})
+            per_org[provider] = per_org.get(provider, 0) + 1
+            event_checked = True
             try:
                 inspect_hits(
                     event,
@@ -530,10 +556,21 @@ def hunt_bankruptcy_links(
                         "error": f"{type(exc).__name__}: {_compact(exc)[:500]}",
                     }
                 )
+        if event_checked:
+            searched_events += 1
 
     provider_count = int(sum(request_counts.values()))
-    if not exa and not brave:
+    direct_recheck_failed = any(
+        row.get("provider") == "Watchlist direct recheck"
+        and str(row.get("reason") or "").startswith("PAGE_READ_FAILED:")
+        for row in rejected
+    )
+    if events and not exa and not brave and not known_link_rechecks:
         coverage = "SEARCH_PROVIDERS_UNAVAILABLE"
+    elif known_link_rechecks and provider_count == 0 and direct_recheck_failed:
+        coverage = "DIRECT_WATCHLIST_RECHECK_FAILED"
+    elif known_link_rechecks and provider_count == 0:
+        coverage = "DIRECT_WATCHLIST_RECHECK_ONLY"
     elif provider_count == 0 and events:
         coverage = "SEARCH_NOT_RUN"
     elif provider_errors and provider_count == len(provider_errors):
@@ -551,7 +588,9 @@ def hunt_bankruptcy_links(
         "events_searched": searched_events,
         "official_bankruptcy_events_considered": len(events),
         "provider_request_counts": request_counts,
+        "provider_request_counts_by_organisation": request_counts_by_org,
         "paid_provider_requests": provider_count,
+        "known_link_rechecks": known_link_rechecks,
         "page_reads": page_reads,
         "page_read_limit": max_page_reads,
         "verified_bankruptcy_sale_link_count": len(links),

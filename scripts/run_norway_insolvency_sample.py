@@ -46,7 +46,7 @@ def fetch_status(status: str, size: int) -> Mapping[str, Any]:
 def sample(*, size: int = 25, max_cards: int = 10,
            fetcher: Callable[[str, int], Mapping[str, Any]] = fetch_status,
            now: datetime | None = None) -> dict[str, Any]:
-    if not 1 <= size <= 50 or not 1 <= max_cards <= 10:
+    if not 1 <= size <= 50 or not 1 <= max_cards <= 20:
         raise ValueError("Bound exceeded")
     stamp = (now or datetime.now(timezone.utc)).isoformat()
     events: dict[str, dict[str, Any]] = {}
@@ -140,8 +140,8 @@ def build_recent_sample(
     now: datetime | None = None,
 ) -> dict[str, Any]:
     """Convert newest official bankruptcy updates into the strict event schema."""
-    if not 1 <= max_cards <= 10:
-        raise ValueError("max_cards must be between 1 and 10")
+    if not 1 <= max_cards <= 20:
+        raise ValueError("max_cards must be between 1 and 20")
     if not 1 <= update_limit <= 500 or not 1 <= entity_limit <= 20:
         raise ValueError("Recent-update budget exceeded")
     if (
