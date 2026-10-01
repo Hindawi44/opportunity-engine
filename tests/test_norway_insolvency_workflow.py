@@ -20,8 +20,10 @@ def test_live_route_is_official_bankruptcy_then_paid_link_chase_then_openai():
     assert "actions: read" in live
     assert "--recent-updates" in live
     assert "--lookback-days 7" in live
-    assert "--update-limit 500" in live
-    assert "--entity-limit 20" in live
+    assert "--update-batch-size 2000" in live
+    assert "--max-update-records 50000" in live
+    assert "--max-update-batches 25" in live
+    assert "--entity-limit 500" in live
     assert "--max-cards 20" in live
     assert "--max-events 5" in live
     assert "--results-per-query 5" in live

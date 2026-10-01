@@ -101,6 +101,8 @@ def collect_brreg_update_id_cursor_signals(
     entity_fetch_limit: int = DEFAULT_ENTITY_FETCH_LIMIT,
     timeout: float = DEFAULT_TIMEOUT_SECONDS,
     json_get: JsonGetter = _default_json_get,
+    require_clothing: bool = True,
+    bankruptcy_only: bool = False,
 ) -> dict[str, Any]:
     """Read a complete bounded update window through ``oppdateringsid`` cursors."""
     if observed_at.tzinfo is None or observed_at.utcoffset() is None:
@@ -250,6 +252,8 @@ def collect_brreg_update_id_cursor_signals(
             "status": "BLOCKED_DIRECT_ACCESS",
             "access_mode": "DIRECT_OFFICIAL_REST_API",
             "retrieval_mode": "UPDATE_ID_CURSOR",
+            "bankruptcy_only": bankruptcy_only,
+            "all_sectors": not require_clothing,
             "updates_url": initial_url,
             "last_request_url": last_request_url,
             "lookback_days": lookback_days,
@@ -281,7 +285,10 @@ def collect_brreg_update_id_cursor_signals(
     candidates: dict[str, dict[str, Any]] = {}
     for update in updates:
         orgnr = _compact(update.get("organisasjonsnummer"))
-        if orgnr and _update_has_relevant_status_change(update):
+        if orgnr and _update_has_relevant_status_change(
+            update,
+            bankruptcy_only=bankruptcy_only,
+        ):
             candidates[orgnr] = update
 
     entity_headers = {
@@ -307,7 +314,13 @@ def collect_brreg_update_id_cursor_signals(
             entity_errors.append(f"{orgnr}: {type(exc).__name__}: {exc}")
             continue
 
-        signal = _brreg_signal(entity, observed_at=observed_at, update=update)
+        signal = _brreg_signal(
+            entity,
+            observed_at=observed_at,
+            update=update,
+            require_clothing=require_clothing,
+            bankruptcy_only=bankruptcy_only,
+        )
         if signal is None:
             rejected += 1
             continue
@@ -333,6 +346,8 @@ def collect_brreg_update_id_cursor_signals(
         "status": status,
         "access_mode": "DIRECT_OFFICIAL_REST_API",
         "retrieval_mode": "UPDATE_ID_CURSOR",
+        "bankruptcy_only": bankruptcy_only,
+        "all_sectors": not require_clothing,
         "updates_url": initial_url,
         "last_request_url": last_request_url,
         "lookback_days": lookback_days,

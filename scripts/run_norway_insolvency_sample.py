@@ -2,8 +2,9 @@
 
 The registry is an event source, NOT a source of goods for sale. Liquidation,
 forced dissolution and generic auction listings are deliberately excluded.
-The bounded registry query is a sample, not comprehensive or necessarily the
-newest. No paid API, credentials, contacts, purchases or database writes.
+The active recent-update route follows the official update-id cursor until the
+requested time window is complete or reports partial coverage explicitly. No
+paid API, credentials, contacts, purchases or database writes.
 """
 from __future__ import annotations
 
@@ -16,8 +17,8 @@ from urllib.parse import urlencode
 
 import requests
 
-from opportunity_engine.discovery.direct_official_source_adapters import (
-    collect_brreg_direct_signals,
+from opportunity_engine.discovery.brreg_update_id_cursor import (
+    collect_brreg_update_id_cursor_signals,
 )
 
 BASE = "https://data.brreg.no/enhetsregisteret/api/enheter"
@@ -124,7 +125,7 @@ def sample(*, size: int = 25, max_cards: int = 10,
         "forced_dissolution_events_excluded": True,
         "surplus_only_links_excluded": True,
         "dealer_links_excluded": True,
-        "source_errors": errors, "events": ordered[:max_cards],
+        "source_errors": errors, "events": ordered,
         "paid_provider_requests": 0, "automatic_contact": False,
         "automatic_bid": False, "automatic_purchase": False,
         "automatic_payment": False,
@@ -135,15 +136,11 @@ def build_recent_sample(
     source: Mapping[str, Any],
     *,
     max_cards: int = 10,
-    update_limit: int = 500,
-    entity_limit: int = 20,
     now: datetime | None = None,
 ) -> dict[str, Any]:
     """Convert newest official bankruptcy updates into the strict event schema."""
     if not 1 <= max_cards <= 20:
         raise ValueError("max_cards must be between 1 and 20")
-    if not 1 <= update_limit <= 500 or not 1 <= entity_limit <= 20:
-        raise ValueError("Recent-update budget exceeded")
     if (
         source.get("source_key") != SOURCE_KEY
         or source.get("source_country") != "NO"
@@ -152,7 +149,12 @@ def build_recent_sample(
     ):
         raise ValueError("Expected all-sector Norwegian bankruptcy-only updates")
     status = str(source.get("status") or "UNKNOWN")
-    if status not in {"SUCCESS", "VALID_ZERO", "BLOCKED_DIRECT_ACCESS"}:
+    if status not in {
+        "SUCCESS",
+        "VALID_ZERO",
+        "PARTIAL_RETRIEVAL",
+        "BLOCKED_DIRECT_ACCESS",
+    }:
         raise ValueError("Unknown official-source status")
     raw_signals = source.get("signals")
     if not isinstance(raw_signals, list):
@@ -220,14 +222,19 @@ def build_recent_sample(
     ]
     retrieved = int(source.get("retrieved_record_count") or 0)
     candidates = int(source.get("candidate_entity_count") or 0)
+    retrieval_complete = source.get("retrieval_complete") is True
+    update_window_complete = source.get("update_window_complete") is True
+    candidate_evaluation_complete = (
+        source.get("candidate_evaluation_complete") is True
+    )
     if status == "BLOCKED_DIRECT_ACCESS":
         coverage = "SOURCE_UNAVAILABLE"
+    elif not retrieval_complete:
+        coverage = "PARTIAL_OFFICIAL_UPDATE_WINDOW"
     elif errors or invalid:
         coverage = "PARTIAL_SOURCE_FAILURE"
-    elif retrieved >= update_limit or candidates > entity_limit:
-        coverage = "PARTIAL_BOUNDED_RECENT_UPDATES"
     else:
-        coverage = "BOUNDED_RECENT_UPDATES_NOT_FULL_NORWAY"
+        coverage = "COMPLETE_RECENT_OFFICIAL_UPDATE_WINDOW"
     stamp = (now or datetime.now(timezone.utc)).isoformat()
     return {
         "schema_version": "norway-insolvency-event-sample-1",
@@ -235,13 +242,22 @@ def build_recent_sample(
         "captured_at": stamp,
         "coverage": coverage,
         "source_mode": "RECENT_OFFICIAL_UPDATES",
+        "source_status": status,
+        "retrieval_mode": source.get("retrieval_mode"),
         "lookback_days": source.get("lookback_days"),
         "official_updates_read": retrieved,
+        "official_updates_total_reported": source.get("initial_total_elements"),
+        "official_update_batches_read": int(
+            source.get("cursor_batches_fetched") or 0
+        ),
+        "official_update_window_complete": update_window_complete,
+        "candidate_evaluation_complete": candidate_evaluation_complete,
+        "retrieval_complete": retrieval_complete,
         "bankruptcy_update_candidates": candidates,
         "official_entity_pages_read": int(source.get("entity_fetch_count") or 0),
         "filter_queries_attempted": 1,
         "filter_queries_successful": 0 if status == "BLOCKED_DIRECT_ACCESS" else 1,
-        "sample_page_size": update_limit,
+        "sample_page_size": int(source.get("cursor_batch_size") or 0),
         "counts_by_filter": {
             "konkurs": {
                 "read": candidates,
@@ -260,7 +276,7 @@ def build_recent_sample(
         "surplus_only_links_excluded": True,
         "dealer_links_excluded": True,
         "source_errors": errors,
-        "events": ordered[:max_cards],
+        "events": ordered,
         "paid_provider_requests": 0,
         "automatic_contact": False,
         "automatic_bid": False,
@@ -270,17 +286,21 @@ def build_recent_sample(
 
 
 def render_arabic(report: Mapping[str, Any]) -> str:
-    coverage_note = (
-        "تحديثات رسمية حديثة ومحدودة وليست كل إفلاسات النرويج."
-        if report.get("source_mode") == "RECENT_OFFICIAL_UPDATES"
-        else "عيّنة محدودة وليست جميع الشركات أو بالضرورة أحدث الإفلاسات."
-    )
+    if report.get("source_mode") == "RECENT_OFFICIAL_UPDATES":
+        coverage_note = (
+            "اكتملت قراءة نافذة التحديثات الرسمية المطلوبة."
+            if report.get("retrieval_complete") is True
+            else "قراءة نافذة التحديثات الرسمية غير مكتملة؛ لا يجوز اعتبار الصفر نفيًا لوجود إفلاسات."
+        )
+    else:
+        coverage_note = "عيّنة محدودة وليست جميع الشركات أو بالضرورة أحدث الإفلاسات."
     lines = ["صيّاد الإفلاس فقط — النرويج، جميع القطاعات",
              f"التغطية: {report['coverage']} — {coverage_note}",
              f"شركات رُصدت في العينة: {report['unique_sampled_companies']} | أحداث معروضة: {report['displayed_event_count']} | روابط بيع مرتبطة مثبتة: 0",
              "مستبعد من البداية: التصفية، الحلّ الإجباري، التاجر، والفائض غير المرتبط بإفلاس.",
              "لا يُعامل أي إعلان مزاد عام كفرصة إفلاس. سجل الشركة لا يثبت بيع أصولها."]
-    for event in report["events"]:
+    displayed = int(report.get("displayed_event_count") or 0)
+    for event in report["events"][:displayed]:
         labels = "، ".join(LABELS[k] for k in event["event_kinds"])
         lines.extend(["", f"{labels}: {event['company_name']} ({event['organisation_number']})",
                       f"التاريخ: {event['event_date'] or 'غير معروف'} | المكان: {event['location'] or 'غير معروف'}",
@@ -298,24 +318,31 @@ def main() -> None:
     parser.add_argument("--max-cards", type=int, default=10)
     parser.add_argument("--recent-updates", action="store_true")
     parser.add_argument("--lookback-days", type=int, default=7)
-    parser.add_argument("--update-limit", type=int, default=500)
-    parser.add_argument("--entity-limit", type=int, default=20)
+    parser.add_argument("--update-batch-size", type=int, default=2_000)
+    parser.add_argument("--max-update-records", type=int, default=50_000)
+    parser.add_argument("--max-update-batches", type=int, default=25)
+    parser.add_argument("--entity-limit", type=int, default=500)
     args = parser.parse_args()
     source: dict[str, Any] | None = None
     if args.recent_updates:
         if (
             not 1 <= args.lookback_days <= 14
-            or not 1 <= args.update_limit <= 500
-            or not 1 <= args.entity_limit <= 20
+            or not 1 <= args.update_batch_size <= 10_000
+            or not 1 <= args.max_update_records <= 50_000
+            or not 1 <= args.max_update_batches <= 50
+            or not 1 <= args.entity_limit <= 2_000
         ):
             parser.error(
-                "Recent-update limits: 1-14 days, 1-500 updates and 1-20 entities"
+                "Recent-update limits: 1-14 days, batch 1-10000, "
+                "1-50000 updates, 1-50 batches and 1-2000 entities"
             )
         observed_at = datetime.now(timezone.utc)
-        source = collect_brreg_direct_signals(
+        source = collect_brreg_update_id_cursor_signals(
             observed_at=observed_at,
             lookback_days=args.lookback_days,
-            update_limit=args.update_limit,
+            batch_size=args.update_batch_size,
+            max_cursor_records=args.max_update_records,
+            max_cursor_batches=args.max_update_batches,
             entity_fetch_limit=args.entity_limit,
             require_clothing=False,
             bankruptcy_only=True,
@@ -323,8 +350,6 @@ def main() -> None:
         report = build_recent_sample(
             source,
             max_cards=args.max_cards,
-            update_limit=args.update_limit,
-            entity_limit=args.entity_limit,
             now=observed_at,
         )
     else:
