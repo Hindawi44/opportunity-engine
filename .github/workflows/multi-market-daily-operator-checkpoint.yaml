@@ -28,11 +28,14 @@ on:
       - "config/operator-review-events-v1.json"
       - "scripts/run_norway_insolvency_sample.py"
       - "src/opportunity_engine/discovery/direct_official_source_adapters.py"
+      - "src/opportunity_engine/discovery/brreg_complete_update_window.py"
+      - "src/opportunity_engine/discovery/brreg_update_id_cursor.py"
       - "scripts/run_norway_bankruptcy_link_hunt.py"
       - "scripts/run_norway_bankruptcy_watchlist.py"
       - "scripts/restore_norway_bankruptcy_watchlist.py"
       - "tests/test_norway_insolvency_sample.py"
       - "tests/test_direct_official_source_adapters_v1.py"
+      - "tests/test_brreg_update_id_cursor_v1.py"
       - "tests/test_norway_bankruptcy_link_hunt.py"
       - "tests/test_norway_bankruptcy_watchlist.py"
       - "tests/test_restore_norway_bankruptcy_watchlist.py"
@@ -56,6 +59,8 @@ on:
       - "scripts/run_norway_openai_search_intelligence.py"
       - "scripts/run_norway_insolvency_sample.py"
       - "src/opportunity_engine/discovery/direct_official_source_adapters.py"
+      - "src/opportunity_engine/discovery/brreg_complete_update_window.py"
+      - "src/opportunity_engine/discovery/brreg_update_id_cursor.py"
       - "scripts/run_norway_bankruptcy_link_hunt.py"
       - "scripts/run_norway_bankruptcy_watchlist.py"
       - "scripts/restore_norway_bankruptcy_watchlist.py"
@@ -95,7 +100,7 @@ jobs:
         env:
           PYTHONPATH: src:.
         run: |
-          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_review_cycle.py tests/test_norway_tools_scope.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_direct_official_source_adapters_v1.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_bankruptcy_link_hunt.py tests/test_norway_bankruptcy_watchlist.py tests/test_restore_norway_bankruptcy_watchlist.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
+          pytest -q tests/test_existing_norway_engine_workflow.py tests/test_norway_all_assets_workflow.py tests/test_norway_review_cycle.py tests/test_norway_tools_scope.py tests/test_norway_direct_sales.py tests/test_multi_market_operator_checkpoint_workflow.py tests/test_direct_official_source_adapters_v1.py tests/test_brreg_update_id_cursor_v1.py tests/test_event_first_hunter_pilot.py tests/test_norway_insolvency_sample.py tests/test_norway_bankruptcy_link_hunt.py tests/test_norway_bankruptcy_watchlist.py tests/test_restore_norway_bankruptcy_watchlist.py tests/test_norway_insolvency_workflow.py tests/test_norway_insolvency_sale_links.py tests/test_norway_insolvency_sale_status_audit.py tests/test_norway_unlabeled_vare_probe.py
 
   norway-bankruptcy-hunter:
     needs: norway-contract
@@ -138,8 +143,10 @@ jobs:
           python scripts/run_norway_insolvency_sample.py \
             --recent-updates \
             --lookback-days 7 \
-            --update-limit 500 \
-            --entity-limit 20 \
+            --update-batch-size 2000 \
+            --max-update-records 50000 \
+            --max-update-batches 25 \
+            --entity-limit 500 \
             --max-cards 20 \
             --output-dir "$BANKRUPTCY_OUTPUT"
       - name: Retain official bankruptcies for 60 days and select due follow-ups

@@ -27,30 +27,39 @@ def registry(rows):
 
 
 def recent_source(*, status="SUCCESS", signals=None, errors=None):
+    rows = signals or []
+    complete = status in {"SUCCESS", "VALID_ZERO"}
     return {
         "source_key": "BRREG_ENHETSREGISTERET_API",
         "source_country": "NO",
         "status": status,
         "bankruptcy_only": True,
         "all_sectors": True,
+        "retrieval_mode": "UPDATE_ID_CURSOR",
         "lookback_days": 7,
+        "cursor_batch_size": 2_000,
+        "cursor_batches_fetched": 1,
+        "initial_total_elements": 12,
+        "retrieval_complete": complete,
+        "update_window_complete": complete,
+        "candidate_evaluation_complete": complete,
         "retrieved_record_count": 12,
-        "candidate_entity_count": 1,
-        "entity_fetch_count": 1,
+        "candidate_entity_count": len(rows),
+        "entity_fetch_count": len(rows),
         "errors": errors or [],
-        "signals": signals or [],
+        "signals": rows,
     }
 
 
-def recent_signal():
+def recent_signal(number="123456789", name="Nord Industri AS"):
     return {
-        "signal_id": "official-notice:no:brreg:123456789:konkurs",
-        "company_name": "Nord Industri AS",
-        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/123456789",
+        "signal_id": f"official-notice:no:brreg:{number}:konkurs",
+        "company_name": name,
+        "source_url": f"https://data.brreg.no/enhetsregisteret/api/enheter/{number}",
         "event_date": "2026-09-23T00:00:00Z",
         "location": "Namsos",
         "metadata": {
-            "organisation_number": "123456789",
+            "organisation_number": number,
             "event_kind": "KONKURS",
         },
     }
@@ -85,16 +94,46 @@ def test_recent_official_updates_become_bankruptcy_only_events():
     report = build_recent_sample(
         recent_source(signals=[recent_signal()]),
         max_cards=5,
-        update_limit=500,
-        entity_limit=20,
         now=NOW,
     )
     assert report["source_mode"] == "RECENT_OFFICIAL_UPDATES"
-    assert report["coverage"] == "BOUNDED_RECENT_UPDATES_NOT_FULL_NORWAY"
+    assert report["coverage"] == "COMPLETE_RECENT_OFFICIAL_UPDATE_WINDOW"
+    assert report["official_updates_read"] == 12
+    assert report["official_updates_total_reported"] == 12
+    assert report["retrieval_complete"] is True
     assert report["events"][0]["event_kinds"] == ["konkurs"]
     assert report["events"][0]["event_date"] == "2026-09-23"
     assert "avvikling" not in report["events"][0]["followup_search"].casefold()
-    assert "تحديثات رسمية حديثة" in render_arabic(report)
+    assert "اكتملت قراءة نافذة التحديثات الرسمية" in render_arabic(report)
+
+
+def test_partial_update_window_cannot_be_reported_as_a_valid_zero():
+    report = build_recent_sample(
+        recent_source(status="PARTIAL_RETRIEVAL"),
+        now=NOW,
+    )
+
+    assert report["coverage"] == "PARTIAL_OFFICIAL_UPDATE_WINDOW"
+    assert report["retrieval_complete"] is False
+    assert "لا يجوز اعتبار الصفر" in render_arabic(report)
+
+
+def test_all_official_events_reach_watchlist_even_when_preview_is_limited():
+    signals = [
+        recent_signal("123456789", "First AS"),
+        recent_signal("223456789", "Second AS"),
+        recent_signal("323456789", "Third AS"),
+    ]
+    report = build_recent_sample(
+        recent_source(signals=signals),
+        max_cards=1,
+        now=NOW,
+    )
+
+    assert len(report["events"]) == 3
+    assert report["displayed_event_count"] == 1
+    assert report["truncated_event_count"] == 2
+    assert render_arabic(report).count("رابط بيع الأصول:") == 1
 
 
 def test_recent_converter_rejects_any_non_bankruptcy_signal():

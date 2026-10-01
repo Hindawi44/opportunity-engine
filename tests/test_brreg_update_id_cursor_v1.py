@@ -83,6 +83,16 @@ def _clothing_entity(orgnr: str) -> dict:
     }
 
 
+def _industrial_entity(orgnr: str) -> dict:
+    entity = _clothing_entity(orgnr)
+    entity["navn"] = "NORD INDUSTRI AS"
+    entity["naeringskode1"] = {
+        "kode": "25.110",
+        "beskrivelse": "Produksjon av metallkonstruksjoner",
+    }
+    return entity
+
+
 def test_cursor_continues_from_last_update_id_plus_one() -> None:
     getter = CursorJsonGetter(
         batches={
@@ -124,6 +134,49 @@ def test_cursor_continues_from_last_update_id_plus_one() -> None:
     assert second_query["oppdateringsid"] == ["12"]
     assert "dato" not in second_query
     assert second_query["updatedBefore"] == first_query["updatedBefore"]
+
+
+def test_bankruptcy_only_all_sectors_excludes_liquidation_updates() -> None:
+    getter = CursorJsonGetter(
+        batches={
+            None: _batch(
+                2,
+                [
+                    _update(13, "999999999", path="/konkurs", value=True),
+                    _update(
+                        14,
+                        "888888888",
+                        path="/underAvvikling",
+                        value=True,
+                    ),
+                ],
+            )
+        },
+        entities={"999999999": _industrial_entity("999999999")},
+    )
+
+    report = collect_brreg_update_id_cursor_signals(
+        observed_at=NOW,
+        batch_size=2,
+        max_cursor_records=10,
+        max_cursor_batches=5,
+        json_get=getter,
+        require_clothing=False,
+        bankruptcy_only=True,
+    )
+
+    assert report["status"] == "SUCCESS"
+    assert report["bankruptcy_only"] is True
+    assert report["all_sectors"] is True
+    assert report["retrieval_complete"] is True
+    assert report["candidate_entity_count"] == 1
+    assert report["accepted_signal_count"] == 1
+    assert report["signals"][0]["company_name"] == "NORD INDUSTRI AS"
+    assert report["signals"][0]["metadata"]["event_kind"] == "KONKURS"
+    entity_urls = [url for url in getter.urls if "/api/enheter/" in url]
+    assert entity_urls == [
+        "https://data.brreg.no/enhetsregisteret/api/enheter/999999999"
+    ]
 
 
 def test_cursor_valid_zero_requires_complete_final_batch() -> None:
