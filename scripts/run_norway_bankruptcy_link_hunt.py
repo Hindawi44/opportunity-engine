@@ -27,6 +27,10 @@ import requests
 from opportunity_engine.discovery.brave_search import BraveSearchProvider
 from opportunity_engine.discovery.exa_search import ExaSearchProvider
 from opportunity_engine.discovery.search_provider import SearchHit, SearchProvider
+from scripts.norway_bankruptcy_evidence import (
+    sale_url_rejection,
+    validate_follow_up_context,
+)
 
 
 SCHEMA_VERSION = "norway-bankruptcy-link-hunt-1.0"
@@ -69,15 +73,6 @@ ENDED = re.compile(
     re.IGNORECASE,
 )
 
-NON_SALE_HOSTS = frozenset(
-    {
-        "brreg.no",
-        "proff.no",
-        "purehelp.no",
-        "gulesider.no",
-        "firmalisten.no",
-    }
-)
 KNOWN_SALE_HOSTS = frozenset(
     {
         "auksjonen.no",
@@ -86,13 +81,8 @@ KNOWN_SALE_HOSTS = frozenset(
         "finn.no",
     }
 )
-GENERIC_INDEX_PATHS = frozenset(
-    {
-        "/",
-        "/butikk/",
-        "/auksjoner/torget/vareparti-og-konkursbo",
-        "/auksjoner/torget/vareparti-og-konkursbo/",
-    }
+GENERIC_BANKRUPTCY_TITLE = re.compile(
+    r"\b(?:konkurser|konkursliste|konkursoversikt)\b", re.IGNORECASE
 )
 
 
@@ -103,6 +93,8 @@ class _VisibleText(HTMLParser):
         self.title_parts: list[str] = []
         self._skip = 0
         self._in_title = False
+        self.passage_parts: list[list[str]] = [[]]
+        self._passage_stack = [self.passage_parts[0]]
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         del attrs
@@ -110,25 +102,34 @@ class _VisibleText(HTMLParser):
             self._skip += 1
         if tag == "title":
             self._in_title = True
+        if not self._skip and tag in {"article", "section", "tr"}:
+            passage: list[str] = []
+            self.passage_parts.append(passage)
+            self._passage_stack.append(passage)
 
     def handle_data(self, value: str) -> None:
         if self._skip:
             return
-        self.parts.append(value)
         if self._in_title:
             self.title_parts.append(value)
+        else:
+            self.parts.append(value)
+            self._passage_stack[-1].append(value)
 
     def handle_endtag(self, tag: str) -> None:
         if tag in {"script", "style", "noscript", "svg"} and self._skip:
             self._skip -= 1
         if tag == "title":
             self._in_title = False
+        if not self._skip and tag in {"article", "section", "tr"} and len(self._passage_stack) > 1:
+            self._passage_stack.pop()
 
 
 @dataclass(frozen=True, slots=True)
 class PageEvidence:
     title: str
     text: str
+    passages: tuple[str, ...] = ()
 
 
 PageLoader = Callable[[str], str]
@@ -163,7 +164,7 @@ def _safe_norwegian_url(raw: object) -> str | None:
         return None
     if (
         parsed.scheme.casefold() != "https"
-        or not host.endswith(".no")
+        or not (host.endswith(".no") or host == "konkurs.app")
         or parsed.username
         or parsed.password
         or port not in (None, 443)
@@ -238,6 +239,10 @@ def _page_evidence(html: str) -> PageEvidence:
     return PageEvidence(
         title=_compact(" ".join(parser.title_parts))[:500],
         text=_compact(" ".join(parser.parts))[:120_000],
+        passages=tuple(
+            _compact(" ".join(parts))[:120_000]
+            for parts in parser.passage_parts if parts
+        ),
     )
 
 
@@ -261,27 +266,53 @@ def _event_identity(event: Mapping[str, Any]) -> tuple[str, str]:
 
 
 def _identity_method(text: str, organisation_number: str, company_name: str) -> str | None:
-    digits = re.sub(r"\D", "", text)
-    if organisation_number in digits:
+    number = r"[\s.-]*".join(
+        re.escape(organisation_number[index:index + 3]) for index in (0, 3, 6)
+    )
+    if re.search(r"(?<!\d)" + number + r"(?!\d)", text):
         return "OFFICIAL_ORGANISATION_NUMBER_ON_PAGE"
     folded_text = _fold(text)
     full_name = _fold(company_name)
-    if full_name and full_name in folded_text:
+    if full_name and re.search(r"\b" + re.escape(full_name) + r"\b", folded_text):
         return "OFFICIAL_COMPANY_NAME_ON_PAGE"
     core_name = re.sub(r"\s+(?:as|asa|enk|nuf|ans|da)$", "", full_name).strip()
-    if len(core_name) >= 7 and core_name in folded_text:
+    if len(core_name) >= 7 and re.search(r"\b" + re.escape(core_name) + r"\b", folded_text):
         return "OFFICIAL_COMPANY_CORE_NAME_ON_PAGE"
     return None
 
 
 def _url_precheck(url: str) -> str | None:
+    return sale_url_rejection(url)
+
+
+def _context_page(url: str) -> bool:
     parsed = urlsplit(url)
-    host = (parsed.hostname or "").casefold()
-    if any(_host_matches(host, domain) for domain in NON_SALE_HOSTS):
-        return "COMPANY_DIRECTORY_NOT_SALE_PAGE"
-    if parsed.path.casefold() in GENERIC_INDEX_PATHS:
-        return "GENERIC_INDEX_NOT_EXACT_SALE_PAGE"
-    return None
+    return parsed.hostname == "konkurs.app" and bool(
+        re.fullmatch(r"/konkursbo/\d{9}/?", parsed.path)
+    )
+
+
+def _follow_up_context(
+    page: PageEvidence, url: str, organisation_number: str, company_name: str,
+) -> dict[str, Any] | None:
+    if _fold(page.title.split("|", 1)[0]) != _fold(company_name + " KONKURSBO"):
+        return None
+    if _identity_method(page.text, organisation_number, "") != "OFFICIAL_ORGANISATION_NUMBER_ON_PAGE":
+        return None
+    match = re.search(
+        r"\bBostyrer\s+(?:Adv\.?|Advokat)\s+(.{3,150}?)"
+        r"(?=\s+Bostyrers\s+postadresse\b)", page.text, re.IGNORECASE,
+    )
+    if match is None:
+        return None
+    return validate_follow_up_context({
+        "organisation_number": organisation_number,
+        "company_name": company_name,
+        "estate_organisation_number": urlsplit(url).path.rstrip("/").rsplit("/", 1)[-1],
+        "trustee_name": _compact(match.group(1)),
+        "source_url": url.rstrip("/"),
+        "search_hints_only": True,
+    }, organisation_number=organisation_number, company_name=company_name)
 
 
 def _known_sale_detail(url: str) -> bool:
@@ -327,6 +358,8 @@ def _page_rejection(
     company_name: str,
 ) -> tuple[str | None, str | None]:
     page_text = _compact(f"{page.title} {page.text}")
+    if GENERIC_BANKRUPTCY_TITLE.search(page.title):
+        return "GENERIC_BANKRUPTCY_INFORMATION_NOT_SALE", None
     if not BANKRUPTCY.search(page_text):
         if LIQUIDATION_OR_SURPLUS.search(page_text) or TRADER.search(page_text):
             return "LIQUIDATION_SURPLUS_OR_TRADER_NOT_BANKRUPTCY", None
@@ -340,15 +373,45 @@ def _page_rejection(
         return "SALE_PAGE_EXPLICITLY_ENDED", None
     if not ESTATE_SALE_RELATION.search(page_text):
         return "NO_EXPLICIT_BANKRUPTCY_ESTATE_SALE_RELATION", None
+    # Identity and sale language must describe the same local passage. A company
+    # in a long list plus an unrelated bankruptcy FAQ is never sale evidence.
+    related_identity = None
+    for block in page.passages or (page.text,):
+        for relation in ESTATE_SALE_RELATION.finditer(block):
+            if re.match(
+                r"\s+(?:ofte|vanligvis|normalt|typisk|som\s+regel)\b",
+                block[relation.end():], re.IGNORECASE,
+            ):
+                continue
+            passage = block[max(0, relation.start() - 300):relation.end() + 300]
+            related_identity = _identity_method(passage, organisation_number, company_name)
+            if related_identity:
+                break
+        if related_identity:
+            break
+    if related_identity is None:
+        return "BANKRUPTCY_SALE_NOT_LINKED_TO_COMPANY", None
     if not _compact(hit.title):
         return "SEARCH_RESULT_WITHOUT_TITLE", None
-    return None, identity_method
+    return None, related_identity
 
 
 def _search_query(company_name: str, organisation_number: str) -> str:
     return (
-        f'"{company_name}" "{organisation_number}" konkursbo '
+        f'("{company_name}" OR "{organisation_number}") konkursbo '
         "(bostyrer OR auksjon OR selges OR varelager OR driftsmidler OR inventar)"
+    )
+
+
+def _follow_up_query(
+    company_name: str, organisation_number: str, context: Mapping[str, Any] | None,
+) -> str:
+    if not context:
+        return _search_query(company_name, organisation_number)
+    return (
+        f'("{company_name}" OR "{organisation_number}" OR '
+        f'"{context["estate_organisation_number"]}") konkursbo '
+        f'(auksjon OR selges OR varelager OR inventar OR "{context["trustee_name"]}")'
     )
 
 
@@ -398,6 +461,14 @@ def hunt_bankruptcy_links(
     page_reads = 0
     searched_events = 0
     known_link_rechecks = 0
+    contexts: dict[str, dict[str, Any]] = {}
+    for event in events:
+        org, name = _event_identity(event)
+        context = validate_follow_up_context(
+            event.get("follow_up_context"), organisation_number=org, company_name=name,
+        )
+        if context:
+            contexts[org] = context
 
     def reject(*, event: Mapping[str, Any], hit: SearchHit, reason: str) -> None:
         if len(rejected) >= MAX_REJECTED_HITS:
@@ -428,12 +499,13 @@ def hunt_bankruptcy_links(
                 reject(event=event, hit=hit, reason="DUPLICATE_URL")
                 continue
             seen_event_urls.add(event_url)
-            precheck = _url_precheck(safe_url)
+            context_page = _context_page(safe_url)
+            precheck = None if context_page else _url_precheck(safe_url)
             if precheck:
                 reject(event=event, hit=hit, reason=precheck)
                 continue
             snippet = _compact(f"{hit.title} {hit.description}")
-            if not BANKRUPTCY.search(snippet) and not _known_sale_detail(safe_url):
+            if not context_page and not BANKRUPTCY.search(snippet) and not _known_sale_detail(safe_url):
                 if LIQUIDATION_OR_SURPLUS.search(snippet) or TRADER.search(snippet):
                     reject(
                         event=event,
@@ -455,6 +527,15 @@ def hunt_bankruptcy_links(
                     hit=hit,
                     reason=f"PAGE_READ_FAILED:{type(exc).__name__}",
                 )
+                continue
+            if context_page:
+                context = _follow_up_context(page, safe_url, organisation_number, company_name)
+                if context:
+                    contexts[organisation_number] = context
+                reject(event=event, hit=hit, reason=(
+                    "BANKRUPTCY_CONTEXT_ONLY_NOT_SALE" if context
+                    else "BANKRUPTCY_CONTEXT_IDENTITY_NOT_VERIFIED"
+                ))
                 continue
             reason, identity_method = _page_rejection(
                 page,
@@ -494,7 +575,7 @@ def hunt_bankruptcy_links(
 
     for event in events:
         organisation_number, company_name = _event_identity(event)
-        query = _search_query(company_name, organisation_number)
+        query = _follow_up_query(company_name, organisation_number, contexts.get(organisation_number))
         accepted_for_event = 0
         event_checked = False
         known_urls = event.get("known_sale_urls") or []
@@ -546,7 +627,10 @@ def hunt_bankruptcy_links(
             try:
                 inspect_hits(
                     event,
-                    list(brave.search(query, count=results_per_query)),
+                    list(brave.search(
+                        _follow_up_query(company_name, organisation_number, contexts.get(organisation_number)),
+                        count=results_per_query,
+                    )),
                 )
             except Exception as exc:
                 provider_errors.append(
@@ -598,6 +682,7 @@ def hunt_bankruptcy_links(
         "rejected_hit_count": len(rejected),
         "rejected_hits": rejected,
         "provider_errors": provider_errors,
+        "follow_up_contexts": list(contexts.values()),
         "policy": {
             "official_bankruptcy_event_required_first": True,
             "official_company_identity_required_on_sale_page": True,
@@ -611,6 +696,8 @@ def hunt_bankruptcy_links(
             "generic_auction_index_excluded": True,
             "ended_sales_excluded": True,
             "search_snippet_never_sufficient": True,
+            "company_identity_and_sale_relation_required_in_same_passage": True,
+            "registry_context_never_counted_as_sale": True,
         },
         "openai_requests": 0,
         "automatic_contact": False,
@@ -634,6 +721,14 @@ def render_arabic(report: Mapping[str, Any]) -> str:
         "مستبعد: التاجر وحده، الفائض وحده، التصفية، صفحة المزاد العامة، والبيع المنتهي.",
     ]
     links = report.get("verified_bankruptcy_sale_links") or []
+    for context in report.get("follow_up_contexts") or []:
+        lines.extend([
+            "",
+            f"بيانات متابعة: {context['company_name']} — رقم التفليسة {context['estate_organisation_number']}",
+            f"الوكيل: {context['trustee_name']}",
+            f"مصدر المتابعة: {context['source_url']}",
+            "هذه بيانات للبحث والمتابعة؛ لم تثبت عرض بضائع للبيع.",
+        ])
     if not links:
         lines.extend(
             [

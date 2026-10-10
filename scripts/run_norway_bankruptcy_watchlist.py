@@ -16,6 +16,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Mapping
 from urllib.parse import urlsplit
+from scripts.norway_bankruptcy_evidence import (
+    sale_url_rejection,
+    validate_follow_up_context,
+)
 
 WATCHLIST_SCHEMA = "norway-bankruptcy-watchlist-1.0"
 DELTA_SCHEMA = "norway-bankruptcy-watchlist-delta-1.0"
@@ -30,6 +34,7 @@ SALE_VERIFIED = "SALE_LINK_VERIFIED"
 ALLOWED_CASE_STATUSES = {WAITING, SALE_VERIFIED}
 ACTIVE_LINK = "ACTIVE"
 ENDED_LINK = "ENDED"
+INVALIDATED_LINK = "INVALIDATED"
 
 DEFAULT_RETENTION_DAYS = 60
 DEFAULT_RECHECK_DAYS = 3
@@ -126,7 +131,7 @@ def _empty_watchlist(now: datetime) -> dict[str, Any]:
 def _validate_sale_link(row: Mapping[str, Any]) -> dict[str, Any]:
     url = _safe_norwegian_sale_url(row.get("sale_url"))
     status = _compact(row.get("status"))
-    if status not in {ACTIVE_LINK, ENDED_LINK}:
+    if status not in {ACTIVE_LINK, ENDED_LINK, INVALIDATED_LINK}:
         raise ValueError("Unknown watchlist sale-link status")
     first_verified_at = _parse_instant(
         row.get("first_verified_at"), field="first_verified_at"
@@ -139,7 +144,7 @@ def _validate_sale_link(row: Mapping[str, Any]) -> dict[str, Any]:
     ended_at: str | None = None
     if status == ENDED_LINK:
         ended_at = _iso(_parse_instant(row.get("ended_at"), field="ended_at"))
-    return {
+    link = {
         "sale_url": url,
         "status": status,
         "sale_page_title": _compact(row.get("sale_page_title"))[:500],
@@ -148,6 +153,15 @@ def _validate_sale_link(row: Mapping[str, Any]) -> dict[str, Any]:
         "last_verified_at": _iso(last_verified_at),
         "ended_at": ended_at,
     }
+    if status == INVALIDATED_LINK:
+        link["invalidated_at"] = _iso(_parse_instant(
+            row.get("invalidated_at"), field="invalidated_at"
+        ))
+        reason = _compact(row.get("invalidation_reason"))
+        if not reason:
+            raise ValueError("Invalidated sale link must retain the rejection reason")
+        link["invalidation_reason"] = reason[:200]
+    return link
 
 
 def _validate_case(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -200,7 +214,7 @@ def _validate_case(row: Mapping[str, Any]) -> dict[str, Any]:
         except ValueError as exc:
             raise ValueError("event_date must be an ISO date") from exc
         event_date = event_date[:10]
-    return {
+    case = {
         "organisation_number": organisation_number,
         "company_name": company_name,
         "official_url": official_url,
@@ -219,6 +233,13 @@ def _validate_case(row: Mapping[str, Any]) -> dict[str, Any]:
         "last_check_outcome": _compact(row.get("last_check_outcome")) or None,
         "verified_sale_links": links,
     }
+    context = validate_follow_up_context(
+        row.get("follow_up_context"), organisation_number=organisation_number,
+        company_name=company_name,
+    )
+    if context:
+        case["follow_up_context"] = context
+    return case
 
 
 def validate_watchlist(payload: Mapping[str, Any]) -> dict[str, Any]:
@@ -354,7 +375,7 @@ def _case_event(case: Mapping[str, Any]) -> dict[str, Any]:
         for link in case["verified_sale_links"]
         if link["status"] == ACTIVE_LINK
     ]
-    return {
+    event = {
         "organisation_number": case["organisation_number"],
         "company_name": case["company_name"],
         "official_url": case["official_url"],
@@ -370,10 +391,26 @@ def _case_event(case: Mapping[str, Any]) -> dict[str, Any]:
         # fifteen-page budget while avoiding a paid search for a still-live URL.
         "known_sale_urls": active_urls[:2],
         "followup_search": (
-            f'"{case["company_name"]}" "{case["organisation_number"]}" '
+            f'("{case["company_name"]}" OR "{case["organisation_number"]}") '
             "konkursbo (bostyrer OR auksjon OR selges OR varelager OR driftsmidler)"
         ),
     }
+    if case.get("follow_up_context"):
+        event["follow_up_context"] = dict(case["follow_up_context"])
+    return event
+
+
+def _invalidate_link(
+    link: dict[str, Any], case: Mapping[str, Any], delta: dict[str, Any],
+    stamp: datetime, reason: str,
+) -> None:
+    link["status"] = INVALIDATED_LINK
+    link["invalidated_at"] = _iso(stamp)
+    link["invalidation_reason"] = reason
+    _append_change(
+        delta, change_type="VERIFIED_SALE_LINK_INVALIDATED", case=case,
+        now=stamp, sale_url=link["sale_url"], reason=reason,
+    )
 
 
 def prepare_watchlist(
@@ -411,6 +448,20 @@ def prepare_watchlist(
                 previous_status=case["status"],
             )
             continue
+        previous_status = case["status"]
+        for link in case["verified_sale_links"]:
+            reason = sale_url_rejection(link["sale_url"])
+            if link["status"] == ACTIVE_LINK and reason:
+                _invalidate_link(link, case, delta, stamp, reason)
+        case["status"] = SALE_VERIFIED if any(
+            link["status"] == ACTIVE_LINK for link in case["verified_sale_links"]
+        ) else WAITING
+        if previous_status != case["status"]:
+            case["next_check_at"] = _iso(stamp)
+            _append_change(
+                delta, change_type="CASE_STATUS_CHANGED", case=case, now=stamp,
+                previous_status=previous_status, current_status=case["status"],
+            )
         active_cases.append(case)
     by_org = {case["organisation_number"]: case for case in active_cases}
 
@@ -438,6 +489,8 @@ def prepare_watchlist(
                 changed_fields.append(field)
         case["last_seen_at"] = _iso(stamp)
         if changed_fields:
+            if "company_name" in changed_fields:
+                case.pop("follow_up_context", None)
             _append_change(
                 delta,
                 change_type="OFFICIAL_BANKRUPTCY_DATA_CHANGED",
@@ -512,7 +565,8 @@ def _validated_link_row(row: Mapping[str, Any]) -> tuple[str, str]:
     sale_url = _safe_norwegian_sale_url(row.get("sale_url"))
     official_url = _compact(row.get("official_bankruptcy_url"))
     if (
-        row.get("classification") != "OFFICIAL_BANKRUPTCY_LINKED_ASSET_SALE"
+        sale_url_rejection(sale_url) is not None
+        or row.get("classification") != "OFFICIAL_BANKRUPTCY_LINKED_ASSET_SALE"
         or row.get("event_kind") != "KONKURS"
         or len(organisation_number) != 9
         or not organisation_number.isascii()
@@ -618,6 +672,25 @@ def finalize_watchlist(
         if org and org not in selected_orgs:
             raise ValueError("Provider error belongs to a non-selected bankruptcy")
     previous_status = {org: by_org[org]["status"] for org in selected_orgs}
+    contexts_raw = link_report.get("follow_up_contexts") or []
+    if not isinstance(contexts_raw, list) or len(contexts_raw) > DEFAULT_MAX_DUE_CASES:
+        raise ValueError("follow_up_contexts must be a bounded list")
+    for raw_context in contexts_raw:
+        if not isinstance(raw_context, Mapping):
+            raise ValueError("Invalid bankruptcy follow-up context row")
+        org = _compact(raw_context.get("organisation_number"))
+        if org not in selected_orgs:
+            raise ValueError("Follow-up context belongs to a non-selected bankruptcy")
+        case = by_org[org]
+        context = validate_follow_up_context(
+            raw_context, organisation_number=org, company_name=case["company_name"],
+        )
+        if case.get("follow_up_context") != context:
+            case["follow_up_context"] = context
+            _append_change(
+                delta, change_type="BANKRUPTCY_FOLLOW_UP_CONTEXT_UPDATED",
+                case=case, now=stamp,
+            )
     for org in selected_orgs:
         case = by_org[org]
         case["last_checked_at"] = _iso(stamp)
@@ -637,6 +710,16 @@ def finalize_watchlist(
             ended_by_org.setdefault(org, set()).add(
                 _safe_norwegian_sale_url(raw_rejection.get("url"))
             )
+        if raw_rejection.get("provider") == "Watchlist direct recheck" and raw_rejection.get("reason") in {
+            "COMPANY_DIRECTORY_NOT_SALE_PAGE", "GENERIC_INDEX_NOT_EXACT_SALE_PAGE",
+            "GENERIC_BANKRUPTCY_INFORMATION_NOT_SALE", "BANKRUPTCY_SALE_NOT_LINKED_TO_COMPANY",
+            "NO_EXPLICIT_BANKRUPTCY_ESTATE_SALE_RELATION",
+            "OFFICIAL_BANKRUPT_COMPANY_NOT_IDENTIFIED_ON_PAGE",
+            "NO_EXPLICIT_BANKRUPTCY_LANGUAGE_ON_PAGE", "NO_ASSET_SALE_LANGUAGE_ON_PAGE",
+        }:
+            for link in by_org[org]["verified_sale_links"]:
+                if link["status"] == ACTIVE_LINK and link["sale_url"] == raw_rejection.get("url"):
+                    _invalidate_link(link, by_org[org], delta, stamp, raw_rejection["reason"])
     for org, ended_urls in ended_by_org.items():
         case = by_org[org]
         for link in case["verified_sale_links"]:
@@ -696,6 +779,8 @@ def finalize_watchlist(
             existing["status"] = ACTIVE_LINK
             existing["last_verified_at"] = _iso(stamp)
             existing["ended_at"] = None
+            existing.pop("invalidated_at", None)
+            existing.pop("invalidation_reason", None)
             existing["sale_page_title"] = _compact(raw_link.get("sale_page_title"))[
                 :500
             ]
@@ -773,6 +858,8 @@ def render_arabic(
         "OFFICIAL_BANKRUPTCY_DATA_CHANGED": "تغيّرت بيانات الإفلاس الرسمية",
         "NEW_VERIFIED_BANKRUPTCY_SALE_LINK": "ظهر رابط بيع جديد ومثبت",
         "VERIFIED_SALE_LINK_ENDED": "انتهى رابط بيع كان مثبتًا",
+        "VERIFIED_SALE_LINK_INVALIDATED": "سُحب إثبات رابط لأنه لا يثبت إعلان بيع",
+        "BANKRUPTCY_FOLLOW_UP_CONTEXT_UPDATED": "حُفظ رقم التفليسة ووكيلها للبحث التالي",
         "CASE_STATUS_CHANGED": "تغيّرت حالة المتابعة",
         "CASE_EXPIRED_AFTER_60_DAYS": "انتهت متابعة الحالة بعد 60 يومًا",
     }
