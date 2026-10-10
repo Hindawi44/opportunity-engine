@@ -1,0 +1,113 @@
+# Temporary administrative cancellation only; normal project workflows remain paused.
+# Fixed target: opportunity-engine run 32217946716. No project/provider credentials.
+name: Cancel one stale Opportunity Engine run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/admin-cancel-stale-run-32217946716.yaml"
+
+permissions:
+  actions: write
+
+concurrency:
+  group: admin-cancel-stale-run-32217946716
+  cancel-in-progress: false
+
+jobs:
+  cancel-one-stale-run:
+    if: ${{ github.repository == 'Hindawi44/opportunity-engine' && github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.head_commit.message == 'Admin only: cancel stale opportunity-engine run 32217946716' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Cancel the fixed stale run and verify terminal status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.request
+          
+          REPOSITORY = "Hindawi44/opportunity-engine"
+          RUN_ID = 32217946716
+          EXPECTED_HEAD = "1a46bdc81c00c7c5df12ca5aad413fa8ee2f2908"
+          URL = f"https://api.github.com/repos/{REPOSITORY}/actions/runs/{RUN_ID}"
+          HEADERS = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+              "X-GitHub-Api-Version": "2026-03-10",
+              "User-Agent": "opportunity-engine-single-stale-run-cancel",
+          }
+          if os.environ.get("GITHUB_REPOSITORY") != REPOSITORY:
+              raise SystemExit("Refusing a different repository")
+          
+          def call(suffix="", method="GET"):
+              if suffix not in ("", "/cancel", "/force-cancel"):
+                  raise SystemExit("Refusing an unsupported endpoint")
+              req = urllib.request.Request(
+                  URL + suffix,
+                  data=b"" if method == "POST" else None,
+                  headers=HEADERS,
+                  method=method,
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=20) as response:
+                      raw = response.read()
+                      return response.status, json.loads(raw) if raw else {}
+              except urllib.error.HTTPError as error:
+                  raw = error.read()
+                  try:
+                      message = json.loads(raw).get("message", "")
+                  except (ValueError, TypeError):
+                      message = "GitHub rejected the request"
+                  return error.code, {"message": message}
+          
+          def read_state():
+              code, state = call()
+              if code != 200:
+                  raise SystemExit(f"Cannot read target run: HTTP {code}")
+              if (state.get("id") != RUN_ID
+                      or (state.get("repository") or {}).get("full_name") != REPOSITORY
+                      or state.get("head_sha") != EXPECTED_HEAD):
+                  raise SystemExit("Target identity changed; refusing cancellation")
+              print(json.dumps({
+                  "run_id": state["id"],
+                  "status": state.get("status"),
+                  "conclusion": state.get("conclusion"),
+              }))
+              return state
+          
+          def wait_for_completion():
+              for attempt in range(6):
+                  state = read_state()
+                  if state.get("status") == "completed":
+                      return True
+                  if attempt < 5:
+                      time.sleep(3)
+              return False
+          
+          state = read_state()
+          if state.get("status") == "completed":
+              print("Target is already completed; no cancellation request was needed.")
+          elif state.get("status") != "queued":
+              raise SystemExit("Target is no longer the stale queued run; refusing other work.")
+          else:
+              code, result = call("/cancel", "POST")
+              print(f"Cancellation HTTP status: {code}")
+              if code not in (202, 409):
+                  raise SystemExit(f"Cancellation rejected: HTTP {code}: {result.get('message', '')}")
+              if wait_for_completion():
+                  print("Target completion verified after cancellation.")
+              else:
+                  code, result = call("/force-cancel", "POST")
+                  print(f"Force cancellation HTTP status: {code}")
+                  if code != 202:
+                      raise SystemExit(f"Force cancellation rejected: HTTP {code}: {result.get('message', '')}")
+                  if not wait_for_completion():
+                      raise SystemExit("Cancellation requested but terminal completion is not yet verified.")
+                  print("Target completion verified after force cancellation.")
+          PY
