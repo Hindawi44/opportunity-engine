@@ -1,8 +1,8 @@
-name: Norway Hunter Manual Verification
+# Paused by the repository owner on 2026-10-10.
+# Original configuration: docs/operations/paused-workflows-2026-10-10/research-shadow-manual.yaml.txt
+# Resuming requires a new explicit instruction from the owner.
+name: "Norway Hunter Manual Verification (PAUSED)"
 
-# Former Italy, France, Netherlands and foreign-keyword research is archived as
-# docs/archive/foreign-manual-research-20260919.yaml.txt. Historical results and
-# code remain unchanged. No paid provider credentials or foreign market calls.
 on:
   workflow_dispatch:
 
@@ -10,20 +10,9 @@ permissions:
   contents: read
 
 jobs:
-  norway-offline-tests:
+  paused:
+    if: ${{ false }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      PYTHONPATH: src:.
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install existing dependencies
-        run: python -m pip install -r requirements.txt
-      - name: Verify Norway-only event and auction-link contracts without network requests
-        run: |
-          pytest -q tests/test_event_first_hunter_pilot.py tests/test_event_auction_evidence_link_v1.py
+      - name: Project remains paused
+        run: echo "Project paused; no provider calls or project jobs are permitted."

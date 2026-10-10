@@ -1,0 +1,378 @@
+name: One Opportunity Commercial Analysis
+
+on:
+  workflow_run:
+    workflows:
+      - Multi-Market Daily Operator Checkpoint
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      opportunity_identity:
+        description: Exact active analysis-eligible opportunity identity from the latest checkpoint
+        required: true
+        type: string
+      quantity_condition_status:
+        description: Confirm the quantity and condition from the exact item page
+        required: true
+        type: choice
+        default: NOT_CONFIRMED
+        options:
+          - NOT_CONFIRMED
+          - CONFIRMED
+      final_payable_price_nok:
+        description: Final cash payable price including auction fees and VAT (NOK)
+        required: true
+        type: string
+      recoverable_input_vat_nok:
+        description: Explicit input VAT amount confirmed recoverable for this purchase (NOK; zero allowed)
+        required: true
+        type: string
+      transport_nok:
+        description: Pickup or delivery cost (NOK; zero is allowed)
+        required: true
+        type: string
+      conservative_resale_nok:
+        description: Conservative gross total resale value for the full lot (NOK)
+        required: true
+        type: string
+      resale_output_vat_nok:
+        description: Explicit output VAT included in conservative gross resale (NOK; zero allowed)
+        required: true
+        type: string
+      resale_comparable_count:
+        description: Number of documented resale comparables
+        required: true
+        type: string
+      commercial_review_note:
+        description: Optional note about condition, sizes, price evidence, tax basis, or risk
+        required: false
+        type: string
+        default: ""
+  pull_request:
+    paths:
+      - ".github/workflows/one-opportunity-commercial-analysis.yaml"
+      - "scripts/download_latest_checkpoint_analysis.py"
+      - "scripts/apply_one_opportunity_commercial_inputs.py"
+      - "scripts/run_targeted_market_enrichment.py"
+      - "src/opportunity_engine/discovery/latest_checkpoint_analysis.py"
+      - "src/opportunity_engine/discovery/one_opportunity_commercial_analysis.py"
+      - "src/opportunity_engine/discovery/one_opportunity_commercial_vat_basis_v1.py"
+      - "src/opportunity_engine/discovery/commercial_candidate_selection_v1.py"
+      - "tests/test_latest_checkpoint_analysis_v1.py"
+      - "tests/test_one_opportunity_commercial_analysis_v1.py"
+      - "tests/test_one_opportunity_commercial_vat_basis_v1.py"
+      - "tests/test_commercial_candidate_selection_v1.py"
+      - "tests/test_one_opportunity_commercial_analysis_workflow.py"
+      - "tests/test_targeted_market_enrichment_v1.py"
+      - "tests/test_targeted_market_enrichment_workflow_v1.py"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: one-opportunity-commercial-analysis-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-tests:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install focused test dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Test commercial and targeted-enrichment contracts
+        env:
+          PYTHONPATH: src:.
+        run: |
+          pytest tests/test_latest_checkpoint_analysis_v1.py -q
+          pytest tests/test_one_opportunity_commercial_analysis_v1.py -q
+          pytest tests/test_one_opportunity_commercial_vat_basis_v1.py -q
+          pytest tests/test_commercial_candidate_selection_v1.py -q
+          pytest tests/test_one_opportunity_commercial_analysis_workflow.py -q
+          pytest tests/test_one_opportunity_daily_analysis_v1.py -q
+          pytest tests/test_targeted_market_enrichment_v1.py -q
+          pytest tests/test_targeted_market_enrichment_workflow_v1.py -q
+
+  targeted-read-only-enrichment:
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: src:.
+      OUTPUT_DIR: artifacts/targeted-market-enrichment
+      SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install existing project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Download upstream core artifact without rescanning markets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! printf '%s' "$SOURCE_RUN_ID" | grep -Eq '^[0-9]+$'; then
+            echo "source workflow run ID must be numeric" >&2
+            exit 2
+          fi
+          mkdir -p artifacts/upstream
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name multi-market-daily-operator-checkpoint \
+            --dir artifacts/upstream
+
+      - name: Locate upstream domain brief
+        run: |
+          UPSTREAM_BRIEF="$(find artifacts/upstream -type f -name domain-market-intelligence-brief.json -print -quit)"
+          if [ -z "$UPSTREAM_BRIEF" ]; then
+            echo "domain-market-intelligence-brief.json not found in upstream artifact" >&2
+            exit 2
+          fi
+          echo "UPSTREAM_BRIEF=$UPSTREAM_BRIEF" >> "$GITHUB_ENV"
+          UPSTREAM_CHECKPOINT="$(find artifacts/upstream -type f -name multi-market-daily-checkpoint.json -print -quit)"
+          if [ -z "$UPSTREAM_CHECKPOINT" ]; then
+            echo "multi-market-daily-checkpoint.json not found in upstream artifact" >&2
+            exit 2
+          fi
+          echo "UPSTREAM_CHECKPOINT=$UPSTREAM_CHECKPOINT" >> "$GITHUB_ENV"
+
+      - name: Run zero-cost eligibility gate
+        id: gate
+        run: |
+          python scripts/run_targeted_market_enrichment.py \
+            --brief "$UPSTREAM_BRIEF" \
+            --checkpoint "$UPSTREAM_CHECKPOINT" \
+            --output-dir "$OUTPUT_DIR" \
+            --gate-only
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          gate = json.loads(
+              Path("artifacts/targeted-market-enrichment/targeted-enrichment-gate.json")
+              .read_text(encoding="utf-8")
+          )
+          should_run = gate.get("should_run_targeted_enrichment") is True
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"should_run={'true' if should_run else 'false'}\n")
+          print("paid_enrichment_required:", should_run)
+          print("eligible_signal_count:", gate.get("eligible_signal_count", 0))
+          PY
+
+      - name: Run paid targeted enrichment only for eligible hunt signals
+        if: ${{ steps.gate.outputs.should_run == 'true' }}
+        env:
+          OPPORTUNITY_ENGINE_TARGETED_ENRICHMENT: "1"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+          OPENAI_HUNT_TRIAGE_MODEL: gpt-5.6-luna
+          OPENAI_HUNT_DEEP_MODEL: gpt-5.6-terra
+          OPENAI_HUNT_MAX_SIGNALS: "10"
+          OPENAI_HUNT_MAX_DEEP_CASES: "1"
+          OPENAI_HUNT_MAX_API_REQUESTS: "2"
+          OPENAI_HUNT_MAX_ESTIMATED_COST_USD: "0.08"
+          HUNT_FOLLOWUP_MAX_CASES: "1"
+          HUNT_FOLLOWUP_MAX_QUERIES_PER_CASE: "3"
+          HUNT_FOLLOWUP_RESULTS_PER_QUERY: "5"
+          HUNT_FOLLOWUP_MAX_REQUESTS: "3"
+        run: |
+          python scripts/run_targeted_market_enrichment.py \
+            --brief "$UPSTREAM_BRIEF" \
+            --checkpoint "$UPSTREAM_CHECKPOINT" \
+            --output-dir "$OUTPUT_DIR"
+
+      - name: Validate gate, safety and cost isolation
+        env:
+          SHOULD_RUN: ${{ steps.gate.outputs.should_run }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("artifacts/targeted-market-enrichment")
+          gate = json.loads((root / "targeted-enrichment-gate.json").read_text(encoding="utf-8"))
+          if gate.get("gate_uses_paid_api") is not False:
+              raise SystemExit("Eligibility gate may not use a paid API")
+          for key in ("automatic_contact", "automatic_bid", "automatic_purchase", "automatic_payment"):
+              if gate.get(key) is not False:
+                  raise SystemExit(f"Targeted gate changed read-only safety: {key}")
+
+          should_run = os.environ.get("SHOULD_RUN") == "true"
+          if should_run:
+              summary = json.loads(
+                  (root / "targeted-market-enrichment-summary.json").read_text(encoding="utf-8")
+              )
+              if summary.get("status") != "TARGETED_ENRICHMENT_COMPLETE":
+                  raise SystemExit("Eligible targeted enrichment did not complete")
+              if summary.get("openai_hunt_status") == "SKIPPED_NO_API_KEY":
+                  raise SystemExit("Eligible enrichment is missing OPENAI_API_KEY")
+              if summary.get("targeted_followup_status") == "SKIPPED_NO_BRAVE_KEY":
+                  raise SystemExit("Eligible enrichment is missing BRAVE_SEARCH_API_KEY")
+              if int(summary.get("openai_api_request_count") or 0) > 2:
+                raise SystemExit("OpenAI targeted request limit changed")
+              if float(summary.get("openai_estimated_cost_usd") or 0.0) > 0.08:
+                raise SystemExit("OpenAI targeted cost guard changed")
+              if int(summary.get("targeted_brave_request_count") or 0) > 3:
+                raise SystemExit("Brave targeted request limit changed")
+          else:
+              if gate.get("status") != "SKIPPED_NO_ELIGIBLE_HUNT_SIGNALS":
+                  raise SystemExit("Zero-cost gate skip state is inconsistent")
+              if (root / "openai-hunt-case-enrichment.json").exists():
+                  raise SystemExit("OpenAI artifact exists despite zero-cost skip")
+              if (root / "hunt-case-targeted-followup.json").exists():
+                  raise SystemExit("Brave follow-up artifact exists despite zero-cost skip")
+          PY
+
+      - name: Upload targeted enrichment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: targeted-market-enrichment
+          path: artifacts/targeted-market-enrichment/
+          if-no-files-found: error
+
+  manual-read-only-commercial-analysis:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: src:.
+      INPUT_DIR: artifacts/one-opportunity-commercial-analysis/input
+      OUTPUT_DIR: artifacts/one-opportunity-commercial-analysis/output
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install existing project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Download latest successful daily checkpoint analysis
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python scripts/download_latest_checkpoint_analysis.py \
+            --output-dir "$INPUT_DIR" \
+            --status-path "$INPUT_DIR/source-checkpoint.json"
+
+      - name: Apply explicit commercial inputs and run conservative decision engine
+        env:
+          COMMERCIAL_OPPORTUNITY_ID: ${{ github.event.inputs.opportunity_identity }}
+          QUANTITY_CONDITION_STATUS: ${{ github.event.inputs.quantity_condition_status }}
+          FINAL_PAYABLE_PRICE_NOK: ${{ github.event.inputs.final_payable_price_nok }}
+          RECOVERABLE_INPUT_VAT_NOK: ${{ github.event.inputs.recoverable_input_vat_nok }}
+          TRANSPORT_NOK: ${{ github.event.inputs.transport_nok }}
+          CONSERVATIVE_RESALE_NOK: ${{ github.event.inputs.conservative_resale_nok }}
+          RESALE_OUTPUT_VAT_NOK: ${{ github.event.inputs.resale_output_vat_nok }}
+          RESALE_COMPARABLE_COUNT: ${{ github.event.inputs.resale_comparable_count }}
+          COMMERCIAL_REVIEW_NOTE: ${{ github.event.inputs.commercial_review_note }}
+        run: |
+          python scripts/apply_one_opportunity_commercial_inputs.py \
+            --analysis "$INPUT_DIR/one-opportunity-daily-analysis.json" \
+            --checkpoint "$INPUT_DIR/multi-market-daily-checkpoint.json" \
+            --output-dir "$OUTPUT_DIR" \
+            --opportunity-id "$COMMERCIAL_OPPORTUNITY_ID" \
+            --quantity-condition-status "$QUANTITY_CONDITION_STATUS" \
+            --final-payable-price-nok "$FINAL_PAYABLE_PRICE_NOK" \
+            --recoverable-input-vat-nok "$RECOVERABLE_INPUT_VAT_NOK" \
+            --transport-nok "$TRANSPORT_NOK" \
+            --conservative-resale-nok "$CONSERVATIVE_RESALE_NOK" \
+            --resale-output-vat-nok "$RESALE_OUTPUT_VAT_NOK" \
+            --resale-comparable-count "$RESALE_COMPARABLE_COUNT" \
+            --review-note "$COMMERCIAL_REVIEW_NOTE"
+
+      - name: Validate identity, candidate eligibility, VAT basis, safety and financial output
+        env:
+          EXPECTED_OPPORTUNITY_ID: ${{ github.event.inputs.opportunity_identity }}
+          QUANTITY_CONDITION_STATUS: ${{ github.event.inputs.quantity_condition_status }}
+          EXPECTED_RECOVERABLE_INPUT_VAT_NOK: ${{ github.event.inputs.recoverable_input_vat_nok }}
+          EXPECTED_RESALE_OUTPUT_VAT_NOK: ${{ github.event.inputs.resale_output_vat_nok }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("artifacts/one-opportunity-commercial-analysis/output")
+          report = json.loads(
+              (root / "one-opportunity-commercial-analysis.json").read_text(encoding="utf-8")
+          )
+          summary = (root / "one-opportunity-commercial-analysis.txt").read_text(encoding="utf-8")
+          expected = os.environ["EXPECTED_OPPORTUNITY_ID"].strip()
+          selected = (report.get("selected_opportunity") or {}).get("opportunity_identity")
+          if selected != expected:
+              raise SystemExit("Commercial analysis targeted a different opportunity")
+
+          candidate_selection = report.get("commercial_candidate_selection") or {}
+          if candidate_selection.get("checkpoint_eligibility_verified") is not True:
+              raise SystemExit("Commercial opportunity was not verified against the checkpoint eligible set")
+          if candidate_selection.get("selection_mode") == "MANUAL_ELIGIBLE_CANDIDATE_OVERRIDE":
+              if int(candidate_selection.get("search_requests_made") or 0) != 0:
+                  raise SystemExit("Commercial candidate override may not make search requests")
+              if int(candidate_selection.get("page_fetches_made") or 0) != 0:
+                  raise SystemExit("Commercial candidate override may not fetch pages")
+
+          vat_basis = report.get("vat_basis") or {}
+          if vat_basis.get("explicit") is not True:
+              raise SystemExit("Commercial financial decision is missing explicit VAT basis")
+          if vat_basis.get("inferred_vat_rate") is not None:
+              raise SystemExit("Commercial workflow may not infer a VAT rate")
+          if vat_basis.get("decision_basis") != "ECONOMIC_NET_OF_EXPLICIT_VAT":
+              raise SystemExit("Commercial decision did not use the explicit economic VAT basis")
+          if float(vat_basis.get("recoverable_input_vat_nok")) != float(os.environ["EXPECTED_RECOVERABLE_INPUT_VAT_NOK"]):
+              raise SystemExit("Recoverable input VAT does not match the explicit workflow input")
+          if float(vat_basis.get("resale_output_vat_nok")) != float(os.environ["EXPECTED_RESALE_OUTPUT_VAT_NOK"]):
+              raise SystemExit("Resale output VAT does not match the explicit workflow input")
+
+          for key in (
+              "automatic_contact",
+              "automatic_bid",
+              "automatic_purchase",
+              "automatic_payment",
+          ):
+              if report.get(key) is not False:
+                  raise SystemExit(f"Automatic action safety changed: {key}")
+          if summary.count("الإجراء البشري الوحيد:") != 1:
+              raise SystemExit("Commercial phone summary must contain exactly one human action")
+          if os.environ["QUANTITY_CONDITION_STATUS"] == "CONFIRMED":
+              if report.get("analysis_state") != "FINANCIAL_DECISION_COMPLETE":
+                  raise SystemExit("Complete explicit inputs did not produce a financial decision")
+              readiness = report.get("financial_readiness") or {}
+              if readiness.get("ready_for_financial_engine") is not True:
+                  raise SystemExit("Financial readiness did not become true")
+              if readiness.get("maximum_final_cash_payable_price_nok") is not None:
+                  raise SystemExit("Workflow must not infer a maximum cash payable price")
+          print(summary)
+          PY
+
+      - name: Upload one-opportunity commercial decision
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: one-opportunity-commercial-analysis
+          path: artifacts/one-opportunity-commercial-analysis/
+          if-no-files-found: error
