@@ -273,3 +273,128 @@ def test_due_budget_defers_without_dropping_cases() -> None:
     assert due["watchlist_due_case_count"] == 6
     assert due["watchlist_selected_case_count"] == 5
     assert due["watchlist_deferred_due_case_count"] == 1
+
+def context_row():
+    return {
+        "organisation_number": ORG, "company_name": COMPANY,
+        "estate_organisation_number": "938645558",
+        "trustee_name": "Tore M Famestad",
+        "source_url": "https://konkurs.app/konkursbo/938645558",
+        "search_hints_only": True,
+    }
+
+
+def test_follow_up_context_is_saved_and_carried_to_next_due_search():
+    watchlist, due, delta = prepare_watchlist(events(), now=NOW)
+    evidence = link_report(links=[])
+    evidence["follow_up_contexts"] = [context_row()]
+    saved, changes, forwarded = finalize_watchlist(watchlist, due, evidence, delta, now=NOW)
+    assert saved["cases"][0]["follow_up_context"] == context_row()
+    assert saved["cases"][0]["status"] == WAITING
+    assert forwarded["verified_bankruptcy_sale_links"] == []
+    assert "BANKRUPTCY_FOLLOW_UP_CONTEXT_UPDATED" in {
+        row["change_type"] for row in changes["changes"]
+    }
+    _, next_due, _ = prepare_watchlist(
+        events(include=False), saved, now=NOW + timedelta(days=3)
+    )
+    assert next_due["events"][0]["follow_up_context"] == context_row()
+    assert saved["cases"][0]["paid_search_requests"] == 2
+
+
+def test_context_of_other_company_cannot_enter_watchlist():
+    watchlist, due, delta = prepare_watchlist(events(), now=NOW)
+    evidence = link_report(links=[])
+    wrong = context_row()
+    wrong["organisation_number"] = "987654321"
+    evidence["follow_up_contexts"] = [wrong]
+    with pytest.raises(ValueError, match="non-selected"):
+        finalize_watchlist(watchlist, due, evidence, delta, now=NOW)
+
+
+def test_company_rename_clears_old_follow_up_context():
+    watchlist, due, delta = prepare_watchlist(events(), now=NOW)
+    evidence = link_report(links=[])
+    evidence["follow_up_contexts"] = [context_row()]
+    saved, _, _ = finalize_watchlist(watchlist, due, evidence, delta, now=NOW)
+    renamed = events()
+    renamed["events"][0]["company_name"] = "Nytt navn AS"
+    prepared, next_due, _ = prepare_watchlist(
+        renamed, saved, now=NOW + timedelta(days=3)
+    )
+    assert "follow_up_context" not in prepared["cases"][0]
+    assert "follow_up_context" not in next_due["events"][0]
+
+
+def test_legacy_mynk_false_positive_is_invalidated_on_restore_without_losing_history():
+    watchlist, due, delta = prepare_watchlist(events(), now=NOW)
+    legacy, _, _ = finalize_watchlist(
+        watchlist, due, link_report(links=[link_row()]), delta, now=NOW
+    )
+    old_link = legacy["cases"][0]["verified_sale_links"][0]
+    old_link["sale_url"] = "https://mynk.no/signaler/konkurser/byggefirmaer"
+    old_link["sale_page_title"] = "Konkurser byggefirmaer: 64 siste 30 dager"
+    prepared, next_due, changes = prepare_watchlist(
+        events(include=False), legacy, now=NOW + timedelta(days=1)
+    )
+    case = prepared["cases"][0]
+    assert case["status"] == WAITING
+    assert prepared["verified_sale_case_count"] == 0
+    assert len(case["verified_sale_links"]) == 1
+    assert case["verified_sale_links"][0]["status"] == "INVALIDATED"
+    assert case["verified_sale_links"][0]["ended_at"] is None
+    assert case["verified_sale_links"][0]["invalidation_reason"] == "COMPANY_DIRECTORY_NOT_SALE_PAGE"
+    assert next_due["events"][0]["known_sale_urls"] == []
+    assert "VERIFIED_SALE_LINK_INVALIDATED" in {x["change_type"] for x in changes["changes"]}
+
+
+def test_old_directory_link_cannot_be_inserted_as_new_verified_sale():
+    watchlist, due, delta = prepare_watchlist(events(), now=NOW)
+    fake = link_row()
+    fake["sale_url"] = "https://mynk.no/signaler/konkurser/byggefirmaer"
+    with pytest.raises(ValueError, match="Unverified or non-bankruptcy"):
+        finalize_watchlist(watchlist, due, link_report(links=[fake]), delta, now=NOW)
+
+
+def test_direct_recheck_that_disproves_sale_reopens_case_without_marking_sold():
+    watchlist, due, delta = prepare_watchlist(events(), now=NOW)
+    active, _, _ = finalize_watchlist(
+        watchlist, due, link_report(links=[link_row()]), delta, now=NOW
+    )
+    prepared, next_due, clean_delta = prepare_watchlist(
+        events(include=False), active, now=NOW + timedelta(days=3)
+    )
+    rejected = {
+        "organisation_number": ORG, "company_name": COMPANY, "url": SALE,
+        "provider": "Watchlist direct recheck",
+        "reason": "BANKRUPTCY_SALE_NOT_LINKED_TO_COMPANY",
+    }
+    saved, changes, _ = finalize_watchlist(
+        prepared, next_due, link_report(rejected=[rejected]), clean_delta,
+        now=NOW + timedelta(days=3),
+    )
+    link = saved["cases"][0]["verified_sale_links"][0]
+    assert saved["cases"][0]["status"] == WAITING
+    assert link["status"] == "INVALIDATED" and link["ended_at"] is None
+    assert "VERIFIED_SALE_LINK_ENDED" not in {x["change_type"] for x in changes["changes"]}
+
+
+def test_temporary_page_outage_preserves_existing_verification_history():
+    watchlist, due, delta = prepare_watchlist(events(), now=NOW)
+    active, _, _ = finalize_watchlist(
+        watchlist, due, link_report(links=[link_row()]), delta, now=NOW
+    )
+    prepared, next_due, clean_delta = prepare_watchlist(
+        events(include=False), active, now=NOW + timedelta(days=3)
+    )
+    rejected = {
+        "organisation_number": ORG, "company_name": COMPANY, "url": SALE,
+        "provider": "Watchlist direct recheck", "reason": "PAGE_READ_FAILED:RuntimeError",
+    }
+    saved, _, _ = finalize_watchlist(
+        prepared, next_due, link_report(rejected=[rejected], paid=0, coverage="DIRECT_WATCHLIST_RECHECK_FAILED"),
+        clean_delta, now=NOW + timedelta(days=3),
+    )
+    assert saved["cases"][0]["status"] == SALE_VERIFIED
+    assert saved["cases"][0]["verified_sale_links"][0]["status"] == "ACTIVE"
+    assert saved["cases"][0]["next_check_at"] == (NOW + timedelta(days=4)).isoformat()
