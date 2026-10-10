@@ -1,0 +1,40 @@
+{
+  "automatic_bid": false,
+  "automatic_contact": false,
+  "automatic_payment": false,
+  "automatic_purchase": false,
+  "change_count": 4,
+  "changes": [
+    {
+      "change_type": "VERIFIED_SALE_LINK_INVALIDATED",
+      "company_name": "FARGE OG FIKS SERVICE AS",
+      "occurred_at": "2026-10-10T12:37:06.045155+00:00",
+      "organisation_number": "933765032",
+      "reason": "COMPANY_DIRECTORY_NOT_SALE_PAGE",
+      "sale_url": "https://mynk.no/signaler/konkurser/byggefirmaer"
+    },
+    {
+      "change_type": "CASE_STATUS_CHANGED",
+      "company_name": "FARGE OG FIKS SERVICE AS",
+      "current_status": "WAITING_FOR_SALE",
+      "occurred_at": "2026-10-10T12:37:06.045155+00:00",
+      "organisation_number": "933765032",
+      "previous_status": "SALE_LINK_VERIFIED"
+    },
+    {
+      "change_type": "BANKRUPTCY_FOLLOW_UP_CONTEXT_UPDATED",
+      "company_name": "ENKEL BIL AS",
+      "occurred_at": "2026-10-10T12:37:36.763209+00:00",
+      "organisation_number": "937142536"
+    },
+    {
+      "change_type": "BANKRUPTCY_FOLLOW_UP_CONTEXT_UPDATED",
+      "company_name": "NORDIC NEEDLE AS",
+      "occurred_at": "2026-10-10T12:37:36.763209+00:00",
+      "organisation_number": "937465483"
+    }
+  ],
+  "generated_at": "2026-10-10T12:37:36.763209+00:00",
+  "schema_version": "norway-bankruptcy-watchlist-delta-1.0",
+  "scope": "NO_ONLY_OFFICIAL_BANKRUPTCY_60_DAY_FOLLOW_UP"
+}

@@ -1,0 +1,334 @@
+{
+  "automatic_bid": false,
+  "automatic_contact": false,
+  "automatic_payment": false,
+  "automatic_purchase": false,
+  "captured_at": "2026-10-10T12:37:06.765105+00:00",
+  "coverage": "BOUNDED_BANKRUPTCY_LINK_HUNT",
+  "event_input_count": 5,
+  "events_searched": 5,
+  "follow_up_contexts": [
+    {
+      "company_name": "ENKEL BIL AS",
+      "estate_organisation_number": "938591458",
+      "organisation_number": "937142536",
+      "search_hints_only": true,
+      "source_url": "https://konkurs.app/konkursbo/938591458",
+      "trustee_name": "Thomas Nortvedt"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "estate_organisation_number": "938587248",
+      "organisation_number": "937465483",
+      "search_hints_only": true,
+      "source_url": "https://konkurs.app/konkursbo/938587248",
+      "trustee_name": "Karsten Alexander Anfinsen"
+    }
+  ],
+  "known_link_rechecks": 0,
+  "official_bankruptcy_events_considered": 5,
+  "openai_requests": 0,
+  "page_read_limit": 15,
+  "page_reads": 15,
+  "paid_provider_requests": 8,
+  "policy": {
+    "bankruptcy_estate_sale_relationship_required_on_page": true,
+    "bankruptcy_language_required_on_sale_page": true,
+    "company_identity_and_sale_relation_required_in_same_passage": true,
+    "dealer_only_excluded": true,
+    "ended_sales_excluded": true,
+    "forced_dissolution_excluded": true,
+    "generic_auction_index_excluded": true,
+    "liquidation_only_excluded": true,
+    "official_bankruptcy_event_required_first": true,
+    "official_company_identity_required_on_sale_page": true,
+    "registry_context_never_counted_as_sale": true,
+    "sale_language_required_on_sale_page": true,
+    "search_snippet_never_sufficient": true,
+    "surplus_only_excluded": true
+  },
+  "provider_errors": [],
+  "provider_request_counts": {
+    "Brave Search": 3,
+    "Exa": 5
+  },
+  "provider_request_counts_by_organisation": {
+    "935877288": {
+      "Brave Search": 1,
+      "Exa": 1
+    },
+    "937142536": {
+      "Brave Search": 1,
+      "Exa": 1
+    },
+    "937465483": {
+      "Brave Search": 1,
+      "Exa": 1
+    },
+    "942446748": {
+      "Exa": 1
+    },
+    "988416002": {
+      "Exa": 1
+    }
+  },
+  "rejected_hit_count": 36,
+  "rejected_hits": [
+    {
+      "company_name": "BRØDRENE BYGG&MASKIN AS",
+      "organisation_number": "935877288",
+      "provider": "Exa",
+      "reason": "NO_ASSET_SALE_LANGUAGE_ON_PAGE",
+      "url": "https://nabonytt.no/bedrift/brodrene-bygg-maskin-as-935877288"
+    },
+    {
+      "company_name": "BRØDRENE BYGG&MASKIN AS",
+      "organisation_number": "935877288",
+      "provider": "Exa",
+      "reason": "PAGE_READ_FAILED:HTTPError",
+      "url": "https://sokfirma.no/selskap/935877288/brodrene-bygg-maskin-as"
+    },
+    {
+      "company_name": "BRØDRENE BYGG&MASKIN AS",
+      "organisation_number": "935877288",
+      "provider": "Exa",
+      "reason": "PAGE_READ_FAILED:HTTPError",
+      "url": "https://www.generate.no/bedrift/935877288/BRODRENE-BYGGMASKIN-AS"
+    },
+    {
+      "company_name": "BRØDRENE BYGG&MASKIN AS",
+      "organisation_number": "935877288",
+      "provider": "Exa",
+      "reason": "GENERIC_INDEX_NOT_EXACT_SALE_PAGE",
+      "url": "https://brodrenebyggogmaskinas.no/"
+    },
+    {
+      "company_name": "BRØDRENE BYGG&MASKIN AS",
+      "organisation_number": "935877288",
+      "provider": "Brave Search",
+      "reason": "SEARCH_RESULT_HAS_NO_BANKRUPTCY_SIGNAL",
+      "url": "https://www.pappers.no/company/brodrene-byggandmaskin-as-935877288"
+    },
+    {
+      "company_name": "BRØDRENE BYGG&MASKIN AS",
+      "organisation_number": "935877288",
+      "provider": "Brave Search",
+      "reason": "COMPANY_DIRECTORY_NOT_SALE_PAGE",
+      "url": "https://www.gulesider.no/br%c3%b8drene+bygg%26maskin+as+nittedal/303420206/bedrift"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Exa",
+      "reason": "BANKRUPTCY_CONTEXT_ONLY_NOT_SALE",
+      "url": "https://konkurs.app/konkursbo/938591458"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Exa",
+      "reason": "PAGE_READ_FAILED:HTTPError",
+      "url": "https://www.generate.no/bedrift/937142536/ENKEL-BIL-AS"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Exa",
+      "reason": "PAGE_READ_FAILED:HTTPError",
+      "url": "https://sokfirma.no/selskap/937142536/enkel-bil-as"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Exa",
+      "reason": "COMPANY_DIRECTORY_NOT_SALE_PAGE",
+      "url": "https://www.proff.no/selskap/enkel-bil-as/ski/biler-og-kj%C3%B8ret%C3%B8y/IFHY7T40CUX"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Exa",
+      "reason": "OFFICIAL_BANKRUPT_COMPANY_NOT_IDENTIFIED_ON_PAGE",
+      "url": "https://norverdi.no/tjenester/salg-av-konkursbo-og-inventar"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Brave Search",
+      "reason": "SEARCH_RESULT_HAS_NO_BANKRUPTCY_SIGNAL",
+      "url": "https://www.stadssalg.no/items?filter_by=category:Konkursbo"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Brave Search",
+      "reason": "SEARCH_RESULT_HAS_NO_BANKRUPTCY_SIGNAL",
+      "url": "https://www.auksjonen.no/auksjoner/verksted"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Brave Search",
+      "reason": "GENERIC_INDEX_NOT_EXACT_SALE_PAGE",
+      "url": "https://www.altpasalg.no/"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Brave Search",
+      "reason": "GENERIC_INDEX_NOT_EXACT_SALE_PAGE",
+      "url": "https://www.stadssalg.no/"
+    },
+    {
+      "company_name": "ENKEL BIL AS",
+      "organisation_number": "937142536",
+      "provider": "Brave Search",
+      "reason": "NO_EXPLICIT_BANKRUPTCY_LANGUAGE_ON_PAGE",
+      "url": "https://www.stadssalg.no/info/budsystemet"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Exa",
+      "reason": "BANKRUPTCY_CONTEXT_ONLY_NOT_SALE",
+      "url": "https://konkurs.app/konkursbo/938587248"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Exa",
+      "reason": "PAGE_READ_FAILED:HTTPError",
+      "url": "https://www.generate.no/bedrift/937465483/NORDIC-NEEDLE-AS"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Exa",
+      "reason": "NON_NORWEGIAN_OR_UNSAFE_URL",
+      "url": "https://emptera.com/companies/nordic-needle-as-organisasjonsnummer-937465483"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Exa",
+      "reason": "OFFICIAL_BANKRUPT_COMPANY_NOT_IDENTIFIED_ON_PAGE",
+      "url": "https://norverdi.no/tjenester/salg-av-konkursbo-og-inventar"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Exa",
+      "reason": "OFFICIAL_BANKRUPT_COMPANY_NOT_IDENTIFIED_ON_PAGE",
+      "url": "https://norverdi.no/tjenester/avvikling-av-konkursbo"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Brave Search",
+      "reason": "OFFICIAL_BANKRUPT_COMPANY_NOT_IDENTIFIED_ON_PAGE",
+      "url": "https://www.traktor.no/auksjonerer-bort-varelageret/s/5-151-12283"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Brave Search",
+      "reason": "SEARCH_RESULT_HAS_NO_BANKRUPTCY_SIGNAL",
+      "url": "https://www.stadssalg.no/items?filter_by=category:Konkursbo"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Brave Search",
+      "reason": "NON_NORWEGIAN_OR_UNSAFE_URL",
+      "url": "https://www.facebook.com/p/Konkurs-og-Varelager-Salg-Sandnes-100057387611906/"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Brave Search",
+      "reason": "OFFICIAL_BANKRUPT_COMPANY_NOT_IDENTIFIED_ON_PAGE",
+      "url": "https://www.nordlys.no/naring/han-kjopte-intersports-konkursbo-selges-pa-billigsalg-til-bodovaringene/s/1-79-6377378"
+    },
+    {
+      "company_name": "NORDIC NEEDLE AS",
+      "organisation_number": "937465483",
+      "provider": "Brave Search",
+      "reason": "OFFICIAL_BANKRUPT_COMPANY_NOT_IDENTIFIED_ON_PAGE",
+      "url": "https://www.auksjon.no/article/konkursbo_helgelandbyggas"
+    },
+    {
+      "company_name": "KVIKKSERVICE AS",
+      "organisation_number": "942446748",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://konkurs.app/konkursbo/938556539"
+    },
+    {
+      "company_name": "KVIKKSERVICE AS",
+      "organisation_number": "942446748",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://regnskapsbasen.no/selskap/kvikkservice-as-942446748"
+    },
+    {
+      "company_name": "KVIKKSERVICE AS",
+      "organisation_number": "942446748",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://forvalt.no/Konkurs/Firmadetaljer/942446748/664693"
+    },
+    {
+      "company_name": "KVIKKSERVICE AS",
+      "organisation_number": "942446748",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://naeringsradar.no/foretak/942446748"
+    },
+    {
+      "company_name": "KVIKKSERVICE AS",
+      "organisation_number": "942446748",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://www.generate.no/bedrift/942446748/KVIKKSERVICE-AS"
+    },
+    {
+      "company_name": "FRANK GRØNVOLD AS",
+      "organisation_number": "988416002",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://sokfirma.no/selskap/988416002/frank-gronvold-as"
+    },
+    {
+      "company_name": "FRANK GRØNVOLD AS",
+      "organisation_number": "988416002",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://nabonytt.no/bedrift/frank-gronvold-as-988416002"
+    },
+    {
+      "company_name": "FRANK GRØNVOLD AS",
+      "organisation_number": "988416002",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://norverdi.no/tjenester/salg-av-konkursbo-og-inventar"
+    },
+    {
+      "company_name": "FRANK GRØNVOLD AS",
+      "organisation_number": "988416002",
+      "provider": "Exa",
+      "reason": "PAGE_READ_BUDGET_EXHAUSTED",
+      "url": "https://norverdi.no/tjenester/salg-av-virksomheter"
+    },
+    {
+      "company_name": "FRANK GRØNVOLD AS",
+      "organisation_number": "988416002",
+      "provider": "Exa",
+      "reason": "COMPANY_DIRECTORY_NOT_SALE_PAGE",
+      "url": "https://konkurs.app/"
+    }
+  ],
+  "schema_version": "norway-bankruptcy-link-hunt-1.0",
+  "scope": "NO_ONLY_OFFICIAL_BANKRUPTCY_LINK_CHASE",
+  "verified_bankruptcy_sale_link_count": 0,
+  "verified_bankruptcy_sale_links": []
+}

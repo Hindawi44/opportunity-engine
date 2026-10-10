@@ -17,3 +17,7 @@ Repository state before pause: `dbcc7421b2358170f71109de6b3ce6251baaef4f`.
 Last verified operational run: https://github.com/Hindawi44/opportunity-engine/actions/runs/38052487663 (163 retained bankruptcy cases; zero verified sale links).
 
 Pausing consumers prevents their future usage charges. It does not cancel provider subscription fees or charges already incurred.
+
+## Preserved case state
+
+The last verified 163-case watchlist, its delta and search evidence are preserved in `data/frozen/norway-bankruptcy-2026-10-10/`, so restoration does not depend on expiring GitHub Actions artifacts. These are frozen historical records, not current sale recommendations.

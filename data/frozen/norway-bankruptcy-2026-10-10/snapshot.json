@@ -1,0 +1,12 @@
+{
+  "purpose": "Durable snapshot saved when the owner paused the project. No provider calls were made to create this snapshot.",
+  "source_run_id": 38052487663,
+  "source_run_url": "https://github.com/Hindawi44/opportunity-engine/actions/runs/38052487663",
+  "source_commit": "dbcc7421b2358170f71109de6b3ce6251baaef4f",
+  "paused_workflows_commit": "4a03c9a8cbc398ab9aea0aa55076349fd1a99474",
+  "source_watchlist_generated_at": "2026-10-10T12:37:36.763209+00:00",
+  "retained_case_count": 163,
+  "verified_sale_case_count": 0,
+  "credentials_included": false,
+  "resume_requires_new_owner_instruction": true
+}
