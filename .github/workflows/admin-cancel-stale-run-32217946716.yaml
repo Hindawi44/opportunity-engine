@@ -17,7 +17,8 @@ concurrency:
 
 jobs:
   cancel-one-stale-run:
-    if: ${{ github.repository == 'Hindawi44/opportunity-engine' && github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.head_commit.message == 'Admin only: cancel stale opportunity-engine run 32217946716' }}
+    if: >-
+      ${{ github.repository == 'Hindawi44/opportunity-engine' && github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.head_commit.message == 'Admin only: cancel stale opportunity-engine run 32217946716' }}
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
